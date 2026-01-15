@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Language } from '../types';
 import { UI_TEXT } from '../constants';
 import { useAuth } from '../contexts/AuthContext';
 
-
 interface LayoutProps {
   children: React.ReactNode;
-  activeTab: 'chat' | 'library';
-  onTabChange: (tab: 'chat' | 'library') => void;
   language: Language;
   onLanguageChange: (lang: Language) => void;
   isGuest?: boolean;
@@ -32,8 +30,6 @@ const AnimatedText = ({ children }: { children: React.ReactNode }) => (
 
 export const Layout: React.FC<LayoutProps> = ({
   children,
-  activeTab,
-  onTabChange,
   language,
   onLanguageChange,
   isGuest,
@@ -41,6 +37,10 @@ export const Layout: React.FC<LayoutProps> = ({
 }) => {
   const t = UI_TEXT[language];
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const activeTab = location.pathname.startsWith('/library') ? 'library' : 'chat';
+
   // Default sidebar open on desktop, closed on mobile
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
@@ -81,13 +81,13 @@ export const Layout: React.FC<LayoutProps> = ({
           {/* Navigation */}
           <nav className="px-3 space-y-1 mb-2">
             <button
-              onClick={() => { onTabChange('chat'); if (window.innerWidth < 768) setIsSidebarOpen(false); }}
+              onClick={() => { navigate('/chat'); if (window.innerWidth < 768) setIsSidebarOpen(false); }}
               className={`w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm transition-colors ${activeTab === 'chat' ? 'bg-[#212121] text-white' : 'hover:bg-[#212121] text-slate-300'}`}
             >
               <span><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg></span> <AnimatedText>{t.chatTab}</AnimatedText>
             </button>
             <button
-              onClick={() => { onTabChange('library'); if (window.innerWidth < 768) setIsSidebarOpen(false); }}
+              onClick={() => { navigate('/library'); if (window.innerWidth < 768) setIsSidebarOpen(false); }}
               className={`w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm transition-colors ${activeTab === 'library' ? 'bg-[#212121] text-white' : 'hover:bg-[#212121] text-slate-300'}`}
             >
               <span><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg></span> <AnimatedText>{t.libraryTab}</AnimatedText>
