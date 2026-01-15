@@ -1,0 +1,118 @@
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { authService } from '../services/authService';
+import type { User as SupabaseUser } from '@supabase/supabase-js';
+import { User, AuthContextType } from '../types';
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error('useAuth must be used within AuthProvider');
+    }
+    return context;
+};
+
+interface AuthProviderProps {
+    children: ReactNode;
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+    const [user, setUser] = useState<User | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        // Check current session
+        checkUser();
+
+        // Listen to auth changes
+        const subscription = authService.onAuthStateChange((supabaseUser) => {
+            if (supabaseUser) {
+                setUser(convertSupabaseUser(supabaseUser));
+            } else {
+                setUser(null);
+            }
+            setIsLoading(false);
+        });
+
+        return () => {
+            subscription.unsubscribe();
+        };
+    }, []);
+
+    const checkUser = async () => {
+        try {
+            const supabaseUser = await authService.getCurrentUser();
+            if (supabaseUser) {
+                setUser(convertSupabaseUser(supabaseUser));
+            }
+        } catch (error) {
+            console.error('Error checking user:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const convertSupabaseUser = (supabaseUser: SupabaseUser): User => {
+        return {
+            id: supabaseUser.id,
+            name: supabaseUser.user_metadata?.display_name || supabaseUser.email?.split('@')[0] || 'User',
+            email: supabaseUser.email || ''
+        };
+    };
+
+    const login = async (email: string, password: string): Promise<boolean> => {
+        try {
+            const { data, error } = await authService.signInWithEmail(email, password);
+            if (error) {
+                console.error('Login error:', error);
+                return false;
+            }
+            if (data.user) {
+                setUser(convertSupabaseUser(data.user));
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('Login exception:', error);
+            return false;
+        }
+    };
+
+    const register = async (name: string, email: string, password: string): Promise<boolean> => {
+        try {
+            const { data, error } = await authService.signUp(email, password, name);
+            if (error) {
+                console.error('Register error:', error);
+                return false;
+            }
+            if (data.user) {
+                setUser(convertSupabaseUser(data.user));
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('Register exception:', error);
+            return false;
+        }
+    };
+
+    const logout = async () => {
+        try {
+            await authService.signOut();
+            setUser(null);
+        } catch (error) {
+            console.error('Logout error:', error);
+        }
+    };
+
+    const value: AuthContextType = {
+        user,
+        login,
+        register,
+        logout,
+        isLoading
+    };
+
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};

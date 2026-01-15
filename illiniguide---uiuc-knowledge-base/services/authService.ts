@@ -1,0 +1,105 @@
+import { supabase } from './supabase';
+import type { User, AuthError } from '@supabase/supabase-js';
+
+export const authService = {
+    /**
+     * Sign in with Google OAuth
+     */
+    async signInWithGoogle() {
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: window.location.origin
+            }
+        });
+        return { data, error };
+    },
+
+    /**
+     * Sign in with email and password
+     */
+    async signInWithEmail(email: string, password: string) {
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+        });
+        return { data, error };
+    },
+
+    /**
+     * Sign up with email and password
+     */
+    async signUp(email: string, password: string, displayName?: string) {
+        const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+                data: {
+                    display_name: displayName
+                }
+            }
+        });
+
+        // Create user profile
+        if (data.user && !error) {
+            await supabase.from('user_profiles').insert({
+                id: data.user.id,
+                display_name: displayName,
+                language: 'zh'
+            });
+        }
+
+        return { data, error };
+    },
+
+    /**
+     * Sign out current user
+     */
+    async signOut() {
+        const { error } = await supabase.auth.signOut();
+        return { error };
+    },
+
+    /**
+     * Get current authenticated user
+     */
+    async getCurrentUser(): Promise<User | null> {
+        const { data: { user } } = await supabase.auth.getUser();
+        return user;
+    },
+
+    /**
+     * Listen to auth state changes
+     */
+    onAuthStateChange(callback: (user: User | null) => void) {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            callback(session?.user || null);
+        });
+        return subscription;
+    },
+
+    /**
+     * Get user profile
+     */
+    async getUserProfile(userId: string) {
+        const { data, error } = await supabase
+            .from('user_profiles')
+            .select('*')
+            .eq('id', userId)
+            .single();
+
+        return { data, error };
+    },
+
+    /**
+     * Update user profile
+     */
+    async updateUserProfile(userId: string, updates: { language?: 'en' | 'zh'; display_name?: string }) {
+        const { data, error } = await supabase
+            .from('user_profiles')
+            .update(updates)
+            .eq('id', userId);
+
+        return { data, error };
+    }
+};
