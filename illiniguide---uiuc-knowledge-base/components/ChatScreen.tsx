@@ -168,6 +168,13 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ language }) => {
                                                 ul: ({ node, ...props }) => <ul className="list-disc list-inside space-y-1" {...props} />,
                                                 ol: ({ node, ...props }) => <ol className="list-decimal list-inside space-y-1" {...props} />,
                                                 p: ({ node, ...props }) => <p className="mb-2 last:mb-0" {...props} />,
+                                                img: ({ node, ...props }) => (
+                                                   <img
+                                                      {...props}
+                                                      className="rounded-lg shadow-sm max-w-full h-auto my-2 border border-slate-200"
+                                                      loading="lazy"
+                                                   />
+                                                ),
                                              }}
                                           >
                                              {msg.text}

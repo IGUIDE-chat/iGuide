@@ -43,12 +43,10 @@ export const streamChatResponse = async function* (
       finalUserMessage += " (请务必用中文回答)";
     }
 
+    // OPTIMIZATION: Do not send full history if auto_save_history is enabled.
+    // Sending full history causes duplication (Server Context + Client Sent History).
+    // We only send the NEWEST message.
     const messages = [
-      ...history.map(h => ({
-        role: h.role === 'model' ? 'assistant' : 'user',
-        content: h.text,
-        content_type: 'text'
-      })),
       { role: 'user', content: finalUserMessage, content_type: 'text' }
     ];
 
