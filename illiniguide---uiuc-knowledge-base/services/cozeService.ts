@@ -53,19 +53,17 @@ export const streamChatResponse = async function* (
     ];
 
     // 2. Call Coze API
-    const response = await fetch(COZE_API_URL, {
+    // 2. Call Cloudflare Pages Function (Proxy)
+    // We send payload to our own backend, which adds the keys and forwards to Coze
+    const response = await fetch('/api/chat', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${COZE_API_KEY}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        bot_id: COZE_BOT_ID,
-        user_id: 'illini_guest_user', // Anonymous user ID
-        stream: true,
-        auto_save_history: true,
-        additional_messages: messages,
-        ...(conversationId && { conversation_id: conversationId })  // Include if provided
+        message: finalUserMessage,
+        history: history,
+        conversationId: conversationId
       })
     });
 
