@@ -2,7 +2,7 @@ import { Article, Category, Language } from './types';
 
 export const UI_TEXT = {
   en: {
-    appTitle: "IlliniGuide",
+    appTitle: "UIUC Guide",
     chatTab: "Chat",
     libraryTab: "Library",
     welcomeTitle: "Hey, welcome to",
@@ -44,7 +44,7 @@ export const UI_TEXT = {
     initLocal: "Load Local Model"
   },
   zh: {
-    appTitle: "伊利诺伊指南",
+    appTitle: "UIUC 指南",
     chatTab: "AI 助手",
     libraryTab: "知识库",
     welcomeTitle: "你好，欢迎来到",

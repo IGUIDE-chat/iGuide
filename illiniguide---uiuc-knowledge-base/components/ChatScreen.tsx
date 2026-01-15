@@ -83,22 +83,24 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ language }) => {
 
    // Unified Container Class: EXACTLY matching App.tsx
    // w-full max-w-3xl mx-auto px-4
+   // Unified Container Class: OpenAI-like max-w-3xl for optimal readability
    const containerClass = "w-full max-w-3xl mx-auto px-4";
 
    return (
       <div className="flex flex-col h-full w-full relative">
          {/* Scrollable Area */}
-         <div className="flex-1 overflow-y-auto w-full no-scrollbar">
+         <div className="flex-1 overflow-y-auto w-full">
             <div className="flex flex-col min-h-full">
 
                {messages.length === 0 ? (
                   /* Empty State (Landing) */
                   <div className="flex-1 flex flex-col items-center justify-center p-4">
-                     <div className="mb-4 w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm text-2xl border border-slate-100">
-                        🎓
+                     <div className="flex items-center gap-3 mb-8">
+                        <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-xl border border-slate-100">
+                           🎓
+                        </div>
+                        <h2 className="text-2xl font-semibold text-slate-800 text-center tracking-tight">{t.welcomeTitle} UIUC</h2>
                      </div>
-                     {/* Unified font: text-xl font-bold (same as App.tsx headers) */}
-                     <h2 className="text-xl font-bold text-slate-900 mb-6 text-center">{t.welcomeTitle} UIUC</h2>
 
                      {/* Suggestions Grid */}
                      <div className={containerClass}>
@@ -107,9 +109,9 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ language }) => {
                               <button
                                  key={i}
                                  onClick={() => sendMessage(s.text)}
-                                 className="p-3 border border-slate-200 rounded-lg hover:bg-slate-50 text-left text-xs sm:text-sm text-slate-600 transition-colors"
+                                 className="p-3 border border-slate-200 rounded-2xl hover:bg-slate-50 text-left text-sm text-slate-600 transition-colors shadow-sm hover:shadow-md"
                               >
-                                 <span className="mr-2">{s.icon}</span>
+                                 <span className="mr-2.5 text-base">{s.icon}</span>
                                  {s.text}
                               </button>
                            ))}
@@ -223,11 +225,11 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ language }) => {
          </div>
 
          {/* Input Area (Sticky Bottom) */}
-         <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-white via-white to-transparent pt-4 pb-6">
+         <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-white via-white to-transparent pt-2 pb-6">
             <div className={containerClass}>
-               <form onSubmit={handleSubmit} className="relative shadow-lg rounded-xl border border-slate-200 bg-white focus-within:ring-1 focus-within:ring-slate-300 overflow-hidden transition-all">
+               <form onSubmit={handleSubmit} className="relative shadow-md rounded-[26px] border border-slate-200 bg-white focus-within:ring-1 focus-within:ring-slate-300 overflow-hidden transition-all">
                   <input
-                     className="w-full py-3 pl-4 pr-10 text-sm text-slate-800 placeholder-slate-400 focus:outline-none bg-transparent resize-none"
+                     className="w-full py-3.5 pl-5 pr-12 text-base text-slate-900 placeholder-slate-400 focus:outline-none bg-transparent resize-none"
                      placeholder={t.inputPlaceholder}
                      value={input}
                      onChange={e => setInput(e.target.value)}
@@ -235,17 +237,17 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ language }) => {
                   <button
                      type="submit"
                      disabled={!input.trim() || isLoading}
-                     className={`absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md transition-all ${!input.trim() || isLoading ? 'bg-slate-100 text-slate-300 cursor-not-allowed' : 'bg-black text-white hover:opacity-80'
+                     className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full transition-all ${!input.trim() || isLoading ? 'bg-slate-100 text-slate-300 cursor-not-allowed' : 'bg-black text-white hover:opacity-80'
                         }`}
                   >
                      {isLoading ? (
-                        <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                      ) : (
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
                      )}
                   </button>
                </form>
-               <div className="text-center mt-2 text-[10px] text-slate-400">
+               <div className="text-center mt-3 text-xs text-slate-400">
                   {t.aiError}
                </div>
             </div>

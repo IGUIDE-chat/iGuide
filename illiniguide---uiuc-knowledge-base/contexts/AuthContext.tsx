@@ -106,10 +106,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
     };
 
+    const loginWithGoogle = async () => {
+        try {
+            const { error } = await authService.signInWithGoogle();
+            if (error) {
+                console.error('Google login error:', error);
+                return false;
+            }
+            return true;
+        } catch (error) {
+            console.error('Google login exception:', error);
+            return false;
+        }
+    };
+
     const value: AuthContextType = {
         user,
         login,
         register,
+        loginWithGoogle,
         logout,
         isLoading
     };
