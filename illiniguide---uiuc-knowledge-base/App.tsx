@@ -63,52 +63,8 @@ export default function App() {
       );
     }
 
-    // 2. Search View
-    if (searchQuery) {
-      return (
+    // Search logic merged into Library Home to preserve input focus
 
-        <div className="h-full overflow-y-auto w-full no-scrollbar">
-          <div className="max-w-3xl mx-auto px-4 py-8 pb-24">
-            <div className="mb-6 flex items-center justify-between">
-              <h2 className="text-xl font-bold text-slate-800">
-                {t.searchTitle} <span className="text-illini-orange">"{searchQuery}"</span>
-              </h2>
-              <button
-                onClick={() => setSearchQuery('')}
-                className="text-xs font-medium text-slate-500 hover:text-illini-blue px-3 py-1 rounded-full hover:bg-slate-100 transition-colors"
-              >
-                {t.clear}
-              </button>
-            </div>
-            {filteredArticles.length === 0 ? (
-              <div className="text-center py-16 bg-white/50 rounded-2xl border border-slate-200 border-dashed">
-                <p className="text-slate-500 text-base">{t.noResults}</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 gap-4">
-                {filteredArticles.map((article) => {
-                  const cat = CATEGORIES.find(c => c.id === article.category);
-                  const catText = cat ? getCategoryText(cat, language) : null;
-                  return (
-                    <div
-                      key={article.id}
-                      onClick={() => handleArticleClick(article.id)}
-                      className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 hover:shadow-xl hover:shadow-slate-200/50 hover:-translate-y-1 hover:border-illini-blue/20 cursor-pointer transition-all duration-300 group"
-                    >
-                      <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500 mb-4 group-hover:bg-illini-blue/10 group-hover:text-illini-blue transition-colors">
-                        {catText?.label}
-                      </span>
-                      <h3 className="text-lg font-bold text-slate-900 mb-3 group-hover:text-illini-blue transition-colors leading-tight">{article.title}</h3>
-                      <p className="text-slate-500 text-sm line-clamp-3 leading-relaxed">{article.summary}</p>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </div>
-      );
-    }
 
     // 3. Category View
     if (libraryState.type === 'CATEGORY') {
@@ -166,7 +122,7 @@ export default function App() {
       );
     }
 
-    // 4. Library Home
+    // 4. Library Home (Unified with Search)
     return (
       <div className="h-full overflow-y-auto w-full animate-fade-in-up no-scrollbar">
         <div className="max-w-3xl mx-auto px-4 py-8 pb-24">
@@ -189,26 +145,67 @@ export default function App() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {CATEGORIES.map((category) => {
-              const categoryText = getCategoryText(category, language);
-              return (
-                <div
-                  key={category.id}
-                  onClick={() => handleCategoryClick(category.id)}
-                  className="bg-white p-7 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:shadow-slate-200/50 hover:-translate-y-1 transition-all duration-300 cursor-pointer group"
+          {searchQuery ? (
+            <div className="animate-fade-in-up">
+              <div className="mb-6 flex items-center justify-between">
+                <h2 className="text-xl font-bold text-slate-800">
+                  {t.searchTitle} <span className="text-illini-orange">"{searchQuery}"</span>
+                </h2>
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="text-xs font-medium text-slate-500 hover:text-illini-blue px-3 py-1 rounded-full hover:bg-slate-100 transition-colors"
                 >
-                  <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:bg-illini-blue group-hover:text-white transition-colors duration-300 shadow-inner">
-                    {category.icon}
-                  </div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-illini-blue transition-colors">{categoryText.label}</h3>
-                  <p className="text-slate-500 text-sm leading-relaxed">
-                    {categoryText.description}
-                  </p>
+                  {t.clear}
+                </button>
+              </div>
+              {filteredArticles.length === 0 ? (
+                <div className="text-center py-16 bg-white/50 rounded-2xl border border-slate-200 border-dashed">
+                  <p className="text-slate-500 text-base">{t.noResults}</p>
                 </div>
-              );
-            })}
-          </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-4">
+                  {filteredArticles.map((article) => {
+                    const cat = CATEGORIES.find(c => c.id === article.category);
+                    const catText = cat ? getCategoryText(cat, language) : null;
+                    return (
+                      <div
+                        key={article.id}
+                        onClick={() => handleArticleClick(article.id)}
+                        className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 hover:shadow-xl hover:shadow-slate-200/50 hover:-translate-y-1 hover:border-illini-blue/20 cursor-pointer transition-all duration-300 group"
+                      >
+                        <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500 mb-4 group-hover:bg-illini-blue/10 group-hover:text-illini-blue transition-colors">
+                          {catText?.label}
+                        </span>
+                        <h3 className="text-lg font-bold text-slate-900 mb-3 group-hover:text-illini-blue transition-colors leading-tight">{article.title}</h3>
+                        <p className="text-slate-500 text-sm line-clamp-3 leading-relaxed">{article.summary}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              {CATEGORIES.map((category) => {
+                const categoryText = getCategoryText(category, language);
+                return (
+                  <div
+                    key={category.id}
+                    onClick={() => handleCategoryClick(category.id)}
+                    className="bg-white p-7 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:shadow-slate-200/50 hover:-translate-y-1 transition-all duration-300 cursor-pointer group"
+                  >
+                    <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:bg-illini-blue group-hover:text-white transition-colors duration-300 shadow-inner">
+                      {category.icon}
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-illini-blue transition-colors">{categoryText.label}</h3>
+                    <p className="text-slate-500 text-sm leading-relaxed">
+                      {categoryText.description}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
     );

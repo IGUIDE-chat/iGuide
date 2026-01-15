@@ -64,10 +64,10 @@ export const Layout: React.FC<LayoutProps> = ({
         className={`
           fixed inset-y-0 left-0 z-50 bg-[#171717] text-slate-200 flex flex-col transition-all duration-300 ease-in-out
           md:relative
-          ${isSidebarOpen ? 'translate-x-0 w-[260px]' : '-translate-x-full w-[260px] md:w-0 md:translate-x-0 md:overflow-hidden'}
+          ${isSidebarOpen ? 'translate-x-0 w-[180px]' : '-translate-x-full w-[180px] md:w-0 md:translate-x-0 md:overflow-hidden'}
         `}
       >
-        <div className="flex flex-col h-full w-[260px]">
+        <div className="flex flex-col h-full w-[180px]">
           {/* Sidebar Header / Logo */}
           <div className="p-3 mb-2 flex items-center justify-between">
             <div className="flex items-center gap-2 px-2 py-2 rounded-md hover:bg-white/5 cursor-pointer w-full transition-colors">
