@@ -53,19 +53,42 @@ export const streamChatResponse = async function* (
     ];
 
     // 2. Call Coze API
-    // 2. Call Cloudflare Pages Function (Proxy)
-    // We send payload to our own backend, which adds the keys and forwards to Coze
-    const response = await fetch('/api/chat', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        message: finalUserMessage,
-        history: history,
-        conversationId: conversationId
-      })
-    });
+    let response;
+
+    // HYBRID MODE:
+    // Local Dev: Call Coze directly (requires VITE_COZE_API_KEY in .env.local)
+    // Production: Call Cloudflare Backend Proxy (secure, handles CORS & Secrets)
+    if (import.meta.env.DEV) {
+      console.log('[Dev] Using direct Coze API call');
+      response = await fetch(COZE_API_URL, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${COZE_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          bot_id: COZE_BOT_ID,
+          user_id: 'illini_guest_user',
+          stream: true,
+          auto_save_history: true,
+          additional_messages: messages,
+          ...(conversationId && { conversation_id: conversationId })
+        })
+      });
+    } else {
+      // Production: Use Proxy
+      response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: finalUserMessage,
+          history: history,
+          conversationId: conversationId
+        })
+      });
+    }
 
     if (!response.ok) {
       const errText = await response.text();
