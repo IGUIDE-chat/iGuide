@@ -7,6 +7,7 @@ import { Language, ChatMessage } from '../types';
 import { streamChatResponse } from '../services/cozeService';
 import { UI_TEXT } from '../constants';
 import { conversationService } from '../services/conversationService';
+import { localConversationService } from '../services/localConversationService';
 import { useAuth } from '../contexts/AuthContext';
 
 interface ChatScreenProps {
@@ -64,7 +65,8 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
    const loadConversation = async (conversationId: string) => {
       setIsLoadingHistory(true);
       try {
-         const { data, error } = await conversationService.getConversation(conversationId);
+         const service = user ? conversationService : localConversationService;
+         const { data, error } = await service.getConversation(conversationId);
          if (error) throw error;
 
          if (data && data.messages) {
@@ -87,12 +89,12 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
       setInput('');
       setIsLoading(true);
 
-      // Create conversation if needed (only for logged-in users)
+      // Create conversation if needed (supports both logged-in and guest users)
       let conversationId = currentConversationId;
-      if (user && !conversationId) {
+      if (!conversationId) {
          try {
-
-            const { data, error } = await conversationService.createConversation(
+            const service = user ? conversationService : localConversationService;
+            const { data, error } = await service.createConversation(
                undefined,
                generateSmartTitle(text) // Use smart title
             );
@@ -107,9 +109,10 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
       }
 
       // Save user message if we have a conversation
-      if (user && conversationId) {
+      if (conversationId) {
          try {
-            await conversationService.saveMessage(conversationId, userMsg);
+            const service = user ? conversationService : localConversationService;
+            await service.saveMessage(conversationId, userMsg);
          } catch (error) {
             console.error('Failed to save user message:', error);
          }
@@ -165,9 +168,10 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
          ));
 
          // Save AI message if we have a conversation and message has content
-         if (user && conversationId && aiMsg.text && aiMsg.text.trim()) {
+         if (conversationId && aiMsg.text && aiMsg.text.trim()) {
             try {
-               await conversationService.saveMessage(conversationId, aiMsg);
+               const service = user ? conversationService : localConversationService;
+               await service.saveMessage(conversationId, aiMsg);
             } catch (error) {
                console.error('Failed to save AI message:', error);
             }
@@ -257,35 +261,33 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
                                        <div className="whitespace-pre-wrap">{msg.text}</div>
                                     ) : (
                                        // AI messages: render with Typewriter effect
-                                       msg.text ? (
-                                          <TypewriterMarkdown
-                                             content={msg.text}
-                                             isStreaming={msg.isStreaming}
-                                             components={{
-                                                a: ({ node, ...props }) => (
-                                                   <a {...props} className="text-illini-orange hover:underline" target="_blank" rel="noopener noreferrer" />
-                                                ),
-                                                code: ({ node, className, children, ...props }) => {
-                                                   const isInline = !className;
-                                                   return isInline ? (
-                                                      <code className="bg-slate-100 px-1 py-0.5 rounded text-xs" {...props}>{children}</code>
-                                                   ) : (
-                                                      <code className="block bg-slate-100 p-2 rounded text-xs overflow-x-auto" {...props}>{children}</code>
-                                                   );
-                                                },
-                                                ul: ({ node, ...props }) => <ul className="list-disc list-inside space-y-1" {...props} />,
-                                                ol: ({ node, ...props }) => <ol className="list-decimal list-inside space-y-1" {...props} />,
-                                                p: ({ node, ...props }) => <p className="mb-2 last:mb-0" {...props} />,
-                                                img: ({ node, ...props }) => (
-                                                   <img
-                                                      {...props}
-                                                      className="rounded-lg shadow-sm max-w-full h-auto my-2 border border-slate-200"
-                                                      loading="lazy"
-                                                   />
-                                                ),
-                                             }}
-                                          />
-                                       ) : null
+                                       <TypewriterMarkdown
+                                          content={msg.text || ''}
+                                          isStreaming={msg.isStreaming}
+                                          components={{
+                                             a: ({ node, ...props }) => (
+                                                <a {...props} className="text-illini-orange hover:underline" target="_blank" rel="noopener noreferrer" />
+                                             ),
+                                             code: ({ node, className, children, ...props }) => {
+                                                const isInline = !className;
+                                                return isInline ? (
+                                                   <code className="bg-slate-100 px-1 py-0.5 rounded text-xs" {...props}>{children}</code>
+                                                ) : (
+                                                   <code className="block bg-slate-100 p-2 rounded text-xs overflow-x-auto" {...props}>{children}</code>
+                                                );
+                                             },
+                                             ul: ({ node, ...props }) => <ul className="list-disc list-inside space-y-1" {...props} />,
+                                             ol: ({ node, ...props }) => <ol className="list-decimal list-inside space-y-1" {...props} />,
+                                             p: ({ node, ...props }) => <p className="mb-2 last:mb-0" {...props} />,
+                                             img: ({ node, ...props }) => (
+                                                <img
+                                                   {...props}
+                                                   className="rounded-lg shadow-sm max-w-full h-auto my-2 border border-slate-200"
+                                                   loading="lazy"
+                                                />
+                                             ),
+                                          }}
+                                       />
                                     )}
                                     {msg.isStreaming && (
                                        <span className="inline-flex items-center ml-1 align-middle">

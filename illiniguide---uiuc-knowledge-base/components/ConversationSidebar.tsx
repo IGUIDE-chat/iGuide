@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import * as React from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TypewriterText } from './TypewriterText';
 import { ConversationSummary } from '../types';
 import { conversationService } from '../services/conversationService';
+import { localConversationService } from '../services/localConversationService';
 import { useAuth } from '../contexts/AuthContext';
 
 interface ConversationSidebarProps {
@@ -58,15 +60,12 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
     // ... (keep loadConversations and other handlers)
 
     const loadConversations = async () => {
-        if (!user) {
-            setConversations([]);
-            setIsLoading(false);
-            return;
-        }
-
         setIsLoading(true);
         try {
-            const { data, error } = await conversationService.getUserConversations();
+            // Use local service if not logged in
+            const service = user ? conversationService : localConversationService;
+            const { data, error } = await service.getUserConversations();
+
             if (error) throw error;
 
             if (data) {
@@ -90,7 +89,8 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
         e.stopPropagation();
 
         try {
-            const { error } = await conversationService.togglePinConversation(conversationId, !isPinned);
+            const service = user ? conversationService : localConversationService;
+            const { error } = await service.togglePinConversation(conversationId, !isPinned);
             if (error) throw error;
 
             // Reload conversations
@@ -111,7 +111,8 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
         if (!showDeleteConfirm) return;
 
         try {
-            const { error } = await conversationService.deleteConversation(showDeleteConfirm);
+            const service = user ? conversationService : localConversationService;
+            const { error } = await service.deleteConversation(showDeleteConfirm);
             if (error) throw error;
 
             if (showDeleteConfirm === currentConversationId) {
@@ -152,7 +153,8 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
 
     const categoryOrder = [t.pinned, t.today, t.yesterday, t.thisWeek, t.older];
 
-    if (!user) return null;
+    // Removed early return for !user to allow guest mode
+    // if (!user) return null;
 
     return (
         <>

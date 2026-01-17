@@ -16,6 +16,22 @@ export const TypewriterMarkdown: React.FC<TypewriterMarkdownProps> = ({
     speed = 20,
     components
 }) => {
+    // 1. NON-STREAMING (Static Content)
+    // If not streaming, bypass all complex effect logic and render immediately.
+    // This guarantees that history and completed messages NEVER vanish.
+    if (!isStreaming) {
+        return (
+            <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={components}
+            >
+                {content}
+            </ReactMarkdown>
+        );
+    }
+
+    // 2. STREAMING (Typewriter Effect)
+    // Initialize with empty string for streaming start
     const [displayedContent, setDisplayedContent] = useState('');
     const indexRef = useRef(0);
     const contentRef = useRef(content);
@@ -25,14 +41,8 @@ export const TypewriterMarkdown: React.FC<TypewriterMarkdownProps> = ({
         contentRef.current = content;
     }, [content]);
 
+    // Typewriter animation
     useEffect(() => {
-        // If not streaming, just show everything immediately to avoid annoyance on history load
-        if (!isStreaming) {
-            setDisplayedContent(content);
-            indexRef.current = content.length;
-            return;
-        }
-
         const intervalId = setInterval(() => {
             const currentContent = contentRef.current;
             const currentIndex = indexRef.current;
@@ -54,16 +64,7 @@ export const TypewriterMarkdown: React.FC<TypewriterMarkdownProps> = ({
         }, speed);
 
         return () => clearInterval(intervalId);
-    }, [isStreaming, speed]); // Run effect when streaming status changes
-
-    // Handle case where we switch from streaming to not streaming (completion)
-    // We want to ensure we show the full text at the end
-    useEffect(() => {
-        if (!isStreaming && content !== displayedContent) {
-            setDisplayedContent(content);
-            indexRef.current = content.length;
-        }
-    }, [isStreaming, content, displayedContent]);
+    }, [speed]);
 
     return (
         <ReactMarkdown

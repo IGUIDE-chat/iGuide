@@ -112,7 +112,7 @@ export const Layout: React.FC<LayoutProps> = ({
 
           {/* Middle Section - Sidebar Content */}
           <div className="flex-1 overflow-hidden flex flex-col">
-            {activeTab === 'chat' && !isGuest && user && (
+            {activeTab === 'chat' && (
               <ConversationSidebar
                 currentConversationId={currentConversationId}
                 onSelectConversation={onSelectConversation}

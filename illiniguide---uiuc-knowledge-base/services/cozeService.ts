@@ -42,7 +42,7 @@ export const streamChatResponse = async function* (
     if (lang === 'zh') {
       finalUserMessage += " (请务必用中文回答)";
     } else if (lang === 'en') {
-      finalUserMessage = "Please answer in English: " + finalUserMessage;
+      finalUserMessage = "Please answer in English. Provide a detailed, helpful, and comprehensive response: " + finalUserMessage;
     }
 
     // OPTIMIZATION: Do not send full history if auto_save_history is enabled.
@@ -59,8 +59,9 @@ export const streamChatResponse = async function* (
     // Local Dev: Call Coze directly (requires VITE_COZE_API_KEY in .env.local)
     // Production: Call Cloudflare Backend Proxy (secure, handles CORS & Secrets)
     if (import.meta.env.DEV) {
-      console.log('[Dev] Using direct Coze API call');
-      response = await fetch(COZE_API_URL, {
+      console.log('[Dev] Using proxy Coze API call');
+      // Use local proxy path defined in vite.config.ts to avoid CORS
+      response = await fetch('/api/coze/v3/chat', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${COZE_API_KEY}`,
