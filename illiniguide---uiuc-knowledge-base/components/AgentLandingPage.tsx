@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Language } from '../types';
 import { UI_TEXT } from '../constants';
 
@@ -48,36 +48,41 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({ type, langua
 
     return (
         <div className="h-full w-full flex items-center justify-center bg-white overflow-auto p-4">
-            <motion.div
-                key={language}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.2 }}
-                className="max-w-md w-full text-center"
-            >
-                {/* Icon */}
+            <div className="max-w-md w-full text-center relative">
+                {/* Icon - static, doesn't change with language */}
                 <div className="mx-auto mb-6 w-20 h-20 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shadow-sm">
                     {config.icon}
                 </div>
 
-                {/* Title */}
-                <h1 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">
-                    {title}
-                </h1>
+                {/* Animated text content with crossfade */}
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={language}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.2, ease: 'easeOut' }}
+                    >
+                        {/* Title */}
+                        <h1 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">
+                            {title}
+                        </h1>
 
-                {/* Coming Soon Badge */}
-                <div className="mb-5">
-                    <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-illini-orange text-white">
-                        {t.comingSoon}
-                    </span>
-                </div>
+                        {/* Coming Soon Badge */}
+                        <div className="mb-5">
+                            <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-illini-orange text-white">
+                                {t.comingSoon}
+                            </span>
+                        </div>
 
-                {/* Description */}
-                <p className="text-slate-500 text-sm leading-relaxed mb-8 max-w-sm mx-auto">
-                    {desc}
-                </p>
+                        {/* Description */}
+                        <p className="text-slate-500 text-sm leading-relaxed mb-8 max-w-sm mx-auto min-h-[3rem]">
+                            {desc}
+                        </p>
+                    </motion.div>
+                </AnimatePresence>
 
-                {/* Email Form */}
+                {/* Email Form - partially animated */}
                 {!submitted ? (
                     <form onSubmit={handleSubmit} className="space-y-3 max-w-xs mx-auto">
                         <input
@@ -88,12 +93,19 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({ type, langua
                             required
                             className="w-full px-4 py-3 rounded-full border border-slate-200 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-illini-blue/10 focus:border-slate-300 shadow-sm text-sm transition-all"
                         />
-                        <button
-                            type="submit"
-                            className="w-full py-3 rounded-full font-semibold text-sm text-white bg-illini-orange hover:bg-illini-orange/90 transition-colors shadow-md active:scale-[0.98]"
-                        >
-                            {t.notifyMe}
-                        </button>
+                        <AnimatePresence mode="wait">
+                            <motion.button
+                                key={language + '-btn'}
+                                type="submit"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.15 }}
+                                className="w-full py-3 rounded-full font-semibold text-sm text-white bg-illini-orange hover:bg-illini-orange/90 transition-colors shadow-md active:scale-[0.98]"
+                            >
+                                {t.notifyMe}
+                            </motion.button>
+                        </AnimatePresence>
                     </form>
                 ) : (
                     <div className="bg-slate-50 border border-slate-100 rounded-2xl p-5 max-w-xs mx-auto">
@@ -103,7 +115,7 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({ type, langua
                         </p>
                     </div>
                 )}
-            </motion.div>
+            </div>
         </div>
     );
 };
