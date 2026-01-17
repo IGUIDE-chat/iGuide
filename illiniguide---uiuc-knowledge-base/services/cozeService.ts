@@ -63,8 +63,8 @@ export const streamChatResponse = async function* (
       finalUserMessage += " (请务必用中文回答)";
     } else if (lang === 'en') {
       // ENHANCED PROMPT: Force detailed translation instead of summary
-      finalUserMessage += " (Please answer only in English)";
-      // You MUST provide a comprehensive, extremely detailed response. Translate all relevant information from the Knowledge Base step-by-step. Do NOT summarize or shorten the content. Match the length and depth of a native Chinese response.)";
+      // The bot tends to give shorter responses in English, so we explicitly instruct it to be comprehensive
+      finalUserMessage += " (Please answer ONLY in English. You MUST provide a comprehensive, extremely detailed response. Translate ALL relevant information from the Knowledge Base step-by-step. Do NOT summarize or shorten the content. Match the length and depth of a native Chinese response.)";
     }
 
     // OPTIMIZATION: Do not send full history if auto_save_history is enabled.
@@ -95,6 +95,10 @@ export const streamChatResponse = async function* (
           stream: true,
           auto_save_history: true,
           additional_messages: messages,
+          custom_variables: {
+            language: lang === 'zh' ? 'Chinese' : 'English',
+            response_detail_level: 'comprehensive'
+          },
           ...(conversationId && { conversation_id: conversationId })
         })
       });
@@ -109,7 +113,8 @@ export const streamChatResponse = async function* (
           message: finalUserMessage,
           history: history,
           conversationId: conversationId,
-          userId: cozeUserId
+          userId: cozeUserId,
+          lang: lang  // Pass language to backend for custom_variables
         })
       });
     }

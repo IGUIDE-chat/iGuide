@@ -27,7 +27,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
     try {
         const body = await request.json() as any;
-        const { message, conversationId, history } = body;
+        const { message, conversationId, history, userId, lang = 'en' } = body;
 
         // Use Environment Secret (PAT or OAuth Token)
         // For now, simpler to use PAT on server-side which is equally secure for a single bot.
@@ -45,7 +45,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             },
             body: JSON.stringify({
                 bot_id: BOT_ID,
-                user_id: "user_123",
+                user_id: userId || "user_123",
                 stream: true,
                 auto_save_history: true,
                 additional_messages: [
@@ -55,7 +55,12 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
                         content_type: 'text'
                     })),
                     { role: 'user', content: message, content_type: 'text' }
-                ]
+                ],
+                custom_variables: {
+                    language: lang === 'zh' ? 'Chinese' : 'English',
+                    response_detail_level: 'comprehensive'
+                },
+                ...(conversationId && { conversation_id: conversationId })
             })
         });
 
