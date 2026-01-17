@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { motion, AnimatePresence } from 'framer-motion';
 import { TypewriterMarkdown } from './TypewriterMarkdown';
 import { Language, ChatMessage } from '../types';
 import { streamChatResponse } from '../services/cozeService';
@@ -214,28 +215,39 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
                {messages.length === 0 ? (
                   /* Empty State (Landing) */
                   <div className="flex-1 flex flex-col items-center justify-center p-4">
-                     <div className="flex items-center gap-3 mb-8">
-                        <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-xl border border-slate-100">
-                           🎓
-                        </div>
-                        <h2 className="text-2xl font-semibold text-slate-800 text-center tracking-tight">{t.welcomeTitle} UIUC</h2>
-                     </div>
+                     <AnimatePresence mode="wait">
+                        <motion.div
+                           key={language}
+                           initial={{ opacity: 0, y: 8 }}
+                           animate={{ opacity: 1, y: 0 }}
+                           exit={{ opacity: 0, y: -8 }}
+                           transition={{ duration: 0.2, ease: 'easeOut' }}
+                           className="w-full flex flex-col items-center"
+                        >
+                           <div className="flex items-center gap-3 mb-8">
+                              <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-xl border border-slate-100">
+                                 🎓
+                              </div>
+                              <h2 className="text-2xl font-semibold text-slate-800 text-center tracking-tight">{t.welcomeTitle} UIUC</h2>
+                           </div>
 
-                     {/* Suggestions Grid */}
-                     <div className={containerClass}>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                           {t.suggestions.map((s, i) => (
-                              <button
-                                 key={i}
-                                 onClick={() => sendMessage(s.text)}
-                                 className="p-3 border border-slate-200 rounded-2xl hover:bg-slate-50 text-left text-sm text-slate-600 transition-colors shadow-sm hover:shadow-md"
-                              >
-                                 <span className="mr-2.5 text-base">{s.icon}</span>
-                                 {s.text}
-                              </button>
-                           ))}
-                        </div>
-                     </div>
+                           {/* Suggestions Grid */}
+                           <div className={containerClass}>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                 {t.suggestions.map((s, i) => (
+                                    <button
+                                       key={i}
+                                       onClick={() => sendMessage(s.text)}
+                                       className="p-3 border border-slate-200 rounded-2xl hover:bg-slate-50 text-left text-sm text-slate-600 transition-colors shadow-sm hover:shadow-md"
+                                    >
+                                       <span className="mr-2.5 text-base">{s.icon}</span>
+                                       {s.text}
+                                    </button>
+                                 ))}
+                              </div>
+                           </div>
+                        </motion.div>
+                     </AnimatePresence>
                   </div>
                ) : (
                   /* Message List */

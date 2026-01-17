@@ -50,10 +50,20 @@ const LibraryPage = ({ language }: { language: Language }) => {
     <div className="h-full overflow-y-auto w-full animate-fade-in-up no-scrollbar">
       <div className="max-w-3xl mx-auto px-4 py-8 pb-24">
         <div className="text-center py-10">
-          <h2 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">{t.knowledgeBaseTitle}</h2>
-          <p className="text-slate-500 text-base mb-8 max-w-2xl mx-auto">
-            {t.knowledgeBaseSubtitle}
-          </p>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={language}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+            >
+              <h2 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">{t.knowledgeBaseTitle}</h2>
+              <p className="text-slate-500 text-base mb-8 max-w-2xl mx-auto">
+                {t.knowledgeBaseSubtitle}
+              </p>
+            </motion.div>
+          </AnimatePresence>
 
           {/* Library Search */}
           <div className="max-w-xl mx-auto relative mb-16 group">
