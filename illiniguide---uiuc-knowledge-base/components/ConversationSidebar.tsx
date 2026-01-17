@@ -204,8 +204,8 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                                                             : 'hover:bg-white/10 text-slate-300'
                                                             }`}
                                                     >
-                                                        <div className="flex items-start justify-between gap-1.5">
-                                                            <div className="flex-1 min-w-0">
+                                                        <div className="relative overflow-hidden">
+                                                            <div className="pr-1">
                                                                 <div className={`text-xs font-medium truncate ${conv.id === currentConversationId
                                                                     ? 'text-white'
                                                                     : 'text-slate-300 group-hover:text-white'
@@ -219,10 +219,13 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                                                                 )}
                                                             </div>
 
-                                                            <div className="flex gap-0.5">
+                                                            <div className={`absolute right-0 top-0 bottom-0 w-24 flex items-center justify-end px-2 gap-0.5 bg-gradient-to-l to-transparent opacity-0 group-hover:opacity-100 transition-all duration-200 ${conv.id === currentConversationId
+                                                                    ? 'from-[#454545] via-[#454545]'
+                                                                    : 'from-[#2E2E2E] via-[#2E2E2E]'
+                                                                }`}>
                                                                 <button
                                                                     onClick={(e) => handleTogglePin(conv.id, conv.isPinned, e)}
-                                                                    className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 hover:bg-illini-orange/20 rounded"
+                                                                    className="p-1 hover:bg-white/10 rounded-md transition-colors"
                                                                     title={conv.isPinned ? t.unpin : t.pin}
                                                                 >
                                                                     <svg
@@ -241,7 +244,7 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                                                                 </button>
                                                                 <button
                                                                     onClick={(e) => handleDeleteClick(conv.id, e)}
-                                                                    className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 hover:bg-red-500/20 rounded"
+                                                                    className="p-1 hover:bg-red-500/20 rounded-md transition-colors"
                                                                     title={t.delete}
                                                                 >
                                                                     <svg
