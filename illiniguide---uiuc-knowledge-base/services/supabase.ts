@@ -3,6 +3,12 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+// Debug: Log what keys are actually available (without logging full secrets)
+console.log('[Supabase Setup] URL defined:', !!supabaseUrl);
+console.log('[Supabase Setup] Key defined:', !!supabaseAnonKey);
+console.log('[Supabase Setup] URL value (first 10 chars):', supabaseUrl ? supabaseUrl.substring(0, 10) + '...' : 'undefined');
+console.log('[Supabase Setup] Env Keys:', Object.keys(import.meta.env).filter(k => k.startsWith('VITE_')));
+
 if (!supabaseUrl || !supabaseAnonKey) {
     console.warn('⚠️ Supabase credentials not found. App will load but Auth will fail.');
     console.warn('Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Cloudflare Environment Variables.');
