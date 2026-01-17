@@ -47,10 +47,10 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({ type, langua
     };
 
     return (
-        <div className="h-full w-full flex items-center justify-center bg-white overflow-auto p-4">
+        <div className="h-full w-full flex items-center justify-center bg-white overflow-auto p-4 md:p-8">
             <div className="max-w-md w-full text-center relative">
                 {/* Icon - static, doesn't change with language */}
-                <div className="mx-auto mb-6 w-20 h-20 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shadow-sm">
+                <div className="mx-auto mb-4 md:mb-6 w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shadow-sm">
                     {config.icon}
                 </div>
 

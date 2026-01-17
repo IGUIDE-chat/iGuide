@@ -47,12 +47,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onGuestLogin, language
     };
 
     return (
-        <div className="min-h-screen flex items-start justify-center pt-32 bg-gradient-to-br from-illini-blue/10 via-white to-illini-orange/10 overflow-y-auto relative">
-            {/* Language Switcher - Fixed Position */}
-            <div className="absolute top-8 right-8 z-50">
+        <div className="min-h-screen flex items-start justify-center pt-16 md:pt-32 bg-gradient-to-br from-illini-blue/10 via-white to-illini-orange/10 overflow-y-auto relative px-4">
+            {/* Language Switcher - Responsive Position */}
+            <div className="absolute top-4 right-4 md:top-8 md:right-8 z-50">
                 <button
                     onClick={() => onLanguageChange(language === 'en' ? 'zh' : 'en')}
-                    className="bg-white/80 backdrop-blur-md px-4 py-2.5 rounded-full shadow-sm border border-slate-200 text-sm font-semibold text-slate-600 hover:text-illini-blue hover:border-illini-blue/30 transition-all flex items-center gap-2"
+                    className="bg-white/80 backdrop-blur-md px-3 py-2 md:px-4 md:py-2.5 rounded-full shadow-sm border border-slate-200 text-sm font-semibold text-slate-600 hover:text-illini-blue hover:border-illini-blue/30 transition-all flex items-center gap-2"
                 >
                     <span>{language === 'en' ? '🌏 中文' : '🌏 English'}</span>
                 </button>
@@ -61,7 +61,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onGuestLogin, language
             <motion.div
                 layout
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className="w-full max-w-md p-8 bg-white rounded-3xl shadow-2xl border border-slate-100"
+                className="w-full max-w-md p-6 md:p-8 bg-white rounded-3xl shadow-2xl border border-slate-100"
             >
                 {/* Logo */}
                 <div className="text-center mb-8">
