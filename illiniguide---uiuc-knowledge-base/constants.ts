@@ -10,7 +10,7 @@ export const UI_TEXT = {
     suggestions: [
       { icon: '💉', text: "What vaccines are required for enrollment?" },
       { icon: '✈️', text: "How to get from the airport to campus?" },
-      { icon: '🛏️', text: "How to choose a freshman dorm?" },
+      { icon: '🛏️', text: "What are the pros of each freshman dorm?" },
       { icon: '🎓', text: "How to transfer to Engineering?" }
     ],
     inputPlaceholder: "Ask anything...",
@@ -73,7 +73,7 @@ export const UI_TEXT = {
     suggestions: [
       { icon: '💉', text: "入学要打什么疫苗？" },
       { icon: '✈️', text: "怎么从机场到学校？" },
-      { icon: '🛏️', text: "新生怎么选择宿舍？" },
+      { icon: '🛏️', text: "新生宿舍都各有什么优点？" },
       { icon: '🎓', text: "怎么转工院？" }
     ],
     inputPlaceholder: "随便问点什么...",

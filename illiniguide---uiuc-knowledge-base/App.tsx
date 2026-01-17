@@ -1,4 +1,5 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import * as React from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Routes, Route, Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Layout } from './components/Layout';

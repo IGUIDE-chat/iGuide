@@ -1,6 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import * as React from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { TypewriterMarkdown } from './TypewriterMarkdown';
 import { Language, ChatMessage } from '../types';
 import { streamChatResponse } from '../services/cozeService';
 import { UI_TEXT } from '../constants';
@@ -240,8 +242,8 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
                                        👤
                                     </div>
                                  ) : (
-                                    <div className="w-6 h-6 bg-illini-orange rounded-sm flex items-center justify-center text-white font-bold text-[10px] shadow-sm">
-                                       AI
+                                    <div className="w-6 h-6 bg-illini-orange rounded-sm flex items-center justify-center text-white font-bold text-xs shadow-sm font-serif">
+                                       I
                                     </div>
                                  )}
                               </div>
@@ -254,10 +256,11 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
                                        // User messages: plain text with pre-wrap
                                        <div className="whitespace-pre-wrap">{msg.text}</div>
                                     ) : (
-                                       // AI messages: render as Markdown
+                                       // AI messages: render with Typewriter effect
                                        msg.text ? (
-                                          <ReactMarkdown
-                                             remarkPlugins={[remarkGfm]}
+                                          <TypewriterMarkdown
+                                             content={msg.text}
+                                             isStreaming={msg.isStreaming}
                                              components={{
                                                 a: ({ node, ...props }) => (
                                                    <a {...props} className="text-illini-orange hover:underline" target="_blank" rel="noopener noreferrer" />
@@ -281,9 +284,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
                                                    />
                                                 ),
                                              }}
-                                          >
-                                             {msg.text}
-                                          </ReactMarkdown>
+                                          />
                                        ) : null
                                     )}
                                     {msg.isStreaming && (
