@@ -24,13 +24,31 @@ export const streamChatResponse = async function* (
   history: { role: 'user' | 'model'; text: string }[],
   newMessage: string,
   lang: string = 'en',
-  conversationId?: string  // Optional Coze conversation ID
+  conversationId?: string,  // Optional Coze conversation ID
+  userId?: string           // Optional: Pass Supabase User ID or Guest ID
 ): AsyncGenerator<StreamResponse> {
 
   if (!COZE_API_KEY || !COZE_BOT_ID) {
     yield { text: "Error: Coze configuration missing." };
     return;
   }
+
+  // 0. Determine Coze User ID (Isolation)
+  // If we have a logged-in userId, use it.
+  // If not, use (or generate) a persistent Guest UUID from localStorage.
+  let cozeUserId = userId;
+  if (!cozeUserId) {
+    const STORAGE_KEY = 'illini_guest_device_id';
+    let guestId = localStorage.getItem(STORAGE_KEY);
+    if (!guestId) {
+      // Simple random ID generator (sufficient for guest isolation)
+      guestId = 'guest_' + Math.random().toString(36).substring(2, 15);
+      localStorage.setItem(STORAGE_KEY, guestId);
+    }
+    cozeUserId = guestId;
+  }
+
+  console.log('[Coze] Using UserID:', cozeUserId);
 
   try {
     // 1. Prepare Request
@@ -71,7 +89,7 @@ export const streamChatResponse = async function* (
         },
         body: JSON.stringify({
           bot_id: COZE_BOT_ID,
-          user_id: 'illini_guest_user',
+          user_id: cozeUserId,
           stream: true,
           auto_save_history: true,
           additional_messages: messages,
@@ -88,7 +106,8 @@ export const streamChatResponse = async function* (
         body: JSON.stringify({
           message: finalUserMessage,
           history: history,
-          conversationId: conversationId
+          conversationId: conversationId,
+          userId: cozeUserId
         })
       });
     }

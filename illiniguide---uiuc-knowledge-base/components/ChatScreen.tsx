@@ -132,7 +132,9 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
          const stream = await streamChatResponse(
             messages.map(m => ({ role: m.role, text: m.text })),
             userMsg.text,
-            language
+            language,
+            conversationId || undefined, // Pass conversation ID for memory/history
+            user?.id                     // Pass Supabase User ID (undefined if guest)
          );
 
          let fullText = '';
