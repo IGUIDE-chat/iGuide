@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { Layout } from './Layout';
 import { ArticleView } from './ArticleView';
 import { ChatScreen } from './ChatScreen';
@@ -11,9 +12,20 @@ import { ViewState, CategoryId, Language } from '../types';
 function AppContent() {
   const { user } = useAuth();
   const [authView, setAuthView] = useState<'login' | 'register'>('login');
-  const [activeTab, setActiveTab] = useState<'chat' | 'library'>('chat');
+
+  // Navigation & Conversation State
+  const navigate = useNavigate();
+  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
+
+  // Clear current conversation when user logs in/out to prevent ID conflicts
+  useEffect(() => {
+    setCurrentConversationId(null);
+  }, [user]);
+
   const [libraryState, setLibraryState] = useState<ViewState>({ type: 'HOME' });
   const [searchQuery, setSearchQuery] = useState('');
+
+  // NOTE: Removed local activeTab state in favor of Router
 
   // 1. 强制默认语言为中文 'zh'
   const [language, setLanguage] = useState<Language>('zh');
@@ -62,6 +74,10 @@ function AppContent() {
             <ArticleView
               article={article}
               onBack={() => setLibraryState({ type: 'HOME' })}
+              onSearch={(query) => {
+                setSearchQuery(query);
+                setLibraryState({ type: 'HOME' });
+              }}
               language={language}
             />
           </div>
@@ -227,18 +243,28 @@ function AppContent() {
   // Show main app if authenticated
   return (
     <Layout
-      activeTab={activeTab}
-      onTabChange={setActiveTab}
       language={language}
       onLanguageChange={setLanguage}
+      currentConversationId={currentConversationId}
+      onNewConversation={() => setCurrentConversationId(null)}
+      onSelectConversation={setCurrentConversationId}
     >
-      {activeTab === 'chat' && (
-        <ChatScreen
-          onNavigateToLibrary={() => setActiveTab('library')}
-          language={language}
+      <Routes>
+        <Route path="/" element={<Navigate to="/chat" replace />} />
+        <Route
+          path="/chat"
+          element={
+            <ChatScreen
+              onNavigateToLibrary={() => navigate('/library')}
+              language={language}
+              currentConversationId={currentConversationId}
+              onConversationCreated={(id) => setCurrentConversationId(id)}
+            />
+          }
         />
-      )}
-      {activeTab === 'library' && renderLibrary()}
+        <Route path="/library" element={renderLibrary()} />
+        <Route path="*" element={<Navigate to="/chat" replace />} />
+      </Routes>
     </Layout>
   );
 }

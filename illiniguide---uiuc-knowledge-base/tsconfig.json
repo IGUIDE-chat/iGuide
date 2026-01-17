@@ -14,16 +14,22 @@
     "isolatedModules": true,
     "moduleDetection": "force",
     "allowJs": true,
+    "esModuleInterop": true,
     "jsx": "react-jsx",
+    "baseUrl": ".",
     "paths": {
       "@/*": [
         "./*"
+      ],
+      "@supabase/supabase-js": [
+        "node_modules/@supabase/supabase-js"
       ]
     },
     "allowImportingTsExtensions": true,
     "noEmit": true,
     "types": [
-      "vite/client"
+      "vite/client",
+      "@cloudflare/workers-types"
     ]
   }
 }

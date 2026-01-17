@@ -14,9 +14,11 @@ interface LayoutProps {
   onLanguageChange: (lang: Language) => void;
   isGuest?: boolean;
   onExitGuest?: () => void;
-  currentConversationId: string | null;
-  onNewConversation: () => void;
-  onSelectConversation: (conversationId: string | null) => void;
+  currentConversationId?: string | null;
+  onNewConversation?: () => void;
+  onSelectConversation?: (conversationId: string | null) => void;
+  activeTab?: string;
+  onTabChange?: (tab: any) => void;
 }
 
 const AnimatedText = ({ children }: { children: React.ReactNode }) => (
@@ -42,13 +44,16 @@ export const Layout: React.FC<LayoutProps> = ({
   onExitGuest,
   currentConversationId,
   onNewConversation,
-  onSelectConversation
+  onSelectConversation,
+  activeTab: propActiveTab,
+  onTabChange
 }) => {
   const t = UI_TEXT[language];
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const getActiveTab = () => {
+    if (propActiveTab) return propActiveTab;
     if (location.pathname.startsWith('/library')) return 'library';
     if (location.pathname.startsWith('/courses')) return 'courses';
     if (location.pathname.startsWith('/dorms')) return 'dorms';
@@ -144,9 +149,9 @@ export const Layout: React.FC<LayoutProps> = ({
           <div className="flex-1 overflow-hidden flex flex-col">
             {activeTab === 'chat' && (
               <ConversationSidebar
-                currentConversationId={currentConversationId}
-                onSelectConversation={onSelectConversation}
-                onNewConversation={onNewConversation}
+                currentConversationId={currentConversationId ?? null}
+                onSelectConversation={onSelectConversation ?? (() => { })}
+                onNewConversation={onNewConversation ?? (() => { })}
                 language={language}
               />
             )}

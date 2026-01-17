@@ -60,6 +60,13 @@ export const conversationService = {
         const user = await authService.getCurrentUser();
         if (!user) throw new Error('User not authenticated');
 
+        // Validate UUID format to prevent "invalid input syntax" errors
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (!uuidRegex.test(conversationId)) {
+            console.warn(`[Suspicious ID] Blocked non-UUID conversation check: ${conversationId}`);
+            return { data: null, error: new Error('Invalid conversation ID format') };
+        }
+
         const { data: conversation, error: convError } = await supabase
             .from('conversations')
             .select('*')

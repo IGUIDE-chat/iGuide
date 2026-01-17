@@ -1,7 +1,20 @@
+// Shim for Cloudflare Pages Functions type
+type PagesFunction<T = unknown> = (context: {
+    request: Request;
+    env: T;
+    params: Record<string, string>;
+    waitUntil: (promise: Promise<any>) => void;
+    next: () => Promise<Response>;
+    data: Record<string, unknown>;
+}) => Promise<Response>;
+
 interface Env {
     COZE_CLIENT_ID: string;
     COZE_PRIVATE_KEY: string; // The private key PEM content
     COZE_BOT_ID: string;
+    COZE_API_TOKEN?: string;
+    VITE_COZE_API_KEY?: string;
+    VITE_COZE_BOT_ID?: string;
 }
 
 // Helper to generate JWT (Minimal implementation or import remote library if needed)

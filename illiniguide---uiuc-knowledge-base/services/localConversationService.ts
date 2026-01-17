@@ -41,7 +41,8 @@ const setStorage = (data: Record<string, LocalConversation>) => {
 export const localConversationService = {
     async createConversation(cozeConversationId?: string, title: string = 'New Chat') {
         const conversations = getStorage();
-        const id = Date.now().toString();
+        // Use crypto.randomUUID for compatibility (safely falls back if needed, but modern browsers support it)
+        const id = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString();
         const now = new Date().toISOString();
 
         const newConv: LocalConversation = {

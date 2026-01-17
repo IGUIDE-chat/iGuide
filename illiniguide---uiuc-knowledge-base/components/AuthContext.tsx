@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, FC } from 'react';
 import { User, AuthContextType } from '../types';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -15,7 +15,7 @@ interface AuthProviderProps {
     children: ReactNode;
 }
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -89,6 +89,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         setIsLoading(false);
         return true;
+        setIsLoading(false);
+        return true;
+    };
+
+    const loginWithGoogle = async (): Promise<boolean> => {
+        // TODO: Implement actual Google Login
+        console.warn('Google Login not yet implemented');
+        return false;
+    };
+
+    const updateName = async (name: string): Promise<boolean> => {
+        if (!user) return false;
+
+        const updatedUser = { ...user, name };
+        setUser(updatedUser);
+        localStorage.setItem('uiuc_kb_user', JSON.stringify(updatedUser));
+
+        // Update in users list as well
+        const usersData = localStorage.getItem('uiuc_kb_users');
+        if (usersData) {
+            const users = JSON.parse(usersData);
+            const userIndex = users.findIndex((u: any) => u.email === user.email);
+            if (userIndex !== -1) {
+                users[userIndex].name = name;
+                localStorage.setItem('uiuc_kb_users', JSON.stringify(users));
+            }
+        }
+        return true;
     };
 
     const logout = () => {
@@ -97,7 +125,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, register, logout, isLoading }}>
+        <AuthContext.Provider value={{ user, login, register, logout, loginWithGoogle, updateName, isLoading }}>
             {children}
         </AuthContext.Provider>
     );
