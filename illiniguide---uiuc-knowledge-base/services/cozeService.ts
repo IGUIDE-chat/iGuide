@@ -28,8 +28,10 @@ export const streamChatResponse = async function* (
   userId?: string           // Optional: Pass Supabase User ID or Guest ID
 ): AsyncGenerator<StreamResponse> {
 
-  if (!COZE_API_KEY || !COZE_BOT_ID) {
-    yield { text: "Error: Coze configuration missing." };
+  // In DEV mode, we need the keys to call Coze directly.
+  // In PROD mode, we use a backend proxy, so the client doesn't need the keys.
+  if (import.meta.env.DEV && (!COZE_API_KEY || !COZE_BOT_ID)) {
+    yield { text: "Error: Coze configuration missing in .env.local (Dev Mode)." };
     return;
   }
 
