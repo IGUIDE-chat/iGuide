@@ -15,40 +15,69 @@ def test_coze():
         'Content-Type': 'application/json'
     }
 
-    payload = {
-        "bot_id": COZE_BOT_ID,
-        "user_id": "test_user_py_001",
-        "stream": False,
-        "auto_save_history": True,
-        "additional_messages": [
-            {
-                "role": "user",
-                "content": "Hello! Are you online?",
-                "content_type": "text"
+    print(f"\nStarting 5-Round Comparative Test (Math -> Engineering)...")
+    print(f"English Query: 'How to transfer to engineering from math? (answer only in English)'")
+    print(f"Chinese Query: '数学怎么转工院？ (请务必用中文回答)'")
+    print("-" * 60)
+    print(f"{'Round':<6} | {'Lang':<8} | {'Chars':<8} | {'Words':<8} | {'Preview'}")
+    print("-" * 60)
+
+    english_stats = []
+    chinese_stats = []
+
+    for i in range(5):
+        # Run both languages for this round
+        for lang, query_base, prompt_suffix in [
+            ('EN', "How to transfer to engineering from math?", " (answer only in English)"),
+            ('ZH', "数学怎么转工院？", " (请务必用中文回答)")
+        ]:
+            full_query = query_base + prompt_suffix
+            payload = {
+                "bot_id": COZE_BOT_ID,
+                "user_id": f"test_user_compare_{i}_{lang}",
+                "stream": True,
+                "auto_save_history": True,
+                "additional_messages": [{"role": "user", "content": full_query, "content_type": "text"}]
             }
-        ]
-    }
 
-    try:
-        response = requests.post(COZE_API_URL, headers=headers, json=payload, timeout=30)
-        
-        if response.status_code != 200:
-            print(f"API Error: {response.status_code}")
-            print(response.text)
-            return
+            try:
+                response = requests.post(COZE_API_URL, headers=headers, json=payload, stream=True, timeout=60)
+                full_response = ""
+                for line in response.iter_lines():
+                    if line:
+                        decoded_line = line.decode('utf-8')
+                        if decoded_line.startswith('data:'):
+                            json_str = decoded_line[5:].strip()
+                            try:
+                                if '[DONE]' in json_str: break
+                                data = json.loads(json_str)
+                                if data.get('type') == 'answer' and 'content' in data:
+                                    full_response += data['content']
+                                if data.get('event') == 'conversation.chat.completed': break
+                            except: pass
+                
+                char_count = len(full_response)
+                word_count = len(full_response.split())
+                
+                # Store stats
+                if lang == 'EN': english_stats.append(word_count)
+                else: chinese_stats.append(char_count) # Use chars for Chinese roughly
 
-        data = response.json()
-        print("API Response Received!")
-        
-        if 'id' in data:
-            print(f"   Chat ID: {data['id']}")
-            print("   Status: Connection Successful.")
-        else:
-            print("   Warning: Response format unexpected.")
-            print(json.dumps(data, indent=2))
+                # Safe preview
+                safe_preview = full_response[:30].replace(chr(10), ' ').encode('ascii', 'replace').decode('ascii')
+                print(f"{i+1:<6} | {lang:<8} | {char_count:<8} | {word_count:<8} | {safe_preview}...")
 
-    except Exception as e:
-        print(f"❌ Connection Failed: {e}")
+            except Exception as e:
+                print(f"{i+1:<6} | {lang:<8} | ERROR: {e}")
+
+    # Summary
+    if english_stats and chinese_stats:
+        avg_en = sum(english_stats) / len(english_stats)
+        avg_zh = sum(chinese_stats) / len(chinese_stats)
+        print("-" * 60)
+        print(f"Average English Words: {avg_en:.1f}")
+        print(f"Average Chinese Chars: {avg_zh:.1f}")
+        print(f"Ratio (EN Words / ZH Chars): {avg_en/avg_zh:.2f}")
 
 if __name__ == "__main__":
     test_coze()

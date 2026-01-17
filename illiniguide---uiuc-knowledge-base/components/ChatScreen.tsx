@@ -323,16 +323,20 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
                                  {/* Follow-up Questions */}
                                  {msg.role === 'model' && msg.followUpQuestions && msg.followUpQuestions.length > 0 && (
                                     <div className="mt-3 flex flex-wrap gap-2">
-                                       {msg.followUpQuestions.map((question, idx) => (
-                                          <button
-                                             key={idx}
-                                             onClick={() => sendMessage(question)}
-                                             disabled={isLoading}
-                                             className="text-xs px-3 py-1.5 bg-slate-100 hover:bg-illini-blue hover:text-white rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-slate-200 hover:border-illini-blue"
-                                          >
-                                             💡 {question}
-                                          </button>
-                                       ))}
+                                       {msg.followUpQuestions.slice(0, 3).map((question, idx) => {
+                                          const displayText = question.length > 50 ? question.substring(0, 47) + '...' : question;
+                                          return (
+                                             <button
+                                                key={idx}
+                                                onClick={() => sendMessage(question)}
+                                                disabled={isLoading}
+                                                title={question}
+                                                className="text-xs px-3 py-1.5 bg-slate-100 hover:bg-illini-blue hover:text-white rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-slate-200 hover:border-illini-blue"
+                                             >
+                                                💡 {displayText}
+                                             </button>
+                                          );
+                                       })}
                                     </div>
                                  )}
                               </div>

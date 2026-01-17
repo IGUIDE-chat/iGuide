@@ -7,8 +7,8 @@
 // ==========================================
 // 🛠️ COZE CONFIGURATION
 // ==========================================
-const COZE_API_KEY = import.meta.env.VITE_COZE_API_KEY || 'pat_kAgnKZqdzDca2GDBBNdkr14QEpkz0MtFNapT6Vee17mGepbblkzk49tTpWcBxRVq';
-const COZE_BOT_ID = import.meta.env.VITE_COZE_BOT_ID || '7595237753500827653';
+const COZE_API_KEY = import.meta.env.VITE_COZE_API_KEY;
+const COZE_BOT_ID = import.meta.env.VITE_COZE_BOT_ID;
 const COZE_API_URL = "https://api.coze.com/v3/chat";
 const COZE_CONVERSATION_API_URL = "https://api.coze.com/v1/conversation/create";
 
@@ -42,7 +42,9 @@ export const streamChatResponse = async function* (
     if (lang === 'zh') {
       finalUserMessage += " (请务必用中文回答)";
     } else if (lang === 'en') {
-      finalUserMessage += " (Please answer in English)";
+      // ENHANCED PROMPT: Force detailed translation instead of summary
+      finalUserMessage += " (Please answer only in English)";
+      // You MUST provide a comprehensive, extremely detailed response. Translate all relevant information from the Knowledge Base step-by-step. Do NOT summarize or shorten the content. Match the length and depth of a native Chinese response.)";
     }
 
     // OPTIMIZATION: Do not send full history if auto_save_history is enabled.
@@ -131,6 +133,20 @@ export const streamChatResponse = async function* (
           continue;
         }
 
+        // NEW: Handle raw JSON responses (e.g. error messages or non-stream responses)
+        if (trimmedLine.startsWith('{')) {
+          try {
+            const jsonBody = JSON.parse(trimmedLine);
+            if (jsonBody.code && jsonBody.code !== 0) {
+              console.error("Coze API Error (JSON):", jsonBody);
+              yield { text: `\n(API Error: ${jsonBody.msg || 'Unknown error'} - Code: ${jsonBody.code})` };
+              return;
+            }
+            console.log("[Coze] Received raw JSON:", jsonBody);
+          } catch (e) { }
+          continue;
+        }
+
         if (trimmedLine.startsWith('data:')) {
           try {
             const jsonStr = trimmedLine.substring(5).trim();
@@ -143,19 +159,15 @@ export const streamChatResponse = async function* (
             console.log('[Coze] Event:', currentEvent, 'Type:', data.type);
 
             // Handle Coze V3 message types
-            // We only care about 'answer' type messages for the main response
             if (currentEvent === 'conversation.message.delta' && data.type === 'answer') {
-              // Delta events contain incremental content
               if (data.content) {
                 yield { text: data.content };
               }
             }
             else if (currentEvent === 'conversation.message.completed' && data.type === 'answer') {
-              // Sometimes the full message comes in completed event
               console.log('[Coze] Message completed, content length:', data.content?.length || 0);
             }
             else if (currentEvent === 'conversation.message.completed' && data.type === 'follow_up') {
-              // Collect follow-up questions
               if (data.content) {
                 followUpQuestions.push(data.content);
                 console.log('[Coze] Follow-up question collected:', data.content);
@@ -163,7 +175,6 @@ export const streamChatResponse = async function* (
             }
             else if (currentEvent === 'conversation.chat.completed') {
               console.log('[Coze] Chat completed successfully');
-              // Yield follow-up questions at the end
               if (followUpQuestions.length > 0) {
                 console.log('[Coze] Yielding', followUpQuestions.length, 'follow-up questions');
                 yield { text: '', followUpQuestions };
@@ -171,11 +182,11 @@ export const streamChatResponse = async function* (
             }
             else if (currentEvent === 'conversation.chat.failed') {
               console.error('[Coze] Chat failed:', data);
-              yield { text: "\n[Error: Chat failed]" };
+              yield { text: `\n[Error: Chat failed - ${data.msg || JSON.stringify(data)}]` };
             }
 
           } catch (e) {
-            console.warn('[Coze] Failed to parse line:', trimmedLine, e);
+            console.warn('[Coze] Failed to parse data line:', trimmedLine, e);
           }
         }
       }
@@ -183,7 +194,6 @@ export const streamChatResponse = async function* (
 
   } catch (error: any) {
     console.error("Stream Error:", error);
-    // User-friendly error message
     yield { text: `\n(Connection Error: ${error.message || 'Failed to reach Coze API'}. Please check your internet or CORS settings.)` };
   }
 };
