@@ -76,13 +76,13 @@ export const UI_TEXT = {
     emailSuccess: "Thanks! We'll notify you when it's ready.",
 
     coursesTitle: "Course Selection Agent",
-    coursesDesc: "Get personalized course recommendations based on your major, interests, and graduation requirements. Never stress about registration again.",
+    coursesDesc: "Get personalized course recommendations based on your major and interests. Never stress about registration again.",
 
     dormsTitle: "Dorm Selection Agent",
-    dormsDesc: "Find the perfect dorm for your lifestyle. Compare amenities, locations, and vibes to make the best housing decision.",
+    dormsDesc: "Find the perfect dorm for your lifestyle. Compare amenities and locations to make the best choice.",
 
     resumeTitle: "Resume Builder Agent",
-    resumeDesc: "Create a standout resume tailored for internships and jobs. Get AI-powered suggestions to highlight your UIUC experience."
+    resumeDesc: "Create a standout resume for internships and jobs. Get AI suggestions to highlight your UIUC experience."
   },
   zh: {
     appTitle: "UIUC 指南",
