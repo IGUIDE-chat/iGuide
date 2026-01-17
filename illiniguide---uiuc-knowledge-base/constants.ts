@@ -76,7 +76,7 @@ export const UI_TEXT = {
     emailSuccess: "Thanks! We'll notify you when it's ready.",
 
     coursesTitle: "Course Selection Agent",
-    coursesDesc: "Get personalized course recommendations based on your major and interests. Never stress about registration again.",
+    coursesDesc: "Get personalized course recommendations based on your major and interests. No more registration stress.",
 
     dormsTitle: "Dorm Selection Agent",
     dormsDesc: "Find the perfect dorm for your lifestyle. Compare amenities and locations to make the best choice.",
