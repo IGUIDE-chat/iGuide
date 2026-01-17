@@ -2,12 +2,12 @@ import requests
 import json
 
 # Coze Configuration
-COZE_API_KEY = 'pat_kAgnKZqdzDca2GDBBNdkr14QEpkz0MtFNapT6Vee17mGepbblkzk49tTpWcBxRVq'
+COZE_API_KEY = 'pat_69hIiNSLjqAXFejtV1XErY8UrFoma2HNxEqSpbCzSxS6w0w97yV8f60x1JgYXBSc'
 COZE_BOT_ID = '7595237753500827653'
 COZE_API_URL = "https://api.coze.com/v3/chat"
 
 def test_coze():
-    print("🚀 Testing Coze API Connection (Python)...")
+    print("Testing Coze API Connection (Python)...")
     print(f"   Bot ID: {COZE_BOT_ID}")
 
     headers = {
@@ -33,12 +33,12 @@ def test_coze():
         response = requests.post(COZE_API_URL, headers=headers, json=payload, timeout=30)
         
         if response.status_code != 200:
-            print(f"❌ API Error: {response.status_code}")
+            print(f"API Error: {response.status_code}")
             print(response.text)
             return
 
         data = response.json()
-        print("✅ API Response Received!")
+        print("API Response Received!")
         
         if 'id' in data:
             print(f"   Chat ID: {data['id']}")

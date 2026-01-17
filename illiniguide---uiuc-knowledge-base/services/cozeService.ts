@@ -41,6 +41,8 @@ export const streamChatResponse = async function* (
     let finalUserMessage = newMessage;
     if (lang === 'zh') {
       finalUserMessage += " (请务必用中文回答)";
+    } else if (lang === 'en') {
+      finalUserMessage = "Please answer in English: " + finalUserMessage;
     }
 
     // OPTIMIZATION: Do not send full history if auto_save_history is enabled.
