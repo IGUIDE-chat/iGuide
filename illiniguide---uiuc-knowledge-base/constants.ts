@@ -5,7 +5,7 @@ export const UI_TEXT = {
     appTitle: "UIUC Guide",
     chatTab: "Chat",
     libraryTab: "Library",
-    welcomeTitle: "Hey, welcome to",
+    welcomeTitle: "Hey, welcome to UIUC",
     welcomeSubtitle: "I'm your personal campus guide. Ask me about finding your way around, dorm life, or where to get the best bubble tea.",
     suggestions: [
       { icon: '💉', text: "What vaccines are required for freshmen?" },
@@ -88,7 +88,7 @@ export const UI_TEXT = {
     appTitle: "UIUC 指南",
     chatTab: "AI 助手",
     libraryTab: "知识库",
-    welcomeTitle: "你好，欢迎来到",
+    welcomeTitle: "嗨~欢迎来到UIUC",
     welcomeSubtitle: "我是你的校园私人助手。关于宿舍、交通、选课或者哪里有好喝的奶茶，尽管问我。",
     suggestions: [
       { icon: '💉', text: "入学要打什么疫苗？" },

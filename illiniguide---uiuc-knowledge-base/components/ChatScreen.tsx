@@ -237,7 +237,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
                               <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-xl border border-slate-100">
                                  🎓
                               </div>
-                              <h2 className="text-2xl font-semibold text-slate-800 text-center tracking-tight">{t.welcomeTitle} UIUC</h2>
+                              <h2 className="text-2xl font-semibold text-slate-800 text-center tracking-tight">{t.welcomeTitle}</h2>
                            </div>
 
                            {/* Suggestions Grid */}
