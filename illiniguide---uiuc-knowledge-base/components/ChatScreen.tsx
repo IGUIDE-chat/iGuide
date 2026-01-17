@@ -54,13 +54,19 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
    const messagesEndRef = useRef<HTMLDivElement>(null);
 
    // Load conversation history when currentConversationId changes
+   // BUT skip if we're in the middle of streaming (to avoid overwriting live data)
    useEffect(() => {
+      if (isLoading) {
+         // Skip loading if we're actively streaming - the messages are already in state
+         console.log('[ChatScreen] Skipping loadConversation - streaming in progress');
+         return;
+      }
       if (currentConversationId) {
          loadConversation(currentConversationId);
       } else {
          setMessages([]);
       }
-   }, [currentConversationId]);
+   }, [currentConversationId, isLoading]);
 
    const loadConversation = async (conversationId: string) => {
       setIsLoadingHistory(true);

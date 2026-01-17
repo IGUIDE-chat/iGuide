@@ -53,9 +53,10 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
 
     // ... (keep usage of hooks)
 
+    // Reload conversations when user changes OR when a new conversation is created/selected
     useEffect(() => {
         loadConversations();
-    }, [user]);
+    }, [user, currentConversationId]);
 
     // ... (keep loadConversations and other handlers)
 
