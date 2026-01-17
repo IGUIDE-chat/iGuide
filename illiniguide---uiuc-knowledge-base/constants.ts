@@ -71,7 +71,7 @@ export const UI_TEXT = {
 
     // Agent Landing Pages
     comingSoon: "Coming Soon",
-    notifyMe: "Notify Me",
+    notifyMe: "Join Waitlist",
     emailPlaceholder: "Enter your email",
     emailSuccess: "Thanks! We'll notify you when it's ready.",
 
@@ -154,7 +154,7 @@ export const UI_TEXT = {
 
     // Agent Landing Pages
     comingSoon: "即将上线",
-    notifyMe: "通知我",
+    notifyMe: "加入抢先名单",
     emailPlaceholder: "输入你的邮箱",
     emailSuccess: "谢谢！上线后我们会第一时间通知你。",
 

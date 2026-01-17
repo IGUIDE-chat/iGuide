@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Language } from '../types';
 import { UI_TEXT } from '../constants';
 
@@ -23,23 +23,6 @@ const AGENT_CONFIG = {
         gradient: 'from-emerald-500 to-teal-600'
     }
 };
-
-// Animated text component for smooth language switching
-const AnimatedText = ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <AnimatePresence mode="wait">
-        <motion.span
-            key={children?.toString()}
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.2 }}
-            className={className}
-            style={{ display: 'inline-block' }}
-        >
-            {children}
-        </motion.span>
-    </AnimatePresence>
-);
 
 export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({ type, language }) => {
     const t = UI_TEXT[language];
@@ -66,81 +49,59 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({ type, langua
     return (
         <div className="h-full w-full flex items-center justify-center bg-white overflow-auto p-4">
             <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4 }}
+                key={language}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.2 }}
                 className="max-w-md w-full text-center"
             >
-                {/* Icon with subtle background */}
-                <motion.div
-                    initial={{ scale: 0.9 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.1, type: 'spring' }}
-                    className="mx-auto mb-6 w-20 h-20 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shadow-sm"
-                >
+                {/* Icon */}
+                <div className="mx-auto mb-6 w-20 h-20 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shadow-sm">
                     {config.icon}
-                </motion.div>
+                </div>
 
-                {/* Title with animation - fixed height to prevent layout shift */}
-                <h1 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight h-8 flex items-center justify-center">
-                    <AnimatedText>{title}</AnimatedText>
+                {/* Title */}
+                <h1 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">
+                    {title}
                 </h1>
 
-                {/* Coming Soon Badge with animation */}
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                    className="mb-5 h-7 flex items-center justify-center"
-                >
+                {/* Coming Soon Badge */}
+                <div className="mb-5">
                     <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-illini-orange text-white">
-                        <AnimatedText>{t.comingSoon}</AnimatedText>
+                        {t.comingSoon}
                     </span>
-                </motion.div>
+                </div>
 
-                {/* Description with animation - fixed min-height to prevent layout shift */}
-                <p className="text-slate-500 text-sm leading-relaxed mb-8 max-w-sm mx-auto min-h-[3.5rem]">
-                    <AnimatedText>{desc}</AnimatedText>
+                {/* Description */}
+                <p className="text-slate-500 text-sm leading-relaxed mb-8 max-w-sm mx-auto">
+                    {desc}
                 </p>
 
                 {/* Email Form */}
                 {!submitted ? (
-                    <motion.form
-                        onSubmit={handleSubmit}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.3 }}
-                        className="space-y-3 max-w-xs mx-auto"
-                    >
-                        <div className="relative group">
-                            <div className="absolute inset-0 bg-gradient-to-r from-illini-blue to-illini-orange opacity-0 group-focus-within:opacity-10 blur-xl rounded-full transition-opacity" />
-                            <input
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder={t.emailPlaceholder}
-                                required
-                                className="relative w-full px-4 py-3 rounded-full border border-slate-200 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-illini-blue/10 focus:border-slate-300 shadow-sm text-sm transition-all"
-                            />
-                        </div>
+                    <form onSubmit={handleSubmit} className="space-y-3 max-w-xs mx-auto">
+                        <input
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder={t.emailPlaceholder}
+                            required
+                            className="w-full px-4 py-3 rounded-full border border-slate-200 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-illini-blue/10 focus:border-slate-300 shadow-sm text-sm transition-all"
+                        />
                         <button
                             type="submit"
                             className="w-full py-3 rounded-full font-semibold text-sm text-white bg-illini-orange hover:bg-illini-orange/90 transition-colors shadow-md active:scale-[0.98]"
                         >
-                            <AnimatedText>{t.notifyMe}</AnimatedText>
+                            {t.notifyMe}
                         </button>
-                    </motion.form>
+                    </form>
                 ) : (
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="bg-slate-50 border border-slate-100 rounded-2xl p-5 max-w-xs mx-auto"
-                    >
+                    <div className="bg-slate-50 border border-slate-100 rounded-2xl p-5 max-w-xs mx-auto">
                         <span className="text-2xl mb-2 block">✅</span>
                         <p className="text-slate-600 text-sm font-medium">
-                            <AnimatedText>{t.emailSuccess}</AnimatedText>
+                            {t.emailSuccess}
                         </p>
-                    </motion.div>
+                    </div>
                 )}
             </motion.div>
         </div>
