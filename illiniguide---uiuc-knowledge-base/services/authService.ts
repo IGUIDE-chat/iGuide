@@ -101,5 +101,13 @@ export const authService = {
             .eq('id', userId);
 
         return { data, error };
+    },
+
+    /**
+     * Update user metadata (display name)
+     */
+    async updateUser(attributes: { data: { display_name: string } }) {
+        const { data, error } = await supabase.auth.updateUser(attributes);
+        return { data, error };
     }
 };

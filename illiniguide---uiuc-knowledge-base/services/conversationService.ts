@@ -36,6 +36,7 @@ export const conversationService = {
         id,
         title,
         coze_conversation_id,
+        is_pinned,
         created_at,
         updated_at,
         messages (
@@ -46,6 +47,7 @@ export const conversationService = {
         )
       `)
             .eq('user_id', user.id)
+            .order('is_pinned', { ascending: false })
             .order('updated_at', { ascending: false });
 
         return { data, error };
@@ -55,13 +57,28 @@ export const conversationService = {
      * Get a specific conversation with all messages
      */
     async getConversation(conversationId: string) {
+        const user = await authService.getCurrentUser();
+        if (!user) throw new Error('User not authenticated');
+
         const { data: conversation, error: convError } = await supabase
             .from('conversations')
             .select('*')
             .eq('id', conversationId)
+            .eq('user_id', user.id)
             .single();
 
-        if (convError) return { data: null, error: convError };
+        if (convError || !conversation) {
+            return { data: null, error: convError || new Error('Access denied') };
+        }
+
+        // Update last_viewed_at asynchronously (no need to await)
+        supabase
+            .from('conversations')
+            .update({ last_viewed_at: new Date().toISOString() })
+            .eq('id', conversationId)
+            .then(({ error }) => {
+                if (error) console.error('Failed to update last_viewed_at:', error);
+            });
 
         const { data: messages, error: msgError } = await supabase
             .from('messages')
@@ -134,6 +151,21 @@ export const conversationService = {
 
         return { error };
     },
+
+    /**
+     * Toggle pin status of a conversation
+     */
+    async togglePinConversation(conversationId: string, isPinned: boolean) {
+        const { data, error } = await supabase
+            .from('conversations')
+            .update({ is_pinned: isPinned })
+            .eq('id', conversationId);
+
+        return { data, error };
+    },
+
+
+
 
     /**
      * Convert Supabase messages to ChatMessage format

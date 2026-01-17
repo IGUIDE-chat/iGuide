@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { Language } from '../types';
 import { UI_TEXT } from '../constants';
 import { useAuth } from '../contexts/AuthContext';
+import { ConversationSidebar } from './ConversationSidebar';
+import { LibrarySidebar } from './LibrarySidebar';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -11,6 +13,9 @@ interface LayoutProps {
   onLanguageChange: (lang: Language) => void;
   isGuest?: boolean;
   onExitGuest?: () => void;
+  currentConversationId: string | null;
+  onNewConversation: () => void;
+  onSelectConversation: (conversationId: string | null) => void;
 }
 
 const AnimatedText = ({ children }: { children: React.ReactNode }) => (
@@ -33,7 +38,10 @@ export const Layout: React.FC<LayoutProps> = ({
   language,
   onLanguageChange,
   isGuest,
-  onExitGuest
+  onExitGuest,
+  currentConversationId,
+  onNewConversation,
+  onSelectConversation
 }) => {
   const t = UI_TEXT[language];
   const { user, logout } = useAuth();
@@ -97,37 +105,35 @@ export const Layout: React.FC<LayoutProps> = ({
           {/* Divider */}
           <div className="mx-3 my-2 border-t border-white/10" />
 
-          {/* Conversation History */}
-          <div className="flex-1 px-3 overflow-y-auto no-scrollbar">
-            <div className="text-xs font-semibold text-slate-500 px-3 mb-2 uppercase tracking-wider">
-              {language === 'zh' ? '历史记录' : 'History'}
-            </div>
-            {/* Placeholder for history items */}
-            <div className="px-3 py-2 text-sm text-slate-600 italic">
-              {language === 'zh' ? '暂无历史记录' : 'No history yet'}
-            </div>
+          {/* Middle Section - Sidebar Content */}
+          <div className="flex-1 overflow-hidden flex flex-col">
+            {activeTab === 'chat' && !isGuest && user && (
+              <ConversationSidebar
+                currentConversationId={currentConversationId}
+                onSelectConversation={onSelectConversation}
+                onNewConversation={onNewConversation}
+                language={language}
+              />
+            )}
+            {activeTab === 'library' && (
+              <LibrarySidebar
+                language={language}
+                currentArticleId={location.pathname.startsWith('/library/article/') ? location.pathname.split('/').pop() : undefined}
+              />
+            )}
           </div>
 
           {/* Bottom Actions */}
           <div className="p-3 border-t border-white/10 space-y-2">
-            {/* User Profile - Only Show if NOT Guest */}
-            {!isGuest && (
-              <div className="px-3 py-2 bg-white/5 rounded-md">
-                <div className="text-xs text-slate-400 mb-1">Signed in as</div>
-                <div className="text-sm font-medium text-white truncate">{user?.name}</div>
-                <div className="text-xs text-slate-400 truncate">{user?.email}</div>
-              </div>
-            )}
-
             {/* Language Toggle */}
             <button
               onClick={() => onLanguageChange(language === 'zh' ? 'en' : 'zh')}
               className="w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm hover:bg-[#212121] transition-colors text-slate-300"
             >
-              <span><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></span> <AnimatedText>{language === 'zh' ? '语言: 中文' : 'Lang: English'}</AnimatedText>
+              <span><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></span> <AnimatedText>{language === 'zh' ? '中文' : 'English'}</AnimatedText>
             </button>
 
-            {/* Logout / Exit Guest Button */}
+            {/* User Profile / Login Button */}
             {isGuest ? (
               <button
                 onClick={onExitGuest}
@@ -137,12 +143,20 @@ export const Layout: React.FC<LayoutProps> = ({
                 <AnimatedText>{language === 'zh' ? '登录' : 'Login'}</AnimatedText>
               </button>
             ) : (
-              <button
-                onClick={logout}
-                className="w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm hover:bg-red-500/10 transition-colors text-red-400 hover:text-red-300"
+              <Link
+                to="/profile"
+                className="flex items-center gap-3 px-3 py-2 rounded-md bg-white/5 hover:bg-white/10 cursor-pointer transition-colors block"
               >
-                <span><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg></span> <AnimatedText>{language === 'zh' ? '退出登录' : 'Logout'}</AnimatedText>
-              </button>
+                {/* Avatar */}
+                <div className="w-8 h-8 rounded-full bg-illini-orange flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
+                  {user?.name?.charAt(0).toUpperCase() || 'U'}
+                </div>
+                {/* User Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="text-[10px] text-slate-400">Signed in as</div>
+                  <div className="text-xs font-medium text-white truncate">{user?.name || user?.email}</div>
+                </div>
+              </Link>
             )}
           </div>
         </div>

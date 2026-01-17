@@ -1,0 +1,26 @@
+// 用户消息右对齐的样式修改
+// 在 ChatScreen.tsx 的消息列表部分,找到第212行并修改为:
+
+<div className={`${containerClass} flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+
+// 找到第215-217行的用户头像,修改为:
+
+<div className="w-6 h-6 bg-gradient-to-br from-illini-blue to-illini-orange rounded-sm flex items-center justify-center text-white text-xs font-semibold">
+  {user?.name?.charAt(0).toUpperCase() || 'U'}
+</div>
+
+// 找到第224行,修改为:
+
+<div className={`relative flex-1 overflow-hidden pt-0.5 ${msg.role === 'user' ? 'flex flex-col items-end' : ''}`}>
+
+// 找到第225-227行,修改为:
+
+<div className={`font-semibold text-xs text-slate-900 mb-1 ${msg.role === 'user' ? 'text-right' : ''}`}>
+  {msg.role === 'user' ? t.userRole : t.botName}
+</div>
+
+// 找到第228-231行,修改为:
+
+<div className={`prose prose-slate prose-sm max-w-none leading-relaxed ${msg.role === 'user' ? 'bg-gradient-to-br from-illini-blue to-illini-orange text-white px-4 py-3 rounded-2xl rounded-tr-sm max-w-[80%]' : 'text-slate-800'}`}>
+  {msg.role === 'user' ? (
+    <div className="whitespace-pre-wrap text-white">{msg.text}</div>

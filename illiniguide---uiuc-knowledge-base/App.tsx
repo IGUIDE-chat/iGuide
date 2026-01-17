@@ -1,13 +1,15 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Routes, Route, Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { ArticleView } from './components/ArticleView';
 import { ChatScreen } from './components/ChatScreen';
 import { LoginScreen } from './components/LoginScreen';
+import { ProfileScreen } from './components/ProfileScreen';
 import { CATEGORIES, ARTICLES, getArticleText, getCategoryText, UI_TEXT } from './constants';
 import { CategoryId, Language } from './types';
 import { useAuth } from './contexts/AuthContext';
+import { libraryService } from './services/libraryService';
 
 // --- Page Components ---
 
@@ -206,6 +208,12 @@ const ArticlePage = ({ language }: { language: Language }) => {
 
   const article = ARTICLES.find(a => a.id === articleId);
 
+  useEffect(() => {
+    if (article) {
+      libraryService.addToHistory(article);
+    }
+  }, [article]);
+
   if (!article) {
     return <div className="p-8 text-center text-slate-500">Article not found</div>;
   }
@@ -230,6 +238,37 @@ export default function App() {
   const { user, isLoading } = useAuth();
   const [language, setLanguage] = useState<Language>('zh');
   const [isGuest, setIsGuest] = useState(true);
+  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
+
+  // Sync guest state with user auth status
+  useEffect(() => {
+    if (user) {
+      setIsGuest(false);
+    }
+  }, [user]);
+
+  // Load last conversation on mount
+  useEffect(() => {
+    const lastId = localStorage.getItem('lastConversationId');
+    if (lastId && !isGuest) {
+      setCurrentConversationId(lastId);
+    }
+  }, [isGuest]);
+
+
+
+  const handleNewConversation = () => {
+    setCurrentConversationId(null);
+  };
+
+  const handleSelectConversation = (conversationId: string | null) => {
+    setCurrentConversationId(conversationId);
+    if (conversationId) {
+      localStorage.setItem('lastConversationId', conversationId);
+    } else {
+      localStorage.removeItem('lastConversationId');
+    }
+  };
 
   // Show loading state while checking auth
   if (isLoading) {
@@ -272,6 +311,9 @@ export default function App() {
             onLanguageChange={setLanguage}
             isGuest={isGuest}
             onExitGuest={() => setIsGuest(false)}
+            currentConversationId={currentConversationId}
+            onNewConversation={handleNewConversation}
+            onSelectConversation={handleSelectConversation}
           >
             <Routes>
               <Route path="/" element={<Navigate to="/chat" replace />} />
@@ -281,12 +323,15 @@ export default function App() {
                   <ChatScreen
                     onNavigateToLibrary={() => { /* Navigation handled by Layout link, but can add check here if needed */ }}
                     language={language}
+                    currentConversationId={currentConversationId}
+                    onConversationCreated={setCurrentConversationId}
                   />
                 }
               />
               <Route path="/library" element={<LibraryPage language={language} />} />
               <Route path="/library/category/:categoryId" element={<CategoryPage language={language} />} />
               <Route path="/library/article/:articleId" element={<ArticlePage language={language} />} />
+              <Route path="/profile" element={<ProfileScreen language={language} onBack={() => window.history.back()} />} />
             </Routes>
           </Layout>
         </motion.div>

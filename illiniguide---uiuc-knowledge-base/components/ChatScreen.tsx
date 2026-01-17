@@ -4,18 +4,77 @@ import remarkGfm from 'remark-gfm';
 import { Language, ChatMessage } from '../types';
 import { streamChatResponse } from '../services/cozeService';
 import { UI_TEXT } from '../constants';
+import { conversationService } from '../services/conversationService';
+import { useAuth } from '../contexts/AuthContext';
 
 interface ChatScreenProps {
    onNavigateToLibrary: () => void;
    language: Language;
+   currentConversationId: string | null;
+   onConversationCreated?: (conversationId: string) => void;
 }
 
-export const ChatScreen: React.FC<ChatScreenProps> = ({ language }) => {
+export const ChatScreen: React.FC<ChatScreenProps> = ({
+   language,
+   currentConversationId,
+   onConversationCreated
+}) => {
+
+   // Generate smart conversation title
+   const generateSmartTitle = (text: string): string => {
+      // Remove common prefixes
+      let title = text
+         .replace(/^(请|帮我|帮忙|能否|可以|how to|please|help me)/i, '')
+         .trim();
+
+      // Extract key information
+      if (title.includes('?') || title.includes('？')) {
+         // It's a question, take the core part
+         title = title.split(/[?？]/)[0].trim();
+      }
+
+      // Limit length
+      if (title.length > 30) {
+         title = title.substring(0, 27) + '...';
+      }
+
+      return title || '新对话';
+   };
+
+
    const t = UI_TEXT[language];
+   const { user } = useAuth();
    const [messages, setMessages] = useState<ChatMessage[]>([]);
    const [input, setInput] = useState('');
    const [isLoading, setIsLoading] = useState(false);
+   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
    const messagesEndRef = useRef<HTMLDivElement>(null);
+
+   // Load conversation history when currentConversationId changes
+   useEffect(() => {
+      if (currentConversationId) {
+         loadConversation(currentConversationId);
+      } else {
+         setMessages([]);
+      }
+   }, [currentConversationId]);
+
+   const loadConversation = async (conversationId: string) => {
+      setIsLoadingHistory(true);
+      try {
+         const { data, error } = await conversationService.getConversation(conversationId);
+         if (error) throw error;
+
+         if (data && data.messages) {
+            const chatMessages = conversationService.convertToChatMessages(data.messages);
+            setMessages(chatMessages);
+         }
+      } catch (error) {
+         console.error('Failed to load conversation:', error);
+      } finally {
+         setIsLoadingHistory(false);
+      }
+   };
 
    // Shared function to send a message (used by form submit and suggestion clicks)
    const sendMessage = async (text: string) => {
@@ -25,6 +84,34 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ language }) => {
       setMessages(prev => [...prev, userMsg]);
       setInput('');
       setIsLoading(true);
+
+      // Create conversation if needed (only for logged-in users)
+      let conversationId = currentConversationId;
+      if (user && !conversationId) {
+         try {
+
+            const { data, error } = await conversationService.createConversation(
+               undefined,
+               generateSmartTitle(text) // Use smart title
+            );
+            if (error) throw error;
+            if (data) {
+               conversationId = data.id;
+               onConversationCreated?.(data.id);
+            }
+         } catch (error) {
+            console.error('Failed to create conversation:', error);
+         }
+      }
+
+      // Save user message if we have a conversation
+      if (user && conversationId) {
+         try {
+            await conversationService.saveMessage(conversationId, userMsg);
+         } catch (error) {
+            console.error('Failed to save user message:', error);
+         }
+      }
 
       try {
          const aiMsgId = (Date.now() + 1).toString();
@@ -38,6 +125,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ language }) => {
          );
 
          let fullText = '';
+         let followUpQuestions: string[] | undefined;
          let lastUpdateTime = Date.now();
          const UPDATE_INTERVAL = 50; // Update every 50ms for smooth effect
 
@@ -55,6 +143,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ language }) => {
                }
             }
             if (chunk.followUpQuestions) {
+               followUpQuestions = chunk.followUpQuestions;
                setMessages(prev => prev.map(msg =>
                   msg.id === aiMsgId ? { ...msg, followUpQuestions: chunk.followUpQuestions } : msg
                ));
@@ -62,9 +151,25 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ language }) => {
          }
 
          // Final update with complete text
+         const aiMsg: ChatMessage = {
+            id: aiMsgId,
+            role: 'model',
+            text: fullText,
+            isStreaming: false,
+            followUpQuestions
+         };
          setMessages(prev => prev.map(msg =>
-            msg.id === aiMsgId ? { ...msg, text: fullText, isStreaming: false } : msg
+            msg.id === aiMsgId ? aiMsg : msg
          ));
+
+         // Save AI message if we have a conversation and message has content
+         if (user && conversationId && aiMsg.text && aiMsg.text.trim()) {
+            try {
+               await conversationService.saveMessage(conversationId, aiMsg);
+            } catch (error) {
+               console.error('Failed to save AI message:', error);
+            }
+         }
       } catch (error) {
          setMessages(prev => [...prev, { id: Date.now().toString(), role: 'model', text: "Connection error. Please try again." }]);
       } finally {
@@ -128,7 +233,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ language }) => {
                              Inner div handles width and padding.
                              Removed 'px-4' from outer div to avoid double padding on mobile.
                           */}
-                           <div className={`${containerClass} flex gap-4`}>
+                           <div className={`${containerClass} flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
                               <div className="flex-shrink-0 flex flex-col relative items-end">
                                  {msg.role === 'user' ? (
                                     <div className="w-6 h-6 bg-slate-200 rounded-sm flex items-center justify-center text-slate-500 text-xs">
@@ -140,7 +245,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ language }) => {
                                     </div>
                                  )}
                               </div>
-                              <div className="relative flex-1 overflow-hidden pt-0.5">
+                              <div className={`relative flex-1 overflow-hidden pt-0.5 ${msg.role === 'user' ? 'flex flex-col items-end' : ''}`}>
                                  <div className="font-semibold text-xs text-slate-900 mb-1">
                                     {msg.role === 'user' ? t.userRole : t.botName}
                                  </div>

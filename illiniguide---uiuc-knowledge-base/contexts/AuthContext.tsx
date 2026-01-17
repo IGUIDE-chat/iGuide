@@ -106,6 +106,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
     };
 
+    const updateName = async (name: string): Promise<boolean> => {
+        try {
+            const { data, error } = await authService.updateUser({ data: { display_name: name } });
+            if (error) {
+                console.error('Update name error:', error);
+                return false;
+            }
+            if (data.user) {
+                setUser(prev => prev ? { ...prev, name } : null);
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('Update name exception:', error);
+            return false;
+        }
+    };
+
     const loginWithGoogle = async () => {
         try {
             const { error } = await authService.signInWithGoogle();
@@ -126,6 +144,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         register,
         loginWithGoogle,
         logout,
+        updateName,
         isLoading
     };
 

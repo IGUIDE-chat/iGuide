@@ -39,6 +39,14 @@ export interface ChatMessage {
   followUpQuestions?: string[];
 }
 
+export interface ConversationSummary {
+  id: string;
+  title: string;
+  updatedAt: string;
+  isPinned: boolean;
+  messageCount?: number;
+}
+
 export type ViewState =
   | { type: 'HOME' }
   | { type: 'CATEGORY'; categoryId: CategoryId }
@@ -61,5 +69,15 @@ export interface AuthContextType {
   register: (name: string, email: string, password: string) => Promise<boolean>;
   loginWithGoogle: () => Promise<boolean>;
   logout: () => void;
+  updateName: (name: string) => Promise<boolean>;
   isLoading: boolean;
+}
+
+export interface LibraryHistoryItem {
+  id: string;
+  articleId: string;
+  articleTitle: string;
+  articleTitleZh?: string;
+  isPinned: boolean;
+  viewedAt: string;
 }
