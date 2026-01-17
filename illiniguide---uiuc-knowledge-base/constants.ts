@@ -8,7 +8,7 @@ export const UI_TEXT = {
     welcomeTitle: "Hey, welcome to",
     welcomeSubtitle: "I'm your personal campus guide. Ask me about finding your way around, dorm life, or where to get the best bubble tea.",
     suggestions: [
-      { icon: '🛏️', text: "Which dorm is best for freshmen?" },
+      { icon: '💉', text: "What vaccines are required for enrollment?" },
       { icon: '🚌', text: "How does the bus system work?" },
       { icon: '☕', text: "Where are good study spots?" },
       { icon: '🍔', text: "Best food on Green Street?" }
@@ -71,7 +71,7 @@ export const UI_TEXT = {
     welcomeTitle: "你好，欢迎来到",
     welcomeSubtitle: "我是你的校园私人助手。关于宿舍、交通、选课或者哪里有好喝的奶茶，尽管问我。",
     suggestions: [
-      { icon: '🛏️', text: "大一新生选哪个宿舍好？" },
+      { icon: '💉', text: "入学要打什么疫苗？" },
       { icon: '🚌', text: "CUMTD 公交系统怎么坐？" },
       { icon: '☕', text: "哪里适合自习？" },
       { icon: '🍔', text: "绿街有什么好吃的？" }
