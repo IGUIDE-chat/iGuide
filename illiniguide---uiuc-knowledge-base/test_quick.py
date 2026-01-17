@@ -7,47 +7,19 @@ COZE_API_KEY = 'pat_69hIiNSLjqAXFejtV1XErY8UrFoma2HNxEqSpbCzSxS6w0w97yV8f60x1JgY
 COZE_BOT_ID = '7595237753500827653'
 COZE_API_URL = "https://api.coze.com/v3/chat"
 
-# Test questions in both languages
+# Quick test with only 3 questions
 TEST_QUESTIONS = [
     {
         "en": "What vaccines are required for enrollment?",
         "zh": "入学需要哪些疫苗？"
     },
     {
-        "en": "How do I register for classes?",
-        "zh": "如何注册课程？"
-    },
-    {
-        "en": "What are the library hours?",
-        "zh": "图书馆的开放时间是什么？"
-    },
-    {
         "en": "How can I get a student ID card?",
         "zh": "如何获得学生证？"
     },
     {
-        "en": "What dining options are available on campus?",
-        "zh": "校园里有哪些餐饮选择？"
-    },
-    {
         "en": "How do I access the student portal?",
         "zh": "如何访问学生门户？"
-    },
-    {
-        "en": "What are the parking regulations?",
-        "zh": "停车规定是什么？"
-    },
-    {
-        "en": "How do I apply for on-campus housing?",
-        "zh": "如何申请校内住宿？"
-    },
-    {
-        "en": "What health services are available?",
-        "zh": "有哪些健康服务可用？"
-    },
-    {
-        "en": "How do I join student organizations?",
-        "zh": "如何加入学生组织？"
     }
 ]
 
@@ -121,7 +93,7 @@ def call_coze(query, lang, user_id):
 
 def test_coze():
     print("=" * 80)
-    print("Chinese vs English Response Length Test - 10 Questions")
+    print("QUICK TEST - Chinese vs English Response Length (3 Questions)")
     print("=" * 80)
     print()
     
@@ -129,32 +101,22 @@ def test_coze():
     
     for i, question in enumerate(TEST_QUESTIONS, 1):
         print(f"\n{'='*80}")
-        print(f"Test {i}/10")
+        print(f"Test {i}/3")
         print(f"{'='*80}")
         
         # Test Chinese
         print(f"\n[Q] Question (Chinese): {question['zh']}")
         print("[*] Calling Coze API in Chinese...")
-        zh_response, zh_length = call_coze(question['zh'], 'zh', f"test_user_{i}_zh")
-        zh_words = len(zh_response.split())
-        print(f"[OK] Chinese response: {zh_length} chars, {zh_words} words")
+        zh_response, zh_length = call_coze(question['zh'], 'zh', f"quick_test_{i}_zh")
+        print(f"[OK] Chinese response: {zh_length} chars")
         
-        # Safe preview for Windows console
-        safe_preview = zh_response[:100].replace('\n', ' ')
-        try:
-            print(f"Preview: {safe_preview}...")
-        except:
-            print(f"Preview: [encoding issue]")
-        
-        time.sleep(2)  # Rate limiting
+        time.sleep(1)  # Reduced delay
         
         # Test English
         print(f"\n[Q] Question (English): {question['en']}")
         print("[*] Calling Coze API in English...")
-        en_response, en_length = call_coze(question['en'], 'en', f"test_user_{i}_en")
-        en_words = len(en_response.split())
-        print(f"[OK] English response: {en_length} chars, {en_words} words")
-        print(f"Preview: {en_response[:100].replace(chr(10), ' ')}...")
+        en_response, en_length = call_coze(question['en'], 'en', f"quick_test_{i}_en")
+        print(f"[OK] English response: {en_length} chars")
         
         # Compare
         ratio = (en_length / zh_length * 100) if zh_length > 0 else 0
@@ -162,8 +124,8 @@ def test_coze():
         status = "[PASS]" if passed else "[FAIL]"
         
         print(f"\n[Stats] Comparison:")
-        print(f"   Chinese: {zh_length} chars ({zh_words} words)")
-        print(f"   English: {en_length} chars ({en_words} words)")
+        print(f"   Chinese: {zh_length} chars")
+        print(f"   English: {en_length} chars")
         print(f"   Ratio: {ratio:.1f}%")
         print(f"   Status: {status}")
         
@@ -177,7 +139,7 @@ def test_coze():
             "passed": passed
         })
         
-        time.sleep(2)  # Rate limiting
+        time.sleep(1)  # Reduced delay
     
     # Summary
     print(f"\n\n{'='*80}")
@@ -195,14 +157,14 @@ def test_coze():
     
     print(f"\n{'='*80}")
     print(f"Overall Results:")
-    print(f"  Passed: {passed_count}/10 tests ({passed_count*10}%)")
+    print(f"  Passed: {passed_count}/3 tests ({passed_count*100//3}%)")
     print(f"  Average EN/ZH Ratio: {avg_ratio:.1f}%")
     print(f"{'='*80}")
     
     # Save detailed results
-    with open('test_results.json', 'w', encoding='utf-8') as f:
+    with open('test_results_quick.json', 'w', encoding='utf-8') as f:
         json.dump(results, f, indent=2, ensure_ascii=False)
-    print("\n[SAVED] Detailed results saved to test_results.json")
+    print("\n[SAVED] Results saved to test_results_quick.json")
 
 if __name__ == "__main__":
     test_coze()

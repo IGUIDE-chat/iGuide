@@ -48,7 +48,14 @@ export const Layout: React.FC<LayoutProps> = ({
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const activeTab = location.pathname.startsWith('/library') ? 'library' : 'chat';
+  const getActiveTab = () => {
+    if (location.pathname.startsWith('/library')) return 'library';
+    if (location.pathname.startsWith('/courses')) return 'courses';
+    if (location.pathname.startsWith('/dorms')) return 'dorms';
+    if (location.pathname.startsWith('/resume')) return 'resume';
+    return 'chat';
+  };
+  const activeTab = getActiveTab();
 
   // Default sidebar open on desktop, closed on mobile
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -104,6 +111,29 @@ export const Layout: React.FC<LayoutProps> = ({
               className={`w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm transition-colors ${activeTab === 'library' ? 'bg-[#212121] text-white' : 'hover:bg-[#212121] text-slate-300'}`}
             >
               <span><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg></span> <AnimatedText>{t.libraryTab}</AnimatedText>
+            </button>
+
+            {/* Divider */}
+            <div className="my-2 border-t border-white/10" />
+
+            {/* New Agent Buttons */}
+            <button
+              onClick={() => { navigate('/courses'); if (window.innerWidth < 768) setIsSidebarOpen(false); }}
+              className={`w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm transition-colors ${activeTab === 'courses' ? 'bg-[#212121] text-white' : 'hover:bg-[#212121] text-slate-300'}`}
+            >
+              <span className="text-lg">📚</span> <AnimatedText>{t.coursesTab}</AnimatedText>
+            </button>
+            <button
+              onClick={() => { navigate('/dorms'); if (window.innerWidth < 768) setIsSidebarOpen(false); }}
+              className={`w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm transition-colors ${activeTab === 'dorms' ? 'bg-[#212121] text-white' : 'hover:bg-[#212121] text-slate-300'}`}
+            >
+              <span className="text-lg">🏠</span> <AnimatedText>{t.dormsTab}</AnimatedText>
+            </button>
+            <button
+              onClick={() => { navigate('/resume'); if (window.innerWidth < 768) setIsSidebarOpen(false); }}
+              className={`w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm transition-colors ${activeTab === 'resume' ? 'bg-[#212121] text-white' : 'hover:bg-[#212121] text-slate-300'}`}
+            >
+              <span className="text-lg">📝</span> <AnimatedText>{t.resumeTab}</AnimatedText>
             </button>
           </nav>
 

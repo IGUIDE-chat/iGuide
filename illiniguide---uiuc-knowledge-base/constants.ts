@@ -62,7 +62,27 @@ export const UI_TEXT = {
     guestMode: "Skip login, try Guest Mode",
     loginError: "Login failed, please check email/password",
     registerError: "Registration failed, try again later",
-    genericError: "An error occurred, please try again"
+    genericError: "An error occurred, please try again",
+
+    // Agent Tabs
+    coursesTab: "Courses",
+    dormsTab: "Housing",
+    resumeTab: "Resume",
+
+    // Agent Landing Pages
+    comingSoon: "Coming Soon",
+    notifyMe: "Notify Me",
+    emailPlaceholder: "Enter your email",
+    emailSuccess: "Thanks! We'll notify you when it's ready.",
+
+    coursesTitle: "Course Selection Agent",
+    coursesDesc: "Get personalized course recommendations based on your major, interests, and graduation requirements. Never stress about registration again.",
+
+    dormsTitle: "Dorm Selection Agent",
+    dormsDesc: "Find the perfect dorm for your lifestyle. Compare amenities, locations, and vibes to make the best housing decision.",
+
+    resumeTitle: "Resume Builder Agent",
+    resumeDesc: "Create a standout resume tailored for internships and jobs. Get AI-powered suggestions to highlight your UIUC experience."
   },
   zh: {
     appTitle: "UIUC 指南",
@@ -125,7 +145,27 @@ export const UI_TEXT = {
     guestMode: "暂不登录，试用临时对话",
     loginError: "登录失败，请检查邮箱和密码",
     registerError: "注册失败，请稍后重试",
-    genericError: "发生错误，请稍后重试"
+    genericError: "发生错误，请稍后重试",
+
+    // Agent Tabs
+    coursesTab: "选课",
+    dormsTab: "选宿舍",
+    resumeTab: "简历",
+
+    // Agent Landing Pages
+    comingSoon: "即将上线",
+    notifyMe: "通知我",
+    emailPlaceholder: "输入你的邮箱",
+    emailSuccess: "谢谢！上线后我们会第一时间通知你。",
+
+    coursesTitle: "选课助手",
+    coursesDesc: "根据你的专业、兴趣和毕业要求，获取个性化选课推荐。再也不用为选课发愁。",
+
+    dormsTitle: "选宿舍助手",
+    dormsDesc: "找到最适合你生活方式的宿舍。比较设施、位置和氛围，做出最佳住宿选择。",
+
+    resumeTitle: "简历助手",
+    resumeDesc: "打造针对实习和工作的出色简历。获取 AI 驱动的建议，突出你的 UIUC 经历。"
   }
 };
 

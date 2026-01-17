@@ -1,0 +1,92 @@
+[
+  {
+    "test": 1,
+    "question_zh": "入学需要哪些疫苗？",
+    "question_en": "What vaccines are required for enrollment?",
+    "zh_length": 3056,
+    "en_length": 1402,
+    "ratio": 45.87696335078534,
+    "passed": false
+  },
+  {
+    "test": 2,
+    "question_zh": "如何注册课程？",
+    "question_en": "How do I register for classes?",
+    "zh_length": 662,
+    "en_length": 2222,
+    "ratio": 335.64954682779455,
+    "passed": true
+  },
+  {
+    "test": 3,
+    "question_zh": "图书馆的开放时间是什么？",
+    "question_en": "What are the library hours?",
+    "zh_length": 846,
+    "en_length": 346,
+    "ratio": 40.8983451536643,
+    "passed": false
+  },
+  {
+    "test": 4,
+    "question_zh": "如何获得学生证？",
+    "question_en": "How can I get a student ID card?",
+    "zh_length": 1836,
+    "en_length": 3092,
+    "ratio": 168.40958605664488,
+    "passed": true
+  },
+  {
+    "test": 5,
+    "question_zh": "校园里有哪些餐饮选择？",
+    "question_en": "What dining options are available on campus?",
+    "zh_length": 632,
+    "en_length": 3482,
+    "ratio": 550.9493670886076,
+    "passed": true
+  },
+  {
+    "test": 6,
+    "question_zh": "如何访问学生门户？",
+    "question_en": "How do I access the student portal?",
+    "zh_length": 1046,
+    "en_length": 1388,
+    "ratio": 132.6959847036329,
+    "passed": true
+  },
+  {
+    "test": 7,
+    "question_zh": "停车规定是什么？",
+    "question_en": "What are the parking regulations?",
+    "zh_length": 344,
+    "en_length": 4242,
+    "ratio": 1233.139534883721,
+    "passed": true
+  },
+  {
+    "test": 8,
+    "question_zh": "如何申请校内住宿？",
+    "question_en": "How do I apply for on-campus housing?",
+    "zh_length": 3284,
+    "en_length": 5076,
+    "ratio": 154.5676004872107,
+    "passed": true
+  },
+  {
+    "test": 9,
+    "question_zh": "有哪些健康服务可用？",
+    "question_en": "What health services are available?",
+    "zh_length": 3270,
+    "en_length": 4170,
+    "ratio": 127.5229357798165,
+    "passed": true
+  },
+  {
+    "test": 10,
+    "question_zh": "如何加入学生组织？",
+    "question_en": "How do I join student organizations?",
+    "zh_length": 1262,
+    "en_length": 520,
+    "ratio": 41.20443740095087,
+    "passed": false
+  }
+]

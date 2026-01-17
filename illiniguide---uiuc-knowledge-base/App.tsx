@@ -7,6 +7,7 @@ import { ArticleView } from './components/ArticleView';
 import { ChatScreen } from './components/ChatScreen';
 import { LoginScreen } from './components/LoginScreen';
 import { ProfileScreen } from './components/ProfileScreen';
+import { AgentLandingPage } from './components/AgentLandingPage';
 import { CATEGORIES, ARTICLES, getArticleText, getCategoryText, UI_TEXT } from './constants';
 import { CategoryId, Language } from './types';
 import { useAuth } from './contexts/AuthContext';
@@ -344,6 +345,11 @@ export default function App() {
               <Route path="/library/category/:categoryId" element={<CategoryPage language={language} />} />
               <Route path="/library/article/:articleId" element={<ArticlePage language={language} />} />
               <Route path="/profile" element={<ProfileScreen language={language} onBack={() => window.history.back()} />} />
+
+              {/* Agent Landing Pages */}
+              <Route path="/courses" element={<AgentLandingPage type="courses" language={language} />} />
+              <Route path="/dorms" element={<AgentLandingPage type="dorms" language={language} />} />
+              <Route path="/resume" element={<AgentLandingPage type="resume" language={language} />} />
             </Routes>
           </Layout>
         </motion.div>

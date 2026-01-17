@@ -1,0 +1,29 @@
+[
+  {
+    "test": 1,
+    "question_zh": "入学需要哪些疫苗？",
+    "question_en": "What vaccines are required for enrollment?",
+    "zh_length": 3060,
+    "en_length": 1650,
+    "ratio": 53.92156862745098,
+    "passed": false
+  },
+  {
+    "test": 2,
+    "question_zh": "如何获得学生证？",
+    "question_en": "How can I get a student ID card?",
+    "zh_length": 1670,
+    "en_length": 3182,
+    "ratio": 190.53892215568862,
+    "passed": true
+  },
+  {
+    "test": 3,
+    "question_zh": "如何访问学生门户？",
+    "question_en": "How do I access the student portal?",
+    "zh_length": 1672,
+    "en_length": 6384,
+    "ratio": 381.8181818181818,
+    "passed": true
+  }
+]
