@@ -63,6 +63,15 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
          return;
       }
       if (currentConversationId) {
+         // Safety Check: If logged in, ONLY allow valid UUIDs
+         // This prevents race conditions where legacy/guest IDs persist for one render cycle after login
+         if (user) {
+            const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+            if (!uuidRegex.test(currentConversationId)) {
+               console.warn('[ChatScreen] Skipping load of invalid/legacy ID for logged-in user:', currentConversationId);
+               return;
+            }
+         }
          loadConversation(currentConversationId);
       } else {
          setMessages([]);
@@ -273,8 +282,10 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
                               <div className={`${containerClass} flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
                                  <div className="flex-shrink-0 flex flex-col relative items-end">
                                     {msg.role === 'user' ? (
-                                       <div className="w-6 h-6 bg-slate-200 rounded-sm flex items-center justify-center text-slate-500 text-xs">
-                                          👤
+                                       <div className="w-6 h-6 bg-slate-200 rounded-lg flex items-center justify-center text-slate-500">
+                                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                                             <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clipRule="evenodd" />
+                                          </svg>
                                        </div>
                                     ) : (
                                        <div className="w-6 h-6 bg-illini-orange rounded-sm flex items-center justify-center text-white font-bold text-xs shadow-sm font-serif">
