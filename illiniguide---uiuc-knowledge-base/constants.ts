@@ -41,7 +41,28 @@ export const UI_TEXT = {
     downloadingModel: "Downloading Model...",
     modelReady: "Model Ready",
     webGpuError: "WebGPU is not supported on this device. Please use Cloud AI.",
-    initLocal: "Load Local Model"
+    initLocal: "Load Local Model",
+
+    // Login Screen
+    loginTitle: "UIUC Guide",
+    loginSubtitle: "UIUC Incoming Student Knowledge Base",
+    loginSwitch: "Login",
+    registerSwitch: "Register",
+    googleLogin: "Login with Google",
+    orEmail: "Or use email",
+    emailLabel: "Email",
+    passwordLabel: "Password",
+    loginAction: "Login",
+    registerAction: "Register",
+    processing: "Processing...",
+    noAccount: "Don't have an account?",
+    hasAccount: "Already have an account?",
+    registerNow: "Register Now",
+    loginNow: "Login Now",
+    guestMode: "Skip login, try Guest Mode",
+    loginError: "Login failed, please check email/password",
+    registerError: "Registration failed, try again later",
+    genericError: "An error occurred, please try again"
   },
   zh: {
     appTitle: "UIUC 指南",
@@ -83,7 +104,28 @@ export const UI_TEXT = {
     downloadingModel: "正在下载模型...",
     modelReady: "模型就绪",
     webGpuError: "您的设备不支持 WebGPU，请使用云端 AI。",
-    initLocal: "加载本地模型"
+    initLocal: "加载本地模型",
+
+    // Login Screen
+    loginTitle: "UIUC 指南",
+    loginSubtitle: "UIUC 新生知识库",
+    loginSwitch: "登录",
+    registerSwitch: "注册",
+    googleLogin: "使用 Google 账号登录",
+    orEmail: "或者使用邮箱",
+    emailLabel: "邮箱",
+    passwordLabel: "密码",
+    loginAction: "登录",
+    registerAction: "注册",
+    processing: "处理中...",
+    noAccount: "还没有账号？",
+    hasAccount: "已有账号？",
+    registerNow: "立即注册",
+    loginNow: "立即登录",
+    guestMode: "暂不登录，试用临时对话",
+    loginError: "登录失败，请检查邮箱和密码",
+    registerError: "注册失败，请稍后重试",
+    genericError: "发生错误，请稍后重试"
   }
 };
 

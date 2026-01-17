@@ -236,7 +236,14 @@ const ArticlePage = ({ language }: { language: Language }) => {
 
 export default function App() {
   const { user, isLoading } = useAuth();
-  const [language, setLanguage] = useState<Language>('zh');
+  // Initialize language from browser preference
+  const [language, setLanguage] = useState<Language>(() => {
+    if (typeof navigator !== 'undefined') {
+      const browserLang = navigator.language.toLowerCase();
+      return browserLang.startsWith('zh') ? 'zh' : 'en';
+    }
+    return 'zh';
+  });
   const [isGuest, setIsGuest] = useState(true);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
 
@@ -276,7 +283,7 @@ export default function App() {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-illini-blue/10 via-white to-illini-orange/10">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-illini-orange border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-600">加载中...</p>
+          <p className="text-slate-600">{language === 'zh' ? '加载中...' : 'Loading...'}</p>
         </div>
       </div>
     );
@@ -295,7 +302,11 @@ export default function App() {
           transition={{ duration: 0.3 }}
           className="h-full w-full"
         >
-          <LoginScreen onGuestLogin={() => setIsGuest(true)} />
+          <LoginScreen
+            onGuestLogin={() => setIsGuest(true)}
+            language={language}
+            onLanguageChange={setLanguage}
+          />
         </motion.div>
       ) : (
         <motion.div
