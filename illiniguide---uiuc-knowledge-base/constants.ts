@@ -11,7 +11,7 @@ export const UI_TEXT = {
       { icon: '💉', text: "What vaccines are required for enrollment?" },
       { icon: '🚌', text: "How does the bus system work?" },
       { icon: '☕', text: "Where are good study spots?" },
-      { icon: '🍔', text: "Best food on Green Street?" }
+      { icon: '🎓', text: "How to transfer to Engineering?" }
     ],
     inputPlaceholder: "Ask anything...",
     searchPlaceholder: "Search for guides...",
@@ -74,7 +74,7 @@ export const UI_TEXT = {
       { icon: '💉', text: "入学要打什么疫苗？" },
       { icon: '🚌', text: "CUMTD 公交系统怎么坐？" },
       { icon: '☕', text: "哪里适合自习？" },
-      { icon: '🍔', text: "绿街有什么好吃的？" }
+      { icon: '🎓', text: "怎么转工院？" }
     ],
     inputPlaceholder: "随便问点什么...",
     searchPlaceholder: "搜索指南...",
