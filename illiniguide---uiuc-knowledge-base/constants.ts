@@ -8,9 +8,9 @@ export const UI_TEXT = {
     welcomeTitle: "Hey, welcome to",
     welcomeSubtitle: "I'm your personal campus guide. Ask me about finding your way around, dorm life, or where to get the best bubble tea.",
     suggestions: [
-      { icon: '💉', text: "What vaccines are required for enrollment?" },
-      { icon: '✈️', text: "How to get from the airport to campus?" },
-      { icon: '🛏️', text: "What are the pros of each freshman dorm?" },
+      { icon: '💉', text: "What vaccines are required for freshmen?" },
+      { icon: '✈️', text: "How to get from O'Hare International Airport to campus?" },
+      { icon: '🛏️', text: "What dorm options are available for freshmen?" },
       { icon: '🎓', text: "How to transfer to Engineering?" }
     ],
     inputPlaceholder: "Ask anything...",

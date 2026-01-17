@@ -56,16 +56,8 @@ export const streamChatResponse = async function* (
     // 1. Prepare Request
     // We map 'model' role to 'assistant' for Coze API compatibility
 
-    // If language is Chinese, we append a strict instruction to the latest message
-    // This ensures the bot speaks Chinese even if the user asks in English or uses English terms.
-    let finalUserMessage = newMessage;
-    if (lang === 'zh') {
-      finalUserMessage += " (请务必用中文回答)";
-    } else if (lang === 'en') {
-      // ENHANCED PROMPT: Force detailed translation instead of summary
-      // The bot tends to give shorter responses in English, so we explicitly instruct it to be comprehensive
-      finalUserMessage += " (Please answer ONLY in English. You MUST provide a comprehensive, extremely detailed response. Translate ALL relevant information from the Knowledge Base step-by-step. Do NOT summarize or shorten the content. Match the length and depth of a native Chinese response.)";
-    }
+    // Message is sent directly - bilingual search logic is now in Coze Bot persona
+    const finalUserMessage = newMessage;
 
     // OPTIMIZATION: Do not send full history if auto_save_history is enabled.
     // Sending full history causes duplication (Server Context + Client Sent History).
