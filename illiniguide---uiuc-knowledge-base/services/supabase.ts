@@ -14,10 +14,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
     console.warn('Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Cloudflare Environment Variables.');
 }
 
-// Fallback to prevent app crash (White Screen) if keys are missing
-// createClient throws if URL is empty string.
-const finalUrl = supabaseUrl || 'https://placeholder.supabase.co';
-const finalKey = supabaseAnonKey || 'placeholder-key';
+// Fallback to prevent app crash if keys are missing (but we expect them to be injected via vite.config.ts)
+const finalUrl = supabaseUrl || '';
+const finalKey = supabaseAnonKey || '';
 
 export const supabase = createClient(finalUrl, finalKey);
 
