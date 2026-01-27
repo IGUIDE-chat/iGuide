@@ -1,0 +1,274 @@
+{
+    "preserve_terms": {
+        "universities": {
+            "UIUC": {
+                "en": "University of Illinois Urbana-Champaign",
+                "zh": "伊利诺伊大学香槟分校",
+                "preserve": "UIUC",
+                "aliases": [
+                    "伊大",
+                    "香槟分校",
+                    "UIUC"
+                ]
+            },
+            "UI": {
+                "en": "University of Illinois",
+                "zh": "伊利诺伊大学",
+                "preserve": "UI",
+                "aliases": [
+                    "伊利诺伊大学"
+                ]
+            }
+        },
+        "departments": {
+            "CS": {
+                "en": "Computer Science",
+                "zh": "计算机科学",
+                "preserve": "CS",
+                "aliases": [
+                    "计算机",
+                    "计科",
+                    "CS"
+                ]
+            },
+            "ECE": {
+                "en": "Electrical and Computer Engineering",
+                "zh": "电子与计算机工程",
+                "preserve": "ECE",
+                "aliases": [
+                    "电子工程",
+                    "计算机工程",
+                    "ECE"
+                ]
+            },
+            "MATH": {
+                "en": "Mathematics",
+                "zh": "数学",
+                "preserve": "MATH",
+                "aliases": [
+                    "数学系",
+                    "MATH"
+                ]
+            },
+            "PHYS": {
+                "en": "Physics",
+                "zh": "物理",
+                "preserve": "PHYS",
+                "aliases": [
+                    "物理系",
+                    "PHYS"
+                ]
+            },
+            "CHEM": {
+                "en": "Chemistry",
+                "zh": "化学",
+                "preserve": "CHEM",
+                "aliases": [
+                    "化学系",
+                    "CHEM"
+                ]
+            },
+            "ME": {
+                "en": "Mechanical Engineering",
+                "zh": "机械工程",
+                "preserve": "ME",
+                "aliases": [
+                    "机械",
+                    "ME"
+                ]
+            },
+            "CEE": {
+                "en": "Civil and Environmental Engineering",
+                "zh": "土木与环境工程",
+                "preserve": "CEE",
+                "aliases": [
+                    "土木",
+                    "环境工程",
+                    "CEE"
+                ]
+            }
+        },
+        "immigration": {
+            "ISSS": {
+                "en": "International Student and Scholar Services",
+                "zh": "国际学生学者服务中心",
+                "preserve": "ISSS",
+                "aliases": [
+                    "国际学生办公室",
+                    "ISSS"
+                ]
+            },
+            "I-20": {
+                "en": "Certificate of Eligibility for Nonimmigrant Student Status",
+                "zh": "非移民学生身份资格证明",
+                "preserve": "I-20",
+                "aliases": [
+                    "I20",
+                    "I-20表格"
+                ]
+            },
+            "OPT": {
+                "en": "Optional Practical Training",
+                "zh": "选择性实习训练",
+                "preserve": "OPT",
+                "aliases": [
+                    "实习",
+                    "OPT"
+                ]
+            },
+            "CPT": {
+                "en": "Curricular Practical Training",
+                "zh": "课程实习训练",
+                "preserve": "CPT",
+                "aliases": [
+                    "CPT"
+                ]
+            },
+            "F-1": {
+                "en": "F-1 Student Visa",
+                "zh": "F-1学生签证",
+                "preserve": "F-1",
+                "aliases": [
+                    "F1",
+                    "学生签证"
+                ]
+            }
+        },
+        "academic": {
+            "GPA": {
+                "en": "Grade Point Average",
+                "zh": "平均成绩点数",
+                "preserve": "GPA",
+                "aliases": [
+                    "绩点",
+                    "平均成绩",
+                    "GPA"
+                ]
+            },
+            "AP": {
+                "en": "Advanced Placement",
+                "zh": "大学先修课程",
+                "preserve": "AP",
+                "aliases": [
+                    "AP课程",
+                    "AP"
+                ]
+            },
+            "IB": {
+                "en": "International Baccalaureate",
+                "zh": "国际文凭",
+                "preserve": "IB",
+                "aliases": [
+                    "IB课程",
+                    "IB"
+                ]
+            },
+            "TA": {
+                "en": "Teaching Assistant",
+                "zh": "助教",
+                "preserve": "TA",
+                "aliases": [
+                    "助教",
+                    "TA"
+                ]
+            },
+            "RA": {
+                "en": "Research Assistant",
+                "zh": "研究助理",
+                "preserve": "RA",
+                "aliases": [
+                    "研究助理",
+                    "RA"
+                ]
+            }
+        },
+        "facilities": {
+            "ARC": {
+                "en": "Activities and Recreation Center",
+                "zh": "活动与娱乐中心",
+                "preserve": "ARC",
+                "aliases": [
+                    "健身房",
+                    "体育馆",
+                    "ARC"
+                ]
+            },
+            "CRCE": {
+                "en": "Campus Recreation Center East",
+                "zh": "东校区娱乐中心",
+                "preserve": "CRCE",
+                "aliases": [
+                    "CRCE"
+                ]
+            }
+        }
+    },
+    "common_translations": {
+        "course": {
+            "zh": [
+                "课程",
+                "课",
+                "科目"
+            ],
+            "en": "course"
+        },
+        "professor": {
+            "zh": [
+                "教授",
+                "老师",
+                "讲师"
+            ],
+            "en": "professor"
+        },
+        "semester": {
+            "zh": [
+                "学期",
+                "semester"
+            ],
+            "en": "semester"
+        },
+        "credit": {
+            "zh": [
+                "学分",
+                "credit"
+            ],
+            "en": "credit"
+        },
+        "prerequisite": {
+            "zh": [
+                "先修课",
+                "前置课程",
+                "prerequisite"
+            ],
+            "en": "prerequisite"
+        },
+        "major": {
+            "zh": [
+                "专业",
+                "主修"
+            ],
+            "en": "major"
+        },
+        "minor": {
+            "zh": [
+                "辅修",
+                "副修"
+            ],
+            "en": "minor"
+        },
+        "dorm": {
+            "zh": [
+                "宿舍",
+                "寝室"
+            ],
+            "en": "dorm"
+        },
+        "dining hall": {
+            "zh": [
+                "食堂",
+                "餐厅"
+            ],
+            "en": "dining hall"
+        }
+    }
+}

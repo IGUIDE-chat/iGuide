@@ -33,12 +33,21 @@ export interface Category {
   description_zh?: string;
 }
 
+
+export interface Source {
+  title: string;
+  url: string;
+  content?: string;
+  score?: number;
+}
+
 export interface ChatMessage {
   id: string;
   role: 'user' | 'model';
   text: string;
   isStreaming?: boolean;
   followUpQuestions?: string[];
+  sources?: Source[];
 }
 
 export interface ConversationSummary {

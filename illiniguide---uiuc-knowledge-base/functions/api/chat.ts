@@ -17,6 +17,7 @@ interface Env {
     COZE_API_TOKEN?: string;
     VITE_COZE_API_KEY?: string;
     VITE_COZE_BOT_ID?: string;
+    VITE_BACKEND_URL?: string;
 }
 
 // Helper to generate JWT (Minimal implementation or import remote library if needed)
@@ -38,50 +39,46 @@ interface Env {
 // Assuming S2S for a chatbot.
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
-    const { request, env } = context;
+    const { request, env, data } = context;
 
     try {
         const body = await request.json() as any;
-        const { message, conversationId, history, userId, lang = 'en' } = body;
 
-        // Use Environment Secret (PAT or OAuth Token)
-        // For now, simpler to use PAT on server-side which is equally secure for a single bot.
-        const API_TOKEN = env.VITE_COZE_API_KEY || env.COZE_API_TOKEN;
-        const BOT_ID = env.VITE_COZE_BOT_ID || env.COZE_BOT_ID;
+        // Use injected data from middleware
+        const region = data.region as string || 'Global';
+        const userId = request.headers.get('X-User-ID') || 'anon';
 
-        if (!API_TOKEN) return new Response("Missing API Key", { status: 500 });
+        // VPS Backend Endpoint (Tunnel URL or Direct IP)
+        // In production, this would be an Argo Tunnel hostname e.g. "https://api.illiniguide.com/api/v1/chat"
+        // For development/demo, we use a placeholder or local env var.
+        const BACKEND_URL = env.VITE_BACKEND_URL || "http://localhost:8000/api/v1/chat";
 
-        // Call Coze API
-        const cozeRes = await fetch("https://api.coze.com/v3/chat", {
+        // Forward request to Python Core
+        const backendRes = await fetch(BACKEND_URL, {
             method: "POST",
             headers: {
-                "Authorization": `Bearer ${API_TOKEN}`,
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "X-User-Region": region,
+                "X-User-ID": userId,
+                // Pass auth token if backend needs to verify again or use it
+                "Authorization": request.headers.get("Authorization") || ""
             },
             body: JSON.stringify({
-                bot_id: BOT_ID,
-                user_id: userId || "user_123",
-                stream: true,
-                auto_save_history: true,
-                additional_messages: [
-                    ...(history || []).map((h: any) => ({
-                        role: h.role === 'model' ? 'assistant' : 'user',
-                        content: h.text,
-                        content_type: 'text'
-                    })),
-                    { role: 'user', content: message, content_type: 'text' }
-                ],
-                custom_variables: {
-                    language: lang === 'zh' ? 'Chinese' : 'English',
-                    response_detail_level: 'comprehensive'
-                },
-                ...(conversationId && { conversation_id: conversationId })
+                query: body.message,
+                conversation_id: body.conversationId,
+                history: body.history,
+                stream: true
             })
         });
 
-        // Stream back
+        // Handle streaming response from Python
+        if (!backendRes.ok) {
+            const errorText = await backendRes.text();
+            return new Response(JSON.stringify({ error: `Backend Error: ${errorText}` }), { status: backendRes.status });
+        }
+
         const { readable, writable } = new TransformStream();
-        cozeRes.body?.pipeTo(writable);
+        backendRes.body?.pipeTo(writable);
 
         return new Response(readable, {
             headers: {

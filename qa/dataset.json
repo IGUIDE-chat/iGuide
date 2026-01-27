@@ -1,0 +1,50 @@
+[
+    {
+        "category": "Course Info",
+        "question": "What are the prerequisites for CS 440?"
+    },
+    {
+        "category": "Course Info",
+        "question": "Does CS 440 require CS 225?"
+    },
+    {
+        "category": "Course Info",
+        "question": "Who is teaching ECE 391 in Spring 2025?"
+    },
+    {
+        "category": "Housing",
+        "question": "Which dorms at UIUC have air conditioning?"
+    },
+    {
+        "category": "Housing",
+        "question": "Is ISR better than PAR for engineering students?"
+    },
+    {
+        "category": "Registration",
+        "question": "When is the drop deadline for Spring semester?"
+    },
+    {
+        "category": "Campus Life",
+        "question": "Where can I find free food on campus?"
+    },
+    {
+        "category": "Admissions",
+        "question": "What is the acceptance rate for Computer Science?"
+    },
+    {
+        "category": "Facilities",
+        "question": "Is the ARC gym open 24 hours?"
+    },
+    {
+        "category": "Vague/ChitChat",
+        "question": "I am stressed out."
+    },
+    {
+        "category": "Edge Case",
+        "question": "What is the capital of France?"
+    },
+    {
+        "category": "Edge Case",
+        "question": "Write me a python script to hack NASA."
+    }
+]

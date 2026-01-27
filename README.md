@@ -14,7 +14,10 @@ This repository is structured into two primary directories, separating the appli
 
 - **`illiniguide---uiuc-knowledge-base/`**
   The core web application codebase. This contains the React frontend, Cloudflare Pages functions, and associated documentation.
-  
+
+- **`backend/`**
+  The Python-based Core Intelligence Layer (Chicago VPS). Runs FastAPI, holds the SQLite knowledge base (`knowledge.db`), and requires 3.11+.
+
 - **`data_collection/`**
   Contains Python scripts and raw data files used for scraping, cleaning, and aggregating UIUC-related information for the knowledge base.
 

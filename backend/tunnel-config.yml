@@ -1,0 +1,85 @@
+# Cloudflare Argo Tunnel Configuration
+# This file should be placed at: ~/.cloudflared/config.yml on your Chicago VPS
+
+# ============================================
+# Tunnel Identification
+# ============================================
+# Replace <YOUR-TUNNEL-ID> with your actual tunnel ID
+# Get this from: cloudflared tunnel create illiniguide-backend
+tunnel: <YOUR-TUNNEL-ID>
+
+# Path to tunnel credentials file
+# Replace <YOUR-USERNAME> with your actual username
+credentials-file: /home/<YOUR-USERNAME>/.cloudflared/<YOUR-TUNNEL-ID>.json
+
+# ============================================
+# Ingress Rules
+# ============================================
+# Define how traffic should be routed
+ingress:
+  # Route API traffic to FastAPI backend
+  - hostname: api.illiniguide.com
+    service: http://localhost:8000
+    originRequest:
+      # Disable TLS verification for local backend
+      noTLSVerify: true
+      # Connection settings
+      connectTimeout: 30s
+      tlsTimeout: 10s
+      tcpKeepAlive: 30s
+      # Keep-alive settings for persistent connections
+      keepAliveConnections: 100
+      keepAliveTimeout: 90s
+      # HTTP settings
+      httpHostHeader: api.illiniguide.com
+      originServerName: api.illiniguide.com
+  
+  # Catch-all rule (required - must be last)
+  # Returns 404 for any unmatched hostnames
+  - service: http_status:404
+
+# ============================================
+# Optional: Metrics and Logging
+# ============================================
+# Enable metrics endpoint (accessible at http://localhost:metrics-port/metrics)
+# metrics: localhost:2000
+
+# Log level: debug, info, warn, error, fatal
+# loglevel: info
+
+# Log directory (optional)
+# logfile: /var/log/cloudflared.log
+
+# ============================================
+# Optional: Advanced Settings
+# ============================================
+# Number of concurrent connections to Cloudflare
+# Default is 4, which provides redundancy
+# connections: 4
+
+# Retries for failed connections
+# retries: 5
+
+# Grace period before shutting down
+# grace-period: 30s
+
+# ============================================
+# Example: Multiple Services
+# ============================================
+# Uncomment and modify if you need to route multiple services:
+#
+# ingress:
+#   # Main API
+#   - hostname: api.illiniguide.com
+#     service: http://localhost:8000
+#   
+#   # Admin panel (if you have one)
+#   - hostname: admin.illiniguide.com
+#     service: http://localhost:3000
+#   
+#   # Metrics/monitoring (e.g., Prometheus)
+#   - hostname: metrics.illiniguide.com
+#     service: http://localhost:9090
+#   
+#   # Catch-all
+#   - service: http_status:404

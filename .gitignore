@@ -12,7 +12,22 @@
 Thumbs.db
 
 # Node Modules
-node_modules/
-dist/
+node__pycache__/
+*.pyc
 .env
-.env.local
+.venv/
+venv/
+*.db
+*.db-shm
+*.db-wal
+# Database files should only be in backend/data/
+/knowledge.db
+/knowledge.db-shm
+/knowledge.db-wal
+
+# Large Model Files (download separately)
+backend/models/*.onnx
+backend/models/*.onnx_data
+backend/data/*.db
+backend/data/*.db-shm
+backend/data/*.db-wal

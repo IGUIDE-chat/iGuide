@@ -1,0 +1,18 @@
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+pydantic>=2.6.0
+pydantic-settings>=2.1.0
+python-dotenv>=1.0.1
+base58
+httpx>=0.27.0
+numpy
+sqlite-vec
+# For ONNX runtime execution of embeddings/rerankers
+onnxruntime>=1.17.0
+tokenizers>=0.15.0
+# For Web fallback
+tavily-python>=0.3.0
+trafilatura>=1.6.0
+beautifulsoup4>=4.12.0
+# For testing
+pytest>=8.0.0

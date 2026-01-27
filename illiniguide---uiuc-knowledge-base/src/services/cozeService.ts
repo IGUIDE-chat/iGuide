@@ -12,9 +12,12 @@ const COZE_BOT_ID = import.meta.env.VITE_COZE_BOT_ID;
 const COZE_API_URL = "https://api.coze.com/v3/chat";
 const COZE_CONVERSATION_API_URL = "https://api.coze.com/v1/conversation/create";
 
+import { Source } from '../types';
+
 export interface StreamResponse {
   text: string;
   followUpQuestions?: string[];
+  sources?: Source[];
 }
 
 /**
@@ -177,7 +180,14 @@ export const streamChatResponse = async function* (
             console.log('[Coze] Event:', currentEvent, 'Type:', data.type);
 
             // Handle Coze V3 message types
-            if (currentEvent === 'conversation.message.delta' && data.type === 'answer') {
+            if (currentEvent === 'sources') {
+              try {
+                const sources = JSON.parse(jsonStr) as Source[];
+                yield { text: '', sources };
+                console.log('[Coze] Sources received:', sources.length);
+              } catch (e) { console.error('Error parsing sources', e); }
+            }
+            else if (currentEvent === 'conversation.message.delta' && data.type === 'answer') {
               if (data.content) {
                 yield { text: data.content };
               }
