@@ -7,23 +7,17 @@ pages_build_output_dir = "dist"
 [build]
 command = "npm run build"
 
-[build.environment]
-NODE_VERSION = "18"
+# Note: Environment variables should be set in Cloudflare Pages dashboard
+# Go to: Settings → Environment variables
+# 
+# Required variables:
+# - VITE_SUPABASE_URL
+# - VITE_SUPABASE_ANON_KEY
+# - VITE_DEEPSEEK_API_KEY (production only)
+# - VITE_SILICONFLOW_API_KEY (production only)
+# - VITE_BACKEND_URL
+#
+# Node.js version is set automatically by Cloudflare Pages (v18)
 
-# Environment variables for development
-[env.development]
-VITE_SUPABASE_URL = ""  # Set in Cloudflare Pages dashboard
-VITE_SUPABASE_ANON_KEY = ""  # Set in Cloudflare Pages dashboard
-VITE_BACKEND_URL = "http://localhost:8000/api/v1/chat"
-
-# Environment variables for production
-[env.production]
-VITE_SUPABASE_URL = ""  # Set in Cloudflare Pages dashboard
-VITE_SUPABASE_ANON_KEY = ""  # Set in Cloudflare Pages dashboard
-VITE_DEEPSEEK_API_KEY = ""  # Set in Cloudflare Pages dashboard
-VITE_SILICONFLOW_API_KEY = ""  # Set in Cloudflare Pages dashboard
-VITE_BACKEND_URL = "https://api.illiniguide.com/api/v1/chat"  # Your Argo Tunnel URL
-
-# Compatibility flags
-[compatibility_flags]
-nodejs_compat = true
+# Compatibility flags (must be array format)
+compatibility_flags = ["nodejs_compat"]
