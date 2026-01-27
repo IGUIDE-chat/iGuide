@@ -1,3 +1,5 @@
+// [LAYOUT] Sidebar component displaying reading history and pinned articles.
+// [布局] 显示阅读历史和置顶文章的侧边栏组件。
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TypewriterText } from './TypewriterText';

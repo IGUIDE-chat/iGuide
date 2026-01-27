@@ -1,3 +1,5 @@
+// [PAGE] Landing page template for specific agents (Courses, Dorms, Resume).
+// [页面] 用于特定智能体（课程、宿舍、简历）的着陆页模板。
 import * as React from 'react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';

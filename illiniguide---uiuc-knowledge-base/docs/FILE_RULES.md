@@ -7,6 +7,8 @@ This document outlines the file structure and organization rules for the `Illini
 *   **`root/`**
     *   **`src/`**: Source code directory.
         *   **`components/`**: React UI components (e.g., `ChatScreen.tsx`, `ArticleView.tsx`).
+        *   **`data/`**: Static data and content.
+            *   **`articles/`**: Individual article TypeScript files.
         *   **`services/`**: API and logic services (e.g., `conversationService.ts`, `supabase.ts`).
         *   **`contexts/`**: React Context providers (e.g., `AuthContext.tsx`).
     *   **`functions/`**: Cloudflare Pages functions (serverless backend).

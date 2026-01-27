@@ -1,3 +1,5 @@
+// [COMPONENT] Renders a single knowledge base article with Markdown support.
+// [组件] 支持 Markdown 的知识库文章渲染组件。
 import * as React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';

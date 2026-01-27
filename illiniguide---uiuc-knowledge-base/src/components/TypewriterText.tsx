@@ -1,4 +1,6 @@
-import React from 'react';
+// [COMPONENT] Animated text component that simulates typing effect.
+// [组件] 模拟打字机效果的动画文本组件。
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 
 interface TypewriterTextProps {

@@ -1,3 +1,5 @@
+// [FUNCTION] Serverless function handling chat requests and API proxying.
+// [函数] 处理聊天请求和 API 代理的无服务器函数。
 // Shim for Cloudflare Pages Functions type
 type PagesFunction<T = unknown> = (context: {
     request: Request;

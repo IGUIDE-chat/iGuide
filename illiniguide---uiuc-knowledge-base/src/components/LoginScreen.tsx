@@ -1,3 +1,5 @@
+// [PAGE] Combined login/registration screen with guest mode support.
+// [页面] 集成了访客模式支持的登录/注册页面。
 import * as React from 'react';
 import { useState } from 'react';
 import { motion } from 'framer-motion';

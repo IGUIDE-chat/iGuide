@@ -1,3 +1,5 @@
+// [SERVICE] Supabase client configuration and type definitions for database interaction.
+// [服务] Supabase 客户端配置及数据库交互的类型定义。
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;

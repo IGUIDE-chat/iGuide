@@ -1,6 +1,8 @@
 export type Language = 'en' | 'zh';
 export type AIProvider = 'cloud' | 'local' | 'coze';
 
+// [ROOT] Global TypeScript interfaces and type definitions.
+// [根组件] 全局 TypeScript 接口和类型定义。
 export interface Article {
   id: string;
   category: CategoryId;

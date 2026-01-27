@@ -1,3 +1,5 @@
+// [CONFIG] Vite build configuration and plugin setup.
+// [配置] Vite 构建配置和插件设置。
 import path from 'path';
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';

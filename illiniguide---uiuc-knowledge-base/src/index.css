@@ -1,5 +1,6 @@
-/* Global base styles and animations */
-
+/* [ROOT] Global styles and Tailwind CSS directives. */
+/* [根组件] 全局样式和 Tailwind CSS 指令。 */
+@tailwind base;
 /* Fade-in-up animation */
 @keyframes fade-in-up {
   from {

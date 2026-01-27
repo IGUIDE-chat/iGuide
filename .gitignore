@@ -1,0 +1,18 @@
+# Agent Configuration
+.agent/
+.gemini/
+.cursor/
+.codebuddy/
+.codex/
+.claude/
+.agents/
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Node Modules
+node_modules/
+dist/
+.env
+.env.local

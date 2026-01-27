@@ -1,3 +1,5 @@
+// [LAYOUT] Main application wrapper with sidebar and mobile navigation.
+// [布局] 包含侧边栏和移动端导航的主要应用容器。
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';

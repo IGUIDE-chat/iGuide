@@ -1,3 +1,5 @@
+// [PAGE] Main chat interface for AI interactions.
+// [页面] AI 对话交互的主界面。
 import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';

@@ -1,4 +1,6 @@
 import * as React from 'react';
+// [ROOT] Main application component handling routing and global layout.
+// [根组件] 处理路由和全局布局的应用程序主组件。
 import { useState, useMemo, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Routes, Route, Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';

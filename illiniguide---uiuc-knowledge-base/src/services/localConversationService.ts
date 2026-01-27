@@ -1,3 +1,5 @@
+// [SERVICE] Manages local storage for guest mode conversations.
+// [服务] 管理访客模式下的本地会话存储。
 import { ChatMessage, ConversationSummary } from '../types';
 
 const STORAGE_KEY = 'guest_conversations';

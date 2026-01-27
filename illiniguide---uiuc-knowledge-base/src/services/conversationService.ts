@@ -1,6 +1,8 @@
 import { supabase, type Conversation, type Message } from './supabase';
 import { authService } from './authService';
-import { ChatMessage } from '../types';
+// [SERVICE] Manages chat conversations, including storage and retrieval.
+// [服务] 管理聊天会话，包括存储和检索功能。
+import { ChatMessage, ConversationSummary } from '../types';
 
 export const conversationService = {
     /**

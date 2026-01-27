@@ -1,3 +1,5 @@
+// [SERVICE] Integration with Dify AI platform for advanced chat features.
+// [服务] 集成 Dify AI 平台以提供高级对话功能。
 /**
  * DIFY API SERVICE
  * Replaces Coze implementation with Dify Cloud API.
@@ -187,6 +189,7 @@ export const streamChatResponse = async function* (
         yield { text: `\n(Connection Error: ${error.message || 'Failed to reach Dify API'}. Please check your API key and network connection.)` };
     }
 };
+
 
 /**
  * Helper function to get or create conversation ID

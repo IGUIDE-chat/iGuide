@@ -1,4 +1,6 @@
 import * as React from 'react';
+// [LAYOUT] Sidebar component displaying chat history and conversation management.
+// [布局] 显示对话历史和管理的侧边栏组件。
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TypewriterText } from './TypewriterText';
@@ -220,8 +222,8 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                                                             </div>
 
                                                             <div className={`absolute right-0 top-0 bottom-0 w-24 flex items-center justify-end px-2 gap-0.5 bg-gradient-to-l to-transparent opacity-0 group-hover:opacity-100 transition-all duration-200 ${conv.id === currentConversationId
-                                                                    ? 'from-[#454545] via-[#454545]'
-                                                                    : 'from-[#2E2E2E] via-[#2E2E2E]'
+                                                                ? 'from-[#454545] via-[#454545]'
+                                                                : 'from-[#2E2E2E] via-[#2E2E2E]'
                                                                 }`}>
                                                                 <button
                                                                     onClick={(e) => handleTogglePin(conv.id, conv.isPinned, e)}

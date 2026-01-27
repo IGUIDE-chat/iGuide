@@ -1,3 +1,5 @@
+# [SCRIPT] Utility to modify ChatScreen component layout.
+# [脚本] 用于修改 ChatScreen 组件布局的工具脚本。
 import re
 
 # Read the file

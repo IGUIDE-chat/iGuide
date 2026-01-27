@@ -1,3 +1,5 @@
+// [LEGACY/UNUSED] Old app entry point. See src/App.tsx.
+// [遗留/未使用] 旧的应用入口文件。请参考 src/App.tsx。
 import { useState, useMemo, useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { Layout } from './Layout';

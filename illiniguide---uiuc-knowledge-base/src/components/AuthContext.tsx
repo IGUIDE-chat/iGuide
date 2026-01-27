@@ -1,3 +1,5 @@
+// [LEGACY/UNUSED] Old context file. See src/contexts/AuthContext.tsx.
+// [遗留/未使用] 旧的上下文文件。请参考 src/contexts/AuthContext.tsx。
 import { createContext, useContext, useState, useEffect, ReactNode, FC } from 'react';
 import { User, AuthContextType } from '../types';
 

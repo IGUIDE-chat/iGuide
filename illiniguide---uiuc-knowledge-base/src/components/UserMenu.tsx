@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+// [COMPONENT] Dropdown menu for user profile actions.
+// [组件] 用户个人资料操作的下拉菜单。
+import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
 export const UserMenu: React.FC = () => {

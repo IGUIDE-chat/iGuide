@@ -1,3 +1,5 @@
+# [TEST] Script to verify Coze API connection and bilingual performance.
+# [测试] 用于验证 Coze API 连接和双语性能的脚本。
 import requests
 import json
 import time

@@ -1,3 +1,5 @@
+// [CONTEXT] Authentication provider managing user login state and session persistence.
+// [上下文] 管理用户登录状态和会话持久化的身份验证提供者。
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { authService } from '../services/authService';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
