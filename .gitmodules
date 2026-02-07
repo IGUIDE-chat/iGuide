@@ -1,0 +1,3 @@
+[submodule "data_collection"]
+	path = data_collection
+	url = https://github.com/AODadbase/UIUC-Web-Crawler
