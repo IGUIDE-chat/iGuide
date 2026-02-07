@@ -1,0 +1,5 @@
+{
+  "name": "IlliniGuide - Housing Selection",
+  "description": "An interactive guide for UIUC students to explore, filter, and choose dorms, featuring an AI assistant for personalized housing advice.",
+  "requestFramePermissions": []
+}
