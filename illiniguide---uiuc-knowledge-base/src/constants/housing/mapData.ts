@@ -17,7 +17,7 @@ export const CAMPUS_ZONES = {
             type: 'Feature' as const,
             properties: {
                 name: 'Green Street\nCampustown',
-                name_zh: '格林街\n校园城',
+                name_zh: 'Green Street\nCampustown',
                 description: 'Hub for dining, nightlife, and shopping',
                 color: '#FFD600' // Vibrant Yellow
             },
@@ -54,7 +54,7 @@ export const CAMPUS_ZONES = {
             type: 'Feature' as const,
             properties: {
                 name: 'Downtown\nChampaign',
-                name_zh: '香槟市中心',
+                name_zh: 'Downtown\nChampaign',
                 description: 'Historic district with upscale dining and cafes',
                 color: '#00B0FF' // Vibrant Blue
             },
@@ -91,7 +91,7 @@ export const CAMPUS_ZONES = {
             type: 'Feature' as const,
             properties: {
                 name: 'Engineering\n(North)',
-                name_zh: '工学院\n（北校区）',
+                name_zh: 'Engineering\n(North)',
                 description: 'Grainger College of Engineering',
                 color: '#FF3D00' // Vibrant Deep Orange
             },
@@ -128,7 +128,7 @@ export const CAMPUS_ZONES = {
             type: 'Feature' as const,
             properties: {
                 name: 'LAS\n(Main Quad)',
-                name_zh: '文理学院\n（主广场）',
+                name_zh: 'LAS\n(Main Quad)',
                 description: 'College of Liberal Arts & Sciences',
                 color: '#00C853' // Vibrant Green
             },
@@ -165,7 +165,7 @@ export const CAMPUS_ZONES = {
             type: 'Feature' as const,
             properties: {
                 name: 'Business\n(South)',
-                name_zh: '商学院\n（南校区）',
+                name_zh: 'Business\n(South)',
                 description: 'Gies College of Business',
                 color: '#FF6D00' // Vibrant Orange
             },
@@ -206,7 +206,7 @@ export const CAMPUS_ZONES = {
             type: 'Feature' as const,
             properties: {
                 name: 'ACES\n(South)',
-                name_zh: '农业与环境学院\n（南校区）',
+                name_zh: 'ACES\n(South)',
                 description: 'College of ACES',
                 color: '#64DD17' // Vibrant Light Green
             },
@@ -245,7 +245,7 @@ export const CAMPUS_LANDMARKS: Landmark[] = [
     {
         id: 'union',
         name: 'Illini Union',
-        name_zh: '伊利诺伊学生中心',
+        name_zh: 'Illini Union',
         type: 'union',
         lat: 40.1093,
         lng: -88.2272
@@ -253,7 +253,7 @@ export const CAMPUS_LANDMARKS: Landmark[] = [
     {
         id: 'library',
         name: 'Main Library',
-        name_zh: '主图书馆',
+        name_zh: 'Main Library',
         type: 'library',
         lat: 40.1047,
         lng: -88.2284
@@ -261,7 +261,7 @@ export const CAMPUS_LANDMARKS: Landmark[] = [
     {
         id: 'arc',
         name: 'ARC (Gym)',
-        name_zh: 'ARC 健身中心',
+        name_zh: 'ARC (Gym)',
         type: 'gym',
         lat: 40.1011,
         lng: -88.2343
@@ -269,7 +269,7 @@ export const CAMPUS_LANDMARKS: Landmark[] = [
     {
         id: 'siebel-center',
         name: 'Siebel Center (CS)',
-        name_zh: 'Siebel 计算机中心',
+        name_zh: 'Siebel Center (CS)',
         type: 'school',
         lat: 40.1138,
         lng: -88.2259
@@ -277,7 +277,7 @@ export const CAMPUS_LANDMARKS: Landmark[] = [
     {
         id: 'ece-building',
         name: 'ECE Building',
-        name_zh: 'ECE 电气与计算机工程楼',
+        name_zh: 'ECE Building',
         type: 'school',
         lat: 40.1150,
         lng: -88.2280
@@ -286,7 +286,7 @@ export const CAMPUS_LANDMARKS: Landmark[] = [
     {
         id: 'bookstore',
         name: 'Illini Union Bookstore',
-        name_zh: '伊利诺伊书店',
+        name_zh: 'Illini Union Bookstore',
         type: 'store',
         lat: 40.1092,
         lng: -88.2294
@@ -294,7 +294,7 @@ export const CAMPUS_LANDMARKS: Landmark[] = [
     {
         id: 'county-market',
         name: 'County Market',
-        name_zh: 'County Market 超市',
+        name_zh: 'County Market',
         type: 'store',
         lat: 40.1130,
         lng: -88.2338
@@ -302,7 +302,7 @@ export const CAMPUS_LANDMARKS: Landmark[] = [
     {
         id: 'target',
         name: 'Target (Green St)',
-        name_zh: 'Target（格林街）',
+        name_zh: 'Target (Green St)',
         type: 'store',
         lat: 40.1102,
         lng: -88.2301
@@ -310,7 +310,7 @@ export const CAMPUS_LANDMARKS: Landmark[] = [
     {
         id: 'crce',
         name: 'CRCE (Gym)',
-        name_zh: 'CRCE 健身中心',
+        name_zh: 'CRCE (Gym)',
         type: 'gym',
         lat: 40.1045,
         lng: -88.2220
@@ -318,7 +318,7 @@ export const CAMPUS_LANDMARKS: Landmark[] = [
     {
         id: 'mckinley',
         name: 'McKinley Health',
-        name_zh: '麦金利健康中心',
+        name_zh: 'McKinley Health',
         type: 'medical',
         lat: 40.1030,
         lng: -88.2205
@@ -326,7 +326,7 @@ export const CAMPUS_LANDMARKS: Landmark[] = [
     {
         id: 'cif',
         name: 'CIF',
-        name_zh: 'CIF 创新教学楼',
+        name_zh: 'CIF',
         type: 'school',
         lat: 40.1125,
         lng: -88.2284
@@ -334,7 +334,7 @@ export const CAMPUS_LANDMARKS: Landmark[] = [
     {
         id: 'hmart',
         name: 'H Mart (Urbana)',
-        name_zh: 'H Mart（Urbana）',
+        name_zh: 'H Mart (Urbana)',
         type: 'store',
         lat: 40.1145,
         lng: -88.2068
@@ -342,7 +342,7 @@ export const CAMPUS_LANDMARKS: Landmark[] = [
     {
         id: 'walgreens',
         name: 'Walgreens (Green St)',
-        name_zh: 'Walgreens（格林街）',
+        name_zh: 'Walgreens (Green St)',
         type: 'store',
         lat: 40.1104,
         lng: -88.2328
@@ -350,7 +350,7 @@ export const CAMPUS_LANDMARKS: Landmark[] = [
     {
         id: 'cvs',
         name: 'CVS (Green St)',
-        name_zh: 'CVS（格林街）',
+        name_zh: 'CVS (Green St)',
         type: 'store',
         lat: 40.1103,
         lng: -88.2405
@@ -358,7 +358,7 @@ export const CAMPUS_LANDMARKS: Landmark[] = [
     {
         id: 'usps',
         name: 'USPS (Green St)',
-        name_zh: 'USPS（格林街）',
+        name_zh: 'USPS (Green St)',
         type: 'service',
         lat: 40.1103,
         lng: -88.2351
@@ -367,7 +367,7 @@ export const CAMPUS_LANDMARKS: Landmark[] = [
     {
         id: 'mcdonalds',
         name: 'McDonald\'s',
-        name_zh: '麦当劳',
+        name_zh: 'McDonald\'s',
         type: 'dining',
         lat: 40.1103,
         lng: -88.2298

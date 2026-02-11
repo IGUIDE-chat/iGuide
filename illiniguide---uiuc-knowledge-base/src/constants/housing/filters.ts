@@ -5,12 +5,12 @@
 ] as const;
 
 export const ROOM_TYPES = [
-    { id: '1B1B', label: { en: 'Single (1B1B)', zh: '单人间 (1B1B)' } },
-    { id: '2B1B', label: { en: 'Double (2B1B)', zh: '双人间 (2B1B)' } },
-    { id: '3B1B', label: { en: 'Triples (3B1B)', zh: '三人间 (3B1B)' } },
-    { id: '4B2B', label: { en: 'Quad (4B2B)', zh: '四人间 (4B2B)' } },
-    { id: 'Suite', label: { en: 'Suite', zh: '套间' } },
-    { id: 'Cluster', label: { en: 'Cluster', zh: '集群房型' } }
+    { id: '1B1B', label: { en: 'Single (1B1B)', zh: 'Single (1B1B)' } },
+    { id: '2B1B', label: { en: 'Double (2B1B)', zh: 'Double (2B1B)' } },
+    { id: '3B1B', label: { en: 'Triples (3B1B)', zh: 'Triples (3B1B)' } },
+    { id: '4B2B', label: { en: 'Quad (4B2B)', zh: 'Quad (4B2B)' } },
+    { id: 'Suite', label: { en: 'Suite', zh: 'Suite' } },
+    { id: 'Cluster', label: { en: 'Cluster', zh: 'Cluster' } }
 ] as const;
 
 // New filter constants for structured tags
