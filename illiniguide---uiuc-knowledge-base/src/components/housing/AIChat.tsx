@@ -36,8 +36,9 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
     }, [t.initialMessage]);
 
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages, isOpen]);
+        if (!isOpen) return;
+        messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+    }, [isOpen]);
 
     const handleSend = async () => {
         if (!inputText.trim() || isLoading) return;
@@ -55,14 +56,6 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
 
         try {
             const botMessageId = (Date.now() + 1).toString();
-            const botMessageBase: ChatMessage = {
-                id: botMessageId,
-                role: 'model',
-                text: '',
-                timestamp: new Date()
-            };
-            setMessages((prev) => [...prev, botMessageBase]);
-
             const historyForCoze = messages
                 .filter((message) => message.id !== 'welcome')
                 .map((message) => ({
@@ -72,9 +65,25 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
 
             const stream = streamChatResponse(historyForCoze, userMessage.text, language);
             let responseText = '';
+            let hasRenderedBotMessage = false;
 
             for await (const chunk of stream) {
                 if (!chunk.text) {
+                    continue;
+                }
+
+                if (!hasRenderedBotMessage) {
+                    responseText = chunk.text;
+                    hasRenderedBotMessage = true;
+                    setMessages((prev) => [
+                        ...prev,
+                        {
+                            id: botMessageId,
+                            role: 'model',
+                            text: responseText,
+                            timestamp: new Date()
+                        }
+                    ]);
                     continue;
                 }
 
@@ -90,31 +99,27 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
             }
 
             if (!responseText.trim()) {
-                setMessages((prev) =>
-                    prev.map((message) =>
-                        message.id === botMessageId
-                            ? { ...message, text: 'No response received. Please try again.' }
-                            : message
-                    )
-                );
+                setMessages((prev) => [
+                    ...prev,
+                    {
+                        id: botMessageId,
+                        role: 'model',
+                        text: 'No response received. Please try again.',
+                        timestamp: new Date()
+                    }
+                ]);
             }
         } catch (error) {
             console.error(error);
-            setMessages((prev) => {
-                const next = [...prev];
-                const latestModelIndex = next
-                    .map((message) => message.role)
-                    .lastIndexOf('model');
-
-                if (latestModelIndex >= 0 && !next[latestModelIndex].text) {
-                    next[latestModelIndex] = {
-                        ...next[latestModelIndex],
-                        text: 'Connection failed. Please try again.'
-                    };
+            setMessages((prev) => [
+                ...prev,
+                {
+                    id: (Date.now() + 2).toString(),
+                    role: 'model',
+                    text: 'Connection failed. Please try again.',
+                    timestamp: new Date()
                 }
-
-                return next;
-            });
+            ]);
         } finally {
             setIsLoading(false);
         }

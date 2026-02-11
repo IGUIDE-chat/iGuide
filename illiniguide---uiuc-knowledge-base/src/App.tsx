@@ -372,7 +372,15 @@ export default function App() {
 
                   {/* Agent Landing Pages */}
                   <Route path="/courses" element={<AgentLandingPage type="courses" language={language} />} />
-                  <Route path="/dorms" element={<DormList language={language} />} />
+                  <Route
+                    path="/dorms"
+                    element={
+                      <>
+                        <DormList language={language} />
+                        <AIChat language={language} />
+                      </>
+                    }
+                  />
                   <Route
                     path="/dorms/:id"
                     element={
