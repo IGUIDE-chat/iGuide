@@ -77,6 +77,7 @@ const PriceSection: React.FC<PriceSectionProps> = ({
 
             <div className="px-2 mb-8">
                 <Slider
+                    className="slider-modern"
                     range
                     min={priceLimits[0]}
                     max={priceLimits[1]}
