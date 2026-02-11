@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ARTICLES, CATEGORIES, getArticleText, getCategoryText, UI_TEXT } from '../../constants';
+import { ARTICLES, CATEGORIES, getArticleText, getCategoryText } from '../../constants';
+import { UI_TEXT } from '../../i18n/uiText';
 import { Language } from '../../types';
 
 interface LibraryHomePageProps {

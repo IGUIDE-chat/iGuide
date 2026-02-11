@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { TypewriterMarkdown } from './TypewriterMarkdown';
 import { Language, ChatMessage } from '../types';
 import { streamChatResponse } from '../services/ai';
-import { UI_TEXT } from '../constants';
+import { UI_TEXT } from '../i18n/uiText';
 import { conversationService } from '../services/conversationService';
 import { localConversationService } from '../services/localConversationService';
 import { useAuth } from '../contexts/AuthContext';

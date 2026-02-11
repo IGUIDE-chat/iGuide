@@ -1,6 +1,6 @@
-import { Language } from '../types';
+﻿import { Language } from '../types';
 
-export const UI_TEXT: Record<Language, {
+export type UITextEntry = {
     appTitle: string;
     chatTab: string;
     libraryTab: string;
@@ -66,7 +66,9 @@ export const UI_TEXT: Record<Language, {
     dormsDesc: string;
     resumeTitle: string;
     resumeDesc: string;
-}> = {
+};
+
+export const UI_TEXT: Record<Language, UITextEntry> = {
     en: {
         appTitle: 'UIUC Guide',
         chatTab: 'Chat',
@@ -77,7 +79,7 @@ export const UI_TEXT: Record<Language, {
         suggestions: [
             { icon: '💉', text: 'What vaccines are required for freshmen?' },
             { icon: '✈️', text: "How to get from O'Hare International Airport to campus?" },
-            { icon: '🛏️', text: 'What dorm options are available for freshmen?' },
+            { icon: '🏠', text: 'What dorm options are available for freshmen?' },
             { icon: '🎓', text: 'How to transfer to Engineering?' }
         ],
         inputPlaceholder: 'Ask anything...',
@@ -104,10 +106,10 @@ export const UI_TEXT: Record<Language, {
         providerLocal: 'Local (Free)',
         providerCoze: 'Coze (Agent)',
         localModelDesc: 'Runs in your browser. Needs ~1GB download.',
-        downloadingModel: 'Downloading Model...',
-        modelReady: 'Model Ready',
+        downloadingModel: 'Downloading model...',
+        modelReady: 'Model ready',
         webGpuError: 'WebGPU is not supported on this device. Please use Cloud AI.',
-        initLocal: 'Load Local Model',
+        initLocal: 'Load local model',
         loginTitle: 'UIUC Guide',
         loginSubtitle: 'UIUC Incoming Student Knowledge Base',
         loginSwitch: 'Login',
@@ -121,8 +123,8 @@ export const UI_TEXT: Record<Language, {
         processing: 'Processing...',
         noAccount: "Don't have an account?",
         hasAccount: 'Already have an account?',
-        registerNow: 'Register Now',
-        loginNow: 'Login Now',
+        registerNow: 'Register now',
+        loginNow: 'Login now',
         guestMode: 'Skip login, try Guest Mode',
         loginError: 'Login failed, please check email/password',
         registerError: 'Registration failed, try again later',
@@ -130,8 +132,8 @@ export const UI_TEXT: Record<Language, {
         coursesTab: 'Courses',
         dormsTab: 'Housing',
         resumeTab: 'Resume',
-        comingSoon: 'Coming Soon',
-        notifyMe: 'Join Waitlist',
+        comingSoon: 'Coming soon',
+        notifyMe: 'Join waitlist',
         emailPlaceholder: 'Enter your email',
         emailSuccess: "Thanks! We'll notify you when it's ready.",
         coursesTitle: 'Course Selection Agent',
@@ -149,16 +151,16 @@ export const UI_TEXT: Record<Language, {
         chatTab: 'AI 助手',
         libraryTab: '知识库',
         welcomeTitle: '欢迎来到 UIUC',
-        welcomeSubtitle: '我是你的校园助手。关于宿舍、交通、选课或美食，随时可以问我。',
+        welcomeSubtitle: '我是你的校园助手。关于宿舍、交通、选课和生活，随时可以问我。',
         suggestions: [
-            { icon: '💉', text: '入学要打什么疫苗？' },
-            { icon: '✈️', text: '怎么从机场到学校？' },
-            { icon: '🛏️', text: '新生宿舍都有哪些选择？' },
-            { icon: '🎓', text: '怎么转工院？' }
+            { icon: '💉', text: '新生需要打哪些疫苗？' },
+            { icon: '✈️', text: '怎么从奥黑尔机场到学校？' },
+            { icon: '🏠', text: '新生有哪些宿舍选择？' },
+            { icon: '🎓', text: '如何转入工程学院？' }
         ],
         inputPlaceholder: '随时提问...',
         searchPlaceholder: '搜索指南...',
-        searchTitle: '搜索结果:',
+        searchTitle: '搜索结果：',
         clear: '清除',
         noResults: '没有找到相关指南。',
         backToCategories: '返回分类列表',
@@ -167,7 +169,7 @@ export const UI_TEXT: Record<Language, {
         relatedTopics: '相关话题',
         updated: '更新于',
         knowledgeBaseTitle: '新生知识库',
-        knowledgeBaseSubtitle: '由学长学姐编写的实用指南。从住宿到深夜美食，应有尽有。',
+        knowledgeBaseSubtitle: '由学长学姐整理的实用指南，从住宿到校园生活一站式覆盖。',
         emptyCategory: '该分类下暂无文章。',
         highTraffic: '当前请求较多',
         highTrafficMsg: '我现在有点忙不过来。你可以先去知识库查看已验证内容。',
@@ -178,10 +180,10 @@ export const UI_TEXT: Record<Language, {
         providerCloud: '云端 (Coze)',
         providerLocal: '本地 (免费)',
         providerCoze: 'Coze (智能体)',
-        localModelDesc: '在浏览器本地运行，首次需下载约 1GB 模型。',
+        localModelDesc: '在浏览器本地运行，首次需要下载约 1GB 模型。',
         downloadingModel: '正在下载模型...',
         modelReady: '模型已就绪',
-        webGpuError: '当前设备不支持 WebGPU，请改用云端 AI。',
+        webGpuError: '当前设备不支持 WebGPU，请使用云端 AI。',
         initLocal: '加载本地模型',
         loginTitle: 'UIUC 指南',
         loginSubtitle: 'UIUC 新生知识库',
@@ -203,18 +205,17 @@ export const UI_TEXT: Record<Language, {
         registerError: '注册失败，请稍后重试',
         genericError: '发生错误，请稍后重试',
         coursesTab: '选课',
-        dormsTab: '住宿',
+        dormsTab: '宿舍',
         resumeTab: '简历',
         comingSoon: '即将上线',
         notifyMe: '加入候补名单',
         emailPlaceholder: '输入你的邮箱',
         emailSuccess: '感谢提交，我们上线后会第一时间通知你。',
         coursesTitle: '选课助手',
-        coursesDesc: '根据你的专业和兴趣提供个性化选课建议，降低选课试错成本。',
+        coursesDesc: '根据你的专业和兴趣提供个性化选课建议，减少选课试错成本。',
         dormsTitle: '选宿舍助手',
         dormsDesc: '对比宿舍位置、设施和预算，找到最适合你的住宿方案。',
         resumeTitle: '简历助手',
-        resumeDesc: '快速生成面向实习与求职的简历，并获得可执行的优化建议。'
+        resumeDesc: '快速生成用于实习和求职的简历，并获得可执行的优化建议。'
     }
 };
-
