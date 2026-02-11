@@ -325,6 +325,23 @@ const DormMap: React.FC<DormMapProps> = ({
             : { perSem: '/sem', viewDetails: 'Details →', ac: 'AC', dining: 'Dining' };
     const formatPopupPrice = (price: number) => `$${(price / 1000).toFixed(1)}k`;
 
+    if (!MAPBOX_TOKEN) {
+        return (
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+                <div className="text-center p-8 bg-white rounded-2xl shadow-xl max-w-md mx-4">
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">
+                        {language === 'zh' ? '地图不可用' : 'Map unavailable'}
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                        {language === 'zh'
+                            ? '缺少 VITE_MAPBOX_TOKEN 环境变量，请在部署平台配置后重试。'
+                            : 'Missing VITE_MAPBOX_TOKEN environment variable. Configure it and redeploy.'}
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="w-full h-full relative bg-gray-50">
             <Map
