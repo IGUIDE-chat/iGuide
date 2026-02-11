@@ -14,6 +14,7 @@ export const buildLandmarkFeatureCollection = (landmarks: Landmark[]) => ({
         properties: {
             id: landmark.id,
             name: landmark.name,
+            name_zh: landmark.name_zh,
             type: landmark.type
         } satisfies LandmarkFeatureProperties,
         geometry: {

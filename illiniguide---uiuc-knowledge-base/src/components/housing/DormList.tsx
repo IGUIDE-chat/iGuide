@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+﻿import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Dorm } from '../../types/housing';
 import { UIUC_DORMS } from '../../constants/housing/dormData';
@@ -38,16 +38,16 @@ const DORM_LIST_TEXT: Record<Language, DormListText> = {
     zh: {
         searchPlaceholder: '输入搜索宿舍...',
         noResults: '未找到匹配宿舍',
-        noResultsDesc: '没有宿舍匹配当前筛选条件。',
+        noResultsDesc: '没有宿舍匹配当前筛选条件，请尝试调整筛选或清空部分条件。',
         clearFilters: '清空全部筛选',
         viewMap: '地图视图',
         viewList: '列表视图',
         results: '个结果',
-        mapNoResults: '当前筛选下暂无宿舍。',
+        mapNoResults: '当前筛选条件下暂无宿舍。',
         clearPrice: '清除价格筛选',
         filters: '筛选',
         noDormsInArea: '该区域暂无宿舍',
-        panToSeeDorms: '请移动地图查看其他区域的宿舍'
+        panToSeeDorms: '请移动或缩放地图查看其他区域的宿舍'
     }
 };
 
@@ -291,6 +291,7 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
                         {isMapView && visibleInMap.length > 0 && (
                             <MapCarousel
                                 dorms={visibleInMap}
+                                language={language}
                                 favoritesSet={favoritesSet}
                                 onToggleFavorite={handleToggleFavorite}
                                 onViewDetails={handleViewDetails}

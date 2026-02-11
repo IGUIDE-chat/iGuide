@@ -1,4 +1,4 @@
-import { Language } from '../../../types';
+﻿import { Language } from '../../../types';
 
 export interface DormDetailText {
     dormNotFound: string;
@@ -57,25 +57,25 @@ export const dormDetailTexts: Record<Language, DormDetailText> = {
         favorites: 'My Favorites'
     },
     zh: {
-        dormNotFound: '未找到宿舍',
+        dormNotFound: '未找到该宿舍',
         backToDorms: '返回宿舍列表',
         backToBrowse: '返回浏览',
         campus: '校区',
         about: '简介',
         prosAndCons: '优缺点',
         good: '优点',
-        notSoGood: '缺点',
+        notSoGood: '不足',
         quickStats: '快速信息',
         roomType: '房型',
         diningHall: '食堂',
         onSite: '楼内',
         nearby: '附近',
-        annualPrice: '年价格',
-        illiniTip: '小贴士',
-        tipWithAc: '这栋宿舍有空调，8 月和 9 月会舒服很多。',
+        annualPrice: '年费用',
+        illiniTip: '伊利诺伊小贴士',
+        tipWithAc: '该宿舍配有空调，8 月和 9 月会舒适很多。',
         tipWithoutAc: '建议准备风扇。初秋会比较热，但这里的社区氛围很好。',
-        saved: '已收藏',
-        save: '收藏宿舍',
+        saved: '已加入收藏',
+        save: '加入收藏',
         viewingHistory: '浏览历史',
         favorites: '我的收藏'
     }
@@ -92,10 +92,10 @@ export const aiChatTexts: Record<Language, AiChatText> = {
     },
     zh: {
         title: '伊利诺伊助手',
-        subtitle: '由 DeepSeek 提供支持',
-        placeholder: '询问关于宿舍、文化、食物...',
+        subtitle: '由 DeepSeek 驱动',
+        placeholder: '可以问我宿舍、校园文化、美食等问题...',
         thinking: '思考中...',
         initialMessage:
-            "你好！我是你的伊利诺伊大学住宿助手。我可以帮你根据专业、生活方式或预算找到最合适的宿舍。试试问我“工程系学生适合住哪里？”或“哪里的食物最好吃？”"
+            '你好！我是你的 UIUC 住宿助手。我可以根据你的专业、生活方式和预算推荐宿舍。你可以问我“工科学生更适合哪栋宿舍？”或“哪附近吃饭更方便？”。'
     }
 };

@@ -213,6 +213,10 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                                     {msg.role === 'model' && mentionedDorms.length > 0 && (
                                         <div className="mt-3 ml-2 flex flex-col gap-3 w-full">
                                             {mentionedDorms.map((dorm) => (
+                                                (() => {
+                                                    const dormName =
+                                                        language === 'zh' && dorm.name_zh ? dorm.name_zh : dorm.name;
+                                                    return (
                                                 <button
                                                     key={dorm.id}
                                                     onClick={() => navigate(`/dorms/${dorm.id}`)}
@@ -222,14 +226,14 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                                                     <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                                                         <img
                                                             src={dorm.imageUrl}
-                                                            alt={dorm.name}
+                                                            alt={dormName}
                                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                                         />
                                                     </div>
                                                     <div className="flex-grow min-w-0">
                                                         <div className="flex justify-between items-start">
                                                             <h4 className="text-sm font-bold text-gray-900 group-hover:text-illini-orange transition-colors truncate">
-                                                                {dorm.name}
+                                                                {dormName}
                                                             </h4>
                                                         </div>
                                                         <div className="flex gap-1 mt-1.5 flex-wrap">
@@ -244,6 +248,8 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                                                         </div>
                                                     </div>
                                                 </button>
+                                                    );
+                                                })()
                                             ))}
                                         </div>
                                     )}

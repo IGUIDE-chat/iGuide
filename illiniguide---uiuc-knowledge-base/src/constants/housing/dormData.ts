@@ -3,7 +3,7 @@
 // Accurate UIUC dorm coordinates based on campus geography
 // Campus reference: Main Quad (40.1074, -88.2317), Engineering Quad (40.1130, -88.2280)
 
-export const UIUC_DORMS: Dorm[] = [
+const RAW_UIUC_DORMS: Dorm[] = [
     {
         id: 'isr',
         name: 'Illinois Street Residence (ISR)',
@@ -1185,7 +1185,93 @@ export const UIUC_DORMS: Dorm[] = [
     }
 ];
 
+const DORM_NAME_ZH_BY_ID: Record<string, string> = {
+    isr: '伊利诺伊街宿舍（ISR）',
+    nugent: '努金特宿舍楼',
+    wassaja: '瓦萨哈宿舍楼',
+    bousefield: '布斯菲尔德宿舍楼',
+    par: '宾夕法尼亚大道宿舍（PAR）',
+    far: '佛罗里达大道宿舍（FAR）',
+    allen: '艾伦宿舍楼',
+    'busey-evans': '布西-埃文斯宿舍',
+    snyder: '斯奈德宿舍楼',
+    hopkins: '霍普金斯宿舍楼',
+    weston: '韦斯顿宿舍楼',
+    scott: '斯科特宿舍楼',
+    taft: '塔夫脱宿舍楼',
+    'van-doren': '范多伦宿舍楼',
+    daniels: '丹尼尔斯宿舍楼',
+    sherman: '谢尔曼宿舍楼',
+    lar: '林肯大道宿舍（LAR）',
+    bromley: '布罗姆利宿舍楼',
+    'illini-tower': '伊利诺伊塔',
+    newman: '纽曼宿舍楼',
+    hendrick: '亨德里克之家',
+    'eugene-field': '尤金·菲尔德宿舍楼',
+    presby: '普雷斯比宿舍楼',
+    armory: '军械库宿舍楼'
+};
+
+const LOCATION_ZH: Record<Dorm['location'], string> = {
+    Ikenberry: 'Ikenberry 区',
+    'Main Quad': '主广场区',
+    'PAR/FAR': 'PAR/FAR 区',
+    Campustown: '校园城',
+    'South Campus': '南校区'
+};
+
+const TYPE_ZH: Record<Dorm['type'], string> = {
+    Traditional: '传统宿舍',
+    Cluster: '集群式房型',
+    Suite: '套间',
+    'Semi-Suite': '半套间'
+};
+
+const HOUSING_TYPE_ZH: Record<Dorm['housingType'], string> = {
+    URH: '校内宿舍',
+    PCH: '私营认证宿舍'
+};
+
+const buildDefaultProsZh = (dorm: Dorm): string[] => [
+    `位于${LOCATION_ZH[dorm.location]}，日常通勤较方便`,
+    dorm.ac ? '配备空调，夏季居住更舒适' : '房间无空调，建议准备风扇',
+    dorm.dining ? '食堂可达，用餐便利' : '可选择周边餐饮，选择更灵活'
+];
+
+const buildDefaultConsZh = (dorm: Dorm): string[] => [
+    `年费用约 $${dorm.price.toLocaleString()}，请结合预算评估`,
+    dorm.housingType === 'PCH'
+        ? '私营宿舍管理规则与校内宿舍存在差异'
+        : '高峰时段公共区域可能较拥挤',
+    dorm.location === 'Ikenberry' || dorm.location === 'South Campus'
+        ? '距离部分院系步行时间可能偏长'
+        : '热门时段周边人流较多'
+];
+
+const enrichDormZhContent = (dorm: Dorm): Dorm => {
+    const nameZh = dorm.name_zh?.trim() || DORM_NAME_ZH_BY_ID[dorm.id] || dorm.name;
+
+    const descriptionZh =
+        dorm.description_zh?.trim() ||
+        `${nameZh}位于${LOCATION_ZH[dorm.location]}，属于${HOUSING_TYPE_ZH[dorm.housingType]}的${TYPE_ZH[dorm.type]}。年住宿费用约 $${dorm.price.toLocaleString()}，${dorm.ac ? '配有空调' : '未配备空调'}，${dorm.dining ? '就近可使用食堂。' : '需前往附近区域就餐。'}`;
+
+    const prosZh = dorm.pros_zh && dorm.pros_zh.length > 0 ? dorm.pros_zh : buildDefaultProsZh(dorm);
+    const consZh = dorm.cons_zh && dorm.cons_zh.length > 0 ? dorm.cons_zh : buildDefaultConsZh(dorm);
+
+    return {
+        ...dorm,
+        name_zh: nameZh,
+        description_zh: descriptionZh,
+        pros_zh: prosZh,
+        cons_zh: consZh,
+        location_zh: dorm.location_zh || LOCATION_ZH[dorm.location],
+        type_zh: dorm.type_zh || TYPE_ZH[dorm.type]
+    };
+};
+
+export const UIUC_DORMS: Dorm[] = RAW_UIUC_DORMS.map(enrichDormZhContent);
+
 // Export dorm IDs for individual routes
-export const DORM_IDS = UIUC_DORMS.map(dorm => dorm.id);
+export const DORM_IDS = UIUC_DORMS.map((dorm) => dorm.id);
 
 

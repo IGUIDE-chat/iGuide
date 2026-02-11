@@ -10,11 +10,15 @@ export const buildZonesFillLayer = (showZones: boolean) => ({
     }
 });
 
-export const buildZonesLabelLayer = (showZones: boolean, showZoneLabels: boolean) => ({
+export const buildZonesLabelLayer = (
+    showZones: boolean,
+    showZoneLabels: boolean,
+    isChinese: boolean
+) => ({
     id: 'zones-label',
     type: 'symbol' as const,
     layout: {
-        'text-field': ['get', 'name'],
+        'text-field': ['coalesce', ['get', isChinese ? 'name_zh' : 'name'], ['get', 'name']],
         'text-font': ['DIN Offc Pro Bold', 'Arial Unicode MS Bold'],
         'text-size': 13,
         'text-transform': 'uppercase',
@@ -33,11 +37,11 @@ export const buildZonesLabelLayer = (showZones: boolean, showZoneLabels: boolean
     }
 });
 
-export const buildLandmarksLayer = (showLandmarks: boolean) => ({
+export const buildLandmarksLayer = (showLandmarks: boolean, isChinese: boolean) => ({
     id: 'landmarks-layer',
     type: 'symbol' as const,
     layout: {
-        'text-field': ['get', 'name'],
+        'text-field': ['coalesce', ['get', isChinese ? 'name_zh' : 'name'], ['get', 'name']],
         'text-font': ['DIN Offc Pro Bold', 'Arial Unicode MS Bold'],
         'text-size': 12,
         'text-offset': [0, 1.4],

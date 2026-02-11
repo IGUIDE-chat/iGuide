@@ -9,5 +9,6 @@ export interface DormFeatureProperties {
 export interface LandmarkFeatureProperties {
     id: string;
     name: string;
+    name_zh?: string;
     type: string;
 }

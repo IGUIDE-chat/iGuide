@@ -48,6 +48,8 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
     const dormName = language === 'zh' && dorm.name_zh ? dorm.name_zh : dorm.name;
     const dormDescription =
         language === 'zh' && dorm.description_zh ? dorm.description_zh : dorm.description;
+    const dormPros = language === 'zh' && dorm.pros_zh?.length ? dorm.pros_zh : dorm.pros;
+    const dormCons = language === 'zh' && dorm.cons_zh?.length ? dorm.cons_zh : dorm.cons;
 
     return (
         <div className="h-full overflow-y-auto w-full no-scrollbar">
@@ -75,8 +77,8 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                 title={t.prosAndCons}
                                 goodLabel={t.good}
                                 notSoGoodLabel={t.notSoGood}
-                                pros={dorm.pros}
-                                cons={dorm.cons}
+                                pros={dormPros}
+                                cons={dormCons}
                             />
 
                             {dorm.floorPlans && dorm.floorPlans.length > 0 && (

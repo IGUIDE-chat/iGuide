@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+﻿import React, { useEffect, useRef } from 'react';
 import { Dorm } from '../../types/housing';
 import { formatPrice } from '../../constants/housing/pricing';
 import { Language } from '../../types';
@@ -49,101 +49,108 @@ const DormBottomSheet: React.FC<DormBottomSheetProps> = ({
             perRoom: '/room',
             viewDetails: 'View Details',
             close: 'Close',
-            amenities: 'Amenities',
             roomTypes: 'Room Types',
             compare: 'Compare',
-            selectToCompare: 'Select dorms to compare',
-            vs: 'vs'
+            vs: 'vs',
+            ac: 'AC',
+            dining: 'Dining',
+            yearly: '/year'
         },
         zh: {
             from: '起价',
-            perRoom: '/间',
+            perRoom: '/房',
             viewDetails: '查看详情',
             close: '关闭',
-            amenities: '设施',
             roomTypes: '房型',
             compare: '对比',
-            selectToCompare: '选择宿舍进行对比',
-            vs: '对比'
+            vs: '对比',
+            ac: '空调',
+            dining: '食堂',
+            yearly: '/年'
         }
     }[language];
 
     if (!dorm && !isCompare) return null;
 
-    const renderDormCard = (d: Dorm, isPrimary = true) => (
-        <div className={`flex ${isPrimary ? '' : 'opacity-75'}`}>
-            <div className="w-28 h-28 flex-shrink-0 rounded-xl overflow-hidden shadow-lg">
-                <img
-                    src={d.imageUrl}
-                    alt={d.name}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                        e.currentTarget.src = 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400';
-                    }}
-                />
-            </div>
+    const renderDormCard = (d: Dorm, isPrimary = true) => {
+        const dormName = language === 'zh' && d.name_zh ? d.name_zh : d.name;
+        const dormLocation = language === 'zh' && d.location_zh ? d.location_zh : d.location;
 
-            <div className="flex-1 min-w-0 ml-4 flex flex-col justify-between">
-                <div>
-                    <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1 min-w-0">
-                            <h3 className="font-bold text-gray-900 text-base truncate">{d.name}</h3>
-                            <div className="flex items-center text-gray-500 text-xs mt-0.5">
-                                <MapPin size={12} className="mr-1 flex-shrink-0" />
-                                <span className="truncate">{d.location}</span>
-                            </div>
-                        </div>
-                        <span
-                            className={`text-xs font-semibold px-2 py-1 rounded-full flex-shrink-0 ${
-                                d.housingType === 'URH'
-                                    ? 'bg-orange-100 text-illini-orange'
-                                    : 'bg-blue-100 text-illini-blue'
-                            }`}
-                        >
-                            {d.housingType === 'URH' ? 'URH' : 'PCH'}
-                        </span>
-                    </div>
-
-                    <div className="flex items-center gap-3 mt-2">
-                        {d.ac && (
-                            <div className="flex items-center text-gray-600" title="Air Conditioning">
-                                <Snowflake size={14} className="mr-1" />
-                                <span className="text-xs">AC</span>
-                            </div>
-                        )}
-                        {d.dining && (
-                            <div className="flex items-center text-gray-600" title="Dining Hall">
-                                <UtensilsCrossed size={14} className="mr-1" />
-                                <span className="text-xs">Dining</span>
-                            </div>
-                        )}
-                        <div className="flex items-center text-gray-600" title="Room Type">
-                            <Home size={14} className="mr-1" />
-                            <span className="text-xs">{d.type}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="flex items-center justify-between mt-2">
-                    <div className="flex items-baseline">
-                        <span className="text-xs text-gray-500 mr-1">{t.from}</span>
-                        <span className="text-lg font-bold text-gray-900">{formatPrice(d.price)}</span>
-                        <span className="text-xs text-gray-400 ml-1">{t.perRoom}</span>
-                    </div>
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onSelectDorm(d);
+        return (
+            <div className={`flex ${isPrimary ? '' : 'opacity-75'}`}>
+                <div className="w-28 h-28 flex-shrink-0 rounded-xl overflow-hidden shadow-lg">
+                    <img
+                        src={d.imageUrl}
+                        alt={dormName}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                            e.currentTarget.src = 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400';
                         }}
-                        type="button"
-                        className="bg-illini-blue text-white text-xs font-semibold py-2 px-4 rounded-full hover:bg-illini-blue/90 transition-colors shadow-md"
-                    >
-                        {t.viewDetails}
-                    </button>
+                    />
+                </div>
+
+                <div className="flex-1 min-w-0 ml-4 flex flex-col justify-between">
+                    <div>
+                        <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                                <h3 className="font-bold text-gray-900 text-base truncate">{dormName}</h3>
+                                <div className="flex items-center text-gray-500 text-xs mt-0.5">
+                                    <MapPin size={12} className="mr-1 flex-shrink-0" />
+                                    <span className="truncate">{dormLocation}</span>
+                                </div>
+                            </div>
+                            <span
+                                className={`text-xs font-semibold px-2 py-1 rounded-full flex-shrink-0 ${
+                                    d.housingType === 'URH'
+                                        ? 'bg-orange-100 text-illini-orange'
+                                        : 'bg-blue-100 text-illini-blue'
+                                }`}
+                            >
+                                {d.housingType === 'URH' ? 'URH' : 'PCH'}
+                            </span>
+                        </div>
+
+                        <div className="flex items-center gap-3 mt-2">
+                            {d.ac && (
+                                <div className="flex items-center text-gray-600" title="Air Conditioning">
+                                    <Snowflake size={14} className="mr-1" />
+                                    <span className="text-xs">{t.ac}</span>
+                                </div>
+                            )}
+                            {d.dining && (
+                                <div className="flex items-center text-gray-600" title="Dining Hall">
+                                    <UtensilsCrossed size={14} className="mr-1" />
+                                    <span className="text-xs">{t.dining}</span>
+                                </div>
+                            )}
+                            <div className="flex items-center text-gray-600" title="Room Type">
+                                <Home size={14} className="mr-1" />
+                                <span className="text-xs">{d.type}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center justify-between mt-2">
+                        <div className="flex items-baseline">
+                            <span className="text-xs text-gray-500 mr-1">{t.from}</span>
+                            <span className="text-lg font-bold text-gray-900">{formatPrice(d.price)}</span>
+                            <span className="text-xs text-gray-400 ml-1">{t.perRoom}</span>
+                        </div>
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onSelectDorm(d);
+                            }}
+                            type="button"
+                            className="bg-illini-blue text-white text-xs font-semibold py-2 px-4 rounded-full hover:bg-illini-blue/90 transition-colors shadow-md"
+                        >
+                            {t.viewDetails}
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
-    );
+        );
+    };
 
     return (
         <AnimatePresence>
@@ -171,7 +178,9 @@ const DormBottomSheet: React.FC<DormBottomSheetProps> = ({
 
                     <div className="px-6 pb-8 overflow-y-auto max-h-[calc(70vh-60px)]">
                         <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-bold text-gray-900">{isCompare ? t.compare : dorm?.name}</h2>
+                            <h2 className="text-lg font-bold text-gray-900">
+                                {isCompare ? t.compare : language === 'zh' && dorm?.name_zh ? dorm.name_zh : dorm?.name}
+                            </h2>
                             <button
                                 onClick={onClose}
                                 type="button"

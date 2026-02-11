@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Dorm } from '../../types/housing';
 import { formatPrice } from '../../constants/housing/pricing';
 import { MapPin, Utensils, Wind } from 'lucide-react';
@@ -21,15 +21,14 @@ const DormCard: React.FC<DormCardProps> = ({
 }) => {
     const getName = () => (language === 'zh' && dorm.name_zh ? dorm.name_zh : dorm.name);
     const getDescription = () => (language === 'zh' && dorm.description_zh ? dorm.description_zh : dorm.description);
+    const locationLabel = language === 'zh' && dorm.location_zh ? dorm.location_zh : dorm.location;
 
     const t = {
         en: {
-            viewDetails: 'View Details',
             ac: 'AC',
             dining: 'Dining'
         },
         zh: {
-            viewDetails: '查看详情',
             ac: '空调',
             dining: '食堂'
         }
@@ -87,7 +86,7 @@ const DormCard: React.FC<DormCardProps> = ({
 
                 <div className="flex items-center text-gray-500 text-sm mb-4">
                     <MapPin size={14} className="mr-1 text-illini-orange" />
-                    {dorm.location}
+                    {locationLabel}
                 </div>
 
                 <div className="flex gap-2 mb-4 flex-wrap">

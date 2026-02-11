@@ -323,6 +323,7 @@ const DormMap: React.FC<DormMapProps> = ({
         language === 'zh'
             ? { perSem: '/学期', viewDetails: '查看详情', ac: '空调', dining: '餐厅' }
             : { perSem: '/sem', viewDetails: 'Details →', ac: 'AC', dining: 'Dining' };
+    const isChinese = language === 'zh';
     const formatPopupPrice = (price: number) => `$${(price / 1000).toFixed(1)}k`;
 
     if (!MAPBOX_TOKEN) {
@@ -384,7 +385,7 @@ const DormMap: React.FC<DormMapProps> = ({
 
                 <Source id="zones" type="geojson" data={CAMPUS_ZONES as any}>
                     <Layer {...(buildZonesFillLayer(showZones) as any)} />
-                    <Layer {...(buildZonesLabelLayer(showZones, showZoneLabels) as any)} />
+                    <Layer {...(buildZonesLabelLayer(showZones, showZoneLabels, isChinese) as any)} />
                 </Source>
 
                 <Source
@@ -392,7 +393,7 @@ const DormMap: React.FC<DormMapProps> = ({
                     type="geojson"
                     data={buildLandmarkFeatureCollection(visibleLandmarks as Landmark[])}
                 >
-                    <Layer {...(buildLandmarksLayer(showLandmarks) as any)} />
+                    <Layer {...(buildLandmarksLayer(showLandmarks, isChinese) as any)} />
                 </Source>
 
                 <Source
@@ -478,7 +479,7 @@ const DormMap: React.FC<DormMapProps> = ({
                             <div className="p-3">
                                 <div className="flex items-center justify-between mb-1">
                                     <h4 className="font-bold text-gray-900 text-sm truncate flex-1">
-                                        {hoveredDorm.name}
+                                        {isChinese && hoveredDorm.name_zh ? hoveredDorm.name_zh : hoveredDorm.name}
                                     </h4>
                                     <span
                                         className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ml-2 flex-shrink-0 ${hoveredDorm.housingType === 'URH'
