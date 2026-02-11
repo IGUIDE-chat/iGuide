@@ -10,9 +10,14 @@ import { ChatScreen } from './components/ChatScreen';
 import { LoginScreen } from './components/LoginScreen';
 import { ProfileScreen } from './components/ProfileScreen';
 import { AgentLandingPage } from './components/AgentLandingPage';
+import DormList from './components/housing/DormList';
+import DormDetail from './components/housing/DormDetail';
+import AIChat from './components/housing/AIChat';
 import { CATEGORIES, ARTICLES, getArticleText, getCategoryText, UI_TEXT } from './constants';
 import { CategoryId, Language } from './types';
 import { useAuth } from './contexts/AuthContext';
+import { HousingProvider } from './contexts/HousingContext';
+import { DormUserInteractionProvider } from './contexts/DormUserInteractionContext';
 import { libraryService } from './services/libraryService';
 
 // --- Page Components ---
@@ -248,6 +253,11 @@ const ArticlePage = ({ language }: { language: Language }) => {
   );
 };
 
+const LegacyDormRedirect = () => {
+  const { id } = useParams<{ id: string }>();
+  return <Navigate to={id ? `/dorms/${id}` : '/dorms'} replace />;
+};
+
 export default function App() {
   const { user, isLoading } = useAuth();
   // Initialize language from browser preference
@@ -331,39 +341,53 @@ export default function App() {
           transition={{ duration: 0.4, ease: "easeOut" }}
           className="h-full w-full"
         >
-          <Layout
-            language={language}
-            onLanguageChange={setLanguage}
-            isGuest={isGuest}
-            onExitGuest={() => setIsGuest(false)}
-            currentConversationId={currentConversationId}
-            onNewConversation={handleNewConversation}
-            onSelectConversation={handleSelectConversation}
-          >
-            <Routes>
-              <Route path="/" element={<Navigate to="/chat" replace />} />
-              <Route
-                path="/chat"
-                element={
-                  <ChatScreen
-                    onNavigateToLibrary={() => { /* Navigation handled by Layout link, but can add check here if needed */ }}
-                    language={language}
-                    currentConversationId={currentConversationId}
-                    onConversationCreated={setCurrentConversationId}
+          <HousingProvider>
+            <DormUserInteractionProvider>
+              <Layout
+                language={language}
+                onLanguageChange={setLanguage}
+                isGuest={isGuest}
+                onExitGuest={() => setIsGuest(false)}
+                currentConversationId={currentConversationId}
+                onNewConversation={handleNewConversation}
+                onSelectConversation={handleSelectConversation}
+              >
+                <Routes>
+                  <Route path="/" element={<Navigate to="/chat" replace />} />
+                  <Route
+                    path="/chat"
+                    element={
+                      <ChatScreen
+                        onNavigateToLibrary={() => { /* Navigation handled by Layout link, but can add check here if needed */ }}
+                        language={language}
+                        currentConversationId={currentConversationId}
+                        onConversationCreated={setCurrentConversationId}
+                      />
+                    }
                   />
-                }
-              />
-              <Route path="/library" element={<LibraryPage language={language} />} />
-              <Route path="/library/category/:categoryId" element={<CategoryPage language={language} />} />
-              <Route path="/library/article/:articleId" element={<ArticlePage language={language} />} />
-              <Route path="/profile" element={<ProfileScreen language={language} onBack={() => window.history.back()} />} />
+                  <Route path="/library" element={<LibraryPage language={language} />} />
+                  <Route path="/library/category/:categoryId" element={<CategoryPage language={language} />} />
+                  <Route path="/library/article/:articleId" element={<ArticlePage language={language} />} />
+                  <Route path="/profile" element={<ProfileScreen language={language} onBack={() => window.history.back()} />} />
 
-              {/* Agent Landing Pages */}
-              <Route path="/courses" element={<AgentLandingPage type="courses" language={language} />} />
-              <Route path="/dorms" element={<AgentLandingPage type="dorms" language={language} />} />
-              <Route path="/resume" element={<AgentLandingPage type="resume" language={language} />} />
-            </Routes>
-          </Layout>
+                  {/* Agent Landing Pages */}
+                  <Route path="/courses" element={<AgentLandingPage type="courses" language={language} />} />
+                  <Route path="/dorms" element={<DormList language={language} />} />
+                  <Route
+                    path="/dorms/:id"
+                    element={
+                      <>
+                        <DormDetail language={language} />
+                        <AIChat language={language} />
+                      </>
+                    }
+                  />
+                  <Route path="/dorm/:id" element={<LegacyDormRedirect />} />
+                  <Route path="/resume" element={<AgentLandingPage type="resume" language={language} />} />
+                </Routes>
+              </Layout>
+            </DormUserInteractionProvider>
+          </HousingProvider>
         </motion.div>
       )}
     </AnimatePresence>
