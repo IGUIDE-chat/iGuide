@@ -139,7 +139,7 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                 type="button"
                 className={`fixed bottom-6 right-6 z-50 p-4 rounded-full shadow-2xl transition-all duration-300 ${isOpen
                     ? 'bg-gray-800 rotate-90 scale-75'
-                    : 'bg-gradient-to-r from-illini-orange to-orange-600 hover:scale-110'
+                    : 'bg-gradient-to-r from-[#FF5F05] to-orange-600 hover:scale-110'
                     }`}
             >
                 {isOpen ? <X className="text-white" /> : <MessageCircle className="text-white w-8 h-8" />}
@@ -222,37 +222,37 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                                                     const dormName =
                                                         language === 'zh' && dorm.name_zh ? dorm.name_zh : dorm.name;
                                                     return (
-                                                <button
-                                                    key={dorm.id}
-                                                    onClick={() => navigate(`/dorms/${dorm.id}`)}
-                                                    type="button"
-                                                    className="flex items-center gap-3 bg-white border border-gray-100 p-3 rounded-xl shadow-sm hover:shadow-md hover:border-illini-orange/30 transition-all group w-full text-left"
-                                                >
-                                                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                                                        <img
-                                                            src={dorm.imageUrl}
-                                                            alt={dormName}
-                                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                                        />
-                                                    </div>
-                                                    <div className="flex-grow min-w-0">
-                                                        <div className="flex justify-between items-start">
-                                                            <h4 className="text-sm font-bold text-gray-900 group-hover:text-illini-orange transition-colors truncate">
-                                                                {dormName}
-                                                            </h4>
-                                                        </div>
-                                                        <div className="flex gap-1 mt-1.5 flex-wrap">
-                                                            {dorm.tags.slice(0, 2).map((tag) => (
-                                                                <span
-                                                                    key={tag}
-                                                                    className="text-[10px] px-1.5 py-0.5 rounded-md bg-gray-50 text-gray-500 border border-gray-100"
-                                                                >
-                                                                    {tag}
-                                                                </span>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                </button>
+                                                        <button
+                                                            key={dorm.id}
+                                                            onClick={() => navigate(`/dorms/${dorm.id}`)}
+                                                            type="button"
+                                                            className="flex items-center gap-3 bg-white border border-gray-100 p-3 rounded-xl shadow-sm hover:shadow-md hover:border-illini-orange/30 transition-all group w-full text-left"
+                                                        >
+                                                            <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                                                                <img
+                                                                    src={dorm.imageUrl}
+                                                                    alt={dormName}
+                                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                                                />
+                                                            </div>
+                                                            <div className="flex-grow min-w-0">
+                                                                <div className="flex justify-between items-start">
+                                                                    <h4 className="text-sm font-bold text-gray-900 group-hover:text-illini-orange transition-colors truncate">
+                                                                        {dormName}
+                                                                    </h4>
+                                                                </div>
+                                                                <div className="flex gap-1 mt-1.5 flex-wrap">
+                                                                    {dorm.tags.slice(0, 2).map((tag) => (
+                                                                        <span
+                                                                            key={tag}
+                                                                            className="text-[10px] px-1.5 py-0.5 rounded-md bg-gray-50 text-gray-500 border border-gray-100"
+                                                                        >
+                                                                            {tag}
+                                                                        </span>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+                                                        </button>
                                                     );
                                                 })()
                                             ))}

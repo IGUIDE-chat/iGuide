@@ -24,9 +24,8 @@ import { libraryService } from './services/libraryService';
 
 const LibraryPage = ({ language }: { language: Language }) => {
   const t = UI_TEXT[language];
-  const [searchParams, setSearchParams] = useSearchParams();
-  const searchQuery = searchParams.get('q') || '';
   const navigate = useNavigate();
+  const [localQuery, setLocalQuery] = useState('');
 
   const localizedArticles = useMemo(() => {
     return ARTICLES.map(a => ({
@@ -36,63 +35,44 @@ const LibraryPage = ({ language }: { language: Language }) => {
   }, [language]);
 
   const filteredArticles = useMemo(() => {
-    if (!searchQuery) return [];
-    const query = searchQuery.toLowerCase();
+    if (!localQuery) return [];
+    const query = localQuery.toLowerCase();
     return localizedArticles.filter(
       (article) =>
         article.title.toLowerCase().includes(query) ||
         article.tags.some((tag) => tag.toLowerCase().includes(query))
     );
-  }, [searchQuery, localizedArticles]);
-
-  const setSearchQuery = (query: string) => {
-    if (query) {
-      setSearchParams({ q: query });
-    } else {
-      setSearchParams({});
-    }
-  };
+  }, [localQuery, localizedArticles]);
 
   return (
     <div className="h-full overflow-y-auto w-full animate-fade-in-up no-scrollbar">
       <div className="max-w-3xl mx-auto px-4 py-8 pb-24">
         <div className="text-center py-10">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={language}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
-            >
-              <h2 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">{t.knowledgeBaseTitle}</h2>
-              <p className="text-slate-500 text-base mb-8 max-w-2xl mx-auto">
-                {t.knowledgeBaseSubtitle}
-              </p>
-            </motion.div>
-          </AnimatePresence>
+          <h2 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">{t.knowledgeBaseTitle}</h2>
+          <p className="text-slate-500 text-base mb-8 max-w-2xl mx-auto">
+            {t.knowledgeBaseSubtitle}
+          </p>
 
           {/* Library Search */}
-          <div className="max-w-xl mx-auto relative mb-16 group">
-            <div className="absolute inset-0 bg-gradient-to-r from-illini-blue to-illini-orange opacity-20 blur-xl rounded-full group-hover:opacity-30 transition-opacity"></div>
+          <div className="max-w-xl mx-auto relative mb-16">
             <input
               type="text"
-              className="relative block w-full pl-5 pr-5 py-3.5 bg-white border border-slate-200 rounded-full text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-illini-blue/10 focus:border-slate-300 shadow-md shadow-slate-200/50 transition-all text-base"
+              className="block w-full pl-5 pr-5 py-3.5 bg-white border border-slate-200 rounded-full text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-illini-blue/10 focus:border-slate-300 shadow-sm shadow-slate-200/50 transition-all text-base hover:shadow-md"
               placeholder={t.searchPlaceholder}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={localQuery}
+              onChange={(e) => setLocalQuery(e.target.value)}
             />
           </div>
         </div>
 
-        {searchQuery ? (
+        {localQuery ? (
           <div className="animate-fade-in-up">
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-xl font-bold text-slate-800">
-                {t.searchTitle} <span className="text-illini-orange">"{searchQuery}"</span>
+                {t.searchTitle} <span className="text-illini-orange">"{localQuery}"</span>
               </h2>
               <button
-                onClick={() => setSearchQuery('')}
+                onClick={() => setLocalQuery('')}
                 className="text-xs font-medium text-slate-500 hover:text-illini-blue px-3 py-1 rounded-full hover:bg-slate-100 transition-colors"
               >
                 {t.clear}
