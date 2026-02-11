@@ -1,9 +1,12 @@
 import React from 'react';
 import { DollarSign, Home, Utensils } from 'lucide-react';
 import { Dorm } from '../../../../types/housing';
+import { Language } from '../../../../types';
+import { getDormTypeLabel } from '../../../../utils/housingLabels';
 
 interface DormQuickStatsSectionProps {
     dorm: Dorm;
+    language: Language;
     quickStatsLabel: string;
     roomTypeLabel: string;
     diningHallLabel: string;
@@ -15,6 +18,7 @@ interface DormQuickStatsSectionProps {
 
 const DormQuickStatsSection: React.FC<DormQuickStatsSectionProps> = ({
     dorm,
+    language,
     quickStatsLabel,
     roomTypeLabel,
     diningHallLabel,
@@ -34,7 +38,7 @@ const DormQuickStatsSection: React.FC<DormQuickStatsSectionProps> = ({
                         <Home size={18} className="mr-3 text-illini-blue" />
                         <span>{roomTypeLabel}</span>
                     </div>
-                    <span className="font-medium text-gray-900">{dorm.type}</span>
+                    <span className="font-medium text-gray-900">{getDormTypeLabel(dorm.type, language)}</span>
                 </div>
                 <div className="flex items-center justify-between">
                     <div className="flex items-center text-gray-700">

@@ -92,6 +92,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                         <div className="col-span-1 p-8 bg-gray-50/50 space-y-6">
                             <DormQuickStatsSection
                                 dorm={dorm}
+                                language={language}
                                 quickStatsLabel={t.quickStats}
                                 roomTypeLabel={t.roomType}
                                 diningHallLabel={t.diningHall}

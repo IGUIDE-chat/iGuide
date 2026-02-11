@@ -1,9 +1,10 @@
-import React from 'react';
+﻿import React from 'react';
 import { Dorm } from '../../types/housing';
 import { formatPrice } from '../../constants/housing/pricing';
 import { Language } from '../../types';
 import { X, Check, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getDormTypeLabel, getRoomTypeLabel } from '../../utils/housingLabels';
 
 interface DormComparisonProps {
     dorms: Dorm[];
@@ -24,38 +25,22 @@ const DormComparison: React.FC<DormComparisonProps> = ({ dorms, onClose, languag
         en: {
             title: 'Compare Dorms',
             close: 'Close',
-            features: {
-                name: 'Name',
-                location: 'Location',
-                type: 'Type',
-                housingType: 'Housing Type',
-                price: 'Price Range',
-                ac: 'Air Conditioning',
-                dining: 'Dining Hall',
-                roomTypes: 'Room Types'
-            },
             yes: 'Yes',
             no: 'No',
             urh: 'URH',
-            pch: 'PCH'
+            pch: 'PCH',
+            feature: 'Feature',
+            bestOption: 'Best option'
         },
         zh: {
-            title: '对比宿舍',
+            title: '宿舍对比',
             close: '关闭',
-            features: {
-                name: '名称',
-                location: '位置',
-                type: '类型',
-                housingType: '住宿类型',
-                price: '价格范围',
-                ac: '空调',
-                dining: '食堂',
-                roomTypes: '房型'
-            },
             yes: '是',
             no: '否',
             urh: '校内宿舍',
-            pch: '校外认证住房'
+            pch: '私营认证住宿',
+            feature: '特征',
+            bestOption: '最佳选项'
         }
     }[language];
 
@@ -63,23 +48,31 @@ const DormComparison: React.FC<DormComparisonProps> = ({ dorms, onClose, languag
         {
             label: 'Name',
             label_zh: '名称',
-            getValue: (dorm) => (
-                <div className="flex items-center gap-2">
-                    <img src={dorm.imageUrl} alt={dorm.name} className="w-10 h-10 rounded-lg object-cover" />
-                    <span className="font-medium text-sm">{dorm.name}</span>
-                </div>
-            )
+            getValue: (dorm) => {
+                const dormName = language === 'zh' && dorm.name_zh ? dorm.name_zh : dorm.name;
+                return (
+                    <div className="flex items-center gap-2">
+                        <img src={dorm.imageUrl} alt={dormName} className="w-10 h-10 rounded-lg object-cover" />
+                        <span className="font-medium text-sm">{dormName}</span>
+                    </div>
+                );
+            }
         },
         {
             label: 'Location',
             label_zh: '位置',
-            getValue: (dorm) => <span className="text-sm text-gray-600">{dorm.location}</span>
+            getValue: (dorm) => {
+                const locationLabel = language === 'zh' && dorm.location_zh ? dorm.location_zh : dorm.location;
+                return <span className="text-sm text-gray-600">{locationLabel}</span>;
+            }
         },
         {
             label: 'Type',
             label_zh: '类型',
             getValue: (dorm) => (
-                <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">{dorm.type}</span>
+                <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
+                    {getDormTypeLabel(dorm.type, language === 'zh' ? 'zh' : 'en')}
+                </span>
             )
         },
         {
@@ -141,7 +134,7 @@ const DormComparison: React.FC<DormComparisonProps> = ({ dorms, onClose, languag
                 <div className="flex flex-wrap gap-1">
                     {dorm.roomTypes?.slice(0, 3).map((type) => (
                         <span key={type} className="px-2 py-0.5 bg-illini-blue/10 text-illini-blue text-xs rounded">
-                            {type}
+                            {getRoomTypeLabel(type, language === 'zh' ? 'zh' : 'en')}
                         </span>
                     ))}
                     {dorm.roomTypes && dorm.roomTypes.length > 3 && (
@@ -196,19 +189,22 @@ const DormComparison: React.FC<DormComparisonProps> = ({ dorms, onClose, languag
                             <thead>
                                 <tr className="bg-gray-50">
                                     <th className="sticky left-0 z-10 bg-gray-50 px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b border-r border-gray-200">
-                                        {language === 'zh' ? '特征' : 'Feature'}
+                                        {t.feature}
                                     </th>
-                                    {dorms.map((dorm) => (
-                                        <th
-                                            key={dorm.id}
-                                            className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b border-gray-200 min-w-[220px]"
-                                        >
-                                            <div className="flex items-center gap-2">
-                                                <img src={dorm.imageUrl} alt={dorm.name} className="w-8 h-8 rounded object-cover" />
-                                                <span className="truncate">{dorm.name}</span>
-                                            </div>
-                                        </th>
-                                    ))}
+                                    {dorms.map((dorm) => {
+                                        const dormName = language === 'zh' && dorm.name_zh ? dorm.name_zh : dorm.name;
+                                        return (
+                                            <th
+                                                key={dorm.id}
+                                                className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b border-gray-200 min-w-[220px]"
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    <img src={dorm.imageUrl} alt={dormName} className="w-8 h-8 rounded object-cover" />
+                                                    <span className="truncate">{dormName}</span>
+                                                </div>
+                                            </th>
+                                        );
+                                    })}
                                 </tr>
                             </thead>
                             <tbody>
@@ -243,7 +239,7 @@ const DormComparison: React.FC<DormComparisonProps> = ({ dorms, onClose, languag
                     <div className="border-t border-gray-200 bg-white px-6 py-3 text-xs text-gray-500 flex items-center gap-2">
                         <span className="inline-flex items-center gap-1 text-green-700">
                             <Check size={14} />
-                            <span>{language === 'zh' ? '最佳选项' : 'Best option'}</span>
+                            <span>{t.bestOption}</span>
                         </span>
                     </div>
                 </motion.div>

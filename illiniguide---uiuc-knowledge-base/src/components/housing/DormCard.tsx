@@ -3,6 +3,7 @@ import { Dorm } from '../../types/housing';
 import { formatPrice } from '../../constants/housing/pricing';
 import { MapPin, Utensils, Wind } from 'lucide-react';
 import { Language } from '../../types';
+import { getRoomTypeLabel } from '../../utils/housingLabels';
 
 interface DormCardProps {
     dorm: Dorm;
@@ -105,7 +106,7 @@ const DormCard: React.FC<DormCardProps> = ({
                             key={type}
                             className="inline-block px-2 py-1 rounded-md border border-gray-200 text-gray-600 text-[10px] font-medium bg-white"
                         >
-                            {type}
+                            {getRoomTypeLabel(type, language)}
                         </span>
                     ))}
                     {dorm.tags.slice(0, 2).map((tag) => (

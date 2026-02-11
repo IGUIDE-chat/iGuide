@@ -3,6 +3,7 @@ import { FloorPlan } from '../../types/housing';
 import { formatPrice } from '../../constants/housing/pricing';
 import { Bed, Maximize, Check, X, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getRoomTypeLabel } from '../../utils/housingLabels';
 
 interface FloorPlanSectionProps {
     floorPlans: FloorPlan[];
@@ -70,6 +71,7 @@ const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, languag
             <div className="space-y-3">
                 {sortedPlans.map((plan) => {
                     const isExpanded = expandedPlan === plan.type;
+                    const roomTypeLabel = getRoomTypeLabel(plan.type, language);
 
                     return (
                         <motion.div
@@ -85,7 +87,7 @@ const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, languag
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
                                         <div className={`px-3 py-1.5 rounded-lg text-sm font-semibold border ${getRoomTypeColor(plan.type)}`}>
-                                            {plan.type}
+                                            {roomTypeLabel}
                                         </div>
 
                                         <div className="flex items-center gap-1">
@@ -126,7 +128,7 @@ const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, languag
                                     )}
                                     <div className="flex items-center gap-1">
                                         <Bed size={14} />
-                                        <span>{plan.type}</span>
+                                        <span>{roomTypeLabel}</span>
                                     </div>
                                 </div>
                             </div>
@@ -142,7 +144,7 @@ const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, languag
                                         <div className="px-4 pb-4 pt-0 border-t border-gray-100">
                                             {plan.imageUrl && (
                                                 <div className="mt-4 rounded-lg overflow-hidden bg-gray-100">
-                                                    <img src={plan.imageUrl} alt={`${plan.type} floor plan`} className="w-full h-auto" />
+                                                    <img src={plan.imageUrl} alt={`${roomTypeLabel} floor plan`} className="w-full h-auto" />
                                                 </div>
                                             )}
 
