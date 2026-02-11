@@ -108,7 +108,7 @@ const DormMap: React.FC<DormMapProps> = ({
     const [hoveredDorm, setHoveredDorm] = useState<Dorm | null>(null);
     const [hoveredCoords, setHoveredCoords] = useState<[number, number] | null>(null);
     const [isMapReady, setIsMapReady] = useState(false);
-    const [arePillImagesReady, setArePillImagesReady] = useState(false);
+    const [areMapImagesReady, setAreMapImagesReady] = useState(false);
     const [visibleDorms, setVisibleDorms] = useState<Dorm[]>([]);
     const mapRef = useRef<MapRef>(null);
     const fitBoundsTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -233,17 +233,21 @@ const DormMap: React.FC<DormMapProps> = ({
     const onMapLoad = useCallback((event: mapboxgl.MapboxEvent) => {
         setIsMapReady(true);
         const map = event.target as mapboxgl.Map;
-        setArePillImagesReady(registerMapAssets(map));
+        setAreMapImagesReady(registerMapAssets(map));
     }, []);
 
     useEffect(() => {
         if (!isMapReady || !mapRef.current) return;
 
         const map = mapRef.current.getMap();
-        const ensureAssets = () => setArePillImagesReady(registerMapAssets(map));
+        const ensureAssets = () => setAreMapImagesReady(registerMapAssets(map));
         const handleStyleImageMissing = (event: { id: string }) => {
-            if (event.id === 'pill' || event.id === 'pill-active') {
-                setArePillImagesReady(registerMapAssets(map));
+            if (
+                event.id === 'pill' ||
+                event.id === 'pill-active' ||
+                event.id.startsWith('landmark-')
+            ) {
+                setAreMapImagesReady(registerMapAssets(map));
             }
         };
 
@@ -394,7 +398,9 @@ const DormMap: React.FC<DormMapProps> = ({
                     type="geojson"
                     data={buildLandmarkFeatureCollection(visibleLandmarks as Landmark[])}
                 >
-                    <Layer {...(buildLandmarksLayer(showLandmarks, isChinese) as any)} />
+                    {areMapImagesReady && (
+                        <Layer {...(buildLandmarksLayer(showLandmarks, isChinese) as any)} />
+                    )}
                 </Source>
 
                 <Source
@@ -408,7 +414,7 @@ const DormMap: React.FC<DormMapProps> = ({
                     <Layer {...(CLUSTERS_LAYER as any)} />
                     <Layer {...(CLUSTER_COUNT_LAYER as any)} />
 
-                    {arePillImagesReady && (
+                    {areMapImagesReady && (
                         <Layer {...(UNCLUSTERED_LAYER as any)} />
                     )}
                 </Source>

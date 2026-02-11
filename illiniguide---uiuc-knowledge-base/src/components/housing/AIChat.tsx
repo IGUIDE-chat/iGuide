@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X, Send, Sparkles, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ChatMessage } from '../../types/housing';
-import { streamChatResponse } from '../../services/cozeService';
+import { streamChatResponse } from '../../services/ai';
 import { isDormMention, findMentionedDorms } from '../../utils/housingUtils';
 import { TypewriterText } from './TypewriterText';
 import { Language } from '../../types';

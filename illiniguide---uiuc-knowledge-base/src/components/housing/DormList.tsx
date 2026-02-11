@@ -232,7 +232,7 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
                 setViewMode={setViewMode}
             />
 
-            <div className="flex-1 overflow-hidden bg-gray-50/50 relative flex flex-row">
+            <div className="flex-1 overflow-hidden bg-gray-50/50 relative z-0 flex flex-row">
                 <div
                     className={`
                         h-full overflow-y-auto p-4 xl:p-6 transition-all duration-300 scrollbar-thin

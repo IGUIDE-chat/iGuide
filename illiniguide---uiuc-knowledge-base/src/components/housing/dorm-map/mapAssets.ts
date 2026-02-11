@@ -251,5 +251,9 @@ export const registerMapAssets = (map: mapboxgl.Map) => {
         }
     }
 
-    return map.hasImage('pill') && map.hasImage('pill-active');
+    const areLandmarkImagesReady = LANDMARK_ICON_TYPES.every((type) =>
+        map.hasImage(`landmark-${type}`)
+    );
+
+    return map.hasImage('pill') && map.hasImage('pill-active') && areLandmarkImagesReady;
 };

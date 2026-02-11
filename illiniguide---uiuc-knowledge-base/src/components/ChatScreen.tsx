@@ -7,7 +7,7 @@ import remarkGfm from 'remark-gfm';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TypewriterMarkdown } from './TypewriterMarkdown';
 import { Language, ChatMessage } from '../types';
-import { streamChatResponse } from '../services/cozeService';
+import { streamChatResponse } from '../services/ai';
 import { UI_TEXT } from '../constants';
 import { conversationService } from '../services/conversationService';
 import { localConversationService } from '../services/localConversationService';
