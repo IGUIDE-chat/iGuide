@@ -10,18 +10,22 @@ import { ChatScreen } from './components/ChatScreen';
 import { LoginScreen } from './components/LoginScreen';
 import { ProfileScreen } from './components/ProfileScreen';
 import { AgentLandingPage } from './components/AgentLandingPage';
+import DormList from './components/housing/DormList';
+import DormDetail from './components/housing/DormDetail';
+import AIChat from './components/housing/AIChat';
 import { CATEGORIES, ARTICLES, getArticleText, getCategoryText, UI_TEXT } from './constants';
 import { CategoryId, Language } from './types';
 import { useAuth } from './contexts/AuthContext';
+import { HousingProvider } from './contexts/HousingContext';
+import { DormUserInteractionProvider } from './contexts/DormUserInteractionContext';
 import { libraryService } from './services/libraryService';
 
 // --- Page Components ---
 
 const LibraryPage = ({ language }: { language: Language }) => {
   const t = UI_TEXT[language];
-  const [searchParams, setSearchParams] = useSearchParams();
-  const searchQuery = searchParams.get('q') || '';
   const navigate = useNavigate();
+  const [localQuery, setLocalQuery] = useState('');
 
   const localizedArticles = useMemo(() => {
     return ARTICLES.map(a => ({
@@ -31,63 +35,44 @@ const LibraryPage = ({ language }: { language: Language }) => {
   }, [language]);
 
   const filteredArticles = useMemo(() => {
-    if (!searchQuery) return [];
-    const query = searchQuery.toLowerCase();
+    if (!localQuery) return [];
+    const query = localQuery.toLowerCase();
     return localizedArticles.filter(
       (article) =>
         article.title.toLowerCase().includes(query) ||
         article.tags.some((tag) => tag.toLowerCase().includes(query))
     );
-  }, [searchQuery, localizedArticles]);
-
-  const setSearchQuery = (query: string) => {
-    if (query) {
-      setSearchParams({ q: query });
-    } else {
-      setSearchParams({});
-    }
-  };
+  }, [localQuery, localizedArticles]);
 
   return (
     <div className="h-full overflow-y-auto w-full animate-fade-in-up no-scrollbar">
       <div className="max-w-3xl mx-auto px-4 py-8 pb-24">
         <div className="text-center py-10">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={language}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
-            >
-              <h2 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">{t.knowledgeBaseTitle}</h2>
-              <p className="text-slate-500 text-base mb-8 max-w-2xl mx-auto">
-                {t.knowledgeBaseSubtitle}
-              </p>
-            </motion.div>
-          </AnimatePresence>
+          <h2 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">{t.knowledgeBaseTitle}</h2>
+          <p className="text-slate-500 text-base mb-8 max-w-2xl mx-auto">
+            {t.knowledgeBaseSubtitle}
+          </p>
 
           {/* Library Search */}
-          <div className="max-w-xl mx-auto relative mb-16 group">
-            <div className="absolute inset-0 bg-gradient-to-r from-illini-blue to-illini-orange opacity-20 blur-xl rounded-full group-hover:opacity-30 transition-opacity"></div>
+          <div className="max-w-xl mx-auto relative mb-16">
             <input
               type="text"
-              className="relative block w-full pl-5 pr-5 py-3.5 bg-white border border-slate-200 rounded-full text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-illini-blue/10 focus:border-slate-300 shadow-md shadow-slate-200/50 transition-all text-base"
+              className="block w-full pl-5 pr-5 py-3.5 bg-white border border-slate-200 rounded-full text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-illini-blue/10 focus:border-slate-300 shadow-sm shadow-slate-200/50 transition-all text-base hover:shadow-md"
               placeholder={t.searchPlaceholder}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={localQuery}
+              onChange={(e) => setLocalQuery(e.target.value)}
             />
           </div>
         </div>
 
-        {searchQuery ? (
+        {localQuery ? (
           <div className="animate-fade-in-up">
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-xl font-bold text-slate-800">
-                {t.searchTitle} <span className="text-illini-orange">"{searchQuery}"</span>
+                {t.searchTitle} <span className="text-illini-orange">"{localQuery}"</span>
               </h2>
               <button
-                onClick={() => setSearchQuery('')}
+                onClick={() => setLocalQuery('')}
                 className="text-xs font-medium text-slate-500 hover:text-illini-blue px-3 py-1 rounded-full hover:bg-slate-100 transition-colors"
               >
                 {t.clear}
@@ -248,6 +233,11 @@ const ArticlePage = ({ language }: { language: Language }) => {
   );
 };
 
+const LegacyDormRedirect = () => {
+  const { id } = useParams<{ id: string }>();
+  return <Navigate to={id ? `/dorms/${id}` : '/dorms'} replace />;
+};
+
 export default function App() {
   const { user, isLoading } = useAuth();
   // Initialize language from browser preference
@@ -331,39 +321,61 @@ export default function App() {
           transition={{ duration: 0.4, ease: "easeOut" }}
           className="h-full w-full"
         >
-          <Layout
-            language={language}
-            onLanguageChange={setLanguage}
-            isGuest={isGuest}
-            onExitGuest={() => setIsGuest(false)}
-            currentConversationId={currentConversationId}
-            onNewConversation={handleNewConversation}
-            onSelectConversation={handleSelectConversation}
-          >
-            <Routes>
-              <Route path="/" element={<Navigate to="/chat" replace />} />
-              <Route
-                path="/chat"
-                element={
-                  <ChatScreen
-                    onNavigateToLibrary={() => { /* Navigation handled by Layout link, but can add check here if needed */ }}
-                    language={language}
-                    currentConversationId={currentConversationId}
-                    onConversationCreated={setCurrentConversationId}
+          <HousingProvider>
+            <DormUserInteractionProvider>
+              <Layout
+                language={language}
+                onLanguageChange={setLanguage}
+                isGuest={isGuest}
+                onExitGuest={() => setIsGuest(false)}
+                currentConversationId={currentConversationId}
+                onNewConversation={handleNewConversation}
+                onSelectConversation={handleSelectConversation}
+              >
+                <Routes>
+                  <Route path="/" element={<Navigate to="/chat" replace />} />
+                  <Route
+                    path="/chat"
+                    element={
+                      <ChatScreen
+                        onNavigateToLibrary={() => { /* Navigation handled by Layout link, but can add check here if needed */ }}
+                        language={language}
+                        currentConversationId={currentConversationId}
+                        onConversationCreated={setCurrentConversationId}
+                      />
+                    }
                   />
-                }
-              />
-              <Route path="/library" element={<LibraryPage language={language} />} />
-              <Route path="/library/category/:categoryId" element={<CategoryPage language={language} />} />
-              <Route path="/library/article/:articleId" element={<ArticlePage language={language} />} />
-              <Route path="/profile" element={<ProfileScreen language={language} onBack={() => window.history.back()} />} />
+                  <Route path="/library" element={<LibraryPage language={language} />} />
+                  <Route path="/library/category/:categoryId" element={<CategoryPage language={language} />} />
+                  <Route path="/library/article/:articleId" element={<ArticlePage language={language} />} />
+                  <Route path="/profile" element={<ProfileScreen language={language} onBack={() => window.history.back()} />} />
 
-              {/* Agent Landing Pages */}
-              <Route path="/courses" element={<AgentLandingPage type="courses" language={language} />} />
-              <Route path="/dorms" element={<AgentLandingPage type="dorms" language={language} />} />
-              <Route path="/resume" element={<AgentLandingPage type="resume" language={language} />} />
-            </Routes>
-          </Layout>
+                  {/* Agent Landing Pages */}
+                  <Route path="/courses" element={<AgentLandingPage type="courses" language={language} />} />
+                  <Route
+                    path="/dorms"
+                    element={
+                      <>
+                        <DormList language={language} />
+                        <AIChat language={language} />
+                      </>
+                    }
+                  />
+                  <Route
+                    path="/dorms/:id"
+                    element={
+                      <>
+                        <DormDetail language={language} />
+                        <AIChat language={language} />
+                      </>
+                    }
+                  />
+                  <Route path="/dorm/:id" element={<LegacyDormRedirect />} />
+                  <Route path="/resume" element={<AgentLandingPage type="resume" language={language} />} />
+                </Routes>
+              </Layout>
+            </DormUserInteractionProvider>
+          </HousingProvider>
         </motion.div>
       )}
     </AnimatePresence>
