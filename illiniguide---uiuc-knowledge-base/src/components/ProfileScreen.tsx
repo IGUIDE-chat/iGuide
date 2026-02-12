@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { UI_TEXT } from '../constants';
+import { UI_TEXT } from '../i18n/uiText';
 import { Language } from '../types';
 
 interface ProfileScreenProps {
