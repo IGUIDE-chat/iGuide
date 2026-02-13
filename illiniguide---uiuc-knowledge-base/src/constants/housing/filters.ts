@@ -5,10 +5,10 @@
 ] as const;
 
 export const ROOM_TYPES = [
-    { id: '1B1B', label: { en: 'Single (1B1B)', zh: 'Single (1B1B)' } },
-    { id: '2B1B', label: { en: 'Double (2B1B)', zh: 'Double (2B1B)' } },
-    { id: '3B1B', label: { en: 'Triples (3B1B)', zh: 'Triples (3B1B)' } },
-    { id: '4B2B', label: { en: 'Quad (4B2B)', zh: 'Quad (4B2B)' } },
+    { id: '1B1B', label: { en: '1B1B', zh: '1B1B' } },
+    { id: '2B1B', label: { en: '2B1B', zh: '2B1B' } },
+    { id: '3B1B', label: { en: '3B1B', zh: '3B1B' } },
+    { id: '4B2B', label: { en: '4B2B', zh: '4B2B' } },
     { id: 'Suite', label: { en: 'Suite', zh: 'Suite' } },
     { id: 'Cluster', label: { en: 'Cluster', zh: 'Cluster' } }
 ] as const;
