@@ -1,4 +1,4 @@
-export const AMENITIES = [
+﻿export const AMENITIES = [
     { id: 'ac', label: { en: 'Air Conditioning', zh: '空调' }, icon: 'Snowflake' },
     { id: 'dining', label: { en: 'Dining Hall', zh: '食堂' }, icon: 'Utensils' },
     { id: 'gym', label: { en: 'Gym Nearby', zh: '附近健身房' }, icon: 'Dumbbell' }

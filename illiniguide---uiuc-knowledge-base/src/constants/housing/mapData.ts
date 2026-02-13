@@ -17,7 +17,7 @@ export const CAMPUS_ZONES = {
             type: 'Feature' as const,
             properties: {
                 name: 'Green Street\nCampustown',
-                name_zh: 'Green Street\nCampustown',
+                name_zh: '绿街\nCampustown',
                 description: 'Hub for dining, nightlife, and shopping',
                 color: '#FFD600' // Vibrant Yellow
             },
@@ -294,15 +294,15 @@ export const CAMPUS_LANDMARKS: Landmark[] = [
     {
         id: 'county-market',
         name: 'County Market',
-        name_zh: 'County Market',
+        name_zh: 'County Market(超市)',
         type: 'store',
         lat: 40.1130,
         lng: -88.2338
     },
     {
         id: 'target',
-        name: 'Target (Green St)',
-        name_zh: 'Target (Green St)',
+        name: 'Target',
+        name_zh: 'Target(超市)',
         type: 'store',
         lat: 40.1102,
         lng: -88.2301
@@ -333,32 +333,32 @@ export const CAMPUS_LANDMARKS: Landmark[] = [
     },
     {
         id: 'hmart',
-        name: 'H Mart (Urbana)',
-        name_zh: 'H Mart (Urbana)',
+        name: 'H Mart',
+        name_zh: 'H Mart(超市)',
         type: 'store',
         lat: 40.1145,
         lng: -88.2068
     },
     {
         id: 'walgreens',
-        name: 'Walgreens (Green St)',
-        name_zh: 'Walgreens (Green St)',
+        name: 'Walgreens',
+        name_zh: 'Walgreens',
         type: 'store',
         lat: 40.1104,
         lng: -88.2328
     },
     {
         id: 'cvs',
-        name: 'CVS (Green St)',
-        name_zh: 'CVS (Green St)',
+        name: 'CVS',
+        name_zh: 'CVS',
         type: 'store',
         lat: 40.1103,
         lng: -88.2405
     },
     {
         id: 'usps',
-        name: 'USPS (Green St)',
-        name_zh: 'USPS (Green St)',
+        name: 'USPS',
+        name_zh: 'USPS',
         type: 'service',
         lat: 40.1103,
         lng: -88.2351

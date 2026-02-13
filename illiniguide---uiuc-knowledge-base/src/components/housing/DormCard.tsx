@@ -38,7 +38,7 @@ const DormCard: React.FC<DormCardProps> = ({
     return (
         <div
             onClick={() => onViewDetails(dorm)}
-            className="bg-gradient-to-br from-white/95 via-white/90 to-gray-50/95 backdrop-blur-md rounded-xl shadow-sm border border-gray-100/80 overflow-hidden hover:shadow-md transition-shadow duration-300 flex flex-col h-full group relative cursor-pointer"
+            className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300 flex flex-col h-full group relative cursor-pointer"
         >
             <div className="relative h-64 overflow-hidden">
                 <img
@@ -47,7 +47,7 @@ const DormCard: React.FC<DormCardProps> = ({
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 <div className="absolute top-3 right-3 flex flex-col gap-2 items-end">
-                    <div className="bg-white/90 backdrop-blur-sm px-2 py-1 rounded-md text-xs font-bold text-illini-blue shadow-sm transition-transform duration-200 group-hover:scale-110 group-hover:font-extrabold origin-top-right">
+                    <div className="bg-white px-2 py-1 rounded-md text-xs font-bold text-illini-blue shadow-sm transition-transform duration-200 group-hover:scale-110 group-hover:font-extrabold origin-top-right">
                         {formatPrice(dorm.price)}
                     </div>
                 </div>
@@ -59,7 +59,7 @@ const DormCard: React.FC<DormCardProps> = ({
                             onToggleFavorite(dorm.id);
                         }}
                         type="button"
-                        className="absolute top-3 left-3 p-2 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white text-gray-400 hover:text-red-500 transition-colors shadow-sm"
+                        className="absolute top-3 left-3 p-2 rounded-full bg-white hover:bg-gray-50 text-gray-400 hover:text-red-500 transition-colors shadow-sm"
                         aria-label={isFavorite ? 'Unsave dorm' : 'Save dorm'}
                     >
                         <svg
