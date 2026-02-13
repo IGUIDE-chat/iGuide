@@ -294,7 +294,7 @@ export const CAMPUS_LANDMARKS: Landmark[] = [
     {
         id: 'county-market',
         name: 'County Market',
-        name_zh: 'County Market 超市',
+        name_zh: 'County Market(超市)',
         type: 'store',
         lat: 40.1130,
         lng: -88.2338
@@ -302,7 +302,7 @@ export const CAMPUS_LANDMARKS: Landmark[] = [
     {
         id: 'target',
         name: 'Target',
-        name_zh: 'Target ',
+        name_zh: 'Target(超市)',
         type: 'store',
         lat: 40.1102,
         lng: -88.2301
@@ -334,7 +334,7 @@ export const CAMPUS_LANDMARKS: Landmark[] = [
     {
         id: 'hmart',
         name: 'H Mart',
-        name_zh: 'H Mart 超市',
+        name_zh: 'H Mart(超市)',
         type: 'store',
         lat: 40.1145,
         lng: -88.2068
