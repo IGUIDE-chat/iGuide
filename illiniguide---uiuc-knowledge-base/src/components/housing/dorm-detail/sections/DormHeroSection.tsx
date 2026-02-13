@@ -22,7 +22,7 @@ const DormHeroSection: React.FC<DormHeroSectionProps> = ({ dorm, dormName, campu
                         {dorm.tags.map((tag) => (
                             <span
                                 key={tag}
-                                className="px-3 py-1 bg-white/90 rounded-full text-sm font-medium border border-white/30 transition-colors duration-150 hover:bg-white"
+                                className="px-3 py-1 bg-white/20 rounded-full text-sm font-medium border border-white/30 transition-colors duration-150 hover:bg-white/40 hover:border-white/50"
                             >
                                 {tag}
                             </span>
