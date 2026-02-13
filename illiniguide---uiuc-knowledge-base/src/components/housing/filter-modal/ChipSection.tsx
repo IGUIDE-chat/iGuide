@@ -18,9 +18,9 @@ const ChipSection: React.FC<ChipSectionProps> = ({ title, options, selectedValue
                         key={value}
                         onClick={() => onToggle(value)}
                         type="button"
-                        className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors ${isSelected
-                            ? 'bg-black text-white border-black'
-                            : 'bg-white text-gray-700 border-gray-300 hover:border-black'
+                        className={`px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200 ${isSelected
+                            ? 'bg-illini-blue text-white border-illini-blue active:bg-[#0e2240] active:border-[#0e2240]'
+                            : 'bg-white text-gray-700 border-gray-300 hover:border-illini-orange active:bg-orange-50/50'
                             }`}
                     >
                         {value}

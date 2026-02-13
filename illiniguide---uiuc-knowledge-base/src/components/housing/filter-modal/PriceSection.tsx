@@ -119,7 +119,7 @@ const PriceSection: React.FC<PriceSectionProps> = ({
             </div>
 
             <div className="flex items-center gap-4">
-                <div className="border border-gray-300 rounded-xl px-3 py-2 flex-1 focus-within:ring-2 focus-within:ring-black focus-within:border-transparent transition-colors">
+                <div className="border border-gray-300 rounded-xl px-3 py-2 flex-1 hover:border-illini-orange focus-within:ring-2 focus-within:ring-illini-orange focus-within:border-illini-orange transition-colors">
                     <div className="text-xs text-gray-500">{t.minPrice}</div>
                     <div className="flex items-center">
                         <span className="text-lg">$</span>
@@ -137,7 +137,7 @@ const PriceSection: React.FC<PriceSectionProps> = ({
                     </div>
                 </div>
                 <div className="text-gray-400">-</div>
-                <div className="border border-gray-300 rounded-xl px-3 py-2 flex-1 focus-within:ring-2 focus-within:ring-black focus-within:border-transparent transition-colors">
+                <div className="border border-gray-300 rounded-xl px-3 py-2 flex-1 hover:border-illini-orange focus-within:ring-2 focus-within:ring-illini-orange focus-within:border-illini-orange transition-colors">
                     <div className="text-xs text-gray-500">{t.maxPrice}</div>
                     <div className="flex items-center">
                         <span className="text-lg">$</span>

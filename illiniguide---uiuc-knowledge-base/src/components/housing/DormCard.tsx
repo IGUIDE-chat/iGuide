@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Dorm } from '../../types/housing';
 import { formatPrice } from '../../constants/housing/pricing';
 import { MapPin, Utensils, Wind } from 'lucide-react';
@@ -47,7 +47,7 @@ const DormCard: React.FC<DormCardProps> = ({
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 <div className="absolute top-3 right-3 flex flex-col gap-2 items-end">
-                    <div className="bg-white px-2 py-1 rounded-md text-xs font-bold text-illini-blue shadow-sm">
+                    <div className="bg-white px-2 py-1 rounded-md text-xs font-bold text-illini-blue shadow-sm transition-transform duration-200 group-hover:scale-110 group-hover:font-extrabold origin-top-right">
                         {formatPrice(dorm.price)}
                     </div>
                 </div>
@@ -82,7 +82,7 @@ const DormCard: React.FC<DormCardProps> = ({
 
             <div className="p-5 flex flex-col flex-grow">
                 <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-xl font-bold text-gray-900 leading-tight">{getName()}</h3>
+                    <h3 className="text-2xl font-bold text-gray-900 leading-tight transition-transform duration-150 hover:scale-[1.03] origin-left antialiased">{getName()}</h3>
                 </div>
 
                 <div className="flex items-center text-gray-500 text-sm mb-4">
@@ -92,19 +92,19 @@ const DormCard: React.FC<DormCardProps> = ({
 
                 <div className="flex gap-2 mb-4 flex-wrap">
                     {dorm.ac && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium">
+                        <span className="inline-flex items-center px-2 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium transition-colors duration-150 hover:bg-blue-100 hover:text-blue-800">
                             <Wind size={10} className="mr-1" /> {t.ac}
                         </span>
                     )}
                     {dorm.dining && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full bg-orange-50 text-orange-700 text-xs font-medium">
+                        <span className="inline-flex items-center px-2 py-1 rounded-full bg-orange-50 text-orange-700 text-xs font-medium transition-colors duration-150 hover:bg-orange-100 hover:text-orange-800">
                             <Utensils size={10} className="mr-1" /> {t.dining}
                         </span>
                     )}
                     {dorm.roomTypes?.slice(0, 2).map((type) => (
                         <span
                             key={type}
-                            className="inline-block px-2 py-1 rounded-md border border-gray-200 text-gray-600 text-[10px] font-medium bg-white"
+                            className="inline-block px-2 py-1 rounded-md border border-gray-200 text-gray-600 text-[10px] font-medium bg-white transition-colors duration-150 hover:bg-gray-50 hover:text-gray-800 hover:border-gray-300"
                         >
                             {getRoomTypeLabel(type, language)}
                         </span>
@@ -112,14 +112,14 @@ const DormCard: React.FC<DormCardProps> = ({
                     {dorm.tags.slice(0, 2).map((tag) => (
                         <span
                             key={tag}
-                            className="inline-block px-2 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium"
+                            className="inline-block px-2 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium transition-colors duration-150 hover:bg-gray-200 hover:text-gray-800"
                         >
                             {tag}
                         </span>
                     ))}
                 </div>
 
-                <p className="text-gray-600 text-sm mb-2 line-clamp-3 flex-grow">{getDescription()}</p>
+                <p className="text-gray-700 text-sm leading-relaxed mb-2 line-clamp-3 flex-grow antialiased">{getDescription()}</p>
             </div>
         </div>
     );

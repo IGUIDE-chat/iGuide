@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { FloorPlan } from '../../types/housing';
 import { formatPrice } from '../../constants/housing/pricing';
 import { Bed, Maximize, Check, X, ChevronDown } from 'lucide-react';
@@ -47,12 +47,7 @@ const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, languag
     }
 
     const getRoomTypeColor = (type: string): string => {
-        if (type.includes('Studio')) return 'bg-purple-100 text-purple-700 border-purple-200';
-        if (type.includes('1B')) return 'bg-blue-100 text-blue-700 border-blue-200';
-        if (type.includes('2B')) return 'bg-green-100 text-green-700 border-green-200';
-        if (type.includes('3B')) return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-        if (type.includes('4B')) return 'bg-orange-100 text-orange-700 border-orange-200';
-        return 'bg-gray-100 text-gray-700 border-gray-200';
+        return 'bg-orange-100 text-orange-800 border-orange-300 font-semibold';
     };
 
     const togglePlan = (type: string) => {
@@ -77,7 +72,7 @@ const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, languag
                         <motion.div
                             key={plan.type}
                             layout
-                            className={`bg-white rounded-xl border overflow-hidden transition-shadow ${
+                            className={`bg-gradient-to-br from-white/95 via-white/90 to-gray-50/95 backdrop-blur-md rounded-xl border border-gray-200/80 overflow-hidden transition-shadow ${
                                 isExpanded
                                     ? 'shadow-lg border-illini-orange/30'
                                     : 'shadow-sm border-gray-200 hover:shadow-md'
@@ -86,7 +81,7 @@ const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, languag
                             <div className="p-4 cursor-pointer" onClick={() => togglePlan(plan.type)}>
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
-                                        <div className={`px-3 py-1.5 rounded-lg text-sm font-semibold border ${getRoomTypeColor(plan.type)}`}>
+                                        <div className={`px-3 py-1.5 rounded-lg text-base font-semibold border transition-all duration-200 ${getRoomTypeColor(plan.type)} hover:brightness-95 active:brightness-90 antialiased`}>
                                             {roomTypeLabel}
                                         </div>
 
