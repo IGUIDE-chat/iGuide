@@ -42,15 +42,23 @@ To run the application locally:
 
 **Architecture Diagram**
 
+![Architecture Diagram](./illiniguide---uiuc-knowledge-base/docs/diagrams/architecture_v3.jpg)
+
 We follow a strict file structure to keep the codebase maintainable. All source code resides in the `src/` directory.
 
 | Directory | Description |
 | :--- | :--- |
 | `src/` | **Core Application Source Code** |
+| &nbsp;&nbsp;├─ `app/` | Global app configuration and routes. |
 | &nbsp;&nbsp;├─ `components/` | Reusable React UI components (e.g., `ChatScreen.tsx`, `Sidebar.tsx`). |
 | &nbsp;&nbsp;├─ `services/` | API clients and business logic (e.g., `conversationService.ts`, `supabase.ts`). |
 | &nbsp;&nbsp;├─ `contexts/` | Global React Context providers (e.g., `AuthContext.tsx`, `ThemeContext.tsx`). |
 | &nbsp;&nbsp;├─ `pages/` | Top-level page components (if applicable). |
+| &nbsp;&nbsp;├─ `hooks/` | Custom React hooks. |
+| &nbsp;&nbsp;├─ `utils/` | Utility functions. |
+| &nbsp;&nbsp;├─ `constants/` | Constant values and configuration. |
+| &nbsp;&nbsp;├─ `i18n/` | Internationalization resources. |
+| &nbsp;&nbsp;├─ `data/` | Static data files. |
 | &nbsp;&nbsp;└─ `types/` | TypeScript type definitions and interfaces. |
 | `functions/` | Cloudflare Pages Functions (Serverless backend). |
 | `tests/` | Automated tests (Python/JS). |
@@ -129,15 +137,23 @@ Detailed documentation can be found in the `illiniguide---uiuc-knowledge-base/do
 
 **架构图 (Architecture Diagram)**
 
+![架构图](./illiniguide---uiuc-knowledge-base/docs/diagrams/architecture_v3.jpg)
+
 我们遵循严格的文件结构以保持代码库的可维护性。所有源代码都位于 `src/` 目录下。
 
 | 目录 | 描述 |
 | :--- | :--- |
 | `src/` | **核心应用程序源代码** |
+| &nbsp;&nbsp;├─ `app/` | 全局应用配置和路由。 |
 | &nbsp;&nbsp;├─ `components/` | 可复用的 React UI 组件 (例如 `ChatScreen.tsx`, `Sidebar.tsx`)。 |
 | &nbsp;&nbsp;├─ `services/` | API 客户端和业务逻辑 (例如 `conversationService.ts`, `supabase.ts`)。 |
 | &nbsp;&nbsp;├─ `contexts/` | 全局 React Context 提供者 (例如 `AuthContext.tsx`, `ThemeContext.tsx`)。 |
 | &nbsp;&nbsp;├─ `pages/` | 顶级页面组件 (如果在项目中使用)。 |
+| &nbsp;&nbsp;├─ `hooks/` | 自定义 React Hooks。 |
+| &nbsp;&nbsp;├─ `utils/` | 工具函数。 |
+| &nbsp;&nbsp;├─ `constants/` | 常量值和配置。 |
+| &nbsp;&nbsp;├─ `i18n/` | 国际化资源。 |
+| &nbsp;&nbsp;├─ `data/` | 静态数据文件。 |
 | &nbsp;&nbsp;└─ `types/` | TypeScript 类型定义和接口。 |
 | `functions/` | Cloudflare Pages Functions (无服务器后端)。 |
 | `tests/` | 自动化测试 (Python/JS)。 |
