@@ -1,15 +1,12 @@
-﻿# IlliniGuide - UIUC Knowledge Base
+# IlliniGuide - UIUC Knowledge Base
 
-Main frontend application for the UIUC assistant platform.
+A comprehensive, zero-cost architecture knowledge base for new UIUC students featuring static content delivery and an AI-powered campus assistant.
 
-## Runtime Entry
+## Setup
 
-- App entry: `src/index.tsx`
-- App composition: `src/App.tsx`
-- Route declarations: `src/app/routes.tsx`
-- Page registry: `src/app/pageRegistry.ts`
+See [docs/CHATFLOW_SETUP.md](docs/CHATFLOW_SETUP.md) for Coze configuration.
 
-## Project Structure
+## File Structure
 
 ```text
 illiniguide---uiuc-knowledge-base/
