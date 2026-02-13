@@ -63,7 +63,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                     {t.backToBrowse}
                 </button>
 
-                <div className="bg-gradient-to-br from-white/95 via-white/90 to-gray-50/95 backdrop-blur-md rounded-2xl shadow-xl overflow-hidden border border-gray-100/80">
+                <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
                     <DormHeroSection dorm={dorm} dormName={dormName} campusLabel={t.campus} />
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-0 md:divide-x divide-gray-100">
