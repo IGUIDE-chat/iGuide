@@ -1,14 +1,14 @@
-﻿export const AMENITIES = [
+export const AMENITIES = [
     { id: 'ac', label: { en: 'Air Conditioning', zh: '空调' }, icon: 'Snowflake' },
     { id: 'dining', label: { en: 'Dining Hall', zh: '食堂' }, icon: 'Utensils' },
     { id: 'gym', label: { en: 'Gym Nearby', zh: '附近健身房' }, icon: 'Dumbbell' }
 ] as const;
 
 export const ROOM_TYPES = [
-    { id: '1B1B', label: { en: '1B1B', zh: '1B1B' } },
-    { id: '2B1B', label: { en: '2B1B', zh: '2B1B' } },
-    { id: '3B1B', label: { en: '3B1B', zh: '3B1B' } },
-    { id: '4B2B', label: { en: '4B2B', zh: '4B2B' } },
+    { id: '1B1B', label: { en: 'Single (1B1B)', zh: '一居一卫 (1B1B)' } },
+    { id: '2B1B', label: { en: 'Double (2B1B)', zh: '两居一卫 (2B1B)' } },
+    { id: '3B1B', label: { en: 'Triples (3B1B)', zh: '三居一卫 (3B1B)' } },
+    { id: '4B2B', label: { en: 'Quad (4B2B)', zh: '四居两卫 (4B2B)' } },
     { id: 'Suite', label: { en: 'Suite', zh: 'Suite' } },
     { id: 'Cluster', label: { en: 'Cluster', zh: 'Cluster' } }
 ] as const;

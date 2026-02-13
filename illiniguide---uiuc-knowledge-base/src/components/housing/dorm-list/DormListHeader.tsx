@@ -54,10 +54,10 @@ const DormListHeader: React.FC<DormListHeaderProps> = ({
                             onClick={onOpenFilters}
                             type="button"
                             className={`
-                                px-4 py-2 rounded-full text-sm font-medium border transition-all whitespace-nowrap flex items-center gap-2
+                                px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200 whitespace-nowrap flex items-center gap-2
                                 ${hasActiveFilters
-                                    ? 'border-black text-black bg-gray-50'
-                                    : 'bg-white text-gray-700 border-gray-200 hover:border-black'
+                                    ? 'border-illini-orange/40 text-illini-orange/90 bg-orange-50/50 hover:border-illini-orange/60 hover:text-illini-orange hover:bg-orange-50/80 active:border-illini-orange/70 active:text-illini-orange active:bg-orange-100'
+                                    : 'bg-white text-gray-700 border-gray-200 hover:border-illini-orange/40 hover:text-illini-orange/80 hover:bg-orange-50/50 active:border-illini-orange/50 active:text-illini-orange/90 active:bg-orange-50'
                                 }
                             `}
                         >
@@ -65,7 +65,7 @@ const DormListHeader: React.FC<DormListHeaderProps> = ({
                             {t.filters}
                         </button>
                         {hasActiveFilters && (
-                            <div className="absolute -top-1.5 -right-1.5 bg-black text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full border-2 border-white shadow-sm">
+                            <div className="absolute -top-1.5 -right-1.5 bg-illini-orange text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full border-2 border-white shadow-sm">
                                 {activeFilterCount}
                             </div>
                         )}
