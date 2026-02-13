@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
-import { UI_TEXT } from '../constants';
+import { UI_TEXT } from '../i18n/uiText';
 import { Language } from '../types';
 
 interface LoginScreenProps {

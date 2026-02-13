@@ -5,10 +5,11 @@ import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { Language } from '../types';
-import { UI_TEXT } from '../constants';
+import { UI_TEXT } from '../i18n/uiText';
 import { useAuth } from '../contexts/AuthContext';
 import { ConversationSidebar } from './ConversationSidebar';
 import { LibrarySidebar } from './LibrarySidebar';
+import { DormSidebar } from './DormSidebar';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -161,6 +162,12 @@ export const Layout: React.FC<LayoutProps> = ({
               <LibrarySidebar
                 language={language}
                 currentArticleId={location.pathname.startsWith('/library/article/') ? location.pathname.split('/').pop() : undefined}
+              />
+            )}
+            {activeTab === 'dorms' && (
+              <DormSidebar
+                language={language}
+                currentDormId={location.pathname.startsWith('/dorms/') ? location.pathname.split('/').pop() : undefined}
               />
             )}
           </div>

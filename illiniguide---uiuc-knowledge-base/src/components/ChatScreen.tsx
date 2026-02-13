@@ -7,8 +7,8 @@ import remarkGfm from 'remark-gfm';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TypewriterMarkdown } from './TypewriterMarkdown';
 import { Language, ChatMessage } from '../types';
-import { streamChatResponse } from '../services/cozeService';
-import { UI_TEXT } from '../constants';
+import { streamChatResponse } from '../services/ai';
+import { UI_TEXT } from '../i18n/uiText';
 import { conversationService } from '../services/conversationService';
 import { localConversationService } from '../services/localConversationService';
 import { useAuth } from '../contexts/AuthContext';
@@ -173,6 +173,12 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
                   msg.id === aiMsgId ? { ...msg, followUpQuestions: chunk.followUpQuestions } : msg
                ));
             }
+         }
+
+         if (!fullText.trim()) {
+            fullText = language === 'zh'
+               ? '暂时没有收到回复，请重试。'
+               : 'No response was returned. Please try again.';
          }
 
          // Final update with complete text
