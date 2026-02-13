@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Language } from '../types';
-import { UI_TEXT } from '../i18n/uiText';
+import { UI_TEXT } from '../constants';
 
 interface AgentLandingPageProps {
     type: 'courses' | 'dorms' | 'resume';

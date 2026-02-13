@@ -4,8 +4,7 @@ import * as React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Article, Language } from '../types';
-import { CATEGORIES, getArticleText, getCategoryText } from '../constants';
-import { UI_TEXT } from '../i18n/uiText';
+import { CATEGORIES, getArticleText, getCategoryText, UI_TEXT } from '../constants';
 
 interface ArticleViewProps {
   article: Article;

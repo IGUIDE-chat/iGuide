@@ -44,23 +44,12 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         const body = await request.json() as any;
         const { message, conversationId, history, userId, lang = 'en' } = body;
 
-        // Prefer server-only secrets first to avoid accidentally using stale public vars.
-        const API_TOKEN = (env.COZE_API_TOKEN || env.VITE_COZE_API_KEY || '').trim();
-        const BOT_ID = (env.COZE_BOT_ID || env.VITE_COZE_BOT_ID || '').trim();
+        // Use Environment Secret (PAT or OAuth Token)
+        // For now, simpler to use PAT on server-side which is equally secure for a single bot.
+        const API_TOKEN = env.VITE_COZE_API_KEY || env.COZE_API_TOKEN;
+        const BOT_ID = env.VITE_COZE_BOT_ID || env.COZE_BOT_ID;
 
-        if (!API_TOKEN) {
-            return new Response(
-                JSON.stringify({ error: 'Missing Coze API token in environment.' }),
-                { status: 500, headers: { 'Content-Type': 'application/json' } }
-            );
-        }
-
-        if (!BOT_ID) {
-            return new Response(
-                JSON.stringify({ error: 'Missing Coze bot id in environment.' }),
-                { status: 500, headers: { 'Content-Type': 'application/json' } }
-            );
-        }
+        if (!API_TOKEN) return new Response("Missing API Key", { status: 500 });
 
         // Call Coze API
         const cozeRes = await fetch("https://api.coze.com/v3/chat", {
