@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Heart } from 'lucide-react';
 import { Dorm } from '../../../types/housing';
 import { Language } from '../../../types';
@@ -62,7 +62,7 @@ const MapCarousel: React.FC<MapCarouselProps> = ({
                             onMouseLeave={() => onHoverDorm(null)}
                             className="flex-shrink-0 w-[240px] snap-start cursor-pointer group"
                         >
-                            <div className="bg-white rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.12)] overflow-hidden h-full border border-gray-100 flex flex-col">
+                            <div className="bg-gradient-to-br from-white/95 via-white/90 to-gray-50/95 backdrop-blur-md rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.12)] overflow-hidden h-full border border-gray-100/80 flex flex-col">
                                 <div className="relative h-28 overflow-hidden bg-gray-100 shrink-0">
                                     <img
                                         src={dorm.imageUrl}
@@ -102,7 +102,7 @@ const MapCarousel: React.FC<MapCarouselProps> = ({
                                 <div className="p-3 flex flex-col justify-between flex-1">
                                     <div>
                                         <div className="flex justify-between items-start mb-0.5">
-                                            <h3 className="font-bold text-gray-900 text-sm leading-tight truncate pr-2">
+                                            <h3 className="font-bold text-gray-900 text-base leading-tight truncate pr-2 transition-transform duration-150 hover:scale-[1.03] origin-left">
                                                 {dormName}
                                             </h3>
                                             <div className="flex items-center gap-0.5 shrink-0">

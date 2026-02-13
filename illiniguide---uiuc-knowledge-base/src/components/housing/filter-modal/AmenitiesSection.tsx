@@ -27,8 +27,10 @@ const AmenitiesSection: React.FC<AmenitiesSectionProps> = ({
                     <label key={amenity.id} className="flex items-center gap-3 cursor-pointer group select-none py-1">
                         <div
                             className={`
-                            w-6 h-6 rounded-[4px] border flex items-center justify-center transition-colors duration-200
-                            ${isSelected ? 'bg-black border-black text-white' : 'border-gray-300 group-hover:border-black bg-white'}
+                            w-6 h-6 rounded-[4px] border flex items-center justify-center transition-all duration-200
+                            ${isSelected
+                                ? 'bg-illini-blue border-illini-blue text-white active:bg-[#0e2240] active:border-[#0e2240]'
+                                : 'border-gray-300 group-hover:border-illini-orange bg-white active:bg-orange-50/50'}
                         `}
                         >
                             {isSelected && <Check size={16} strokeWidth={3} />}
@@ -39,8 +41,8 @@ const AmenitiesSection: React.FC<AmenitiesSectionProps> = ({
                                 onChange={() => onToggle(amenity.id)}
                             />
                         </div>
-                        <div className="flex items-center gap-2 text-gray-700 group-hover:text-black transition-colors">
-                            <Icon size={18} className="text-gray-500 group-hover:text-black" />
+                        <div className="flex items-center gap-2 text-gray-700 group-hover:text-illini-orange transition-colors">
+                            <Icon size={18} className="text-gray-500 group-hover:text-illini-orange" />
                             <span>{amenity.label[language] || amenity.label.en}</span>
                         </div>
                     </label>

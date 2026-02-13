@@ -226,7 +226,7 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                                                             key={dorm.id}
                                                             onClick={() => navigate(`/dorms/${dorm.id}`)}
                                                             type="button"
-                                                            className="flex items-center gap-3 bg-white border border-gray-100 p-3 rounded-xl shadow-sm hover:shadow-md hover:border-illini-orange/30 transition-all group w-full text-left"
+                                                            className="flex items-center gap-3 bg-gradient-to-br from-white/95 to-gray-50/95 backdrop-blur-md border border-gray-100/80 p-3 rounded-xl shadow-sm hover:shadow-md hover:border-illini-orange/30 transition-all group w-full text-left"
                                                         >
                                                             <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                                                                 <img
@@ -237,7 +237,7 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                                                             </div>
                                                             <div className="flex-grow min-w-0">
                                                                 <div className="flex justify-between items-start">
-                                                                    <h4 className="text-sm font-bold text-gray-900 group-hover:text-illini-orange transition-colors truncate">
+                                                                    <h4 className="text-base font-bold text-gray-900 group-hover:text-illini-orange transition-colors truncate">
                                                                         {dormName}
                                                                     </h4>
                                                                 </div>
@@ -245,7 +245,7 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                                                                     {dorm.tags.slice(0, 2).map((tag) => (
                                                                         <span
                                                                             key={tag}
-                                                                            className="text-[10px] px-1.5 py-0.5 rounded-md bg-gray-50 text-gray-500 border border-gray-100"
+                                                                            className="text-[10px] px-1.5 py-0.5 rounded-md bg-gray-50 text-gray-500 border border-gray-100 transition-colors duration-150 hover:bg-gray-100 hover:text-gray-700 hover:border-gray-200"
                                                                         >
                                                                             {tag}
                                                                         </span>

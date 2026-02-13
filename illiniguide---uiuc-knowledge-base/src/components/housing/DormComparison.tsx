@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Dorm } from '../../types/housing';
 import { formatPrice } from '../../constants/housing/pricing';
 import { Language } from '../../types';
@@ -53,7 +53,7 @@ const DormComparison: React.FC<DormComparisonProps> = ({ dorms, onClose, languag
                 return (
                     <div className="flex items-center gap-2">
                         <img src={dorm.imageUrl} alt={dormName} className="w-10 h-10 rounded-lg object-cover" />
-                        <span className="font-medium text-sm">{dormName}</span>
+                        <span className="font-medium text-base">{dormName}</span>
                     </div>
                 );
             }
@@ -200,7 +200,7 @@ const DormComparison: React.FC<DormComparisonProps> = ({ dorms, onClose, languag
                                             >
                                                 <div className="flex items-center gap-2">
                                                     <img src={dorm.imageUrl} alt={dormName} className="w-8 h-8 rounded object-cover" />
-                                                    <span className="truncate">{dormName}</span>
+                                                    <span className="truncate text-base">{dormName}</span>
                                                 </div>
                                             </th>
                                         );
