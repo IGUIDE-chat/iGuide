@@ -1,5 +1,6 @@
-﻿import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Dorm } from '../../types/housing';
 import { UIUC_DORMS } from '../../constants/housing/dormData';
 import { getPriceRangeFromData } from '../../constants/housing/pricing';
@@ -7,6 +8,7 @@ import DormMap from './DormMap';
 import { FilterModal } from './FilterModal';
 import { useHousingFilters } from '../../contexts/HousingContext';
 import { useSharedDormInteraction } from '../../contexts/DormUserInteractionContext';
+import { useLayout } from '../../contexts/LayoutContext';
 import { Language } from '../../types';
 import DormListHeader from './dorm-list/DormListHeader';
 import DormGrid from './dorm-list/DormGrid';
@@ -14,6 +16,45 @@ import MapCarousel from './dorm-list/MapCarousel';
 import { ListEmptyState, MapEmptyViewportOverlay, MapNoResultsOverlay } from './dorm-list/EmptyStates';
 import { filterAndSortDorms, normalizePriceRange } from './dorm-list/filtering';
 import { DormListText } from './dorm-list/types';
+
+/** 侧栏打开时：飞向收藏区域（侧栏中部偏下）；侧栏关闭时：飞向打开目录按钮（左上角） */
+const TARGET_FAVORITES = { x: 90, y: 360 };
+const TARGET_TOGGLE_BUTTON = { x: 30, y: 30 };
+
+/** 飞心 SVG 为 24px，侧栏收藏爱心为 12px，scale 0.5 时落地与收藏爱心完美重合 */
+const FAVORITES_HEART_SCALE = 12 / 24;
+
+const FlyingHeart: React.FC<{
+    startX: number;
+    startY: number;
+    targetX: number;
+    targetY: number;
+    onComplete: () => void;
+}> = ({ startX, startY, targetX, targetY, onComplete }) => (
+    <motion.div
+        className="pointer-events-none fixed left-0 top-0 z-[100] origin-center"
+        initial={{ x: startX, y: startY, scale: 1 }}
+        animate={{
+            x: targetX,
+            y: targetY,
+            scale: FAVORITES_HEART_SCALE
+        }}
+        transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+        onAnimationComplete={onComplete}
+        style={{ willChange: 'transform' }}
+    >
+        <div className="-translate-x-1/2 -translate-y-1/2">
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="w-6 h-6 text-red-500 drop-shadow-md"
+            >
+                <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+            </svg>
+        </div>
+    </motion.div>
+);
 
 interface DormListProps {
     language: Language;
@@ -53,8 +94,10 @@ const DORM_LIST_TEXT: Record<Language, DormListText> = {
 
 const DormList: React.FC<DormListProps> = ({ language }) => {
     const navigate = useNavigate();
+    const { isSidebarOpen, favoritesIconRef, sidebarToggleButtonRef, mobileSidebarButtonRef } = useLayout();
     const { toggleFavorite, addToHistory, favorites } = useSharedDormInteraction();
     const [hasMountedMap, setHasMountedMap] = useState(false);
+    const [flyingHeart, setFlyingHeart] = useState<{ x: number; y: number; targetX: number; targetY: number } | null>(null);
     const [hoveredDormId, setHoveredDormId] = useState<string | null>(null);
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
     const [isCarouselHovering, setIsCarouselHovering] = useState(false);
@@ -213,7 +256,32 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
         clearAllFilters();
     };
 
-    const handleToggleFavorite = (dorm: Dorm) => {
+    const handleToggleFavorite = (dorm: Dorm, e?: React.MouseEvent) => {
+        const wasNotFavorite = !favoritesSet.has(dorm.id);
+        if (wasNotFavorite && e) {
+            let targetX: number;
+            let targetY: number;
+            if (isSidebarOpen && favoritesIconRef?.current) {
+                const rect = favoritesIconRef.current.getBoundingClientRect();
+                targetX = rect.left + rect.width / 2;
+                targetY = rect.top + rect.height / 2;
+            } else if (isSidebarOpen) {
+                targetX = TARGET_FAVORITES.x;
+                targetY = TARGET_FAVORITES.y;
+            } else {
+                const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+                const toggleEl = isMobile ? mobileSidebarButtonRef?.current : sidebarToggleButtonRef?.current;
+                if (toggleEl) {
+                    const rect = toggleEl.getBoundingClientRect();
+                    targetX = rect.left + rect.width / 2;
+                    targetY = rect.top + rect.height / 2;
+                } else {
+                    targetX = TARGET_TOGGLE_BUTTON.x;
+                    targetY = TARGET_TOGGLE_BUTTON.y;
+                }
+            }
+            setFlyingHeart({ x: e.clientX, y: e.clientY, targetX, targetY });
+        }
         void toggleFavorite(dorm.id, dorm.name, dorm.name_zh);
     };
 
@@ -232,13 +300,13 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
                 setViewMode={setViewMode}
             />
 
-            <div className="flex-1 overflow-hidden bg-gray-50/50 relative z-0 flex flex-row">
+            <div className="flex-1 overflow-hidden bg-gray-50/50 relative z-0 flex flex-row min-w-0">
                 <div
                     className={`
-                        h-full overflow-y-auto p-4 xl:p-6 transition-all duration-300 scrollbar-thin
+                        h-full overflow-y-auto p-4 xl:p-6 transition-all duration-300 scrollbar-thin min-w-0
                         ${isListView
                             ? 'w-full opacity-100 z-10'
-                            : 'absolute inset-0 xl:static xl:w-[40%] xl:opacity-100 xl:border-r xl:border-gray-200 xl:z-auto opacity-0 pointer-events-none xl:pointer-events-auto'
+                            : 'absolute inset-0 xl:static xl:w-[40%] xl:min-w-0 xl:opacity-100 xl:border-r xl:border-gray-200 xl:z-auto opacity-0 pointer-events-none xl:pointer-events-auto'
                         }
                     `}
                 >
@@ -259,15 +327,15 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
                 {(hasMountedMap || isMapView) && (
                     <div
                         className={`
-                            h-full transition-all duration-300 flex flex-col
+                            h-full transition-all duration-300 flex flex-col min-w-0
                             ${isMapView
-                                ? 'absolute inset-0 xl:static xl:w-[60%] opacity-100 z-20 xl:z-auto'
+                                ? 'absolute inset-0 xl:static xl:w-[60%] xl:min-w-0 opacity-100 z-20 xl:z-auto'
                                 : 'absolute inset-0 xl:static xl:hidden opacity-0 pointer-events-none'
                             }
                         `}
                     >
-                        <div className="flex-1 min-h-0 relative">
-                            <div className="h-full w-full bg-gray-100">
+                        <div className="flex-1 min-h-0 min-w-0 relative flex flex-col">
+                            <div className="flex-1 min-h-[200px] w-full bg-gray-100">
                                 <DormMap
                                     dorms={filteredDorms}
                                     onSelectDorm={handleViewDetails}
@@ -313,6 +381,16 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
                 onClose={() => setIsFilterModalOpen(false)}
                 language={language === 'zh' ? 'zh' : 'en'}
             />
+
+            {flyingHeart && (
+                <FlyingHeart
+                    startX={flyingHeart.x}
+                    startY={flyingHeart.y}
+                    targetX={flyingHeart.targetX}
+                    targetY={flyingHeart.targetY}
+                    onComplete={() => setFlyingHeart(null)}
+                />
+            )}
         </div>
     );
 };

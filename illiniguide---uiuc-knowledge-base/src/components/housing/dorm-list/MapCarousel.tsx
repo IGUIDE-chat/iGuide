@@ -8,7 +8,7 @@ interface MapCarouselProps {
     dorms: Dorm[];
     language: Language;
     favoritesSet: Set<string>;
-    onToggleFavorite: (dorm: Dorm) => void;
+    onToggleFavorite: (dorm: Dorm, e?: React.MouseEvent) => void;
     onViewDetails: (dorm: Dorm) => void;
     onHoverDorm: (id: string | null) => void;
     scrollContainerRef: React.RefObject<HTMLDivElement | null>;
@@ -87,7 +87,7 @@ const MapCarousel: React.FC<MapCarouselProps> = ({
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            onToggleFavorite(dorm);
+                                            onToggleFavorite(dorm, e);
                                         }}
                                         type="button"
                                         className="absolute top-2 right-2 p-1.5 rounded-full bg-black/10 backdrop-blur-sm"

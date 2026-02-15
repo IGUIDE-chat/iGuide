@@ -29,7 +29,7 @@ const RoomTypeSection: React.FC<RoomTypeSectionProps> = ({
                             w-6 h-6 rounded-[4px] border flex items-center justify-center transition-all duration-200
                             ${isSelected
                                 ? 'bg-illini-orange/25 border-illini-orange/60 text-illini-orange active:bg-illini-orange/40 active:border-illini-orange/80'
-                                : 'border-gray-300 group-hover:border-illini-orange bg-white active:bg-orange-50/50'}
+                                : 'border-gray-300 group-hover:border-illini-blue active:border-illini-blue bg-white active:bg-blue-50/50'}
                         `}
                         >
                             {isSelected && <Check size={16} strokeWidth={3} />}
@@ -40,7 +40,7 @@ const RoomTypeSection: React.FC<RoomTypeSectionProps> = ({
                                 onChange={() => onToggle(type.id)}
                             />
                         </div>
-                        <span className="text-gray-700 group-hover:text-illini-orange transition-colors relative -top-0.5">
+                        <span className="text-gray-700 group-hover:text-illini-blue transition-colors relative -top-0.5">
                             {type.label[language] || type.label.en}
                         </span>
                     </label>

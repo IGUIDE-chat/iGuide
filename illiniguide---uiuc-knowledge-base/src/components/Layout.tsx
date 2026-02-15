@@ -1,12 +1,13 @@
 // [LAYOUT] Main application wrapper with sidebar and mobile navigation.
 // [布局] 包含侧边栏和移动端导航的主要应用容器。
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { Language } from '../types';
 import { UI_TEXT } from '../i18n/uiText';
 import { useAuth } from '../contexts/AuthContext';
+import { LayoutProvider } from '../contexts/LayoutContext';
 import { ConversationSidebar } from './ConversationSidebar';
 import { LibrarySidebar } from './LibrarySidebar';
 import { DormSidebar } from './DormSidebar';
@@ -67,6 +68,9 @@ export const Layout: React.FC<LayoutProps> = ({
 
   // Default sidebar open on desktop, closed on mobile
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const favoritesIconRef = useRef<SVGSVGElement | null>(null);
+  const sidebarToggleButtonRef = useRef<HTMLButtonElement | null>(null);
+  const mobileSidebarButtonRef = useRef<HTMLButtonElement | null>(null);
 
   // Initialize state based on screen size only on client side mount
   useEffect(() => {
@@ -76,6 +80,7 @@ export const Layout: React.FC<LayoutProps> = ({
   }, []);
 
   return (
+    <LayoutProvider isSidebarOpen={isSidebarOpen} favoritesIconRef={favoritesIconRef} sidebarToggleButtonRef={sidebarToggleButtonRef} mobileSidebarButtonRef={mobileSidebarButtonRef}>
     <div className="flex h-[100dvh] w-full bg-white text-slate-900 font-sans overflow-hidden">
       {/* Mobile Sidebar Overlay */}
       <div
@@ -168,6 +173,7 @@ export const Layout: React.FC<LayoutProps> = ({
               <DormSidebar
                 language={language}
                 currentDormId={location.pathname.startsWith('/dorms/') ? location.pathname.split('/').pop() : undefined}
+                favoritesIconRef={favoritesIconRef}
               />
             )}
           </div>
@@ -215,8 +221,9 @@ export const Layout: React.FC<LayoutProps> = ({
       < main className="flex-1 flex flex-col relative h-full w-full bg-white min-w-0" >
 
         {/* Desktop Sidebar Toggle - Single Button Positioned Absolutely */}
-        < div className="hidden md:block absolute top-3 left-3 z-30" >
+        < div className="hidden md:block absolute top-3 left-3 z-40" >
           <button
+            ref={sidebarToggleButtonRef}
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             className="text-slate-400 hover:text-slate-600 p-2 rounded-md hover:bg-slate-100 transition-colors"
             title={isSidebarOpen ? "Close Sidebar" : "Open Sidebar"}
@@ -227,7 +234,7 @@ export const Layout: React.FC<LayoutProps> = ({
 
         {/* Mobile Header (Only visible on mobile) */}
         < div className="md:hidden flex items-center p-3 border-b border-slate-100 bg-white sticky top-0 z-20" >
-          <button onClick={() => setIsSidebarOpen(true)} className="text-slate-500 mr-4 p-1">
+          <button ref={mobileSidebarButtonRef} onClick={() => setIsSidebarOpen(true)} className="text-slate-500 mr-4 p-1">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
           </button>
           <span className="font-semibold text-slate-700 text-sm">
@@ -235,10 +242,11 @@ export const Layout: React.FC<LayoutProps> = ({
           </span>
         </div >
 
-        <div className="flex-1 overflow-hidden relative">
+        <div className="flex-1 overflow-hidden relative min-w-0">
           {children}
         </div>
       </main >
     </div >
+    </LayoutProvider>
   );
 };

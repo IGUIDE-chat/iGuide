@@ -81,7 +81,7 @@ const DormComparison: React.FC<DormComparisonProps> = ({ dorms, onClose, languag
             getValue: (dorm) => (
                 <span
                     className={`px-2 py-1 text-xs rounded-full ${
-                        dorm.housingType === 'URH' ? 'bg-orange-100 text-illini-orange' : 'bg-blue-100 text-illini-blue'
+                        dorm.housingType === 'URH' ? 'bg-illini-orange/15 text-illini-orange' : 'bg-blue-100 text-illini-blue'
                     }`}
                 >
                     {dorm.housingType === 'URH' ? t.urh : t.pch}

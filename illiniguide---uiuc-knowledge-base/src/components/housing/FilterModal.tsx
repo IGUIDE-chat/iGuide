@@ -263,6 +263,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
                                         onToggle={(value) =>
                                             toggleStringArray(localLocations, setLocalLocations, value)
                                         }
+                                        accentColor="blue"
                                     />
 
                                     <hr className="my-8 border-gray-100" />
@@ -292,6 +293,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
                                         onToggle={(value) =>
                                             toggleStringArray(localTypes, setLocalTypes, value)
                                         }
+                                        accentColor="blue"
                                     />
 
                                     <hr className="my-8 border-gray-100" />

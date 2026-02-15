@@ -56,7 +56,7 @@ const DormActionPanel: React.FC<DormActionPanelProps> = ({
             <button
                 onClick={onToggleSave}
                 type="button"
-                className={`w-full py-3 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 ${isSaved ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-illini-orange hover:bg-orange-600'
+                className={`w-full py-3 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 ${isSaved ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-illini-orange hover:bg-illini-orange-dark'
                     }`}
             >
                 {isSaved ? savedLabel : saveLabel}
