@@ -247,40 +247,40 @@ export const CAMPUS_LANDMARKS: Landmark[] = [
         name: 'Illini Union',
         name_zh: 'Illini Union',
         type: 'union',
-        lat: 40.1093,
-        lng: -88.2272
+        lat: 40.1092252342299,
+        lng: -88.22722170704449
     },
     {
         id: 'library',
         name: 'Main Library',
         name_zh: 'Main Library',
         type: 'library',
-        lat: 40.1047,
-        lng: -88.2284
+        lat: 40.10471119668479,
+        lng: -88.22902417993053
     },
     {
         id: 'arc',
         name: 'ARC (Gym)',
         name_zh: 'ARC (Gym)',
         type: 'gym',
-        lat: 40.1011,
-        lng: -88.2343
+        lat: 40.100684888169084,
+        lng: -88.23601776145921
     },
     {
         id: 'siebel-center',
         name: 'Siebel Center (CS)',
         name_zh: 'Siebel Center (CS)',
         type: 'school',
-        lat: 40.1138,
-        lng: -88.2259
+        lat: 40.113801471402596,
+        lng:  -88.2249041352866
     },
     {
         id: 'ece-building',
         name: 'ECE Building',
         name_zh: 'ECE Building',
         type: 'school',
-        lat: 40.1150,
-        lng: -88.2280
+        lat: 40.11492760887548,
+        lng: -88.22802989519542
     },
     // New Landmarks
     {
@@ -288,80 +288,80 @@ export const CAMPUS_LANDMARKS: Landmark[] = [
         name: 'Illini Union Bookstore',
         name_zh: 'Illini Union Bookstore',
         type: 'store',
-        lat: 40.1092,
-        lng: -88.2294
+        lat: 40.10829322991013,
+        lng: -88.22922027529316
     },
     {
         id: 'county-market',
         name: 'County Market',
         name_zh: 'County Market(超市)',
         type: 'store',
-        lat: 40.1130,
-        lng: -88.2338
+        lat: 40.11301977423581,
+        lng: -88.23394405183204
     },
     {
         id: 'target',
         name: 'Target',
         name_zh: 'Target(超市)',
         type: 'store',
-        lat: 40.1102,
-        lng: -88.2301
+        lat: 40.110109087389475,
+        lng: -88.23017080569798
     },
     {
         id: 'crce',
         name: 'CRCE (Gym)',
         name_zh: 'CRCE (Gym)',
         type: 'gym',
-        lat: 40.1045,
-        lng: -88.2220
+        lat: 40.10476961777321,
+        lng: -88.22191495533255
     },
     {
         id: 'mckinley',
         name: 'McKinley Health',
         name_zh: 'McKinley Health',
         type: 'medical',
-        lat: 40.1030,
-        lng: -88.2205
+        lat: 40.10280859957014,
+        lng: -88.21980282686037
     },
     {
         id: 'cif',
         name: 'CIF',
         name_zh: 'CIF',
         type: 'school',
-        lat: 40.1125,
-        lng: -88.2284
+        lat: 40.11247604751845,
+        lng: -88.22832596821532
     },
     {
         id: 'hmart',
         name: 'H Mart',
         name_zh: 'H Mart(超市)',
         type: 'store',
-        lat: 40.1145,
-        lng: -88.2068
+        lat: 40.11444384417658,
+        lng: -88.20588947215093
     },
     {
         id: 'walgreens',
         name: 'Walgreens',
         name_zh: 'Walgreens',
         type: 'store',
-        lat: 40.1104,
-        lng: -88.2328
+        lat: 40.10999291447267,
+        lng: -88.23273543546361
     },
     {
         id: 'cvs',
         name: 'CVS',
         name_zh: 'CVS',
         type: 'store',
-        lat: 40.1103,
-        lng: -88.2405
+        lat: 40.10955228408728,
+        lng: -88.24430430485087
     },
     {
         id: 'usps',
         name: 'USPS',
         name_zh: 'USPS',
         type: 'service',
-        lat: 40.1103,
-        lng: -88.2351
+        lat: 40.11049753904377,
+        lng: -88.23511197584901
     },
     // Dining & Zones
     {
@@ -369,8 +369,8 @@ export const CAMPUS_LANDMARKS: Landmark[] = [
         name: 'McDonald\'s',
         name_zh: 'McDonald\'s',
         type: 'dining',
-        lat: 40.1103,
-        lng: -88.2298
+        lat: 40.11043290801958,
+        lng: -88.229839506289
     }
 ];
 

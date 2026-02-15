@@ -51,8 +51,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
             { type: '3B1B', price: 13500, sqft: 280, description: 'Triple room with shared bathroom', available: true },
             { type: '2B2B', price: 15000, sqft: 240, description: 'Double room with semi-private bathroom', available: true }
         ],
-        lat: 40.1095,
-        lng: -88.2214
+        lat: 40.11027312975463,
+        lng: -88.22187818321625
     },
     // Ikenberry North Halls - split from compound entry
     {
@@ -101,8 +101,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
             { type: '2B1B', price: 15200, sqft: 220, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/NUGENT-2B1B.png', description: 'Double room with semi-private bathroom', available: true },
             { type: '4B2B', price: 14800, sqft: 450, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/NUGENT-4B2B.png', description: 'Quad suite with 2 bathrooms', available: true }
         ],
-        lat: 40.1043,
-        lng: -88.2393
+        lat: 40.1038849685309,
+        lng: -88.23723829865558
     },
     {
         id: 'wassaja',
@@ -150,8 +150,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
             { type: '2B1B', price: 15200, sqft: 220, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/WASSAJA-2B1B.png', description: 'Double room with semi-private bathroom', available: true },
             { type: '4B2B', price: 14800, sqft: 450, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/WASSAJA-4B2B.png', description: 'Quad suite with 2 bathrooms', available: true }
         ],
-        lat: 40.1035,
-        lng: -88.2365
+        lat: 40.103508532497905, 
+        lng: -88.23783939855508
     },
     {
         id: 'bousefield',
@@ -199,8 +199,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
             { type: '2B1B', price: 15200, sqft: 220, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/BOUSEFIELD-2B1B.png', description: 'Double room with semi-private bathroom', available: true },
             { type: '4B2B', price: 14800, sqft: 450, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/BOUSEFIELD-4B2B.png', description: 'Quad suite with 2 bathrooms', available: true }
         ],
-        lat: 40.0993,
-        lng: -88.2343
+        lat: 40.10189634941614,
+        lng: -88.2380594197237
     },
     {
         id: 'par',
@@ -248,8 +248,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
             { type: '2B1B', price: 13800, sqft: 180, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/PAR-2B1B.png', description: 'Double room with community bathroom', available: true },
             { type: '3B1B', price: 13200, sqft: 250, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/PAR-3B1B.png', description: 'Triple room with community bathroom', available: true }
         ],
-        lat: 40.1000,
-        lng: -88.2203
+        lat: 40.1000121975501,
+        lng: -88.22015709284125
     },
     {
         id: 'far',
@@ -297,8 +297,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
             { type: '2B1B', price: 9200, sqft: 170, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/FAR-2B1B.png', description: 'Double room with community bathroom', available: true },
             { type: '3B1B', price: 8800, sqft: 240, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/FAR-3B1B.png', description: 'Triple room with community bathroom', available: true }
         ],
-        lat: 40.0992,
-        lng: -88.2212
+        lat: 40.098956890499174,
+        lng: -88.22096763817163
     },
     {
         id: 'allen',
@@ -346,8 +346,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
             { type: '2B1B', price: 8500, sqft: 160, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/ALLEN-2B1B.png', description: 'Double room with community bathroom', available: true },
             { type: '3B1B', price: 8000, sqft: 220, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/ALLEN-3B1B.png', description: 'Triple room with community bathroom', available: true }
         ],
-        lat: 40.1082,
-        lng: -88.2215
+        lat: 40.10411647399734,
+        lng: -88.22101625773642
     },
     {
         id: 'busey-evans',
@@ -395,8 +395,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
             { type: '2B1B', price: 8800, sqft: 170, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/BUSEYEVANS-2B1B.png', description: 'Double room with community bathroom', available: true },
             { type: 'Studio', price: 9500, sqft: 140, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/BUSEYEVANS-Studio.png', description: 'Private room with sink', available: true }
         ],
-        lat: 40.1075,
-        lng: -88.2244
+        lat: 40.10577232571417,
+        lng: -88.22323498533768
     },
     // Ikenberry South Halls - split from compound entry
     {
@@ -445,8 +445,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
             { type: '2B1B', price: 11200, sqft: 175, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/SNYDER-2B1B.png', description: 'Double room with community bathroom', available: true },
             { type: '3B1B', price: 10800, sqft: 240, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/SNYDER-3B1B.png', description: 'Triple room with community bathroom', available: true }
         ],
-        lat: 40.1064,
-        lng: -88.2366
+        lat: 40.1022174939617,
+        lng: -88.23541624956036
     },
     {
         id: 'hopkins',
@@ -494,8 +494,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
             { type: '2B1B', price: 11200, sqft: 175, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/HOPKINS-2B1B.png', description: 'Double room with community bathroom', available: true },
             { type: '3B1B', price: 10800, sqft: 240, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/HOPKINS-3B1B.png', description: 'Triple room with community bathroom', available: true }
         ],
-        lat: 40.1025,
-        lng: -88.2378
+        lat: 40.10260589874599,
+        lng: -88.23785331375801
     },
     {
         id: 'weston',
@@ -543,8 +543,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
             { type: '2B1B', price: 11500, sqft: 180, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/WESTON-2B1B.png', description: 'Double room with community bathroom', available: true },
             { type: '3B1B', price: 11000, sqft: 250, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/WESTON-3B1B.png', description: 'Triple room with community bathroom', available: true }
         ],
-        lat: 40.1009,
-        lng: -88.2285
+        lat: 40.10299241417007,
+        lng: -88.23530433294022
     },
     {
         id: 'scott',
@@ -585,8 +585,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
             { type: '2B1B', price: 11200, sqft: 175, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/SCOTT-2B1B.png', description: 'Double room with community bathroom', available: true },
             { type: '3B1B', price: 10800, sqft: 240, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/SCOTT-3B1B.png', description: 'Triple room with community bathroom', available: true }
         ],
-        lat: 40.1058,
-        lng: -88.2360
+        lat: 40.10210930610599,
+        lng: -88.23675776021224
     },
     // Taft and Van Doren - split from TVD compound entry
     {
@@ -635,8 +635,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
             { type: '2B1B', price: 6200, sqft: 150, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/TAPT-2B1B.png', description: 'Double room with community bathroom', available: true },
             { type: '3B1B', price: 5900, sqft: 200, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/TAPT-3B1B.png', description: 'Triple room with community bathroom', available: true }
         ],
-        lat: 40.1018,
-        lng: -88.2339
+        lat: 40.10197529283074, 
+        lng: -88.23368088266433
     },
     {
         id: 'van-doren',
@@ -684,8 +684,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
             { type: '2B1B', price: 6200, sqft: 150, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/VANDOREN-2B1B.png', description: 'Double room with community bathroom', available: true },
             { type: '3B1B', price: 5900, sqft: 200, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/VANDOREN-3B1B.png', description: 'Triple room with community bathroom', available: true }
         ],
-        lat: 40.1018,
-        lng: -88.2339
+        lat: 40.101684942573044, 
+        lng: -88.23406047469018
     },
     {
         id: 'daniels',
@@ -734,8 +734,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
             { type: '2B2B', price: 15500, sqft: 250, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/DANIELS-2B2B.png', description: 'Double room with private bathroom', available: true },
             { type: 'Studio', price: 15200, sqft: 180, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/DANIELS-Studio.png', description: 'Private studio with kitchenette', available: true }
         ],
-        lat: 40.1095,
-        lng: -88.2214
+        lat: 40.110818977382294,
+        lng: -88.22180529084652
     },
     {
         id: 'sherman',
@@ -783,8 +783,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
             { type: '2B1B', price: 12500, sqft: 190, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/SHERMAN-2B1B.png', description: 'Double room with semi-private bathroom', available: true },
             { type: 'Studio', price: 14000, sqft: 150, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/SHERMAN-Studio.png', description: 'Private studio with kitchenette', available: true }
         ],
-        lat: 40.1080,
-        lng: -88.2325
+        lat: 40.1071305724729,
+        lng: -88.23231258832209
     },
     {
         id: 'lar',
@@ -832,8 +832,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
             { type: '2B1B', price: 9000, sqft: 165, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/LAR-2B1B.png', description: 'Double room with community bathroom', available: true },
             { type: '3B1B', price: 8800, sqft: 230, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/LAR-3B1B.png', description: 'Triple room with community bathroom', available: true }
         ],
-        lat: 40.1078,
-        lng: -88.2218
+        lat: 40.104154937761855,
+        lng: -88.21994736520489
     },
     {
         id: 'bromley',
@@ -881,8 +881,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
             { type: '2B2B', price: 15500, sqft: 320, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/BROMLEY-2B2B.png', description: 'Double room with private bathroom', available: true },
             { type: 'Suite', price: 15800, sqft: 400, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/BROMLEY-Suite.png', description: 'Suite with shared living area', available: true }
         ],
-        lat: 40.1068,
-        lng: -88.2322
+        lat: 40.107121375140615,
+        lng: -88.23483418653669
     },
     {
         id: 'illini-tower',
@@ -931,8 +931,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
             { type: '2B1B', price: 13500, sqft: 320, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/ILLINITOWER-2B1B.png', description: 'Two-bedroom with shared bathroom', available: true },
             { type: '4B2B', price: 12800, sqft: 580, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/ILLINITOWER-4B2B.png', description: 'Four-bedroom suite with 2 baths', available: true }
         ],
-        lat: 40.1068,
-        lng: -88.2289
+        lat: 40.10651744288508,
+        lng: -88.2322944721566
     },
     {
         id: 'newman',
@@ -981,8 +981,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
             { type: 'Studio', price: 13500, sqft: 160, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/NEWMAN-Studio.png', description: 'Private studio with kitchenette', available: true },
             { type: '2B2B', price: 13800, sqft: 240, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/NEWMAN-2B2B.png', description: 'Double room with private bathroom', available: true }
         ],
-        lat: 40.1065,
-        lng: -88.2300
+        lat: 40.10573372686307,
+        lng: -88.23002764961086
     },
     {
         id: 'hendrick',
@@ -1030,57 +1030,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
             { type: '2B1B', price: 14800, sqft: 250, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/HENDRICK-2B1B.png', description: 'Double room with private bathroom', available: true },
             { type: 'Studio', price: 15500, sqft: 180, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/HENDRICK-Studio.png', description: 'Private studio with kitchenette', available: true }
         ],
-        lat: 40.1105,
-        lng: -88.2215
-    },
-    {
-        id: 'eugene-field',
-        name: 'Eugene Field Hall',
-        name_zh: '',
-        location: 'Ikenberry',
-        type: 'Semi-Suite',
-        housingType: 'URH',
-        ac: true,
-        dining: true,
-        tags: ['Social', 'Modern', 'Popular', 'Near Main Quad', 'Near Engineering', 'Near ARC/CRCE', 'Near Ikenberry Dining', 'ARC', 'Elevator', 'Laundry', 'Pool', 'Gym Nearby', 'LEADS LLC'],
-        structuredTags: {
-            elevator: true,
-            laundry: true,
-            studyRooms: false,
-            kitchen: false,
-            parking: true,
-            gymNearby: true,
-            pool: true,
-            genderInclusive: true,
-            quietFloors: true,
-            substanceFree: false,
-            petFriendly: false,
-            llc: ['LEADS LLC'],
-            // Proximity
-            nearMainQuad: true,
-            nearEngineering: true,
-            nearBusiness: false,
-            nearARC: true,
-            nearGreenStreet: false,
-            nearIkenberryDining: true
-        },
-        description: 'Part of the Ikenberry North halls, featuring modern amenities and close proximity to ARC.',
-        description_zh: '',
-        imageUrl: 'https://picsum.photos/800/600?random=2c',
-        pros: ['Very modern rooms', 'Close to the ARC (Gym)', 'LEADS LLC'],
-        pros_zh: [],
-        cons: ['Most expensive options', 'Far from engineering quad'],
-        cons_zh: [],
-        price: 15200,
-        priceRange: '$$$$',
-        roomTypes: ['1B1B', '2B1B', '4B2B'],
-        floorPlans: [
-            { type: '1B1B', price: 15500, sqft: 140, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/EUGENEFIELD-1B1B.png', description: 'Single room with semi-private bathroom', available: true },
-            { type: '2B1B', price: 15200, sqft: 220, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/EUGENEFIELD-2B1B.png', description: 'Double room with semi-private bathroom', available: true },
-            { type: '4B2B', price: 14800, sqft: 450, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/EUGENEFIELD-4B2B.png', description: 'Quad suite with 2 bathrooms', available: true }
-        ],
-        lat: 40.1005,
-        lng: -88.2380
+        lat: 40.11089292014344,
+        lng: -88.21985099184408
     },
     // Presby Hall - Ikenberry North area
     {
@@ -1129,8 +1080,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
             { type: '2B1B', price: 11200, sqft: 200, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/PRESBY-2B1B.png', description: 'Double room with shared bathroom', available: true },
             { type: '3B1B', price: 10800, sqft: 280, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/PRESBY-3B1B.png', description: 'Triple room with shared bathroom', available: true }
         ],
-        lat: 40.1015,
-        lng: -88.2375
+        lat: 40.108249643315276,
+        lng: -88.23263697408665
     },
     // Armory Hall - Ikenberry area
     {
@@ -1180,8 +1131,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
             { type: '3B1B', price: 11200, sqft: 285, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/ARMORY-3B1B.png', description: 'Triple room with shared bathroom', available: true },
             { type: 'Studio', price: 12500, sqft: 180, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/ARMORY-Studio.png', description: 'Private studio room', available: true }
         ],
-        lat: 40.1005,
-        lng: -88.2365
+        lat: 40.1057022499472,
+        lng: -88.2367063025306
     }
 ];
 
