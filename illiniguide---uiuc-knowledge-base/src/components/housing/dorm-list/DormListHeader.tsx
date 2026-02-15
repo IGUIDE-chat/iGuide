@@ -33,10 +33,10 @@ const DormListHeader: React.FC<DormListHeaderProps> = ({
     const isListView = !isMapView;
 
     return (
-        <div className="bg-white border-b border-gray-200 sticky top-0 z-50 transition-all shadow-sm">
-            <div className="px-6 py-4 flex flex-col xl:flex-row items-center gap-4">
-                <div className="flex-1 w-full max-w-4xl mx-auto flex items-center justify-center gap-3">
-                    <div className="relative w-full max-w-md shrink-0">
+        <div className="bg-white border-b border-gray-200 sticky top-0 z-30 transition-all shadow-sm">
+            <div className="px-6 py-4 flex flex-col xl:flex-row items-center gap-4 min-w-0">
+                <div className="flex-1 w-full min-w-0 max-w-4xl mx-auto flex items-center justify-center gap-3">
+                    <div className="relative w-full min-w-0 max-w-md">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <Search className="h-4 w-4 text-gray-400" />
                         </div>
