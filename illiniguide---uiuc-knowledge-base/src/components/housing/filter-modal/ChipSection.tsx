@@ -12,7 +12,7 @@ interface ChipSectionProps {
 const ChipSection: React.FC<ChipSectionProps> = ({ title, options, selectedValues, onToggle, accentColor = 'orange' }) => {
     const unselectedClass = accentColor === 'blue'
         ? 'bg-white text-gray-700 border-gray-300 hover:border-illini-blue active:border-illini-blue active:bg-blue-50/50'
-        : 'bg-white text-gray-700 border-gray-300 hover:border-illini-orange active:border-illini-orange active:bg-orange-50/50';
+        : 'bg-white text-gray-700 border-gray-300 hover:border-illini-orange active:border-illini-orange active:bg-illini-orange/10';
     return (
         <section className="mb-8">
             <h3 className="text-xl font-bold mb-4">{title}</h3>

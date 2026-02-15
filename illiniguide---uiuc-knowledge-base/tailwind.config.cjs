@@ -9,6 +9,8 @@ module.exports = {
       colors: {
         'illini-blue': '#13294B',
         'illini-orange': '#FF5F05',
+        'illini-orange-light': '#FF7A30',
+        'illini-orange-dark': '#E05504',
       },
     },
   },

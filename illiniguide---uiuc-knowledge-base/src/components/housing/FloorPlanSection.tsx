@@ -47,7 +47,7 @@ const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, languag
     }
 
     const getRoomTypeColor = (type: string): string => {
-        return 'bg-orange-100 text-orange-800 border-orange-300 font-semibold';
+        return 'bg-illini-orange/15 text-illini-orange border-illini-orange/40 font-semibold';
     };
 
     const togglePlan = (type: string) => {

@@ -14,7 +14,7 @@ const HousingTypeSection: React.FC<HousingTypeSectionProps> = ({ t, value, onCha
             <label
                 className={`
                 flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors duration-200
-                ${value === 'URH' ? 'border-illini-orange bg-orange-50/50 ring-1 ring-illini-orange' : 'border-gray-200 hover:border-illini-orange hover:bg-orange-50/30 active:border-illini-orange active:bg-orange-50/30'}
+                ${value === 'URH' ? 'border-illini-orange bg-illini-orange/10 ring-1 ring-illini-orange' : 'border-gray-200 hover:border-illini-orange hover:bg-illini-orange/10 active:border-illini-orange active:bg-illini-orange/10'}
             `}
             >
                 <input
@@ -31,12 +31,12 @@ const HousingTypeSection: React.FC<HousingTypeSectionProps> = ({ t, value, onCha
             <label
                 className={`
                 flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors duration-200
-                ${value === 'PCH' ? 'border-illini-blue bg-blue-50/50 ring-1 ring-illini-blue' : 'border-gray-200 hover:border-illini-orange hover:bg-orange-50/30 active:border-illini-orange active:bg-orange-50/30'}
+                ${value === 'PCH' ? 'border-illini-orange bg-illini-orange/10 ring-1 ring-illini-orange' : 'border-gray-200 hover:border-illini-orange hover:bg-illini-orange/10 active:border-illini-orange active:bg-illini-orange/10'}
             `}
             >
                 <input
                     type="checkbox"
-                    className="w-5 h-5 accent-illini-blue rounded-md"
+                    className="w-5 h-5 accent-illini-orange rounded-md"
                     checked={value === 'PCH'}
                     onChange={() => onChange(value === 'PCH' ? 'ALL' : 'PCH')}
                 />

@@ -7,7 +7,7 @@ interface DormGridProps {
     dorms: Dorm[];
     isListView: boolean;
     favoritesSet: Set<string>;
-    onToggleFavorite: (dorm: Dorm) => void;
+    onToggleFavorite: (dorm: Dorm, e?: React.MouseEvent) => void;
     onViewDetails: (dorm: Dorm) => void;
     language: Language;
 }
@@ -36,7 +36,7 @@ const DormGrid: React.FC<DormGridProps> = ({
                     dorm={dorm}
                     onViewDetails={onViewDetails}
                     isFavorite={favoritesSet.has(dorm.id)}
-                    onToggleFavorite={() => onToggleFavorite(dorm)}
+                    onToggleFavorite={(dorm, e) => onToggleFavorite(dorm, e)}
                     language={language}
                 />
             ))}

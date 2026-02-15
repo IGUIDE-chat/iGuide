@@ -9,7 +9,7 @@ interface DormCardProps {
     dorm: Dorm;
     onViewDetails: (dorm: Dorm) => void;
     isFavorite?: boolean;
-    onToggleFavorite?: (id: string) => void;
+    onToggleFavorite?: (dorm: Dorm, e?: React.MouseEvent) => void;
     language?: Language;
 }
 
@@ -56,7 +56,7 @@ const DormCard: React.FC<DormCardProps> = ({
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            onToggleFavorite(dorm.id);
+                            onToggleFavorite(dorm, e);
                         }}
                         type="button"
                         className="absolute top-3 left-3 p-2 rounded-full bg-white hover:bg-gray-50 text-gray-400 hover:text-red-500 transition-colors shadow-sm"
@@ -97,7 +97,7 @@ const DormCard: React.FC<DormCardProps> = ({
                         </span>
                     )}
                     {dorm.dining && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full bg-orange-50 text-orange-700 text-xs font-medium transition-colors duration-150 hover:bg-orange-100 hover:text-orange-800">
+                        <span className="inline-flex items-center px-2 py-1 rounded-full bg-illini-orange/10 text-illini-orange text-xs font-medium transition-colors duration-150 hover:bg-illini-orange/15 hover:text-illini-orange">
                             <Utensils size={10} className="mr-1" /> {t.dining}
                         </span>
                     )}
