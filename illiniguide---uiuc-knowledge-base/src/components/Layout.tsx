@@ -215,7 +215,7 @@ export const Layout: React.FC<LayoutProps> = ({
       < main className="flex-1 flex flex-col relative h-full w-full bg-white min-w-0" >
 
         {/* Desktop Sidebar Toggle - Single Button Positioned Absolutely */}
-        < div className="hidden md:block absolute top-3 left-3 z-30" >
+        < div className="hidden md:block absolute top-3 left-3 z-40" >
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             className="text-slate-400 hover:text-slate-600 p-2 rounded-md hover:bg-slate-100 transition-colors"
@@ -235,7 +235,7 @@ export const Layout: React.FC<LayoutProps> = ({
           </span>
         </div >
 
-        <div className="flex-1 overflow-hidden relative">
+        <div className="flex-1 overflow-hidden relative min-w-0">
           {children}
         </div>
       </main >

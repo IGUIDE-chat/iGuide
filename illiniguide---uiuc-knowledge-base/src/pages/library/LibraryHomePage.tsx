@@ -31,8 +31,8 @@ const LibraryHomePage: React.FC<LibraryHomePageProps> = ({ language }) => {
   }, [localQuery, localizedArticles]);
 
   return (
-    <div className="h-full overflow-y-auto w-full animate-fade-in-up no-scrollbar">
-      <div className="max-w-3xl mx-auto px-4 py-8 pb-24">
+    <div className="h-full overflow-y-auto w-full min-w-0 animate-fade-in-up no-scrollbar">
+      <div className="max-w-3xl mx-auto px-4 py-8 pb-24 min-w-0">
         <div className="text-center py-10">
           <h2 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">{t.knowledgeBaseTitle}</h2>
           <p className="text-slate-500 text-base mb-8 max-w-2xl mx-auto">{t.knowledgeBaseSubtitle}</p>

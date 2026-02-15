@@ -29,8 +29,8 @@ const LibraryCategoryPage: React.FC<LibraryCategoryPageProps> = ({ language }) =
   const categoryText = getCategoryText(category, language);
 
   return (
-    <div className="h-full overflow-y-auto w-full animate-fade-in-up no-scrollbar">
-      <div className="max-w-3xl mx-auto px-4 py-8 pb-24">
+    <div className="h-full overflow-y-auto w-full min-w-0 animate-fade-in-up no-scrollbar">
+      <div className="max-w-3xl mx-auto px-4 py-8 pb-24 min-w-0">
         <button
           type="button"
           onClick={() => navigate('/library')}
