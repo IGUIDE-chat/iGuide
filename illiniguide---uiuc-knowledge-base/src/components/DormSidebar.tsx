@@ -1,6 +1,6 @@
-﻿import React, { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Clock, Star, Trash2 } from 'lucide-react';
+import { Clock, Heart, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { UIUC_DORMS } from '../constants/housing/dormData';
 import { useSharedDormInteraction } from '../contexts/DormUserInteractionContext';
@@ -11,6 +11,8 @@ import { TypewriterText } from './TypewriterText';
 interface DormSidebarProps {
     language: Language;
     currentDormId?: string | null;
+    /** Ref for the favorites section heart icon SVG (flying-heart target) */
+    favoritesIconRef?: React.RefObject<SVGSVGElement | null>;
 }
 
 interface SidebarDormItem {
@@ -22,7 +24,7 @@ interface SidebarDormItem {
 
 const DORM_BY_ID = new Map(UIUC_DORMS.map((dorm) => [dorm.id, dorm]));
 
-export const DormSidebar: React.FC<DormSidebarProps> = ({ language, currentDormId }) => {
+export const DormSidebar: React.FC<DormSidebarProps> = ({ language, currentDormId, favoritesIconRef }) => {
     const navigate = useNavigate();
     const {
         favorites,
@@ -198,7 +200,11 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({ language, currentDormI
                 <section>
                     <div className="flex items-center justify-between px-1 mb-1.5">
                         <div className="flex items-center gap-1.5 text-slate-400">
-                            <Star size={12} className="text-illini-orange fill-illini-orange" />
+                            <Heart
+                                ref={favoritesIconRef}
+                                size={12}
+                                className="shrink-0 text-red-500 fill-red-500"
+                            />
                             <h3 className="text-[10px] font-semibold uppercase tracking-wider">{t.favorites}</h3>
                         </div>
                         {favoriteItems.length > 0 && (

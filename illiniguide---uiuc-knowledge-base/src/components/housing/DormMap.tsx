@@ -1,4 +1,4 @@
-﻿import React, { Component, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { Component, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Dorm } from '../../types/housing';
 import { useHousingMapUi } from '../../contexts/HousingContext';
 import { CAMPUS_LANDMARKS, CAMPUS_ZONES, Landmark } from '../../constants/housing/mapData';
@@ -490,7 +490,7 @@ const DormMap: React.FC<DormMapProps> = ({
                                     </h4>
                                     <span
                                         className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ml-2 flex-shrink-0 ${hoveredDorm.housingType === 'URH'
-                                            ? 'bg-orange-100 text-orange-600'
+                                            ? 'bg-illini-orange/15 text-illini-orange'
                                             : 'bg-blue-100 text-blue-600'
                                             }`}
                                     >

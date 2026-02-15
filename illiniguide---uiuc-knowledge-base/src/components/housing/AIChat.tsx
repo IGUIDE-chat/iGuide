@@ -139,7 +139,7 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                 type="button"
                 className={`fixed bottom-6 right-6 z-50 p-4 rounded-full shadow-2xl transition-all duration-300 ${isOpen
                     ? 'bg-gray-800 rotate-90 scale-75'
-                    : 'bg-gradient-to-r from-[#FF5F05] to-orange-600 hover:scale-110'
+                    : 'bg-illini-orange hover:bg-illini-orange-dark hover:scale-110'
                     }`}
             >
                 {isOpen ? <X className="text-white" /> : <MessageCircle className="text-white w-8 h-8" />}
@@ -287,7 +287,7 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                             onClick={handleSend}
                             type="button"
                             disabled={isLoading || !inputText.trim()}
-                            className="absolute right-2 bottom-2 p-2 bg-illini-orange text-white rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            className="absolute right-2 bottom-2 p-2 bg-illini-orange text-white rounded-lg hover:bg-illini-orange-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         >
                             <Send size={16} />
                         </button>

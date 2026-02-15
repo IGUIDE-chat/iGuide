@@ -53,7 +53,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
 
     return (
         <div className="h-full overflow-y-auto w-full no-scrollbar">
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-32">
+            <div className="max-w-6xl mx-auto px-4 sm:px-5 py-8 pb-32 md:pt-14 md:px-6">
                 <button
                     onClick={() => navigate('/dorms')}
                     type="button"
@@ -118,7 +118,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                 type="button"
                                 className={`w-full py-3 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 ${isSaved
                                     ? 'bg-emerald-600 hover:bg-emerald-700'
-                                    : 'bg-illini-orange hover:bg-orange-600'
+                                    : 'bg-illini-orange hover:bg-illini-orange-dark'
                                     }`}
                             >
                                 {isSaved ? t.saved : t.save}
