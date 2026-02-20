@@ -3,7 +3,7 @@ export interface Landmark {
     id: string;
     name: string;
     name_zh?: string;
-    type: 'school' | 'library' | 'union' | 'gym' | 'store' | 'dining' | 'medical' | 'service';
+    type: 'school' | 'library' | 'union' | 'gym' | 'store' | 'dining' | 'medical' | 'service' | 'transport';
     lat: number;
     lng: number;
     icon?: string;
@@ -362,6 +362,14 @@ export const CAMPUS_LANDMARKS: Landmark[] = [
         type: 'service',
         lat: 40.11049753904377,
         lng: -88.23511197584901
+    },
+    {
+        id: 'illini-terminal',
+        name: 'Illini Terminal',
+        name_zh: 'Illini Terminal',
+        type: 'transport',
+        lat: 40.11576349139271, 
+        lng: -88.24114625734319
     },
     // Dining & Zones
     {

@@ -9,5 +9,6 @@ export const LANDMARK_ICON_TYPES = [
     'union',
     'medical',
     'service',
+    'transport',
     'school'
 ];
