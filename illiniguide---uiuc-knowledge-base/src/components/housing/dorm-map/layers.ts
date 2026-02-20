@@ -64,6 +64,8 @@ export const buildLandmarksLayer = (showLandmarks: boolean, isChinese: boolean) 
             'landmark-medical',
             'service',
             'landmark-service',
+            'transport',
+            'landmark-transport',
             'landmark-school'
         ],
         'icon-size': 1.1,

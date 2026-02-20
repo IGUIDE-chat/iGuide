@@ -205,6 +205,21 @@ const createLandmarkIcon = (type: string) => {
             ctx.lineTo(cx + 8, cy - 5);
             ctx.stroke();
             break;
+        case 'transport':
+            ctx.beginPath();
+            ctx.rect(cx - 7, cy - 7, 14, 12);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(cx - 7, cy - 2);
+            ctx.lineTo(cx + 7, cy - 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(cx - 4, cy + 7, 2, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(cx + 4, cy + 7, 2, 0, 2 * Math.PI);
+            ctx.fill();
+            break;
         case 'school':
         default:
             ctx.beginPath();
