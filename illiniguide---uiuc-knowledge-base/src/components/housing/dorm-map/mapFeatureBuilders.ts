@@ -2,11 +2,6 @@ import { Dorm } from '../../../types/housing';
 import { Landmark } from '../../../constants/housing/mapData';
 import { DormFeatureProperties, LandmarkFeatureProperties } from './types';
 
-const toPriceLabel = (price: number) => {
-    const kPrice = price / 1000;
-    return `$${parseFloat(kPrice.toFixed(1))}k`;
-};
-
 export const buildLandmarkFeatureCollection = (landmarks: Landmark[]) => ({
     type: 'FeatureCollection' as const,
     features: landmarks.map((landmark) => ({
@@ -35,7 +30,6 @@ export const buildDormFeatureCollection = (
         properties: {
             id: dorm.id,
             price: dorm.price,
-            formattedPrice: dorm.price ? toPriceLabel(dorm.price) : 'N/A',
             name: dorm.name,
             isActive: hoveredDormId === dorm.id || highlightedDormId === dorm.id
         } satisfies DormFeatureProperties,

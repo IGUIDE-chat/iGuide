@@ -99,7 +99,6 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
     const [hasMountedMap, setHasMountedMap] = useState(false);
     const [flyingHeart, setFlyingHeart] = useState<{ x: number; y: number; targetX: number; targetY: number } | null>(null);
     const [hoveredDormId, setHoveredDormId] = useState<string | null>(null);
-    const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
     const [isCarouselHovering, setIsCarouselHovering] = useState(false);
     const [visibleInMap, setVisibleInMap] = useState<Dorm[]>([]);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -107,6 +106,8 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
     const {
         searchTerm,
         setSearchTerm,
+        isFilterModalOpen,
+        setIsFilterModalOpen,
         activeFilters,
         priceRange,
         setPriceRange,

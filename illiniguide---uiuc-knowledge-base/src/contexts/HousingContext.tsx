@@ -5,6 +5,8 @@ import { getPriceRangeFromData } from '../constants/housing/pricing';
 interface HousingFiltersContextType {
     searchTerm: string;
     setSearchTerm: (term: string) => void;
+    isFilterModalOpen: boolean;
+    setIsFilterModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
     activeFilters: FilterOption[];
     setActiveFilters: React.Dispatch<React.SetStateAction<FilterOption[]>>;
     priceRange: [number, number];
@@ -49,6 +51,7 @@ const HousingMapUiContext = createContext<HousingMapUiContextType | undefined>(u
 
 export const HousingProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [searchTerm, setSearchTerm] = useState('');
+    const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
     const [activeFilters, setActiveFilters] = useState<FilterOption[]>([]);
     const [priceRange, setPriceRange] = useState<[number, number]>(getPriceRangeFromData());
     const [locationFilters, setLocationFilters] = useState<string[]>([]);
@@ -83,6 +86,8 @@ export const HousingProvider: React.FC<{ children: ReactNode }> = ({ children })
     const filtersValue = useMemo<HousingFiltersContextType>(() => ({
         searchTerm,
         setSearchTerm,
+        isFilterModalOpen,
+        setIsFilterModalOpen,
         activeFilters,
         setActiveFilters,
         priceRange,
@@ -110,6 +115,7 @@ export const HousingProvider: React.FC<{ children: ReactNode }> = ({ children })
         clearAllFilters
     }), [
         searchTerm,
+        isFilterModalOpen,
         activeFilters,
         priceRange,
         locationFilters,
