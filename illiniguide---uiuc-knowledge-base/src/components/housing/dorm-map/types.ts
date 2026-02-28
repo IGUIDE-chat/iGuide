@@ -1,7 +1,6 @@
 export interface DormFeatureProperties {
     id: string;
     price: number;
-    formattedPrice: string;
     name: string;
     isActive: boolean;
 }

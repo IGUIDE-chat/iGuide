@@ -89,7 +89,7 @@ export const CLUSTERS_LAYER = {
     filter: ['has', 'point_count'],
     paint: {
         'circle-color': '#ffffff',
-        'circle-radius': ['step', ['get', 'point_count'], 18, 10, 22, 30, 26],
+        'circle-radius': ['step', ['get', 'point_count'], 22, 10, 26, 30, 31],
         'circle-stroke-width': 1,
         'circle-stroke-color': '#dddddd',
         'circle-pitch-alignment': 'map'
@@ -103,7 +103,7 @@ export const CLUSTER_COUNT_LAYER = {
     layout: {
         'text-field': '{point_count_abbreviated}',
         'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
-        'text-size': 12,
+        'text-size': 18,
         'text-allow-overlap': true
     },
     paint: { 'text-color': '#222222' }
@@ -114,14 +114,14 @@ export const UNCLUSTERED_LAYER = {
     type: 'symbol' as const,
     filter: ['!', ['has', 'point_count']],
     layout: {
-        'text-field': ['get', 'formattedPrice'],
+        'text-field': ['get', 'name'],
         'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
         'text-size': 14,
         'text-offset': [0, 0],
         'text-anchor': 'center',
         'icon-image': ['case', ['get', 'isActive'], 'pill-active', 'pill'],
         'icon-text-fit': 'both',
-        'icon-text-fit-padding': [6, 12, 6, 12],
+        'icon-text-fit-padding': [7, 14, 7, 14],
         'icon-allow-overlap': false,
         'text-allow-overlap': false,
         'icon-ignore-placement': false,

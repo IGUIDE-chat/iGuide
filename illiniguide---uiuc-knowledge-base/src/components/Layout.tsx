@@ -4,9 +4,12 @@ import * as React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { Search, SlidersHorizontal } from 'lucide-react';
 import { Language } from '../types';
 import { UI_TEXT } from '../i18n/uiText';
 import { useAuth } from '../contexts/AuthContext';
+import { useHousingFilters } from '../contexts/HousingContext';
+import { getPriceRangeFromData } from '../constants/housing/pricing';
 import { LayoutProvider } from '../contexts/LayoutContext';
 import { ConversationSidebar } from './ConversationSidebar';
 import { LibrarySidebar } from './LibrarySidebar';
@@ -53,7 +56,22 @@ export const Layout: React.FC<LayoutProps> = ({
   onTabChange
 }) => {
   const t = UI_TEXT[language];
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
+  const {
+    searchTerm,
+    setSearchTerm,
+    setIsFilterModalOpen,
+    activeFilters,
+    priceRange,
+    locationFilters,
+    typeFilters,
+    roomTypeFilters,
+    housingTypeDetails,
+    amenityFilters,
+    communityFilters,
+    llcFilters,
+    proximityFilters
+  } = useHousingFilters();
   const navigate = useNavigate();
   const location = useLocation();
   const getActiveTab = () => {
@@ -65,6 +83,32 @@ export const Layout: React.FC<LayoutProps> = ({
     return 'chat';
   };
   const activeTab = getActiveTab();
+  const isDormListPage = location.pathname === '/dorms';
+  const isHousingMobileHeader = activeTab === 'dorms' && isDormListPage;
+  const defaultPriceRange = getPriceRangeFromData();
+  const hasPriceFilter = priceRange[0] !== defaultPriceRange[0] || priceRange[1] !== defaultPriceRange[1];
+  const hasActiveDormFilters =
+    activeFilters.length > 0 ||
+    hasPriceFilter ||
+    housingTypeDetails !== 'ALL' ||
+    locationFilters.length > 0 ||
+    typeFilters.length > 0 ||
+    roomTypeFilters.length > 0 ||
+    amenityFilters.length > 0 ||
+    communityFilters.length > 0 ||
+    llcFilters.length > 0 ||
+    proximityFilters.length > 0;
+  const activeDormFilterCount =
+    (hasPriceFilter ? 1 : 0) +
+    (housingTypeDetails !== 'ALL' ? 1 : 0) +
+    locationFilters.length +
+    typeFilters.length +
+    roomTypeFilters.length +
+    activeFilters.length +
+    amenityFilters.length +
+    communityFilters.length +
+    llcFilters.length +
+    proximityFilters.length;
 
   // Default sidebar open on desktop, closed on mobile
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -72,11 +116,18 @@ export const Layout: React.FC<LayoutProps> = ({
   const sidebarToggleButtonRef = useRef<HTMLButtonElement | null>(null);
   const mobileSidebarButtonRef = useRef<HTMLButtonElement | null>(null);
 
-  // Initialize state based on screen size only on client side mount
   useEffect(() => {
-    if (window.innerWidth < 768) {
-      setIsSidebarOpen(false);
-    }
+    const mediaQuery = window.matchMedia('(min-width: 768px)');
+    const handleMediaChange = (event: MediaQueryListEvent | MediaQueryList) => {
+      setIsSidebarOpen(event.matches);
+    };
+
+    handleMediaChange(mediaQuery);
+    mediaQuery.addEventListener('change', handleMediaChange);
+
+    return () => {
+      mediaQuery.removeEventListener('change', handleMediaChange);
+    };
   }, []);
 
   return (
@@ -233,13 +284,54 @@ export const Layout: React.FC<LayoutProps> = ({
         </div >
 
         {/* Mobile Header (Only visible on mobile) */}
-        < div className="md:hidden flex items-center p-3 border-b border-slate-100 bg-white sticky top-0 z-20" >
-          <button ref={mobileSidebarButtonRef} onClick={() => setIsSidebarOpen(true)} className="text-slate-500 mr-4 p-1">
+        < div className="md:hidden flex items-center gap-2 p-3 border-b border-slate-100 bg-white sticky top-0 z-20" >
+          <button
+            ref={mobileSidebarButtonRef}
+            onClick={() => setIsSidebarOpen(true)}
+            className="h-10 w-10 shrink-0 text-slate-500 flex items-center justify-center rounded-xl bg-slate-100 border border-slate-200"
+          >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
           </button>
-          <span className="font-semibold text-slate-700 text-sm">
-            {activeTab === 'chat' ? t.chatTab : activeTab === 'library' ? t.libraryTab : activeTab === 'courses' ? t.coursesTab : activeTab === 'dorms' ? t.dormsTab : activeTab === 'resume' ? t.resumeTab : t.chatTab}
-          </span>
+          {isHousingMobileHeader ? (
+            <>
+              <div className="flex-1 min-w-0 flex items-center gap-2">
+                <div className="relative flex-1 min-w-0">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+                  <input
+                    type="text"
+                    className="block h-10 w-full pl-9 pr-3 border border-gray-200 rounded-full leading-5 bg-gray-50/50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-black/20 text-sm transition-all shadow-sm"
+                    placeholder={language === 'zh' ? '输入搜索宿舍...' : 'Type to search dorms...'}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+                <div className="relative shrink-0">
+                  <button
+                    type="button"
+                    aria-label={language === 'zh' ? '筛选' : 'Filters'}
+                    onClick={() => setIsFilterModalOpen(true)}
+                    className={`
+                      px-3 py-2 rounded-full border transition-all duration-200 flex items-center justify-center
+                      ${hasActiveDormFilters
+                        ? 'border-illini-orange/40 text-illini-orange bg-illini-orange/10'
+                        : 'bg-white text-gray-700 border-gray-200'}
+                    `}
+                  >
+                    <SlidersHorizontal size={16} />
+                  </button>
+                  {hasActiveDormFilters && (
+                    <div className="absolute -top-1.5 -right-1.5 bg-illini-orange text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full border-2 border-white shadow-sm">
+                      {activeDormFilterCount}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </>
+          ) : (
+            <span className="font-semibold text-slate-700 text-sm">
+              {activeTab === 'chat' ? t.chatTab : activeTab === 'library' ? t.libraryTab : activeTab === 'courses' ? t.coursesTab : activeTab === 'dorms' ? t.dormsTab : activeTab === 'resume' ? t.resumeTab : t.chatTab}
+            </span>
+          )}
         </div >
 
         <div className="flex-1 overflow-hidden relative min-w-0">
