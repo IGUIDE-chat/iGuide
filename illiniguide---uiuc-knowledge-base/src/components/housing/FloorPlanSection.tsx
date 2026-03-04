@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FloorPlan } from '../../types/housing';
 import { formatPrice } from '../../constants/housing/pricing';
-import { Bed, Maximize, Check, X, ChevronDown } from 'lucide-react';
+import { Bed, Maximize, Check, X, ChevronDown, ImageOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getRoomTypeLabel } from '../../utils/housingLabels';
 
@@ -12,6 +12,11 @@ interface FloorPlanSectionProps {
 
 const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, language = 'en' }) => {
     const [expandedPlan, setExpandedPlan] = useState<string | null>(null);
+    const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+
+    const handleImageError = (type: string) => {
+        setImageErrors(prev => ({ ...prev, [type]: true }));
+    };
 
     const t = {
         en: {
@@ -139,7 +144,21 @@ const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, languag
                                         <div className="px-4 pb-4 pt-0 border-t border-gray-100">
                                             {plan.imageUrl && (
                                                 <div className="mt-4 rounded-lg overflow-hidden bg-gray-100">
-                                                    <img src={plan.imageUrl} alt={`${roomTypeLabel} floor plan`} className="w-full h-auto" />
+                                                    {imageErrors[plan.type] ? (
+                                                        <div className="flex flex-col items-center justify-center h-32 gap-2 text-gray-400">
+                                                            <ImageOff size={28} />
+                                                            <span className="text-xs">
+                                                                {language === 'zh' ? '户型图暂不可用' : 'Floor plan unavailable'}
+                                                            </span>
+                                                        </div>
+                                                    ) : (
+                                                        <img
+                                                            src={plan.imageUrl}
+                                                            alt={`${roomTypeLabel} floor plan`}
+                                                            className="w-full h-auto"
+                                                            onError={() => handleImageError(plan.type)}
+                                                        />
+                                                    )}
                                                 </div>
                                             )}
 
