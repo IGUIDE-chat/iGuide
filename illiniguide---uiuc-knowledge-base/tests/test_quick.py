@@ -1,4 +1,6 @@
-import requests
+import pytest
+
+requests = pytest.importorskip("requests")
 import json
 import time
 
