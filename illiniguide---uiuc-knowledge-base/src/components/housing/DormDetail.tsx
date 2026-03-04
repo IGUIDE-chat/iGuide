@@ -67,7 +67,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                     <DormHeroSection dorm={dorm} dormName={dormName} campusLabel={t.campus} />
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-0 md:divide-x divide-gray-100">
-                        <div className="col-span-2 p-8 space-y-8">
+                        <div className="col-span-2 p-4 md:p-8 space-y-8">
                             <section>
                                 <h2 className="text-2xl font-bold text-illini-blue mb-4">{t.about}</h2>
                                 <p className="text-gray-600 leading-relaxed text-lg">{dormDescription}</p>
@@ -89,7 +89,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                             )}
                         </div>
 
-                        <div className="col-span-1 p-8 bg-gray-50/50 space-y-6">
+                        <div className="col-span-1 p-4 md:p-8 bg-gray-50/50 space-y-6">
                             <DormQuickStatsSection
                                 dorm={dorm}
                                 language={language}
