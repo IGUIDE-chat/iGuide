@@ -141,7 +141,7 @@ const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, languag
                                         exit={{ height: 0, opacity: 0 }}
                                         transition={{ duration: 0.2 }}
                                     >
-                                        <div className="px-4 pb-4 pt-0 border-t border-gray-100">
+                                        <div className="px-3 pb-3 md:px-4 md:pb-4 pt-0 border-t border-gray-100">
                                             {plan.imageUrl && (
                                                 <div className="mt-4 rounded-lg overflow-hidden bg-gray-100">
                                                     {imageErrors[plan.type] ? (
