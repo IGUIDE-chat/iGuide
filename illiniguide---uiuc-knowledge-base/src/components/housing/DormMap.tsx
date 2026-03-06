@@ -176,6 +176,10 @@ const DormMap: React.FC<DormMapProps> = ({
 
                 if (!bounds.isEmpty()) {
                     map.fitBounds(bounds, { padding: 90, maxZoom: 16, duration: 0 });
+                    // fitBounds does not synchronously update getBounds(), so we
+                    // directly set all dorms as visible — fitBounds was called with
+                    // exactly these dorms, so they are all within the new viewport.
+                    setVisibleDorms(safeDorms);
                 }
             } catch (error) {
                 console.error('[DormMap] Failed to fit bounds safely:', error);

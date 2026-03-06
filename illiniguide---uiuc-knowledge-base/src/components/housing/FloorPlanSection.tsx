@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FloorPlan } from '../../types/housing';
 import { formatPrice } from '../../constants/housing/pricing';
-import { Bed, Maximize, Check, X, ChevronDown } from 'lucide-react';
+import { Bed, Maximize, Check, X, ChevronDown, ImageOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getRoomTypeLabel } from '../../utils/housingLabels';
 
@@ -12,6 +12,11 @@ interface FloorPlanSectionProps {
 
 const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, language = 'en' }) => {
     const [expandedPlan, setExpandedPlan] = useState<string | null>(null);
+    const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+
+    const handleImageError = (type: string) => {
+        setImageErrors(prev => ({ ...prev, [type]: true }));
+    };
 
     const t = {
         en: {
@@ -78,41 +83,41 @@ const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, languag
                                     : 'shadow-sm border-gray-200 hover:shadow-md'
                             }`}
                         >
-                            <div className="p-4 cursor-pointer" onClick={() => togglePlan(plan.type)}>
+                            <div className="p-3 cursor-pointer" onClick={() => togglePlan(plan.type)}>
                                 <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-3">
-                                        <div className={`px-3 py-1.5 rounded-lg text-base font-semibold border transition-all duration-200 ${getRoomTypeColor(plan.type)} hover:brightness-95 active:brightness-90 antialiased`}>
+                                    <div className="flex items-center gap-2">
+                                        <div className={`px-2.5 py-1 rounded-lg text-sm font-semibold border transition-all duration-200 ${getRoomTypeColor(plan.type)} hover:brightness-95 active:brightness-90 antialiased`}>
                                             {roomTypeLabel}
                                         </div>
 
-                                        <div className="flex items-center gap-1">
+                                        <div className="flex items-center gap-0.5">
                                             {plan.available !== false ? (
                                                 <>
-                                                    <Check size={14} className="text-green-500" />
+                                                    <Check size={12} className="text-green-500" />
                                                     <span className="text-xs text-green-600 font-medium">{t.available}</span>
                                                 </>
                                             ) : (
                                                 <>
-                                                    <X size={14} className="text-yellow-500" />
+                                                    <X size={12} className="text-yellow-500" />
                                                     <span className="text-xs text-yellow-600 font-medium">{t.notAvailable}</span>
                                                 </>
                                             )}
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center gap-4">
-                                        <div className="text-right">
-                                            <div className="text-lg font-bold text-illini-orange">{formatPrice(plan.price)}</div>
-                                            <div className="text-xs text-gray-400">{t.perYear}</div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="flex items-baseline gap-0.5">
+                                            <span className="text-base font-bold text-illini-orange">{formatPrice(plan.price)}</span>
+                                            <span className="text-xs text-gray-400">{t.perYear}</span>
                                         </div>
 
                                         <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                                            <ChevronDown size={20} className="text-gray-400" />
+                                            <ChevronDown size={16} className="text-gray-400" />
                                         </motion.div>
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-4 mt-3 text-sm text-gray-500">
+                                <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
                                     {plan.sqft && (
                                         <div className="flex items-center gap-1">
                                             <Maximize size={14} />
@@ -136,10 +141,24 @@ const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, languag
                                         exit={{ height: 0, opacity: 0 }}
                                         transition={{ duration: 0.2 }}
                                     >
-                                        <div className="px-4 pb-4 pt-0 border-t border-gray-100">
+                                        <div className="px-3 pb-3 md:px-4 md:pb-4 pt-0 border-t border-gray-100">
                                             {plan.imageUrl && (
                                                 <div className="mt-4 rounded-lg overflow-hidden bg-gray-100">
-                                                    <img src={plan.imageUrl} alt={`${roomTypeLabel} floor plan`} className="w-full h-auto" />
+                                                    {imageErrors[plan.type] ? (
+                                                        <div className="flex flex-col items-center justify-center h-32 gap-2 text-gray-400">
+                                                            <ImageOff size={28} />
+                                                            <span className="text-xs">
+                                                                {language === 'zh' ? '户型图暂不可用' : 'Floor plan unavailable'}
+                                                            </span>
+                                                        </div>
+                                                    ) : (
+                                                        <img
+                                                            src={plan.imageUrl}
+                                                            alt={`${roomTypeLabel} floor plan`}
+                                                            className="w-full h-auto"
+                                                            onError={() => handleImageError(plan.type)}
+                                                        />
+                                                    )}
                                                 </div>
                                             )}
 
@@ -149,19 +168,19 @@ const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, languag
                                                 </div>
                                             )}
 
-                                            <div className="mt-4 grid grid-cols-2 gap-3">
-                                                <div className="bg-gray-50 rounded-lg p-3">
-                                                    <div className="text-xs text-gray-400 uppercase tracking-wider">{t.price}</div>
-                                                    <div className="text-lg font-bold text-illini-orange mt-1">{formatPrice(plan.price)}</div>
-                                                    <div className="text-xs text-gray-500">
+                                            <div className="mt-3 grid grid-cols-2 gap-2">
+                                                <div className="bg-gray-50 rounded-lg p-2.5">
+                                                    <div className="text-[10px] text-gray-400 uppercase tracking-wider">{t.price}</div>
+                                                    <div className="text-sm font-bold text-illini-orange mt-0.5">{formatPrice(plan.price)}</div>
+                                                    <div className="text-[10px] text-gray-500">
                                                         ~{formatPrice(Math.round(plan.price / 12))}/month
                                                     </div>
                                                 </div>
                                                 {plan.sqft && (
-                                                    <div className="bg-gray-50 rounded-lg p-3">
-                                                        <div className="text-xs text-gray-400 uppercase tracking-wider">{t.sqft}</div>
-                                                        <div className="text-lg font-bold text-gray-900 mt-1">{plan.sqft}</div>
-                                                        <div className="text-xs text-gray-500">{t.sqftLabel}</div>
+                                                    <div className="bg-gray-50 rounded-lg p-2.5">
+                                                        <div className="text-[10px] text-gray-400 uppercase tracking-wider">{t.sqft}</div>
+                                                        <div className="text-sm font-bold text-gray-900 mt-0.5">{plan.sqft}</div>
+                                                        <div className="text-[10px] text-gray-500">{t.sqftLabel}</div>
                                                     </div>
                                                 )}
                                             </div>
