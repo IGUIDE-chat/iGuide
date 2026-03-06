@@ -10,19 +10,19 @@ interface DormHeroSectionProps {
 
 const DormHeroSection: React.FC<DormHeroSectionProps> = ({ dorm, dormName, campusLabel }) => {
     return (
-        <div className="h-64 md:h-80 w-full relative">
+        <div className="h-56 md:h-80 w-full relative">
             <img src={dorm.imageUrl} alt={dormName} className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
-                <div className="p-8 text-white">
-                    <div className="flex items-center gap-2 mb-2 text-illini-orange font-bold uppercase tracking-wider text-sm">
-                        <MapPin size={16} /> {dorm.location} {campusLabel}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent flex items-end">
+                <div className="p-4 md:p-8 text-white w-full">
+                    <div className="flex items-center gap-1.5 mb-1 text-illini-orange font-bold uppercase tracking-wider text-xs md:text-sm">
+                        <MapPin size={13} /> {dorm.location} {campusLabel}
                     </div>
-                    <h1 className="text-5xl md:text-6xl font-bold mb-2 transition-transform duration-150 hover:scale-[1.03] origin-left antialiased tracking-tight">{dormName}</h1>
-                    <div className="flex flex-wrap gap-2">
+                    <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-2 antialiased tracking-tight leading-tight">{dormName}</h1>
+                    <div className="flex flex-wrap gap-1.5 md:gap-2">
                         {dorm.tags.map((tag) => (
                             <span
                                 key={tag}
-                                className="px-3 py-1 bg-white/20 rounded-full text-sm font-medium border border-white/30 transition-colors duration-150 hover:bg-white/40 hover:border-white/50"
+                                className="px-2 py-0.5 md:px-3 md:py-1 bg-white/20 rounded-full text-xs md:text-sm font-medium border border-white/30"
                             >
                                 {tag}
                             </span>
