@@ -1,7 +1,7 @@
 // [COMPONENT] Admin slide-in panel for editing dorm content overrides.
 // [组件] 管理员侧边滑出面板，用于编辑宿舍信息覆盖项。
 import React, { useState, useEffect } from 'react';
-import { X, Plus, Trash2, RotateCcw, Save } from 'lucide-react';
+import { X, Plus, Trash2, RotateCcw, Save, Upload, Loader2 } from 'lucide-react';
 import { Dorm } from '../../types/housing';
 import { DormOverride, dormAdminService } from '../../services/dormAdminService';
 import { Language } from '../../types';
@@ -76,12 +76,22 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
     const [descriptionZh, setDescriptionZh] = useState(dorm.description_zh ?? '');
     const [imageUrl, setImageUrl] = useState(dorm.imageUrl);
     const [price, setPrice] = useState(String(dorm.price));
+    const [location, setLocation] = useState(dorm.location);
+    const [locationZh, setLocationZh] = useState(dorm.location_zh ?? '');
+    const [type, setType] = useState(dorm.type);
+    const [typeZh, setTypeZh] = useState(dorm.type_zh ?? '');
+    const [housingType, setHousingType] = useState(dorm.housingType);
+    const [roomTypes, setRoomTypes] = useState<string[]>(dorm.roomTypes);
+    const [tags, setTags] = useState<string[]>(dorm.tags);
+
     const [ac, setAc] = useState(dorm.ac);
     const [dining, setDining] = useState(dorm.dining);
     const [pros, setPros] = useState<string[]>(dorm.pros);
     const [prosZh, setProsZh] = useState<string[]>(dorm.pros_zh ?? []);
     const [cons, setCons] = useState<string[]>(dorm.cons);
     const [consZh, setConsZh] = useState<string[]>(dorm.cons_zh ?? []);
+
+    const [uploadingImage, setUploadingImage] = useState(false);
 
     // Load existing override on mount
     useEffect(() => {
@@ -93,6 +103,13 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
             if (override.description_zh != null) setDescriptionZh(override.description_zh);
             if (override.image_url != null) setImageUrl(override.image_url);
             if (override.price != null) setPrice(String(override.price));
+            if (override.location != null) setLocation(override.location as any);
+            if (override.location_zh != null) setLocationZh(override.location_zh);
+            if (override.type != null) setType(override.type as any);
+            if (override.type_zh != null) setTypeZh(override.type_zh);
+            if (override.housing_type != null) setHousingType(override.housing_type as any);
+            if (override.room_types != null) setRoomTypes(override.room_types);
+            if (override.tags != null) setTags(override.tags);
             if (override.ac != null) setAc(override.ac);
             if (override.dining != null) setDining(override.dining);
             if (override.pros != null) setPros(override.pros);
@@ -110,6 +127,13 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
         description_zh: descriptionZh || null,
         image_url: imageUrl || null,
         price: price !== '' ? Number(price) : null,
+        location,
+        location_zh: locationZh || null,
+        type,
+        type_zh: typeZh || null,
+        housing_type: housingType,
+        room_types: roomTypes.length ? roomTypes : null,
+        tags: tags.length ? tags : null,
         ac,
         dining,
         pros,
@@ -117,6 +141,19 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
         cons,
         cons_zh: consZh.length ? consZh : null,
     });
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setUploadingImage(true);
+        const url = await dormAdminService.uploadDormImage(file);
+        setUploadingImage(false);
+        if (url) {
+            setImageUrl(url);
+        } else {
+            alert(language === 'zh' ? '图片上传失败，请重试。' : 'Image upload failed. Please try again.');
+        }
+    };
 
     const handleSave = async () => {
         setSaving(true);
@@ -157,6 +194,12 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
             nameLabel: 'Name',
             descLabel: 'Description',
             imageLabel: 'Image URL',
+            locationLabel: 'Location',
+            typeLabel: 'Dorm Type',
+            housingTypeLabel: 'Housing Type',
+            roomTypesLabel: 'Room Types',
+            tagsLabel: 'Tags',
+            uploadImage: 'Upload File',
             priceLabel: 'Annual Price (USD)',
             acLabel: 'Air Conditioning',
             diningLabel: 'On-site Dining',
@@ -175,6 +218,12 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
             nameLabel: '名称',
             descLabel: '描述',
             imageLabel: '图片 URL',
+            locationLabel: '地理位置',
+            typeLabel: '宿舍类型',
+            housingTypeLabel: '公立/私立',
+            roomTypesLabel: '房型',
+            tagsLabel: '标签',
+            uploadImage: '上传文件',
             priceLabel: '年费用（美元）',
             acLabel: '空调',
             diningLabel: '楼内食堂',
@@ -217,11 +266,10 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                             key={tab}
                             type="button"
                             onClick={() => setLangTab(tab)}
-                            className={`flex-1 py-2 text-sm font-medium transition-colors ${
-                                langTab === tab
+                            className={`flex-1 py-2 text-sm font-medium transition-colors ${langTab === tab
                                     ? 'border-b-2 border-illini-orange text-illini-blue'
                                     : 'text-gray-500 hover:text-illini-blue'
-                            }`}
+                                }`}
                         >
                             {tab === 'en' ? t.langEn : t.langZh}
                         </button>
@@ -249,12 +297,55 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                                 />
                             </Field>
                             <Field label={t.imageLabel}>
-                                <input
-                                    type="text"
-                                    value={imageUrl}
-                                    onChange={(e) => setImageUrl(e.target.value)}
-                                    className={inputCls}
-                                />
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        value={imageUrl || ''}
+                                        onChange={(e) => setImageUrl(e.target.value)}
+                                        className={inputCls}
+                                        placeholder="https://..."
+                                    />
+                                    <label className="flex-shrink-0 flex items-center justify-center gap-1 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-lg px-3 cursor-pointer transition-colors text-gray-700">
+                                        {uploadingImage ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+                                        <span className="sr-only sm:not-sr-only text-xs font-medium">{t.uploadImage}</span>
+                                        <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploadingImage} />
+                                    </label>
+                                </div>
+                            </Field>
+                            <div className="flex gap-4">
+                                <div className="flex-1">
+                                    <Field label={t.locationLabel}>
+                                        <select value={location} onChange={e => setLocation(e.target.value as any)} className={inputCls}>
+                                            <option value="Ikenberry">Ikenberry</option>
+                                            <option value="Main Quad">Main Quad</option>
+                                            <option value="PAR/FAR">PAR/FAR</option>
+                                            <option value="Campustown">Campustown</option>
+                                            <option value="South Campus">South Campus</option>
+                                        </select>
+                                    </Field>
+                                </div>
+                                <div className="flex-1">
+                                    <Field label={t.housingTypeLabel}>
+                                        <select value={housingType} onChange={e => setHousingType(e.target.value as any)} className={inputCls}>
+                                            <option value="URH">URH</option>
+                                            <option value="PCH">PCH</option>
+                                        </select>
+                                    </Field>
+                                </div>
+                            </div>
+                            <Field label={t.typeLabel}>
+                                <select value={type} onChange={e => setType(e.target.value as any)} className={inputCls}>
+                                    <option value="Traditional">Traditional</option>
+                                    <option value="Cluster">Cluster</option>
+                                    <option value="Suite">Suite</option>
+                                    <option value="Semi-Suite">Semi-Suite</option>
+                                </select>
+                            </Field>
+                            <Field label={t.roomTypesLabel}>
+                                <EditableList items={roomTypes} onChange={setRoomTypes} placeholder="Add room type" />
+                            </Field>
+                            <Field label={t.tagsLabel}>
+                                <EditableList items={tags} onChange={setTags} placeholder="Add tag" />
                             </Field>
                             <Field label={t.priceLabel}>
                                 <input
@@ -294,6 +385,18 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                                     className={inputCls}
                                 />
                             </Field>
+                            <div className="flex gap-4">
+                                <div className="flex-1">
+                                    <Field label={t.locationLabel}>
+                                        <input type="text" value={locationZh} onChange={(e) => setLocationZh(e.target.value)} className={inputCls} placeholder="中文位置..." />
+                                    </Field>
+                                </div>
+                                <div className="flex-1">
+                                    <Field label={t.typeLabel}>
+                                        <input type="text" value={typeZh} onChange={(e) => setTypeZh(e.target.value)} className={inputCls} placeholder="中文分类..." />
+                                    </Field>
+                                </div>
+                            </div>
                             <Field label={t.prosLabel}>
                                 <EditableList items={prosZh} onChange={setProsZh} placeholder={t.addPro} />
                             </Field>
@@ -371,14 +474,12 @@ function Toggle({
         <label className="flex items-center gap-2 cursor-pointer select-none">
             <div
                 onClick={() => onChange(!checked)}
-                className={`w-9 h-5 rounded-full transition-colors flex items-center px-0.5 ${
-                    checked ? 'bg-illini-orange' : 'bg-gray-300'
-                }`}
+                className={`w-9 h-5 rounded-full transition-colors flex items-center px-0.5 ${checked ? 'bg-illini-orange' : 'bg-gray-300'
+                    }`}
             >
                 <div
-                    className={`w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                        checked ? 'translate-x-4' : 'translate-x-0'
-                    }`}
+                    className={`w-4 h-4 bg-white rounded-full shadow transition-transform ${checked ? 'translate-x-4' : 'translate-x-0'
+                        }`}
                 />
             </div>
             <span className="text-gray-700">{label}</span>
