@@ -106,9 +106,9 @@ const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, languag
                                     </div>
 
                                     <div className="flex items-center gap-2">
-                                        <div className="text-right">
-                                            <div className="text-base font-bold text-illini-orange">{formatPrice(plan.price)}</div>
-                                            <div className="text-xs text-gray-400">{t.perYear}</div>
+                                        <div className="flex items-baseline gap-0.5">
+                                            <span className="text-base font-bold text-illini-orange">{formatPrice(plan.price)}</span>
+                                            <span className="text-xs text-gray-400">{t.perYear}</span>
                                         </div>
 
                                         <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
