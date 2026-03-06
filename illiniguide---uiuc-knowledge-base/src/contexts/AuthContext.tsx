@@ -59,7 +59,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return {
             id: supabaseUser.id,
             name: supabaseUser.user_metadata?.display_name || supabaseUser.email?.split('@')[0] || 'User',
-            email: supabaseUser.email || ''
+            email: supabaseUser.email || '',
+            isAdmin: supabaseUser.user_metadata?.is_admin === true
         };
     };
 

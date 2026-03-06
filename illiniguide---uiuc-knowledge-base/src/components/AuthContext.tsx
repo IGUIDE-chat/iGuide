@@ -48,7 +48,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 
         if (foundUser) {
             const { password: _, ...userWithoutPassword } = foundUser;
-            setUser(userWithoutPassword);
+            setUser({ ...userWithoutPassword, isAdmin: false });
             localStorage.setItem('uiuc_kb_user', JSON.stringify(userWithoutPassword));
             setIsLoading(false);
             return true;
@@ -86,8 +86,9 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 
         // Auto-login after registration
         const { password: _, ...userWithoutPassword } = newUser;
-        setUser(userWithoutPassword);
-        localStorage.setItem('uiuc_kb_user', JSON.stringify(userWithoutPassword));
+        const userRecord = { ...userWithoutPassword, isAdmin: false };
+        setUser(userRecord);
+        localStorage.setItem('uiuc_kb_user', JSON.stringify(userRecord));
 
         setIsLoading(false);
         return true;
