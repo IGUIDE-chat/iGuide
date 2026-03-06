@@ -1,10 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Pencil } from 'lucide-react';
 import { UIUC_DORMS } from '../../constants/housing/dormData';
 import { formatPrice } from '../../constants/housing/pricing';
 import { useSharedDormInteraction } from '../../contexts/DormUserInteractionContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { dormAdminService } from '../../services/dormAdminService';
+import { Dorm } from '../../types/housing';
 import FloorPlanSection from './FloorPlanSection';
+import DormEditPanel from './DormEditPanel';
 import { Language } from '../../types';
 import { dormDetailTexts } from './i18n/dormTexts';
 import DormHeroSection from './dorm-detail/sections/DormHeroSection';
@@ -19,16 +23,30 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { addToHistory, toggleFavorite, isFavorite } = useSharedDormInteraction();
-    const dorm = UIUC_DORMS.find((d) => d.id === id);
-    const isSaved = dorm ? isFavorite(dorm.id) : false;
+    const { user } = useAuth();
+
+    const staticDorm = UIUC_DORMS.find((d) => d.id === id);
+
+    // Dorm with admin overrides applied (starts as static data)
+    const [dorm, setDorm] = useState<Dorm | undefined>(staticDorm);
+    const [editOpen, setEditOpen] = useState(false);
 
     const t = dormDetailTexts[language];
+
+    // Load Supabase override on mount
+    useEffect(() => {
+        if (!staticDorm) return;
+        setDorm(staticDorm); // reset when navigating between dorms
+        dormAdminService.getOverride(staticDorm.id).then((override) => {
+            setDorm(dormAdminService.applyOverride(staticDorm, override));
+        });
+    }, [staticDorm?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         if (dorm) {
             addToHistory(dorm);
         }
-    }, [dorm, addToHistory]);
+    }, [dorm?.id, addToHistory]); // eslint-disable-line react-hooks/exhaustive-deps
 
     if (!dorm) {
         return (
@@ -45,23 +63,40 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
         );
     }
 
+    const isSaved = isFavorite(dorm.id);
     const dormName = language === 'zh' && dorm.name_zh ? dorm.name_zh : dorm.name;
     const dormDescription =
         language === 'zh' && dorm.description_zh ? dorm.description_zh : dorm.description;
     const dormPros = language === 'zh' && dorm.pros_zh?.length ? dorm.pros_zh : dorm.pros;
     const dormCons = language === 'zh' && dorm.cons_zh?.length ? dorm.cons_zh : dorm.cons;
 
+    const editBtnLabel = language === 'zh' ? '编辑宿舍信息' : 'Edit Dorm Info';
+
     return (
         <div className="h-full overflow-y-auto w-full no-scrollbar">
             <div className="max-w-6xl mx-auto px-4 sm:px-5 py-8 pb-32 md:pt-14 md:px-6">
-                <button
-                    onClick={() => navigate('/dorms')}
-                    type="button"
-                    className="group flex items-center text-gray-500 hover:text-illini-blue mb-6 transition-colors"
-                >
-                    <ArrowLeft size={20} className="mr-2 group-hover:-translate-x-1 transition-transform" />
-                    {t.backToBrowse}
-                </button>
+                {/* Top bar: back + optional admin edit button */}
+                <div className="flex items-center justify-between mb-6">
+                    <button
+                        onClick={() => navigate('/dorms')}
+                        type="button"
+                        className="group flex items-center text-gray-500 hover:text-illini-blue transition-colors"
+                    >
+                        <ArrowLeft size={20} className="mr-2 group-hover:-translate-x-1 transition-transform" />
+                        {t.backToBrowse}
+                    </button>
+
+                    {user?.isAdmin && (
+                        <button
+                            type="button"
+                            onClick={() => setEditOpen(true)}
+                            className="flex items-center gap-2 bg-illini-blue text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-900 transition-colors"
+                        >
+                            <Pencil size={14} />
+                            {editBtnLabel}
+                        </button>
+                    )}
+                </div>
 
                 <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
                     <DormHeroSection dorm={dorm} dormName={dormName} campusLabel={t.campus} />
@@ -127,6 +162,19 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                     </div>
                 </div>
             </div>
+
+            {/* Admin edit panel */}
+            {editOpen && staticDorm && (
+                <DormEditPanel
+                    dorm={staticDorm}
+                    language={language}
+                    onClose={() => setEditOpen(false)}
+                    onSaved={(updated) => {
+                        setDorm(updated);
+                        setEditOpen(false);
+                    }}
+                />
+            )}
         </div>
     );
 };
