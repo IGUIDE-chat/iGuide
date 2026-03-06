@@ -99,4 +99,3 @@ export const aiChatTexts: Record<Language, AiChatText> = {
             '你好！我是你的 UIUC 住宿助手。我可以根据你的专业、生活方式和预算推荐宿舍。你可以问我“工科学生更适合哪栋宿舍？”或“哪里吃饭更方便？”。'
     }
 };
-
