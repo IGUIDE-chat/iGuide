@@ -176,6 +176,7 @@ const DormMap: React.FC<DormMapProps> = ({
 
                 if (!bounds.isEmpty()) {
                     map.fitBounds(bounds, { padding: 90, maxZoom: 16, duration: 0 });
+                    handleViewportChange();
                 }
             } catch (error) {
                 console.error('[DormMap] Failed to fit bounds safely:', error);
