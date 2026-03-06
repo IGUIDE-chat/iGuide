@@ -20,6 +20,13 @@ export interface DormOverride {
     cons_zh?: string[] | null;
     ac?: boolean | null;
     dining?: boolean | null;
+    location?: string | null;
+    location_zh?: string | null;
+    type?: string | null;
+    type_zh?: string | null;
+    housing_type?: string | null;
+    room_types?: string[] | null;
+    tags?: string[] | null;
     updated_at?: string;
     updated_by?: string;
 }
@@ -103,6 +110,13 @@ function applyOverride(dorm: Dorm, override: DormOverride | null | undefined): D
         ...(override.cons_zh != null && { cons_zh: override.cons_zh }),
         ...(override.ac != null && { ac: override.ac }),
         ...(override.dining != null && { dining: override.dining }),
+        ...(override.location != null && { location: override.location as any }),
+        ...(override.location_zh != null && { location_zh: override.location_zh }),
+        ...(override.type != null && { type: override.type as any }),
+        ...(override.type_zh != null && { type_zh: override.type_zh }),
+        ...(override.housing_type != null && { housingType: override.housing_type as any }),
+        ...(override.room_types != null && { roomTypes: override.room_types as any }),
+        ...(override.tags != null && { tags: override.tags }),
     };
 }
 
@@ -114,6 +128,29 @@ function applyOverridesToList(dorms: Dorm[], overrides: DormOverride[]): Dorm[] 
     return dorms.map((d) => applyOverride(d, byId.get(d.id)));
 }
 
+/**
+ * Upload an image file to the Supabase Storage bucket 'dorm-images'.
+ * Returns the public URL of the uploaded image.
+ */
+async function uploadDormImage(file: File): Promise<string | null> {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
+    const filePath = `user_uploads/${fileName}`;
+
+    const { error: uploadError } = await supabase
+        .storage
+        .from('dorm-images')
+        .upload(filePath, file);
+
+    if (uploadError) {
+        console.error('[dormAdminService] uploadDormImage error:', uploadError);
+        return null;
+    }
+
+    const { data } = supabase.storage.from('dorm-images').getPublicUrl(filePath);
+    return data.publicUrl;
+}
+
 export const dormAdminService = {
     getAllOverrides,
     getOverride,
@@ -121,4 +158,5 @@ export const dormAdminService = {
     deleteOverride,
     applyOverride,
     applyOverridesToList,
+    uploadDormImage,
 };
