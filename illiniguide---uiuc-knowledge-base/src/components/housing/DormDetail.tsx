@@ -69,8 +69,8 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-0 md:divide-x divide-gray-100">
                         <div className="col-span-2 p-4 md:p-8 space-y-8">
                             <section>
-                                <h2 className="text-2xl font-bold text-illini-blue mb-4">{t.about}</h2>
-                                <p className="text-gray-600 leading-relaxed text-lg">{dormDescription}</p>
+                                <h2 className="text-xl md:text-2xl font-bold text-illini-blue mb-3">{t.about}</h2>
+                                <p className="text-gray-600 leading-relaxed text-sm md:text-lg">{dormDescription}</p>
                             </section>
 
                             <DormProsConsSection
