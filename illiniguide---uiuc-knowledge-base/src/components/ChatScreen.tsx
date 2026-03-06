@@ -175,12 +175,6 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
             }
          }
 
-         if (!fullText.trim()) {
-            fullText = language === 'zh'
-               ? '暂时没有收到回复，请重试。'
-               : 'No response was returned. Please try again.';
-         }
-
          // Final update with complete text
          const aiMsg: ChatMessage = {
             id: aiMsgId,

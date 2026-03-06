@@ -117,12 +117,6 @@ export const streamChatResponse = async function* (
       throw new Error(`Coze API returned ${response.status}: ${errText}`);
     }
 
-    const responseContentType = response.headers.get('content-type') || '';
-    if (responseContentType.includes('text/html')) {
-      const htmlText = await response.text();
-      throw new Error(`Unexpected HTML response from chat endpoint: ${htmlText.substring(0, 200)}`);
-    }
-
     if (!response.body) throw new Error("No response body");
 
     // 3. Process Stream
@@ -131,109 +125,12 @@ export const streamChatResponse = async function* (
     let buffer = '';
     let currentEvent = '';
     let followUpQuestions: string[] = [];
-    let sawAnswerDelta = false;
-
-    const handleLine = (trimmedLine: string) => {
-      const outputs: StreamResponse[] = [];
-      let abort = false;
-
-      if (!trimmedLine) {
-        return { outputs, abort };
-      }
-
-      // SSE format: "event: <event_type>" followed by "data: <json>"
-      if (trimmedLine.startsWith('event:')) {
-        currentEvent = trimmedLine.substring(6).trim();
-        return { outputs, abort };
-      }
-
-      // Handle raw JSON responses (e.g. error bodies or non-SSE payload)
-      if (trimmedLine.startsWith('{')) {
-        try {
-          const jsonBody = JSON.parse(trimmedLine);
-          if (jsonBody.code && jsonBody.code !== 0) {
-            console.error("Coze API Error (JSON):", jsonBody);
-            outputs.push({ text: `\n(API Error: ${jsonBody.msg || 'Unknown error'} - Code: ${jsonBody.code})` });
-            abort = true;
-            return { outputs, abort };
-          }
-          console.log("[Coze] Received raw JSON:", jsonBody);
-        } catch {
-          // Ignore non-JSON lines.
-        }
-        return { outputs, abort };
-      }
-
-      if (!trimmedLine.startsWith('data:')) {
-        return { outputs, abort };
-      }
-
-      try {
-        const jsonStr = trimmedLine.substring(5).trim();
-        if (!jsonStr || jsonStr === '"[DONE]"' || jsonStr === '[DONE]') {
-          console.log('[Coze] Received [DONE] signal');
-          return { outputs, abort };
-        }
-
-        const data = JSON.parse(jsonStr);
-        console.log('[Coze] Event:', currentEvent, 'Type:', data.type);
-
-        if (currentEvent === 'conversation.message.delta' && data.type === 'answer') {
-          if (data.content) {
-            sawAnswerDelta = true;
-            outputs.push({ text: data.content });
-          }
-        } else if (currentEvent === 'conversation.message.completed' && data.type === 'answer') {
-          const completedText = typeof data.content === 'string' ? data.content : '';
-          console.log('[Coze] Message completed, content length:', completedText.length || 0);
-          // Some environments do not emit delta chunks; use completed content as fallback.
-          if (!sawAnswerDelta && completedText) {
-            outputs.push({ text: completedText });
-          }
-        } else if (currentEvent === 'conversation.message.completed' && data.type === 'follow_up') {
-          if (data.content) {
-            followUpQuestions.push(data.content);
-            console.log('[Coze] Follow-up question collected:', data.content);
-          }
-        } else if (currentEvent === 'conversation.chat.completed') {
-          console.log('[Coze] Chat completed successfully');
-          if (followUpQuestions.length > 0) {
-            console.log('[Coze] Yielding', followUpQuestions.length, 'follow-up questions');
-            outputs.push({ text: '', followUpQuestions });
-          }
-        } else if (currentEvent === 'conversation.chat.failed') {
-          console.error('[Coze] Chat failed:', data);
-          outputs.push({ text: `\n[Error: Chat failed - ${data.msg || JSON.stringify(data)}]` });
-        } else if (!currentEvent && data.type === 'answer' && data.content) {
-          // Fallback: if event name is missing, still accept answer payload.
-          sawAnswerDelta = true;
-          outputs.push({ text: data.content });
-        }
-      } catch (e) {
-        console.warn('[Coze] Failed to parse data line:', trimmedLine, e);
-      }
-
-      return { outputs, abort };
-    };
 
     console.log('[Coze] Starting to read stream...');
 
     while (true) {
       const { done, value } = await reader.read();
       if (done) {
-        // Flush decoder and process any remaining buffered line.
-        buffer += decoder.decode();
-        if (buffer.trim()) {
-          for (const tailLine of buffer.split('\n')) {
-            const { outputs, abort } = handleLine(tailLine.trim());
-            for (const output of outputs) {
-              yield output;
-            }
-            if (abort) {
-              return;
-            }
-          }
-        }
         console.log('[Coze] Stream completed');
         break;
       }
@@ -245,12 +142,70 @@ export const streamChatResponse = async function* (
       buffer = lines.pop() || '';
 
       for (const line of lines) {
-        const { outputs, abort } = handleLine(line.trim());
-        for (const output of outputs) {
-          yield output;
+        const trimmedLine = line.trim();
+        if (!trimmedLine) continue;
+
+        // SSE format: "event: <event_type>" followed by "data: <json>"
+        if (trimmedLine.startsWith('event:')) {
+          currentEvent = trimmedLine.substring(6).trim();
+          continue;
         }
-        if (abort) {
-          return;
+
+        // NEW: Handle raw JSON responses (e.g. error messages or non-stream responses)
+        if (trimmedLine.startsWith('{')) {
+          try {
+            const jsonBody = JSON.parse(trimmedLine);
+            if (jsonBody.code && jsonBody.code !== 0) {
+              console.error("Coze API Error (JSON):", jsonBody);
+              yield { text: `\n(API Error: ${jsonBody.msg || 'Unknown error'} - Code: ${jsonBody.code})` };
+              return;
+            }
+            console.log("[Coze] Received raw JSON:", jsonBody);
+          } catch (e) { }
+          continue;
+        }
+
+        if (trimmedLine.startsWith('data:')) {
+          try {
+            const jsonStr = trimmedLine.substring(5).trim();
+            if (!jsonStr || jsonStr === '"[DONE]"') {
+              console.log('[Coze] Received [DONE] signal');
+              continue;
+            }
+
+            const data = JSON.parse(jsonStr);
+            console.log('[Coze] Event:', currentEvent, 'Type:', data.type);
+
+            // Handle Coze V3 message types
+            if (currentEvent === 'conversation.message.delta' && data.type === 'answer') {
+              if (data.content) {
+                yield { text: data.content };
+              }
+            }
+            else if (currentEvent === 'conversation.message.completed' && data.type === 'answer') {
+              console.log('[Coze] Message completed, content length:', data.content?.length || 0);
+            }
+            else if (currentEvent === 'conversation.message.completed' && data.type === 'follow_up') {
+              if (data.content) {
+                followUpQuestions.push(data.content);
+                console.log('[Coze] Follow-up question collected:', data.content);
+              }
+            }
+            else if (currentEvent === 'conversation.chat.completed') {
+              console.log('[Coze] Chat completed successfully');
+              if (followUpQuestions.length > 0) {
+                console.log('[Coze] Yielding', followUpQuestions.length, 'follow-up questions');
+                yield { text: '', followUpQuestions };
+              }
+            }
+            else if (currentEvent === 'conversation.chat.failed') {
+              console.error('[Coze] Chat failed:', data);
+              yield { text: `\n[Error: Chat failed - ${data.msg || JSON.stringify(data)}]` };
+            }
+
+          } catch (e) {
+            console.warn('[Coze] Failed to parse data line:', trimmedLine, e);
+          }
         }
       }
     }
