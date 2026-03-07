@@ -9,8 +9,8 @@ export interface DormViewingHistory {
     dorm_id: string;
     dorm_name: string;
     dorm_name_zh?: string;
-    viewed_at: string;
-    created_at: string;
+    view_count: number;
+    last_viewed_at: string;
 }
 
 const TABLE_NAME = 'dorm_viewing_history';
@@ -43,7 +43,7 @@ export const dormViewingService = {
                 .update({
                     dorm_name: dormName,
                     dorm_name_zh: dormNameZh || null,
-                    viewed_at: viewedAt
+                    last_viewed_at: viewedAt
                 })
                 .eq('id', existing.id)
                 .eq('user_id', user.id);
@@ -62,7 +62,7 @@ export const dormViewingService = {
                 dorm_id: dormId,
                 dorm_name: dormName,
                 dorm_name_zh: dormNameZh || null,
-                viewed_at: viewedAt
+                last_viewed_at: viewedAt
             });
 
         if (error) {
@@ -82,7 +82,7 @@ export const dormViewingService = {
             .from(TABLE_NAME)
             .select('*')
             .eq('user_id', user.id)
-            .order('viewed_at', { ascending: false })
+            .order('last_viewed_at', { ascending: false })
             .limit(limit);
 
         if (error) {
