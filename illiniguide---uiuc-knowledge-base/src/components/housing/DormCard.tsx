@@ -10,6 +10,7 @@ interface DormCardProps {
     onViewDetails: (dorm: Dorm) => void;
     isFavorite?: boolean;
     onToggleFavorite?: (dorm: Dorm, e?: React.MouseEvent) => void;
+    onHoverDorm?: (dormId: string | null) => void;
     language?: Language;
 }
 
@@ -18,6 +19,7 @@ const DormCard: React.FC<DormCardProps> = ({
     onViewDetails,
     isFavorite = false,
     onToggleFavorite,
+    onHoverDorm,
     language = 'en'
 }) => {
     const getName = () => (language === 'zh' && dorm.name_zh ? dorm.name_zh : dorm.name);
@@ -38,6 +40,8 @@ const DormCard: React.FC<DormCardProps> = ({
     return (
         <div
             onClick={() => onViewDetails(dorm)}
+            onMouseEnter={() => onHoverDorm?.(dorm.id)}
+            onMouseLeave={() => onHoverDorm?.(null)}
             className="dorm-card bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300 flex flex-col h-full group relative cursor-pointer"
         >
             <div className="relative h-64 overflow-hidden">

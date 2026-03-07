@@ -318,6 +318,7 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
                             favoritesSet={favoritesSet}
                             onToggleFavorite={handleToggleFavorite}
                             onViewDetails={handleViewDetails}
+                            onHoverDorm={setHoveredDormId}
                             language={language}
                         />
                     ) : (
