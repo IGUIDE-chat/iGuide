@@ -2,7 +2,7 @@
 // [组件] 管理员侧边滑出面板，用于编辑宿舍信息覆盖项。
 import React, { useState, useEffect } from 'react';
 import { X, Plus, Trash2, RotateCcw, Save, Upload, Loader2 } from 'lucide-react';
-import { Dorm } from '../../types/housing';
+import { Dorm, FloorPlan, RoomType } from '../../types/housing';
 import { DormOverride, dormAdminService } from '../../services/dormAdminService';
 import { Language } from '../../types';
 
@@ -83,6 +83,8 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
     const [housingType, setHousingType] = useState(dorm.housingType);
     const [roomTypes, setRoomTypes] = useState<string[]>(dorm.roomTypes);
     const [tags, setTags] = useState<string[]>(dorm.tags);
+    const [floorPlans, setFloorPlans] = useState<FloorPlan[]>(dorm.floorPlans ?? []);
+    const [galleryImages, setGalleryImages] = useState<string[]>([]); // Override gallery array
 
     const [ac, setAc] = useState(dorm.ac);
     const [dining, setDining] = useState(dorm.dining);
@@ -110,6 +112,8 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
             if (override.housing_type != null) setHousingType(override.housing_type as any);
             if (override.room_types != null) setRoomTypes(override.room_types);
             if (override.tags != null) setTags(override.tags);
+            if (override.floor_plans != null) setFloorPlans(override.floor_plans);
+            if (override.gallery_images != null) setGalleryImages(override.gallery_images);
             if (override.ac != null) setAc(override.ac);
             if (override.dining != null) setDining(override.dining);
             if (override.pros != null) setPros(override.pros);
@@ -134,6 +138,8 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
         housing_type: housingType,
         room_types: roomTypes.length ? roomTypes : null,
         tags: tags.length ? tags : null,
+        floor_plans: floorPlans.length ? floorPlans : null,
+        gallery_images: galleryImages.length ? galleryImages : null,
         ac,
         dining,
         pros,
@@ -170,6 +176,31 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
         }
 
         e.target.value = '';
+    };
+
+    const handleFloorPlanImageUpload = async (index: number, file: File) => {
+        if (!file.type.startsWith('image/')) {
+            alert(language === 'zh' ? '仅支持上传图片文件。' : 'Only image files are supported.');
+            return;
+        }
+        const maxBytes = 10 * 1024 * 1024;
+        if (file.size > maxBytes) {
+            alert(language === 'zh' ? '图片大小不能超过 10MB。' : 'Image size must be 10MB or smaller.');
+            return;
+        }
+
+        setUploadingImage(true);
+        const { publicUrl, errorMessage } = await dormAdminService.uploadDormImage(file);
+        setUploadingImage(false);
+
+        if (publicUrl) {
+            const next = [...floorPlans];
+            next[index] = { ...next[index], imageUrl: publicUrl };
+            setFloorPlans(next);
+        } else {
+            const fallback = language === 'zh' ? '上传失败，请重试。' : 'Upload failed. Please try again.';
+            alert(errorMessage ? `${fallback}\n${errorMessage}` : fallback);
+        }
     };
 
     const handleSave = async () => {
@@ -216,6 +247,9 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
             housingTypeLabel: 'Housing Type',
             roomTypesLabel: 'Room Types',
             tagsLabel: 'Tags',
+            floorPlansLabel: 'Floor Plans & Pricing',
+            addFloorPlan: 'Add floor plan',
+            galleryLabel: 'Gallery Images',
             uploadImage: 'Upload File',
             priceLabel: 'Annual Price (USD)',
             acLabel: 'Air Conditioning',
@@ -240,6 +274,9 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
             housingTypeLabel: '公立/私立',
             roomTypesLabel: '房型',
             tagsLabel: '标签',
+            floorPlansLabel: '户型图与详细价格 (Floor Plans)',
+            addFloorPlan: '添加户型',
+            galleryLabel: '图库照片 (Gallery)',
             uploadImage: '上传文件',
             priceLabel: '年费用（美元）',
             acLabel: '空调',
@@ -284,8 +321,8 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                             type="button"
                             onClick={() => setLangTab(tab)}
                             className={`flex-1 py-2 text-sm font-medium transition-colors ${langTab === tab
-                                    ? 'border-b-2 border-illini-orange text-illini-blue'
-                                    : 'text-gray-500 hover:text-illini-blue'
+                                ? 'border-b-2 border-illini-orange text-illini-blue'
+                                : 'text-gray-500 hover:text-illini-blue'
                                 }`}
                         >
                             {tab === 'en' ? t.langEn : t.langZh}
@@ -373,6 +410,40 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                                     className={inputCls}
                                 />
                             </Field>
+
+                            <hr className="my-2 border-gray-200" />
+                            <Field label={t.floorPlansLabel}>
+                                <div className="space-y-3 border border-gray-200 rounded-lg p-3 bg-gray-50">
+                                    {floorPlans.map((fp, idx) => (
+                                        <div key={idx} className="flex flex-col gap-2 p-3 bg-white border border-gray-200 rounded shadow-sm">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-xs font-bold text-gray-500">Plan #{idx + 1}</span>
+                                                <button type="button" onClick={() => setFloorPlans(floorPlans.filter((_, i) => i !== idx))} className="text-red-400 hover:text-red-600">
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <input type="text" value={fp.type} onChange={e => { const n = [...floorPlans]; n[idx].type = e.target.value as any; setFloorPlans(n); }} placeholder="e.g. 2B1B" className={inputCls} />
+                                                <input type="number" value={fp.price} onChange={e => { const n = [...floorPlans]; n[idx].price = Number(e.target.value); setFloorPlans(n); }} placeholder="Price/yr" className={inputCls} />
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <input type="text" value={fp.imageUrl || ''} onChange={e => { const n = [...floorPlans]; n[idx].imageUrl = e.target.value; setFloorPlans(n); }} placeholder="Image URL..." className={inputCls} />
+                                                <label className="flex-shrink-0 flex items-center justify-center gap-1 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-lg px-2 cursor-pointer text-gray-700">
+                                                    <Upload size={14} />
+                                                    <input type="file" accept="image/*" className="hidden" onChange={e => { if (e.target.files?.[0]) handleFloorPlanImageUpload(idx, e.target.files[0]); e.target.value = ''; }} />
+                                                </label>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    <button type="button" onClick={() => setFloorPlans([...floorPlans, { type: 'Studio', price: 0 }])} className="flex items-center gap-1 text-xs text-illini-blue hover:underline">
+                                        <Plus size={12} /> {t.addFloorPlan}
+                                    </button>
+                                </div>
+                            </Field>
+                            <Field label={t.galleryLabel}>
+                                <EditableList items={galleryImages} onChange={setGalleryImages} placeholder="Add gallery image URL" />
+                            </Field>
+
                             <div className="flex gap-6">
                                 <Toggle label={t.acLabel} checked={ac} onChange={setAc} />
                                 <Toggle label={t.diningLabel} checked={dining} onChange={setDining} />
@@ -419,6 +490,39 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                             </Field>
                             <Field label={t.consLabel}>
                                 <EditableList items={consZh} onChange={setConsZh} placeholder={t.addCon} />
+                            </Field>
+
+                            <hr className="my-2 border-gray-200" />
+                            <Field label={t.floorPlansLabel}>
+                                <div className="space-y-3 border border-gray-200 rounded-lg p-3 bg-gray-50">
+                                    {floorPlans.map((fp, idx) => (
+                                        <div key={idx} className="flex flex-col gap-2 p-3 bg-white border border-gray-200 rounded shadow-sm">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-xs font-bold text-gray-500">户型 #{idx + 1}</span>
+                                                <button type="button" onClick={() => setFloorPlans(floorPlans.filter((_, i) => i !== idx))} className="text-red-400 hover:text-red-600">
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <input type="text" value={fp.type} onChange={e => { const n = [...floorPlans]; n[idx].type = e.target.value as any; setFloorPlans(n); }} placeholder="例如: 2B1B" className={inputCls} />
+                                                <input type="number" value={fp.price} onChange={e => { const n = [...floorPlans]; n[idx].price = Number(e.target.value); setFloorPlans(n); }} placeholder="价格/年" className={inputCls} />
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <input type="text" value={fp.imageUrl || ''} onChange={e => { const n = [...floorPlans]; n[idx].imageUrl = e.target.value; setFloorPlans(n); }} placeholder="图片链接..." className={inputCls} />
+                                                <label className="flex-shrink-0 flex items-center justify-center gap-1 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-lg px-2 cursor-pointer text-gray-700">
+                                                    <Upload size={14} />
+                                                    <input type="file" accept="image/*" className="hidden" onChange={e => { if (e.target.files?.[0]) handleFloorPlanImageUpload(idx, e.target.files[0]); e.target.value = ''; }} />
+                                                </label>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    <button type="button" onClick={() => setFloorPlans([...floorPlans, { type: 'Studio', price: 0 }])} className="flex items-center gap-1 text-xs text-illini-blue hover:underline">
+                                        <Plus size={12} /> {t.addFloorPlan}
+                                    </button>
+                                </div>
+                            </Field>
+                            <Field label={t.galleryLabel}>
+                                <EditableList items={galleryImages} onChange={setGalleryImages} placeholder="添加图库照片连结" />
                             </Field>
                         </>
                     )}
