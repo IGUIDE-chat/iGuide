@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useRef } from 'react';
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import Slider from 'rc-slider';
 import { HISTOGRAM_DATA, ModalText } from './modalText';
 
@@ -19,6 +19,8 @@ const PriceSection: React.FC<PriceSectionProps> = ({
 }) => {
     const pendingRangeRef = useRef<[number, number] | null>(null);
     const frameRef = useRef<number | null>(null);
+    const [minInput, setMinInput] = useState<string>(() => String(value[0]));
+    const [maxInput, setMaxInput] = useState<string>(() => String(value[1]));
 
     const flushPending = useCallback(() => {
         frameRef.current = null;
@@ -56,6 +58,29 @@ const PriceSection: React.FC<PriceSectionProps> = ({
             }
         };
     }, []);
+
+    useEffect(() => {
+        setMinInput(String(value[0]));
+        setMaxInput(String(value[1]));
+    }, [value]);
+
+    const commitMinInput = useCallback(
+        (raw: string) => {
+            const parsed = Number.parseInt(raw, 10);
+            const nextMin = Number.isFinite(parsed) ? parsed : value[0];
+            commitRangeChange(normalizeRange([nextMin, value[1]]));
+        },
+        [commitRangeChange, normalizeRange, value]
+    );
+
+    const commitMaxInput = useCallback(
+        (raw: string) => {
+            const parsed = Number.parseInt(raw, 10);
+            const nextMax = Number.isFinite(parsed) ? parsed : value[1];
+            commitRangeChange(normalizeRange([value[0], nextMax]));
+        },
+        [commitRangeChange, normalizeRange, value]
+    );
 
     return (
         <section className="mb-8">
@@ -126,11 +151,15 @@ const PriceSection: React.FC<PriceSectionProps> = ({
                         <input
                             type="number"
                             step={100}
-                            value={value[0]}
+                            value={minInput}
                             onChange={(e) => {
-                                const numeric = Number.parseInt(e.target.value, 10);
-                                const minValue = Number.isFinite(numeric) ? numeric : priceLimits[0];
-                                commitRangeChange(normalizeRange([minValue, value[1]]));
+                                setMinInput(e.target.value);
+                            }}
+                            onBlur={(e) => commitMinInput(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key !== 'Enter') return;
+                                commitMinInput((e.currentTarget as HTMLInputElement).value);
+                                e.currentTarget.blur();
                             }}
                             className="w-full outline-none text-lg ml-1"
                         />
@@ -144,11 +173,15 @@ const PriceSection: React.FC<PriceSectionProps> = ({
                         <input
                             type="number"
                             step={100}
-                            value={value[1]}
+                            value={maxInput}
                             onChange={(e) => {
-                                const numeric = Number.parseInt(e.target.value, 10);
-                                const maxValue = Number.isFinite(numeric) ? numeric : priceLimits[1];
-                                commitRangeChange(normalizeRange([value[0], maxValue]));
+                                setMaxInput(e.target.value);
+                            }}
+                            onBlur={(e) => commitMaxInput(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key !== 'Enter') return;
+                                commitMaxInput((e.currentTarget as HTMLInputElement).value);
+                                e.currentTarget.blur();
                             }}
                             className="w-full outline-none text-lg ml-1"
                         />
