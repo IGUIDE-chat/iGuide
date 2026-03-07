@@ -63,6 +63,8 @@ const MapCarousel: React.FC<MapCarouselProps> = ({
                                     <img
                                         src={dorm.imageUrl}
                                         alt={dormName}
+                                        loading="lazy"
+                                        decoding="async"
                                         className="w-full h-full object-cover"
                                         onError={(e) => {
                                             e.currentTarget.src = 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400';
