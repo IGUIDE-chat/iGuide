@@ -21,6 +21,8 @@ const PriceSection: React.FC<PriceSectionProps> = ({
     const frameRef = useRef<number | null>(null);
     const [minInput, setMinInput] = useState<string>(() => String(value[0]));
     const [maxInput, setMaxInput] = useState<string>(() => String(value[1]));
+    const minEditingRef = useRef(false);
+    const maxEditingRef = useRef(false);
 
     const flushPending = useCallback(() => {
         frameRef.current = null;
@@ -60,8 +62,12 @@ const PriceSection: React.FC<PriceSectionProps> = ({
     }, []);
 
     useEffect(() => {
-        setMinInput(String(value[0]));
-        setMaxInput(String(value[1]));
+        if (!minEditingRef.current) {
+            setMinInput(String(value[0]));
+        }
+        if (!maxEditingRef.current) {
+            setMaxInput(String(value[1]));
+        }
     }, [value]);
 
     const commitMinInput = useCallback(
@@ -152,10 +158,16 @@ const PriceSection: React.FC<PriceSectionProps> = ({
                             type="number"
                             step={100}
                             value={minInput}
+                            onFocus={() => {
+                                minEditingRef.current = true;
+                            }}
                             onChange={(e) => {
                                 setMinInput(e.target.value);
                             }}
-                            onBlur={(e) => commitMinInput(e.target.value)}
+                            onBlur={(e) => {
+                                minEditingRef.current = false;
+                                commitMinInput(e.target.value);
+                            }}
                             onKeyDown={(e) => {
                                 if (e.key !== 'Enter') return;
                                 commitMinInput((e.currentTarget as HTMLInputElement).value);
@@ -174,10 +186,16 @@ const PriceSection: React.FC<PriceSectionProps> = ({
                             type="number"
                             step={100}
                             value={maxInput}
+                            onFocus={() => {
+                                maxEditingRef.current = true;
+                            }}
                             onChange={(e) => {
                                 setMaxInput(e.target.value);
                             }}
-                            onBlur={(e) => commitMaxInput(e.target.value)}
+                            onBlur={(e) => {
+                                maxEditingRef.current = false;
+                                commitMaxInput(e.target.value);
+                            }}
                             onKeyDown={(e) => {
                                 if (e.key !== 'Enter') return;
                                 commitMaxInput((e.currentTarget as HTMLInputElement).value);
