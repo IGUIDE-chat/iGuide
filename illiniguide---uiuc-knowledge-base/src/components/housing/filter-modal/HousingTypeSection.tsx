@@ -31,12 +31,12 @@ const HousingTypeSection: React.FC<HousingTypeSectionProps> = ({ t, value, onCha
             <label
                 className={`
                 flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors duration-200
-                ${value === 'PCH' ? 'border-illini-orange bg-illini-orange/10 ring-1 ring-illini-orange' : 'border-gray-200 hover:border-illini-orange hover:bg-illini-orange/10 active:border-illini-orange active:bg-illini-orange/10'}
+                ${value === 'PCH' ? 'border-illini-blue bg-blue-50/50 ring-1 ring-illini-blue' : 'border-gray-200 hover:border-illini-blue hover:bg-blue-50/50 active:border-illini-blue active:bg-blue-50/50'}
             `}
             >
                 <input
                     type="checkbox"
-                    className="w-5 h-5 accent-illini-orange rounded-md"
+                    className="w-5 h-5 accent-illini-blue rounded-md"
                     checked={value === 'PCH'}
                     onChange={() => onChange(value === 'PCH' ? 'ALL' : 'PCH')}
                 />

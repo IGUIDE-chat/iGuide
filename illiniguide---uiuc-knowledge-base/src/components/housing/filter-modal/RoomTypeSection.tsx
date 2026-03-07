@@ -28,7 +28,7 @@ const RoomTypeSection: React.FC<RoomTypeSectionProps> = ({
                             className={`
                             w-6 h-6 rounded-[4px] border flex items-center justify-center transition-all duration-200
                             ${isSelected
-                                ? 'bg-illini-orange/25 border-illini-orange/60 text-illini-orange active:bg-illini-orange/40 active:border-illini-orange/80'
+                                ? 'bg-illini-blue border-illini-blue text-white active:bg-[#0e2240] active:border-[#0e2240]'
                                 : 'border-gray-300 group-hover:border-illini-blue active:border-illini-blue bg-white active:bg-blue-50/50'}
                         `}
                         >
