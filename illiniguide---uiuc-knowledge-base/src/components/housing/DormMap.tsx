@@ -110,6 +110,7 @@ const DormMap: React.FC<DormMapProps> = ({
     const [isMapReady, setIsMapReady] = useState(false);
     const [areMapImagesReady, setAreMapImagesReady] = useState(false);
     const [visibleDorms, setVisibleDorms] = useState<Dorm[]>([]);
+    const containerRef = useRef<HTMLDivElement>(null);
     const mapRef = useRef<MapRef>(null);
     const fitBoundsTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -206,6 +207,33 @@ const DormMap: React.FC<DormMapProps> = ({
 
         return () => window.cancelAnimationFrame(rafId);
     }, [isVisible, isMapReady, safeDorms.length]);
+
+    useEffect(() => {
+        if (!isVisible || !isMapReady || !mapRef.current || !containerRef.current) return;
+
+        const map = mapRef.current;
+        const container = containerRef.current;
+
+        const runResize = () => {
+            map?.resize();
+        };
+
+        // Catch post-transition sizing on view switches.
+        runResize();
+        const t1 = window.setTimeout(runResize, 120);
+        const t2 = window.setTimeout(runResize, 320);
+
+        const observer = new ResizeObserver(() => {
+            runResize();
+        });
+        observer.observe(container);
+
+        return () => {
+            window.clearTimeout(t1);
+            window.clearTimeout(t2);
+            observer.disconnect();
+        };
+    }, [isVisible, isMapReady]);
 
     useEffect(() => {
         if (hoveredDorm && !safeDorms.some((dorm) => dorm.id === hoveredDorm.id)) {
@@ -353,7 +381,7 @@ const DormMap: React.FC<DormMapProps> = ({
     }
 
     return (
-        <div className="w-full h-full relative bg-gray-50">
+        <div ref={containerRef} className="w-full h-full relative bg-gray-50">
             <Map
                 ref={mapRef}
                 onLoad={onMapLoad}
