@@ -9,9 +9,15 @@ interface DormHeroSectionProps {
 }
 
 const DormHeroSection: React.FC<DormHeroSectionProps> = ({ dorm, dormName, campusLabel }) => {
+    const allImages = [dorm.imageUrl, ...(dorm.galleryImages || [])].filter(Boolean);
+
     return (
-        <div className="h-56 md:h-80 w-full relative">
-            <img src={dorm.imageUrl} alt={dormName} className="w-full h-full object-cover" />
+        <div className="h-56 md:h-80 w-full relative group">
+            <div className="flex h-full w-full overflow-x-auto snap-x snap-mandatory scrollbar-hide no-scrollbar">
+                {allImages.map((img, i) => (
+                    <img key={i} src={img} alt={`${dormName} ${i + 1}`} className="w-full h-full object-cover shrink-0 snap-center" />
+                ))}
+            </div>
             <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent flex items-end">
                 <div className="p-4 md:p-8 text-white w-full">
                     <div className="flex items-center gap-1.5 mb-1 text-illini-orange font-bold uppercase tracking-wider text-xs md:text-sm">
