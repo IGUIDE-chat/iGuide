@@ -6,6 +6,7 @@ import { Layout } from './components/Layout';
 import { AppRoutes } from './app/routes';
 import { useAuth } from './contexts/AuthContext';
 import { HousingProvider } from './contexts/HousingContext';
+import { DormDataProvider } from './contexts/DormDataContext';
 import { DormUserInteractionProvider } from './contexts/DormUserInteractionContext';
 import { Language } from './types';
 
@@ -86,8 +87,9 @@ export default function App() {
           transition={{ duration: 0.4, ease: 'easeOut' }}
           className="h-full w-full"
         >
-          <HousingProvider>
-            <DormUserInteractionProvider>
+          <DormDataProvider>
+            <HousingProvider>
+              <DormUserInteractionProvider>
               <Layout
                 language={language}
                 onLanguageChange={setLanguage}
@@ -103,8 +105,9 @@ export default function App() {
                   onConversationCreated={setCurrentConversationId}
                 />
               </Layout>
-            </DormUserInteractionProvider>
-          </HousingProvider>
+              </DormUserInteractionProvider>
+            </HousingProvider>
+          </DormDataProvider>
         </motion.div>
       )}
     </AnimatePresence>

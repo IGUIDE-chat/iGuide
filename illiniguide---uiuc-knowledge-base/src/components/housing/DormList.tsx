@@ -2,8 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Dorm } from '../../types/housing';
-import { UIUC_DORMS } from '../../constants/housing/dormData';
 import { getPriceRangeFromData } from '../../constants/housing/pricing';
+import { useDormData } from '../../contexts/DormDataContext';
 import DormMap from './DormMap';
 import { FilterModal } from './FilterModal';
 import { useHousingFilters } from '../../contexts/HousingContext';
@@ -94,6 +94,7 @@ const DORM_LIST_TEXT: Record<Language, DormListText> = {
 
 const DormList: React.FC<DormListProps> = ({ language }) => {
     const navigate = useNavigate();
+    const { dorms: allDorms } = useDormData();
     const { isSidebarOpen, favoritesIconRef, sidebarToggleButtonRef, mobileSidebarButtonRef } = useLayout();
     const { toggleFavorite, addToHistory, favorites } = useSharedDormInteraction();
     const [hasMountedMap, setHasMountedMap] = useState(false);
@@ -135,7 +136,7 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
     const t = DORM_LIST_TEXT[language];
     const isMapView = viewMode === 'map';
     const isListView = !isMapView;
-    const priceLimits = useMemo<[number, number]>(() => getPriceRangeFromData(), []);
+    const priceLimits = useMemo<[number, number]>(() => getPriceRangeFromData(allDorms), [allDorms]);
     const favoritesSet = useMemo(() => new Set(favorites), [favorites]);
 
     const hasPriceFilter = useMemo(
@@ -202,7 +203,7 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
 
     const filteredDorms = useMemo(
         () =>
-            filterAndSortDorms(UIUC_DORMS, {
+            filterAndSortDorms(allDorms, {
                 searchTerm,
                 activeFilters,
                 normalizedPriceRange,
@@ -217,6 +218,7 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
                 sortBy
             }),
         [
+            allDorms,
             searchTerm,
             activeFilters,
             normalizedPriceRange,

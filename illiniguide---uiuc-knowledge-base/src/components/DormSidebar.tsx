@@ -2,8 +2,8 @@ import React, { useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Clock, Heart, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { UIUC_DORMS } from '../constants/housing/dormData';
 import { useSharedDormInteraction } from '../contexts/DormUserInteractionContext';
+import { useDormData } from '../contexts/DormDataContext';
 import { Language } from '../types';
 import { Dorm } from '../types/housing';
 import { TypewriterText } from './TypewriterText';
@@ -22,10 +22,10 @@ interface SidebarDormItem {
     imageUrl: string;
 }
 
-const DORM_BY_ID = new Map(UIUC_DORMS.map((dorm) => [dorm.id, dorm]));
-
 export const DormSidebar: React.FC<DormSidebarProps> = ({ language, currentDormId, favoritesIconRef }) => {
     const navigate = useNavigate();
+    const { dorms } = useDormData();
+    const dormById = useMemo(() => new Map(dorms.map((dorm) => [dorm.id, dorm])), [dorms]);
     const {
         favorites,
         cloudFavorites,
@@ -61,7 +61,7 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({ language, currentDormI
     const favoriteItems = useMemo<SidebarDormItem[]>(() => {
         return favorites
             .map((favoriteId) => {
-                const dorm = DORM_BY_ID.get(favoriteId);
+                const dorm = dormById.get(favoriteId);
                 if (dorm) {
                     return {
                         id: dorm.id,
@@ -82,7 +82,7 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({ language, currentDormI
                 };
             })
             .filter((item): item is SidebarDormItem => item !== null);
-    }, [favorites, cloudFavorites]);
+    }, [favorites, cloudFavorites, dormById]);
 
     const historyItems = useMemo<SidebarDormItem[]>(() => {
         return recentlyViewed.map((dorm: Dorm) => ({

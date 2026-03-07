@@ -43,6 +43,7 @@ export interface Dorm {
     priceRange: '$' | '$$' | '$$$' | '$$$$'; // Keep for backwards compatibility
     roomTypes: RoomType[];
     floorPlans?: FloorPlan[]; // Detailed floor plans with specific prices and images
+    galleryImages?: string[]; // Array of gallery image URLs
     housingType: 'URH' | 'PCH';
     // Map coordinates
     lat: number;

@@ -1,3 +1,4 @@
+// TODO: Once AI prompt can accept dynamic dorms, switch to dormService.getAllDorms()
 import { UIUC_DORMS } from '../constants/housing';
 import { ChatMessage } from '../types/housing';
 
