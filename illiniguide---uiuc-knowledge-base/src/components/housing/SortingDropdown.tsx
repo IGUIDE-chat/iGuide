@@ -45,8 +45,8 @@ const SortingDropdown: React.FC<SortingDropdownProps> = memo(({ sortBy, onSortCh
                 onClick={() => setIsOpen(!isOpen)}
                 type="button"
                 className={`flex items-center justify-center p-2.5 rounded-full border transition-all duration-200 ${isOpen
-                        ? 'border-illini-orange/50 bg-illini-orange/15 text-illini-orange'
-                        : 'border-gray-200 bg-white text-gray-700 hover:border-illini-orange/40 hover:text-illini-orange/80 hover:bg-illini-orange/10 active:border-illini-orange/50 active:text-illini-orange active:bg-illini-orange/10'
+                        ? 'border-illini-blue/50 bg-illini-blue/10 text-illini-blue'
+                        : 'border-gray-200 bg-white text-gray-700 hover:border-illini-blue/40 hover:text-illini-blue/80 hover:bg-illini-blue/5 active:border-illini-blue/50 active:text-illini-blue active:bg-illini-blue/10'
                     }`}
                 title={`Sort by: ${currentLabel}`}
             >
@@ -63,12 +63,12 @@ const SortingDropdown: React.FC<SortingDropdownProps> = memo(({ sortBy, onSortCh
                                 setIsOpen(false);
                             }}
                             type="button"
-                            className="group w-full flex items-center justify-between px-4 py-2 text-sm text-left hover:bg-illini-orange/10 transition-colors first:rounded-t-lg last:rounded-b-lg"
+                            className="group w-full flex items-center justify-between px-4 py-2 text-sm text-left hover:bg-illini-blue/5 transition-colors first:rounded-t-lg last:rounded-b-lg"
                         >
-                            <span className={sortBy === option.value ? 'font-medium text-illini-orange' : 'text-gray-600 group-hover:text-illini-orange/80'}>
+                            <span className={sortBy === option.value ? 'font-medium text-illini-blue' : 'text-gray-600 group-hover:text-illini-blue/80'}>
                                 {option.label}
                             </span>
-                            {sortBy === option.value && <Check size={14} className="text-illini-orange" />}
+                            {sortBy === option.value && <Check size={14} className="text-illini-blue" />}
                         </button>
                     ))}
                 </div>
