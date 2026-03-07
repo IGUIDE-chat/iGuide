@@ -98,8 +98,8 @@ export interface DormViewingHistory {
     dorm_id: string;
     dorm_name: string;
     dorm_name_zh?: string;
-    viewed_at: string;
-    created_at: string;
+    view_count: number;
+    last_viewed_at: string;
 }
 
 // Dorm favorite item

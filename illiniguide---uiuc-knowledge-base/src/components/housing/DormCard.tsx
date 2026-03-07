@@ -4,6 +4,7 @@ import { formatPrice } from '../../constants/housing/pricing';
 import { MapPin, Utensils, Wind } from 'lucide-react';
 import { Language } from '../../types';
 import { getRoomTypeLabel } from '../../utils/housingLabels';
+import { getTagLabel } from '../../utils/tagLabels';
 
 interface DormCardProps {
     dorm: Dorm;
@@ -120,7 +121,7 @@ const DormCard: React.FC<DormCardProps> = ({
                             key={tag}
                             className="inline-block px-2 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium transition-colors duration-150 hover:bg-gray-200 hover:text-gray-800"
                         >
-                            {tag}
+                            {getTagLabel(tag, language)}
                         </span>
                     ))}
                 </div>
