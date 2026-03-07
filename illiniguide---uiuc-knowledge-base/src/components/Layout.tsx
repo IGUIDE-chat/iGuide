@@ -43,6 +43,25 @@ const AnimatedText = ({ children }: { children: React.ReactNode }) => (
   </AnimatePresence>
 );
 
+const SidebarLabel = ({
+  isOpen,
+  children,
+  className = ''
+}: {
+  isOpen: boolean;
+  children: React.ReactNode;
+  className?: string;
+}) => (
+  <motion.span
+    initial={false}
+    animate={isOpen ? { opacity: 1, x: 0, maxWidth: 220 } : { opacity: 0, x: -6, maxWidth: 0 }}
+    transition={{ duration: 0.2, ease: 'easeOut' }}
+    className={`inline-block overflow-hidden whitespace-nowrap ${className}`}
+  >
+    {children}
+  </motion.span>
+);
+
 export const Layout: React.FC<LayoutProps> = ({
   children,
   language,
@@ -152,7 +171,9 @@ export const Layout: React.FC<LayoutProps> = ({
           <div className="p-3 mb-2 flex items-center justify-between">
             <div className="flex items-center gap-2 px-2 py-2 rounded-md hover:bg-white/5 cursor-pointer w-full transition-colors">
               <div className="w-6 h-6 bg-illini-orange rounded flex items-center justify-center font-bold text-white text-xs">I</div>
-              <span className="font-semibold text-sm tracking-tight text-white"><AnimatedText>{t.appTitle}</AnimatedText></span>
+              <SidebarLabel isOpen={isSidebarOpen} className="font-semibold text-sm tracking-tight text-white">
+                <AnimatedText>{t.appTitle}</AnimatedText>
+              </SidebarLabel>
             </div>
             {/* Mobile Close Button */}
             <button onClick={() => setIsSidebarOpen(false)} className="md:hidden text-slate-400 p-2 hover:text-white">✕</button>
@@ -168,13 +189,15 @@ export const Layout: React.FC<LayoutProps> = ({
               }}
               className={`w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm transition-colors ${activeTab === 'chat' ? 'bg-[#212121] text-white' : 'hover:bg-[#212121] text-slate-300'}`}
             >
-              <span><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg></span> <AnimatedText>{t.chatTab}</AnimatedText>
+              <span><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg></span>
+              <SidebarLabel isOpen={isSidebarOpen}><AnimatedText>{t.chatTab}</AnimatedText></SidebarLabel>
             </button>
             <button
               onClick={() => { navigate('/library'); if (window.innerWidth < 768) setIsSidebarOpen(false); }}
               className={`w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm transition-colors ${activeTab === 'library' ? 'bg-[#212121] text-white' : 'hover:bg-[#212121] text-slate-300'}`}
             >
-              <span><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg></span> <AnimatedText>{t.libraryTab}</AnimatedText>
+              <span><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg></span>
+              <SidebarLabel isOpen={isSidebarOpen}><AnimatedText>{t.libraryTab}</AnimatedText></SidebarLabel>
             </button>
 
             {/* Divider */}
@@ -185,19 +208,22 @@ export const Layout: React.FC<LayoutProps> = ({
               onClick={() => { navigate('/courses'); if (window.innerWidth < 768) setIsSidebarOpen(false); }}
               className={`w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm transition-colors ${activeTab === 'courses' ? 'bg-[#212121] text-white' : 'hover:bg-[#212121] text-slate-300'}`}
             >
-              <span><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg></span> <AnimatedText>{t.coursesTab}</AnimatedText>
+              <span><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg></span>
+              <SidebarLabel isOpen={isSidebarOpen}><AnimatedText>{t.coursesTab}</AnimatedText></SidebarLabel>
             </button>
             <button
               onClick={() => { navigate('/dorms'); if (window.innerWidth < 768) setIsSidebarOpen(false); }}
               className={`w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm transition-colors ${activeTab === 'dorms' ? 'bg-[#212121] text-white' : 'hover:bg-[#212121] text-slate-300'}`}
             >
-              <span><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg></span> <AnimatedText>{t.dormsTab}</AnimatedText>
+              <span><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg></span>
+              <SidebarLabel isOpen={isSidebarOpen}><AnimatedText>{t.dormsTab}</AnimatedText></SidebarLabel>
             </button>
             <button
               onClick={() => { navigate('/resume'); if (window.innerWidth < 768) setIsSidebarOpen(false); }}
               className={`w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm transition-colors ${activeTab === 'resume' ? 'bg-[#212121] text-white' : 'hover:bg-[#212121] text-slate-300'}`}
             >
-              <span><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg></span> <AnimatedText>{t.resumeTab}</AnimatedText>
+              <span><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg></span>
+              <SidebarLabel isOpen={isSidebarOpen}><AnimatedText>{t.resumeTab}</AnimatedText></SidebarLabel>
             </button>
           </nav>
 
@@ -236,7 +262,10 @@ export const Layout: React.FC<LayoutProps> = ({
               onClick={() => onLanguageChange(language === 'zh' ? 'en' : 'zh')}
               className="w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm hover:bg-[#212121] transition-colors text-slate-300"
             >
-              <span><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></span> <AnimatedText>{language === 'zh' ? '中文' : 'English'}</AnimatedText>
+              <span><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></span>
+              <SidebarLabel isOpen={isSidebarOpen}>
+                <AnimatedText>{language === 'zh' ? '\u4e2d\u6587' : 'English'}</AnimatedText>
+              </SidebarLabel>
             </button>
 
             {/* User Profile / Login Button */}
@@ -246,7 +275,9 @@ export const Layout: React.FC<LayoutProps> = ({
                 className="w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm hover:bg-[#212121] transition-colors text-white group"
               >
                 <div className="w-5 h-5 bg-illini-orange rounded-sm flex items-center justify-center font-bold text-white text-[10px] group-hover:scale-110 transition-transform">I</div>
-                <AnimatedText>{language === 'zh' ? '登录' : 'Login'}</AnimatedText>
+                <SidebarLabel isOpen={isSidebarOpen}>
+                  <AnimatedText>{language === 'zh' ? '\u767b\u5f55' : 'Login'}</AnimatedText>
+                </SidebarLabel>
               </button>
             ) : (
               <Link
@@ -258,10 +289,15 @@ export const Layout: React.FC<LayoutProps> = ({
                   {user?.name?.charAt(0).toUpperCase() || 'U'}
                 </div>
                 {/* User Info */}
-                <div className="flex-1 min-w-0">
+                <motion.div
+                  initial={false}
+                  animate={isSidebarOpen ? { opacity: 1, x: 0, maxWidth: 180 } : { opacity: 0, x: -6, maxWidth: 0 }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
+                  className="flex-1 min-w-0 overflow-hidden whitespace-nowrap"
+                >
                   <div className="text-[10px] text-slate-400">Signed in as</div>
                   <div className="text-xs font-medium text-white truncate">{user?.name || user?.email}</div>
-                </div>
+                </motion.div>
               </Link>
             )}
           </div>
