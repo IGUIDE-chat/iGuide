@@ -55,15 +55,25 @@ ALTER TABLE public.dorm_overrides ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "dorm_overrides_select_all" ON public.dorm_overrides FOR
 SELECT USING (true);
 
--- Only users whose Supabase user_metadata.is_admin = true may write
+-- Replace write policy with a robust admin check:
+-- allow admin flag from app_metadata or user_metadata.
+DROP POLICY IF EXISTS "dorm_overrides_write_admin" ON public.dorm_overrides;
 CREATE POLICY "dorm_overrides_write_admin"
     ON public.dorm_overrides
     FOR ALL
     USING (
-        (auth.jwt() -> 'user_metadata' ->> 'is_admin')::boolean = true
+        COALESCE(
+            NULLIF(auth.jwt() -> 'app_metadata' ->> 'is_admin', '')::boolean,
+            NULLIF(auth.jwt() -> 'user_metadata' ->> 'is_admin', '')::boolean,
+            false
+        ) = true
     )
     WITH CHECK (
-        (auth.jwt() -> 'user_metadata' ->> 'is_admin')::boolean = true
+        COALESCE(
+            NULLIF(auth.jwt() -> 'app_metadata' ->> 'is_admin', '')::boolean,
+            NULLIF(auth.jwt() -> 'user_metadata' ->> 'is_admin', '')::boolean,
+            false
+        ) = true
     );
 
 GRANT SELECT ON public.dorm_overrides TO anon, authenticated;
@@ -89,6 +99,11 @@ ON CONFLICT (id) DO NOTHING;
 -- Storage RLS Policies
 -- Note: 'storage.objects' table uses RLS
 
+DROP POLICY IF EXISTS "Public Access to Dorm Images" ON storage.objects;
+DROP POLICY IF EXISTS "Admin Upload Dorm Images" ON storage.objects;
+DROP POLICY IF EXISTS "Admin Update Dorm Images" ON storage.objects;
+DROP POLICY IF EXISTS "Admin Delete Dorm Images" ON storage.objects;
+
 -- 1. Anyone can view/read images
 CREATE POLICY "Public Access to Dorm Images" ON storage.objects FOR
 SELECT USING (bucket_id = 'dorm-images');
@@ -98,7 +113,11 @@ CREATE POLICY "Admin Upload Dorm Images"
     ON storage.objects FOR INSERT
     WITH CHECK (
         bucket_id = 'dorm-images'
-        AND (auth.jwt() -> 'user_metadata' ->> 'is_admin')::boolean = true
+        AND COALESCE(
+            NULLIF(auth.jwt() -> 'app_metadata' ->> 'is_admin', '')::boolean,
+            NULLIF(auth.jwt() -> 'user_metadata' ->> 'is_admin', '')::boolean,
+            false
+        ) = true
     );
 
 -- 3. Only admins can update images
@@ -106,11 +125,19 @@ CREATE POLICY "Admin Update Dorm Images"
     ON storage.objects FOR UPDATE
     USING (
         bucket_id = 'dorm-images'
-        AND (auth.jwt() -> 'user_metadata' ->> 'is_admin')::boolean = true
+        AND COALESCE(
+            NULLIF(auth.jwt() -> 'app_metadata' ->> 'is_admin', '')::boolean,
+            NULLIF(auth.jwt() -> 'user_metadata' ->> 'is_admin', '')::boolean,
+            false
+        ) = true
     )
     WITH CHECK (
         bucket_id = 'dorm-images'
-        AND (auth.jwt() -> 'user_metadata' ->> 'is_admin')::boolean = true
+        AND COALESCE(
+            NULLIF(auth.jwt() -> 'app_metadata' ->> 'is_admin', '')::boolean,
+            NULLIF(auth.jwt() -> 'user_metadata' ->> 'is_admin', '')::boolean,
+            false
+        ) = true
     );
 
 -- 4. Only admins can delete images
@@ -118,5 +145,9 @@ CREATE POLICY "Admin Delete Dorm Images"
     ON storage.objects FOR DELETE
     USING (
         bucket_id = 'dorm-images'
-        AND (auth.jwt() -> 'user_metadata' ->> 'is_admin')::boolean = true
+        AND COALESCE(
+            NULLIF(auth.jwt() -> 'app_metadata' ->> 'is_admin', '')::boolean,
+            NULLIF(auth.jwt() -> 'user_metadata' ->> 'is_admin', '')::boolean,
+            false
+        ) = true
     );
