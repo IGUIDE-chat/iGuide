@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Pencil } from 'lucide-react';
-import { UIUC_DORMS } from '../../constants/housing/dormData';
 import { formatPrice } from '../../constants/housing/pricing';
 import { useSharedDormInteraction } from '../../contexts/DormUserInteractionContext';
+import { useDormData } from '../../contexts/DormDataContext';
 import { useAuth } from '../../contexts/AuthContext';
-import { dormAdminService } from '../../services/dormAdminService';
+import { dormService } from '../../services/dormService';
 import { Dorm } from '../../types/housing';
 import FloorPlanSection from './FloorPlanSection';
 import DormEditPanel from './DormEditPanel';
@@ -24,23 +24,27 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
     const navigate = useNavigate();
     const { addToHistory, toggleFavorite, isFavorite } = useSharedDormInteraction();
     const { user } = useAuth();
+    const { getDormById: getFromContext, refreshDorms } = useDormData();
 
-    const staticDorm = UIUC_DORMS.find((d) => d.id === id);
-
-    // Dorm with admin overrides applied (starts as static data)
-    const [dorm, setDorm] = useState<Dorm | undefined>(staticDorm);
+    // Start with context data (instant), then fetch latest from DB
+    const contextDorm = getFromContext(id ?? '');
+    const [dorm, setDorm] = useState<Dorm | undefined>(contextDorm);
     const [editOpen, setEditOpen] = useState(false);
 
     const t = dormDetailTexts[language];
 
-    // Load Supabase override on mount
+    // Load latest from DB on mount / id change
     useEffect(() => {
-        if (!staticDorm) return;
-        setDorm(staticDorm); // reset when navigating between dorms
-        dormAdminService.getOverride(staticDorm.id).then((override) => {
-            setDorm(dormAdminService.applyOverride(staticDorm, override));
+        if (!id) return;
+        // Immediately show context data
+        const fromCtx = getFromContext(id);
+        if (fromCtx) setDorm(fromCtx);
+
+        // Then fetch fresh from DB
+        dormService.getDormById(id).then((dbDorm) => {
+            if (dbDorm) setDorm(dbDorm);
         });
-    }, [staticDorm?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         if (dorm) {
@@ -164,14 +168,15 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
             </div>
 
             {/* Admin edit panel */}
-            {editOpen && staticDorm && (
+            {editOpen && dorm && (
                 <DormEditPanel
-                    dorm={staticDorm}
+                    dorm={dorm}
                     language={language}
                     onClose={() => setEditOpen(false)}
                     onSaved={(updated) => {
                         setDorm(updated);
                         setEditOpen(false);
+                        void refreshDorms();
                     }}
                 />
             )}

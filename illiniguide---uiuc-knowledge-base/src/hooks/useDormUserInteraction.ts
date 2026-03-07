@@ -1,20 +1,21 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Dorm } from '../types/housing';
-import { UIUC_DORMS } from '../constants/housing';
 import { dormViewingService } from '../services/dormViewingService';
 import { dormFavoritesService, type DormFavorite } from '../services/dormFavoritesService';
 import { useAuth } from '../contexts/AuthContext';
+import { useDormData } from '../contexts/DormDataContext';
 
 const FAVORITES_KEY = 'uiuc-dorm-favorites';
 const HISTORY_KEY = 'uiuc-dorm-history';
 const MAX_HISTORY_ITEMS = 10;
-const DORM_BY_ID = new Map(UIUC_DORMS.map(dorm => [dorm.id, dorm]));
 
 /**
  * Enhanced hook for dorm user interactions with Supabase + localStorage fallback
  */
 export const useDormUserInteraction = () => {
     const { user } = useAuth();
+    const { dorms } = useDormData();
+    const dormById = useMemo(() => new Map(dorms.map(d => [d.id, d])), [dorms]);
     const [isLoading, setIsLoading] = useState(false);
 
     // Favorites State - Initialize from localStorage
@@ -75,7 +76,7 @@ export const useDormUserInteraction = () => {
             setCloudFavorites(favoritesData);
 
             const historyDorms: Dorm[] = historyData
-                .map(item => DORM_BY_ID.get(item.dorm_id))
+                .map(item => dormById.get(item.dorm_id))
                 .filter((dorm): dorm is Dorm => Boolean(dorm));
             setRecentlyViewed(historyDorms);
 
@@ -89,7 +90,7 @@ export const useDormUserInteraction = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [user]);
+    }, [user, dormById]);
 
     useEffect(() => {
         if (user) {

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useMemo, useState, ReactNode, useCallback } from 'react';
 import { FilterOption, RoomType } from '../types/housing';
 import { getPriceRangeFromData } from '../constants/housing/pricing';
+import { useDormData } from './DormDataContext';
 
 interface HousingFiltersContextType {
     searchTerm: string;
@@ -50,10 +51,11 @@ const HousingFiltersContext = createContext<HousingFiltersContextType | undefine
 const HousingMapUiContext = createContext<HousingMapUiContextType | undefined>(undefined);
 
 export const HousingProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+    const { dorms } = useDormData();
     const [searchTerm, setSearchTerm] = useState('');
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
     const [activeFilters, setActiveFilters] = useState<FilterOption[]>([]);
-    const [priceRange, setPriceRange] = useState<[number, number]>(getPriceRangeFromData());
+    const [priceRange, setPriceRange] = useState<[number, number]>(getPriceRangeFromData(dorms));
     const [locationFilters, setLocationFilters] = useState<string[]>([]);
     const [typeFilters, setTypeFilters] = useState<string[]>([]);
     const [roomTypeFilters, setRoomTypeFilters] = useState<RoomType[]>([]);
@@ -72,7 +74,7 @@ export const HousingProvider: React.FC<{ children: ReactNode }> = ({ children })
     const clearAllFilters = useCallback(() => {
         setSearchTerm('');
         setActiveFilters([]);
-        setPriceRange(getPriceRangeFromData());
+        setPriceRange(getPriceRangeFromData(dorms));
         setLocationFilters([]);
         setTypeFilters([]);
         setRoomTypeFilters([]);
@@ -81,7 +83,7 @@ export const HousingProvider: React.FC<{ children: ReactNode }> = ({ children })
         setCommunityFilters([]);
         setLlcFilters([]);
         setProximityFilters([]);
-    }, []);
+    }, [dorms]);
 
     const filtersValue = useMemo<HousingFiltersContextType>(() => ({
         searchTerm,

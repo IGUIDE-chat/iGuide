@@ -63,6 +63,18 @@ illiniguide---uiuc-knowledge-base/
 
 Reference: `docs/FILE_RULES.md`
 
+## Database & Data Management
+
+The application uses Supabase for database and storage.
+To initialize or update the housing data:
+
+1. Create the `dorms` table and run necessary migrations: `scripts/migrations/create_dorms_table.sql`
+2. Seed the database using the provided script (requires `SUPABASE_URL` and `SUPABASE_SERVICE_KEY` environment variables):
+   ```bash
+   npx tsx scripts/seed-dorms-table.ts
+   ```
+   *This script merges any local static data with existing database overrides into a unified `dorms` table.*
+
 ## Commands
 
 ```bash
