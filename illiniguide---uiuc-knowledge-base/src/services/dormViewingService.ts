@@ -13,7 +13,7 @@ export interface DormViewingHistory {
     created_at: string;
 }
 
-const TABLE_NAME = 'user_history';
+const TABLE_NAME = 'dorm_viewing_history';
 
 export const dormViewingService = {
     /**
