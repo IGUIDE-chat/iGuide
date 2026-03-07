@@ -1,3 +1,22 @@
+# 🧠 Dify Chatflow Ultimate Prompts | Dify Chatflow 终极 Prompt 设计方案
+English Summary | [中文版本](#中文版本-chinese-version)
+
+---
+
+## English Summary
+
+This guide contains the engineered prompts used in the Advanced RAG Dify Chatflow. These prompts enable the AI to perform intent recognition, deep reasoning, date-awareness, and automatic follow-up question generation.
+
+### Nodes Overview:
+1. **Question Classifier**: Determines if the query requires a real-time search, general knowledge base lookup, or is just a greeting.
+2. **Query Refinement**: Optimizes conversational queries into search-engine-friendly keywords.
+3. **Answer Synthesis**: Formats the final answer strictly adhering to Markdown, correctly attributing sources, and utilizing the injected `{{#sys.date#}}` for temporal context.
+4. **Follow-up Generator**: Reads the conversation context to provide 3 highly relevant follow-up questions for the user as a JSON array.
+
+---
+
+## 中文版本 (Chinese Version)
+
 # 🧠 Dify Chatflow 终极 Prompt 设计方案
 
 本通过精心设计的 Prompt，让你的 AI 助手具备**意图识别**、**深度思考**、**日期感知**和**自动追问**的能力。

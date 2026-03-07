@@ -1,3 +1,24 @@
+# 🌊 Dify Chatflow Setup Guide | Dify Chatflow 搭建指南
+English Summary | [中文版本](#中文版本-chinese-version)
+
+---
+
+## English Summary
+
+This guide maps out the setup of the basic dual-retrieval Chatflow within Dify.
+
+### Architecture Flow:
+1. **Knowledge Retrieval**: Searches the `UIUC Campus Guide` knowledge base first.
+2. **Condition Branch (If/Else)**: Checks if the knowledge base yielded non-empty results.
+    - **True**: Pipes context into an LLM (e.g. DeepSeek-Chat) to formulate the answer directly.
+    - **False**: Triggers a web search Tool (like Tavily) using the user's query, pipes results to an LLM, and answers using live web data.
+
+This fallback design minimizes API/Search costs while maximizing the precision of domain-specific documentation.
+
+---
+
+## 中文版本 (Chinese Version)
+
 # 🌊 Dify Chatflow 搭建指南 (知识库 + 联网搜索)
 
 Chatflow 允许你通过拖拽节点来控制 AI 的思考过程。我们的目标是建立这样一个流程：
