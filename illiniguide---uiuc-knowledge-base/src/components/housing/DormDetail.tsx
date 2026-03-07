@@ -103,7 +103,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                 </div>
 
                 <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
-                    <DormHeroSection dorm={dorm} dormName={dormName} campusLabel={t.campus} />
+                    <DormHeroSection dorm={dorm} dormName={dormName} campusLabel={t.campus} language={language} />
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-0 md:divide-x divide-gray-100">
                         <div className="col-span-2 p-4 md:p-8 space-y-8">

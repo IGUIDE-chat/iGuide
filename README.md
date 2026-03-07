@@ -176,6 +176,18 @@ Detailed documentation can be found in the `illiniguide---uiuc-knowledge-base/do
 
 有关详细的文件规则，请参阅 `illiniguide---uiuc-knowledge-base/docs/FILE_RULES.md`（如果有）或严格遵守上述文件夹结构。
 
+### 🗄️ 数据库与数据管理 (Database & Data Management)
+
+该应用程序使用 Supabase 进行数据库和存储。
+要初始化或更新宿舍数据：
+
+1. 在 Supabase SQL Editor 中创建 `dorms` 总表并运行必要的迁移：`scripts/migrations/create_dorms_table.sql`
+2. 使用提供的脚本填充数据库（需要配置 `SUPABASE_URL` 和 `SUPABASE_SERVICE_KEY` 环境变量）：
+   ```bash
+   npx tsx scripts/seed-dorms-table.ts
+   ```
+   *注意：此脚本会将所有本地静态数据与数据库中现有的管理员修改记录智能合并，并推送到统一的 `dorms` 总表中。*
+
 ### 📊 数据收集 (`data_collection/`)
 
 用于填充知识库的脚本。

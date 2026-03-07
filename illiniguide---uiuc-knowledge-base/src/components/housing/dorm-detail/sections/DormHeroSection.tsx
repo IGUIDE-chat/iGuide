@@ -1,14 +1,17 @@
 import React from 'react';
 import { MapPin } from 'lucide-react';
 import { Dorm } from '../../../../types/housing';
+import { Language } from '../../../../types';
+import { getTagLabel } from '../../../../utils/tagLabels';
 
 interface DormHeroSectionProps {
     dorm: Dorm;
     dormName: string;
     campusLabel: string;
+    language?: Language;
 }
 
-const DormHeroSection: React.FC<DormHeroSectionProps> = ({ dorm, dormName, campusLabel }) => {
+const DormHeroSection: React.FC<DormHeroSectionProps> = ({ dorm, dormName, campusLabel, language = 'en' }) => {
     const allImages = [dorm.imageUrl, ...(dorm.galleryImages || [])].filter(Boolean);
 
     return (
@@ -30,7 +33,7 @@ const DormHeroSection: React.FC<DormHeroSectionProps> = ({ dorm, dormName, campu
                                 key={tag}
                                 className="px-2 py-0.5 md:px-3 md:py-1 bg-white/20 rounded-full text-xs md:text-sm font-medium border border-white/30"
                             >
-                                {tag}
+                                {getTagLabel(tag, language)}
                             </span>
                         ))}
                     </div>
