@@ -27,6 +27,8 @@ export interface DormOverride {
     housing_type?: string | null;
     room_types?: string[] | null;
     tags?: string[] | null;
+    floor_plans?: any[] | null;
+    gallery_images?: string[] | null;
     updated_at?: string;
     updated_by?: string;
 }
@@ -117,6 +119,8 @@ function applyOverride(dorm: Dorm, override: DormOverride | null | undefined): D
         ...(override.housing_type != null && { housingType: override.housing_type as any }),
         ...(override.room_types != null && { roomTypes: override.room_types as any }),
         ...(override.tags != null && { tags: override.tags }),
+        ...(override.floor_plans != null && { floorPlans: override.floor_plans as any[] }),
+        ...(override.gallery_images != null && { gallery_images: override.gallery_images }),
     };
 }
 
