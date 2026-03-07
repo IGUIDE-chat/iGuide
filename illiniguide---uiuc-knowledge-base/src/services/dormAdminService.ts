@@ -128,11 +128,29 @@ function applyOverridesToList(dorms: Dorm[], overrides: DormOverride[]): Dorm[] 
     return dorms.map((d) => applyOverride(d, byId.get(d.id)));
 }
 
+export interface DormImageUploadResult {
+    publicUrl: string | null;
+    errorMessage?: string;
+}
+
 /**
  * Upload an image file to the Supabase Storage bucket 'dorm-images'.
- * Returns the public URL of the uploaded image.
+ * Refreshes the auth session first so Storage RLS checks use fresh JWT claims.
  */
-async function uploadDormImage(file: File): Promise<string | null> {
+async function uploadDormImage(file: File): Promise<DormImageUploadResult> {
+    const { error: refreshError } = await supabase.auth.refreshSession();
+    if (refreshError) {
+        console.warn('[dormAdminService] refreshSession warning:', refreshError.message);
+    }
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+        return {
+            publicUrl: null,
+            errorMessage: 'Not authenticated. Please sign in again.',
+        };
+    }
+
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
     const filePath = `user_uploads/${fileName}`;
@@ -140,15 +158,29 @@ async function uploadDormImage(file: File): Promise<string | null> {
     const { error: uploadError } = await supabase
         .storage
         .from('dorm-images')
-        .upload(filePath, file);
+        .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: false,
+            contentType: file.type || undefined,
+        });
 
     if (uploadError) {
         console.error('[dormAdminService] uploadDormImage error:', uploadError);
-        return null;
+        return {
+            publicUrl: null,
+            errorMessage: uploadError.message,
+        };
     }
 
     const { data } = supabase.storage.from('dorm-images').getPublicUrl(filePath);
-    return data.publicUrl;
+    if (!data?.publicUrl) {
+        return {
+            publicUrl: null,
+            errorMessage: 'Upload succeeded but no public URL was returned.',
+        };
+    }
+
+    return { publicUrl: data.publicUrl };
 }
 
 export const dormAdminService = {

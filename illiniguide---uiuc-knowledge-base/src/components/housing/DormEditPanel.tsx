@@ -145,14 +145,31 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
-        setUploadingImage(true);
-        const url = await dormAdminService.uploadDormImage(file);
-        setUploadingImage(false);
-        if (url) {
-            setImageUrl(url);
-        } else {
-            alert(language === 'zh' ? '图片上传失败，请重试。' : 'Image upload failed. Please try again.');
+
+        if (!file.type.startsWith('image/')) {
+            alert(language === 'zh' ? '仅支持上传图片文件。' : 'Only image files are supported.');
+            e.target.value = '';
+            return;
         }
+
+        const maxBytes = 10 * 1024 * 1024;
+        if (file.size > maxBytes) {
+            alert(language === 'zh' ? '图片大小不能超过 10MB。' : 'Image size must be 10MB or smaller.');
+            e.target.value = '';
+            return;
+        }
+
+        setUploadingImage(true);
+        const { publicUrl, errorMessage } = await dormAdminService.uploadDormImage(file);
+        setUploadingImage(false);
+        if (publicUrl) {
+            setImageUrl(publicUrl);
+        } else {
+            const fallback = language === 'zh' ? '图片上传失败，请重试。' : 'Image upload failed. Please try again.';
+            alert(errorMessage ? `${fallback}\n${errorMessage}` : fallback);
+        }
+
+        e.target.value = '';
     };
 
     const handleSave = async () => {
