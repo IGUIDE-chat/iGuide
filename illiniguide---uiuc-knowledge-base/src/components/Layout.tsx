@@ -276,7 +276,7 @@ export const Layout: React.FC<LayoutProps> = ({
           <button
             ref={sidebarToggleButtonRef}
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="text-slate-400 hover:text-slate-600 p-2 rounded-md hover:bg-slate-100 transition-colors"
+            className="text-slate-400 hover:text-illini-blue p-2 rounded-md hover:bg-illini-blue/5 transition-colors"
             title={isSidebarOpen ? "Close Sidebar" : "Open Sidebar"}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
