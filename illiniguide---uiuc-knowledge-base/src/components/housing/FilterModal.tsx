@@ -4,7 +4,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import 'rc-slider/assets/index.css';
 import { useHousingFilters } from '../../contexts/HousingContext';
 import { getPriceRangeFromData } from '../../constants/housing/pricing';
-import { UIUC_DORMS } from '../../constants/housing/dormData';
+import { useDormData } from '../../contexts/DormDataContext';
 import { FilterOption, RoomType } from '../../types/housing';
 import PriceSection from './filter-modal/PriceSection';
 import HousingTypeSection from './filter-modal/HousingTypeSection';
@@ -20,6 +20,7 @@ interface FilterModalProps {
 }
 
 export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, language }) => {
+    const { dorms: allDorms } = useDormData();
     const {
         activeFilters,
         setActiveFilters,
@@ -39,7 +40,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
     } = useHousingFilters();
 
     const t = MODAL_TEXT[language];
-    const priceLimits = useMemo<[number, number]>(() => getPriceRangeFromData(), []);
+    const priceLimits = useMemo<[number, number]>(() => getPriceRangeFromData(allDorms), [allDorms]);
 
     const normalizeRange = useCallback(
         (range: [number, number]): [number, number] => {
@@ -95,12 +96,12 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
     ]);
 
     const locations = useMemo(
-        () => Array.from(new Set(UIUC_DORMS.map((dorm) => dorm.location))).sort(),
-        []
+        () => Array.from(new Set(allDorms.map((dorm) => dorm.location))).sort(),
+        [allDorms]
     );
     const buildingTypes = useMemo(
-        () => Array.from(new Set(UIUC_DORMS.map((dorm) => dorm.type))).sort(),
-        []
+        () => Array.from(new Set(allDorms.map((dorm) => dorm.type))).sort(),
+        [allDorms]
     );
 
     const handleApply = useCallback(() => {

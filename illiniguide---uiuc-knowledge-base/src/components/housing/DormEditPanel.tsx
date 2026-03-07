@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { X, Plus, Trash2, RotateCcw, Save, Upload, Loader2 } from 'lucide-react';
 import { Dorm, FloorPlan, RoomType } from '../../types/housing';
-import { DormOverride, dormAdminService } from '../../services/dormAdminService';
+import { DormUpdate, dormAdminService } from '../../services/dormAdminService';
+import { dormService } from '../../services/dormService';
 import { Language } from '../../types';
 
 interface DormEditPanelProps {
@@ -95,36 +96,33 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
 
     const [uploadingImage, setUploadingImage] = useState(false);
 
-    // Load existing override on mount
+    // Form is initialized from the dorm prop (which already has DB data)
     useEffect(() => {
-        dormAdminService.getOverride(dorm.id).then((override) => {
-            if (!override) return;
-            if (override.name != null) setName(override.name);
-            if (override.name_zh != null) setNameZh(override.name_zh);
-            if (override.description != null) setDescription(override.description);
-            if (override.description_zh != null) setDescriptionZh(override.description_zh);
-            if (override.image_url != null) setImageUrl(override.image_url);
-            if (override.price != null) setPrice(String(override.price));
-            if (override.location != null) setLocation(override.location as any);
-            if (override.location_zh != null) setLocationZh(override.location_zh);
-            if (override.type != null) setType(override.type as any);
-            if (override.type_zh != null) setTypeZh(override.type_zh);
-            if (override.housing_type != null) setHousingType(override.housing_type as any);
-            if (override.room_types != null) setRoomTypes(override.room_types);
-            if (override.tags != null) setTags(override.tags);
-            if (override.floor_plans != null) setFloorPlans(override.floor_plans);
-            if (override.gallery_images != null) setGalleryImages(override.gallery_images);
-            if (override.ac != null) setAc(override.ac);
-            if (override.dining != null) setDining(override.dining);
-            if (override.pros != null) setPros(override.pros);
-            if (override.pros_zh != null) setProsZh(override.pros_zh);
-            if (override.cons != null) setCons(override.cons);
-            if (override.cons_zh != null) setConsZh(override.cons_zh);
-        });
-    }, [dorm.id]);
+        // Reset form when dorm changes
+        setName(dorm.name);
+        setNameZh(dorm.name_zh ?? '');
+        setDescription(dorm.description);
+        setDescriptionZh(dorm.description_zh ?? '');
+        setImageUrl(dorm.imageUrl);
+        setPrice(String(dorm.price));
+        setLocation(dorm.location);
+        setLocationZh(dorm.location_zh ?? '');
+        setType(dorm.type);
+        setTypeZh(dorm.type_zh ?? '');
+        setHousingType(dorm.housingType);
+        setRoomTypes([...dorm.roomTypes]);
+        setTags([...dorm.tags]);
+        setFloorPlans([...(dorm.floorPlans ?? [])]);
+        setGalleryImages([...(dorm.galleryImages ?? [])]);
+        setAc(dorm.ac);
+        setDining(dorm.dining);
+        setPros([...dorm.pros]);
+        setProsZh([...(dorm.pros_zh ?? [])]);
+        setCons([...dorm.cons]);
+        setConsZh([...(dorm.cons_zh ?? [])]);
+    }, [dorm.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    const buildOverride = (): DormOverride => ({
-        dorm_id: dorm.id,
+    const buildUpdate = (): DormUpdate => ({
         name,
         name_zh: nameZh || null,
         description,
@@ -206,13 +204,14 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
     const handleSave = async () => {
         setSaving(true);
         setSaveMsg(null);
-        const override = buildOverride();
-        const ok = await dormAdminService.saveOverride(override);
+        const updates = buildUpdate();
+        const ok = await dormAdminService.updateDorm(dorm.id, updates);
         setSaving(false);
         if (ok) {
             setSaveMsg(language === 'zh' ? '保存成功！' : 'Saved!');
-            const merged = dormAdminService.applyOverride(dorm, override);
-            onSaved(merged);
+            // Fetch the updated dorm from DB to get canonical data
+            const freshDorm = await dormService.getDormById(dorm.id);
+            onSaved(freshDorm ?? { ...dorm, ...updates, imageUrl: updates.image_url ?? dorm.imageUrl, housingType: (updates.housing_type ?? dorm.housingType) as Dorm['housingType'], roomTypes: (updates.room_types ?? dorm.roomTypes) as Dorm['roomTypes'] } as Dorm);
         } else {
             setSaveMsg(language === 'zh' ? '保存失败，请重试。' : 'Save failed. Please try again.');
         }
@@ -225,10 +224,11 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                 : 'Reset all overrides for this dorm? Manual edits will be deleted.'
         )) return;
         setResetting(true);
-        const ok = await dormAdminService.deleteOverride(dorm.id);
+        const ok = await dormAdminService.resetDormToStatic(dorm.id);
         setResetting(false);
         if (ok) {
-            onSaved(dorm); // revert to original static dorm
+            const freshDorm = await dormService.getDormById(dorm.id);
+            onSaved(freshDorm ?? dorm);
             onClose();
         }
     };

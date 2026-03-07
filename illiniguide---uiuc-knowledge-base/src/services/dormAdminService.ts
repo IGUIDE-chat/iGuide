@@ -1,135 +1,90 @@
-// [SERVICE] Admin-only CRUD for dorm content overrides stored in Supabase.
-// [服务] 管理员专用——宿舍内容覆盖项的增删改查（Supabase）。
+// [SERVICE] Admin-only operations for the `dorms` table.
+// [服务] 管理员专用——直接操作 `dorms` 表（替代旧的 override 模式）。
 import { supabase } from './supabase';
 import { Dorm } from '../types/housing';
+import { UIUC_DORMS } from '../constants/housing/dormData';
 
-const TABLE = 'dorm_overrides';
+const TABLE = 'dorms';
 
-/** Fields that admins may override. All are optional — only set ones are applied. */
-export interface DormOverride {
-    dorm_id: string;
-    name?: string | null;
+/** Partial update payload — camelCase fields mapped to snake_case for DB. */
+export interface DormUpdate {
+    name?: string;
     name_zh?: string | null;
-    description?: string | null;
+    description?: string;
     description_zh?: string | null;
     image_url?: string | null;
     price?: number | null;
-    pros?: string[] | null;
-    pros_zh?: string[] | null;
-    cons?: string[] | null;
-    cons_zh?: string[] | null;
-    ac?: boolean | null;
-    dining?: boolean | null;
+    price_range?: string | null;
     location?: string | null;
     location_zh?: string | null;
     type?: string | null;
     type_zh?: string | null;
     housing_type?: string | null;
+    ac?: boolean;
+    dining?: boolean;
     room_types?: string[] | null;
     tags?: string[] | null;
-    floor_plans?: any[] | null;
+    structured_tags?: Record<string, unknown> | null;
+    floor_plans?: unknown[] | null;
     gallery_images?: string[] | null;
-    updated_at?: string;
-    updated_by?: string;
+    pros?: string[] | null;
+    pros_zh?: string[] | null;
+    cons?: string[] | null;
+    cons_zh?: string[] | null;
 }
 
 /**
- * Fetch all overrides (public read — no auth required).
+ * Update a dorm record directly in the `dorms` table. Requires admin session.
  */
-async function getAllOverrides(): Promise<DormOverride[]> {
-    const { data, error } = await supabase
-        .from(TABLE)
-        .select('*');
-    if (error) {
-        console.error('[dormAdminService] getAllOverrides error:', error);
-        return [];
-    }
-    return (data ?? []) as DormOverride[];
-}
-
-/**
- * Fetch the override record for a single dorm (null if none exists).
- */
-async function getOverride(dormId: string): Promise<DormOverride | null> {
-    const { data, error } = await supabase
-        .from(TABLE)
-        .select('*')
-        .eq('dorm_id', dormId)
-        .maybeSingle();
-    if (error) {
-        console.error('[dormAdminService] getOverride error:', error);
-        return null;
-    }
-    return data as DormOverride | null;
-}
-
-/**
- * Save (upsert) an override record. Requires admin session.
- */
-async function saveOverride(override: DormOverride): Promise<boolean> {
+async function updateDorm(dormId: string, updates: DormUpdate): Promise<boolean> {
     const { error } = await supabase
         .from(TABLE)
-        .upsert(override, { onConflict: 'dorm_id' });
+        .update(updates)
+        .eq('id', dormId);
     if (error) {
-        console.error('[dormAdminService] saveOverride error:', error);
+        console.error('[dormAdminService] updateDorm error:', error);
         return false;
     }
     return true;
 }
 
 /**
- * Delete the override record for a dorm, reverting it to static data. Requires admin session.
+ * Reset a dorm to its original static data by overwriting the DB row.
  */
-async function deleteOverride(dormId: string): Promise<boolean> {
-    const { error } = await supabase
-        .from(TABLE)
-        .delete()
-        .eq('dorm_id', dormId);
-    if (error) {
-        console.error('[dormAdminService] deleteOverride error:', error);
+async function resetDormToStatic(dormId: string): Promise<boolean> {
+    const staticDorm = UIUC_DORMS.find((d) => d.id === dormId);
+    if (!staticDorm) {
+        console.error('[dormAdminService] resetDormToStatic: dorm not found in static data:', dormId);
         return false;
     }
-    return true;
-}
 
-/**
- * Merge a Dorm object with its override record.
- * Override fields take precedence over the static values when they are non-null.
- */
-function applyOverride(dorm: Dorm, override: DormOverride | null | undefined): Dorm {
-    if (!override) return dorm;
-    return {
-        ...dorm,
-        ...(override.name != null && { name: override.name }),
-        ...(override.name_zh != null && { name_zh: override.name_zh }),
-        ...(override.description != null && { description: override.description }),
-        ...(override.description_zh != null && { description_zh: override.description_zh }),
-        ...(override.image_url != null && { imageUrl: override.image_url }),
-        ...(override.price != null && { price: override.price }),
-        ...(override.pros != null && { pros: override.pros }),
-        ...(override.pros_zh != null && { pros_zh: override.pros_zh }),
-        ...(override.cons != null && { cons: override.cons }),
-        ...(override.cons_zh != null && { cons_zh: override.cons_zh }),
-        ...(override.ac != null && { ac: override.ac }),
-        ...(override.dining != null && { dining: override.dining }),
-        ...(override.location != null && { location: override.location as any }),
-        ...(override.location_zh != null && { location_zh: override.location_zh }),
-        ...(override.type != null && { type: override.type as any }),
-        ...(override.type_zh != null && { type_zh: override.type_zh }),
-        ...(override.housing_type != null && { housingType: override.housing_type as any }),
-        ...(override.room_types != null && { roomTypes: override.room_types as any }),
-        ...(override.tags != null && { tags: override.tags }),
-        ...(override.floor_plans != null && { floorPlans: override.floor_plans as any[] }),
-        ...(override.gallery_images != null && { galleryImages: override.gallery_images }),
+    const row: DormUpdate = {
+        name: staticDorm.name,
+        name_zh: staticDorm.name_zh ?? null,
+        description: staticDorm.description,
+        description_zh: staticDorm.description_zh ?? null,
+        image_url: staticDorm.imageUrl,
+        price: staticDorm.price,
+        price_range: staticDorm.priceRange,
+        location: staticDorm.location,
+        location_zh: staticDorm.location_zh ?? null,
+        type: staticDorm.type,
+        type_zh: staticDorm.type_zh ?? null,
+        housing_type: staticDorm.housingType,
+        ac: staticDorm.ac,
+        dining: staticDorm.dining,
+        room_types: staticDorm.roomTypes,
+        tags: staticDorm.tags,
+        structured_tags: staticDorm.structuredTags as Record<string, unknown> ?? null,
+        floor_plans: staticDorm.floorPlans ?? null,
+        gallery_images: staticDorm.galleryImages ?? null,
+        pros: staticDorm.pros,
+        pros_zh: staticDorm.pros_zh ?? null,
+        cons: staticDorm.cons,
+        cons_zh: staticDorm.cons_zh ?? null,
     };
-}
 
-/**
- * Apply a map of overrides (keyed by dorm_id) to a full dorm list.
- */
-function applyOverridesToList(dorms: Dorm[], overrides: DormOverride[]): Dorm[] {
-    const byId = new Map(overrides.map((o) => [o.dorm_id, o]));
-    return dorms.map((d) => applyOverride(d, byId.get(d.id)));
+    return updateDorm(dormId, row);
 }
 
 export interface DormImageUploadResult {
@@ -188,11 +143,7 @@ async function uploadDormImage(file: File): Promise<DormImageUploadResult> {
 }
 
 export const dormAdminService = {
-    getAllOverrides,
-    getOverride,
-    saveOverride,
-    deleteOverride,
-    applyOverride,
-    applyOverridesToList,
+    updateDorm,
+    resetDormToStatic,
     uploadDormImage,
 };
