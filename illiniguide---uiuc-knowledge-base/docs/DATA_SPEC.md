@@ -1,4 +1,40 @@
-# 数据架构与爬虫/ETL 开发规范 (Data Architecture & ETL Spec)
+# Data Architecture & ETL Spec | 数据架构与爬虫/ETL 开发规范
+English Summary | [中文版本](#中文版本-chinese-version)
+
+---
+
+## English Summary
+
+This document defines the core data models, storage solutions, and ETL write processes for the IlliniGuide Knowledge Base.
+
+### 1. Dual-Storage Architecture
+1. **Knowledge Base (knowledge.db)**: 
+   - **Purpose**: Stores web-scraped content, chunks, and embeddings for fast, zero-network-overhead reads.
+   - **Stack**: SQLite (Local) + FTS5 (Full-Text Search) + sqlite-vec (Vector Search).
+   - **Pattern**: Chat API is read-only; ETL processes write data here.
+2. **Business & User Data (Supabase)**:
+   - **Purpose**: Stores user authentication, chat logs, and static business data (e.g., the unified dorms table).
+   - **Stack**: PostgreSQL (Cloud).
+   - **Pattern**: Asynchronous read/writes from the API and Admin interfaces.
+
+### 2. Core Data Models (SQLite Knowledge Base)
+- **Source**: A collection of content (e.g., specific site domain).
+- **Document**: Represents a unique URL. Uses main_hash to detect changes and avoid redundant processing.
+- **Chunk**: The smallest retrieval unit. Content must include injected metadata (e.g., breadcrumb paths) to ensure robust search context.
+
+### 3. Database Schema (SQLite)
+The standard internal schema comprises four tables:
+- documents: Page-level metadata, hashes, and verification.
+- chunks: The sliced textual content with path context.
+- chunks_fts: FTS5 virtual table synchronized via SQLite triggers from the chunks table.
+- chunks_vec: Virtual table using sqlite-vec storing Float32 BLOB vector embeddings.
+
+*(For the comprehensive Chinese specifications on data structures, DTOs, and ETL pseudocode, please read the section below.)*
+
+---
+
+## 中文版本 (Chinese Version)
+
 
 本文档是 **IlliniGuide Knowledge Base** 的核心技术规范，定义了数据模型、存储方案及 ETL 写入流程。
 
@@ -14,8 +50,8 @@
     *   **位置**：部署在 VPS 本地（与 Chat API 同机），这是为了追求极致的读取速度和零网络开销。
     *   **读写模式**：Chat API 只读；ETL 进程负责写入。
 
-2.  **用户数据 (Supabase)**：
-    *   **用途**：存储用户身份 (Auth) 和对话历史 (Chat Logs)。
+2.  **业务与用户数据 (Supabase)**：
+    *   **用途**：存储用户身份 (Auth)、对话历史 (Chat Logs) 以及静态数据（如统一的 \dorms\ 表）和相关的覆盖记录。
     *   **技术栈**：Postgres (Cloud)。
     *   **读写模式**：API 异步写入。
 

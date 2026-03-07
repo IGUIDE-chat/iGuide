@@ -1,3 +1,22 @@
+# 🚀 Quick Start: Migrating to Dify | 快速开始: 迁移到 Dify
+English Summary | [中文版本](#中文版本-chinese-version)
+
+---
+
+## English Summary
+
+This document explains how to migrate the AI infrastructure from Coze to Dify and DeepSeek, a setup that saves over 90% of API costs.
+
+### Quick Setup
+1. **Register**: Sign up at [Dify Cloud](https://cloud.dify.ai) and [DeepSeek](https://platform.deepseek.com).
+2. **Environment**: Copy `.env.local.example` to `.env.local` and add your `VITE_DIFY_API_KEY`.
+3. **App Toggle**: In `components/ChatScreen.tsx`, change the import from `cozeService` to `difyService`.
+4. **Run**: Start the server with `npm run dev`.
+
+---
+
+## 中文版本 (Chinese Version)
+
 # 🚀 快速开始: 迁移到 Dify
 
 ## 立即开始 (5 分钟快速配置)
