@@ -68,6 +68,12 @@
   animation: slide-in 0.3s ease-out;
 }
 
+/* Reduce paint/render cost while scrolling long dorm lists. */
+.dorm-card {
+  content-visibility: auto;
+  contain-intrinsic-size: 420px;
+}
+
 /* Highlight glow effect for active map marker */
 @keyframes marker-glow {
   0%, 100% {
