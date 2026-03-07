@@ -31,6 +31,7 @@ const DormListHeader: React.FC<DormListHeaderProps> = ({
 }) => {
     const isMapView = viewMode === 'map';
     const isListView = !isMapView;
+    const activePillLeft = isListView ? '4px' : 'calc(50% - 2px)';
 
     return (
         <div className="hidden md:block bg-white border-b border-gray-200 sticky top-0 z-30 transition-all shadow-sm">
@@ -80,13 +81,14 @@ const DormListHeader: React.FC<DormListHeaderProps> = ({
                     <div className="hidden sm:flex bg-gray-100 rounded-lg p-1 relative">
                         <motion.div
                             className="absolute bg-white shadow-sm rounded-md border border-gray-200/50"
-                            initial={false}
-                            animate={{ left: isListView ? '4px' : 'calc(50% - 2px)' }}
+                            initial={{ left: activePillLeft, scaleX: 0.6, opacity: 0 }}
+                            animate={{ left: activePillLeft, scaleX: 1, opacity: 1 }}
                             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                             style={{
                                 width: 'calc(50% - 6px)',
                                 height: 'calc(100% - 8px)',
-                                top: '4px'
+                                top: '4px',
+                                transformOrigin: 'center'
                             }}
                         />
 
