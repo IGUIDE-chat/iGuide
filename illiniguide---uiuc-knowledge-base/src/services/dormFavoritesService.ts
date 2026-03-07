@@ -14,7 +14,7 @@ export interface DormFavorite {
     updated_at: string;
 }
 
-const TABLE_NAME = 'user_favorites';
+const TABLE_NAME = 'dorm_favorites';
 
 export const dormFavoritesService = {
     /**
