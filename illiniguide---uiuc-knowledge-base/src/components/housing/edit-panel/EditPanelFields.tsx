@@ -1,0 +1,90 @@
+import React from 'react';
+import { Plus, Trash2 } from 'lucide-react';
+
+export const inputCls =
+  'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-illini-blue';
+
+export function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-1">
+      <label className="block font-medium text-gray-700">{label}</label>
+      {children}
+    </div>
+  );
+}
+
+export function EditableList({
+  items,
+  onChange,
+  placeholder,
+}: {
+  items: string[];
+  onChange: (next: string[]) => void;
+  placeholder: string;
+}) {
+  return (
+    <div className="space-y-2">
+      {items.map((item, index) => (
+        <div key={index} className="flex gap-2 items-center">
+          <input
+            className="flex-1 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-illini-blue"
+            value={item}
+            onChange={(event) => {
+              const next = [...items];
+              next[index] = event.target.value;
+              onChange(next);
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => onChange(items.filter((_, currentIndex) => currentIndex !== index))}
+            className="text-red-400 hover:text-red-600"
+          >
+            <Trash2 size={14} />
+          </button>
+        </div>
+      ))}
+      <button
+        type="button"
+        onClick={() => onChange([...items, ''])}
+        className="flex items-center gap-1 text-xs text-illini-blue hover:underline"
+      >
+        <Plus size={12} /> {placeholder}
+      </button>
+    </div>
+  );
+}
+
+export function Toggle({
+  label,
+  checked,
+  onChange,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: (value: boolean) => void;
+}) {
+  return (
+    <label className="flex items-center gap-2 cursor-pointer select-none">
+      <div
+        onClick={() => onChange(!checked)}
+        className={`w-9 h-5 rounded-full transition-colors flex items-center px-0.5 ${
+          checked ? 'bg-illini-orange' : 'bg-gray-300'
+        }`}
+      >
+        <div
+          className={`w-4 h-4 bg-white rounded-full shadow transition-transform ${
+            checked ? 'translate-x-4' : 'translate-x-0'
+          }`}
+        />
+      </div>
+      <span className="text-gray-700">{label}</span>
+    </label>
+  );
+}

@@ -14,50 +14,55 @@ Main frontend application for the UIUC assistant platform.
 ```text
 illiniguide---uiuc-knowledge-base/
 |-- docs/
+|   `-- diagrams/
 |-- functions/
 |   `-- api/
-|-- legacy/
-|   `-- projects/
-|       `-- illiniguide---housing-selection/   [Legacy - Not Mounted]
+|-- public/
 |-- scripts/
+|   `-- migrations/
 |-- src/
 |   |-- app/
-|   |-- pages/
-|   |   |-- chat/
-|   |   |-- library/
-|   |   |-- dorms/
-|   |   |-- courses/
-|   |   |-- resume/
-|   |   `-- profile/
 |   |-- components/
-|   |   `-- housing/
-|   |       |-- dorm-list/
-|   |       |-- dorm-map/
-|   |       |-- dorm-detail/
-|   |       |-- filter-modal/
-|   |       |-- i18n/
-|   |       `-- legacy/                        [Legacy - Not Mounted]
-|   |-- contexts/
-|   |-- services/
+|   |   |-- chat/
+|   |   |-- housing/
+|   |   |   |-- dorm-detail/
+|   |   |   |   `-- sections/
+|   |   |   |-- dorm-list/
+|   |   |   |-- dorm-map/
+|   |   |   |-- edit-panel/
+|   |   |   |-- filter-modal/
+|   |   |   `-- i18n/
+|   |   `-- layout/
 |   |-- constants/
 |   |   `-- housing/
-|   |-- i18n/
+|   |-- contexts/
 |   |-- data/
 |   |   `-- articles/
-|   |-- legacy/                                [Legacy - Not Mounted]
 |   |-- hooks/
+|   |-- i18n/
+|   |-- pages/
+|   |   |-- chat/
+|   |   |-- courses/
+|   |   |-- dorms/
+|   |   |-- library/
+|   |   |-- profile/
+|   |   `-- resume/
+|   |-- scripts/
+|   |-- services/
 |   |-- types/
 |   `-- utils/
-|-- supabase-migrations/
 `-- tests/
 ```
 
 ## Architecture Rules
 
-- Active runtime code must not import from:
-- `src/legacy/**`
-- `src/components/housing/legacy/**`
-- `legacy/projects/**`
+- `src/App.tsx` is the only active app-composition entry in this package.
+- Route-level orchestration belongs in `src/pages/**` and page-local hooks.
+- `src/components/**` should stay presentation-first and feature-local.
+- Active runtime code must not import from reserved legacy boundaries:
+  - `src/legacy/**`
+  - `src/components/housing/legacy/**`
+  - `legacy/projects/**`
 - New pages must be registered in `src/app/pageRegistry.ts`.
 - Route changes must be made in `src/app/routes.tsx`.
 

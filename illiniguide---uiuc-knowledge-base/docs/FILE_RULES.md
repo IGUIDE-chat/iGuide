@@ -1,16 +1,18 @@
 # Project File Organization Rules
 
-This document defines the canonical folder structure for IlliniGuide and keeps the
-same structure contract as:
+This document is the canonical structure contract for
+`illiniguide---uiuc-knowledge-base/`.
 
-- `Ask/README.md`
+It must stay aligned with:
+
 - `Ask/illiniguide---uiuc-knowledge-base/README.md`
+- `Ask/illiniguide---uiuc-knowledge-base/docs/ARCHITECTURE.md`
 
 ---
 
-## 1) Repository-Level Scope (Business Directories)
+## 1) Repository-Level Scope
 
-At repository root (`Ask/`), business-facing directories are:
+At repository root (`Ask/`), the business-facing directories are:
 
 - `api-gateway/`
 - `backend/`
@@ -18,14 +20,14 @@ At repository root (`Ask/`), business-facing directories are:
 - `illiniguide---uiuc-knowledge-base/`
 - `qa/`
 
-Do not document or expand tooling-only hidden folders here (for example `.agent/`,
-`.claude/`, `.gemini/`) in business structure sections.
+Do not expand hidden tooling folders such as `.agent/`, `.claude/`, or `.gemini/`
+inside business structure documentation.
 
 ---
 
-## 2) Main Application Structure (`illiniguide---uiuc-knowledge-base/`)
+## 2) Main Application Structure
 
-Canonical active structure:
+Canonical active structure for `illiniguide---uiuc-knowledge-base/`:
 
 ```text
 illiniguide---uiuc-knowledge-base/
@@ -33,22 +35,22 @@ illiniguide---uiuc-knowledge-base/
 |   `-- diagrams/
 |-- functions/
 |   `-- api/
-|-- legacy/
-|   `-- projects/
-|       `-- illiniguide---housing-selection/   [Legacy - Not Mounted]
+|-- public/
 |-- scripts/
+|   `-- migrations/
 |-- src/
 |   |-- app/
 |   |-- components/
-|   |   `-- housing/
-|   |       |-- dorm-detail/
-|   |       |   `-- sections/
-|   |       |-- dorm-list/
-|   |       |-- dorm-map/
-|   |       |-- filter-modal/
-|   |       |-- i18n/
-|   |       `-- legacy/                        [Legacy - Not Mounted]
-|   |-- config/
+|   |   |-- chat/
+|   |   |-- housing/
+|   |   |   |-- dorm-detail/
+|   |   |   |   `-- sections/
+|   |   |   |-- dorm-list/
+|   |   |   |-- dorm-map/
+|   |   |   |-- edit-panel/
+|   |   |   |-- filter-modal/
+|   |   |   `-- i18n/
+|   |   `-- layout/
 |   |-- constants/
 |   |   `-- housing/
 |   |-- contexts/
@@ -56,10 +58,6 @@ illiniguide---uiuc-knowledge-base/
 |   |   `-- articles/
 |   |-- hooks/
 |   |-- i18n/
-|   |-- legacy/
-|   |   |-- components/
-|   |   |-- config/
-|   |   `-- contexts/
 |   |-- pages/
 |   |   |-- chat/
 |   |   |-- courses/
@@ -67,67 +65,88 @@ illiniguide---uiuc-knowledge-base/
 |   |   |-- library/
 |   |   |-- profile/
 |   |   `-- resume/
+|   |-- scripts/
 |   |-- services/
 |   |-- types/
 |   `-- utils/
-|-- supabase-migrations/
 `-- tests/
 ```
 
+Notes:
+
+- `src/App.tsx` is the only active app-composition file.
+- `src/components/App.tsx` is no longer part of the active structure.
+- This package currently has no mounted legacy directories. If legacy code is
+  reintroduced, it must live under an explicit legacy boundary.
+
 ---
 
-## 3) Directory Contract (Responsibilities)
+## 3) Directory Contract
 
 | Path | Responsibility | Runtime Critical | State |
 | :--- | :--- | :--- | :--- |
-| `docs/` | Project docs and setup specs. | No | Active |
+| `docs/` | Project docs, setup specs, architecture notes. | No | Active |
 | `functions/api/` | Cloudflare Pages API handlers. | Yes | Active |
-| `scripts/` | Utility and maintenance scripts. | No | Active |
-| `src/app/` | Route composition and page registry wiring. | Yes | Active |
-| `src/components/` | Shared UI components. | Yes | Active |
-| `src/components/housing/legacy/` | Archived housing UI references. | No | Legacy |
-| `src/config/` | Runtime/app config modules. | Yes | Active |
-| `src/constants/` | Shared constants. | Yes | Active |
-| `src/constants/housing/` | Housing constants and datasets. | Yes | Active |
-| `src/contexts/` | React context providers. | Yes | Active |
-| `src/data/articles/` | Library content source files. | Yes | Active |
-| `src/hooks/` | Shared hooks. | Yes | Active |
-| `src/i18n/` | i18n texts and config. | Yes | Active |
-| `src/legacy/` | Archived code, not mounted at runtime. | No | Legacy |
-| `src/pages/` | Route-level pages. | Yes | Active |
-| `src/services/` | API/domain service layer. | Yes | Active |
-| `src/types/` | Shared TypeScript types/interfaces. | Yes | Active |
-| `src/utils/` | Utilities/helpers. | No | Active |
-| `supabase-migrations/` | SQL migrations and policy updates. | Yes | Active |
-| `tests/` | Test scripts and validation artifacts. | No | Active |
-| `legacy/projects/illiniguide---housing-selection/` | Historical prototype archive. | No | Legacy |
+| `public/` | Static assets served directly by Vite. | Yes | Active |
+| `scripts/` | Repo-level maintenance and data scripts. | No | Active |
+| `scripts/migrations/` | Manual SQL migrations and database setup scripts. | Yes | Active |
+| `src/app/` | Route declarations and page registry wiring. | Yes | Active |
+| `src/components/` | Shared and feature-presentational UI components. | Yes | Active |
+| `src/components/chat/` | Chat UI subcomponents only. No conversation persistence logic. | Yes | Active |
+| `src/components/layout/` | App shell, nav, sidebar, and layout-only subcomponents. | Yes | Active |
+| `src/components/housing/` | Housing feature UI composition. | Yes | Active |
+| `src/components/housing/dorm-detail/` | Dorm detail feature sections. | Yes | Active |
+| `src/components/housing/dorm-list/` | Dorm list feature subcomponents and controllers. | Yes | Active |
+| `src/components/housing/dorm-map/` | Map builders, layers, and map-specific helpers. | Yes | Active |
+| `src/components/housing/edit-panel/` | Dorm admin edit panel shell, tabs, and form orchestration. | Yes | Active |
+| `src/components/housing/filter-modal/` | Dorm filter modal sections and helpers. | Yes | Active |
+| `src/constants/` | Shared constants and static definitions. | Yes | Active |
+| `src/constants/housing/` | Housing constants and source datasets. | Yes | Active |
+| `src/contexts/` | React context providers and shared app state boundaries. | Yes | Active |
+| `src/data/articles/` | Library article source files. | Yes | Active |
+| `src/hooks/` | Shared hooks reused across routes/features. | Yes | Active |
+| `src/i18n/` | Global i18n texts and language config. | Yes | Active |
+| `src/pages/` | Route-level page orchestration. | Yes | Active |
+| `src/pages/chat/` | Chat route entry and page-local orchestration hooks. | Yes | Active |
+| `src/pages/dorms/` | Dorm route entry pages. | Yes | Active |
+| `src/scripts/` | In-app helper scripts used by frontend workflows. | No | Active |
+| `src/services/` | API, persistence, and integration layer. | Yes | Active |
+| `src/types/` | Shared TypeScript types and interfaces. | Yes | Active |
+| `src/utils/` | Pure helpers and transformation utilities. | No | Active |
+| `tests/` | Test scripts and verification artifacts. | No | Active |
+
+Reserved legacy boundaries, only if needed later:
+
+- `src/legacy/**`
+- `src/components/housing/legacy/**`
+- `legacy/projects/**`
 
 ---
 
-## 4) Architecture Contracts (Must Follow)
+## 4) Architecture Contracts
 
-1. **Route source of truth**  
+1. Route source of truth
    Define route declarations in `src/app/routes.tsx`.
 
-2. **Page registry source of truth**  
+2. Page registry source of truth
    Register route/page metadata in `src/app/pageRegistry.ts`.
 
-3. **Page registry documentation sync**  
-   Keep route docs in sync with `docs/PAGE_REGISTRY.md`.
+3. Page-level orchestration belongs in `src/pages/**`
+   Page files and page-local hooks may own data loading, persistence flows,
+   and feature orchestration.
 
-4. **Legacy boundary**  
-   Legacy code must stay under one of:
-   - `src/legacy/**`
-   - `src/components/housing/legacy/**`
-   - `legacy/projects/**`
-   
-   Active runtime code must not mount or depend on legacy paths.
+4. `src/components/**` stays presentation-first
+   Components may compose UI and localized feature behavior, but persistence
+   flows and route ownership should stay above them.
+
+5. Legacy boundary
+   Active runtime code must not import from reserved legacy paths.
 
 ---
 
-## 5) Exclusions for Structure Docs
+## 5) Structure Doc Exclusions
 
-Do not include generated/dependency/cache directories in structure documentation:
+Do not include generated or dependency directories in structure trees:
 
 - `node_modules/`
 - `dist/`
@@ -135,107 +154,25 @@ Do not include generated/dependency/cache directories in structure documentation
 
 ---
 
-## 6) Verification and Update Checklist
+## 6) Verification Checklist
 
-For structural changes:
+For structure changes:
 
-1. Run `npm run verify:architecture`.
-2. Run `npm run check:all` before merge.
-3. Update all structure docs together:
-   - `README.md` (repo root)
-   - `illiniguide---uiuc-knowledge-base/README.md`
-   - `illiniguide---uiuc-knowledge-base/docs/FILE_RULES.md`
-4. Preserve explicit legacy markers:
-   - `[Legacy - Not Mounted]`
-   - `【历史归档-不参与运行时挂载】` (when using Chinese docs)
-
+1. Run `npm run verify:architecture` if the change affects routing or structure rules.
+2. Run `npm run typecheck`.
+3. Run `npm run build` for component/module reorganizations.
+4. Update these docs together:
+   - `Ask/illiniguide---uiuc-knowledge-base/README.md`
+   - `Ask/illiniguide---uiuc-knowledge-base/docs/FILE_RULES.md`
+   - `Ask/illiniguide---uiuc-knowledge-base/docs/ARCHITECTURE.md`
 
 ---
 
-## 中文版本 (Chinese Version)
+## Quick Summary
 
-# 项目文件组织规则
-
-本文档定义了 IlliniGuide 的规范文件夹结构，并与以下文件保持结构契约：
-
-- \Ask/README.md- \Ask/illiniguide---uiuc-knowledge-base/README.md
----
-
-## 1) 仓库级作用域 (业务目录)
-
-在仓库根目录 (\Ask/\) 下，面向业务的目录有：
-
-- \pi-gateway/- \ackend/- \data_collection/- \illiniguide---uiuc-knowledge-base/- \qa/
-请勿在此处的业务结构部分记录或展开仅用于工具的隐藏文件夹（例如 \.agent/\, \.claude/\, \.gemini/\）。
-
----
-
-## 2) 主应用程序结构 (\illiniguide---uiuc-knowledge-base/\)
-
-规范的活动结构与英文版一致（见上方结构树）。
-
----
-
-## 3) 目录契约 (职责划分)
-
-| 路径 | 职责 | 运行时关键 | 状态 |
-| :--- | :--- | :--- | :--- |
-| \docs/\ | 项目文档和设置规范。 | 否 | 活跃 |
-| \unctions/api/\ | Cloudflare Pages API 处理程序。 | 是 | 活跃 |
-| \scripts/\ | 实用程序和维护脚本。 | 否 | 活跃 |
-| \src/app/\ | 路由组合和页面注册表连接。 | 是 | 活跃 |
-| \src/components/\ | 共享 UI 组件。 | 是 | 活跃 |
-| \src/components/housing/legacy/\ | 归档的房屋 UI 参考。 | 否 | 遗留 |
-| \src/config/\ | 运行时/应用配置模块。 | 是 | 活跃 |
-| \src/constants/\ | 共享常量。 | 是 | 活跃 |
-| \src/constants/housing/\ | 房屋常量和数据集。 | 是 | 活跃 |
-| \src/contexts/\ | React context 提供者。 | 是 | 活跃 |
-| \src/data/articles/\ | 库内容源文件。 | 是 | 活跃 |
-| \src/hooks/\ | 共享 hooks。 | 是 | 活跃 |
-| \src/i18n/\ | 国际化文本和配置。 | 是 | 活跃 |
-| \src/legacy/\ | 归档代码，不在运行时挂载。 | 否 | 遗留 |
-| \src/pages/\ | 路由级页面。 | 是 | 活跃 |
-| \src/services/\ | API/领域服务层。 | 是 | 活跃 |
-| \src/types/\ | 共享 TypeScript 类型/接口。 | 是 | 活跃 |
-| \src/utils/\ | 实用程序/辅助函数。 | 否 | 活跃 |
-| \supabase-migrations/\ | SQL 迁移和策略更新。 | 是 | 活跃 |
-| \	ests/\ | 测试脚本和验证工件。 | 否 | 活跃 |
-| \legacy/projects/illiniguide---housing-selection/\ | 历史原型归档。 | 否 | 遗留 |
-
----
-
-## 4) 架构契约 (必须遵守)
-
-1. **路由的单一事实来源**  
-   在 \src/app/routes.tsx\ 中定义路由声明。
-
-2. **页面注册表的单一事实来源**  
-   在 \src/app/pageRegistry.ts\ 中注册路由/页面元数据。
-
-3. **页面注册表文档同步**  
-   保持路由文档与 \docs/PAGE_REGISTRY.md\ 同步。
-
-4. **遗留代码边界**  
-   遗留代码必须保留在以下路径之一：
-   - \src/legacy/**   - \src/components/housing/legacy/**   - \legacy/projects/**   
-   活动的运行时代码不得挂载或依赖这些遗留路径。
-
----
-
-## 5) 结构文档排除项
-
-不要在结构文档中包含生成的/依赖项/缓存目录：
-
-- ode_modules/- \dist/- \__pycache__/
----
-
-## 6) 验证和更新清单
-
-对于结构性更改：
-
-1. 运行 pm run verify:architecture\。
-2. 在合并之前运行 pm run check:all\。
-3. 一起更新所有结构文档：
-   - \README.md\ (仓库根目录)
-   - \illiniguide---uiuc-knowledge-base/README.md   - \illiniguide---uiuc-knowledge-base/docs/FILE_RULES.md4. 保留明确的遗留标记：
-   - \[Legacy - Not Mounted]   - \【历史归档-不参与运行时挂载】\ (使用中文文档时)
+- The active structure now includes `src/components/chat/`,
+  `src/components/layout/`, `src/components/housing/edit-panel/`, and
+  `src/components/housing/dorm-list/`.
+- `src/App.tsx` is the only active app-composition entry.
+- `src/components/App.tsx` is no longer part of the active structure.
+- Any future legacy code must move into an explicit reserved legacy boundary.
