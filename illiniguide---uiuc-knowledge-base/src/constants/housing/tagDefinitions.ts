@@ -31,7 +31,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         priority: 3,
         cardLayer: 'secondary',
         cardPriority: 1,
-        cardTone: 'positive',
+        cardTone: 'neutral',
     },
     olderBuilding: {
         en: 'Older Building',
@@ -60,7 +60,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         priority: 5,
         cardLayer: 'secondary',
         cardPriority: 3,
-        cardTone: 'positive',
+        cardTone: 'neutral',
     },
     convenienceStore: {
         en: 'Convenience Store',

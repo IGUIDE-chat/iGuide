@@ -269,7 +269,7 @@ const DormCard: React.FC<DormCardProps> = ({
                             key={tag.id}
                             className={`inline-flex items-center rounded-full border px-2 py-1 text-[11px] font-medium ${
                                 tag.tone === 'muted'
-                                    ? 'border-gray-200 bg-gray-100 text-gray-500'
+                                    ? 'border-gray-200/70 bg-gray-100/70 text-gray-400'
                                     : tag.tone === 'positive'
                                       ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
                                       : 'border-slate-200 bg-slate-50 text-slate-700'
