@@ -5,7 +5,7 @@ import { getTagDisplay } from '../../../../utils/tagLabels';
 import { CATEGORY_LABELS } from '../../../../constants/housing/tagDefinitions';
 
 interface DormTagDetailSectionProps {
-    categorizedTags: DormCategorizedTags;
+    categorizedTags?: DormCategorizedTags;
     language: Language;
 }
 

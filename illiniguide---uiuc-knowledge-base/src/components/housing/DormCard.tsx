@@ -28,14 +28,8 @@ const DormCard: React.FC<DormCardProps> = ({
     const locationLabel = language === 'zh' && dorm.location_zh ? dorm.location_zh : dorm.location;
 
     const t = {
-        en: {
-            ac: 'AC',
-            dining: 'Dining'
-        },
-        zh: {
-            ac: '空调',
-            dining: '食堂'
-        }
+        en: { dining: 'Dining' },
+        zh: { dining: '食堂' }
     }[language];
 
     return (
@@ -98,9 +92,9 @@ const DormCard: React.FC<DormCardProps> = ({
                 </div>
 
                 <div className="flex gap-2 mb-4 flex-wrap">
-                    {dorm.ac && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium transition-colors duration-150 hover:bg-blue-100 hover:text-blue-800">
-                            <Wind size={10} className="mr-1" /> {t.ac}
+                    {!dorm.ac && (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-xs font-medium">
+                            <Wind size={10} className="mr-1" /> {language === 'zh' ? '无空调' : 'No AC'}
                         </span>
                     )}
                     {dorm.dining === 'inside' && (
@@ -116,7 +110,9 @@ const DormCard: React.FC<DormCardProps> = ({
                             {getRoomTypeLabel(type, language)}
                         </span>
                     ))}
-                    {getHeroTags(dorm.categorizedTags ?? { livingConditions: [], facilities: [], lifestyle: [] }, 2).map((tag) => (
+                    {getHeroTags(dorm.categorizedTags ?? { livingConditions: [], facilities: [], lifestyle: [] }, 2)
+                        .filter(tag => tag !== 'noAc')
+                        .map((tag) => (
                         <span
                             key={tag}
                             className="inline-block px-2 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium transition-colors duration-150 hover:bg-gray-200 hover:text-gray-800"
