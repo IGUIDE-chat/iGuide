@@ -175,7 +175,7 @@ const DormCard: React.FC<DormCardProps> = ({
     const cardTags = getCardTagItems(
         dorm.categorizedTags ?? { livingConditions: [], facilities: [], lifestyle: [] },
         language,
-        4
+        5
     );
     const cardSummary = getCardSummary(dorm, description, locationLabel, language);
 
@@ -267,13 +267,12 @@ const DormCard: React.FC<DormCardProps> = ({
                     {cardTags.items.map((tag) => (
                         <span
                             key={tag.id}
-                            className={`inline-flex items-center rounded-full border px-2 py-1 text-[11px] font-medium ${
-                                tag.tone === 'muted'
+                            className={`inline-flex items-center rounded-full border px-2 py-1 text-[11px] font-medium ${tag.tone === 'muted'
                                     ? 'border-gray-200/70 bg-gray-100/70 text-gray-400'
                                     : tag.tone === 'positive'
-                                      ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
-                                      : 'border-slate-200 bg-slate-50 text-slate-700'
-                            }`}
+                                        ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                                        : 'border-slate-200 bg-slate-50 text-slate-700'
+                                }`}
                         >
                             {tag.label}
                         </span>
