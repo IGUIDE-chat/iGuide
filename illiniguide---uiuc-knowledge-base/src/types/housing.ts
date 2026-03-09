@@ -56,7 +56,7 @@ export type DiningType = 'inside' | 'nearby' | 'none';
 export interface Dorm {
     id: string;
     name: string;
-    location: 'Ikenberry' | 'Main Quad' | 'PAR/FAR' | 'Campustown' | 'South Campus';
+    location: string;
     ac: boolean;
     dining: DiningType;
     bathroomType: BathroomType;
@@ -68,6 +68,7 @@ export interface Dorm {
     pros: string[];
     cons: string[];
     price: number; // Annual price in USD (base/starting price)
+    applicationFee?: number; // One-time application fee in USD
     priceRange: '$' | '$$' | '$$$' | '$$$$'; // Keep for backwards compatibility
     roomTypes: RoomType[];
     floorPlans?: FloorPlan[]; // Detailed floor plans with specific prices and images

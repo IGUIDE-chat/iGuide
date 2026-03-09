@@ -26,7 +26,7 @@ const ROOM_TYPE_OPTIONS: RoomType[] = [
 
 /** Location presets with EN/ZH labels */
 const LOCATION_PRESETS: { value: string; en: string; zh: string }[] = [
-    { value: 'Ikenberry', en: 'Ikenberry', zh: '六叔村 (Ikenberry)' },
+    { value: 'Ikenberry', en: 'Ikenberry', zh: 'Ikenberry' },
     { value: 'Main Quad', en: 'Main Quad', zh: 'Main Quad' },
     { value: 'PAR/FAR', en: 'PAR/FAR', zh: 'PAR/FAR' },
     { value: 'Campustown', en: 'Campustown', zh: 'Campustown' },
@@ -97,6 +97,7 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
     const [descriptionZh, setDescriptionZh] = useState(dorm.description_zh ?? '');
     const [imageUrl, setImageUrl] = useState(dorm.imageUrl);
     const [price, setPrice] = useState(String(dorm.price));
+    const [applicationFee, setApplicationFee] = useState(String(dorm.applicationFee ?? ''));
     const [location, setLocation] = useState(dorm.location);
     const [locationZh, setLocationZh] = useState(dorm.location_zh ?? '');
     const [housingType, setHousingType] = useState(dorm.housingType);
@@ -125,6 +126,7 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
         setDescriptionZh(dorm.description_zh ?? '');
         setImageUrl(dorm.imageUrl);
         setPrice(String(dorm.price));
+        setApplicationFee(String(dorm.applicationFee ?? ''));
         setLocation(dorm.location);
         setLocationZh(dorm.location_zh ?? '');
         setHousingType(dorm.housingType);
@@ -161,6 +163,7 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
             description_zh: descriptionZh || null,
             image_url: imageUrl || null,
             price: price !== '' ? Number(price) : null,
+            application_fee: applicationFee !== '' ? Number(applicationFee) : null,
             location,
             location_zh: locationZh || null,
             housing_type: housingType,
@@ -307,8 +310,7 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                             key={preset.value}
                             type="button"
                             onClick={() => {
-                                setLocation(preset.value as Dorm['location']);
-                                // Auto-fill ZH location
+                                setLocation(preset.value);
                                 setLocationZh(preset.zh);
                             }}
                             className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${isActive
@@ -321,6 +323,13 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                     );
                 })}
             </div>
+            <input
+                type="text"
+                value={lang === 'zh' ? locationZh : location}
+                onChange={(e) => lang === 'zh' ? setLocationZh(e.target.value) : setLocation(e.target.value)}
+                className={inputCls}
+                placeholder={lang === 'zh' ? '或输入自定义位置...' : 'Or enter custom location...'}
+            />
         </div>
     );
 
@@ -440,6 +449,10 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
 
                         <Field label={zh ? '年费用（美元）' : 'Annual Price (USD)'}>
                             <input type="number" min={0} value={price} onChange={(e) => setPrice(e.target.value)} className={inputCls} />
+                        </Field>
+
+                        <Field label={zh ? '申请手续费（美元）' : 'Application Fee (USD)'}>
+                            <input type="number" min={0} value={applicationFee} onChange={(e) => setApplicationFee(e.target.value)} className={inputCls} placeholder={zh ? '如无可留空' : 'Leave empty if none'} />
                         </Field>
 
                         <Toggle

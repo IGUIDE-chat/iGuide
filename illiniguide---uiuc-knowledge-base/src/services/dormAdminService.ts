@@ -22,6 +22,7 @@ export interface DormUpdate {
     bathroom_type?: string | null;
     room_types?: string[] | null;
     categorized_tags?: Record<string, unknown> | null;
+    application_fee?: number | null;
     floor_plans?: unknown[] | null;
     gallery_images?: string[] | null;
     pros?: string[] | null;
