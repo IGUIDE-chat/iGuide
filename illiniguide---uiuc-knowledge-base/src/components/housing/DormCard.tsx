@@ -4,7 +4,7 @@ import { formatPrice } from '../../constants/housing/pricing';
 import { MapPin, Utensils, Wind } from 'lucide-react';
 import { Language } from '../../types';
 import { getHeroTags, getTagDisplay } from '../../utils/tagLabels';
-import { deriveRoomOptions, getDormBathroomSummary, getRoomDisplayLabel } from '../../utils/roomOptions';
+import { deriveRoomOptions, getDormBathroomTagSummary, getRoomDisplayLabel } from '../../utils/roomOptions';
 
 interface DormCardProps {
     dorm: Dorm;
@@ -27,11 +27,11 @@ const DormCard: React.FC<DormCardProps> = ({
     const getDescription = () => (language === 'zh' && dorm.description_zh ? dorm.description_zh : dorm.description);
     const locationLabel = language === 'zh' && dorm.location_zh ? dorm.location_zh : dorm.location;
     const roomOptions = dorm.roomOptions ?? deriveRoomOptions(dorm.floorPlans, dorm.bathroomType).roomOptions;
-    const bathroomSummary = getDormBathroomSummary(dorm, language);
+    const bathroomSummary = getDormBathroomTagSummary(dorm, language);
 
     const t = {
-        en: { dining: 'Dining', bath: 'Bath' },
-        zh: { dining: '食堂', bath: '卫浴' }
+        en: { dining: 'Dining' },
+        zh: { dining: '食堂' }
     }[language];
 
     return (
@@ -113,7 +113,7 @@ const DormCard: React.FC<DormCardProps> = ({
                         </span>
                     ))}
                     <span className="inline-block px-2 py-1 rounded-md border border-gray-200 text-gray-600 text-[10px] font-medium bg-white transition-colors duration-150 hover:bg-gray-50 hover:text-gray-800 hover:border-gray-300">
-                        {t.bath}: {bathroomSummary}
+                        {bathroomSummary}
                     </span>
                     {getHeroTags(dorm.categorizedTags ?? { livingConditions: [], facilities: [], lifestyle: [] }, 4)
                         .filter(tag => tag !== 'noAc')

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FloorPlan } from '../../types/housing';
+import { FloorPlan, RoomOption } from '../../types/housing';
 import { formatPrice } from '../../constants/housing/pricing';
 import { Maximize, Check, X, ChevronDown, ImageOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -37,6 +37,54 @@ const TEXT = {
     }
 };
 
+function normalizeComparableText(value: string) {
+    return value
+        .toLowerCase()
+        .replace(/community bathroom/g, 'communal bathroom')
+        .replace(/communal bath/g, 'communal bathroom')
+        .replace(/semi-private bath/g, 'semi-private bathroom')
+        .replace(/private bath/g, 'private bathroom')
+        .replace(/[/.·,-]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function buildPlanNarrative(
+    plan: Pick<RoomOption, 'bedCount' | 'bathroomCount' | 'bathroomScope' | 'labelCode'>,
+    language: 'en' | 'zh'
+) {
+    const displayLabel = getRoomDisplayLabel(plan, language);
+    if (plan.labelCode === 'Studio' || plan.labelCode === 'Suite' || plan.labelCode === 'Cluster') {
+        return displayLabel;
+    }
+    if (language === 'zh') {
+        if (plan.bathroomScope === 'communal') {
+            return `${displayLabel}`;
+        }
+        if (plan.bathroomCount != null) {
+            return `${displayLabel}`;
+        }
+        return `${displayLabel}`;
+    }
+
+    const bedLabel = getRoomDisplayLabel(
+        {
+            bedCount: plan.bedCount ?? null,
+            bathroomCount: null,
+            bathroomScope: 'private',
+        },
+        'en'
+    ).split(' / ')[0];
+
+    if (plan.bathroomScope === 'communal') {
+        return `${bedLabel} room with communal bathroom`;
+    }
+    if (plan.bathroomCount != null) {
+        return `${bedLabel} room with ${plan.bathroomCount} bathroom${plan.bathroomCount > 1 ? 's' : ''}`;
+    }
+    return `${bedLabel} room with ${plan.bathroomScope} bathroom`;
+}
+
 const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, language = 'en' }) => {
     const [expandedPlan, setExpandedPlan] = useState<string | null>(null);
     const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
@@ -58,6 +106,42 @@ const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, languag
 
             <div className="space-y-3">
                 {sortedPlans.map((plan) => {
+                    const roomLabel = getRoomDisplayLabel({
+                        bedCount: plan.bedCount ?? null,
+                        bathroomCount: plan.bathroomCount ?? null,
+                        bathroomScope: plan.bathroomScope ?? 'communal',
+                        labelCode: plan.labelCode,
+                    }, language);
+                    const roomDetail = getRoomDetailLabel({
+                        bedCount: plan.bedCount ?? null,
+                        bathroomCount: plan.bathroomCount ?? null,
+                        bathroomScope: plan.bathroomScope ?? 'communal',
+                        labelCode: plan.labelCode,
+                    }, language);
+                    const planDescription = plan.description?.trim();
+                    const hideDetail = normalizeComparableText(roomDetail) === normalizeComparableText(roomLabel);
+                    const hideDescription = !planDescription ? true : [
+                        roomLabel,
+                        roomDetail,
+                        getRoomDisplayLabel({
+                            bedCount: plan.bedCount ?? null,
+                            bathroomCount: plan.bathroomCount ?? null,
+                            bathroomScope: plan.bathroomScope ?? 'communal',
+                            labelCode: plan.labelCode,
+                        }, 'en'),
+                        getRoomDetailLabel({
+                            bedCount: plan.bedCount ?? null,
+                            bathroomCount: plan.bathroomCount ?? null,
+                            bathroomScope: plan.bathroomScope ?? 'communal',
+                            labelCode: plan.labelCode,
+                        }, 'en'),
+                        buildPlanNarrative({
+                            bedCount: plan.bedCount ?? null,
+                            bathroomCount: plan.bathroomCount ?? null,
+                            bathroomScope: plan.bathroomScope ?? 'communal',
+                            labelCode: plan.labelCode,
+                        }, 'en'),
+                    ].some((candidate) => normalizeComparableText(candidate) === normalizeComparableText(planDescription));
                     const planKey = getRoomOptionKey({
                         bedCount: plan.bedCount ?? null,
                         bathroomCount: plan.bathroomCount ?? null,
@@ -78,21 +162,11 @@ const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, languag
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2 flex-wrap">
                                         <div className="px-2.5 py-1 rounded-lg text-sm font-semibold border bg-illini-orange/15 text-illini-orange border-illini-orange/40">
-                                            {getRoomDisplayLabel({
-                                                bedCount: plan.bedCount ?? null,
-                                                bathroomCount: plan.bathroomCount ?? null,
-                                                bathroomScope: plan.bathroomScope ?? 'communal',
-                                                labelCode: plan.labelCode,
-                                            }, language)}
+                                            {roomLabel}
                                         </div>
-                                        <span className="text-xs text-gray-500">
-                                            {getRoomDetailLabel({
-                                                bedCount: plan.bedCount ?? null,
-                                                bathroomCount: plan.bathroomCount ?? null,
-                                                bathroomScope: plan.bathroomScope ?? 'communal',
-                                                labelCode: plan.labelCode,
-                                            }, language)}
-                                        </span>
+                                        {!hideDetail && (
+                                            <span className="text-xs text-gray-500">{roomDetail}</span>
+                                        )}
                                         <div className="flex items-center gap-0.5">
                                             {plan.available !== false ? (
                                                 <>
@@ -157,9 +231,9 @@ const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, languag
                                                 </div>
                                             )}
 
-                                            {plan.description && (
+                                            {!hideDescription && planDescription && (
                                                 <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                                                    <p className="text-sm text-gray-600">{plan.description}</p>
+                                                    <p className="text-sm text-gray-600">{planDescription}</p>
                                                 </div>
                                             )}
 
