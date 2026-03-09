@@ -21,7 +21,16 @@ type ActiveTab = 'content' | 'details' | 'tags' | 'media';
 /** All valid RoomType values for the floor plan dropdown. */
 const ROOM_TYPE_OPTIONS: RoomType[] = [
     'Studio', '1B1B', '2B0B', '2B1B', '2B2B', '3B0B', '3B1B', '3B2B', '3B3B',
-    '4B1B', '4B2B', '4B3B', '4B4B', '5B2B', 'Suite', 'Cluster',
+    '4B0B', '4B1B', '4B2B', '4B3B', '4B4B', '5B2B', 'Suite', 'Cluster',
+];
+
+/** Location presets with EN/ZH labels */
+const LOCATION_PRESETS: { value: string; en: string; zh: string }[] = [
+    { value: 'Ikenberry', en: 'Ikenberry', zh: '六叔村 (Ikenberry)' },
+    { value: 'Main Quad', en: 'Main Quad', zh: 'Main Quad' },
+    { value: 'PAR/FAR', en: 'PAR/FAR', zh: 'PAR/FAR' },
+    { value: 'Campustown', en: 'Campustown', zh: 'Campustown' },
+    { value: 'South Campus', en: 'South Campus', zh: 'South Campus' },
 ];
 
 // ── helpers ──────────────────────────────────────────────────────────────────
@@ -100,6 +109,8 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
     const emptyCategorized: DormCategorizedTags = { livingConditions: [], facilities: [], lifestyle: [] };
     const [categorizedTags, setCategorizedTags] = useState<DormCategorizedTags>(dorm.categorizedTags ?? emptyCategorized);
     const [llcNames, setLlcNames] = useState<string[]>(dorm.categorizedTags?.llcNames ?? []);
+    const [customTags, setCustomTags] = useState<string[]>([]);
+    const [newCustomTag, setNewCustomTag] = useState('');
     const [pros, setPros] = useState<string[]>(dorm.pros);
     const [prosZh, setProsZh] = useState<string[]>(dorm.pros_zh ?? []);
     const [cons, setCons] = useState<string[]>(dorm.cons);
@@ -128,6 +139,8 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
         setConsZh([...(dorm.cons_zh ?? [])]);
         setCategorizedTags(dorm.categorizedTags ?? { livingConditions: [], facilities: [], lifestyle: [] });
         setLlcNames(dorm.categorizedTags?.llcNames ?? []);
+        setCustomTags([]);
+        setNewCustomTag('');
     }, [dorm.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const buildUpdate = (): DormUpdate => {
@@ -170,20 +183,17 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
-
         if (!file.type.startsWith('image/')) {
             alert(language === 'zh' ? '仅支持上传图片文件。' : 'Only image files are supported.');
             e.target.value = '';
             return;
         }
-
         const maxBytes = 10 * 1024 * 1024;
         if (file.size > maxBytes) {
             alert(language === 'zh' ? '图片大小不能超过 10MB。' : 'Image size must be 10MB or smaller.');
             e.target.value = '';
             return;
         }
-
         setUploadingImage(true);
         const { publicUrl, errorMessage } = await dormAdminService.uploadDormImage(file);
         setUploadingImage(false);
@@ -193,7 +203,6 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
             const fallback = language === 'zh' ? '图片上传失败，请重试。' : 'Image upload failed. Please try again.';
             alert(errorMessage ? `${fallback}\n${errorMessage}` : fallback);
         }
-
         e.target.value = '';
     };
 
@@ -207,11 +216,9 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
             alert(language === 'zh' ? '图片大小不能超过 10MB。' : 'Image size must be 10MB or smaller.');
             return;
         }
-
         setUploadingImage(true);
         const { publicUrl, errorMessage } = await dormAdminService.uploadDormImage(file);
         setUploadingImage(false);
-
         if (publicUrl) {
             const next = [...floorPlans];
             next[index] = { ...next[index], imageUrl: publicUrl };
@@ -260,6 +267,20 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
         }
     };
 
+    // ── Custom tag helpers ────────────────────────────────────────────────────
+
+    const handleAddCustomTag = () => {
+        const tag = newCustomTag.trim();
+        if (tag && !customTags.includes(tag)) {
+            setCustomTags([...customTags, tag]);
+            setNewCustomTag('');
+        }
+    };
+
+    const handleRemoveCustomTag = (tag: string) => {
+        setCustomTags(customTags.filter(t => t !== tag));
+    };
+
     // ── Tab definitions ────────────────────────────────────────────────────────
 
     const tabs: { id: ActiveTab; label: string; icon: React.ReactNode }[] = [
@@ -271,6 +292,37 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
 
     // ── i18n shorthand ────────────────────────────────────────────────────────
     const zh = language === 'zh';
+
+    // ── Location preset chips component ───────────────────────────────────────
+    const LocationPresets = ({ lang }: { lang: 'en' | 'zh' }) => (
+        <div className="space-y-2">
+            <label className="block font-medium text-gray-700">
+                {lang === 'zh' ? '位置' : 'Location'}
+            </label>
+            <div className="flex flex-wrap gap-2">
+                {LOCATION_PRESETS.map(preset => {
+                    const isActive = location === preset.value;
+                    return (
+                        <button
+                            key={preset.value}
+                            type="button"
+                            onClick={() => {
+                                setLocation(preset.value as Dorm['location']);
+                                // Auto-fill ZH location
+                                setLocationZh(preset.zh);
+                            }}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${isActive
+                                ? 'bg-illini-blue text-white border-illini-blue shadow-sm'
+                                : 'bg-white text-gray-600 border-gray-300 hover:border-illini-blue hover:text-illini-blue'
+                                }`}
+                        >
+                            {lang === 'zh' ? preset.zh : preset.en}
+                        </button>
+                    );
+                })}
+            </div>
+        </div>
+    );
 
     // ── render ────────────────────────────────────────────────────────────────
     return (
@@ -291,8 +343,8 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                         type="button"
                         onClick={() => setActiveTab(tab.id)}
                         className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium transition-colors ${activeTab === tab.id
-                                ? 'border-b-2 border-illini-orange text-illini-blue'
-                                : 'text-gray-500 hover:text-illini-blue'
+                            ? 'border-b-2 border-illini-orange text-illini-blue'
+                            : 'text-gray-500 hover:text-illini-blue'
                             }`}
                     >
                         {tab.icon}
@@ -315,8 +367,8 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                                     type="button"
                                     onClick={() => setContentLang(lang)}
                                     className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${contentLang === lang
-                                            ? 'bg-white text-illini-blue shadow-sm'
-                                            : 'text-gray-500 hover:text-gray-700'
+                                        ? 'bg-white text-illini-blue shadow-sm'
+                                        : 'text-gray-500 hover:text-gray-700'
                                         }`}
                                 >
                                     {lang === 'en' ? 'English' : '中文'}
@@ -332,6 +384,7 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                                 <Field label="Description">
                                     <textarea rows={4} value={description} onChange={(e) => setDescription(e.target.value)} className={inputCls} />
                                 </Field>
+                                <LocationPresets lang="en" />
                                 <Field label="Pros">
                                     <EditableList items={pros} onChange={setPros} placeholder="Add pro" />
                                 </Field>
@@ -347,9 +400,7 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                                 <Field label="描述">
                                     <textarea rows={4} value={descriptionZh} onChange={(e) => setDescriptionZh(e.target.value)} className={inputCls} />
                                 </Field>
-                                <Field label="中文位置">
-                                    <input type="text" value={locationZh} onChange={(e) => setLocationZh(e.target.value)} className={inputCls} placeholder="例：六叔村" />
-                                </Field>
+                                <LocationPresets lang="zh" />
                                 <Field label="优点">
                                     <EditableList items={prosZh} onChange={setProsZh} placeholder="添加优点" />
                                 </Field>
@@ -380,16 +431,6 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                 {/* ═══ TAB: 详情 Details ═══ */}
                 {activeTab === 'details' && (
                     <>
-                        <Field label={zh ? '地理位置' : 'Location'}>
-                            <select value={location} onChange={e => setLocation(e.target.value as typeof location)} className={inputCls}>
-                                <option value="Ikenberry">Ikenberry</option>
-                                <option value="Main Quad">Main Quad</option>
-                                <option value="PAR/FAR">PAR/FAR</option>
-                                <option value="Campustown">Campustown</option>
-                                <option value="South Campus">South Campus</option>
-                            </select>
-                        </Field>
-
                         <Field label={zh ? '公立/私立' : 'Housing Type'}>
                             <select value={housingType} onChange={e => setHousingType(e.target.value as typeof housingType)} className={inputCls}>
                                 <option value="URH">URH</option>
@@ -449,27 +490,29 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                                 <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
                                     {CATEGORY_LABELS[category][language]}
                                 </p>
-                                <div className="grid grid-cols-2 gap-2">
+                                <div className="flex flex-wrap gap-2">
                                     {TAGS_BY_CATEGORY[category].map(tagId => {
                                         const isChecked = categorizedTags[category].includes(tagId as never);
                                         return (
-                                            <label key={tagId} className="flex items-center gap-2 cursor-pointer select-none">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={isChecked}
-                                                    onChange={() => {
-                                                        setCategorizedTags(prev => {
-                                                            const arr = prev[category] as DormTag[];
-                                                            const next = isChecked
-                                                                ? arr.filter(t => t !== tagId)
-                                                                : [...arr, tagId];
-                                                            return { ...prev, [category]: next };
-                                                        });
-                                                    }}
-                                                    className="accent-illini-orange"
-                                                />
-                                                <span className="text-xs text-gray-700">{getTagDisplay(tagId, language)}</span>
-                                            </label>
+                                            <button
+                                                key={tagId}
+                                                type="button"
+                                                onClick={() => {
+                                                    setCategorizedTags(prev => {
+                                                        const arr = prev[category] as DormTag[];
+                                                        const next = isChecked
+                                                            ? arr.filter(t => t !== tagId)
+                                                            : [...arr, tagId];
+                                                        return { ...prev, [category]: next };
+                                                    });
+                                                }}
+                                                className={`px-3.5 py-2 rounded-lg text-base font-medium border transition-all ${isChecked
+                                                    ? 'bg-illini-orange text-white border-illini-orange shadow-sm'
+                                                    : 'bg-white text-gray-600 border-gray-300 hover:border-illini-orange hover:text-illini-orange'
+                                                    }`}
+                                            >
+                                                {getTagDisplay(tagId, language)}
+                                            </button>
                                         );
                                     })}
                                 </div>
@@ -489,6 +532,50 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                                 />
                             </div>
                         )}
+
+                        {/* Custom tags */}
+                        <div>
+                            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                                {zh ? '自定义标签' : 'Custom Tags'}
+                            </p>
+                            {customTags.length > 0 && (
+                                <div className="flex flex-wrap gap-2 mb-2">
+                                    {customTags.map(tag => (
+                                        <span
+                                            key={tag}
+                                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 border border-gray-300"
+                                        >
+                                            {tag}
+                                            <button
+                                                type="button"
+                                                onClick={() => handleRemoveCustomTag(tag)}
+                                                className="text-gray-400 hover:text-red-500 ml-0.5"
+                                            >
+                                                <X size={12} />
+                                            </button>
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={newCustomTag}
+                                    onChange={(e) => setNewCustomTag(e.target.value)}
+                                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddCustomTag(); } }}
+                                    placeholder={zh ? '输入自定义标签...' : 'Enter custom tag...'}
+                                    className={inputCls}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={handleAddCustomTag}
+                                    disabled={!newCustomTag.trim()}
+                                    className="flex-shrink-0 px-3 py-2 bg-illini-blue text-white text-xs font-medium rounded-lg hover:bg-illini-blue/90 disabled:opacity-40 transition-colors"
+                                >
+                                    <Plus size={14} />
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 )}
 

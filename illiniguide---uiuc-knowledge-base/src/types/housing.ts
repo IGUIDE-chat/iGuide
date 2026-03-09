@@ -94,6 +94,7 @@ export type RoomType =
     | '3B1B'
     | '3B2B'
     | '3B3B'
+    | '4B0B'
     | '4B1B'
     | '4B2B'
     | '4B3B'

@@ -10,6 +10,7 @@ const ROOM_TYPE_LABELS_ZH: Record<RoomType, string> = {
     '3B1B': '三居一卫 (3B1B)',
     '3B2B': '三居两卫 (3B2B)',
     '3B3B': '三居三卫 (3B3B)',
+    '4B0B': '四居零卫 (4B0B)',
     '4B1B': '四居一卫 (4B1B)',
     '4B2B': '四居两卫 (4B2B)',
     '4B3B': '四居三卫 (4B3B)',
