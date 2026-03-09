@@ -4,7 +4,7 @@ import { formatPrice } from '../../constants/housing/pricing';
 import { MapPin, Utensils, Wind } from 'lucide-react';
 import { Language } from '../../types';
 import { getRoomTypeLabel } from '../../utils/housingLabels';
-import { getTagLabel } from '../../utils/tagLabels';
+import { getHeroTags, getTagDisplay } from '../../utils/tagLabels';
 
 interface DormCardProps {
     dorm: Dorm;
@@ -103,7 +103,7 @@ const DormCard: React.FC<DormCardProps> = ({
                             <Wind size={10} className="mr-1" /> {t.ac}
                         </span>
                     )}
-                    {dorm.dining && (
+                    {dorm.dining === 'inside' && (
                         <span className="inline-flex items-center px-2 py-1 rounded-full bg-illini-orange/10 text-illini-orange text-xs font-medium transition-colors duration-150 hover:bg-illini-orange/15 hover:text-illini-orange">
                             <Utensils size={10} className="mr-1" /> {t.dining}
                         </span>
@@ -116,12 +116,12 @@ const DormCard: React.FC<DormCardProps> = ({
                             {getRoomTypeLabel(type, language)}
                         </span>
                     ))}
-                    {dorm.tags.slice(0, 2).map((tag) => (
+                    {getHeroTags(dorm.categorizedTags, 2).map((tag) => (
                         <span
                             key={tag}
                             className="inline-block px-2 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium transition-colors duration-150 hover:bg-gray-200 hover:text-gray-800"
                         >
-                            {getTagLabel(tag, language)}
+                            {getTagDisplay(tag, language)}
                         </span>
                     ))}
                 </div>

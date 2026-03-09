@@ -43,7 +43,7 @@ interface DormOverride {
     cons?: string[] | null;
     cons_zh?: string[] | null;
     ac?: boolean | null;
-    dining?: boolean | null;
+    dining?: string | null;
     location?: string | null;
     location_zh?: string | null;
     type?: string | null;
@@ -70,7 +70,7 @@ function applyOverride(dorm: Dorm, override: DormOverride | undefined): Dorm {
         ...(override.cons != null && { cons: override.cons }),
         ...(override.cons_zh != null && { cons_zh: override.cons_zh }),
         ...(override.ac != null && { ac: override.ac }),
-        ...(override.dining != null && { dining: override.dining }),
+        ...(override.dining != null && { dining: override.dining as Dorm['dining'] }),
         ...(override.location != null && { location: override.location as Dorm['location'] }),
         ...(override.location_zh != null && { location_zh: override.location_zh }),
         ...(override.type != null && { type: override.type as Dorm['type'] }),
@@ -105,6 +105,8 @@ function dormToRow(dorm: Dorm) {
         lng: dorm.lng,
         tags: dorm.tags,
         structured_tags: dorm.structuredTags ?? {},
+        categorized_tags: dorm.categorizedTags ?? {},
+        bathroom_type: dorm.bathroomType,
         room_types: dorm.roomTypes,
         floor_plans: dorm.floorPlans ?? [],
         gallery_images: dorm.galleryImages ?? [],

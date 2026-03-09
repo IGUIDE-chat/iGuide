@@ -1,10 +1,12 @@
-// [UTILITY] Tag label i18n map — translates English tag strings to Chinese.
-// [工具] 标签中英文映射表。
+// [UTILITY] Tag label i18n and hero tag selection utilities.
+// [工具] 标签国际化和 Hero 标签选择工具。
 import { Language } from '../types';
+import { DormCategorizedTags, DormTag } from '../types/housing';
+import { TAG_REGISTRY, TagDefinition } from '../constants/housing/tagDefinitions';
 
-/** All known dorm tags with their Chinese translations. */
+// ── Legacy tag map (kept for backward compat during migration) ──────────────
+
 const TAG_ZH_MAP: Record<string, string> = {
-    // Style / vibe
     'Engineering': '工程学院',
     'Renovated': '已翻新',
     'Modern': '现代',
@@ -17,7 +19,6 @@ const TAG_ZH_MAP: Record<string, string> = {
     'Artsy': '艺术氛围',
     'Affordable': '经济实惠',
     'Freshmen': '新生友好',
-    // Features
     'Late Night Dining': '深夜食堂',
     'Bus Routes': '公交便利',
     'Trellis Dining': 'Trellis 餐厅',
@@ -34,7 +35,6 @@ const TAG_ZH_MAP: Record<string, string> = {
     'Unit One': 'Unit One',
     'Music': '音乐',
     'Female-Identified': '女性宿舍',
-    // Amenities (also a structuredTag but duplicated in tags[])
     'Elevator': '电梯',
     'Laundry': '洗衣房',
     'Study Rooms': '自习室',
@@ -45,14 +45,12 @@ const TAG_ZH_MAP: Record<string, string> = {
     'Gender-Inclusive': '性别包容',
     'Quiet Floors': '安静楼层',
     'Substance-Free': '无烟无酒',
-    // Proximity
     'Near Main Quad': '近 Main Quad',
     'Near Engineering': '近工程学院',
     'Near Business': '近商学院',
     'Near ARC/CRCE': '近 ARC/CRCE',
     'Near Green Street': '近 Green Street',
     'Near Ikenberry Dining': '近 Ike 食堂',
-    // LLCs
     'Engineering LLC': '工程 LLC',
     'Innovation LLC': '创新 LLC',
     'LEADS LLC': 'LEADS LLC',
@@ -62,26 +60,52 @@ const TAG_ZH_MAP: Record<string, string> = {
     'Scholars LLC': 'Scholars LLC',
     'Wohlers LLC': 'Wohlers LLC',
     'Intersections LLC': 'Intersections LLC',
-    // PCH
     'Furnished': '带家具',
     'Apartment': '公寓型',
     'Suite Style': '套房型',
     'Premium': '高端',
 };
 
-/**
- * All known tag values, as a sorted list.
- * Used for the multi-select UI in the admin edit panel.
- */
 export const KNOWN_TAGS: string[] = Object.keys(TAG_ZH_MAP).sort();
 
-/**
- * Return the localised label for a tag.
- * Falls back to the original English string if no translation exists.
- */
+/** Legacy: Return the localised label for an old-style string tag. */
 export function getTagLabel(tag: string, language: Language): string {
     if (language === 'zh') {
         return TAG_ZH_MAP[tag] ?? tag;
     }
     return tag;
+}
+
+// ── New categorized tag utilities ───────────────────────────────────────────
+
+/** Get the display label for a DormTag in the given language. */
+export function getTagDisplay(tag: DormTag, language: Language): string {
+    const def: TagDefinition | undefined = TAG_REGISTRY[tag];
+    if (!def) return tag;
+    return language === 'zh' ? def.zh : def.en;
+}
+
+/** Collect all tags from categorized tags, sorted by priority (ascending = more important first). */
+export function getAllTagsSorted(categorizedTags: DormCategorizedTags): DormTag[] {
+    const all: DormTag[] = [
+        ...categorizedTags.livingConditions,
+        ...categorizedTags.facilities,
+        ...categorizedTags.lifestyle,
+    ];
+    return all.sort((a, b) => {
+        const pa = TAG_REGISTRY[a]?.priority ?? 99;
+        const pb = TAG_REGISTRY[b]?.priority ?? 99;
+        return pa - pb;
+    });
+}
+
+/**
+ * Get hero tags: priority-sorted, capped at maxCount.
+ * Tags with priority >= 7 (too common, like Laundry/Kitchen) are excluded.
+ */
+export function getHeroTags(categorizedTags: DormCategorizedTags, maxCount = 8): DormTag[] {
+    const HERO_PRIORITY_CUTOFF = 7;
+    return getAllTagsSorted(categorizedTags)
+        .filter(tag => (TAG_REGISTRY[tag]?.priority ?? 99) < HERO_PRIORITY_CUTOFF)
+        .slice(0, maxCount);
 }

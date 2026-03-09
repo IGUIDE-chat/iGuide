@@ -21,10 +21,12 @@ export interface DormUpdate {
     type_zh?: string | null;
     housing_type?: string | null;
     ac?: boolean;
-    dining?: boolean;
+    dining?: string;
+    bathroom_type?: string | null;
     room_types?: string[] | null;
     tags?: string[] | null;
     structured_tags?: Record<string, unknown> | null;
+    categorized_tags?: Record<string, unknown> | null;
     floor_plans?: unknown[] | null;
     gallery_images?: string[] | null;
     pros?: string[] | null;
@@ -73,9 +75,11 @@ async function resetDormToStatic(dormId: string): Promise<boolean> {
         housing_type: staticDorm.housingType,
         ac: staticDorm.ac,
         dining: staticDorm.dining,
+        bathroom_type: staticDorm.bathroomType,
         room_types: staticDorm.roomTypes,
         tags: staticDorm.tags,
         structured_tags: staticDorm.structuredTags as Record<string, unknown> ?? null,
+        categorized_tags: staticDorm.categorizedTags as unknown as Record<string, unknown> ?? null,
         floor_plans: staticDorm.floorPlans ?? null,
         gallery_images: staticDorm.galleryImages ?? null,
         pros: staticDorm.pros,

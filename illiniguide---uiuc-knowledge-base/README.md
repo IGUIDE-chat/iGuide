@@ -68,7 +68,7 @@ Reference: `docs/FILE_RULES.md`
 The application uses Supabase for database and storage.
 To initialize or update the housing data:
 
-1. Create the `dorms` table and run necessary migrations: `scripts/migrations/create_dorms_table.sql`
+1. Create the `dorms` table and run necessary migrations: `scripts/migrations/create_dorms_table.sql` and `scripts/migrations/add_categorized_tags.sql`
 2. Seed the database using the provided script (requires `SUPABASE_URL` and `SUPABASE_SERVICE_KEY` environment variables):
    ```bash
    npx tsx scripts/seed-dorms-table.ts

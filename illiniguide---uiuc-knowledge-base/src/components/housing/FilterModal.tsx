@@ -5,12 +5,14 @@ import 'rc-slider/assets/index.css';
 import { useHousingFilters } from '../../contexts/HousingContext';
 import { getPriceRangeFromData } from '../../constants/housing/pricing';
 import { useDormData } from '../../contexts/DormDataContext';
-import { FilterOption, RoomType } from '../../types/housing';
+import { DormTag, FilterOption, RoomType } from '../../types/housing';
+import { TAGS_BY_CATEGORY } from '../../constants/housing/tagDefinitions';
 import PriceSection from './filter-modal/PriceSection';
 import HousingTypeSection from './filter-modal/HousingTypeSection';
 import AmenitiesSection from './filter-modal/AmenitiesSection';
 import RoomTypeSection from './filter-modal/RoomTypeSection';
 import ChipSection from './filter-modal/ChipSection';
+import TagFilterSection from './filter-modal/TagFilterSection';
 import { FilterLanguage, MODAL_TEXT } from './filter-modal/modalText';
 
 interface FilterModalProps {
@@ -36,7 +38,13 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         setTypeFilters,
         setAmenityFilters,
         setCommunityFilters,
-        setLlcFilters
+        setLlcFilters,
+        livingConditionFilters,
+        setLivingConditionFilters,
+        facilityFilters,
+        setFacilityFilters,
+        lifestyleFilters,
+        setLifestyleFilters
     } = useHousingFilters();
 
     const t = MODAL_TEXT[language];
@@ -75,6 +83,9 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
     const [localAmenities, setLocalAmenities] = useState<FilterOption[]>(activeFilters);
     const [localLocations, setLocalLocations] = useState<string[]>(locationFilters);
     const [localTypes, setLocalTypes] = useState<string[]>(typeFilters);
+    const [localLivingConditions, setLocalLivingConditions] = useState<DormTag[]>(livingConditionFilters);
+    const [localFacilities, setLocalFacilities] = useState<DormTag[]>(facilityFilters);
+    const [localLifestyle, setLocalLifestyle] = useState<DormTag[]>(lifestyleFilters);
 
     useEffect(() => {
         if (!isOpen) return;
@@ -84,6 +95,9 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         setLocalAmenities(activeFilters);
         setLocalLocations(locationFilters);
         setLocalTypes(typeFilters);
+        setLocalLivingConditions(livingConditionFilters);
+        setLocalFacilities(facilityFilters);
+        setLocalLifestyle(lifestyleFilters);
     }, [
         isOpen,
         normalizeRange,
@@ -92,7 +106,10 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         roomTypeFilters,
         activeFilters,
         locationFilters,
-        typeFilters
+        typeFilters,
+        livingConditionFilters,
+        facilityFilters,
+        lifestyleFilters
     ]);
 
     const locations = useMemo(
@@ -111,6 +128,9 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         setActiveFilters(localAmenities);
         setLocationFilters(localLocations);
         setTypeFilters(localTypes);
+        setLivingConditionFilters(localLivingConditions);
+        setFacilityFilters(localFacilities);
+        setLifestyleFilters(localLifestyle);
         onClose();
     }, [
         localAmenities,
@@ -119,6 +139,9 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         localPriceRange,
         localRoomTypes,
         localTypes,
+        localLivingConditions,
+        localFacilities,
+        localLifestyle,
         normalizeRange,
         onClose,
         setActiveFilters,
@@ -126,7 +149,10 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         setLocationFilters,
         setPriceRange,
         setRoomTypeFilters,
-        setTypeFilters
+        setTypeFilters,
+        setLivingConditionFilters,
+        setFacilityFilters,
+        setLifestyleFilters
     ]);
 
     const handleClear = useCallback(() => {
@@ -136,6 +162,9 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         setLocalAmenities([]);
         setLocalLocations([]);
         setLocalTypes([]);
+        setLocalLivingConditions([]);
+        setLocalFacilities([]);
+        setLocalLifestyle([]);
 
         setPriceRange(priceLimits);
         setHousingTypeDetails('ALL');
@@ -146,6 +175,9 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         setAmenityFilters([]);
         setCommunityFilters([]);
         setLlcFilters([]);
+        setLivingConditionFilters([]);
+        setFacilityFilters([]);
+        setLifestyleFilters([]);
         onClose();
     }, [
         onClose,
@@ -158,7 +190,10 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         setLocationFilters,
         setPriceRange,
         setRoomTypeFilters,
-        setTypeFilters
+        setTypeFilters,
+        setLivingConditionFilters,
+        setFacilityFilters,
+        setLifestyleFilters
     ]);
 
     const toggleStringArray = useCallback(
@@ -187,6 +222,18 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         setLocalAmenities((prev) =>
             prev.includes(option) ? prev.filter((item) => item !== option) : [...prev, option]
         );
+    }, []);
+
+    const toggleDormTag = useCallback((
+        tag: DormTag,
+        values: DormTag[],
+        setValues: (next: DormTag[]) => void
+    ) => {
+        if (values.includes(tag)) {
+            setValues(values.filter((item) => item !== tag));
+        } else {
+            setValues([...values, tag]);
+        }
     }, []);
 
     const [showFooterShadow, setShowFooterShadow] = useState(true);
@@ -315,6 +362,36 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
                                         onToggle={(value) =>
                                             toggleRoomTypeArray(localRoomTypes, setLocalRoomTypes, value)
                                         }
+                                    />
+
+                                    <hr className="my-8 border-gray-100" />
+
+                                    <TagFilterSection
+                                        title={t.livingConditions}
+                                        language={language}
+                                        tags={TAGS_BY_CATEGORY.livingConditions}
+                                        selectedValues={localLivingConditions}
+                                        onToggle={(tag) => toggleDormTag(tag, localLivingConditions, setLocalLivingConditions)}
+                                    />
+
+                                    <hr className="my-8 border-gray-100" />
+
+                                    <TagFilterSection
+                                        title={t.facilities}
+                                        language={language}
+                                        tags={TAGS_BY_CATEGORY.facilities}
+                                        selectedValues={localFacilities}
+                                        onToggle={(tag) => toggleDormTag(tag, localFacilities, setLocalFacilities)}
+                                    />
+
+                                    <hr className="my-8 border-gray-100" />
+
+                                    <TagFilterSection
+                                        title={t.lifestyle}
+                                        language={language}
+                                        tags={TAGS_BY_CATEGORY.lifestyle}
+                                        selectedValues={localLifestyle}
+                                        onToggle={(tag) => toggleDormTag(tag, localLifestyle, setLocalLifestyle)}
                                     />
                                 </div>
 

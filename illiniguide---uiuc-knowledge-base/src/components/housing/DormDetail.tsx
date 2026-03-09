@@ -14,6 +14,7 @@ import { dormDetailTexts } from './i18n/dormTexts';
 import DormHeroSection from './dorm-detail/sections/DormHeroSection';
 import DormProsConsSection from './dorm-detail/sections/DormProsConsSection';
 import DormQuickStatsSection from './dorm-detail/sections/DormQuickStatsSection';
+import DormTagDetailSection from './dorm-detail/sections/DormTagDetailSection';
 
 interface DormDetailProps {
     language?: Language;
@@ -118,6 +119,11 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                 notSoGoodLabel={t.notSoGood}
                                 pros={dormPros}
                                 cons={dormCons}
+                            />
+
+                            <DormTagDetailSection
+                                categorizedTags={dorm.categorizedTags}
+                                language={language}
                             />
 
                             {dorm.floorPlans && dorm.floorPlans.length > 0 && (

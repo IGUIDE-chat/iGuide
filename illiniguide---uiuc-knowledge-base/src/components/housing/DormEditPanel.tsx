@@ -2,11 +2,12 @@
 // [组件] 管理员侧边滑出面板，用于编辑宿舍信息覆盖项。
 import React, { useState, useEffect } from 'react';
 import { X, Plus, Trash2, RotateCcw, Save, Upload, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
-import { Dorm, DormTags, FloorPlan, RoomType } from '../../types/housing';
+import { Dorm, DormTags, DormCategorizedTags, DiningType, BathroomType, DormTag, FloorPlan, RoomType } from '../../types/housing';
 import { DormUpdate, dormAdminService } from '../../services/dormAdminService';
 import { dormService } from '../../services/dormService';
 import { Language } from '../../types';
-import { KNOWN_TAGS, getTagLabel } from '../../utils/tagLabels';
+import { KNOWN_TAGS, getTagLabel, getTagDisplay } from '../../utils/tagLabels';
+import { TAG_REGISTRY, TAGS_BY_CATEGORY, CATEGORY_LABELS } from '../../constants/housing/tagDefinitions';
 
 interface DormEditPanelProps {
     dorm: Dorm;
@@ -98,7 +99,12 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
     const [galleryImages, setGalleryImages] = useState<string[]>(dorm.galleryImages ?? []);
 
     const [ac, setAc] = useState(dorm.ac);
-    const [dining, setDining] = useState(dorm.dining);
+    const [dining, setDining] = useState<DiningType>(dorm.dining);
+    const [bathroomType, setBathroomType] = useState<BathroomType>(dorm.bathroomType);
+
+    // Categorized tags state
+    const [categorizedTags, setCategorizedTags] = useState<DormCategorizedTags>(dorm.categorizedTags);
+    const [llcNames, setLlcNames] = useState<string[]>(dorm.categorizedTags?.llcNames ?? []);
     const [pros, setPros] = useState<string[]>(dorm.pros);
     const [prosZh, setProsZh] = useState<string[]>(dorm.pros_zh ?? []);
     const [cons, setCons] = useState<string[]>(dorm.cons);
@@ -128,37 +134,50 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
         setGalleryImages([...(dorm.galleryImages ?? [])]);
         setAc(dorm.ac);
         setDining(dorm.dining);
+        setBathroomType(dorm.bathroomType);
         setPros([...dorm.pros]);
         setProsZh([...(dorm.pros_zh ?? [])]);
         setCons([...dorm.cons]);
         setConsZh([...(dorm.cons_zh ?? [])]);
         setStructuredTags(dorm.structuredTags ?? {});
+        setCategorizedTags(dorm.categorizedTags);
+        setLlcNames(dorm.categorizedTags?.llcNames ?? []);
     }, [dorm.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    const buildUpdate = (): DormUpdate => ({
-        name,
-        name_zh: nameZh || null,
-        description,
-        description_zh: descriptionZh || null,
-        image_url: imageUrl || null,
-        price: price !== '' ? Number(price) : null,
-        location,
-        location_zh: locationZh || null,
-        type,
-        type_zh: typeZh || null,
-        housing_type: housingType,
-        room_types: roomTypes.length ? roomTypes : null,
-        tags: tags.length ? tags : null,
-        structured_tags: structuredTags as Record<string, unknown>,
-        floor_plans: floorPlans.length ? floorPlans : null,
-        gallery_images: galleryImages.length ? galleryImages : null,
-        ac,
-        dining,
-        pros,
-        pros_zh: prosZh.length ? prosZh : null,
-        cons,
-        cons_zh: consZh.length ? consZh : null,
-    });
+    const buildUpdate = (): DormUpdate => {
+        // Merge llcNames into categorizedTags
+        const finalCategorizedTags: DormCategorizedTags = {
+            ...categorizedTags,
+            llcNames: categorizedTags.lifestyle.includes('llc') && llcNames.length > 0 ? llcNames : undefined,
+        };
+
+        return {
+            name,
+            name_zh: nameZh || null,
+            description,
+            description_zh: descriptionZh || null,
+            image_url: imageUrl || null,
+            price: price !== '' ? Number(price) : null,
+            location,
+            location_zh: locationZh || null,
+            type,
+            type_zh: typeZh || null,
+            housing_type: housingType,
+            room_types: roomTypes.length ? roomTypes : null,
+            tags: tags.length ? tags : null,
+            structured_tags: structuredTags as Record<string, unknown>,
+            categorized_tags: finalCategorizedTags as unknown as Record<string, unknown>,
+            floor_plans: floorPlans.length ? floorPlans : null,
+            gallery_images: galleryImages.length ? galleryImages : null,
+            ac,
+            dining,
+            bathroom_type: bathroomType,
+            pros,
+            pros_zh: prosZh.length ? prosZh : null,
+            cons,
+            cons_zh: consZh.length ? consZh : null,
+        };
+    };
 
     // ── Image upload handlers ─────────────────────────────────────────────────
 
@@ -561,77 +580,81 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                         <input type="number" min={0} value={price} onChange={(e) => setPrice(e.target.value)} className={inputCls} />
                     </Field>
 
-                    {/* AC & Dining toggles */}
-                    <div className="flex gap-6">
-                        <Toggle label={t.acLabel} checked={ac} onChange={setAc} />
-                        <Toggle label={t.diningLabel} checked={dining} onChange={setDining} />
-                    </div>
+                    {/* AC toggle */}
+                    <Toggle label={t.acLabel} checked={ac} onChange={setAc} />
 
-                    {/* ═══ Structured Tags (Amenities & Filters) ═══ */}
+                    {/* Dining — three-state select */}
+                    <Field label={t.diningLabel}>
+                        <select value={dining} onChange={e => setDining(e.target.value as DiningType)} className={inputCls}>
+                            <option value="inside">{language === 'zh' ? '楼内食堂' : 'Inside'}</option>
+                            <option value="nearby">{language === 'zh' ? '附近' : 'Nearby'}</option>
+                            <option value="none">{language === 'zh' ? '无' : 'None'}</option>
+                        </select>
+                    </Field>
+
+                    {/* Bathroom type */}
+                    <Field label={language === 'zh' ? '卫浴类型' : 'Bathroom Type'}>
+                        <select value={bathroomType} onChange={e => setBathroomType(e.target.value as BathroomType)} className={inputCls}>
+                            <option value="communal">{language === 'zh' ? '公共卫浴' : 'Communal'}</option>
+                            <option value="semi-private">{language === 'zh' ? '半独立卫浴' : 'Semi-Private'}</option>
+                            <option value="private">{language === 'zh' ? '独立卫浴' : 'Private'}</option>
+                        </select>
+                    </Field>
+
+                    {/* ═══ Categorized Tags (unified editor) ═══ */}
                     <button
                         type="button"
                         onClick={() => setShowStructuredTags(!showStructuredTags)}
                         className="w-full flex items-center justify-between py-2 px-3 bg-gray-100 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-200 transition-colors"
                     >
-                        {t.structuredTagsLabel}
+                        {language === 'zh' ? '标签分类' : 'Categorized Tags'}
                         {showStructuredTags ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                     </button>
                     {showStructuredTags && (
                         <div className="space-y-4 border border-gray-200 rounded-lg p-3 bg-gray-50">
-                            {/* Amenities */}
-                            <div>
-                                <p className="text-xs font-bold text-gray-500 mb-1.5">{t.amenitiesLabel}</p>
-                                <div className="grid grid-cols-2 gap-1.5">
-                                    {amenityItems.map(item => (
-                                        <Toggle
-                                            key={item.key}
-                                            label={language === 'zh' ? item.zh : item.en}
-                                            checked={!!structuredTags[item.key]}
-                                            onChange={() => toggleBoolTag(item.key)}
-                                        />
-                                    ))}
+                            {(['livingConditions', 'facilities', 'lifestyle'] as const).map(category => (
+                                <div key={category}>
+                                    <p className="text-xs font-bold text-gray-500 mb-1.5">
+                                        {CATEGORY_LABELS[category][language]}
+                                    </p>
+                                    <div className="grid grid-cols-2 gap-1.5">
+                                        {TAGS_BY_CATEGORY[category].map(tagId => {
+                                            const isChecked = categorizedTags[category].includes(tagId as never);
+                                            return (
+                                                <label key={tagId} className="flex items-center gap-2 cursor-pointer select-none">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={isChecked}
+                                                        onChange={() => {
+                                                            setCategorizedTags(prev => {
+                                                                const arr = prev[category] as DormTag[];
+                                                                const next = isChecked
+                                                                    ? arr.filter(t => t !== tagId)
+                                                                    : [...arr, tagId];
+                                                                return { ...prev, [category]: next };
+                                                            });
+                                                        }}
+                                                        className="accent-illini-orange"
+                                                    />
+                                                    <span className="text-xs text-gray-700">{getTagDisplay(tagId, language)}</span>
+                                                </label>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
-                            </div>
+                            ))}
 
-                            {/* Community */}
-                            <div>
-                                <p className="text-xs font-bold text-gray-500 mb-1.5">{t.communityLabel}</p>
-                                <div className="grid grid-cols-2 gap-1.5">
-                                    {communityItems.map(item => (
-                                        <Toggle
-                                            key={item.key}
-                                            label={language === 'zh' ? item.zh : item.en}
-                                            checked={!!structuredTags[item.key]}
-                                            onChange={() => toggleBoolTag(item.key)}
-                                        />
-                                    ))}
+                            {/* LLC names — only visible when 'llc' lifestyle tag is checked */}
+                            {categorizedTags.lifestyle.includes('llc') && (
+                                <div>
+                                    <p className="text-xs font-bold text-gray-500 mb-1.5">{t.llcLabel}</p>
+                                    <EditableList
+                                        items={llcNames}
+                                        onChange={setLlcNames}
+                                        placeholder={t.addLlc}
+                                    />
                                 </div>
-                            </div>
-
-                            {/* Proximity */}
-                            <div>
-                                <p className="text-xs font-bold text-gray-500 mb-1.5">{t.proximityLabel}</p>
-                                <div className="grid grid-cols-2 gap-1.5">
-                                    {proximityItems.map(item => (
-                                        <Toggle
-                                            key={item.key}
-                                            label={language === 'zh' ? item.zh : item.en}
-                                            checked={!!structuredTags[item.key]}
-                                            onChange={() => toggleBoolTag(item.key)}
-                                        />
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* LLC */}
-                            <div>
-                                <p className="text-xs font-bold text-gray-500 mb-1.5">{t.llcLabel}</p>
-                                <EditableList
-                                    items={structuredTags.llc ?? []}
-                                    onChange={setLlcList}
-                                    placeholder={t.addLlc}
-                                />
-                            </div>
+                            )}
                         </div>
                     )}
 

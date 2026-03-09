@@ -2,7 +2,7 @@ import React from 'react';
 import { MapPin } from 'lucide-react';
 import { Dorm } from '../../../../types/housing';
 import { Language } from '../../../../types';
-import { getTagLabel } from '../../../../utils/tagLabels';
+import { getHeroTags, getTagDisplay } from '../../../../utils/tagLabels';
 
 interface DormHeroSectionProps {
     dorm: Dorm;
@@ -13,6 +13,7 @@ interface DormHeroSectionProps {
 
 const DormHeroSection: React.FC<DormHeroSectionProps> = ({ dorm, dormName, campusLabel, language = 'en' }) => {
     const allImages = [dorm.imageUrl, ...(dorm.galleryImages || [])].filter(Boolean);
+    const heroTags = getHeroTags(dorm.categorizedTags, 8);
 
     return (
         <div className="h-56 md:h-80 w-full relative group">
@@ -28,12 +29,12 @@ const DormHeroSection: React.FC<DormHeroSectionProps> = ({ dorm, dormName, campu
                     </div>
                     <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-2 antialiased tracking-tight leading-tight">{dormName}</h1>
                     <div className="flex flex-wrap gap-1.5 md:gap-2">
-                        {dorm.tags.map((tag) => (
+                        {heroTags.map((tag) => (
                             <span
                                 key={tag}
                                 className="px-2 py-0.5 md:px-3 md:py-1 bg-white/20 rounded-full text-xs md:text-sm font-medium border border-white/30"
                             >
-                                {getTagLabel(tag, language)}
+                                {getTagDisplay(tag, language)}
                             </span>
                         ))}
                     </div>

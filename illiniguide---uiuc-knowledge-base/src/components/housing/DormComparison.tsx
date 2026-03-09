@@ -115,7 +115,7 @@ const DormComparison: React.FC<DormComparisonProps> = ({ dorms, onClose, languag
             label: 'Dining Hall',
             label_zh: '食堂',
             getValue: (dorm) =>
-                dorm.dining ? (
+                dorm.dining === 'inside' ? (
                     <span className="flex items-center gap-1 text-green-600 text-sm">
                         <Check size={16} /> {t.yes}
                     </span>
@@ -125,7 +125,7 @@ const DormComparison: React.FC<DormComparisonProps> = ({ dorms, onClose, languag
                     </span>
                 ),
             highlightBest: true,
-            bestCondition: (dorm) => dorm.dining
+            bestCondition: (dorm) => dorm.dining === 'inside'
         },
         {
             label: 'Room Types',

@@ -1,3 +1,4 @@
+// ── Legacy structured tags (kept temporarily for migration) ──────────────────
 export interface DormTags {
     // Amenities
     elevator?: boolean;
@@ -26,15 +27,43 @@ export interface DormTags {
     nearIkenberryDining?: boolean;
 }
 
+// ── New Categorized Tag System ──────────────────────────────────────────────
+
+export type LivingConditionTag =
+    | 'noAc' | 'newlyRenovated' | 'olderBuilding';
+
+export type FacilityTag =
+    | 'gym' | 'musicRooms' | 'convenienceStore'
+    | 'studyLounge' | 'laundry' | 'kitchen' | 'busStop';
+
+export type LifestyleTag =
+    | 'quiet' | 'socialParty' | 'internationalFriendly'
+    | 'llc' | 'artsyCreative';
+
+export type DormTag = LivingConditionTag | FacilityTag | LifestyleTag;
+export type TagCategory = 'livingConditions' | 'facilities' | 'lifestyle';
+
+export interface DormCategorizedTags {
+    livingConditions: LivingConditionTag[];
+    facilities: FacilityTag[];
+    lifestyle: LifestyleTag[];
+    llcNames?: string[];  // specific LLC names when 'llc' tag is present
+}
+
+export type BathroomType = 'communal' | 'semi-private' | 'private';
+export type DiningType = 'inside' | 'nearby' | 'none';
+
 export interface Dorm {
     id: string;
     name: string;
     location: 'Ikenberry' | 'Main Quad' | 'PAR/FAR' | 'Campustown' | 'South Campus';
     type: 'Traditional' | 'Cluster' | 'Suite' | 'Semi-Suite';
     ac: boolean;
-    dining: boolean; // Has dining hall inside or attached
+    dining: DiningType;
+    bathroomType: BathroomType;
     tags: string[];
-    structuredTags?: DormTags; // New structured tags for filtering
+    structuredTags?: DormTags; // Legacy — kept for migration
+    categorizedTags: DormCategorizedTags;
     description: string;
     imageUrl: string;
     pros: string[];
@@ -114,6 +143,7 @@ export interface DormFavorite {
     updated_at: string;
 }
 
+// Legacy FilterOption — kept temporarily for migration
 export enum FilterOption {
     ALL = 'All',
     AC = 'Air Conditioning',

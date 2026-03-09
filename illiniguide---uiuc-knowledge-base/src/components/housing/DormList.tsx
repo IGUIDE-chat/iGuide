@@ -124,6 +124,9 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
         communityFilters,
         llcFilters,
         proximityFilters,
+        livingConditionFilters,
+        facilityFilters,
+        lifestyleFilters,
         clearAllFilters
     } = useHousingFilters();
 
@@ -155,7 +158,10 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
             amenityFilters.length > 0 ||
             communityFilters.length > 0 ||
             llcFilters.length > 0 ||
-            proximityFilters.length > 0,
+            proximityFilters.length > 0 ||
+            livingConditionFilters.length > 0 ||
+            facilityFilters.length > 0 ||
+            lifestyleFilters.length > 0,
         [
             activeFilters.length,
             hasPriceFilter,
@@ -166,7 +172,10 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
             amenityFilters.length,
             communityFilters.length,
             llcFilters.length,
-            proximityFilters.length
+            proximityFilters.length,
+            livingConditionFilters.length,
+            facilityFilters.length,
+            lifestyleFilters.length
         ]
     );
 
@@ -181,7 +190,10 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
             amenityFilters.length +
             communityFilters.length +
             llcFilters.length +
-            proximityFilters.length,
+            proximityFilters.length +
+            livingConditionFilters.length +
+            facilityFilters.length +
+            lifestyleFilters.length,
         [
             hasPriceFilter,
             housingTypeDetails,
@@ -192,7 +204,10 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
             amenityFilters.length,
             communityFilters.length,
             llcFilters.length,
-            proximityFilters.length
+            proximityFilters.length,
+            livingConditionFilters.length,
+            facilityFilters.length,
+            lifestyleFilters.length
         ]
     );
 
@@ -215,6 +230,9 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
                 communityFilters,
                 llcFilters,
                 proximityFilters,
+                livingConditionFilters,
+                facilityFilters,
+                lifestyleFilters,
                 sortBy
             }),
         [
@@ -230,6 +248,9 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
             communityFilters,
             llcFilters,
             proximityFilters,
+            livingConditionFilters,
+            facilityFilters,
+            lifestyleFilters,
             sortBy
         ]
     );
