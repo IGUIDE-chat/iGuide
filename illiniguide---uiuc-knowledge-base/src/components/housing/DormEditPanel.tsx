@@ -33,16 +33,20 @@ const LOCATION_PRESETS: { value: string; en: string; zh: string }[] = [
     { value: 'South Campus', en: 'South Campus', zh: 'South Campus' },
 ];
 
-/** Official UIUC Living-Learning Communities */
+/** Official UIUC Living-Learning Communities & Special Living Options */
 const LLC_OPTIONS = [
+    'Beckwith Residential Community',
     'Business LLC',
     'Exploration LLC',
     'Global Crossroads LLC',
+    'Health Professions LLC',
     'Honors LLC',
     'Innovation LLC',
     'Intersections LLC',
     'LEADS LLC',
+    'Scholars Community',
     'Sustainability LLC',
+    'Transfer Community',
     'Unit One LLC',
     'WIMSE LLC',
 ];
