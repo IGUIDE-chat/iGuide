@@ -126,9 +126,8 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
     const [diningNearbyDetail, setDiningNearbyDetail] = useState(dorm.diningNearbyDetail ?? '');
     const [bathroomType, setBathroomType] = useState<BathroomType>(dorm.bathroomType);
 
-    const emptyCategorized: DormCategorizedTags = { livingConditions: [], facilities: [], lifestyle: [] };
+    const emptyCategorized: DormCategorizedTags = { livingConditions: [], facilities: [], lifestyle: [], llcNames: [] };
     const [categorizedTags, setCategorizedTags] = useState<DormCategorizedTags>(dorm.categorizedTags ?? emptyCategorized);
-    const [llcNames, setLlcNames] = useState<string[]>(dorm.categorizedTags?.llcNames ?? []);
     const [customTags, setCustomTags] = useState<string[]>([]);
     const [newCustomTag, setNewCustomTag] = useState('');
     const [pros, setPros] = useState<string[]>(dorm.pros);
@@ -159,8 +158,7 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
         setProsZh([...(dorm.pros_zh ?? [])]);
         setCons([...dorm.cons]);
         setConsZh([...(dorm.cons_zh ?? [])]);
-        setCategorizedTags(dorm.categorizedTags ?? { livingConditions: [], facilities: [], lifestyle: [] });
-        setLlcNames(dorm.categorizedTags?.llcNames ?? []);
+        setCategorizedTags(dorm.categorizedTags ?? { livingConditions: [], facilities: [], lifestyle: [], llcNames: [] });
         setCustomTags([]);
         setNewCustomTag('');
     }, [dorm.id]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -168,7 +166,7 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
     const buildUpdate = (): DormUpdate => {
         const finalCategorizedTags: DormCategorizedTags = {
             ...categorizedTags,
-            llcNames: categorizedTags.lifestyle.includes('llc') && llcNames.length > 0 ? llcNames : undefined,
+            llcNames: categorizedTags.lifestyle.includes('llc') && (categorizedTags.llcNames?.length ?? 0) > 0 ? categorizedTags.llcNames : undefined,
         };
 
         // Derive room_types from floor plans automatically
@@ -571,6 +569,7 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                             </p>
                             <div className="flex flex-wrap gap-2">
                                 {LLC_OPTIONS.map(llc => {
+                                    const llcNames = categorizedTags.llcNames ?? [];
                                     const isSelected = llcNames.includes(llc);
                                     return (
                                         <button
@@ -580,19 +579,26 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                                                 const next = isSelected
                                                     ? llcNames.filter(n => n !== llc)
                                                     : [...llcNames, llc];
-                                                setLlcNames(next);
-                                                // Auto-toggle the 'llc' lifestyle tag
-                                                if (next.length > 0 && !categorizedTags.lifestyle.includes('llc')) {
-                                                    setCategorizedTags(prev => ({
+
+                                                // Sync to categorizedTags
+                                                setCategorizedTags(prev => {
+                                                    const lifestyle = [...prev.lifestyle];
+                                                    const hasLlc = next.length > 0;
+
+                                                    // Auto-toggle 'llc' tag in lifestyle
+                                                    if (hasLlc && !lifestyle.includes('llc')) {
+                                                        lifestyle.push('llc');
+                                                    } else if (!hasLlc && lifestyle.includes('llc')) {
+                                                        const idx = lifestyle.indexOf('llc');
+                                                        if (idx > -1) lifestyle.splice(idx, 1);
+                                                    }
+
+                                                    return {
                                                         ...prev,
-                                                        lifestyle: [...prev.lifestyle, 'llc'],
-                                                    }));
-                                                } else if (next.length === 0 && categorizedTags.lifestyle.includes('llc')) {
-                                                    setCategorizedTags(prev => ({
-                                                        ...prev,
-                                                        lifestyle: prev.lifestyle.filter(t => t !== 'llc'),
-                                                    }));
-                                                }
+                                                        lifestyle,
+                                                        llcNames: next
+                                                    };
+                                                });
                                             }}
                                             className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-all ${isSelected
                                                 ? 'bg-illini-blue text-white border-illini-blue shadow-sm'
@@ -604,7 +610,7 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                                     );
                                 })}
                             </div>
-                            {llcNames.length === 0 && (
+                            {(categorizedTags.llcNames?.length ?? 0) === 0 && (
                                 <p className="text-xs text-gray-400 mt-2">
                                     {zh ? '点击选择该宿舍所属的 LLC' : 'Click to select LLCs available in this dorm'}
                                 </p>
