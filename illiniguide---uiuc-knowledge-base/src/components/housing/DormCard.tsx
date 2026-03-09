@@ -175,7 +175,7 @@ const DormCard: React.FC<DormCardProps> = ({
     const cardTags = getCardTagItems(
         dorm.categorizedTags ?? { livingConditions: [], facilities: [], lifestyle: [] },
         language,
-        5
+        4
     );
     const cardSummary = getCardSummary(dorm, description, locationLabel, language);
 
@@ -229,7 +229,7 @@ const DormCard: React.FC<DormCardProps> = ({
             </div>
 
             <div className="flex flex-grow flex-col p-4">
-                <h3 className="mb-2 text-xl font-bold leading-tight text-gray-900 antialiased">
+                <h3 className="mb-2 min-h-[3.5rem] line-clamp-2 text-xl font-bold leading-tight text-gray-900 antialiased">
                     {dormName}
                 </h3>
 
@@ -267,12 +267,13 @@ const DormCard: React.FC<DormCardProps> = ({
                     {cardTags.items.map((tag) => (
                         <span
                             key={tag.id}
+                            title={tag.label}
                             className={`inline-flex items-center rounded-full border px-2 py-1 text-[11px] font-medium ${tag.tone === 'muted'
                                     ? 'border-gray-200/70 bg-gray-100/70 text-gray-400'
                                     : tag.tone === 'positive'
                                         ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
                                         : 'border-slate-200 bg-slate-50 text-slate-700'
-                                }`}
+                                } max-w-[8.5rem] min-w-0 whitespace-nowrap overflow-hidden text-ellipsis`}
                         >
                             {tag.label}
                         </span>
