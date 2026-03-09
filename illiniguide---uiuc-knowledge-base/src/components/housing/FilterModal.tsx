@@ -387,24 +387,6 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
 
                                     <hr className="my-8 border-gray-100" />
 
-                                    {/* 空调 */}
-                                    <section className="mb-8">
-                                        <h3 className="text-xl font-bold mb-6">{t.airConditioning}</h3>
-                                        <button
-                                            type="button"
-                                            onClick={() => setLocalRequireAc(prev => !prev)}
-                                            className={`px-4 py-2 rounded-full border text-sm font-medium transition-colors ${
-                                                localRequireAc
-                                                    ? 'bg-illini-blue text-white border-illini-blue'
-                                                    : 'border-gray-300 text-gray-700 hover:border-illini-blue'
-                                            }`}
-                                        >
-                                            {t.airConditioning}
-                                        </button>
-                                    </section>
-
-                                    <hr className="my-8 border-gray-100" />
-
                                     <RoomTypeSection
                                         title={t.roomType}
                                         language={language}
@@ -416,13 +398,45 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
 
                                     <hr className="my-8 border-gray-100" />
 
-                                    <TagFilterSection
-                                        title={t.livingConditions}
-                                        language={language}
-                                        tags={TAGS_BY_CATEGORY.livingConditions}
-                                        selectedValues={localLivingConditions}
-                                        onToggle={(tag) => toggleDormTag(tag, localLivingConditions, setLocalLivingConditions)}
-                                    />
+                                    {/* 居住条件 — AC toggle + noAc/newlyRenovated tags */}
+                                    <section className="mb-8">
+                                        <h3 className="text-xl font-bold mb-6">{t.livingConditions}</h3>
+                                        <div className="flex flex-wrap gap-3">
+                                            {/* 有空调 */}
+                                            <button
+                                                type="button"
+                                                onClick={() => setLocalRequireAc(prev => !prev)}
+                                                className={`px-4 py-2 rounded-full border text-sm font-medium transition-colors ${
+                                                    localRequireAc
+                                                        ? 'bg-illini-blue text-white border-illini-blue'
+                                                        : 'border-gray-300 text-gray-700 hover:border-illini-blue'
+                                                }`}
+                                            >
+                                                {t.airConditioning}
+                                            </button>
+                                            {/* noAc, newlyRenovated only (olderBuilding excluded) */}
+                                            {(['noAc', 'newlyRenovated'] as DormTag[]).map((tag) => {
+                                                const selected = localLivingConditions.includes(tag);
+                                                const label = tag === 'noAc'
+                                                    ? (language === 'zh' ? '无空调' : 'No AC')
+                                                    : (language === 'zh' ? '设施全新' : 'Newly Renovated');
+                                                return (
+                                                    <button
+                                                        key={tag}
+                                                        type="button"
+                                                        onClick={() => toggleDormTag(tag, localLivingConditions, setLocalLivingConditions)}
+                                                        className={`px-4 py-2 rounded-full border text-sm font-medium transition-colors ${
+                                                            selected
+                                                                ? 'bg-illini-blue text-white border-illini-blue'
+                                                                : 'border-gray-300 text-gray-700 hover:border-illini-blue'
+                                                        }`}
+                                                    >
+                                                        {label}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </section>
 
                                     <hr className="my-8 border-gray-100" />
 
