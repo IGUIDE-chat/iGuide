@@ -62,7 +62,7 @@ export const PrimaryNav: React.FC<PrimaryNavProps> = ({
     <>
       <div className="p-3 mb-2 flex items-center justify-between">
         <div className="flex items-center gap-2 px-2 py-2 rounded-md hover:bg-white/5 cursor-pointer w-full transition-colors">
-          <BrandMark className="h-7 w-7 rounded-md" iconClassName="text-[11px]" />
+          <BrandMark className="h-[26px] w-[26px] rounded-md" iconClassName="text-[10px]" />
           <SidebarLabel
             isOpen={isSidebarOpen}
             className="font-bold text-[15px] tracking-tight text-white"

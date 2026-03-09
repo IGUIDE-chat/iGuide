@@ -118,34 +118,35 @@ function getCardTagDisplay(tag: DormTag, categorizedTags: DormCategorizedTags, l
     return getTagDisplay(tag, language);
 }
 
-export function getCardTagItems(
+export function getCardTagCandidates(
     categorizedTags: DormCategorizedTags,
-    language: Language,
-    maxCount = 4
-): { items: CardTagItem[]; overflowCount: number } {
+    language: Language
+): CardTagItem[] {
     const rankedTags = getAllTagsSorted(categorizedTags)
         .filter((tag) => TAG_REGISTRY[tag]?.cardLayer !== 'hidden')
         .sort((a, b) => {
-            const layerA = TAG_REGISTRY[a]?.cardLayer === 'secondary' ? 0 : 1;
-            const layerB = TAG_REGISTRY[b]?.cardLayer === 'secondary' ? 0 : 1;
-            if (layerA !== layerB) {
-                return layerA - layerB;
-            }
-
             const toneWeight = (tag: DormTag) => {
                 switch (TAG_REGISTRY[tag]?.cardTone) {
-                    case 'positive':
+                    case 'muted':
                         return 0;
                     case 'neutral':
                         return 1;
-                    default:
+                    case 'positive':
                         return 2;
+                    default:
+                        return 3;
                 }
             };
             const toneA = toneWeight(a);
             const toneB = toneWeight(b);
             if (toneA !== toneB) {
                 return toneA - toneB;
+            }
+
+            const layerA = TAG_REGISTRY[a]?.cardLayer === 'secondary' ? 0 : 1;
+            const layerB = TAG_REGISTRY[b]?.cardLayer === 'secondary' ? 0 : 1;
+            if (layerA !== layerB) {
+                return layerA - layerB;
             }
 
             const priorityA = TAG_REGISTRY[a]?.cardPriority ?? 99;
@@ -175,12 +176,19 @@ export function getCardTagItems(
         });
     }
 
-    const hasOverflow = items.length > maxCount;
-    const visibleCount = hasOverflow ? Math.max(maxCount - 1, 0) : maxCount;
+    return items;
+}
+
+export function getCardTagItems(
+    categorizedTags: DormCategorizedTags,
+    language: Language,
+    maxCount = 4
+): { items: CardTagItem[]; overflowCount: number } {
+    const items = getCardTagCandidates(categorizedTags, language);
 
     return {
-        items: items.slice(0, visibleCount),
-        overflowCount: Math.max(items.length - visibleCount, 0),
+        items: items.slice(0, maxCount),
+        overflowCount: Math.max(items.length - maxCount, 0),
     };
 }
 
