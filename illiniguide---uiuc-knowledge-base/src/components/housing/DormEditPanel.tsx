@@ -20,7 +20,7 @@ type ActiveTab = 'content' | 'details' | 'tags' | 'media';
 
 /** All valid RoomType values for the floor plan dropdown. */
 const ROOM_TYPE_OPTIONS: RoomType[] = [
-    'Studio', '1B1B', '2B1B', '2B2B', '3B1B', '3B2B', '3B3B',
+    'Studio', '1B1B', '2B0B', '2B1B', '2B2B', '3B0B', '3B1B', '3B2B', '3B3B',
     '4B1B', '4B2B', '4B3B', '4B4B', '5B2B', 'Suite', 'Cluster',
 ];
 
@@ -89,8 +89,8 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
     const [imageUrl, setImageUrl] = useState(dorm.imageUrl);
     const [price, setPrice] = useState(String(dorm.price));
     const [location, setLocation] = useState(dorm.location);
+    const [locationZh, setLocationZh] = useState(dorm.location_zh ?? '');
     const [housingType, setHousingType] = useState(dorm.housingType);
-    const [roomTypes, setRoomTypes] = useState<string[]>(dorm.roomTypes);
     const [floorPlans, setFloorPlans] = useState<FloorPlan[]>(dorm.floorPlans ?? []);
     const [galleryImages, setGalleryImages] = useState<string[]>(dorm.galleryImages ?? []);
     const [ac, setAc] = useState(dorm.ac);
@@ -115,8 +115,8 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
         setImageUrl(dorm.imageUrl);
         setPrice(String(dorm.price));
         setLocation(dorm.location);
+        setLocationZh(dorm.location_zh ?? '');
         setHousingType(dorm.housingType);
-        setRoomTypes([...dorm.roomTypes]);
         setFloorPlans([...(dorm.floorPlans ?? [])]);
         setGalleryImages([...(dorm.galleryImages ?? [])]);
         setAc(dorm.ac);
@@ -136,6 +136,11 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
             llcNames: categorizedTags.lifestyle.includes('llc') && llcNames.length > 0 ? llcNames : undefined,
         };
 
+        // Derive room_types from floor plans automatically
+        const derivedRoomTypes = floorPlans.length > 0
+            ? Array.from(new Set(floorPlans.map(fp => fp.type)))
+            : [];
+
         return {
             name,
             name_zh: nameZh || null,
@@ -144,8 +149,9 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
             image_url: imageUrl || null,
             price: price !== '' ? Number(price) : null,
             location,
+            location_zh: locationZh || null,
             housing_type: housingType,
-            room_types: roomTypes.length ? roomTypes : null,
+            room_types: derivedRoomTypes.length ? derivedRoomTypes : null,
             categorized_tags: finalCategorizedTags as unknown as Record<string, unknown>,
             floor_plans: floorPlans.length ? floorPlans : null,
             gallery_images: galleryImages.length ? galleryImages : null,
@@ -257,11 +263,14 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
     // ── Tab definitions ────────────────────────────────────────────────────────
 
     const tabs: { id: ActiveTab; label: string; icon: React.ReactNode }[] = [
-        { id: 'content', label: '内容', icon: <FileText size={14} /> },
-        { id: 'details', label: '详情', icon: <Info size={14} /> },
-        { id: 'tags', label: '标签', icon: <Tag size={14} /> },
-        { id: 'media', label: '图片', icon: <Image size={14} /> },
+        { id: 'content', label: language === 'zh' ? '内容' : 'Content', icon: <FileText size={14} /> },
+        { id: 'details', label: language === 'zh' ? '详情' : 'Details', icon: <Info size={14} /> },
+        { id: 'tags', label: language === 'zh' ? '标签' : 'Tags', icon: <Tag size={14} /> },
+        { id: 'media', label: language === 'zh' ? '媒体' : 'Media', icon: <Image size={14} /> },
     ];
+
+    // ── i18n shorthand ────────────────────────────────────────────────────────
+    const zh = language === 'zh';
 
     // ── render ────────────────────────────────────────────────────────────────
     return (
@@ -281,11 +290,10 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                         key={tab.id}
                         type="button"
                         onClick={() => setActiveTab(tab.id)}
-                        className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium transition-colors ${
-                            activeTab === tab.id
+                        className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium transition-colors ${activeTab === tab.id
                                 ? 'border-b-2 border-illini-orange text-illini-blue'
                                 : 'text-gray-500 hover:text-illini-blue'
-                        }`}
+                            }`}
                     >
                         {tab.icon}
                         {tab.label}
@@ -296,7 +304,7 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
             {/* Scrollable Body */}
             <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 text-sm">
 
-                {/* ═══ TAB: 内容 ═══ */}
+                {/* ═══ TAB: 内容 Content ═══ */}
                 {activeTab === 'content' && (
                     <>
                         {/* EN/ZH toggle */}
@@ -306,11 +314,10 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                                     key={lang}
                                     type="button"
                                     onClick={() => setContentLang(lang)}
-                                    className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-                                        contentLang === lang
+                                    className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${contentLang === lang
                                             ? 'bg-white text-illini-blue shadow-sm'
                                             : 'text-gray-500 hover:text-gray-700'
-                                    }`}
+                                        }`}
                                 >
                                     {lang === 'en' ? 'English' : '中文'}
                                 </button>
@@ -340,6 +347,9 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                                 <Field label="描述">
                                     <textarea rows={4} value={descriptionZh} onChange={(e) => setDescriptionZh(e.target.value)} className={inputCls} />
                                 </Field>
+                                <Field label="中文位置">
+                                    <input type="text" value={locationZh} onChange={(e) => setLocationZh(e.target.value)} className={inputCls} placeholder="例：六叔村" />
+                                </Field>
                                 <Field label="优点">
                                     <EditableList items={prosZh} onChange={setProsZh} placeholder="添加优点" />
                                 </Field>
@@ -360,17 +370,17 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                             >
                                 <RotateCcw size={12} />
                                 {resetting
-                                    ? (language === 'zh' ? '重置中…' : 'Resetting…')
-                                    : (language === 'zh' ? '重置为默认值' : 'Reset to defaults')}
+                                    ? (zh ? '重置中…' : 'Resetting…')
+                                    : (zh ? '重置为默认值' : 'Reset to defaults')}
                             </button>
                         </div>
                     </>
                 )}
 
-                {/* ═══ TAB: 详情 ═══ */}
+                {/* ═══ TAB: 详情 Details ═══ */}
                 {activeTab === 'details' && (
                     <>
-                        <Field label={language === 'zh' ? '地理位置' : 'Location'}>
+                        <Field label={zh ? '地理位置' : 'Location'}>
                             <select value={location} onChange={e => setLocation(e.target.value as typeof location)} className={inputCls}>
                                 <option value="Ikenberry">Ikenberry</option>
                                 <option value="Main Quad">Main Quad</option>
@@ -380,60 +390,58 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                             </select>
                         </Field>
 
-                        <Field label={language === 'zh' ? '公立/私立' : 'Housing Type'}>
+                        <Field label={zh ? '公立/私立' : 'Housing Type'}>
                             <select value={housingType} onChange={e => setHousingType(e.target.value as typeof housingType)} className={inputCls}>
                                 <option value="URH">URH</option>
                                 <option value="PCH">PCH</option>
                             </select>
                         </Field>
 
-                        <Field label={language === 'zh' ? '年费用（美元）' : 'Annual Price (USD)'}>
+                        <Field label={zh ? '年费用（美元）' : 'Annual Price (USD)'}>
                             <input type="number" min={0} value={price} onChange={(e) => setPrice(e.target.value)} className={inputCls} />
                         </Field>
 
-                        <Field label={language === 'zh' ? '房型' : 'Room Types'}>
-                            <div className="flex flex-wrap gap-x-3 gap-y-1.5 border border-gray-200 rounded-lg p-3 bg-gray-50">
-                                {ROOM_TYPE_OPTIONS.map(rt => (
-                                    <label key={rt} className="flex items-center gap-1 cursor-pointer select-none whitespace-nowrap">
-                                        <input
-                                            type="checkbox"
-                                            checked={roomTypes.includes(rt)}
-                                            onChange={() => setRoomTypes(prev =>
-                                                prev.includes(rt) ? prev.filter(r => r !== rt) : [...prev, rt]
-                                            )}
-                                            className="accent-illini-orange"
-                                        />
-                                        <span className="text-xs">{rt}</span>
-                                    </label>
-                                ))}
-                            </div>
-                        </Field>
-
                         <Toggle
-                            label={language === 'zh' ? '空调' : 'Air Conditioning'}
+                            label={zh ? '空调' : 'Air Conditioning'}
                             checked={ac}
                             onChange={setAc}
                         />
 
-                        <Field label={language === 'zh' ? '楼内食堂' : 'On-site Dining'}>
+                        <Field label={zh ? '楼内食堂' : 'On-site Dining'}>
                             <select value={dining} onChange={e => setDining(e.target.value as DiningType)} className={inputCls}>
-                                <option value="inside">{language === 'zh' ? '楼内食堂' : 'Inside'}</option>
-                                <option value="nearby">{language === 'zh' ? '附近' : 'Nearby'}</option>
-                                <option value="none">{language === 'zh' ? '无' : 'None'}</option>
+                                <option value="inside">{zh ? '楼内食堂' : 'Inside'}</option>
+                                <option value="nearby">{zh ? '附近' : 'Nearby'}</option>
+                                <option value="none">{zh ? '无' : 'None'}</option>
                             </select>
                         </Field>
 
-                        <Field label={language === 'zh' ? '卫浴类型' : 'Bathroom Type'}>
+                        <Field label={zh ? '卫浴类型' : 'Bathroom Type'}>
                             <select value={bathroomType} onChange={e => setBathroomType(e.target.value as BathroomType)} className={inputCls}>
-                                <option value="communal">{language === 'zh' ? '公共卫浴' : 'Communal'}</option>
-                                <option value="semi-private">{language === 'zh' ? '半独立卫浴' : 'Semi-Private'}</option>
-                                <option value="private">{language === 'zh' ? '独立卫浴' : 'Private'}</option>
+                                <option value="communal">{zh ? '公共卫浴' : 'Communal'}</option>
+                                <option value="semi-private">{zh ? '半独立卫浴' : 'Semi-Private'}</option>
+                                <option value="private">{zh ? '独立卫浴' : 'Private'}</option>
                             </select>
                         </Field>
+
+                        {/* Derived room types — read-only display */}
+                        {floorPlans.length > 0 && (
+                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                                <p className="text-xs font-medium text-gray-500 mb-1.5">
+                                    {zh ? '房型（自动从户型图获取）' : 'Room Types (auto-derived from Floor Plans)'}
+                                </p>
+                                <div className="flex flex-wrap gap-1.5">
+                                    {Array.from(new Set(floorPlans.map(fp => fp.type))).map(rt => (
+                                        <span key={rt} className="inline-block px-2 py-0.5 rounded-md border border-gray-300 text-gray-600 text-xs bg-white">
+                                            {rt}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </>
                 )}
 
-                {/* ═══ TAB: 标签 ═══ */}
+                {/* ═══ TAB: 标签 Tags ═══ */}
                 {activeTab === 'tags' && (
                     <div className="space-y-5">
                         {(['livingConditions', 'facilities', 'lifestyle'] as const).map(category => (
@@ -472,22 +480,22 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                         {categorizedTags.lifestyle.includes('llc') && (
                             <div>
                                 <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
-                                    {language === 'zh' ? '学习生活社区 (LLC)' : 'Living-Learning Communities (LLC)'}
+                                    {zh ? '学习生活社区 (LLC)' : 'Living-Learning Communities (LLC)'}
                                 </p>
                                 <EditableList
                                     items={llcNames}
                                     onChange={setLlcNames}
-                                    placeholder={language === 'zh' ? '添加 LLC' : 'Add LLC'}
+                                    placeholder={zh ? '添加 LLC' : 'Add LLC'}
                                 />
                             </div>
                         )}
                     </div>
                 )}
 
-                {/* ═══ TAB: 图片 ═══ */}
+                {/* ═══ TAB: 媒体 Media ═══ */}
                 {activeTab === 'media' && (
                     <>
-                        <Field label={language === 'zh' ? '主图 URL' : 'Primary Image URL'}>
+                        <Field label={zh ? '主图 URL' : 'Primary Image URL'}>
                             <div className="flex gap-2">
                                 <input
                                     type="text"
@@ -498,27 +506,27 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                                 />
                                 <label className="flex-shrink-0 flex items-center justify-center gap-1 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-lg px-3 cursor-pointer transition-colors text-gray-700">
                                     {uploadingImage ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
-                                    <span className="text-xs font-medium">{language === 'zh' ? '上传' : 'Upload'}</span>
+                                    <span className="text-xs font-medium">{zh ? '上传' : 'Upload'}</span>
                                     <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploadingImage} />
                                 </label>
                             </div>
                         </Field>
 
-                        <Field label={language === 'zh' ? '图库照片 (Gallery)' : 'Gallery Images'}>
+                        <Field label={zh ? '图库照片' : 'Gallery Images'}>
                             <EditableList
                                 items={galleryImages}
                                 onChange={setGalleryImages}
-                                placeholder={language === 'zh' ? '添加图库照片链接' : 'Add gallery image URL'}
+                                placeholder={zh ? '添加图库照片链接' : 'Add gallery image URL'}
                             />
                         </Field>
 
-                        <Field label={language === 'zh' ? '户型图与详细价格 (Floor Plans)' : 'Floor Plans & Pricing'}>
+                        <Field label={zh ? '户型图与价格' : 'Floor Plans & Pricing'}>
                             <div className="space-y-3">
                                 {floorPlans.map((fp, idx) => (
                                     <div key={idx} className="flex flex-col gap-2 p-3 bg-gray-50 border border-gray-200 rounded-lg">
                                         <div className="flex justify-between items-center">
                                             <span className="text-xs font-bold text-gray-500">
-                                                {language === 'zh' ? `户型 #${idx + 1}` : `Plan #${idx + 1}`}
+                                                {zh ? `户型 #${idx + 1}` : `Plan #${idx + 1}`}
                                             </span>
                                             <button type="button" onClick={() => setFloorPlans(floorPlans.filter((_, i) => i !== idx))} className="text-red-400 hover:text-red-600">
                                                 <Trash2 size={14} />
@@ -538,7 +546,7 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                                                 type="number"
                                                 value={fp.price}
                                                 onChange={e => { const n = [...floorPlans]; n[idx] = { ...n[idx], price: Number(e.target.value) }; setFloorPlans(n); }}
-                                                placeholder={language === 'zh' ? '价格/年' : 'Price/yr'}
+                                                placeholder={zh ? '价格/年' : 'Price/yr'}
                                                 className={inputCls}
                                             />
                                         </div>
@@ -547,7 +555,7 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                                                 type="text"
                                                 value={fp.imageUrl || ''}
                                                 onChange={e => { const n = [...floorPlans]; n[idx] = { ...n[idx], imageUrl: e.target.value }; setFloorPlans(n); }}
-                                                placeholder={language === 'zh' ? '图片链接...' : 'Image URL...'}
+                                                placeholder={zh ? '图片链接...' : 'Image URL...'}
                                                 className={inputCls}
                                             />
                                             <label className="flex-shrink-0 flex items-center justify-center gap-1 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-lg px-2 cursor-pointer text-gray-700">
@@ -562,7 +570,7 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                                     onClick={() => setFloorPlans([...floorPlans, { type: 'Studio', price: 0 }])}
                                     className="flex items-center gap-1 text-xs text-illini-blue hover:underline"
                                 >
-                                    <Plus size={12} /> {language === 'zh' ? '添加户型' : 'Add floor plan'}
+                                    <Plus size={12} /> {zh ? '添加户型' : 'Add floor plan'}
                                 </button>
                             </div>
                         </Field>
@@ -579,12 +587,12 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                     className="flex items-center justify-center gap-2 bg-illini-orange hover:bg-illini-orange-dark text-white font-bold px-4 py-2 rounded-lg transition-colors disabled:opacity-60 text-sm"
                 >
                     {saving ? <Loader2 size={14} className="animate-spin" /> : null}
-                    {saving ? (language === 'zh' ? '保存中…' : 'Saving…') : (language === 'zh' ? '保存' : 'Save')}
+                    {saving ? (zh ? '保存中…' : 'Saving…') : (zh ? '保存' : 'Save')}
                 </button>
 
                 {saveSuccess && (
                     <span className="text-xs text-emerald-600 font-medium flex items-center gap-1">
-                        ✓ {language === 'zh' ? '已保存' : 'Saved'}
+                        ✓ {zh ? '已保存' : 'Saved'}
                     </span>
                 )}
                 {saveError && (
@@ -596,7 +604,7 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                     onClick={onClose}
                     className="ml-auto text-xs text-gray-500 hover:text-gray-700 px-3 py-2 border border-gray-300 rounded-lg transition-colors"
                 >
-                    {language === 'zh' ? '取消' : 'Cancel'}
+                    {zh ? '取消' : 'Cancel'}
                 </button>
             </div>
         </div>
