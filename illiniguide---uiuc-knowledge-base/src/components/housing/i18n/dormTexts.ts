@@ -22,6 +22,15 @@ export interface DormDetailText {
     save: string;
     viewingHistory: string;
     favorites: string;
+    ratingsAndReviews: string;
+    commentsTitle: string;
+    leaveComment: string;
+    submitComment: string;
+    deleteComment: string;
+    loginToComment: string;
+    noComments: string;
+    thumbsUpDorm: string;
+    thumbsDownDorm: string;
 }
 
 export interface AiChatText {
@@ -54,7 +63,16 @@ export const dormDetailTexts: Record<Language, DormDetailText> = {
         saved: 'Saved to Favorites',
         save: 'Save to Favorites',
         viewingHistory: 'Viewing History',
-        favorites: 'My Favorites'
+        favorites: 'My Favorites',
+        ratingsAndReviews: 'Ratings & Reviews',
+        commentsTitle: 'Comments',
+        leaveComment: 'Leave a comment...',
+        submitComment: 'Submit',
+        deleteComment: 'Delete',
+        loginToComment: 'Log in to leave a comment',
+        noComments: 'No comments yet',
+        thumbsUpDorm: 'Recommend',
+        thumbsDownDorm: 'Not recommended'
     },
     zh: {
         dormNotFound: '未找到该宿舍',
@@ -77,7 +95,16 @@ export const dormDetailTexts: Record<Language, DormDetailText> = {
         saved: '已加入收藏',
         save: '加入收藏',
         viewingHistory: '浏览历史',
-        favorites: '我的收藏'
+        favorites: '我的收藏',
+        ratingsAndReviews: '评分与评论',
+        commentsTitle: '评论',
+        leaveComment: '写下你的评论...',
+        submitComment: '提交',
+        deleteComment: '删除',
+        loginToComment: '登录后发表评论',
+        noComments: '暂无评论',
+        thumbsUpDorm: '推荐',
+        thumbsDownDorm: '不推荐'
     }
 };
 

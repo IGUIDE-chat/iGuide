@@ -71,6 +71,7 @@ export interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>;
   register: (name: string, email: string, password: string) => Promise<boolean>;
   loginWithGoogle: () => Promise<boolean>;
+  loginWithMicrosoft: () => Promise<boolean>;
   logout: () => void;
   updateName: (name: string) => Promise<boolean>;
   isLoading: boolean;

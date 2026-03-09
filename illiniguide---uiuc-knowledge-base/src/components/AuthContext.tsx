@@ -102,6 +102,12 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         return false;
     };
 
+    const loginWithMicrosoft = async (): Promise<boolean> => {
+        // Keep the legacy provider type-complete even though this file is unused.
+        console.warn('Microsoft Login not yet implemented');
+        return false;
+    };
+
     const updateName = async (name: string): Promise<boolean> => {
         if (!user) return false;
 
@@ -128,7 +134,9 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, register, logout, loginWithGoogle, updateName, isLoading }}>
+        <AuthContext.Provider
+            value={{ user, login, register, logout, loginWithGoogle, loginWithMicrosoft, updateName, isLoading }}
+        >
             {children}
         </AuthContext.Provider>
     );

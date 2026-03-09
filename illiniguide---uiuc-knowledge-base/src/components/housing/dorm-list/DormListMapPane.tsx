@@ -7,7 +7,6 @@ import { MapEmptyViewportOverlay, MapNoResultsOverlay } from './EmptyStates';
 import { DormListText } from './types';
 
 interface DormListMapPaneProps {
-  hasMountedMap: boolean;
   isMapView: boolean;
   filteredDorms: Dorm[];
   visibleInMap: Dorm[];
@@ -27,7 +26,6 @@ interface DormListMapPaneProps {
 }
 
 export const DormListMapPane: React.FC<DormListMapPaneProps> = ({
-  hasMountedMap,
   isMapView,
   filteredDorms,
   visibleInMap,
@@ -45,14 +43,14 @@ export const DormListMapPane: React.FC<DormListMapPaneProps> = ({
   onHoveringChange,
   onMapNoResultAction,
 }) => {
-  if (!hasMountedMap && !isMapView) {
+  if (!isMapView) {
     return null;
   }
 
   return (
     <div
       className={`
-        h-full transition-all duration-300 flex flex-col min-w-0
+        h-full transition-opacity duration-200 flex flex-col min-w-0
         ${
           isMapView
             ? 'absolute inset-0 xl:static xl:w-[60%] xl:min-w-0 opacity-100 z-20 xl:z-auto'

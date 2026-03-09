@@ -196,44 +196,75 @@ const DormMap: React.FC<DormMapProps> = ({
     }, [safeDorms, isVisible, isMapReady]);
 
     useEffect(() => {
-        if (!isVisible || !isMapReady || !mapRef.current) return;
-
-        const rafId = window.requestAnimationFrame(() => {
-            mapRef.current?.resize();
-            window.requestAnimationFrame(() => {
-                mapRef.current?.resize();
-            });
-        });
-
-        return () => window.cancelAnimationFrame(rafId);
-    }, [isVisible, isMapReady, safeDorms.length]);
-
-    useEffect(() => {
         if (!isVisible || !isMapReady || !mapRef.current || !containerRef.current) return;
 
         const map = mapRef.current;
         const container = containerRef.current;
+        const transitionTarget = container.parentElement;
+        let rafOne = 0;
+        let rafTwo = 0;
+        let retryTimer: number | null = null;
+        const timeouts: number[] = [];
 
-        const runResize = () => {
-            map?.resize();
+        const resizeIfSized = () => {
+            if (!map || !container.isConnected) return false;
+            if (container.clientWidth === 0 || container.clientHeight === 0) return false;
+            map.resize();
+            return true;
         };
 
-        // Catch post-transition sizing on view switches.
-        runResize();
-        const t1 = window.setTimeout(runResize, 120);
-        const t2 = window.setTimeout(runResize, 320);
+        const runStabilizedResize = () => {
+            if (!resizeIfSized()) return false;
+
+            rafOne = window.requestAnimationFrame(() => {
+                resizeIfSized();
+                rafTwo = window.requestAnimationFrame(() => {
+                    resizeIfSized();
+                });
+            });
+
+            timeouts.push(window.setTimeout(() => resizeIfSized(), 120));
+            timeouts.push(window.setTimeout(() => resizeIfSized(), 320));
+            return true;
+        };
+
+        const queueRetry = () => {
+            if (retryTimer) return;
+            retryTimer = window.setTimeout(() => {
+                retryTimer = null;
+                runStabilizedResize();
+            }, 80);
+        };
+
+        if (!runStabilizedResize()) {
+            queueRetry();
+        }
 
         const observer = new ResizeObserver(() => {
-            runResize();
+            if (!runStabilizedResize()) {
+                queueRetry();
+            }
         });
         observer.observe(container);
 
-        return () => {
-            window.clearTimeout(t1);
-            window.clearTimeout(t2);
-            observer.disconnect();
+        const handleTransitionEnd = () => {
+            runStabilizedResize();
         };
-    }, [isVisible, isMapReady]);
+        transitionTarget?.addEventListener('transitionend', handleTransitionEnd);
+        window.addEventListener('resize', handleTransitionEnd);
+
+        return () => {
+            window.cancelAnimationFrame(rafOne);
+            window.cancelAnimationFrame(rafTwo);
+            if (retryTimer) {
+                window.clearTimeout(retryTimer);
+            }
+            timeouts.forEach((timeoutId) => window.clearTimeout(timeoutId));
+            observer.disconnect();
+            transitionTarget?.removeEventListener('transitionend', handleTransitionEnd);
+            window.removeEventListener('resize', handleTransitionEnd);
+        };
+    }, [isVisible, isMapReady, safeDorms.length]);
 
     useEffect(() => {
         if (hoveredDorm && !safeDorms.some((dorm) => dorm.id === hoveredDorm.id)) {

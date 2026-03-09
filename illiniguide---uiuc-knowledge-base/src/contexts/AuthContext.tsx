@@ -141,11 +141,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
     };
 
+    const loginWithMicrosoft = async () => {
+        try {
+            const { error } = await authService.signInWithMicrosoft();
+            if (error) {
+                console.error('Microsoft login error:', error);
+                return false;
+            }
+            return true;
+        } catch (error) {
+            console.error('Microsoft login exception:', error);
+            return false;
+        }
+    };
+
     const value: AuthContextType = {
         user,
         login,
         register,
         loginWithGoogle,
+        loginWithMicrosoft,
         logout,
         updateName,
         isLoading

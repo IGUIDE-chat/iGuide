@@ -52,7 +52,6 @@ export const useDormListController = (language: Language) => {
   const { isSidebarOpen, favoritesIconRef, sidebarToggleButtonRef, mobileSidebarButtonRef } =
     useLayout();
   const { toggleFavorite, addToHistory, favorites } = useSharedDormInteraction();
-  const [hasMountedMap, setHasMountedMap] = useState(false);
   const [flyingHeart, setFlyingHeart] = useState<{
     x: number;
     y: number;
@@ -91,12 +90,6 @@ export const useDormListController = (language: Language) => {
     bathroomTypeFilters,
     clearAllFilters,
   } = useHousingFilters();
-
-  useEffect(() => {
-    if (viewMode === 'map') {
-      setHasMountedMap(true);
-    }
-  }, [viewMode]);
 
   const t = DORM_LIST_TEXT[language];
   const isMapView = viewMode === 'map';
@@ -298,7 +291,6 @@ export const useDormListController = (language: Language) => {
   return {
     t,
     filteredDorms,
-    hasMountedMap,
     isMapView,
     isListView,
     hasActiveFilters,

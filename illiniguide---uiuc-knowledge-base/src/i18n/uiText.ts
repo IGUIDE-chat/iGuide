@@ -39,6 +39,7 @@ export type UITextEntry = {
     loginSwitch: string;
     registerSwitch: string;
     googleLogin: string;
+    microsoftLogin: string;
     orEmail: string;
     emailLabel: string;
     passwordLabel: string;
@@ -115,6 +116,7 @@ export const UI_TEXT: Record<Language, UITextEntry> = {
         loginSwitch: 'Login',
         registerSwitch: 'Register',
         googleLogin: 'Login with Google',
+        microsoftLogin: 'Login with Microsoft',
         orEmail: 'Or use email',
         emailLabel: 'Email',
         passwordLabel: 'Password',
@@ -190,6 +192,7 @@ export const UI_TEXT: Record<Language, UITextEntry> = {
         loginSwitch: '登录',
         registerSwitch: '注册',
         googleLogin: '使用 Google 登录',
+        microsoftLogin: '使用 Microsoft 登录',
         orEmail: '或使用邮箱',
         emailLabel: '邮箱',
         passwordLabel: '密码',
