@@ -6,16 +6,16 @@ const SPECIAL_ROOM_TYPES = new Set<RoomType>(['Studio', 'Suite', 'Cluster']);
 
 const ROOM_CODE_LABELS_ZH: Record<string, string> = {
     Studio: 'Studio',
-    '1B0B': '一人间 · 公共卫浴',
+    '1B0B': '单人间 / 公共卫浴',
     '1B1B': '1人1卫',
-    '2B0B': '2人间 · 公共卫浴',
+    '2B0B': '双人间 / 公共卫浴',
     '2B1B': '2人1卫',
     '2B2B': '2人2卫',
-    '3B0B': '3人间 · 公共卫浴',
+    '3B0B': '三人间 / 公共卫浴',
     '3B1B': '3人1卫',
     '3B2B': '3人2卫',
     '3B3B': '3人3卫',
-    '4B0B': '4人间 · 公共卫浴',
+    '4B0B': '四人间 / 公共卫浴',
     '4B1B': '4人1卫',
     '4B2B': '4人2卫',
     '4B3B': '4人3卫',
@@ -121,6 +121,10 @@ function inferBathroomCount(
     return null;
 }
 
+function isSpecialLabelCode(labelCode?: string): labelCode is RoomType {
+    return Boolean(labelCode && SPECIAL_ROOM_TYPES.has(labelCode as RoomType));
+}
+
 export function buildRoomLabelCode(option: Pick<RoomOption, 'bedCount' | 'bathroomCount' | 'bathroomScope'>, specialType?: RoomType) {
     if (specialType && SPECIAL_ROOM_TYPES.has(specialType)) {
         return specialType;
@@ -159,15 +163,34 @@ export function getBathroomScopeLabel(scope: BathroomScope, language: 'en' | 'zh
     return BATH_SCOPE_LABELS[scope][language];
 }
 
+export function getBathroomTagLabel(scope: BathroomScope, language: 'en' | 'zh') {
+    if (language === 'zh') {
+        return getBathroomScopeLabel(scope, language);
+    }
+    return scope === 'semi-private' ? 'Semi-Private' : scope === 'private' ? 'Private' : 'Communal';
+}
+
 export function getRoomDisplayLabel(
     option: Pick<RoomOption, 'bedCount' | 'bathroomCount' | 'bathroomScope' | 'labelCode'>,
     language: 'en' | 'zh'
 ) {
-    if (option.labelCode) {
+    if (language === 'zh' && option.labelCode) {
         return getRoomCodeLabel(option.labelCode, language);
     }
+    if (isSpecialLabelCode(option.labelCode)) {
+        return getRoomCodeLabel(option.labelCode, language);
+    }
+
     const bedLabel = getBedCountLabel(option.bedCount, language);
-    return `${bedLabel} · ${getBathroomScopeLabel(option.bathroomScope, language)}`;
+    if (option.bathroomScope === 'communal') {
+        return `${bedLabel} / ${getBathroomScopeLabel(option.bathroomScope, language)}`;
+    }
+    if (option.bathroomCount != null) {
+        return language === 'zh'
+            ? `${bedLabel} / ${option.bathroomCount}卫`
+            : `${bedLabel} / ${option.bathroomCount} Bath${option.bathroomCount > 1 ? 's' : ''}`;
+    }
+    return `${bedLabel} / ${getBathroomScopeLabel(option.bathroomScope, language)}`;
 }
 
 export function getRoomDetailLabel(
@@ -176,14 +199,14 @@ export function getRoomDetailLabel(
 ) {
     const bedLabel = getBedCountLabel(option.bedCount, language);
     if (option.bathroomScope === 'communal') {
-        return `${bedLabel} · ${getBathroomScopeLabel(option.bathroomScope, language)}`;
+        return `${bedLabel} / ${getBathroomScopeLabel(option.bathroomScope, language)}`;
     }
     if (option.bathroomCount != null) {
         return language === 'zh'
-            ? `${bedLabel} · ${option.bathroomCount}卫`
-            : `${bedLabel} · ${option.bathroomCount} Bath${option.bathroomCount > 1 ? 's' : ''}`;
+            ? `${bedLabel} / ${option.bathroomCount}卫`
+            : `${bedLabel} / ${option.bathroomCount} Bath${option.bathroomCount > 1 ? 's' : ''}`;
     }
-    return `${bedLabel} · ${getBathroomScopeLabel(option.bathroomScope, language)}`;
+    return `${bedLabel} / ${getBathroomScopeLabel(option.bathroomScope, language)}`;
 }
 
 export function getRoomOptionKey(option: Pick<RoomOption, 'bedCount' | 'bathroomCount' | 'bathroomScope' | 'labelCode'>) {
@@ -248,6 +271,18 @@ export function getDormBathroomSummary(dorm: Dorm, language: 'en' | 'zh') {
         return BATH_SUMMARY_LABELS[language].mixed;
     }
     return getBathroomScopeLabel(dorm.bathroomType, language);
+}
+
+export function getDormBathroomTagSummary(dorm: Dorm, language: 'en' | 'zh') {
+    const roomOptions = dorm.roomOptions ?? deriveRoomOptions(dorm.floorPlans, dorm.bathroomType).roomOptions;
+    const scopes = Array.from(new Set(roomOptions.map((option) => option.bathroomScope)));
+    if (scopes.length === 1) {
+        return getBathroomTagLabel(scopes[0], language);
+    }
+    if (scopes.length > 1) {
+        return language === 'zh' ? '多种卫浴' : 'Mixed';
+    }
+    return getBathroomTagLabel(dorm.bathroomType, language);
 }
 
 export function normalizeDorm(dorm: Dorm): Dorm {
