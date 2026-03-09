@@ -88,9 +88,9 @@ export function getTagDisplay(tag: DormTag, language: Language): string {
 /** Collect all tags from categorized tags, sorted by priority (ascending = more important first). */
 export function getAllTagsSorted(categorizedTags: DormCategorizedTags): DormTag[] {
     const all: DormTag[] = [
-        ...categorizedTags.livingConditions,
-        ...categorizedTags.facilities,
-        ...categorizedTags.lifestyle,
+        ...(categorizedTags.livingConditions ?? []),
+        ...(categorizedTags.facilities ?? []),
+        ...(categorizedTags.lifestyle ?? []),
     ];
     return all.sort((a, b) => {
         const pa = TAG_REGISTRY[a]?.priority ?? 99;

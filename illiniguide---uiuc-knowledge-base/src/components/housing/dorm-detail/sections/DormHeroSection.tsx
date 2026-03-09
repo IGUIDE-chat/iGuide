@@ -13,7 +13,8 @@ interface DormHeroSectionProps {
 
 const DormHeroSection: React.FC<DormHeroSectionProps> = ({ dorm, dormName, campusLabel, language = 'en' }) => {
     const allImages = [dorm.imageUrl, ...(dorm.galleryImages || [])].filter(Boolean);
-    const heroTags = getHeroTags(dorm.categorizedTags, 8);
+    const defaultTags = { livingConditions: [], facilities: [], lifestyle: [] };
+    const heroTags = getHeroTags(dorm.categorizedTags ?? defaultTags, 8);
 
     return (
         <div className="h-56 md:h-80 w-full relative group">

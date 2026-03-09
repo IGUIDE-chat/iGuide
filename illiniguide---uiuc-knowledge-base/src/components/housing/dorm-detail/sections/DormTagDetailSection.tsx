@@ -12,8 +12,8 @@ interface DormTagDetailSectionProps {
 const CATEGORY_ORDER: TagCategory[] = ['livingConditions', 'facilities', 'lifestyle'];
 
 const DormTagDetailSection: React.FC<DormTagDetailSectionProps> = ({ categorizedTags, language }) => {
-    const hasAnyTags = CATEGORY_ORDER.some(cat => categorizedTags[cat].length > 0);
-    if (!hasAnyTags) return null;
+    const hasAnyTags = CATEGORY_ORDER.some(cat => (categorizedTags[cat] ?? []).length > 0);
+    if (!categorizedTags || !hasAnyTags) return null;
 
     return (
         <section>
@@ -22,7 +22,7 @@ const DormTagDetailSection: React.FC<DormTagDetailSectionProps> = ({ categorized
             </h3>
             <div className="space-y-4">
                 {CATEGORY_ORDER.map(category => {
-                    const tags = categorizedTags[category];
+                    const tags = categorizedTags[category] ?? [];
                     if (tags.length === 0) return null;
 
                     return (

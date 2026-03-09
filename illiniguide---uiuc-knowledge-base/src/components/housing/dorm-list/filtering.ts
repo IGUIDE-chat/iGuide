@@ -57,9 +57,9 @@ const matchesCategorizedTagFilters = (dorm: Dorm, filters: DormTag[]): boolean =
     if (!dorm.categorizedTags) return false;
 
     const allDormTags: DormTag[] = [
-        ...dorm.categorizedTags.livingConditions,
-        ...dorm.categorizedTags.facilities,
-        ...dorm.categorizedTags.lifestyle,
+        ...(dorm.categorizedTags.livingConditions ?? []),
+        ...(dorm.categorizedTags.facilities ?? []),
+        ...(dorm.categorizedTags.lifestyle ?? []),
     ];
 
     return filters.every(tag => allDormTags.includes(tag));
