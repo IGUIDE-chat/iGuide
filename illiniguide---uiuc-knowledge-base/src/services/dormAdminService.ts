@@ -19,6 +19,7 @@ export interface DormUpdate {
     housing_type?: string | null;
     ac?: boolean;
     dining?: string;
+    dining_nearby_detail?: string | null;
     bathroom_type?: string | null;
     room_types?: string[] | null;
     categorized_tags?: Record<string, unknown> | null;
@@ -38,7 +39,7 @@ export interface DormUpdate {
 const KNOWN_DB_COLUMNS = new Set([
     'name', 'name_zh', 'description', 'description_zh',
     'image_url', 'price', 'location', 'location_zh',
-    'housing_type', 'ac', 'dining', 'bathroom_type',
+    'housing_type', 'ac', 'dining', 'dining_nearby_detail', 'bathroom_type',
     'room_types', 'categorized_tags',
     'floor_plans', 'gallery_images',
     'pros', 'pros_zh', 'cons', 'cons_zh',

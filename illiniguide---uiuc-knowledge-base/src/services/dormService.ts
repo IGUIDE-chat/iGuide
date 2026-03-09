@@ -22,6 +22,7 @@ function rowToDorm(row: Record<string, unknown>): Dorm {
         housingType: (row.housing_type as Dorm['housingType']) ?? 'URH',
         ac: Boolean(row.ac),
         dining: (row.dining as Dorm['dining']) ?? 'nearby',
+        diningNearbyDetail: (row.dining_nearby_detail as string) ?? undefined,
         bathroomType: (row.bathroom_type as Dorm['bathroomType']) ?? 'communal',
         lat: Number(row.lat) || 0,
         lng: Number(row.lng) || 0,
