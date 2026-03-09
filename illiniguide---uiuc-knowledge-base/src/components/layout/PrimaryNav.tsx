@@ -61,11 +61,11 @@ export const PrimaryNav: React.FC<PrimaryNavProps> = ({
   return (
     <>
       <div className="p-3 mb-2 flex items-center justify-between">
-        <div className="flex items-center gap-2 px-2 py-2 rounded-md hover:bg-white/5 cursor-pointer w-full transition-colors">
-          <BrandMark className="h-9 w-9 rounded-lg" iconClassName="h-3.5 w-3.5" />
+        <div className="flex items-center gap-2.5 px-2 py-2 rounded-md hover:bg-white/5 cursor-pointer w-full transition-colors">
+          <BrandMark className="h-8 w-8 rounded-lg" iconClassName="h-4 w-4" />
           <SidebarLabel
             isOpen={isSidebarOpen}
-            className="font-semibold text-sm tracking-tight text-white"
+            className="font-bold text-[15px] tracking-tight text-white"
           >
             <AnimatedText>{appTitle}</AnimatedText>
           </SidebarLabel>
