@@ -10,6 +10,7 @@ export interface DormDetailText {
     good: string;
     notSoGood: string;
     quickStats: string;
+    housingType: string;
     diningHall: string;
     onSite: string;
     nearby: string;
@@ -42,6 +43,7 @@ export const dormDetailTexts: Record<Language, DormDetailText> = {
         good: 'The Good',
         notSoGood: 'The Not-So-Good',
         quickStats: 'Quick Stats',
+        housingType: 'Housing Type',
         diningHall: 'Dining Hall',
         onSite: 'On-site',
         nearby: 'Nearby',
@@ -64,6 +66,7 @@ export const dormDetailTexts: Record<Language, DormDetailText> = {
         good: '优点',
         notSoGood: '不足',
         quickStats: '快速信息',
+        housingType: '住宿类型',
         diningHall: '食堂',
         onSite: '楼内',
         nearby: '附近',

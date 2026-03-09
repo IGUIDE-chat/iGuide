@@ -1,5 +1,5 @@
 import React from 'react';
-import { DollarSign, Utensils, MapPin, Wind, Bath } from 'lucide-react';
+import { DollarSign, Utensils, MapPin, Wind, Bath, Building2 } from 'lucide-react';
 import { Dorm } from '../../../../types/housing';
 import { Language } from '../../../../types';
 import { getDormBathroomSummary } from '../../../../utils/roomOptions';
@@ -8,6 +8,7 @@ interface DormQuickStatsSectionProps {
     dorm: Dorm;
     language: Language;
     quickStatsLabel: string;
+    housingTypeLabel: string;
     diningHallLabel: string;
     onSiteLabel: string;
     nearbyLabel: string;
@@ -24,6 +25,7 @@ const DormQuickStatsSection: React.FC<DormQuickStatsSectionProps> = ({
     dorm,
     language,
     quickStatsLabel,
+    housingTypeLabel,
     diningHallLabel,
     annualPriceLabel,
     formatPrice,
@@ -36,6 +38,21 @@ const DormQuickStatsSection: React.FC<DormQuickStatsSectionProps> = ({
         <div>
             <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">{quickStatsLabel}</h3>
             <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center text-gray-700">
+                        <Building2 size={18} className="mr-3 text-illini-blue" />
+                        <span>{housingTypeLabel}</span>
+                    </div>
+                    <span
+                        className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold tracking-wide ${dorm.housingType === 'URH'
+                            ? 'bg-illini-orange/15 text-illini-orange'
+                            : 'bg-blue-100 text-illini-blue'
+                            }`}
+                    >
+                        {dorm.housingType}
+                    </span>
+                </div>
+
                 <div className="flex items-center justify-between">
                     <div className="flex items-center text-gray-700">
                         <MapPin size={18} className="mr-3 text-illini-blue" />

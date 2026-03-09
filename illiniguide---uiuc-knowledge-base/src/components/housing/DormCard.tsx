@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Bath, BedSingle, MapPin, Utensils, Wind } from 'lucide-react';
 import { formatPrice } from '../../constants/housing/pricing';
 import { Dorm } from '../../types/housing';
 import { Language } from '../../types';
 import { deriveRoomOptions, getRoomRangeSummary } from '../../utils/roomOptions';
-import { getCardTagItems } from '../../utils/tagLabels';
+import { CardTagItem, getCardTagCandidates } from '../../utils/tagLabels';
 
 interface DormCardProps {
     dorm: Dorm;
@@ -14,6 +14,9 @@ interface DormCardProps {
     onHoverDorm?: (dormId: string | null) => void;
     language?: Language;
 }
+
+const CARD_TAG_GAP_PX = 6;
+const MAX_VISIBLE_CARD_TAGS = 4;
 
 const TEXT = {
     en: {
@@ -158,6 +161,114 @@ function getDiningLabel(dorm: Dorm, language: Language) {
     return t.diningNone;
 }
 
+function getCardTagClasses(tag: CardTagItem) {
+    const toneClasses =
+        tag.tone === 'muted'
+            ? 'border-gray-200/70 bg-gray-100/70 text-gray-400'
+            : tag.tone === 'positive'
+                ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                : 'border-slate-200 bg-slate-50 text-slate-700';
+
+    return `inline-flex min-w-0 shrink-0 items-center overflow-hidden text-ellipsis whitespace-nowrap rounded-full border px-2 py-1 text-[11px] font-medium max-w-[8.5rem] ${toneClasses}`;
+}
+
+function getOverflowTagClasses() {
+    return 'inline-flex shrink-0 items-center rounded-full border border-dashed border-gray-300 px-2 py-1 text-[11px] font-medium text-gray-500';
+}
+
+function useResponsiveCardTags(allTags: CardTagItem[], moreTagsLabel: (count: number) => string) {
+    const containerRef = useRef<HTMLDivElement | null>(null);
+    const tagRefs = useRef<Record<string, HTMLSpanElement | null>>({});
+    const overflowRefs = useRef<Record<number, HTMLSpanElement | null>>({});
+    const [layout, setLayout] = useState(() => {
+        const initialVisibleCount = Math.min(allTags.length, MAX_VISIBLE_CARD_TAGS);
+
+        return {
+            visibleCount: initialVisibleCount,
+            overflowCount: Math.max(allTags.length - initialVisibleCount, 0),
+        };
+    });
+
+    const tagSignature = useMemo(() => allTags.map((tag) => tag.id).join('|'), [allTags]);
+
+    useLayoutEffect(() => {
+        const container = containerRef.current;
+        if (!container) {
+            return;
+        }
+
+        let frame = 0;
+
+        const measure = () => {
+            const availableWidth = container.clientWidth;
+            if (!availableWidth) {
+                return;
+            }
+
+            const maxVisibleCount = Math.min(allTags.length, MAX_VISIBLE_CARD_TAGS);
+            let nextVisibleCount = maxVisibleCount;
+
+            for (let count = maxVisibleCount; count >= 1; count -= 1) {
+                const overflowCount = allTags.length - count;
+                const tagWidths = allTags
+                    .slice(0, count)
+                    .reduce((total, tag) => total + (tagRefs.current[tag.id]?.offsetWidth ?? 0), 0);
+                const tagGapWidth = count > 1 ? (count - 1) * CARD_TAG_GAP_PX : 0;
+                const overflowWidth =
+                    overflowCount > 0 ? overflowRefs.current[overflowCount]?.offsetWidth ?? 0 : 0;
+                const overflowGapWidth = overflowCount > 0 && count > 0 ? CARD_TAG_GAP_PX : 0;
+
+                if (tagWidths + tagGapWidth + overflowGapWidth + overflowWidth <= availableWidth) {
+                    nextVisibleCount = count;
+                    break;
+                }
+
+                nextVisibleCount = 1;
+            }
+
+            const nextOverflowCount = Math.max(allTags.length - nextVisibleCount, 0);
+            setLayout((current) => {
+                if (
+                    current.visibleCount === nextVisibleCount &&
+                    current.overflowCount === nextOverflowCount
+                ) {
+                    return current;
+                }
+
+                return {
+                    visibleCount: nextVisibleCount,
+                    overflowCount: nextOverflowCount,
+                };
+            });
+        };
+
+        const scheduleMeasure = () => {
+            cancelAnimationFrame(frame);
+            frame = requestAnimationFrame(measure);
+        };
+
+        scheduleMeasure();
+
+        const resizeObserver = new ResizeObserver(scheduleMeasure);
+        resizeObserver.observe(container);
+
+        return () => {
+            cancelAnimationFrame(frame);
+            resizeObserver.disconnect();
+        };
+    }, [allTags, moreTagsLabel, tagSignature]);
+
+    const visibleItems = allTags.slice(0, layout.visibleCount);
+
+    return {
+        containerRef,
+        overflowCount: layout.overflowCount,
+        overflowRefs,
+        tagRefs,
+        visibleItems,
+    };
+}
+
 const DormCard: React.FC<DormCardProps> = ({
     dorm,
     onViewDetails,
@@ -172,11 +283,11 @@ const DormCard: React.FC<DormCardProps> = ({
     const locationLabel = language === 'zh' && dorm.location_zh ? dorm.location_zh : dorm.location;
     const roomOptions = dorm.roomOptions ?? deriveRoomOptions(dorm.floorPlans, dorm.bathroomType).roomOptions;
     const roomRangeSummary = getRoomRangeSummary(roomOptions, language);
-    const cardTags = getCardTagItems(
+    const cardTagCandidates = getCardTagCandidates(
         dorm.categorizedTags ?? { livingConditions: [], facilities: [], lifestyle: [] },
-        language,
-        4
+        language
     );
+    const cardTags = useResponsiveCardTags(cardTagCandidates, t.moreTags);
     const cardSummary = getCardSummary(dorm, description, locationLabel, language);
 
     return (
@@ -229,7 +340,7 @@ const DormCard: React.FC<DormCardProps> = ({
             </div>
 
             <div className="flex flex-grow flex-col p-4">
-                <h3 className="mb-2 min-h-[3.5rem] line-clamp-2 text-xl font-bold leading-tight text-gray-900 antialiased">
+                <h3 className="mb-1.5 min-h-[2.9rem] line-clamp-2 text-xl font-bold leading-[1.15] text-gray-900 antialiased">
                     {dormName}
                 </h3>
 
@@ -263,27 +374,54 @@ const DormCard: React.FC<DormCardProps> = ({
                     </p>
                 )}
 
-                <div className="mt-auto flex flex-wrap gap-1.5">
-                    {cardTags.items.map((tag) => (
+                <div ref={cardTags.containerRef} className="mt-auto flex min-w-0 items-center gap-1.5 overflow-hidden">
+                    {cardTags.visibleItems.map((tag) => (
                         <span
                             key={tag.id}
                             title={tag.label}
-                            className={`inline-flex items-center rounded-full border px-2 py-1 text-[11px] font-medium ${tag.tone === 'muted'
-                                    ? 'border-gray-200/70 bg-gray-100/70 text-gray-400'
-                                    : tag.tone === 'positive'
-                                        ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
-                                        : 'border-slate-200 bg-slate-50 text-slate-700'
-                                } max-w-[8.5rem] min-w-0 whitespace-nowrap overflow-hidden text-ellipsis`}
+                            className={getCardTagClasses(tag)}
                         >
                             {tag.label}
                         </span>
                     ))}
                     {cardTags.overflowCount > 0 && (
-                        <span className="inline-flex items-center rounded-full border border-dashed border-gray-300 px-2 py-1 text-[11px] font-medium text-gray-500">
+                        <span className={getOverflowTagClasses()}>
                             {t.moreTags(cardTags.overflowCount)}
                         </span>
                     )}
                 </div>
+
+                {cardTagCandidates.length > 0 && (
+                    <div
+                        aria-hidden="true"
+                        className="pointer-events-none absolute left-4 top-4 -z-10 h-0 overflow-hidden opacity-0"
+                    >
+                        <div className="flex items-center gap-1.5">
+                            {cardTagCandidates.map((tag) => (
+                                <span
+                                    key={`measure-${tag.id}`}
+                                    ref={(element) => {
+                                        cardTags.tagRefs.current[tag.id] = element;
+                                    }}
+                                    className={getCardTagClasses(tag)}
+                                >
+                                    {tag.label}
+                                </span>
+                            ))}
+                            {Array.from({ length: cardTagCandidates.length }, (_, index) => index + 1).map((count) => (
+                                <span
+                                    key={`measure-overflow-${count}`}
+                                    ref={(element) => {
+                                        cardTags.overflowRefs.current[count] = element;
+                                    }}
+                                    className={getOverflowTagClasses()}
+                                >
+                                    {t.moreTags(count)}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
