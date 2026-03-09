@@ -1,14 +1,9 @@
-import React from 'react';
-import { DollarSign, Home, Utensils, MapPin, Wind, Bath } from 'lucide-react';
+import { DollarSign, Utensils, MapPin, Wind, Bath } from 'lucide-react';
 import { Dorm } from '../../../../types/housing';
-import { Language } from '../../../../types';
-import { getDormTypeLabel } from '../../../../utils/housingLabels';
-
-interface DormQuickStatsSectionProps {
+import { Language } from '../../../../types'; interface DormQuickStatsSectionProps {
     dorm: Dorm;
     language: Language;
     quickStatsLabel: string;
-    roomTypeLabel: string;
     diningHallLabel: string;
     onSiteLabel: string;
     nearbyLabel: string;
@@ -30,7 +25,6 @@ const DormQuickStatsSection: React.FC<DormQuickStatsSectionProps> = ({
     dorm,
     language,
     quickStatsLabel,
-    roomTypeLabel,
     diningHallLabel,
     annualPriceLabel,
     formatPrice
@@ -45,13 +39,6 @@ const DormQuickStatsSection: React.FC<DormQuickStatsSectionProps> = ({
                 {quickStatsLabel}
             </h3>
             <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center text-gray-700">
-                        <Home size={18} className="mr-3 text-illini-blue" />
-                        <span>{roomTypeLabel}</span>
-                    </div>
-                    <span className="font-medium text-gray-900">{getDormTypeLabel(dorm.type, language)}</span>
-                </div>
                 <div className="flex items-center justify-between">
                     <div className="flex items-center text-gray-700">
                         <MapPin size={18} className="mr-3 text-illini-blue" />

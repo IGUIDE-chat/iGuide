@@ -102,24 +102,33 @@ const DormCard: React.FC<DormCardProps> = ({
                             <Utensils size={10} className="mr-1" /> {t.dining}
                         </span>
                     )}
-                    {dorm.roomTypes?.slice(0, 2).map((type) => (
-                        <span
-                            key={type}
-                            className="inline-block px-2 py-1 rounded-md border border-gray-200 text-gray-600 text-[10px] font-medium bg-white transition-colors duration-150 hover:bg-gray-50 hover:text-gray-800 hover:border-gray-300"
-                        >
-                            {getRoomTypeLabel(type, language)}
-                        </span>
-                    ))}
-                    {getHeroTags(dorm.categorizedTags ?? { livingConditions: [], facilities: [], lifestyle: [] }, 2)
+                    {[...(dorm.roomTypes || [])]
+                        .sort((a, b) => {
+                            // Give priority to Studio and 1B1B, then by numeric value
+                            const order = ['Studio', '1B1B', '2B0B', '2B1B', '2B2B', '3B0B', '3B1B', '3B2B', '3B3B', '4B1B', '4B2B'];
+                            const idxA = order.indexOf(a);
+                            const idxB = order.indexOf(b);
+                            return (idxA > -1 ? idxA : 99) - (idxB > -1 ? idxB : 99);
+                        })
+                        .slice(0, 3)
+                        .map((type) => (
+                            <span
+                                key={type}
+                                className="inline-block px-2 py-1 rounded-md border border-gray-200 text-gray-600 text-[10px] font-medium bg-white transition-colors duration-150 hover:bg-gray-50 hover:text-gray-800 hover:border-gray-300"
+                            >
+                                {getRoomTypeLabel(type, language)}
+                            </span>
+                        ))}
+                    {getHeroTags(dorm.categorizedTags ?? { livingConditions: [], facilities: [], lifestyle: [] }, 4)
                         .filter(tag => tag !== 'noAc')
                         .map((tag) => (
-                        <span
-                            key={tag}
-                            className="inline-block px-2 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium transition-colors duration-150 hover:bg-gray-200 hover:text-gray-800"
-                        >
-                            {getTagDisplay(tag, language)}
-                        </span>
-                    ))}
+                            <span
+                                key={tag}
+                                className="inline-block px-2 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium transition-colors duration-150 hover:bg-gray-200 hover:text-gray-800"
+                            >
+                                {getTagDisplay(tag, language)}
+                            </span>
+                        ))}
                 </div>
 
                 <p className="text-gray-700 text-sm leading-relaxed mb-2 line-clamp-3 flex-grow antialiased">{getDescription()}</p>

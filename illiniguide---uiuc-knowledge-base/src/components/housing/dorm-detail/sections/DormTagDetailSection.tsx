@@ -18,7 +18,7 @@ const DormTagDetailSection: React.FC<DormTagDetailSectionProps> = ({ categorized
     return (
         <section>
             <h3 className="text-lg font-bold text-gray-900 mb-4">
-                {language === 'zh' ? '标签详情' : 'Tags & Features'}
+                {language === 'zh' ? '设施详情' : 'Facility Details'}
             </h3>
             <div className="space-y-4">
                 {CATEGORY_ORDER.map(category => {
