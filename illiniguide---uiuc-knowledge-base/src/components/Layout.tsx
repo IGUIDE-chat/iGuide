@@ -83,7 +83,6 @@ export const Layout: React.FC<LayoutProps> = ({
     activeFilters,
     priceRange,
     locationFilters,
-    typeFilters,
     roomTypeFilters,
     housingTypeDetails,
     amenityFilters,
@@ -111,7 +110,6 @@ export const Layout: React.FC<LayoutProps> = ({
     hasPriceFilter ||
     housingTypeDetails !== 'ALL' ||
     locationFilters.length > 0 ||
-    typeFilters.length > 0 ||
     roomTypeFilters.length > 0 ||
     amenityFilters.length > 0 ||
     communityFilters.length > 0 ||
@@ -121,7 +119,6 @@ export const Layout: React.FC<LayoutProps> = ({
     (hasPriceFilter ? 1 : 0) +
     (housingTypeDetails !== 'ALL' ? 1 : 0) +
     locationFilters.length +
-    typeFilters.length +
     roomTypeFilters.length +
     activeFilters.length +
     amenityFilters.length +

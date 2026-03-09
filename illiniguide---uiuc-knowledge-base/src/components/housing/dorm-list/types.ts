@@ -20,7 +20,6 @@ export interface DormFilterState {
     activeFilters: FilterOption[];
     normalizedPriceRange: [number, number];
     locationFilters: string[];
-    typeFilters: string[];
     roomTypeFilters: RoomType[];
     housingTypeDetails: 'ALL' | 'URH' | 'PCH';
     // Legacy structured tag filters (kept for backward compat)

@@ -19,7 +19,6 @@ export interface ModalText {
     urhDesc: string;
     pchDesc: string;
     location: string;
-    buildingType: string;
     livingConditions: string;
     facilities: string;
     lifestyle: string;
@@ -56,7 +55,6 @@ export const MODAL_TEXT: Record<FilterLanguage, ModalText> = {
         urhDesc: 'Official university residence halls',
         pchDesc: 'Private certified housing',
         location: 'Location',
-        buildingType: 'Building Type',
         livingConditions: 'Living Conditions',
         facilities: 'Facilities',
         lifestyle: 'Lifestyle',
@@ -82,7 +80,6 @@ export const MODAL_TEXT: Record<FilterLanguage, ModalText> = {
         urhDesc: '学校官方宿舍',
         pchDesc: '经认证的校外住宿',
         location: '位置',
-        buildingType: '建筑类型',
         livingConditions: '居住条件',
         facilities: '配套设施',
         lifestyle: '生活方式',

@@ -113,7 +113,6 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
         priceRange,
         setPriceRange,
         locationFilters,
-        typeFilters,
         roomTypeFilters,
         housingTypeDetails,
         viewMode,
@@ -155,7 +154,6 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
             hasPriceFilter ||
             housingTypeDetails !== 'ALL' ||
             locationFilters.length > 0 ||
-            typeFilters.length > 0 ||
             roomTypeFilters.length > 0 ||
             amenityFilters.length > 0 ||
             communityFilters.length > 0 ||
@@ -171,7 +169,6 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
             hasPriceFilter,
             housingTypeDetails,
             locationFilters.length,
-            typeFilters.length,
             roomTypeFilters.length,
             amenityFilters.length,
             communityFilters.length,
@@ -190,7 +187,6 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
             (hasPriceFilter ? 1 : 0) +
             (housingTypeDetails !== 'ALL' ? 1 : 0) +
             locationFilters.length +
-            typeFilters.length +
             roomTypeFilters.length +
             activeFilters.length +
             amenityFilters.length +
@@ -206,7 +202,6 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
             hasPriceFilter,
             housingTypeDetails,
             locationFilters.length,
-            typeFilters.length,
             roomTypeFilters.length,
             activeFilters.length,
             amenityFilters.length,
@@ -233,7 +228,6 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
                 activeFilters,
                 normalizedPriceRange,
                 locationFilters,
-                typeFilters,
                 roomTypeFilters,
                 housingTypeDetails,
                 amenityFilters,
@@ -253,7 +247,6 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
             activeFilters,
             normalizedPriceRange,
             locationFilters,
-            typeFilters,
             roomTypeFilters,
             housingTypeDetails,
             amenityFilters,

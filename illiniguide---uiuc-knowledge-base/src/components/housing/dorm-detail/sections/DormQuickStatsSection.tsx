@@ -1,6 +1,9 @@
+import React from 'react';
 import { DollarSign, Utensils, MapPin, Wind, Bath } from 'lucide-react';
 import { Dorm } from '../../../../types/housing';
-import { Language } from '../../../../types'; interface DormQuickStatsSectionProps {
+import { Language } from '../../../../types';
+
+interface DormQuickStatsSectionProps {
     dorm: Dorm;
     language: Language;
     quickStatsLabel: string;

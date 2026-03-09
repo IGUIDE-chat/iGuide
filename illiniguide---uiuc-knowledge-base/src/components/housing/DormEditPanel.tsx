@@ -90,8 +90,6 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
     const [price, setPrice] = useState(String(dorm.price));
     const [location, setLocation] = useState(dorm.location);
     const [locationZh, setLocationZh] = useState(dorm.location_zh ?? '');
-    const [type, setType] = useState(dorm.type);
-    const [typeZh, setTypeZh] = useState(dorm.type_zh ?? '');
     const [housingType, setHousingType] = useState(dorm.housingType);
     const [roomTypes, setRoomTypes] = useState<string[]>(dorm.roomTypes);
     const [tags, setTags] = useState<string[]>(dorm.tags);
@@ -126,8 +124,6 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
         setPrice(String(dorm.price));
         setLocation(dorm.location);
         setLocationZh(dorm.location_zh ?? '');
-        setType(dorm.type);
-        setTypeZh(dorm.type_zh ?? '');
         setHousingType(dorm.housingType);
         setRoomTypes([...dorm.roomTypes]);
         setTags([...dorm.tags]);
@@ -161,8 +157,6 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
             price: price !== '' ? Number(price) : null,
             location,
             location_zh: locationZh || null,
-            type,
-            type_zh: typeZh || null,
             housing_type: housingType,
             room_types: roomTypes.length ? roomTypes : null,
             tags: tags.length ? tags : null,
@@ -298,7 +292,6 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
             descLabel: 'Description',
             imageLabel: 'Image URL',
             locationLabel: 'Location',
-            typeLabel: 'Dorm Type',
             housingTypeLabel: 'Housing Type',
             roomTypesLabel: 'Room Types',
             tagsLabel: 'Tags',
@@ -332,7 +325,6 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
             descLabel: '描述',
             imageLabel: '图片 URL',
             locationLabel: '地理位置',
-            typeLabel: '宿舍类型',
             housingTypeLabel: '公立/私立',
             roomTypesLabel: '房型',
             tagsLabel: '标签',
@@ -457,11 +449,6 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                                         <input type="text" value={locationZh} onChange={(e) => setLocationZh(e.target.value)} className={inputCls} placeholder="中文位置..." />
                                     </Field>
                                 </div>
-                                <div className="flex-1">
-                                    <Field label={t.typeLabel}>
-                                        <input type="text" value={typeZh} onChange={(e) => setTypeZh(e.target.value)} className={inputCls} placeholder="中文分类..." />
-                                    </Field>
-                                </div>
                             </div>
                             <Field label={t.prosLabel}>
                                 <EditableList items={prosZh} onChange={setProsZh} placeholder={t.addPro} />
@@ -516,37 +503,6 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                             </Field>
                         </div>
                     </div>
-
-                    {/* Dorm Type */}
-                    <Field label={t.typeLabel}>
-                        <select value={type} onChange={e => setType(e.target.value as any)} className={inputCls}>
-                            <option value="Traditional">Traditional</option>
-                            <option value="Cluster">Cluster</option>
-                            <option value="Suite">Suite</option>
-                            <option value="Semi-Suite">Semi-Suite</option>
-                        </select>
-                    </Field>
-
-                    {/* Room Types — multi-select checkboxes */}
-                    <Field label={t.roomTypesLabel}>
-                        <div className="flex flex-wrap gap-2">
-                            {ROOM_TYPE_OPTIONS.map(rt => (
-                                <label key={rt} className="flex items-center gap-1 cursor-pointer select-none">
-                                    <input
-                                        type="checkbox"
-                                        checked={roomTypes.includes(rt)}
-                                        onChange={() => {
-                                            setRoomTypes(prev =>
-                                                prev.includes(rt) ? prev.filter(r => r !== rt) : [...prev, rt]
-                                            );
-                                        }}
-                                        className="accent-illini-orange"
-                                    />
-                                    <span className="text-xs">{rt}</span>
-                                </label>
-                            ))}
-                        </div>
-                    </Field>
 
                     {/* Tags — multi-select checkboxes with i18n labels */}
                     <Field label={t.tagsLabel}>

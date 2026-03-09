@@ -19,8 +19,6 @@ function rowToDorm(row: Record<string, unknown>): Dorm {
         priceRange: (row.price_range as Dorm['priceRange']) ?? '$',
         location: (row.location as Dorm['location']) ?? 'Main Quad',
         location_zh: (row.location_zh as string) ?? undefined,
-        type: (row.type as Dorm['type']) ?? 'Traditional',
-        type_zh: (row.type_zh as string) ?? undefined,
         housingType: (row.housing_type as Dorm['housingType']) ?? 'URH',
         ac: Boolean(row.ac),
         dining: (row.dining as Dorm['dining']) ?? 'nearby',

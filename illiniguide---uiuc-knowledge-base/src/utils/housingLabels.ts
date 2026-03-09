@@ -1,4 +1,4 @@
-import { Dorm, RoomType } from '../types/housing';
+import { RoomType } from '../types/housing';
 
 const ROOM_TYPE_LABELS_ZH: Record<RoomType, string> = {
     Studio: '开间 (Studio)',
@@ -19,20 +19,7 @@ const ROOM_TYPE_LABELS_ZH: Record<RoomType, string> = {
     Cluster: '集群式 (Cluster)'
 };
 
-const DORM_TYPE_LABELS_ZH: Record<Dorm['type'], string> = {
-    Traditional: '传统宿舍',
-    Cluster: '集群式',
-    Suite: '套间',
-    'Semi-Suite': '半套间'
-};
-
 export const getRoomTypeLabel = (roomType: RoomType, language: 'en' | 'zh'): string => {
     if (language !== 'zh') return roomType;
     return ROOM_TYPE_LABELS_ZH[roomType] || roomType;
 };
-
-export const getDormTypeLabel = (dormType: Dorm['type'], language: 'en' | 'zh'): string => {
-    if (language !== 'zh') return dormType;
-    return DORM_TYPE_LABELS_ZH[dormType] || dormType;
-};
-
