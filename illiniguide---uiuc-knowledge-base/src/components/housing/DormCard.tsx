@@ -340,7 +340,7 @@ const DormCard: React.FC<DormCardProps> = ({
             </div>
 
             <div className="flex flex-grow flex-col p-4">
-                <h3 className="mb-1.5 min-h-[2.9rem] line-clamp-2 text-xl font-bold leading-[1.15] text-gray-900 antialiased">
+                <h3 className="mb-1.5 line-clamp-2 text-xl font-bold leading-[1.15] text-gray-900 antialiased">
                     {dormName}
                 </h3>
 
