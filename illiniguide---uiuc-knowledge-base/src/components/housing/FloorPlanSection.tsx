@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { FloorPlan, RoomOption } from '../../types/housing';
+import { BathroomScope, FloorPlan, RoomOption } from '../../types/housing';
 import { formatPrice } from '../../constants/housing/pricing';
-import { Maximize, Check, X, ChevronDown, ImageOff } from 'lucide-react';
+import { Maximize, Check, X, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getRoomDetailLabel, getRoomDisplayLabel, getRoomOptionKey, normalizeFloorPlan } from '../../utils/roomOptions';
+import { getRoomOptionKey, getRoomOptionLabels, normalizeFloorPlan } from '../../utils/roomOptions';
 
 interface FloorPlanSectionProps {
     floorPlans: FloorPlan[];
@@ -20,9 +20,11 @@ const TEXT = {
         notAvailable: 'Limited',
         perYear: '/year',
         sqftLabel: 'sq ft',
-        unavailable: 'Floor plan unavailable',
+        unavailable: 'Floor plan image unavailable',
         priceRange: 'Price Range',
         monthly: '/month',
+        viewFloorPlan: 'View floor plan',
+        hideFloorPlan: 'Hide floor plan',
     },
     zh: {
         title: '户型图与价格',
@@ -33,23 +35,36 @@ const TEXT = {
         notAvailable: '有限',
         perYear: '/年',
         sqftLabel: '平方英尺',
-        unavailable: '暂无可显示的户型图',
+        unavailable: '暂未提供户型图',
         priceRange: '价格范围',
         monthly: '/月',
+        viewFloorPlan: '查看户型图',
+        hideFloorPlan: '收起户型图',
     },
+};
+
+const BATHROOM_SCOPE_ORDER: Record<BathroomScope, number> = {
+    communal: 0,
+    'semi-private': 1,
+    private: 2,
 };
 
 function normalizeComparableText(value: string) {
     return value
         .toLowerCase()
         .replace(/community bathroom/g, 'communal bathroom')
+        .replace(/shared bathroom/g, 'communal bathroom')
         .replace(/communal bath/g, 'communal bathroom')
         .replace(/semi-private bath/g, 'semi-private bathroom')
         .replace(/private bath/g, 'private bathroom')
+        .replace(/bathrooms/g, 'bathroom')
+        .replace(/\bbaths\b/g, 'bath')
         .replace(/single room/g, 'single')
         .replace(/double room/g, 'double')
         .replace(/triple room/g, 'triple')
         .replace(/quad room/g, 'quad')
+        .replace(/\broom\b/g, '')
+        .replace(/\bsuite\b/g, '')
         .replace(/[/.·,-]/g, ' ')
         .replace(/\s+/g, ' ')
         .trim();
@@ -59,31 +74,28 @@ function buildPlanNarrative(
     option: Pick<RoomOption, 'bedCount' | 'bathroomCount' | 'bathroomScope' | 'labelCode'>,
     language: 'en' | 'zh'
 ) {
-    if (option.labelCode === 'Studio' || option.labelCode === 'Suite' || option.labelCode === 'Cluster') {
-        return getRoomDisplayLabel(option, language);
-    }
+    const labels = getRoomOptionLabels(option, language);
+    const isSpecialType = option.labelCode === 'Studio' || option.labelCode === 'Suite' || option.labelCode === 'Cluster';
 
-    const roomLabel = language === 'zh'
-        ? getRoomDisplayLabel(option, language)
-        : `${getRoomDisplayLabel({ ...option, bathroomCount: null, bathroomScope: 'private' }, 'en').split(' / ')[0]} room`;
+    if (!labels.secondaryLabel) {
+        return labels.primaryLabel;
+    }
 
     if (language === 'zh') {
-        if (option.bathroomScope === 'communal') {
-            return `${roomLabel}，公共卫浴`;
-        }
-        if (option.bathroomCount != null) {
-            return `${roomLabel}，${option.bathroomCount}卫`;
-        }
-        return `${roomLabel}，${option.bathroomScope === 'semi-private' ? '半独立卫浴' : '独立卫浴'}`;
+        return `${labels.primaryLabel}，${labels.secondaryLabel}`;
     }
 
-    if (option.bathroomScope === 'communal') {
-        return `${roomLabel} with communal bathroom`;
-    }
-    if (option.bathroomCount != null) {
-        return `${roomLabel} with ${option.bathroomCount} bathroom${option.bathroomCount === 1 ? '' : 's'}`;
-    }
-    return `${roomLabel} with ${option.bathroomScope} bathroom`;
+    const bathroomText = (() => {
+        const normalized = labels.secondaryLabel.toLowerCase();
+        if (normalized.includes('baths')) {
+            return normalized.replace('baths', 'bathrooms');
+        }
+        return normalized.replace('bath', 'bathroom');
+    })();
+
+    return isSpecialType
+        ? `${labels.primaryLabel} with ${bathroomText}`
+        : `${labels.primaryLabel} room with ${bathroomText}`;
 }
 
 const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, language = 'en' }) => {
@@ -96,7 +108,26 @@ const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, languag
     }
 
     const normalizedPlans = floorPlans.map((plan) => normalizeFloorPlan(plan, plan.bathroomScope ?? 'communal'));
-    const sortedPlans = [...normalizedPlans].sort((a, b) => a.price - b.price);
+    const sortedPlans = [...normalizedPlans].sort((a, b) => {
+        const bedDelta = (a.bedCount ?? Number.MAX_SAFE_INTEGER) - (b.bedCount ?? Number.MAX_SAFE_INTEGER);
+        if (bedDelta !== 0) {
+            return bedDelta;
+        }
+
+        const bathroomScopeDelta =
+            BATHROOM_SCOPE_ORDER[a.bathroomScope ?? 'communal'] - BATHROOM_SCOPE_ORDER[b.bathroomScope ?? 'communal'];
+        if (bathroomScopeDelta !== 0) {
+            return bathroomScopeDelta;
+        }
+
+        return a.price - b.price;
+    });
+    const relatedOptions: RoomOption[] = sortedPlans.map((plan) => ({
+        bedCount: plan.bedCount ?? null,
+        bathroomCount: plan.bathroomCount ?? null,
+        bathroomScope: plan.bathroomScope ?? 'communal',
+        labelCode: plan.labelCode,
+    }));
 
     return (
         <section className="mt-8">
@@ -106,130 +137,138 @@ const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, languag
             </div>
 
             <div className="space-y-3">
-                {sortedPlans.map((plan) => {
+                {sortedPlans.map((plan, index) => {
                     const option: RoomOption = {
                         bedCount: plan.bedCount ?? null,
                         bathroomCount: plan.bathroomCount ?? null,
                         bathroomScope: plan.bathroomScope ?? 'communal',
                         labelCode: plan.labelCode,
                     };
-                    const roomLabel = getRoomDisplayLabel(option, language);
-                    const roomDetail = getRoomDetailLabel(option, language);
+                    const labels = getRoomOptionLabels(option, language, relatedOptions);
                     const planDescription = plan.description?.trim();
-                    const hideDetail = normalizeComparableText(roomLabel) === normalizeComparableText(roomDetail);
+                    const itemKey = `${getRoomOptionKey(option)}-${plan.price}-${plan.sqft ?? 'na'}-${index}`;
+                    const isExpanded = expandedPlan === itemKey;
+                    const hasImage = Boolean(plan.imageUrl) && !imageErrors[itemKey];
                     const hideDescription = !planDescription
                         ? true
                         : [
-                            roomLabel,
-                            roomDetail,
-                            getRoomDisplayLabel(option, 'en'),
-                            getRoomDetailLabel(option, 'en'),
+                            labels.primaryLabel,
+                            labels.secondaryLabel,
+                            labels.shortLabel,
                             buildPlanNarrative(option, 'en'),
                             buildPlanNarrative(option, 'zh'),
-                        ].some((candidate) => normalizeComparableText(candidate) === normalizeComparableText(planDescription));
-                    const planKey = getRoomOptionKey(option);
-                    const isExpanded = expandedPlan === planKey;
+                        ]
+                            .filter(Boolean)
+                            .some((candidate) => normalizeComparableText(candidate) === normalizeComparableText(planDescription));
 
                     return (
                         <motion.div
-                            key={`${planKey}-${plan.price}`}
+                            key={itemKey}
                             layout
-                            className={`bg-gradient-to-br from-white/95 via-white/90 to-gray-50/95 backdrop-blur-md rounded-xl border border-gray-200/80 overflow-hidden transition-shadow ${
-                                isExpanded ? 'shadow-lg border-illini-orange/30' : 'shadow-sm border-gray-200 hover:shadow-md'
+                            className={`rounded-xl border bg-white transition-shadow ${
+                                isExpanded ? 'border-illini-orange/30 shadow-md' : 'border-gray-200 shadow-sm'
                             }`}
                         >
-                            <div className="p-3 cursor-pointer" onClick={() => setExpandedPlan(isExpanded ? null : planKey)}>
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2 flex-wrap">
-                                        <div className="px-2.5 py-1 rounded-lg text-sm font-semibold border bg-illini-orange/15 text-illini-orange border-illini-orange/40">
-                                            {roomLabel}
+                            <div className="p-4 md:p-5">
+                                <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                                    <div className="min-w-0 flex-1">
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <span className="px-2.5 py-1 rounded-lg text-sm font-semibold border bg-illini-orange/10 text-illini-orange border-illini-orange/30">
+                                                {labels.primaryLabel}
+                                            </span>
+                                            {labels.secondaryLabel && (
+                                                <span className="text-sm text-gray-600">{labels.secondaryLabel}</span>
+                                            )}
+                                            <span
+                                                className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
+                                                    plan.available !== false
+                                                        ? 'bg-green-50 text-green-700'
+                                                        : 'bg-yellow-50 text-yellow-700'
+                                                }`}
+                                            >
+                                                {plan.available !== false ? (
+                                                    <Check size={12} className="shrink-0" />
+                                                ) : (
+                                                    <X size={12} className="shrink-0" />
+                                                )}
+                                                {plan.available !== false ? t.available : t.notAvailable}
+                                            </span>
                                         </div>
-                                        {!hideDetail && <span className="text-xs text-gray-500">{roomDetail}</span>}
-                                        <div className="flex items-center gap-0.5">
-                                            {plan.available !== false ? (
-                                                <>
-                                                    <Check size={12} className="text-green-500" />
-                                                    <span className="text-xs text-green-600 font-medium">{t.available}</span>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <X size={12} className="text-yellow-500" />
-                                                    <span className="text-xs text-yellow-600 font-medium">{t.notAvailable}</span>
-                                                </>
+
+                                        {!hideDescription && planDescription && (
+                                            <p className="mt-3 text-sm leading-relaxed text-gray-600">{planDescription}</p>
+                                        )}
+
+                                        {!hasImage && (
+                                            <p className="mt-3 text-xs text-gray-400">{t.unavailable}</p>
+                                        )}
+                                    </div>
+
+                                    <div className="w-full md:w-auto md:min-w-[240px]">
+                                        <div className="flex flex-wrap gap-2 md:justify-end">
+                                            <div className="rounded-xl bg-gray-50 px-3 py-2 min-w-[132px]">
+                                                <div className="text-[10px] uppercase tracking-wider text-gray-400">{t.price}</div>
+                                                <div className="mt-1 flex items-baseline gap-1">
+                                                    <span className="text-base font-bold text-illini-orange">
+                                                        {formatPrice(plan.price)}
+                                                    </span>
+                                                    <span className="text-xs text-gray-400">{t.perYear}</span>
+                                                </div>
+                                                <div className="text-xs text-gray-500">
+                                                    ~{formatPrice(Math.round(plan.price / 12))}
+                                                    {t.monthly}
+                                                </div>
+                                            </div>
+
+                                            {plan.sqft && (
+                                                <div className="rounded-xl bg-gray-50 px-3 py-2 min-w-[116px]">
+                                                    <div className="text-[10px] uppercase tracking-wider text-gray-400">
+                                                        {t.sqft}
+                                                    </div>
+                                                    <div className="mt-1 flex items-center gap-1 text-sm font-semibold text-gray-900">
+                                                        <Maximize size={14} className="text-gray-400" />
+                                                        <span>{plan.sqft}</span>
+                                                    </div>
+                                                    <div className="text-xs text-gray-500">{t.sqftLabel}</div>
+                                                </div>
                                             )}
                                         </div>
                                     </div>
-
-                                    <div className="flex items-center gap-2">
-                                        <div className="flex items-baseline gap-0.5">
-                                            <span className="text-base font-bold text-illini-orange">{formatPrice(plan.price)}</span>
-                                            <span className="text-xs text-gray-400">{t.perYear}</span>
-                                        </div>
-                                        <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                                            <ChevronDown size={16} className="text-gray-400" />
-                                        </motion.div>
-                                    </div>
                                 </div>
 
-                                <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
-                                    {plan.sqft && (
-                                        <div className="flex items-center gap-1">
-                                            <Maximize size={14} />
-                                            <span>{plan.sqft} {t.sqftLabel}</span>
-                                        </div>
-                                    )}
-                                </div>
+                                {hasImage && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setExpandedPlan(isExpanded ? null : itemKey)}
+                                        className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-illini-blue hover:text-blue-900 transition-colors"
+                                    >
+                                        <span>{isExpanded ? t.hideFloorPlan : t.viewFloorPlan}</span>
+                                        <motion.span
+                                            animate={{ rotate: isExpanded ? 180 : 0 }}
+                                            transition={{ duration: 0.2 }}
+                                        >
+                                            <ChevronDown size={16} />
+                                        </motion.span>
+                                    </button>
+                                )}
                             </div>
 
-                            <AnimatePresence>
-                                {isExpanded && (
+                            <AnimatePresence initial={false}>
+                                {hasImage && isExpanded && (
                                     <motion.div
                                         initial={{ height: 0, opacity: 0 }}
                                         animate={{ height: 'auto', opacity: 1 }}
                                         exit={{ height: 0, opacity: 0 }}
                                         transition={{ duration: 0.2 }}
+                                        className="border-t border-gray-100"
                                     >
-                                        <div className="px-3 pb-3 md:px-4 md:pb-4 pt-0 border-t border-gray-100">
-                                            {plan.imageUrl && (
-                                                <div className="mt-4 rounded-lg overflow-hidden bg-gray-100">
-                                                    {imageErrors[planKey] ? (
-                                                        <div className="flex flex-col items-center justify-center h-32 gap-2 text-gray-400">
-                                                            <ImageOff size={28} />
-                                                            <span className="text-xs">{t.unavailable}</span>
-                                                        </div>
-                                                    ) : (
-                                                        <img
-                                                            src={plan.imageUrl}
-                                                            alt={`${plan.labelCode ?? 'room'} floor plan`}
-                                                            className="w-full h-auto"
-                                                            onError={() => setImageErrors((prev) => ({ ...prev, [planKey]: true }))}
-                                                        />
-                                                    )}
-                                                </div>
-                                            )}
-
-                                            {!hideDescription && planDescription && (
-                                                <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                                                    <p className="text-sm text-gray-600">{planDescription}</p>
-                                                </div>
-                                            )}
-
-                                            <div className="mt-3 grid grid-cols-2 gap-2">
-                                                <div className="bg-gray-50 rounded-lg p-2.5">
-                                                    <div className="text-[10px] text-gray-400 uppercase tracking-wider">{t.price}</div>
-                                                    <div className="text-sm font-bold text-illini-orange mt-0.5">{formatPrice(plan.price)}</div>
-                                                    <div className="text-[10px] text-gray-500">
-                                                        ~{formatPrice(Math.round(plan.price / 12))}{t.monthly}
-                                                    </div>
-                                                </div>
-                                                {plan.sqft && (
-                                                    <div className="bg-gray-50 rounded-lg p-2.5">
-                                                        <div className="text-[10px] text-gray-400 uppercase tracking-wider">{t.sqft}</div>
-                                                        <div className="text-sm font-bold text-gray-900 mt-0.5">{plan.sqft}</div>
-                                                        <div className="text-[10px] text-gray-500">{t.sqftLabel}</div>
-                                                    </div>
-                                                )}
-                                            </div>
+                                        <div className="px-4 pb-4 pt-4 md:px-5 md:pb-5">
+                                            <img
+                                                src={plan.imageUrl}
+                                                alt={`${labels.primaryLabel} floor plan`}
+                                                className="w-full h-auto rounded-xl border border-gray-200 bg-gray-50"
+                                                onError={() => setImageErrors((prev) => ({ ...prev, [itemKey]: true }))}
+                                            />
                                         </div>
                                     </motion.div>
                                 )}

@@ -4,7 +4,12 @@ import { formatPrice } from '../../constants/housing/pricing';
 import { MapPin, Utensils, Wind } from 'lucide-react';
 import { Language } from '../../types';
 import { getHeroTags, getTagDisplay } from '../../utils/tagLabels';
-import { deriveRoomOptions, getDormBathroomTagSummary, getRoomDisplayLabel } from '../../utils/roomOptions';
+import {
+    deriveRoomOptions,
+    getDormBathroomTagSummary,
+    getRoomOptionLabels,
+    getRoomTypeCountLabel,
+} from '../../utils/roomOptions';
 
 interface DormCardProps {
     dorm: Dorm;
@@ -21,12 +26,16 @@ const TEXT = {
         noAc: 'No AC',
         unsave: 'Unsave dorm',
         save: 'Save dorm',
+        roomTypes: 'Room types',
+        highlights: 'Highlights',
     },
     zh: {
         dining: '食堂',
         noAc: '无空调',
         unsave: '取消收藏宿舍',
         save: '收藏宿舍',
+        roomTypes: '房型',
+        highlights: '亮点',
     },
 };
 
@@ -44,6 +53,7 @@ const DormCard: React.FC<DormCardProps> = ({
     const locationLabel = language === 'zh' && dorm.location_zh ? dorm.location_zh : dorm.location;
     const roomOptions = dorm.roomOptions ?? deriveRoomOptions(dorm.floorPlans, dorm.bathroomType).roomOptions;
     const bathroomSummary = getDormBathroomTagSummary(dorm, language);
+    const visibleRoomOptions = roomOptions.slice(0, 3);
 
     return (
         <div
@@ -106,50 +116,71 @@ const DormCard: React.FC<DormCardProps> = ({
                     {locationLabel}
                 </div>
 
-                <div className="flex gap-2 mb-4 flex-wrap">
-                    {!dorm.ac && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-xs font-medium">
-                            <Wind size={10} className="mr-1" /> {t.noAc}
-                        </span>
-                    )}
-                    {dorm.dining === 'inside' && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full bg-illini-orange/10 text-illini-orange text-xs font-medium transition-colors duration-150 hover:bg-illini-orange/15 hover:text-illini-orange">
-                            <Utensils size={10} className="mr-1" /> {t.dining}
-                        </span>
-                    )}
-                    {roomOptions.slice(0, 3).map((option) => (
-                        <span
-                            key={`${option.labelCode ?? 'custom'}-${option.bedCount ?? 'na'}-${option.bathroomScope}`}
-                            className="inline-block px-2 py-1 rounded-md border border-gray-200 text-gray-600 text-[10px] font-medium bg-white transition-colors duration-150 hover:bg-gray-50 hover:text-gray-800 hover:border-gray-300"
-                        >
-                            {getRoomDisplayLabel(option, language)}
-                        </span>
-                    ))}
-                    <span className="inline-block px-2 py-1 rounded-md border border-gray-200 text-gray-600 text-[10px] font-medium bg-white transition-colors duration-150 hover:bg-gray-50 hover:text-gray-800 hover:border-gray-300">
-                        {bathroomSummary}
-                    </span>
-                    {getHeroTags(dorm.categorizedTags ?? { livingConditions: [], facilities: [], lifestyle: [] }, 4)
-                        .filter((tag) => tag !== 'noAc')
-                        .flatMap((tag) => {
-                            if (tag === 'llc' && dorm.categorizedTags?.llcNames?.length) {
-                                return dorm.categorizedTags.llcNames.map((llcName) => (
-                                    <span
-                                        key={llcName}
-                                        className="inline-block px-2 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium transition-colors duration-150 hover:bg-gray-200 hover:text-gray-800"
-                                    >
-                                        {llcName}
-                                    </span>
-                                ));
-                            }
+                <div className="mb-3">
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-400 mb-2">
+                        {t.roomTypes}
+                    </div>
+                    <div className="flex gap-2 flex-wrap">
+                        {visibleRoomOptions.map((option) => {
+                            const labels = getRoomOptionLabels(option, language, roomOptions);
                             return (
                                 <span
-                                    key={tag}
-                                    className="inline-block px-2 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium transition-colors duration-150 hover:bg-gray-200 hover:text-gray-800"
+                                    key={`${option.labelCode ?? 'custom'}-${option.bedCount ?? 'na'}-${option.bathroomCount ?? 'na'}-${option.bathroomScope}`}
+                                    className="inline-block px-2 py-1 rounded-md border border-gray-200 text-gray-700 text-[11px] font-medium bg-white transition-colors duration-150 hover:bg-gray-50 hover:border-gray-300"
                                 >
-                                    {getTagDisplay(tag, language)}
+                                    {labels.shortLabel}
                                 </span>
                             );
                         })}
+                        {roomOptions.length > 3 && (
+                            <span className="inline-block px-2 py-1 rounded-md border border-dashed border-illini-blue/30 bg-illini-blue/5 text-illini-blue text-[11px] font-medium">
+                                {getRoomTypeCountLabel(roomOptions.length, language)}
+                            </span>
+                        )}
+                    </div>
+                </div>
+
+                <div className="mb-4">
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-400 mb-2">
+                        {t.highlights}
+                    </div>
+                    <div className="flex gap-2 flex-wrap">
+                        <span className="inline-flex items-center px-2 py-1 rounded-full bg-illini-blue/10 text-illini-blue text-xs font-medium">
+                            {bathroomSummary}
+                        </span>
+                        {!dorm.ac && (
+                            <span className="inline-flex items-center px-2 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-xs font-medium">
+                                <Wind size={10} className="mr-1" /> {t.noAc}
+                            </span>
+                        )}
+                        {dorm.dining === 'inside' && (
+                            <span className="inline-flex items-center px-2 py-1 rounded-full bg-illini-orange/10 text-illini-orange text-xs font-medium transition-colors duration-150 hover:bg-illini-orange/15 hover:text-illini-orange">
+                                <Utensils size={10} className="mr-1" /> {t.dining}
+                            </span>
+                        )}
+                        {getHeroTags(dorm.categorizedTags ?? { livingConditions: [], facilities: [], lifestyle: [] }, 4)
+                            .filter((tag) => tag !== 'noAc')
+                            .flatMap((tag) => {
+                                if (tag === 'llc' && dorm.categorizedTags?.llcNames?.length) {
+                                    return dorm.categorizedTags.llcNames.map((llcName) => (
+                                        <span
+                                            key={llcName}
+                                            className="inline-block px-2 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium transition-colors duration-150 hover:bg-gray-200 hover:text-gray-800"
+                                        >
+                                            {llcName}
+                                        </span>
+                                    ));
+                                }
+                                return (
+                                    <span
+                                        key={tag}
+                                        className="inline-block px-2 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium transition-colors duration-150 hover:bg-gray-200 hover:text-gray-800"
+                                    >
+                                        {getTagDisplay(tag, language)}
+                                    </span>
+                                );
+                            })}
+                    </div>
                 </div>
 
                 <p className="text-gray-700 text-sm leading-relaxed mb-2 line-clamp-3 flex-grow antialiased">

@@ -4,7 +4,12 @@ import { formatPrice } from '../../constants/housing/pricing';
 import { Language } from '../../types';
 import { X, Check, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { deriveRoomOptions, getDormBathroomSummary, getRoomDisplayLabel } from '../../utils/roomOptions';
+import {
+    deriveRoomOptions,
+    getDormBathroomSummary,
+    getRoomOptionLabels,
+    getRoomTypeCountLabel,
+} from '../../utils/roomOptions';
 
 interface DormComparisonProps {
     dorms: Dorm[];
@@ -134,16 +139,23 @@ const DormComparison: React.FC<DormComparisonProps> = ({ dorms, onClose, languag
             getValue: (dorm) => {
                 const roomOptions = dorm.roomOptions ?? deriveRoomOptions(dorm.floorPlans, dorm.bathroomType).roomOptions;
                 return (
-                    <div className="flex flex-wrap gap-1">
-                        {roomOptions.slice(0, 3).map((option) => (
-                            <span
-                                key={`${option.labelCode ?? 'custom'}-${option.bedCount ?? 'na'}-${option.bathroomScope}`}
-                                className="px-2 py-0.5 bg-illini-blue/10 text-illini-blue text-xs rounded"
-                            >
-                                {getRoomDisplayLabel(option, language)}
+                    <div className="flex flex-wrap gap-1.5">
+                        {roomOptions.slice(0, 3).map((option) => {
+                            const labels = getRoomOptionLabels(option, language, roomOptions);
+                            return (
+                                <span
+                                    key={`${option.labelCode ?? 'custom'}-${option.bedCount ?? 'na'}-${option.bathroomCount ?? 'na'}-${option.bathroomScope}`}
+                                    className="px-2 py-0.5 bg-illini-blue/10 text-illini-blue text-xs rounded"
+                                >
+                                    {labels.shortLabel}
+                                </span>
+                            );
+                        })}
+                        {roomOptions.length > 3 && (
+                            <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">
+                                {getRoomTypeCountLabel(roomOptions.length, language)}
                             </span>
-                        ))}
-                        {roomOptions.length > 3 && <span className="text-xs text-gray-500">+{roomOptions.length - 3}</span>}
+                        )}
                     </div>
                 );
             },
