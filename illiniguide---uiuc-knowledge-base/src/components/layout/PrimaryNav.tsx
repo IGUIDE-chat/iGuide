@@ -1,5 +1,6 @@
 import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { BrandMark } from '../branding/BrandMark';
 
 interface NavItem {
   key: string;
@@ -61,12 +62,10 @@ export const PrimaryNav: React.FC<PrimaryNavProps> = ({
     <>
       <div className="p-3 mb-2 flex items-center justify-between">
         <div className="flex items-center gap-2 px-2 py-2 rounded-md hover:bg-white/5 cursor-pointer w-full transition-colors">
-          <div className="w-6 h-6 bg-illini-orange rounded flex items-center justify-center font-bold text-white text-xs">
-            I
-          </div>
+          <BrandMark className="h-[26px] w-[26px] rounded-md" iconClassName="text-[10px]" />
           <SidebarLabel
             isOpen={isSidebarOpen}
-            className="font-semibold text-sm tracking-tight text-white"
+            className="font-bold text-[15px] tracking-tight text-white"
           >
             <AnimatedText>{appTitle}</AnimatedText>
           </SidebarLabel>
@@ -84,11 +83,10 @@ export const PrimaryNav: React.FC<PrimaryNavProps> = ({
           <button
             key={item.key}
             onClick={item.onClick}
-            className={`w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm transition-colors ${
-              activeTab === item.key
-                ? 'bg-[#212121] text-white'
-                : 'hover:bg-[#212121] text-slate-300'
-            }`}
+            className={`w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm transition-colors ${activeTab === item.key
+              ? 'bg-[#212121] text-white'
+              : 'hover:bg-[#212121] text-slate-300'
+              }`}
           >
             <span>{item.icon}</span>
             <SidebarLabel isOpen={isSidebarOpen}>

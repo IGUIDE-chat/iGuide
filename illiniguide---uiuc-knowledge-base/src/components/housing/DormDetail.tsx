@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Pencil } from 'lucide-react';
+import { ArrowLeft, Heart, Pencil } from 'lucide-react';
 import { formatPrice } from '../../constants/housing/pricing';
 import { useSharedDormInteraction } from '../../contexts/DormUserInteractionContext';
 import { useDormData } from '../../contexts/DormDataContext';
@@ -79,8 +79,8 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
 
     return (
         <div className="h-full overflow-y-auto w-full no-scrollbar">
-            <div className={`max-w-6xl mx-auto px-4 sm:px-5 py-8 pb-32 md:pt-14 md:px-6 transition-[padding] duration-300 ${editOpen ? 'md:pr-[532px]' : ''}`}>
-                {/* Top bar: back + optional admin edit button */}
+            <div className="max-w-6xl mx-auto px-4 sm:px-5 py-8 pb-32 md:pt-14 md:px-6">
+                {/* Top bar: back + mobile heart + optional admin edit button */}
                 <div className="flex items-center justify-between mb-6">
                     <button
                         onClick={() => navigate('/dorms')}
@@ -91,46 +91,66 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                         {t.backToBrowse}
                     </button>
 
-                    {user?.isAdmin && (
+                    <div className="flex items-center gap-2">
+                        {/* Heart button — mobile only; desktop uses sidebar button */}
                         <button
                             type="button"
-                            onClick={() => setEditOpen(true)}
-                            className="flex items-center gap-2 bg-illini-blue text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-900 transition-colors"
+                            onClick={async () => { await toggleFavorite(dorm.id, dorm.name, dorm.name_zh); }}
+                            aria-label={isSaved ? t.saved : t.save}
+                            className={`md:hidden rounded-full bg-white p-2 shadow-sm transition-colors hover:bg-gray-50 ${isSaved ? 'text-red-500' : 'text-gray-400 hover:text-red-500'}`}
                         >
-                            <Pencil size={14} />
-                            {editBtnLabel}
+                            <Heart size={20} fill={isSaved ? 'currentColor' : 'none'} />
                         </button>
-                    )}
+
+                        {user?.isAdmin && (
+                            <button
+                                type="button"
+                                onClick={() => setEditOpen(true)}
+                                className="flex items-center gap-2 bg-illini-blue text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-900 transition-colors"
+                            >
+                                <Pencil size={14} />
+                                {editBtnLabel}
+                            </button>
+                        )}
+                    </div>
                 </div>
 
                 <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
                     <DormHeroSection dorm={dorm} dormName={dormName} campusLabel={t.campus} language={language} />
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-0 md:divide-x divide-gray-100">
-                        <div className="col-span-2 p-4 md:p-8 space-y-8">
-                            <section>
+                        <div className="col-span-2 p-4 md:p-8 flex flex-col gap-8">
+                            <section className="order-1">
                                 <h2 className="text-xl md:text-2xl font-bold text-illini-blue mb-3">{t.about}</h2>
                                 <p className="text-gray-600 leading-relaxed text-sm md:text-lg">{dormDescription}</p>
                             </section>
 
-                            <DormProsConsSection
-                                title={t.prosAndCons}
-                                goodLabel={t.good}
-                                notSoGoodLabel={t.notSoGood}
-                                pros={dormPros}
-                                cons={dormCons}
-                            />
+                            {/* Mobile: 设施第2; Desktop: 设施第3 */}
+                            <div className="order-2 md:order-3">
+                                <DormTagDetailSection
+                                    categorizedTags={dorm.categorizedTags}
+                                    language={language}
+                                />
+                            </div>
 
-                            <DormTagDetailSection
-                                categorizedTags={dorm.categorizedTags}
-                                language={language}
-                            />
+                            {/* Mobile: 优缺点第3; Desktop: 优缺点第2 */}
+                            <div className="order-3 md:order-2">
+                                <DormProsConsSection
+                                    title={t.prosAndCons}
+                                    goodLabel={t.good}
+                                    notSoGoodLabel={t.notSoGood}
+                                    pros={dormPros}
+                                    cons={dormCons}
+                                />
+                            </div>
 
                             {dorm.floorPlans && dorm.floorPlans.length > 0 && (
-                                <FloorPlanSection
-                                    floorPlans={dorm.floorPlans}
-                                    language={language === 'zh' ? 'zh' : 'en'}
-                                />
+                                <div className="order-4">
+                                    <FloorPlanSection
+                                        floorPlans={dorm.floorPlans}
+                                        language={language === 'zh' ? 'zh' : 'en'}
+                                    />
+                                </div>
                             )}
                         </div>
 
@@ -139,6 +159,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                 dorm={dorm}
                                 language={language}
                                 quickStatsLabel={t.quickStats}
+                                housingTypeLabel={t.housingType}
                                 diningHallLabel={t.diningHall}
                                 onSiteLabel={t.onSite}
                                 nearbyLabel={t.nearby}
@@ -155,12 +176,13 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                 </div>
                             </div>
 
+                            {/* Desktop-only full save button; mobile uses top-bar heart */}
                             <button
                                 onClick={async () => {
                                     await toggleFavorite(dorm.id, dorm.name, dorm.name_zh);
                                 }}
                                 type="button"
-                                className={`w-full py-3 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 ${isSaved
+                                className={`hidden md:block w-full py-3 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 ${isSaved
                                     ? 'bg-emerald-600 hover:bg-emerald-700'
                                     : 'bg-illini-orange hover:bg-illini-orange-dark'
                                     }`}

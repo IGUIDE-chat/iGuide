@@ -18,6 +18,20 @@ export const authService = {
     },
 
     /**
+     * Sign in with Microsoft (Azure) OAuth
+     */
+    async signInWithMicrosoft() {
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: 'azure',
+            options: {
+                scopes: 'email',
+                redirectTo: window.location.origin
+            }
+        });
+        return { data, error };
+    },
+
+    /**
      * Sign in with email and password
      */
     async signInWithEmail(email: string, password: string) {

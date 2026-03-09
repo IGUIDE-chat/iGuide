@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 
 interface ChipSectionProps {
     title: string;
-    options: string[];
+    options: Array<{ value: string; label: string }>;
     selectedValues: string[];
     onToggle: (value: string) => void;
     /** 'blue' for location section hover/active border; default 'orange' */
@@ -18,18 +18,18 @@ const ChipSection: React.FC<ChipSectionProps> = ({ title, options, selectedValue
             <h3 className="text-xl font-bold mb-4">{title}</h3>
             <div className="flex flex-wrap gap-2">
                 {options.map((value) => {
-                    const isSelected = selectedValues.includes(value);
+                    const isSelected = selectedValues.includes(value.value);
                     return (
                         <button
-                            key={value}
-                            onClick={() => onToggle(value)}
+                            key={value.value}
+                            onClick={() => onToggle(value.value)}
                             type="button"
                             className={`px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200 ${isSelected
                                 ? 'bg-illini-blue text-white border-illini-blue active:bg-[#0e2240] active:border-[#0e2240]'
                                 : unselectedClass
                                 }`}
                         >
-                            {value}
+                            {value.label}
                         </button>
                     );
                 })}

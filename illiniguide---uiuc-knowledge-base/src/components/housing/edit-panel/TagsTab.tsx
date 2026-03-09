@@ -1,7 +1,5 @@
 import React from 'react';
-import { CATEGORY_LABELS, TAGS_BY_CATEGORY } from '../../../constants/housing/tagDefinitions';
-import { getTagDisplay } from '../../../utils/tagLabels';
-import { LLC_OPTIONS } from './editPanelText';
+import { CATEGORY_LABELS, getTagDisplay, LLC_OPTIONS, TAGS_BY_CATEGORY } from '../../../constants/housing/metadata';
 import { DormEditFormState } from './useDormEditForm';
 
 interface TagsTabProps {

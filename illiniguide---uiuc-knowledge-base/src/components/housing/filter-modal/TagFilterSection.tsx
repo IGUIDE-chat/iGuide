@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import { Check } from 'lucide-react';
 import { DormTag } from '../../../types/housing';
-import { getTagDisplay } from '../../../utils/tagLabels';
+import { getTagDisplay } from '../../../constants/housing/metadata';
 import { FilterLanguage } from './modalText';
 
 interface TagFilterSectionProps {

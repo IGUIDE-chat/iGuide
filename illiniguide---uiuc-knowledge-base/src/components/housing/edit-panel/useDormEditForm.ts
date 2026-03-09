@@ -7,7 +7,13 @@ import {
   FloorPlan,
 } from '../../../types/housing';
 import { Language } from '../../../types';
-import { DormUpdate, dormAdminService } from '../../../services/dormAdminService';
+import {
+  buildSummary,
+  DormUpdate,
+  dormAdminService,
+  EditHistoryEntry,
+} from '../../../services/dormAdminService';
+import { useAuth } from '../../../contexts/AuthContext';
 import { dormService } from '../../../services/dormService';
 import {
   deriveRoomOptions,
@@ -23,7 +29,7 @@ interface UseDormEditFormOptions {
   onSaved: (updated: Dorm) => void;
 }
 
-export type ActiveTab = 'content' | 'details' | 'tags' | 'media';
+export type ActiveTab = 'content' | 'details' | 'tags' | 'media' | 'history';
 type LayoutKind = 'standard' | 'Studio' | 'Suite' | 'Cluster';
 
 const emptyCategorized: DormCategorizedTags = {
@@ -50,12 +56,41 @@ export const createFloorPlan = (): FloorPlan => ({
   available: true,
 });
 
+function dormToSnapshot(dorm: Dorm): Record<string, unknown> {
+  return {
+    name: dorm.name,
+    name_zh: dorm.name_zh ?? null,
+    description: dorm.description,
+    description_zh: dorm.description_zh ?? null,
+    image_url: dorm.imageUrl ?? null,
+    price: dorm.price,
+    application_fee: dorm.applicationFee ?? null,
+    location: dorm.location,
+    location_zh: dorm.location_zh ?? null,
+    housing_type: dorm.housingType,
+    ac: dorm.ac,
+    dining: dorm.dining,
+    dining_nearby_detail: dorm.diningNearbyDetail ?? null,
+    bathroom_type: dorm.bathroomType,
+    room_types: dorm.roomTypes ?? null,
+    room_options: dorm.roomOptions ?? null,
+    categorized_tags: dorm.categorizedTags ?? null,
+    floor_plans: dorm.floorPlans ?? null,
+    gallery_images: dorm.galleryImages ?? null,
+    pros: dorm.pros,
+    pros_zh: dorm.pros_zh ?? null,
+    cons: dorm.cons,
+    cons_zh: dorm.cons_zh ?? null,
+  };
+}
+
 export const useDormEditForm = ({
   dorm,
   language,
   onClose,
   onSaved,
 }: UseDormEditFormOptions) => {
+  const { user } = useAuth();
   const t = TEXT[language];
   const [activeTab, setActiveTab] = useState<ActiveTab>('content');
   const [contentLang, setContentLang] = useState<'en' | 'zh'>('en');
@@ -65,6 +100,11 @@ export const useDormEditForm = ({
   const [saveError, setSaveError] = useState<string | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // History tab state
+  const [historyEntries, setHistoryEntries] = useState<EditHistoryEntry[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [restoringId, setRestoringId] = useState<string | null>(null);
 
   const [name, setName] = useState(dorm.name);
   const [nameZh, setNameZh] = useState(dorm.name_zh ?? '');
@@ -125,6 +165,14 @@ export const useDormEditForm = ({
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (activeTab !== 'history') return;
+    setHistoryLoading(true);
+    dormAdminService.getEditHistory(dorm.id)
+      .then((entries) => setHistoryEntries(entries))
+      .finally(() => setHistoryLoading(false));
+  }, [activeTab, dorm.id]);
 
   const normalizedFloorPlans = useMemo(
     () => floorPlans.map((plan) => normalizeFloorPlan(plan, bathroomType)),
@@ -219,7 +267,11 @@ export const useDormEditForm = ({
       clearTimeout(timerRef.current);
     }
 
-    const result = await dormAdminService.updateDorm(dorm.id, buildUpdate());
+    const updates = buildUpdate();
+    const snapshotBefore = dormToSnapshot(dorm);
+    const summary = buildSummary(dorm, updates);
+
+    const result = await dormAdminService.updateDorm(dorm.id, updates);
     setSaving(false);
 
     if (!result.ok) {
@@ -229,7 +281,21 @@ export const useDormEditForm = ({
 
     setSaveSuccess(true);
     timerRef.current = setTimeout(() => setSaveSuccess(false), 2000);
+    void dormAdminService.logEdit(dorm.id, dorm.name, user?.email ?? 'unknown', summary, snapshotBefore);
     await refreshDorm();
+  };
+
+  const handleRestore = async (entry: EditHistoryEntry) => {
+    if (!window.confirm(t.alerts.restoreConfirm)) return;
+    setRestoringId(entry.id);
+    const ok = await dormAdminService.restoreSnapshot(dorm.id, entry);
+    setRestoringId(null);
+    if (!ok) {
+      alert(t.alerts.restoreFailed);
+      return;
+    }
+    await refreshDorm();
+    setActiveTab('content');
   };
 
   const reset = async () => {
@@ -313,6 +379,10 @@ export const useDormEditForm = ({
     reset,
     onClose,
     getRoomDisplayLabel,
+    historyEntries,
+    historyLoading,
+    restoringId,
+    handleRestore,
   };
 };
 

@@ -33,7 +33,7 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
       <div className="flex-1 overflow-hidden bg-gray-50/50 relative z-0 flex flex-row min-w-0">
         <div
           className={`
-            h-full overflow-y-auto p-4 xl:p-6 transition-all duration-300 scrollbar-thin min-w-0
+            h-full overflow-y-auto p-4 xl:p-6 transition-opacity duration-200 scrollbar-thin min-w-0
             ${
               controller.isListView
                 ? 'w-full opacity-100 z-10'
@@ -57,7 +57,6 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
         </div>
 
         <DormListMapPane
-          hasMountedMap={controller.hasMountedMap}
           isMapView={controller.isMapView}
           filteredDorms={controller.filteredDorms}
           visibleInMap={controller.visibleInMap}

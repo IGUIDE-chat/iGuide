@@ -31,18 +31,18 @@ const DORM_LIST_TEXT: Record<Language, DormListText> = {
     panToSeeDorms: 'Pan or zoom map to see dorms in other areas',
   },
   zh: {
-    searchPlaceholder: '杈撳叆鎼滅储瀹胯垗...',
-    noResults: '鏈壘鍒板尮閰嶅鑸�',
-    noResultsDesc: '娌℃湁瀹胯垗鍖归厤褰撳墠绛涢€夋潯浠讹紝璇峰皾璇曡皟鏁寸瓫閫夋垨娓呯┖閮ㄥ垎鏉′欢銆�',
-    clearFilters: '娓呯┖鍏ㄩ儴绛涢€�',
-    viewMap: '鍦板浘瑙嗗浘',
-    viewList: '鍒楄〃瑙嗗浘',
-    results: '涓粨鏋�',
-    mapNoResults: '褰撳墠绛涢€夋潯浠朵笅鏆傛棤瀹胯垗銆�',
-    clearPrice: '娓呴櫎浠锋牸绛涢€�',
-    filters: '绛涢€�',
-    noDormsInArea: '璇ュ尯鍩熸殏鏃犲鑸�',
-    panToSeeDorms: '璇风Щ鍔ㄦ垨缂╂斁鍦板浘鏌ョ湅鍏朵粬鍖哄煙鐨勫鑸�',
+    searchPlaceholder: '输入搜索宿舍...',
+    noResults: '未找到匹配宿舍',
+    noResultsDesc: '没有宿舍匹配当前筛选条件，请尝试调整筛选或清空部分条件。',
+    clearFilters: '清空全部筛选',
+    viewMap: '地图视图',
+    viewList: '列表视图',
+    results: '条结果',
+    mapNoResults: '当前筛选条件下暂无宿舍。',
+    clearPrice: '清除价格筛选',
+    filters: '筛选',
+    noDormsInArea: '该区域暂无宿舍',
+    panToSeeDorms: '请移动或缩放地图查看其他区域的宿舍',
   },
 };
 
@@ -52,7 +52,6 @@ export const useDormListController = (language: Language) => {
   const { isSidebarOpen, favoritesIconRef, sidebarToggleButtonRef, mobileSidebarButtonRef } =
     useLayout();
   const { toggleFavorite, addToHistory, favorites } = useSharedDormInteraction();
-  const [hasMountedMap, setHasMountedMap] = useState(false);
   const [flyingHeart, setFlyingHeart] = useState<{
     x: number;
     y: number;
@@ -91,12 +90,6 @@ export const useDormListController = (language: Language) => {
     bathroomTypeFilters,
     clearAllFilters,
   } = useHousingFilters();
-
-  useEffect(() => {
-    if (viewMode === 'map') {
-      setHasMountedMap(true);
-    }
-  }, [viewMode]);
 
   const t = DORM_LIST_TEXT[language];
   const isMapView = viewMode === 'map';
@@ -298,7 +291,6 @@ export const useDormListController = (language: Language) => {
   return {
     t,
     filteredDorms,
-    hasMountedMap,
     isMapView,
     isListView,
     hasActiveFilters,

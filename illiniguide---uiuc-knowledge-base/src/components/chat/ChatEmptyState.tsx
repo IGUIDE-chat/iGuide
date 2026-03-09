@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { Language } from '../../types';
+import { BrandMark } from '../branding/BrandMark';
 
 interface Suggestion {
   icon: string;
@@ -33,9 +34,7 @@ export const ChatEmptyState: React.FC<ChatEmptyStateProps> = ({
           className="w-full flex flex-col items-center"
         >
           <div className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-xl border border-slate-100">
-              🎗
-            </div>
+            <BrandMark className="h-10 w-10 rounded-xl" iconClassName="text-[1.4rem]" />
             <h2 className="text-2xl font-semibold text-slate-800 text-center tracking-tight">
               {title}
             </h2>

@@ -1,10 +1,14 @@
 import React from 'react';
 import { Dorm } from '../../types/housing';
 import { formatPrice } from '../../constants/housing/pricing';
+import { getHousingTypeMeta, getLocalizedLabel } from '../../constants/housing/metadata';
 import { Language } from '../../types';
 import { X, Check, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { deriveRoomOptions, getDormBathroomSummary, getRoomDisplayLabel } from '../../utils/roomOptions';
+import {
+    deriveRoomOptions,
+    getRoomRangeSummary,
+} from '../../utils/roomOptions';
 
 interface DormComparisonProps {
     dorms: Dorm[];
@@ -83,15 +87,14 @@ const DormComparison: React.FC<DormComparisonProps> = ({ dorms, onClose, languag
         },
         {
             label: t.housingType,
-            getValue: (dorm) => (
-                <span
-                    className={`px-2 py-1 text-xs rounded-full ${
-                        dorm.housingType === 'URH' ? 'bg-illini-orange/15 text-illini-orange' : 'bg-blue-100 text-illini-blue'
-                    }`}
-                >
-                    {dorm.housingType === 'URH' ? t.urh : t.pch}
-                </span>
-            ),
+            getValue: (dorm) => {
+                const housingTypeMeta = getHousingTypeMeta(dorm.housingType);
+                return (
+                    <span className={`px-2 py-1 text-xs rounded-full ${housingTypeMeta.badgeClassName}`}>
+                        {getLocalizedLabel(housingTypeMeta, language)}
+                    </span>
+                );
+            },
         },
         {
             label: t.price,
@@ -133,24 +136,17 @@ const DormComparison: React.FC<DormComparisonProps> = ({ dorms, onClose, languag
             label: t.roomOptions,
             getValue: (dorm) => {
                 const roomOptions = dorm.roomOptions ?? deriveRoomOptions(dorm.floorPlans, dorm.bathroomType).roomOptions;
-                return (
-                    <div className="flex flex-wrap gap-1">
-                        {roomOptions.slice(0, 3).map((option) => (
-                            <span
-                                key={`${option.labelCode ?? 'custom'}-${option.bedCount ?? 'na'}-${option.bathroomScope}`}
-                                className="px-2 py-0.5 bg-illini-blue/10 text-illini-blue text-xs rounded"
-                            >
-                                {getRoomDisplayLabel(option, language)}
-                            </span>
-                        ))}
-                        {roomOptions.length > 3 && <span className="text-xs text-gray-500">+{roomOptions.length - 3}</span>}
-                    </div>
-                );
+                const roomSummary = getRoomRangeSummary(roomOptions, language);
+                return <span className="text-sm text-gray-700">{roomSummary.occupancyLabel}</span>;
             },
         },
         {
             label: t.bathroom,
-            getValue: (dorm) => <span className="text-sm text-gray-600">{getDormBathroomSummary(dorm, language)}</span>,
+            getValue: (dorm) => {
+                const roomOptions = dorm.roomOptions ?? deriveRoomOptions(dorm.floorPlans, dorm.bathroomType).roomOptions;
+                const roomSummary = getRoomRangeSummary(roomOptions, language);
+                return <span className="text-sm text-gray-600">{roomSummary.bathroomLabel}</span>;
+            },
         },
     ];
 

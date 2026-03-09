@@ -6,7 +6,14 @@ import { useHousingFilters } from '../../contexts/HousingContext';
 import { getPriceRangeFromData } from '../../constants/housing/pricing';
 import { useDormData } from '../../contexts/DormDataContext';
 import { BathroomCountFilter, BathroomScope, BedCountFilter, DormTag, FilterOption } from '../../types/housing';
-import { TAGS_BY_CATEGORY } from '../../constants/housing/tagDefinitions';
+import {
+    BATHROOM_TYPE_OPTIONS,
+    FILTERABLE_LIVING_CONDITION_TAGS,
+    getLocalizedLabel,
+    getTagDisplay,
+    mergeLocationOptions,
+    TAGS_BY_CATEGORY,
+} from '../../constants/housing/metadata';
 import PriceSection from './filter-modal/PriceSection';
 import HousingTypeSection from './filter-modal/HousingTypeSection';
 import ChipSection from './filter-modal/ChipSection';
@@ -30,12 +37,6 @@ const buildBathroomCountOptions = (t: typeof MODAL_TEXT.en): { value: BathroomCo
     { value: 0, label: t.zeroBathrooms },
     { value: 1, label: t.onePlusBathrooms },
     { value: 2, label: t.twoPlusBathrooms },
-];
-
-const buildBathroomScopeOptions = (t: typeof MODAL_TEXT.en): { value: BathroomScope; label: string }[] => [
-    { value: 'communal', label: t.communalBath },
-    { value: 'semi-private', label: t.semiPrivateBath },
-    { value: 'private', label: t.privateBath },
 ];
 
 function ToggleButtonSection<T extends string | number>({
@@ -108,7 +109,14 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
     const t = MODAL_TEXT[language];
     const priceLimits = useMemo<[number, number]>(() => getPriceRangeFromData(allDorms), [allDorms]);
     const bathroomCountOptions = useMemo(() => buildBathroomCountOptions(t), [t]);
-    const bathroomScopeOptions = useMemo(() => buildBathroomScopeOptions(t), [t]);
+    const bathroomScopeOptions = useMemo(
+        () =>
+            BATHROOM_TYPE_OPTIONS.map((option) => ({
+                value: option.value,
+                label: getLocalizedLabel(option, language),
+            })),
+        [language]
+    );
 
     const normalizeRange = useCallback(
         (range: [number, number]): [number, number] => {
@@ -175,8 +183,12 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
     ]);
 
     const locations = useMemo(
-        () => Array.from(new Set(allDorms.map((dorm) => dorm.location))).sort(),
-        [allDorms]
+        () =>
+            mergeLocationOptions(Array.from(new Set(allDorms.map((dorm) => dorm.location)))).map((option) => ({
+                value: option.value,
+                label: getLocalizedLabel(option, language),
+            })),
+        [allDorms, language]
     );
 
     const toggleStringArray = useCallback((values: string[], setValues: (next: string[]) => void, value: string) => {
@@ -348,7 +360,8 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
                                     <hr className="my-8 border-gray-100" />
 
                                     <HousingTypeSection
-                                        t={t}
+                                        title={t.typeOfPlace}
+                                        language={language}
                                         value={localHousingType}
                                         onChange={setLocalHousingType}
                                     />
@@ -397,36 +410,33 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
                                     <hr className="my-8 border-gray-100" />
 
                                     <section className="mb-8">
-                                        <h3 className="text-xl font-bold mb-6">{t.livingConditions}</h3>
+                                        <h3 className="mb-6 text-xl font-bold">{t.livingConditions}</h3>
                                         <div className="flex flex-wrap gap-3">
                                             <button
                                                 type="button"
                                                 onClick={() => setLocalRequireAc((prev) => !prev)}
-                                                className={`px-4 py-2 rounded-full border text-sm font-medium transition-colors ${
+                                                className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
                                                     localRequireAc
-                                                        ? 'bg-illini-blue text-white border-illini-blue'
+                                                        ? 'border-illini-blue bg-illini-blue text-white'
                                                         : 'border-gray-300 text-gray-700 hover:border-illini-blue'
                                                 }`}
                                             >
                                                 {t.airConditioning}
                                             </button>
-                                            {(['noAc', 'newlyRenovated'] as DormTag[]).map((tag) => {
+                                            {FILTERABLE_LIVING_CONDITION_TAGS.map((tag) => {
                                                 const selected = localLivingConditions.includes(tag);
-                                                const label = tag === 'noAc'
-                                                    ? (language === 'zh' ? '无空调' : 'No AC')
-                                                    : (language === 'zh' ? '新近翻修' : 'Newly Renovated');
                                                 return (
                                                     <button
                                                         key={tag}
                                                         type="button"
                                                         onClick={() => toggleDormTag(tag, localLivingConditions, setLocalLivingConditions)}
-                                                        className={`px-4 py-2 rounded-full border text-sm font-medium transition-colors ${
+                                                        className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
                                                             selected
-                                                                ? 'bg-illini-blue text-white border-illini-blue'
+                                                                ? 'border-illini-blue bg-illini-blue text-white'
                                                                 : 'border-gray-300 text-gray-700 hover:border-illini-blue'
                                                         }`}
                                                     >
-                                                        {label}
+                                                        {getTagDisplay(tag, language)}
                                                     </button>
                                                 );
                                             })}
