@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Pencil } from 'lucide-react';
+import { ArrowLeft, Heart, Pencil } from 'lucide-react';
 import { formatPrice } from '../../constants/housing/pricing';
 import { useSharedDormInteraction } from '../../contexts/DormUserInteractionContext';
 import { useDormData } from '../../contexts/DormDataContext';
@@ -80,7 +80,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
     return (
         <div className="h-full overflow-y-auto w-full no-scrollbar">
             <div className="max-w-6xl mx-auto px-4 sm:px-5 py-8 pb-32 md:pt-14 md:px-6">
-                {/* Top bar: back + optional admin edit button */}
+                {/* Top bar: back + mobile heart + optional admin edit button */}
                 <div className="flex items-center justify-between mb-6">
                     <button
                         onClick={() => navigate('/dorms')}
@@ -91,16 +91,32 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                         {t.backToBrowse}
                     </button>
 
-                    {user?.isAdmin && (
+                    <div className="flex items-center gap-2">
+                        {/* Heart button — mobile only; desktop uses sidebar button */}
                         <button
                             type="button"
-                            onClick={() => setEditOpen(true)}
-                            className="flex items-center gap-2 bg-illini-blue text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-900 transition-colors"
+                            onClick={async () => { await toggleFavorite(dorm.id, dorm.name, dorm.name_zh); }}
+                            aria-label={isSaved ? t.saved : t.save}
+                            className={`md:hidden flex items-center justify-center w-10 h-10 rounded-full shadow transition-colors ${
+                                isSaved
+                                    ? 'bg-emerald-100 text-emerald-600'
+                                    : 'bg-white text-gray-400 hover:text-illini-orange border border-gray-200'
+                            }`}
                         >
-                            <Pencil size={14} />
-                            {editBtnLabel}
+                            <Heart size={18} fill={isSaved ? 'currentColor' : 'none'} />
                         </button>
-                    )}
+
+                        {user?.isAdmin && (
+                            <button
+                                type="button"
+                                onClick={() => setEditOpen(true)}
+                                className="flex items-center gap-2 bg-illini-blue text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-900 transition-colors"
+                            >
+                                <Pencil size={14} />
+                                {editBtnLabel}
+                            </button>
+                        )}
+                    </div>
                 </div>
 
                 <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
@@ -113,17 +129,17 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                 <p className="text-gray-600 leading-relaxed text-sm md:text-lg">{dormDescription}</p>
                             </section>
 
+                            <DormTagDetailSection
+                                categorizedTags={dorm.categorizedTags}
+                                language={language}
+                            />
+
                             <DormProsConsSection
                                 title={t.prosAndCons}
                                 goodLabel={t.good}
                                 notSoGoodLabel={t.notSoGood}
                                 pros={dormPros}
                                 cons={dormCons}
-                            />
-
-                            <DormTagDetailSection
-                                categorizedTags={dorm.categorizedTags}
-                                language={language}
                             />
 
                             {dorm.floorPlans && dorm.floorPlans.length > 0 && (
@@ -155,12 +171,13 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                 </div>
                             </div>
 
+                            {/* Desktop-only full save button; mobile uses top-bar heart */}
                             <button
                                 onClick={async () => {
                                     await toggleFavorite(dorm.id, dorm.name, dorm.name_zh);
                                 }}
                                 type="button"
-                                className={`w-full py-3 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 ${isSaved
+                                className={`hidden md:block w-full py-3 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 ${isSaved
                                     ? 'bg-emerald-600 hover:bg-emerald-700'
                                     : 'bg-illini-orange hover:bg-illini-orange-dark'
                                     }`}
