@@ -169,7 +169,10 @@ const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, languag
                                 isExpanded ? 'border-illini-orange/30 shadow-md' : 'border-gray-200 shadow-sm'
                             }`}
                         >
-                            <div className="p-4 md:p-5">
+                            <div
+                                className={`p-4 md:p-5 ${hasImage ? 'cursor-pointer select-none' : ''}`}
+                                onClick={hasImage ? () => setExpandedPlan(isExpanded ? null : itemKey) : undefined}
+                            >
                                 <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                                     <div className="min-w-0 flex-1">
                                         <div className="flex flex-wrap items-center gap-2">
@@ -193,6 +196,15 @@ const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, languag
                                                 )}
                                                 {plan.available !== false ? t.available : t.notAvailable}
                                             </span>
+                                            {hasImage && (
+                                                <motion.span
+                                                    animate={{ rotate: isExpanded ? 180 : 0 }}
+                                                    transition={{ duration: 0.2 }}
+                                                    className="ml-auto text-gray-400"
+                                                >
+                                                    <ChevronDown size={16} />
+                                                </motion.span>
+                                            )}
                                         </div>
 
                                         {!hideDescription && planDescription && (
@@ -236,21 +248,6 @@ const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, languag
                                     </div>
                                 </div>
 
-                                {hasImage && (
-                                    <button
-                                        type="button"
-                                        onClick={() => setExpandedPlan(isExpanded ? null : itemKey)}
-                                        className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-illini-blue hover:text-blue-900 transition-colors"
-                                    >
-                                        <span>{isExpanded ? t.hideFloorPlan : t.viewFloorPlan}</span>
-                                        <motion.span
-                                            animate={{ rotate: isExpanded ? 180 : 0 }}
-                                            transition={{ duration: 0.2 }}
-                                        >
-                                            <ChevronDown size={16} />
-                                        </motion.span>
-                                    </button>
-                                )}
                             </div>
 
                             <AnimatePresence initial={false}>
