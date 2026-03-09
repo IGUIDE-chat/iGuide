@@ -20,6 +20,9 @@ export interface ModalText {
     pchDesc: string;
     location: string;
     buildingType: string;
+    livingConditions: string;
+    facilities: string;
+    lifestyle: string;
 }
 
 export const HISTOGRAM_DATA = [4, 8, 12, 25, 35, 42, 45, 30, 20, 15, 10, 5, 2, 1];
@@ -48,7 +51,10 @@ export const MODAL_TEXT: Record<FilterLanguage, ModalText> = {
         urhDesc: 'Official university residence halls',
         pchDesc: 'Private certified housing',
         location: 'Location',
-        buildingType: 'Building Type'
+        buildingType: 'Building Type',
+        livingConditions: 'Living Conditions',
+        facilities: 'Facilities',
+        lifestyle: 'Lifestyle'
     },
     zh: {
         filters: '筛选',
@@ -66,6 +72,9 @@ export const MODAL_TEXT: Record<FilterLanguage, ModalText> = {
         urhDesc: '学校官方宿舍',
         pchDesc: '经认证的校外住宿',
         location: '位置',
-        buildingType: '建筑类型'
+        buildingType: '建筑类型',
+        livingConditions: '居住条件',
+        facilities: '配套设施',
+        lifestyle: '生活方式'
     }
 };

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useMemo, useState, ReactNode, useCallback } from 'react';
-import { FilterOption, RoomType } from '../types/housing';
+import { DormTag, FilterOption, RoomType } from '../types/housing';
 import { getPriceRangeFromData } from '../constants/housing/pricing';
 import { useDormData } from './DormDataContext';
 
@@ -24,7 +24,7 @@ interface HousingFiltersContextType {
     setViewMode: (mode: 'list' | 'map') => void;
     sortBy: string;
     setSortBy: (sort: string) => void;
-    // New structured tag filters
+    // Legacy structured tag filters
     amenityFilters: string[];
     setAmenityFilters: React.Dispatch<React.SetStateAction<string[]>>;
     communityFilters: string[];
@@ -33,6 +33,13 @@ interface HousingFiltersContextType {
     setLlcFilters: React.Dispatch<React.SetStateAction<string[]>>;
     proximityFilters: string[];
     setProximityFilters: React.Dispatch<React.SetStateAction<string[]>>;
+    // New categorized tag filters
+    livingConditionFilters: DormTag[];
+    setLivingConditionFilters: React.Dispatch<React.SetStateAction<DormTag[]>>;
+    facilityFilters: DormTag[];
+    setFacilityFilters: React.Dispatch<React.SetStateAction<DormTag[]>>;
+    lifestyleFilters: DormTag[];
+    setLifestyleFilters: React.Dispatch<React.SetStateAction<DormTag[]>>;
     clearAllFilters: () => void;
 }
 
@@ -65,11 +72,15 @@ export const HousingProvider: React.FC<{ children: ReactNode }> = ({ children })
     const [showZones, setShowZones] = useState(true);
     const [showZoneLabels, setShowZoneLabels] = useState(true);
     const [showLandmarks, setShowLandmarks] = useState(true);
-    // New structured tag filters
+    // Legacy structured tag filters
     const [amenityFilters, setAmenityFilters] = useState<string[]>([]);
     const [communityFilters, setCommunityFilters] = useState<string[]>([]);
     const [llcFilters, setLlcFilters] = useState<string[]>([]);
     const [proximityFilters, setProximityFilters] = useState<string[]>([]);
+    // New categorized tag filters
+    const [livingConditionFilters, setLivingConditionFilters] = useState<DormTag[]>([]);
+    const [facilityFilters, setFacilityFilters] = useState<DormTag[]>([]);
+    const [lifestyleFilters, setLifestyleFilters] = useState<DormTag[]>([]);
 
     const clearAllFilters = useCallback(() => {
         setSearchTerm('');
@@ -83,6 +94,9 @@ export const HousingProvider: React.FC<{ children: ReactNode }> = ({ children })
         setCommunityFilters([]);
         setLlcFilters([]);
         setProximityFilters([]);
+        setLivingConditionFilters([]);
+        setFacilityFilters([]);
+        setLifestyleFilters([]);
     }, [dorms]);
 
     const filtersValue = useMemo<HousingFiltersContextType>(() => ({
@@ -114,6 +128,12 @@ export const HousingProvider: React.FC<{ children: ReactNode }> = ({ children })
         setLlcFilters,
         proximityFilters,
         setProximityFilters,
+        livingConditionFilters,
+        setLivingConditionFilters,
+        facilityFilters,
+        setFacilityFilters,
+        lifestyleFilters,
+        setLifestyleFilters,
         clearAllFilters
     }), [
         searchTerm,
@@ -130,6 +150,9 @@ export const HousingProvider: React.FC<{ children: ReactNode }> = ({ children })
         communityFilters,
         llcFilters,
         proximityFilters,
+        livingConditionFilters,
+        facilityFilters,
+        lifestyleFilters,
         clearAllFilters
     ]);
 

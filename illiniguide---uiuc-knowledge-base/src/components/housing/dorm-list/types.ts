@@ -1,4 +1,4 @@
-import { FilterOption, RoomType } from '../../../types/housing';
+import { DormTag, FilterOption, RoomType } from '../../../types/housing';
 
 export interface DormListText {
     searchPlaceholder: string;
@@ -23,9 +23,14 @@ export interface DormFilterState {
     typeFilters: string[];
     roomTypeFilters: RoomType[];
     housingTypeDetails: 'ALL' | 'URH' | 'PCH';
+    // Legacy structured tag filters (kept for backward compat)
     amenityFilters: string[];
     communityFilters: string[];
     llcFilters: string[];
     proximityFilters: string[];
+    // New categorized tag filters
+    livingConditionFilters: DormTag[];
+    facilityFilters: DormTag[];
+    lifestyleFilters: DormTag[];
     sortBy: string;
 }

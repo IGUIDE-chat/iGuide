@@ -531,7 +531,7 @@ const DormMap: React.FC<DormMapProps> = ({
                                 </div>
                                 <div className="flex items-center gap-2 text-[11px] text-gray-500 mb-2">
                                     {hoveredDorm.ac && <span>{popupT.ac}</span>}
-                                    {hoveredDorm.dining && <span>{popupT.dining}</span>}
+                                    {hoveredDorm.dining === 'inside' && <span>{popupT.dining}</span>}
                                     <span>{getDormTypeLabel(hoveredDorm.type, language === 'zh' ? 'zh' : 'en')}</span>
                                 </div>
                                 <div className="flex items-center justify-between">

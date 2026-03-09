@@ -1,5 +1,7 @@
-import { Dorm, FilterOption } from '../../../types/housing';
+import { Dorm, DormTag, FilterOption } from '../../../types/housing';
 import { DormFilterState } from './types';
+
+// ── Legacy structured tag matchers (kept for backward compat) ───────────────
 
 const matchesAmenityFilters = (dorm: Dorm, amenityFilters: string[]) => {
     if (amenityFilters.length === 0) return true;
@@ -46,6 +48,24 @@ const matchesProximityFilters = (dorm: Dorm, proximityFilters: string[]) => {
         return false;
     });
 };
+
+// ── New categorized tag matchers ────────────────────────────────────────────
+
+/** All selected tags must be present in the dorm's categorized tags (AND logic). */
+const matchesCategorizedTagFilters = (dorm: Dorm, filters: DormTag[]): boolean => {
+    if (filters.length === 0) return true;
+    if (!dorm.categorizedTags) return false;
+
+    const allDormTags: DormTag[] = [
+        ...dorm.categorizedTags.livingConditions,
+        ...dorm.categorizedTags.facilities,
+        ...dorm.categorizedTags.lifestyle,
+    ];
+
+    return filters.every(tag => allDormTags.includes(tag));
+};
+
+// ── Sort ────────────────────────────────────────────────────────────────────
 
 const sortDorms = (dorms: Dorm[], sortBy: string) => {
     return [...dorms].sort((a, b) => {
@@ -121,16 +141,26 @@ export const filterAndSortDorms = (dorms: Dorm[], filters: DormFilterState) => {
             return false;
         }
 
+        // Legacy structured tag filters
         if (!matchesAmenityFilters(dorm, filters.amenityFilters)) return false;
         if (!matchesCommunityFilters(dorm, filters.communityFilters)) return false;
         if (!matchesLlcFilters(dorm, filters.llcFilters)) return false;
         if (!matchesProximityFilters(dorm, filters.proximityFilters)) return false;
 
+        // New categorized tag filters (combined — AND logic)
+        const allCategoryFilters: DormTag[] = [
+            ...(filters.livingConditionFilters ?? []),
+            ...(filters.facilityFilters ?? []),
+            ...(filters.lifestyleFilters ?? []),
+        ];
+        if (!matchesCategorizedTagFilters(dorm, allCategoryFilters)) return false;
+
+        // Legacy FilterOption filters
         if (filters.activeFilters.length === 0) return true;
 
         const matchesAC = filters.activeFilters.includes(FilterOption.AC) ? dorm.ac : true;
         const matchesDining = filters.activeFilters.includes(FilterOption.DINING_IN_BUILDING)
-            ? dorm.dining
+            ? dorm.dining === 'inside'
             : true;
 
         return matchesAC && matchesDining;

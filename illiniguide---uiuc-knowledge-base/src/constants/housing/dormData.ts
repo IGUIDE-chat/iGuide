@@ -1,4 +1,4 @@
-﻿import { Dorm } from '../../types/housing';
+﻿import { Dorm, DormCategorizedTags } from '../../types/housing';
 
 // Accurate UIUC dorm coordinates based on campus geography
 // Campus reference: Main Quad (40.1074, -88.2317), Engineering Quad (40.1130, -88.2280)
@@ -12,7 +12,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: 'Traditional',
         housingType: 'URH',
         ac: true,
-        dining: true,
+        dining: 'inside',
+        bathroomType: 'communal',
         tags: ['Engineering', 'Renovated', 'Modern', 'STEM', 'Near Main Quad', 'Near Engineering', 'Near ARC/CRCE'],
         structuredTags: {
             elevator: true,
@@ -34,6 +35,12 @@ const RAW_UIUC_DORMS: Dorm[] = [
             nearARC: true,
             nearGreenStreet: false,
             nearIkenberryDining: false
+        },
+        categorizedTags: {
+            livingConditions: ['newlyRenovated'],
+            facilities: ['gym', 'studyLounge', 'laundry', 'busStop'],
+            lifestyle: ['llc'],
+            llcNames: ['Engineering LLC', 'Innovation LLC']
         },
         description: 'Located conveniently close to engineering quad, ISR features a newly renovated dining center and modern rooms. It is a hub for STEM majors.',
         description_zh: '',
@@ -63,7 +70,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: 'Semi-Suite',
         housingType: 'URH',
         ac: true,
-        dining: true,
+        dining: 'inside',
+        bathroomType: 'semi-private',
         tags: ['Social', 'Modern', 'Popular', 'Near Main Quad', 'Near Engineering', 'Near ARC/CRCE', 'Near Ikenberry Dining', 'Elevator', 'Laundry', 'Pool', 'Gym Nearby', 'LEADS LLC'],
         structuredTags: {
             elevator: true,
@@ -85,6 +93,12 @@ const RAW_UIUC_DORMS: Dorm[] = [
             nearARC: true,
             nearGreenStreet: false,
             nearIkenberryDining: true
+        },
+        categorizedTags: {
+            livingConditions: ['newlyRenovated'],
+            facilities: ['gym', 'laundry'],
+            lifestyle: ['socialParty', 'llc'],
+            llcNames: ['LEADS LLC']
         },
         description: 'One of the newest halls on campus offering premium amenities. Located near to ARC gym and Memorial Stadium. Known for being very social.',
         description_zh: '',
@@ -112,7 +126,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: 'Semi-Suite',
         housingType: 'URH',
         ac: true,
-        dining: true,
+        dining: 'inside',
+        bathroomType: 'semi-private',
         tags: ['Social', 'Modern', 'Popular', 'Near Main Quad', 'Near Engineering', 'Near ARC/CRCE', 'Near Ikenberry Dining', 'Elevator', 'Laundry', 'Pool', 'Gym Nearby'],
         structuredTags: {
             elevator: true,
@@ -134,6 +149,11 @@ const RAW_UIUC_DORMS: Dorm[] = [
             nearARC: true,
             nearGreenStreet: false,
             nearIkenberryDining: true
+        },
+        categorizedTags: {
+            livingConditions: ['newlyRenovated'],
+            facilities: ['gym', 'laundry'],
+            lifestyle: ['socialParty']
         },
         description: 'Named after the first Native American graduate of UIUC. A modern hall in Ikenberry North with premium amenities near the ARC.',
         description_zh: '',
@@ -161,7 +181,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: 'Semi-Suite',
         housingType: 'URH',
         ac: true,
-        dining: true,
+        dining: 'inside',
+        bathroomType: 'semi-private',
         tags: ['Social', 'Modern', 'Popular', 'Near Main Quad', 'Near Engineering', 'Near ARC/CRCE', 'Near Ikenberry Dining', 'Elevator', 'Laundry', 'Pool', 'Gym Nearby', 'Focus LLC'],
         structuredTags: {
             elevator: true,
@@ -183,6 +204,12 @@ const RAW_UIUC_DORMS: Dorm[] = [
             nearARC: true,
             nearGreenStreet: false,
             nearIkenberryDining: true
+        },
+        categorizedTags: {
+            livingConditions: ['newlyRenovated'],
+            facilities: ['gym', 'laundry'],
+            lifestyle: ['llc'],
+            llcNames: ['Focus LLC']
         },
         description: 'A modern hall in Ikenberry North featuring the Focus Interdisciplinary Sciences Living-Learning Community.',
         description_zh: '',
@@ -210,7 +237,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: 'Traditional',
         housingType: 'URH',
         ac: true,
-        dining: true,
+        dining: 'inside',
+        bathroomType: 'communal',
         tags: ['Diverse', 'Late Night Dining', 'Bus Routes', 'Near Business', 'Elevator', 'Laundry', 'Gender-Inclusive'],
         structuredTags: {
             elevator: true,
@@ -232,6 +260,11 @@ const RAW_UIUC_DORMS: Dorm[] = [
             nearARC: false,
             nearGreenStreet: false,
             nearIkenberryDining: false
+        },
+        categorizedTags: {
+            livingConditions: ['newlyRenovated'],
+            facilities: ['gym', 'studyLounge', 'laundry', 'convenienceStore'],
+            lifestyle: ['socialParty']
         },
         description: 'PAR is known for its diversity and famous late-night dining options. It features "Babcock" and "Carr" halls. A bit further south but well connected by bus.',
         description_zh: '',
@@ -259,7 +292,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: 'Traditional',
         housingType: 'URH',
         ac: true,
-        dining: true,
+        dining: 'inside',
+        bathroomType: 'communal',
         tags: ['Quiet', 'Trellis Dining', 'South Campus', 'Near Business', 'Laundry', 'Quiet Floors', 'Gender-Inclusive'],
         structuredTags: {
             elevator: false,
@@ -281,6 +315,11 @@ const RAW_UIUC_DORMS: Dorm[] = [
             nearARC: false,
             nearGreenStreet: false,
             nearIkenberryDining: false
+        },
+        categorizedTags: {
+            livingConditions: [],
+            facilities: ['studyLounge', 'laundry', 'kitchen'],
+            lifestyle: ['quiet', 'internationalFriendly']
         },
         description: 'Located across from PAR, FAR offers air-conditioned rooms and Oglesby/Trelease halls. Known for a slightly quieter atmosphere than Ike.',
         description_zh: '',
@@ -308,7 +347,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: 'Traditional',
         housingType: 'URH',
         ac: false,
-        dining: true,
+        dining: 'inside',
+        bathroomType: 'communal',
         tags: ['Artsy', 'Unit One', 'Music', 'Near Main Quad', 'No AC', 'Laundry', 'Kitchen', 'Quiet Floors'],
         structuredTags: {
             elevator: false,
@@ -330,6 +370,12 @@ const RAW_UIUC_DORMS: Dorm[] = [
             nearARC: false,
             nearGreenStreet: false,
             nearIkenberryDining: false
+        },
+        categorizedTags: {
+            livingConditions: ['noAc', 'olderBuilding'],
+            facilities: ['musicRooms', 'studyLounge', 'laundry', 'kitchen'],
+            lifestyle: ['artsyCreative', 'internationalFriendly', 'llc', 'quiet'],
+            llcNames: ['Unit One']
         },
         description: 'Home to the Unit One LLC, Allen is a hub for creative students. It features music practice rooms, a recording studio, and guest-in-residence programs.',
         description_zh: '',
@@ -357,7 +403,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: 'Traditional',
         housingType: 'URH',
         ac: false,
-        dining: true,
+        dining: 'nearby',
+        bathroomType: 'communal',
         tags: ['Historic', 'Quiet', 'Female-Identified', 'Near Main Quad', 'Laundry', 'Study Rooms', 'Quiet Floors'],
         structuredTags: {
             elevator: false,
@@ -379,6 +426,11 @@ const RAW_UIUC_DORMS: Dorm[] = [
             nearARC: false,
             nearGreenStreet: false,
             nearIkenberryDining: false
+        },
+        categorizedTags: {
+            livingConditions: ['noAc', 'olderBuilding'],
+            facilities: ['studyLounge', 'laundry'],
+            lifestyle: ['quiet']
         },
         description: 'A historic residence hall primarily for female-identified students. Known for its beautiful architecture and quiet, study-focused environment.',
         description_zh: '',
@@ -407,7 +459,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: 'Traditional',
         housingType: 'URH',
         ac: true,
-        dining: false,
+        dining: 'inside',
+        bathroomType: 'semi-private',
         tags: ['Social', 'Traditional', 'Substance-Free', 'Near Main Quad', 'Near Business', 'Near Ikenberry Dining', 'Laundry', 'Study Rooms', 'Substance-Free'],
         structuredTags: {
             elevator: false,
@@ -429,6 +482,12 @@ const RAW_UIUC_DORMS: Dorm[] = [
             nearARC: false,
             nearGreenStreet: false,
             nearIkenberryDining: true
+        },
+        categorizedTags: {
+            livingConditions: ['newlyRenovated'],
+            facilities: ['gym', 'laundry'],
+            lifestyle: ['socialParty', 'llc'],
+            llcNames: ['Exploration LLC']
         },
         description: 'A substance-free hall in Ikenberry South. Part of the traditional "Six Pack" with good access to Ike Dining Hall.',
         description_zh: '',
@@ -456,7 +515,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: 'Traditional',
         housingType: 'URH',
         ac: true,
-        dining: false,
+        dining: 'inside',
+        bathroomType: 'semi-private',
         tags: ['LEADS LLC', 'Social', 'Near Main Quad', 'Near Business', 'Near Ikenberry Dining', 'Ike South', 'Laundry', 'Study Rooms', 'LEADS LLC'],
         structuredTags: {
             elevator: false,
@@ -478,6 +538,11 @@ const RAW_UIUC_DORMS: Dorm[] = [
             nearARC: false,
             nearGreenStreet: false,
             nearIkenberryDining: true
+        },
+        categorizedTags: {
+            livingConditions: ['newlyRenovated'],
+            facilities: ['gym', 'laundry'],
+            lifestyle: ['socialParty']
         },
         description: 'Part of the "Six Pack" in Ikenberry South. Home to the LEADS Living-Learning Community. Known for a strong sense of community.',
         description_zh: '',
@@ -505,7 +570,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: 'Traditional',
         housingType: 'URH',
         ac: true,
-        dining: false,
+        dining: 'inside',
+        bathroomType: 'semi-private',
         tags: ['Exploration LLC', 'Freshmen', 'Social', 'Near Main Quad', 'Near Business', 'Near Ikenberry Dining', 'Laundry', 'Exploration LLC'],
         structuredTags: {
             elevator: false,
@@ -527,6 +593,12 @@ const RAW_UIUC_DORMS: Dorm[] = [
             nearARC: false,
             nearGreenStreet: false,
             nearIkenberryDining: true
+        },
+        categorizedTags: {
+            livingConditions: ['newlyRenovated'],
+            facilities: ['gym', 'laundry'],
+            lifestyle: ['socialParty', 'llc'],
+            llcNames: ['Sustainability LLC']
         },
         description: 'Located in Ikenberry North, Weston houses the Exploration LLC. It is extremely popular among freshmen and known for being very social.',
         description_zh: '',
@@ -554,7 +626,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: 'Traditional',
         housingType: 'URH',
         ac: true,
-        dining: false,
+        dining: 'inside',
+        bathroomType: 'semi-private',
         tags: ['Social', 'Transfer Cluster', 'Ike South', 'Elevator', 'Laundry', 'Study Rooms'],
         structuredTags: {
             elevator: true,
@@ -569,6 +642,11 @@ const RAW_UIUC_DORMS: Dorm[] = [
             substanceFree: false,
             petFriendly: false,
             llc: []
+        },
+        categorizedTags: {
+            livingConditions: ['newlyRenovated'],
+            facilities: ['gym', 'laundry'],
+            lifestyle: ['socialParty']
         },
         description: 'A large residence hall in Ikenberry South. Features a Transfer Community and is known for being a very social hub with easy access to the quad.',
         description_zh: '',
@@ -596,8 +674,9 @@ const RAW_UIUC_DORMS: Dorm[] = [
         location: 'Ikenberry',
         type: 'Traditional',
         housingType: 'URH',
-        ac: false,
-        dining: false,
+        ac: true,
+        dining: 'inside',
+        bathroomType: 'semi-private',
         tags: ['Historic', 'Small Community', 'Near Main Quad', 'Near Ikenberry Dining', 'Ike South', 'Laundry', 'Affordable'],
         structuredTags: {
             elevator: false,
@@ -619,6 +698,12 @@ const RAW_UIUC_DORMS: Dorm[] = [
             nearARC: false,
             nearGreenStreet: false,
             nearIkenberryDining: true
+        },
+        categorizedTags: {
+            livingConditions: ['newlyRenovated'],
+            facilities: ['gym', 'laundry'],
+            lifestyle: ['socialParty', 'llc'],
+            llcNames: ['Scholars LLC']
         },
         description: 'A smaller historic hall in Ikenberry South connected to Van Doren. Known for tight-knit community and unique room layouts.',
         description_zh: '',
@@ -645,8 +730,9 @@ const RAW_UIUC_DORMS: Dorm[] = [
         location: 'Ikenberry',
         type: 'Traditional',
         housingType: 'URH',
-        ac: false,
-        dining: false,
+        ac: true,
+        dining: 'inside',
+        bathroomType: 'semi-private',
         tags: ['Historic', 'Small Community', 'Near Main Quad', 'Near Ikenberry Dining', 'Ike South', 'Laundry', 'Affordable'],
         structuredTags: {
             elevator: false,
@@ -668,6 +754,12 @@ const RAW_UIUC_DORMS: Dorm[] = [
             nearARC: false,
             nearGreenStreet: false,
             nearIkenberryDining: true
+        },
+        categorizedTags: {
+            livingConditions: ['newlyRenovated'],
+            facilities: ['gym', 'laundry'],
+            lifestyle: ['socialParty', 'llc'],
+            llcNames: ['Wohlers LLC']
         },
         description: 'A smaller historic hall in Ikenberry South connected to Taft. Features diverse room shapes and a close community feel.',
         description_zh: '',
@@ -694,8 +786,9 @@ const RAW_UIUC_DORMS: Dorm[] = [
         location: 'Main Quad',
         type: 'Semi-Suite',
         housingType: 'URH',
-        ac: true,
-        dining: false,
+        ac: false,
+        dining: 'nearby',
+        bathroomType: 'communal',
         tags: ['Upperclassmen', 'Quiet', 'Near Main Quad', 'Near Green Street', 'Private Bath', 'Elevator', 'Laundry', 'Kitchen', 'Quiet Floors'],
         structuredTags: {
             elevator: true,
@@ -717,6 +810,11 @@ const RAW_UIUC_DORMS: Dorm[] = [
             nearARC: false,
             nearGreenStreet: true,
             nearIkenberryDining: false
+        },
+        categorizedTags: {
+            livingConditions: ['noAc', 'olderBuilding'],
+            facilities: ['studyLounge', 'laundry'],
+            lifestyle: ['quiet']
         },
         description: 'Reserved for sophomores and above. Daniels offers single and double rooms with private or semi-private bathrooms. Very quiet and academically focused.',
         description_zh: '',
@@ -745,7 +843,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: 'Semi-Suite',
         housingType: 'URH',
         ac: true,
-        dining: false,
+        dining: 'inside',
+        bathroomType: 'communal',
         tags: ['Upperclassmen', 'Singles', 'Graduate', 'Near Main Quad', 'Near Green Street', 'Elevator', 'Laundry', 'Kitchen', 'Study Rooms'],
         structuredTags: {
             elevator: true,
@@ -767,6 +866,12 @@ const RAW_UIUC_DORMS: Dorm[] = [
             nearARC: false,
             nearGreenStreet: true,
             nearIkenberryDining: false
+        },
+        categorizedTags: {
+            livingConditions: ['newlyRenovated'],
+            facilities: ['studyLounge', 'laundry', 'busStop'],
+            lifestyle: ['llc'],
+            llcNames: ['Intersections LLC']
         },
         description: 'Located near the library and psychology building. Sherman is popular for its single rooms and graduate student population. Very independent living style.',
         description_zh: '',
@@ -794,7 +899,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: 'Traditional',
         housingType: 'URH',
         ac: false,
-        dining: true,
+        dining: 'inside',
+        bathroomType: 'communal',
         tags: ['Scholars', 'Quiet', 'Near Main Quad', 'Near ARC/CRCE', 'Sustainability LLC', 'Laundry', 'Study Rooms', 'Scholars LLC'],
         structuredTags: {
             elevator: false,
@@ -816,6 +922,11 @@ const RAW_UIUC_DORMS: Dorm[] = [
             nearARC: true,
             nearGreenStreet: false,
             nearIkenberryDining: false
+        },
+        categorizedTags: {
+            livingConditions: ['noAc', 'olderBuilding'],
+            facilities: ['studyLounge', 'laundry', 'kitchen'],
+            lifestyle: ['quiet', 'internationalFriendly']
         },
         description: 'Home to the Scholars (Leonard) and Sustainability (Shelden) communities. A quieter hall connected to Allen Hall, sharing dining facilities.',
         description_zh: '',
@@ -843,7 +954,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: 'Suite',
         housingType: 'PCH',
         ac: true,
-        dining: true,
+        dining: 'nearby',
+        bathroomType: 'private',
         tags: ['Social', 'PCH', 'Near Engineering', 'Near Green Street', 'Pool', 'Greek Life', 'Elevator', 'Laundry', 'Kitchen', 'Parking'],
         structuredTags: {
             elevator: true,
@@ -865,6 +977,11 @@ const RAW_UIUC_DORMS: Dorm[] = [
             nearARC: false,
             nearGreenStreet: true,
             nearIkenberryDining: false
+        },
+        categorizedTags: {
+            livingConditions: [],
+            facilities: ['gym', 'laundry', 'kitchen', 'busStop'],
+            lifestyle: ['socialParty']
         },
         description: 'A popular Private Certified Housing option known for its social scene and amenities like an indoor pool. Often associated with Greek life.',
         description_zh: '',
@@ -892,7 +1009,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: 'Suite',
         housingType: 'PCH',
         ac: true,
-        dining: true,
+        dining: 'inside',
+        bathroomType: 'private',
         tags: ['PCH', 'Apartment Style', 'Near Main Quad', 'Near Green Street', 'Convenient', 'Elevator', 'Laundry', 'Kitchen', 'Parking', 'Gym Nearby'],
         structuredTags: {
             elevator: true,
@@ -914,6 +1032,11 @@ const RAW_UIUC_DORMS: Dorm[] = [
             nearARC: false,
             nearGreenStreet: true,
             nearIkenberryDining: false
+        },
+        categorizedTags: {
+            livingConditions: [],
+            facilities: ['gym', 'laundry', 'convenienceStore', 'busStop'],
+            lifestyle: ['socialParty']
         },
         description: 'Located just blocks from the Main Quad and Green Street. Offers apartment-style living with full kitchens in some units.',
         description_zh: '',
@@ -942,7 +1065,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: 'Traditional',
         housingType: 'PCH',
         ac: true,
-        dining: true,
+        dining: 'inside',
+        bathroomType: 'private',
         tags: ['PCH', 'Catholic', 'Community', 'Near Main Quad', 'Near Green Street', 'Elevator', 'Laundry', 'Kitchen', 'Quiet Floors'],
         structuredTags: {
             elevator: true,
@@ -964,6 +1088,11 @@ const RAW_UIUC_DORMS: Dorm[] = [
             nearARC: false,
             nearGreenStreet: true,
             nearIkenberryDining: false
+        },
+        categorizedTags: {
+            livingConditions: [],
+            facilities: ['gym', 'laundry', 'studyLounge'],
+            lifestyle: ['quiet']
         },
         description: 'Associated with St. John\'s Catholic Newman Center. Known for its strong community, central location, and good food.',
         description_zh: '',
@@ -992,7 +1121,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: 'Traditional',
         housingType: 'PCH',
         ac: true,
-        dining: true,
+        dining: 'nearby',
+        bathroomType: 'private',
         tags: ['PCH', 'Foodie', 'Near Main Quad', 'Near Engineering', 'Elevator', 'Laundry', 'Kitchen', 'Gym Nearby'],
         structuredTags: {
             elevator: true,
@@ -1014,6 +1144,11 @@ const RAW_UIUC_DORMS: Dorm[] = [
             nearARC: false,
             nearGreenStreet: false,
             nearIkenberryDining: false
+        },
+        categorizedTags: {
+            livingConditions: [],
+            facilities: ['laundry', 'kitchen', 'studyLounge'],
+            lifestyle: ['quiet']
         },
         description: 'Famous for its high-quality dining. Located near the engineering quad, making it a top choice for engineering students.',
         description_zh: '',
@@ -1042,7 +1177,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: 'Traditional',
         housingType: 'URH',
         ac: true,
-        dining: false,
+        dining: 'nearby',
+        bathroomType: 'private',
         tags: ['Social', 'Quiet', 'Modern', 'Near Main Quad', 'Near Ikenberry Dining', 'Elevator', 'Laundry', 'Study Rooms'],
         structuredTags: {
             elevator: true,
@@ -1064,6 +1200,11 @@ const RAW_UIUC_DORMS: Dorm[] = [
             nearARC: false,
             nearGreenStreet: false,
             nearIkenberryDining: true
+        },
+        categorizedTags: {
+            livingConditions: [],
+            facilities: ['laundry', 'kitchen', 'studyLounge'],
+            lifestyle: ['quiet']
         },
         description: 'A modern residence hall in Ikenberry North, offering a quiet study environment with air-conditioned rooms. Close to dining and academic buildings.',
         description_zh: '',
@@ -1092,7 +1233,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: 'Traditional',
         housingType: 'URH',
         ac: true,
-        dining: false,
+        dining: 'nearby',
+        bathroomType: 'private',
         tags: ['Modern', 'Renovated', 'Quiet', 'Near Main Quad', 'Near ARC/CRCE', 'Elevator', 'Laundry', 'Gym Nearby'],
         structuredTags: {
             elevator: true,
@@ -1114,6 +1256,11 @@ const RAW_UIUC_DORMS: Dorm[] = [
             nearARC: true,
             nearGreenStreet: false,
             nearIkenberryDining: false
+        },
+        categorizedTags: {
+            livingConditions: ['newlyRenovated'],
+            facilities: ['gym', 'laundry', 'busStop'],
+            lifestyle: ['socialParty']
         },
         description: 'A recently renovated hall connecting to Presby. Features modern study spaces and proximity to campus recreation facilities. Popular for students who prefer a quieter environment.',
         description_zh: '',
@@ -1186,7 +1333,7 @@ const HOUSING_TYPE_ZH: Record<Dorm['housingType'], string> = {
 const buildDefaultProsZh = (dorm: Dorm): string[] => [
     `位于${dorm.location}，日常通勤较方便`,
     dorm.ac ? '配备空调，夏季居住更舒适' : '房间无空调，建议准备风扇',
-    dorm.dining ? '食堂可达，用餐便利' : '可选择周边餐饮，选择更灵活'
+    dorm.dining === 'inside' ? '食堂可达，用餐便利' : '可选择周边餐饮，选择更灵活'
 ];
 
 const buildDefaultConsZh = (dorm: Dorm): string[] => [
@@ -1208,7 +1355,7 @@ const enrichDormZhContent = (dorm: Dorm): Dorm => {
 
     const descriptionZh =
         dorm.description_zh?.trim() ||
-        `${nameZh}位于${locationZh}，属于${HOUSING_TYPE_ZH[dorm.housingType]}的${TYPE_ZH[dorm.type]}。年住宿费用约 $${dorm.price.toLocaleString()}，${dorm.ac ? '配有空调' : '未配备空调'}，${dorm.dining ? '就近可使用食堂。' : '需前往附近区域就餐。'}`;
+        `${nameZh}位于${locationZh}，属于${HOUSING_TYPE_ZH[dorm.housingType]}的${TYPE_ZH[dorm.type]}。年住宿费用约 $${dorm.price.toLocaleString()}，${dorm.ac ? '配有空调' : '未配备空调'}，${dorm.dining === 'inside' ? '就近可使用食堂。' : '需前往附近区域就餐。'}`;
 
     const prosZh = dorm.pros_zh && dorm.pros_zh.length > 0 ? dorm.pros_zh : buildDefaultProsZh(dorm);
     const consZh = dorm.cons_zh && dorm.cons_zh.length > 0 ? dorm.cons_zh : buildDefaultConsZh(dorm);
