@@ -42,7 +42,7 @@ const KNOWN_DB_COLUMNS = new Set([
     'room_types', 'categorized_tags',
     'floor_plans', 'gallery_images',
     'pros', 'pros_zh', 'cons', 'cons_zh',
-    // Add 'application_fee' here once the column is created in Supabase
+    'application_fee',
 ]);
 
 /**
