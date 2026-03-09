@@ -1,6 +1,12 @@
 export const TEXT = {
   en: {
-    tabs: { content: 'Content', details: 'Details', tags: 'Tags', media: 'Media', history: 'History' },
+    tabs: {
+      content: 'Content',
+      details: 'Details',
+      tags: 'Tags',
+      media: 'Media',
+      history: 'History',
+    },
     labels: {
       name: 'Name',
       description: 'Description',
@@ -41,6 +47,7 @@ export const TEXT = {
       upload: 'Upload',
       restore: 'Restore',
       restoring: 'Restoring...',
+      loading: 'Loading...',
     },
     values: {
       inside: 'Inside',
@@ -74,7 +81,13 @@ export const TEXT = {
     },
   },
   zh: {
-    tabs: { content: '内容', details: '详情', tags: '标签', media: '媒体', history: '历史' },
+    tabs: {
+      content: '内容',
+      details: '详情',
+      tags: '标签',
+      media: '媒体',
+      history: '历史',
+    },
     labels: {
       name: '名称',
       description: '描述',
@@ -115,6 +128,7 @@ export const TEXT = {
       upload: '上传',
       restore: '还原',
       restoring: '还原中...',
+      loading: '加载中...',
     },
     values: {
       inside: '楼内',
@@ -143,7 +157,7 @@ export const TEXT = {
       onlyImages: '仅支持上传图片文件。',
       imageTooLarge: '图片大小不能超过 10MB。',
       imageUploadFailed: '图片上传失败，请重试。',
-      restoreConfirm: '确定要还原至此版本吗？当前数据将被覆盖。',
+      restoreConfirm: '确定要还原到这个版本吗？当前数据将被覆盖。',
       restoreFailed: '还原失败，请重试。',
     },
   },
