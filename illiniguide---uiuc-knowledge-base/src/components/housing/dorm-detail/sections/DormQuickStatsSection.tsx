@@ -1,7 +1,8 @@
 import React from 'react';
-import { DollarSign, Utensils, MapPin, Wind, Bath, Building2 } from 'lucide-react';
+import { Bath, Building2, DollarSign, MapPin, Utensils, Wind } from 'lucide-react';
 import { Dorm } from '../../../../types/housing';
 import { Language } from '../../../../types';
+import { DINING_OPTIONS, getDimensionOptionLabel, getHousingTypeMeta } from '../../../../constants/housing/metadata';
 import { getDormBathroomSummary } from '../../../../utils/roomOptions';
 
 interface DormQuickStatsSectionProps {
@@ -16,11 +17,6 @@ interface DormQuickStatsSectionProps {
     formatPrice: (price: number) => string;
 }
 
-const DINING_LABELS: Record<Language, Record<Dorm['dining'], string>> = {
-    en: { inside: 'On-site', nearby: 'Nearby', none: 'None' },
-    zh: { inside: '楼内', nearby: '附近', none: '无' },
-};
-
 const DormQuickStatsSection: React.FC<DormQuickStatsSectionProps> = ({
     dorm,
     language,
@@ -30,13 +26,14 @@ const DormQuickStatsSection: React.FC<DormQuickStatsSectionProps> = ({
     annualPriceLabel,
     formatPrice,
 }) => {
-    const diningText = DINING_LABELS[language]?.[dorm.dining] ?? DINING_LABELS.en[dorm.dining];
+    const diningText = getDimensionOptionLabel(DINING_OPTIONS, dorm.dining, language);
     const bathroomText = getDormBathroomSummary(dorm, language);
+    const housingTypeMeta = getHousingTypeMeta(dorm.housingType);
     const locationLabel = language === 'zh' && dorm.location_zh ? dorm.location_zh : dorm.location;
 
     return (
         <div>
-            <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">{quickStatsLabel}</h3>
+            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-400">{quickStatsLabel}</h3>
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center text-gray-700">
@@ -44,12 +41,9 @@ const DormQuickStatsSection: React.FC<DormQuickStatsSectionProps> = ({
                         <span>{housingTypeLabel}</span>
                     </div>
                     <span
-                        className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold tracking-wide ${dorm.housingType === 'URH'
-                            ? 'bg-illini-orange/15 text-illini-orange'
-                            : 'bg-blue-100 text-illini-blue'
-                            }`}
+                        className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold tracking-wide ${housingTypeMeta.badgeClassName}`}
                     >
-                        {dorm.housingType}
+                        {housingTypeMeta.shortLabel}
                     </span>
                 </div>
 

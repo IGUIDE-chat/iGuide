@@ -1,5 +1,11 @@
 import React from 'react';
 import { BathroomType, DiningType, Dorm } from '../../../types/housing';
+import {
+  BATHROOM_TYPE_OPTIONS,
+  DINING_OPTIONS,
+  getLocalizedLabel,
+  HOUSING_TYPE_OPTIONS,
+} from '../../../constants/housing/metadata';
 import { DormEditFormState } from './useDormEditForm';
 import { Field, Toggle, inputCls } from './EditPanelFields';
 
@@ -18,8 +24,11 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
           onChange={(event) => form.setHousingType(event.target.value as Dorm['housingType'])}
           className={inputCls}
         >
-          <option value="URH">URH</option>
-          <option value="PCH">PCH</option>
+          {HOUSING_TYPE_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.shortLabel}
+            </option>
+          ))}
         </select>
       </Field>
       <Field label={t.labels.annualPrice}>
@@ -48,9 +57,11 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
           onChange={(event) => form.setDining(event.target.value as DiningType)}
           className={inputCls}
         >
-          <option value="inside">{t.values.inside}</option>
-          <option value="nearby">{t.values.nearby}</option>
-          <option value="none">{t.values.none}</option>
+          {DINING_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {getLocalizedLabel(option, form.language)}
+            </option>
+          ))}
         </select>
       </Field>
       {form.dining === 'nearby' && (
@@ -70,9 +81,11 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
           onChange={(event) => form.setBathroomType(event.target.value as BathroomType)}
           className={inputCls}
         >
-          <option value="communal">{t.values.communal}</option>
-          <option value="semi-private">{t.values.semiPrivate}</option>
-          <option value="private">{t.values.private}</option>
+          {BATHROOM_TYPE_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {getLocalizedLabel(option, form.language)}
+            </option>
+          ))}
         </select>
       </Field>
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">

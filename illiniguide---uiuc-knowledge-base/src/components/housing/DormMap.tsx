@@ -9,6 +9,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { buildDormFeatureCollection, buildLandmarkFeatureCollection } from './dorm-map/mapFeatureBuilders';
 import { DEFAULT_CENTER, DEFAULT_ZOOM } from './dorm-map/mapConstants';
 import { registerMapAssets } from './dorm-map/mapAssets';
+import { getHousingTypeMeta } from '../../constants/housing/metadata';
 import {
     buildLandmarksLayer,
     buildZonesFillLayer,
@@ -519,14 +520,16 @@ const DormMap: React.FC<DormMapProps> = ({
                                     <h4 className="font-bold text-gray-900 text-sm truncate flex-1">
                                         {isChinese && hoveredDorm.name_zh ? hoveredDorm.name_zh : hoveredDorm.name}
                                     </h4>
-                                    <span
-                                        className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ml-2 flex-shrink-0 ${hoveredDorm.housingType === 'URH'
-                                            ? 'bg-illini-orange/15 text-illini-orange'
-                                            : 'bg-blue-100 text-blue-600'
-                                            }`}
-                                    >
-                                        {hoveredDorm.housingType === 'URH' ? 'URH' : 'PCH'}
-                                    </span>
+                                    {(() => {
+                                        const housingTypeMeta = getHousingTypeMeta(hoveredDorm.housingType);
+                                        return (
+                                            <span
+                                                className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ml-2 flex-shrink-0 ${housingTypeMeta.badgeClassName}`}
+                                            >
+                                                {housingTypeMeta.shortLabel}
+                                            </span>
+                                        );
+                                    })()}
                                 </div>
                                 <div className="flex items-center gap-2 text-[11px] text-gray-500 mb-2">
                                     {hoveredDorm.ac && <span>{popupT.ac}</span>}

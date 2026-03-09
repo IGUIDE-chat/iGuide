@@ -1,8 +1,9 @@
 import React from 'react';
 import { MapPin } from 'lucide-react';
+import { getTagDisplay } from '../../../../constants/housing/metadata';
 import { Dorm } from '../../../../types/housing';
 import { Language } from '../../../../types';
-import { getHeroTags, getTagDisplay } from '../../../../utils/tagLabels';
+import { getHeroTags } from '../../../../utils/tagLabels';
 
 interface DormHeroSectionProps {
     dorm: Dorm;

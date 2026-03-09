@@ -162,28 +162,3 @@ export const TEXT = {
     },
   },
 } as const;
-
-export const LOCATION_PRESETS = [
-  { value: 'Ikenberry', en: 'Ikenberry', zh: 'Ikenberry' },
-  { value: 'Main Quad', en: 'Main Quad', zh: 'Main Quad' },
-  { value: 'PAR/FAR', en: 'PAR/FAR', zh: 'PAR/FAR' },
-  { value: 'Campustown', en: 'Campustown', zh: 'Campustown' },
-  { value: 'South Campus', en: 'South Campus', zh: 'South Campus' },
-];
-
-export const LLC_OPTIONS = [
-  'Beckwith Residential Community',
-  'Business LLC',
-  'Exploration LLC',
-  'Global Crossroads LLC',
-  'Health Professions LLC',
-  'Honors LLC',
-  'Innovation LLC',
-  'Intersections LLC',
-  'LEADS LLC',
-  'Scholars Community',
-  'Sustainability LLC',
-  'Transfer Community',
-  'Unit One LLC',
-  'WIMSE LLC',
-];

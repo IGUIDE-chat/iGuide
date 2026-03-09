@@ -1,6 +1,7 @@
 import React from 'react';
 import { Dorm } from '../../types/housing';
 import { formatPrice } from '../../constants/housing/pricing';
+import { getHousingTypeMeta, getLocalizedLabel } from '../../constants/housing/metadata';
 import { Language } from '../../types';
 import { X, Check, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -86,15 +87,14 @@ const DormComparison: React.FC<DormComparisonProps> = ({ dorms, onClose, languag
         },
         {
             label: t.housingType,
-            getValue: (dorm) => (
-                <span
-                    className={`px-2 py-1 text-xs rounded-full ${
-                        dorm.housingType === 'URH' ? 'bg-illini-orange/15 text-illini-orange' : 'bg-blue-100 text-illini-blue'
-                    }`}
-                >
-                    {dorm.housingType === 'URH' ? t.urh : t.pch}
-                </span>
-            ),
+            getValue: (dorm) => {
+                const housingTypeMeta = getHousingTypeMeta(dorm.housingType);
+                return (
+                    <span className={`px-2 py-1 text-xs rounded-full ${housingTypeMeta.badgeClassName}`}>
+                        {getLocalizedLabel(housingTypeMeta, language)}
+                    </span>
+                );
+            },
         },
         {
             label: t.price,

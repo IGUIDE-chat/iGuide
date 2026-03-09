@@ -1,6 +1,7 @@
 import React from 'react';
 import { Loader2, Plus, Trash2, Upload } from 'lucide-react';
 import { BathroomScope, FloorPlan } from '../../../types/housing';
+import { BATHROOM_TYPE_OPTIONS, getLocalizedLabel } from '../../../constants/housing/metadata';
 import { normalizeFloorPlan } from '../../../utils/roomOptions';
 import { EditableList, Field, Toggle, inputCls } from './EditPanelFields';
 import {
@@ -137,9 +138,11 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                       }
                       className={inputCls}
                     >
-                      <option value="communal">{t.values.communal}</option>
-                      <option value="semi-private">{t.values.semiPrivate}</option>
-                      <option value="private">{t.values.private}</option>
+                      {BATHROOM_TYPE_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {getLocalizedLabel(option, form.language)}
+                        </option>
+                      ))}
                     </select>
                   </Field>
                   {layoutKind === 'standard' && (
