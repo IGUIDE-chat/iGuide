@@ -127,6 +127,8 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
         livingConditionFilters,
         facilityFilters,
         lifestyleFilters,
+        requireAc,
+        bathroomTypeFilters,
         clearAllFilters
     } = useHousingFilters();
 
@@ -161,7 +163,9 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
             proximityFilters.length > 0 ||
             livingConditionFilters.length > 0 ||
             facilityFilters.length > 0 ||
-            lifestyleFilters.length > 0,
+            lifestyleFilters.length > 0 ||
+            requireAc ||
+            bathroomTypeFilters.length > 0,
         [
             activeFilters.length,
             hasPriceFilter,
@@ -175,7 +179,9 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
             proximityFilters.length,
             livingConditionFilters.length,
             facilityFilters.length,
-            lifestyleFilters.length
+            lifestyleFilters.length,
+            requireAc,
+            bathroomTypeFilters.length
         ]
     );
 
@@ -193,7 +199,9 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
             proximityFilters.length +
             livingConditionFilters.length +
             facilityFilters.length +
-            lifestyleFilters.length,
+            lifestyleFilters.length +
+            (requireAc ? 1 : 0) +
+            bathroomTypeFilters.length,
         [
             hasPriceFilter,
             housingTypeDetails,
@@ -207,7 +215,9 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
             proximityFilters.length,
             livingConditionFilters.length,
             facilityFilters.length,
-            lifestyleFilters.length
+            lifestyleFilters.length,
+            requireAc,
+            bathroomTypeFilters.length
         ]
     );
 
@@ -233,6 +243,8 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
                 livingConditionFilters,
                 facilityFilters,
                 lifestyleFilters,
+                requireAc,
+                bathroomTypeFilters,
                 sortBy
             }),
         [
@@ -251,6 +263,8 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
             livingConditionFilters,
             facilityFilters,
             lifestyleFilters,
+            requireAc,
+            bathroomTypeFilters,
             sortBy
         ]
     );

@@ -1,4 +1,4 @@
-import { DormTag, FilterOption, RoomType } from '../../../types/housing';
+import { BathroomType, DormTag, FilterOption, RoomType } from '../../../types/housing';
 
 export interface DormListText {
     searchPlaceholder: string;
@@ -32,5 +32,8 @@ export interface DormFilterState {
     livingConditionFilters: DormTag[];
     facilityFilters: DormTag[];
     lifestyleFilters: DormTag[];
+    // Structured filters
+    requireAc: boolean;
+    bathroomTypeFilters: BathroomType[];
     sortBy: string;
 }

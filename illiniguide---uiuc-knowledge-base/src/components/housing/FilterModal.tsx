@@ -5,11 +5,10 @@ import 'rc-slider/assets/index.css';
 import { useHousingFilters } from '../../contexts/HousingContext';
 import { getPriceRangeFromData } from '../../constants/housing/pricing';
 import { useDormData } from '../../contexts/DormDataContext';
-import { DormTag, FilterOption, RoomType } from '../../types/housing';
+import { BathroomType, DormTag, FilterOption, RoomType } from '../../types/housing';
 import { TAGS_BY_CATEGORY } from '../../constants/housing/tagDefinitions';
 import PriceSection from './filter-modal/PriceSection';
 import HousingTypeSection from './filter-modal/HousingTypeSection';
-import AmenitiesSection from './filter-modal/AmenitiesSection';
 import RoomTypeSection from './filter-modal/RoomTypeSection';
 import ChipSection from './filter-modal/ChipSection';
 import TagFilterSection from './filter-modal/TagFilterSection';
@@ -44,7 +43,11 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         facilityFilters,
         setFacilityFilters,
         lifestyleFilters,
-        setLifestyleFilters
+        setLifestyleFilters,
+        requireAc,
+        setRequireAc,
+        bathroomTypeFilters,
+        setBathroomTypeFilters
     } = useHousingFilters();
 
     const t = MODAL_TEXT[language];
@@ -86,6 +89,8 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
     const [localLivingConditions, setLocalLivingConditions] = useState<DormTag[]>(livingConditionFilters);
     const [localFacilities, setLocalFacilities] = useState<DormTag[]>(facilityFilters);
     const [localLifestyle, setLocalLifestyle] = useState<DormTag[]>(lifestyleFilters);
+    const [localRequireAc, setLocalRequireAc] = useState(requireAc);
+    const [localBathroomTypes, setLocalBathroomTypes] = useState<BathroomType[]>(bathroomTypeFilters);
 
     useEffect(() => {
         if (!isOpen) return;
@@ -98,6 +103,8 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         setLocalLivingConditions(livingConditionFilters);
         setLocalFacilities(facilityFilters);
         setLocalLifestyle(lifestyleFilters);
+        setLocalRequireAc(requireAc);
+        setLocalBathroomTypes(bathroomTypeFilters);
     }, [
         isOpen,
         normalizeRange,
@@ -109,7 +116,9 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         typeFilters,
         livingConditionFilters,
         facilityFilters,
-        lifestyleFilters
+        lifestyleFilters,
+        requireAc,
+        bathroomTypeFilters
     ]);
 
     const locations = useMemo(
@@ -131,6 +140,8 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         setLivingConditionFilters(localLivingConditions);
         setFacilityFilters(localFacilities);
         setLifestyleFilters(localLifestyle);
+        setRequireAc(localRequireAc);
+        setBathroomTypeFilters(localBathroomTypes);
         onClose();
     }, [
         localAmenities,
@@ -142,6 +153,8 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         localLivingConditions,
         localFacilities,
         localLifestyle,
+        localRequireAc,
+        localBathroomTypes,
         normalizeRange,
         onClose,
         setActiveFilters,
@@ -152,7 +165,9 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         setTypeFilters,
         setLivingConditionFilters,
         setFacilityFilters,
-        setLifestyleFilters
+        setLifestyleFilters,
+        setRequireAc,
+        setBathroomTypeFilters
     ]);
 
     const handleClear = useCallback(() => {
@@ -165,6 +180,8 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         setLocalLivingConditions([]);
         setLocalFacilities([]);
         setLocalLifestyle([]);
+        setLocalRequireAc(false);
+        setLocalBathroomTypes([]);
 
         setPriceRange(priceLimits);
         setHousingTypeDetails('ALL');
@@ -178,6 +195,8 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         setLivingConditionFilters([]);
         setFacilityFilters([]);
         setLifestyleFilters([]);
+        setRequireAc(false);
+        setBathroomTypeFilters([]);
         onClose();
     }, [
         onClose,
@@ -193,7 +212,9 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         setTypeFilters,
         setLivingConditionFilters,
         setFacilityFilters,
-        setLifestyleFilters
+        setLifestyleFilters,
+        setRequireAc,
+        setBathroomTypeFilters
     ]);
 
     const toggleStringArray = useCallback(
@@ -334,24 +355,53 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
 
                                     <hr className="my-8 border-gray-100" />
 
-                                    <ChipSection
-                                        title={t.buildingType}
-                                        options={buildingTypes}
-                                        selectedValues={localTypes}
-                                        onToggle={(value) =>
-                                            toggleStringArray(localTypes, setLocalTypes, value)
-                                        }
-                                        accentColor="blue"
-                                    />
+                                    {/* 卫浴类型 */}
+                                    <section className="mb-8">
+                                        <h3 className="text-xl font-bold mb-6">{t.bathroomType}</h3>
+                                        <div className="flex flex-wrap gap-3">
+                                            {([
+                                                { value: 'communal' as BathroomType, label: t.communalBath },
+                                                { value: 'semi-private' as BathroomType, label: t.semiPrivateBath },
+                                                { value: 'private' as BathroomType, label: t.privateBath },
+                                            ]).map(({ value, label }) => {
+                                                const selected = localBathroomTypes.includes(value);
+                                                return (
+                                                    <button
+                                                        key={value}
+                                                        type="button"
+                                                        onClick={() => setLocalBathroomTypes(prev =>
+                                                            prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]
+                                                        )}
+                                                        className={`px-4 py-2 rounded-full border text-sm font-medium transition-colors ${
+                                                            selected
+                                                                ? 'bg-illini-blue text-white border-illini-blue'
+                                                                : 'border-gray-300 text-gray-700 hover:border-illini-blue'
+                                                        }`}
+                                                    >
+                                                        {label}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </section>
 
                                     <hr className="my-8 border-gray-100" />
 
-                                    <AmenitiesSection
-                                        title={t.amenities}
-                                        language={language}
-                                        selectedValues={localAmenities}
-                                        onToggle={toggleAmenity}
-                                    />
+                                    {/* 空调 */}
+                                    <section className="mb-8">
+                                        <h3 className="text-xl font-bold mb-6">{t.airConditioning}</h3>
+                                        <button
+                                            type="button"
+                                            onClick={() => setLocalRequireAc(prev => !prev)}
+                                            className={`px-4 py-2 rounded-full border text-sm font-medium transition-colors ${
+                                                localRequireAc
+                                                    ? 'bg-illini-blue text-white border-illini-blue'
+                                                    : 'border-gray-300 text-gray-700 hover:border-illini-blue'
+                                            }`}
+                                        >
+                                            {t.airConditioning}
+                                        </button>
+                                    </section>
 
                                     <hr className="my-8 border-gray-100" />
 

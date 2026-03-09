@@ -155,6 +155,12 @@ export const filterAndSortDorms = (dorms: Dorm[], filters: DormFilterState) => {
         ];
         if (!matchesCategorizedTagFilters(dorm, allCategoryFilters)) return false;
 
+        // AC filter
+        if (filters.requireAc && !dorm.ac) return false;
+
+        // Bathroom type filter
+        if (filters.bathroomTypeFilters.length > 0 && !filters.bathroomTypeFilters.includes(dorm.bathroomType)) return false;
+
         // Legacy FilterOption filters
         if (filters.activeFilters.length === 0) return true;
 

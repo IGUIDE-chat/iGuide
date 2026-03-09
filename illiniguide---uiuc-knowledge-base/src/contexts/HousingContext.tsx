@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useMemo, useState, ReactNode, useCallback } from 'react';
-import { DormTag, FilterOption, RoomType } from '../types/housing';
+import { BathroomType, DormTag, FilterOption, RoomType } from '../types/housing';
 import { getPriceRangeFromData } from '../constants/housing/pricing';
 import { useDormData } from './DormDataContext';
 
@@ -40,6 +40,11 @@ interface HousingFiltersContextType {
     setFacilityFilters: React.Dispatch<React.SetStateAction<DormTag[]>>;
     lifestyleFilters: DormTag[];
     setLifestyleFilters: React.Dispatch<React.SetStateAction<DormTag[]>>;
+    // Structured filters
+    requireAc: boolean;
+    setRequireAc: React.Dispatch<React.SetStateAction<boolean>>;
+    bathroomTypeFilters: BathroomType[];
+    setBathroomTypeFilters: React.Dispatch<React.SetStateAction<BathroomType[]>>;
     clearAllFilters: () => void;
 }
 
@@ -81,6 +86,9 @@ export const HousingProvider: React.FC<{ children: ReactNode }> = ({ children })
     const [livingConditionFilters, setLivingConditionFilters] = useState<DormTag[]>([]);
     const [facilityFilters, setFacilityFilters] = useState<DormTag[]>([]);
     const [lifestyleFilters, setLifestyleFilters] = useState<DormTag[]>([]);
+    // Structured filters
+    const [requireAc, setRequireAc] = useState(false);
+    const [bathroomTypeFilters, setBathroomTypeFilters] = useState<BathroomType[]>([]);
 
     const clearAllFilters = useCallback(() => {
         setSearchTerm('');
@@ -97,6 +105,8 @@ export const HousingProvider: React.FC<{ children: ReactNode }> = ({ children })
         setLivingConditionFilters([]);
         setFacilityFilters([]);
         setLifestyleFilters([]);
+        setRequireAc(false);
+        setBathroomTypeFilters([]);
     }, [dorms]);
 
     const filtersValue = useMemo<HousingFiltersContextType>(() => ({
@@ -134,6 +144,10 @@ export const HousingProvider: React.FC<{ children: ReactNode }> = ({ children })
         setFacilityFilters,
         lifestyleFilters,
         setLifestyleFilters,
+        requireAc,
+        setRequireAc,
+        bathroomTypeFilters,
+        setBathroomTypeFilters,
         clearAllFilters
     }), [
         searchTerm,
@@ -153,6 +167,8 @@ export const HousingProvider: React.FC<{ children: ReactNode }> = ({ children })
         livingConditionFilters,
         facilityFilters,
         lifestyleFilters,
+        requireAc,
+        bathroomTypeFilters,
         clearAllFilters
     ]);
 
