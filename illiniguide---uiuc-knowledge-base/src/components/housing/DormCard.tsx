@@ -121,14 +121,27 @@ const DormCard: React.FC<DormCardProps> = ({
                         ))}
                     {getHeroTags(dorm.categorizedTags ?? { livingConditions: [], facilities: [], lifestyle: [] }, 4)
                         .filter(tag => tag !== 'noAc')
-                        .map((tag) => (
-                            <span
-                                key={tag}
-                                className="inline-block px-2 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium transition-colors duration-150 hover:bg-gray-200 hover:text-gray-800"
-                            >
-                                {getTagDisplay(tag, language)}
-                            </span>
-                        ))}
+                        .flatMap((tag) => {
+                            // Show individual LLC names instead of generic 'llc'
+                            if (tag === 'llc' && dorm.categorizedTags?.llcNames?.length) {
+                                return dorm.categorizedTags.llcNames.map(llcName => (
+                                    <span
+                                        key={llcName}
+                                        className="inline-block px-2 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium transition-colors duration-150 hover:bg-gray-200 hover:text-gray-800"
+                                    >
+                                        {llcName}
+                                    </span>
+                                ));
+                            }
+                            return (
+                                <span
+                                    key={tag}
+                                    className="inline-block px-2 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium transition-colors duration-150 hover:bg-gray-200 hover:text-gray-800"
+                                >
+                                    {getTagDisplay(tag, language)}
+                                </span>
+                            );
+                        })}
                 </div>
 
                 <p className="text-gray-700 text-sm leading-relaxed mb-2 line-clamp-3 flex-grow antialiased">{getDescription()}</p>
