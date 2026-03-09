@@ -54,6 +54,14 @@ const MIXED_BATHROOM_TAG_LABELS = {
     zh: '多种卫浴',
 };
 
+type RoomLabelOption = Pick<RoomOption, 'bedCount' | 'bathroomCount' | 'bathroomScope' | 'labelCode'>;
+
+export interface RoomOptionLabels {
+    shortLabel: string;
+    primaryLabel: string;
+    secondaryLabel: string;
+}
+
 function parseLegacyRoomType(type?: RoomType) {
     if (!type) {
         return { bedCount: null, bathroomCount: null, specialType: undefined as RoomType | undefined };
@@ -188,6 +196,66 @@ export function getBathroomScopeLabel(scope: BathroomScope, language: 'en' | 'zh
 
 export function getBathroomTagLabel(scope: BathroomScope, language: 'en' | 'zh') {
     return BATHROOM_TAG_LABELS[scope][language];
+}
+
+function getBathroomCountLabel(bathroomCount: number, language: 'en' | 'zh') {
+    return language === 'zh'
+        ? `${bathroomCount}卫`
+        : `${bathroomCount} Bath${bathroomCount === 1 ? '' : 's'}`;
+}
+
+function getBathroomSecondaryLabel(option: RoomLabelOption, language: 'en' | 'zh') {
+    if (option.bathroomScope === 'communal') {
+        return getBathroomScopeLabel(option.bathroomScope, language);
+    }
+
+    if (option.bathroomCount != null && option.bathroomCount > 1) {
+        return getBathroomCountLabel(option.bathroomCount, language);
+    }
+
+    return getBathroomScopeLabel(option.bathroomScope, language);
+}
+
+function hasMultipleBathroomVariants(option: RoomLabelOption, relatedOptions: RoomLabelOption[]) {
+    if (option.bedCount == null || isSpecialRoomType(option.labelCode)) {
+        return false;
+    }
+
+    const sameBedOptions = relatedOptions.filter((candidate) =>
+        candidate.bedCount === option.bedCount && !isSpecialRoomType(candidate.labelCode)
+    );
+
+    const signatures = new Set(
+        sameBedOptions.map((candidate) => `${candidate.bathroomScope}:${candidate.bathroomCount ?? 'na'}`)
+    );
+
+    return signatures.size > 1;
+}
+
+export function getRoomOptionLabels(
+    option: RoomLabelOption,
+    language: 'en' | 'zh',
+    relatedOptions: RoomLabelOption[] = [option]
+): RoomOptionLabels {
+    const primaryLabel = isSpecialRoomType(option.labelCode)
+        ? option.labelCode
+        : getBedCountLabel(option.bedCount, language);
+    const secondaryLabel = getBathroomSecondaryLabel(option, language);
+    const shortLabel = hasMultipleBathroomVariants(option, relatedOptions)
+        ? `${primaryLabel} / ${secondaryLabel}`
+        : primaryLabel;
+
+    return {
+        shortLabel,
+        primaryLabel,
+        secondaryLabel,
+    };
+}
+
+export function getRoomTypeCountLabel(count: number, language: 'en' | 'zh') {
+    return language === 'zh'
+        ? `共${count}种房型`
+        : `${count} room type${count === 1 ? '' : 's'}`;
 }
 
 export function getRoomDisplayLabel(
