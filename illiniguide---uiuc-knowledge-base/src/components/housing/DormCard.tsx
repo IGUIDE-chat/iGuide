@@ -1,15 +1,10 @@
 import React from 'react';
-import { Dorm } from '../../types/housing';
-import { formatPrice } from '../../constants/housing/pricing';
 import { MapPin, Utensils, Wind } from 'lucide-react';
+import { formatPrice } from '../../constants/housing/pricing';
+import { Dorm } from '../../types/housing';
 import { Language } from '../../types';
-import { getHeroTags, getTagDisplay } from '../../utils/tagLabels';
-import {
-    deriveRoomOptions,
-    getDormBathroomTagSummary,
-    getRoomOptionLabels,
-    getRoomTypeCountLabel,
-} from '../../utils/roomOptions';
+import { deriveRoomOptions, getRoomRangeSummary } from '../../utils/roomOptions';
+import { getCardTagItems } from '../../utils/tagLabels';
 
 interface DormCardProps {
     dorm: Dorm;
@@ -22,18 +17,40 @@ interface DormCardProps {
 
 const TEXT = {
     en: {
-        dining: 'Dining',
+        ac: 'AC',
         noAc: 'No AC',
+        diningInside: 'Dining hall',
+        diningNearby: 'Dining nearby',
+        diningNone: 'No dining',
+        roomSummaryLabel: 'Layouts',
         unsave: 'Unsave dorm',
         save: 'Save dorm',
+        moreTags: (count: number) => `+${count}`,
     },
     zh: {
-        dining: '食堂',
+        ac: '有空调',
         noAc: '无空调',
+        diningInside: '楼内食堂',
+        diningNearby: '附近食堂',
+        diningNone: '无食堂',
+        roomSummaryLabel: '房型',
         unsave: '取消收藏宿舍',
         save: '收藏宿舍',
+        moreTags: (count: number) => `+${count}`,
     },
 };
+
+function getDiningLabel(dorm: Dorm, language: Language) {
+    const t = TEXT[language];
+    if (dorm.dining === 'inside') {
+        return t.diningInside;
+    }
+    if (dorm.dining === 'nearby') {
+        return t.diningNearby;
+    }
+
+    return t.diningNone;
+}
 
 const DormCard: React.FC<DormCardProps> = ({
     dorm,
@@ -48,38 +65,30 @@ const DormCard: React.FC<DormCardProps> = ({
     const description = language === 'zh' && dorm.description_zh ? dorm.description_zh : dorm.description;
     const locationLabel = language === 'zh' && dorm.location_zh ? dorm.location_zh : dorm.location;
     const roomOptions = dorm.roomOptions ?? deriveRoomOptions(dorm.floorPlans, dorm.bathroomType).roomOptions;
-    const bathroomSummary = getDormBathroomTagSummary(dorm, language);
-    const visibleRoomOptions = roomOptions.slice(0, 3);
-    const visibleHighlightTags = getHeroTags(
+    const roomRangeSummary = getRoomRangeSummary(roomOptions, language);
+    const cardTags = getCardTagItems(
         dorm.categorizedTags ?? { livingConditions: [], facilities: [], lifestyle: [] },
-        3
-    )
-        .filter((tag) => tag !== 'noAc')
-        .flatMap((tag) => {
-            if (tag === 'llc' && dorm.categorizedTags?.llcNames?.length) {
-                return [dorm.categorizedTags.llcNames[0]];
-            }
-            return [getTagDisplay(tag, language)];
-        })
-        .slice(0, 2);
+        language,
+        4
+    );
 
     return (
         <div
             onClick={() => onViewDetails(dorm)}
             onMouseEnter={() => onHoverDorm?.(dorm.id)}
             onMouseLeave={() => onHoverDorm?.(null)}
-            className="dorm-card bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300 flex flex-col h-full group relative cursor-pointer"
+            className="dorm-card group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-shadow duration-300 hover:shadow-md"
         >
-            <div className="relative h-52 overflow-hidden">
+            <div className="relative h-48 overflow-hidden">
                 <img
                     src={dorm.imageUrl}
                     alt={dormName}
                     loading="lazy"
                     decoding="async"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
-                <div className="absolute top-3 right-3 flex flex-col gap-2 items-end">
-                    <div className="bg-white/90 backdrop-blur-sm px-2 py-1 rounded-md text-xs font-bold text-illini-blue shadow-sm transition-transform duration-200 group-hover:scale-110 group-hover:font-extrabold origin-top-right">
+                <div className="absolute right-3 top-3 flex items-end">
+                    <div className="origin-top-right rounded-md bg-white px-2 py-1 text-xs font-bold text-illini-blue shadow-sm transition-transform duration-200 group-hover:scale-105">
                         {formatPrice(dorm.price)}
                     </div>
                 </div>
@@ -91,7 +100,7 @@ const DormCard: React.FC<DormCardProps> = ({
                             onToggleFavorite(dorm, e);
                         }}
                         type="button"
-                        className="absolute top-3 left-3 p-2 rounded-full bg-white hover:bg-gray-50 text-gray-400 hover:text-red-500 transition-colors shadow-sm"
+                        className="absolute left-3 top-3 rounded-full bg-white p-2 text-gray-400 shadow-sm transition-colors hover:bg-gray-50 hover:text-red-500"
                         aria-label={isFavorite ? t.unsave : t.save}
                     >
                         <svg
@@ -99,7 +108,7 @@ const DormCard: React.FC<DormCardProps> = ({
                             viewBox="0 0 24 24"
                             fill={isFavorite ? 'currentColor' : 'none'}
                             stroke="currentColor"
-                            className={`w-5 h-5 ${isFavorite ? 'text-red-500' : ''}`}
+                            className={`h-5 w-5 ${isFavorite ? 'text-red-500' : ''}`}
                             strokeWidth="2"
                         >
                             <path
@@ -112,64 +121,55 @@ const DormCard: React.FC<DormCardProps> = ({
                 )}
             </div>
 
-            <div className="p-4 flex flex-col flex-grow">
-                <div className="flex justify-between items-start mb-1.5">
-                    <h3 className="text-xl font-bold text-gray-900 leading-tight transition-transform duration-150 hover:scale-[1.02] origin-left antialiased">
-                        {dormName}
-                    </h3>
+            <div className="flex flex-grow flex-col p-4">
+                <h3 className="mb-2 text-xl font-bold leading-tight text-gray-900 antialiased">
+                    {dormName}
+                </h3>
+
+                <div className="mb-3 grid grid-cols-2 gap-x-3 gap-y-1.5 text-[12px] text-gray-600">
+                    <div className="col-span-2 inline-flex min-w-0 items-center gap-1">
+                        <MapPin size={13} className="shrink-0 text-illini-orange" />
+                        <span className="line-clamp-1">{locationLabel}</span>
+                    </div>
+                    <div className="inline-flex items-center gap-1">
+                        <Wind size={13} className="shrink-0 text-gray-400" />
+                        <span>{dorm.ac ? t.ac : t.noAc}</span>
+                    </div>
+                    <div className="inline-flex items-center gap-1">
+                        <Utensils size={13} className="shrink-0 text-gray-400" />
+                        <span>{getDiningLabel(dorm, language)}</span>
+                    </div>
                 </div>
 
-                <div className="flex items-center text-gray-500 text-sm mb-3">
-                    <MapPin size={14} className="mr-1 text-illini-orange" />
-                    {locationLabel}
+                <div className="mb-2 text-sm leading-6 text-gray-700">
+                    <span className="mr-1 text-gray-500">{t.roomSummaryLabel}:</span>
+                    <span className="font-medium text-gray-800">{roomRangeSummary.cardSummary}</span>
                 </div>
 
-                <div className="mb-3 flex flex-wrap gap-1.5">
-                    {visibleRoomOptions.map((option) => {
-                        const labels = getRoomOptionLabels(option, language, roomOptions);
-                        return (
-                            <span
-                                key={`${option.labelCode ?? 'custom'}-${option.bedCount ?? 'na'}-${option.bathroomCount ?? 'na'}-${option.bathroomScope}`}
-                                className="inline-block px-2 py-1 rounded-md border border-gray-200 text-gray-700 text-[11px] font-medium bg-white transition-colors duration-150 hover:bg-gray-50 hover:border-gray-300"
-                            >
-                                {labels.shortLabel}
-                            </span>
-                        );
-                    })}
-                    {roomOptions.length > 3 && (
-                        <span className="inline-block px-2 py-1 rounded-md border border-dashed border-illini-blue/30 bg-illini-blue/5 text-illini-blue text-[11px] font-medium">
-                            {getRoomTypeCountLabel(roomOptions.length, language)}
-                        </span>
-                    )}
-                </div>
+                {description && (
+                    <p className="mb-3 line-clamp-1 text-sm leading-6 text-gray-600 antialiased">
+                        {description}
+                    </p>
+                )}
 
-                <div className="mb-3 flex flex-wrap gap-1.5">
-                    <span className="inline-flex items-center px-2 py-1 rounded-full bg-illini-blue/10 text-illini-blue text-[11px] font-medium">
-                        {bathroomSummary}
-                    </span>
-                    {!dorm.ac && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-[11px] font-medium">
-                            <Wind size={10} className="mr-1" /> {t.noAc}
-                        </span>
-                    )}
-                    {dorm.dining === 'inside' && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full bg-illini-orange/10 text-illini-orange text-[11px] font-medium transition-colors duration-150 hover:bg-illini-orange/15 hover:text-illini-orange">
-                            <Utensils size={10} className="mr-1" /> {t.dining}
-                        </span>
-                    )}
-                    {visibleHighlightTags.map((tagLabel) => (
+                <div className="mt-auto flex flex-wrap gap-1.5">
+                    {cardTags.items.map((tag) => (
                         <span
-                            key={tagLabel}
-                            className="inline-block px-2 py-1 rounded-full bg-gray-100 text-gray-600 text-[11px] font-medium transition-colors duration-150 hover:bg-gray-200 hover:text-gray-800"
+                            key={tag.id}
+                            className={`inline-flex items-center rounded-full border px-2 py-1 text-[11px] font-medium ${tag.layer === 'secondary'
+                                    ? 'border-slate-200 bg-slate-50 text-slate-700'
+                                    : 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                                }`}
                         >
-                            {tagLabel}
+                            {tag.label}
                         </span>
                     ))}
+                    {cardTags.overflowCount > 0 && (
+                        <span className="inline-flex items-center rounded-full border border-dashed border-gray-300 px-2 py-1 text-[11px] font-medium text-gray-500">
+                            {t.moreTags(cardTags.overflowCount)}
+                        </span>
+                    )}
                 </div>
-
-                <p className="text-gray-700 text-sm leading-relaxed mb-1 line-clamp-2 flex-grow antialiased">
-                    {description}
-                </p>
             </div>
         </div>
     );
