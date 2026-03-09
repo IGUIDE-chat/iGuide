@@ -56,14 +56,14 @@ const DormListHeader: React.FC<DormListHeaderProps> = ({
                             type="button"
                             aria-label={t.filters}
                             className={`
-                                px-3 py-2 rounded-full text-sm font-medium border transition-all duration-200 whitespace-nowrap flex items-center justify-center
+                                w-10 h-10 rounded-full flex items-center justify-center border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-illini-orange/20
                                 ${hasActiveFilters
                                     ? 'border-illini-orange/40 text-illini-orange bg-illini-orange/10 hover:border-illini-orange/60 hover:text-illini-orange hover:bg-illini-orange/15 active:border-illini-orange/70 active:text-illini-orange active:bg-illini-orange/20'
                                     : 'bg-white text-gray-700 border-gray-200 hover:border-illini-orange/40 hover:text-illini-orange/90 hover:bg-illini-orange/10 active:border-illini-orange/50 active:text-illini-orange active:bg-illini-orange/10'
                                 }
                             `}
                         >
-                            <SlidersHorizontal size={16} />
+                            <SlidersHorizontal size={18} strokeWidth={2} />
                         </button>
                         {hasActiveFilters && (
                             <div className="absolute -top-1.5 -right-1.5 bg-illini-orange text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full border-2 border-white shadow-sm">

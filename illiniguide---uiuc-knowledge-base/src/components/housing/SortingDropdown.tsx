@@ -44,13 +44,13 @@ const SortingDropdown: React.FC<SortingDropdownProps> = memo(({ sortBy, onSortCh
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 type="button"
-                className={`flex items-center justify-center p-2.5 rounded-full border transition-all duration-200 ${isOpen
-                        ? 'border-illini-blue/50 bg-illini-blue/10 text-illini-blue'
-                        : 'border-gray-200 bg-white text-gray-700 hover:border-illini-blue/40 hover:text-illini-blue/80 hover:bg-illini-blue/5 active:border-illini-blue/50 active:text-illini-blue active:bg-illini-blue/10'
+                className={`flex items-center justify-center w-10 h-10 rounded-full border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-illini-blue/20 ${isOpen
+                    ? 'border-illini-blue/50 bg-illini-blue/10 text-illini-blue'
+                    : 'border-gray-200 bg-white text-gray-700 hover:border-illini-blue/40 hover:text-illini-blue/80 hover:bg-illini-blue/5 active:border-illini-blue/50 active:text-illini-blue active:bg-illini-blue/10'
                     }`}
                 title={`Sort by: ${currentLabel}`}
             >
-                <ArrowUpDown size={18} />
+                <ArrowUpDown size={18} strokeWidth={2} />
             </button>
 
             {isOpen && (

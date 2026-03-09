@@ -23,6 +23,11 @@ export interface ModalText {
     livingConditions: string;
     facilities: string;
     lifestyle: string;
+    bathroomType: string;
+    airConditioning: string;
+    communalBath: string;
+    semiPrivateBath: string;
+    privateBath: string;
 }
 
 export const HISTOGRAM_DATA = [4, 8, 12, 25, 35, 42, 45, 30, 20, 15, 10, 5, 2, 1];
@@ -54,7 +59,12 @@ export const MODAL_TEXT: Record<FilterLanguage, ModalText> = {
         buildingType: 'Building Type',
         livingConditions: 'Living Conditions',
         facilities: 'Facilities',
-        lifestyle: 'Lifestyle'
+        lifestyle: 'Lifestyle',
+        bathroomType: 'Bathroom Type',
+        airConditioning: 'Air Conditioning',
+        communalBath: 'Communal',
+        semiPrivateBath: 'Semi-Private',
+        privateBath: 'Private'
     },
     zh: {
         filters: '筛选',
@@ -75,6 +85,11 @@ export const MODAL_TEXT: Record<FilterLanguage, ModalText> = {
         buildingType: '建筑类型',
         livingConditions: '居住条件',
         facilities: '配套设施',
-        lifestyle: '生活方式'
+        lifestyle: '生活方式',
+        bathroomType: '卫浴类型',
+        airConditioning: '有空调',
+        communalBath: '公共卫浴',
+        semiPrivateBath: '半独立卫浴',
+        privateBath: '独立卫浴'
     }
 };
