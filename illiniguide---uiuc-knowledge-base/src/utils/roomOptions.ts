@@ -242,15 +242,15 @@ function getChineseBedStem(bedCount: number) {
 function getEnglishStandardOccupancyLabel(bedCounts: number[]) {
     const labels = bedCounts.map((count) => BED_LABELS[count]?.en ?? `${count}-Bed`);
     if (labels.length === 1) {
-        return `${labels[0]} room`;
+        return labels[0];
     }
 
     const isContiguous = bedCounts.every((count, index) => index === 0 || count - bedCounts[index - 1] === 1);
     if (isContiguous && labels.length >= 3) {
-        return `${labels[0]} to ${labels[labels.length - 1]} rooms`;
+        return `${labels[0]}-${labels[labels.length - 1]}`;
     }
 
-    return `${labels.join('/')} rooms`;
+    return labels.join('/');
 }
 
 function getChineseStandardOccupancyLabel(bedCounts: number[]) {
@@ -277,7 +277,7 @@ function getSpecialOccupancyLabel(optionLabels: string[], language: 'en' | 'zh')
         return optionLabels[0] ?? (language === 'zh' ? '房型多样' : 'Multiple layouts');
     }
 
-    return language === 'zh' ? optionLabels.join('、') : optionLabels.join(', ');
+    return language === 'zh' ? optionLabels.join('、') : optionLabels.join('/');
 }
 
 function hasMultipleBathroomVariants(option: RoomLabelOption, relatedOptions: RoomLabelOption[]) {
@@ -360,7 +360,7 @@ export function getRoomRangeSummary(
         occupancyParts.length > 0
             ? language === 'zh'
                 ? occupancyParts.join('、')
-                : occupancyParts.join(', ')
+                : occupancyParts.join('/')
             : language === 'zh'
               ? '房型多样'
               : 'Multiple layouts';
@@ -368,8 +368,18 @@ export function getRoomRangeSummary(
     const scopes = Array.from(new Set(uniqueOptions.map((option) => option.bathroomScope)));
     const bathroomLabel =
         scopes.length === 1
-            ? getBathroomScopeLabel(scopes[0], language)
-            : MIXED_BATHROOM_LABELS[language];
+            ? language === 'en'
+                ? (
+                    {
+                        communal: 'Shared bath',
+                        'semi-private': 'Semi-private',
+                        private: 'Private bath',
+                    } satisfies Record<BathroomScope, string>
+                )[scopes[0]]
+                : getBathroomScopeLabel(scopes[0], language)
+            : language === 'en'
+              ? 'Mixed bath'
+              : MIXED_BATHROOM_LABELS[language];
 
     return {
         occupancyLabel,
