@@ -33,8 +33,10 @@ export const ChatEmptyState: React.FC<ChatEmptyStateProps> = ({
           className="w-full flex flex-col items-center"
         >
           <div className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-xl border border-slate-100">
-              🎗
+            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-illini-orange border border-slate-100">
+              <svg viewBox="0 0 100 100" fill="currentColor" className="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 20 h60 v15 h-20 v30 h20 v15 h-60 v-15 h20 v-30 h-20 Z" />
+              </svg>
             </div>
             <h2 className="text-2xl font-semibold text-slate-800 text-center tracking-tight">
               {title}
