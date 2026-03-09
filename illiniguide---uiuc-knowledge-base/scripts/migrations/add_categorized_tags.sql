@@ -4,7 +4,8 @@
 -- 1. Add new columns
 ALTER TABLE dorms
   ADD COLUMN IF NOT EXISTS categorized_tags JSONB DEFAULT '{}'::jsonb,
-  ADD COLUMN IF NOT EXISTS bathroom_type TEXT DEFAULT 'communal';
+  ADD COLUMN IF NOT EXISTS bathroom_type TEXT DEFAULT 'communal',
+  ADD COLUMN IF NOT EXISTS room_options JSONB DEFAULT '[]'::jsonb;
 
 -- 2. Alter dining from BOOLEAN to TEXT
 --    PostgreSQL cannot directly cast BOOLEAN → TEXT in ALTER COLUMN,

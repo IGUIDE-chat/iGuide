@@ -50,6 +50,7 @@ interface DormOverride {
     type_zh?: string | null;
     housing_type?: string | null;
     room_types?: string[] | null;
+    room_options?: unknown[] | null;
     tags?: string[] | null;
     floor_plans?: any[] | null;
     gallery_images?: string[] | null;
@@ -75,6 +76,7 @@ function applyOverride(dorm: Dorm, override: DormOverride | undefined): Dorm {
         ...(override.location_zh != null && { location_zh: override.location_zh }),
         ...(override.housing_type != null && { housingType: override.housing_type as Dorm['housingType'] }),
         ...(override.room_types != null && { roomTypes: override.room_types as Dorm['roomTypes'] }),
+        ...(override.room_options != null && { roomOptions: override.room_options as Dorm['roomOptions'] }),
         ...(override.tags != null && { tags: override.tags }),
         ...(override.floor_plans != null && { floorPlans: override.floor_plans }),
         ...(override.gallery_images != null && { galleryImages: override.gallery_images }),
@@ -104,6 +106,7 @@ function dormToRow(dorm: Dorm) {
         categorized_tags: dorm.categorizedTags ?? {},
         bathroom_type: dorm.bathroomType,
         room_types: dorm.roomTypes,
+        room_options: dorm.roomOptions ?? [],
         floor_plans: dorm.floorPlans ?? [],
         gallery_images: dorm.galleryImages ?? [],
         pros: dorm.pros,

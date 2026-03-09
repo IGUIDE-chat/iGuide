@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS public.dorms (
     tags            TEXT[] DEFAULT '{}',
     structured_tags JSONB DEFAULT '{}',
     room_types      TEXT[] DEFAULT '{}',
+    room_options    JSONB DEFAULT '[]',
     floor_plans     JSONB DEFAULT '[]',
     gallery_images  TEXT[] DEFAULT '{}',
     pros            TEXT[] DEFAULT '{}',

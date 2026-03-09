@@ -83,7 +83,9 @@ export const Layout: React.FC<LayoutProps> = ({
     activeFilters,
     priceRange,
     locationFilters,
-    roomTypeFilters,
+    bedCountFilters,
+    bathroomCountFilters,
+    bathroomTypeFilters,
     housingTypeDetails,
     amenityFilters,
     communityFilters,
@@ -110,7 +112,9 @@ export const Layout: React.FC<LayoutProps> = ({
     hasPriceFilter ||
     housingTypeDetails !== 'ALL' ||
     locationFilters.length > 0 ||
-    roomTypeFilters.length > 0 ||
+    bedCountFilters.length > 0 ||
+    bathroomCountFilters.length > 0 ||
+    bathroomTypeFilters.length > 0 ||
     amenityFilters.length > 0 ||
     communityFilters.length > 0 ||
     llcFilters.length > 0 ||
@@ -119,7 +123,9 @@ export const Layout: React.FC<LayoutProps> = ({
     (hasPriceFilter ? 1 : 0) +
     (housingTypeDetails !== 'ALL' ? 1 : 0) +
     locationFilters.length +
-    roomTypeFilters.length +
+    bedCountFilters.length +
+    bathroomCountFilters.length +
+    bathroomTypeFilters.length +
     activeFilters.length +
     amenityFilters.length +
     communityFilters.length +

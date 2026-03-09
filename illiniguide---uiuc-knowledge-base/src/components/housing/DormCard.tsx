@@ -3,8 +3,8 @@ import { Dorm } from '../../types/housing';
 import { formatPrice } from '../../constants/housing/pricing';
 import { MapPin, Utensils, Wind } from 'lucide-react';
 import { Language } from '../../types';
-import { getRoomTypeLabel } from '../../utils/housingLabels';
 import { getHeroTags, getTagDisplay } from '../../utils/tagLabels';
+import { deriveRoomOptions, getDormBathroomSummary, getRoomDisplayLabel } from '../../utils/roomOptions';
 
 interface DormCardProps {
     dorm: Dorm;
@@ -26,10 +26,12 @@ const DormCard: React.FC<DormCardProps> = ({
     const getName = () => (language === 'zh' && dorm.name_zh ? dorm.name_zh : dorm.name);
     const getDescription = () => (language === 'zh' && dorm.description_zh ? dorm.description_zh : dorm.description);
     const locationLabel = language === 'zh' && dorm.location_zh ? dorm.location_zh : dorm.location;
+    const roomOptions = dorm.roomOptions ?? deriveRoomOptions(dorm.floorPlans, dorm.bathroomType).roomOptions;
+    const bathroomSummary = getDormBathroomSummary(dorm, language);
 
     const t = {
-        en: { dining: 'Dining' },
-        zh: { dining: '食堂' }
+        en: { dining: 'Dining', bath: 'Bath' },
+        zh: { dining: '食堂', bath: '卫浴' }
     }[language];
 
     return (
@@ -102,27 +104,20 @@ const DormCard: React.FC<DormCardProps> = ({
                             <Utensils size={10} className="mr-1" /> {t.dining}
                         </span>
                     )}
-                    {[...(dorm.roomTypes || [])]
-                        .sort((a, b) => {
-                            // Give priority to Studio and 1B1B, then by numeric value
-                            const order = ['Studio', '1B1B', '2B0B', '2B1B', '2B2B', '3B0B', '3B1B', '3B2B', '3B3B', '4B1B', '4B2B'];
-                            const idxA = order.indexOf(a);
-                            const idxB = order.indexOf(b);
-                            return (idxA > -1 ? idxA : 99) - (idxB > -1 ? idxB : 99);
-                        })
-                        .slice(0, 3)
-                        .map((type) => (
-                            <span
-                                key={type}
-                                className="inline-block px-2 py-1 rounded-md border border-gray-200 text-gray-600 text-[10px] font-medium bg-white transition-colors duration-150 hover:bg-gray-50 hover:text-gray-800 hover:border-gray-300"
-                            >
-                                {getRoomTypeLabel(type, language)}
-                            </span>
-                        ))}
+                    {roomOptions.slice(0, 3).map((option) => (
+                        <span
+                            key={`${option.labelCode ?? 'custom'}-${option.bedCount ?? 'na'}-${option.bathroomScope}`}
+                            className="inline-block px-2 py-1 rounded-md border border-gray-200 text-gray-600 text-[10px] font-medium bg-white transition-colors duration-150 hover:bg-gray-50 hover:text-gray-800 hover:border-gray-300"
+                        >
+                            {getRoomDisplayLabel(option, language)}
+                        </span>
+                    ))}
+                    <span className="inline-block px-2 py-1 rounded-md border border-gray-200 text-gray-600 text-[10px] font-medium bg-white transition-colors duration-150 hover:bg-gray-50 hover:text-gray-800 hover:border-gray-300">
+                        {t.bath}: {bathroomSummary}
+                    </span>
                     {getHeroTags(dorm.categorizedTags ?? { livingConditions: [], facilities: [], lifestyle: [] }, 4)
                         .filter(tag => tag !== 'noAc')
                         .flatMap((tag) => {
-                            // Show individual LLC names instead of generic 'llc'
                             if (tag === 'llc' && dorm.categorizedTags?.llcNames?.length) {
                                 return dorm.categorizedTags.llcNames.map(llcName => (
                                     <span

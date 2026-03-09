@@ -570,14 +570,24 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                             <div className="flex flex-wrap gap-2">
                                 {LLC_OPTIONS.map(llc => {
                                     const llcNames = categorizedTags.llcNames ?? [];
-                                    const isSelected = llcNames.includes(llc);
+                                    const isSelected = llcNames.some(n => {
+                                        if (n === llc) return true;
+                                        const cleanN = n.replace(/ LLC$/, '').trim();
+                                        const cleanLlc = llc.replace(/ LLC$/, '').trim();
+                                        return cleanN === cleanLlc;
+                                    });
                                     return (
                                         <button
                                             key={llc}
                                             type="button"
                                             onClick={() => {
                                                 const next = isSelected
-                                                    ? llcNames.filter(n => n !== llc)
+                                                    ? llcNames.filter(n => {
+                                                        if (n === llc) return false;
+                                                        const cleanN = n.replace(/ LLC$/, '').trim();
+                                                        const cleanLlc = llc.replace(/ LLC$/, '').trim();
+                                                        return cleanN !== cleanLlc;
+                                                    })
                                                     : [...llcNames, llc];
 
                                                 // Sync to categorizedTags

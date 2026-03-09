@@ -8,7 +8,9 @@ export interface ModalText {
     priceRange: string;
     typeOfPlace: string;
     amenities: string;
-    roomType: string;
+    roomType?: string;
+    bedCount: string;
+    bathroomCount: string;
     clearAll: string;
     showPlaces: string;
     minPrice: string;
@@ -27,6 +29,9 @@ export interface ModalText {
     communalBath: string;
     semiPrivateBath: string;
     privateBath: string;
+    zeroBathrooms: string;
+    onePlusBathrooms: string;
+    twoPlusBathrooms: string;
 }
 
 export const HISTOGRAM_DATA = [4, 8, 12, 25, 35, 42, 45, 30, 20, 15, 10, 5, 2, 1];
@@ -44,7 +49,8 @@ export const MODAL_TEXT: Record<FilterLanguage, ModalText> = {
         priceRange: 'Price Range',
         typeOfPlace: 'Type of Place',
         amenities: 'Amenities',
-        roomType: 'Room Type',
+        bedCount: 'Bed Count',
+        bathroomCount: 'Bathroom Count',
         clearAll: 'Clear all',
         showPlaces: 'Show places',
         minPrice: 'Min Price',
@@ -62,20 +68,24 @@ export const MODAL_TEXT: Record<FilterLanguage, ModalText> = {
         airConditioning: 'Air Conditioning',
         communalBath: 'Communal',
         semiPrivateBath: 'Semi-Private',
-        privateBath: 'Private'
+        privateBath: 'Private',
+        zeroBathrooms: '0',
+        onePlusBathrooms: '1+',
+        twoPlusBathrooms: '2+'
     },
     zh: {
         filters: '筛选',
         priceRange: '价格范围',
         typeOfPlace: '住宿类型',
         amenities: '设施',
-        roomType: '房型',
+        bedCount: '床位数',
+        bathroomCount: '卫浴数量',
         clearAll: '清空全部',
         showPlaces: '显示房源',
         minPrice: '最低价格',
         maxPrice: '最高价格',
-        urh: 'URH',
-        pch: 'PCH',
+        urh: '校内宿舍',
+        pch: '认证校外宿舍',
         avgPrice: '平均年租金约为 $11,500。',
         urhDesc: '学校官方宿舍',
         pchDesc: '经认证的校外住宿',
@@ -84,9 +94,12 @@ export const MODAL_TEXT: Record<FilterLanguage, ModalText> = {
         facilities: '配套设施',
         lifestyle: '生活方式',
         bathroomType: '卫浴类型',
-        airConditioning: '有空调',
+        airConditioning: '空调',
         communalBath: '公共卫浴',
         semiPrivateBath: '半独立卫浴',
-        privateBath: '独立卫浴'
+        privateBath: '独立卫浴',
+        zeroBathrooms: '0',
+        onePlusBathrooms: '1+',
+        twoPlusBathrooms: '2+'
     }
 };

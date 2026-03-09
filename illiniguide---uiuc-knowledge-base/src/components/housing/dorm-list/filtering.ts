@@ -1,5 +1,6 @@
 import { Dorm, DormTag, FilterOption } from '../../../types/housing';
 import { DormFilterState } from './types';
+import { deriveRoomOptions } from '../../../utils/roomOptions';
 
 // ── Legacy structured tag matchers (kept for backward compat) ───────────────
 
@@ -111,6 +112,8 @@ export const normalizePriceRange = (
 
 export const filterAndSortDorms = (dorms: Dorm[], filters: DormFilterState) => {
     const filtered = dorms.filter((dorm) => {
+        const roomOptions = dorm.roomOptions ?? deriveRoomOptions(dorm.floorPlans, dorm.bathroomType).roomOptions;
+
         if (filters.housingTypeDetails !== 'ALL' && dorm.housingType !== filters.housingTypeDetails) {
             return false;
         }
@@ -132,8 +135,23 @@ export const filterAndSortDorms = (dorms: Dorm[], filters: DormFilterState) => {
             return false;
         }
         if (
-            filters.roomTypeFilters.length > 0 &&
-            !filters.roomTypeFilters.some((roomType) => dorm.roomTypes?.includes(roomType))
+            filters.bedCountFilters.length > 0 &&
+            !filters.bedCountFilters.some((threshold) =>
+                roomOptions.some((option) => option.bedCount != null && option.bedCount >= threshold)
+            )
+        ) {
+            return false;
+        }
+        if (
+            filters.bathroomCountFilters.length > 0 &&
+            !filters.bathroomCountFilters.some((threshold) =>
+                roomOptions.some((option) => {
+                    if (threshold === 0) {
+                        return option.bathroomScope === 'communal' && option.bathroomCount === 0;
+                    }
+                    return option.bathroomCount != null && option.bathroomCount >= threshold;
+                })
+            )
         ) {
             return false;
         }
@@ -156,7 +174,14 @@ export const filterAndSortDorms = (dorms: Dorm[], filters: DormFilterState) => {
         if (filters.requireAc && !dorm.ac) return false;
 
         // Bathroom type filter
-        if (filters.bathroomTypeFilters.length > 0 && !filters.bathroomTypeFilters.includes(dorm.bathroomType)) return false;
+        if (
+            filters.bathroomTypeFilters.length > 0 &&
+            !filters.bathroomTypeFilters.some((scope) =>
+                roomOptions.some((option) => option.bathroomScope === scope)
+            )
+        ) {
+            return false;
+        }
 
         // Legacy FilterOption filters
         if (filters.activeFilters.length === 0) return true;

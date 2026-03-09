@@ -4,7 +4,7 @@ import { formatPrice } from '../../constants/housing/pricing';
 import { Language } from '../../types';
 import { X, Check, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getRoomTypeLabel } from '../../utils/housingLabels';
+import { deriveRoomOptions, getDormBathroomSummary, getRoomDisplayLabel } from '../../utils/roomOptions';
 
 interface DormComparisonProps {
     dorms: Dorm[];
@@ -30,7 +30,9 @@ const DormComparison: React.FC<DormComparisonProps> = ({ dorms, onClose, languag
             urh: 'URH',
             pch: 'PCH',
             feature: 'Feature',
-            bestOption: 'Best option'
+            bestOption: 'Best option',
+            roomOptions: 'Room Options',
+            bathroom: 'Bathroom',
         },
         zh: {
             title: '宿舍对比',
@@ -38,9 +40,11 @@ const DormComparison: React.FC<DormComparisonProps> = ({ dorms, onClose, languag
             yes: '是',
             no: '否',
             urh: '校内宿舍',
-            pch: '私营认证住宿',
+            pch: '认证校外宿舍',
             feature: '特征',
-            bestOption: '最佳选项'
+            bestOption: '推荐项',
+            roomOptions: '房型',
+            bathroom: '卫浴',
         }
     }[language];
 
@@ -81,7 +85,7 @@ const DormComparison: React.FC<DormComparisonProps> = ({ dorms, onClose, languag
         },
         {
             label: 'Price Range',
-            label_zh: '价格范围',
+            label_zh: '价格',
             getValue: (dorm) => <span className="font-bold text-illini-orange">{formatPrice(dorm.price)}</span>,
             highlightBest: true,
             bestCondition: (dorm) => dorm.price <= 10000
@@ -119,19 +123,32 @@ const DormComparison: React.FC<DormComparisonProps> = ({ dorms, onClose, languag
             bestCondition: (dorm) => dorm.dining === 'inside'
         },
         {
-            label: 'Room Types',
-            label_zh: '房型',
+            label: t.roomOptions,
+            label_zh: t.roomOptions,
+            getValue: (dorm) => {
+                const roomOptions = dorm.roomOptions ?? deriveRoomOptions(dorm.floorPlans, dorm.bathroomType).roomOptions;
+                return (
+                    <div className="flex flex-wrap gap-1">
+                        {roomOptions.slice(0, 3).map((option) => (
+                            <span
+                                key={`${option.labelCode ?? 'custom'}-${option.bedCount ?? 'na'}-${option.bathroomScope}`}
+                                className="px-2 py-0.5 bg-illini-blue/10 text-illini-blue text-xs rounded"
+                            >
+                                {getRoomDisplayLabel(option, language === 'zh' ? 'zh' : 'en')}
+                            </span>
+                        ))}
+                        {roomOptions.length > 3 && (
+                            <span className="text-xs text-gray-500">+{roomOptions.length - 3}</span>
+                        )}
+                    </div>
+                );
+            }
+        },
+        {
+            label: t.bathroom,
+            label_zh: t.bathroom,
             getValue: (dorm) => (
-                <div className="flex flex-wrap gap-1">
-                    {dorm.roomTypes?.slice(0, 3).map((type) => (
-                        <span key={type} className="px-2 py-0.5 bg-illini-blue/10 text-illini-blue text-xs rounded">
-                            {getRoomTypeLabel(type, language === 'zh' ? 'zh' : 'en')}
-                        </span>
-                    ))}
-                    {dorm.roomTypes && dorm.roomTypes.length > 3 && (
-                        <span className="text-xs text-gray-500">+{dorm.roomTypes.length - 3}</span>
-                    )}
-                </div>
+                <span className="text-sm text-gray-600">{getDormBathroomSummary(dorm, language === 'zh' ? 'zh' : 'en')}</span>
             )
         }
     ];
