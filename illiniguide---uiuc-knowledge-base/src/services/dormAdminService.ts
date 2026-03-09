@@ -31,6 +31,8 @@ export interface DormUpdate {
     pros_zh?: string[] | null;
     cons?: string[] | null;
     cons_zh?: string[] | null;
+    address?: string | null;
+    address_zh?: string | null;
 }
 
 export interface DormMutationResult {
@@ -60,6 +62,7 @@ const KNOWN_DB_COLUMNS = new Set([
     'floor_plans', 'gallery_images',
     'pros', 'pros_zh', 'cons', 'cons_zh',
     'application_fee',
+    'address', 'address_zh',
 ]);
 
 /** Build a human-readable summary of what changed between dorm and updates. */
@@ -77,6 +80,7 @@ export function buildSummary(dorm: Dorm, updates: DormUpdate): string {
     if (updates.categorized_tags !== undefined) parts.push('标签');
     if (updates.floor_plans !== undefined) parts.push('户型图');
     if (updates.gallery_images !== undefined) parts.push('图库');
+    if (updates.address !== undefined) parts.push('地址');
     return parts.length > 0 ? `修改: ${parts.join(', ')}` : '保存';
 }
 
@@ -213,6 +217,8 @@ async function resetDormToStatic(dormId: string): Promise<DormMutationResult> {
         pros_zh: staticDorm.pros_zh ?? null,
         cons: staticDorm.cons,
         cons_zh: staticDorm.cons_zh ?? null,
+        address: staticDorm.address ?? null,
+        address_zh: staticDorm.address_zh ?? null,
     };
 
     return updateDorm(dormId, row);

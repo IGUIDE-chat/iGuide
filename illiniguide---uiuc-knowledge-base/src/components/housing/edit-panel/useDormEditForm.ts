@@ -81,6 +81,8 @@ function dormToSnapshot(dorm: Dorm): Record<string, unknown> {
     pros_zh: dorm.pros_zh ?? null,
     cons: dorm.cons,
     cons_zh: dorm.cons_zh ?? null,
+    address: dorm.address ?? null,
+    address_zh: dorm.address_zh ?? null,
   };
 }
 
@@ -133,6 +135,8 @@ export const useDormEditForm = ({
   const [categorizedTags, setCategorizedTags] = useState<DormCategorizedTags>(
     dorm.categorizedTags ?? emptyCategorized,
   );
+  const [address, setAddress] = useState(dorm.address ?? '');
+  const [addressZh, setAddressZh] = useState(dorm.address_zh ?? '');
 
   useEffect(() => {
     setName(dorm.name);
@@ -156,6 +160,8 @@ export const useDormEditForm = ({
     setCons([...dorm.cons]);
     setConsZh([...(dorm.cons_zh ?? [])]);
     setCategorizedTags(dorm.categorizedTags ?? emptyCategorized);
+    setAddress(dorm.address ?? '');
+    setAddressZh(dorm.address_zh ?? '');
   }, [dorm]);
 
   useEffect(() => {
@@ -224,6 +230,8 @@ export const useDormEditForm = ({
       pros_zh: prosZh.length ? prosZh : null,
       cons,
       cons_zh: consZh.length ? consZh : null,
+      address: address || null,
+      address_zh: addressZh || null,
     };
   };
 
@@ -371,6 +379,10 @@ export const useDormEditForm = ({
     setConsZh,
     categorizedTags,
     setCategorizedTags,
+    address,
+    setAddress,
+    addressZh,
+    setAddressZh,
     normalizedFloorPlans,
     derivedRoomOptions,
     updateFloorPlan,

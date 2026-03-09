@@ -31,6 +31,29 @@ export interface DormDetailText {
     noComments: string;
     thumbsUpDorm: string;
     thumbsDownDorm: string;
+    // New keys for redesigned layout
+    amenities: string;
+    floorPlansDesc: string;
+    comparePlans: string;
+    compareAdd: string;
+    available: string;
+    sqft: string;
+    yr: string;
+    mo: string;
+    communalBath: string;
+    privateBath: string;
+    semiPrivateBath: string;
+    priceRange: string;
+    shareExp: string;
+    loginPrompt: string;
+    loginBtn: string;
+    recommended: string;
+    helpful: string;
+    viewAllReviews: string;
+    viewWebsite: string;
+    positiveRating: string;
+    bedSize: string;
+    address: string;
 }
 
 export interface AiChatText {
@@ -72,7 +95,29 @@ export const dormDetailTexts: Record<Language, DormDetailText> = {
         loginToComment: 'Log in to leave a comment',
         noComments: 'No comments yet',
         thumbsUpDorm: 'Recommend',
-        thumbsDownDorm: 'Not recommended'
+        thumbsDownDorm: 'Not recommended',
+        amenities: 'Amenities & Features',
+        floorPlansDesc: 'Available room types and costs',
+        comparePlans: 'Compare Plans',
+        compareAdd: 'Compare',
+        available: 'Available',
+        sqft: 'sq ft',
+        yr: '/yr',
+        mo: '/mo',
+        communalBath: 'Communal Bath',
+        privateBath: 'Private Bath',
+        semiPrivateBath: 'Semi-Private Bath',
+        priceRange: 'Price Range',
+        shareExp: 'Share your experience',
+        loginPrompt: 'Log in to post a review',
+        loginBtn: 'Log In / Sign Up',
+        recommended: 'Recommended',
+        helpful: 'Helpful',
+        viewAllReviews: 'View all reviews',
+        viewWebsite: 'Official Website',
+        positiveRating: '% Positive',
+        bedSize: 'Bed Size',
+        address: 'Address',
     },
     zh: {
         dormNotFound: '未找到该宿舍',
@@ -104,7 +149,29 @@ export const dormDetailTexts: Record<Language, DormDetailText> = {
         loginToComment: '登录后发表评论',
         noComments: '暂无评论',
         thumbsUpDorm: '推荐',
-        thumbsDownDorm: '不推荐'
+        thumbsDownDorm: '不推荐',
+        amenities: '设施与条件',
+        floorPlansDesc: '可选房型配置与费用',
+        comparePlans: '对比多个户型',
+        compareAdd: '加入对比',
+        available: '可预订',
+        sqft: '平方英尺',
+        yr: '/年',
+        mo: '/月',
+        communalBath: '公共卫浴',
+        privateBath: '独立卫浴',
+        semiPrivateBath: '半独立卫浴',
+        priceRange: '价格范围',
+        shareExp: '分享你的居住体验',
+        loginPrompt: '登录后即可发表评价',
+        loginBtn: '登录 / 注册',
+        recommended: '推荐',
+        helpful: '有用',
+        viewAllReviews: '查看全部评价',
+        viewWebsite: '查看官网详情',
+        positiveRating: '% 好评',
+        bedSize: '床型',
+        address: '地址',
     }
 };
 

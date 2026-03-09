@@ -50,6 +50,7 @@ export interface DormCategorizedTags {
     llcNames?: string[];  // specific LLC names when 'llc' tag is present
 }
 
+export type BedSize = 'Twin XL' | 'Full' | 'Queen' | 'King';
 export type BathroomScope = 'communal' | 'semi-private' | 'private';
 export type BathroomType = BathroomScope;
 export type DiningType = 'inside' | 'nearby' | 'none';
@@ -82,6 +83,9 @@ export interface Dorm {
     // Map coordinates
     lat: number;
     lng: number;
+    // Address
+    address?: string;         // Street address (e.g. "1010 W. Illinois St, Urbana, IL 61801")
+    address_zh?: string;      // Address in Chinese (optional)
     // Localization
     name_zh?: string;
     description_zh?: string;
@@ -126,6 +130,7 @@ export interface FloorPlan {
     labelCode?: string;
     price: number;            // Annual price for this specific floor plan
     sqft?: number;            // Square footage (optional)
+    bedSize?: BedSize;        // Bed size provided in this floor plan
     imageUrl?: string;        // Floor plan layout image URL
     description?: string;     // Description of this floor plan
     available?: boolean;      // Whether this floor plan is currently available

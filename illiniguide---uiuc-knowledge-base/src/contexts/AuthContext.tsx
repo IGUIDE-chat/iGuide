@@ -22,6 +22,7 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isGuest, setIsGuest] = useState(true);
 
     useEffect(() => {
         // Check current session
@@ -155,6 +156,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
     };
 
+    const requestLogin = () => setIsGuest(false);
+
     const value: AuthContextType = {
         user,
         login,
@@ -163,7 +166,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         loginWithMicrosoft,
         logout,
         updateName,
-        isLoading
+        isLoading,
+        isGuest,
+        setIsGuest,
+        requestLogin
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
