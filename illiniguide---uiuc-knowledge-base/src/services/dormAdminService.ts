@@ -32,12 +32,35 @@ export interface DormUpdate {
 }
 
 /**
+ * Columns that exist in the Supabase `dorms` table.
+ * Any key NOT in this set is stripped before sending.
+ */
+const KNOWN_DB_COLUMNS = new Set([
+    'name', 'name_zh', 'description', 'description_zh',
+    'image_url', 'price', 'location', 'location_zh',
+    'housing_type', 'ac', 'dining', 'bathroom_type',
+    'room_types', 'categorized_tags',
+    'floor_plans', 'gallery_images',
+    'pros', 'pros_zh', 'cons', 'cons_zh',
+    // Add 'application_fee' here once the column is created in Supabase
+]);
+
+/**
  * Update a dorm record directly in the `dorms` table. Requires admin session.
+ * Unknown columns are automatically stripped to prevent 400 errors.
  */
 async function updateDorm(dormId: string, updates: DormUpdate): Promise<boolean> {
+    // Strip keys that don't exist in the DB yet
+    const safeUpdates: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(updates)) {
+        if (KNOWN_DB_COLUMNS.has(key)) {
+            safeUpdates[key] = value;
+        }
+    }
+
     const { error } = await supabase
         .from(TABLE)
-        .update(updates)
+        .update(safeUpdates)
         .eq('id', dormId);
     if (error) {
         console.error('[dormAdminService] updateDorm error:', error);
