@@ -32,6 +32,8 @@ export const TEXT = {
       planImageUrl: 'Image URL',
       available: 'Available',
       llc: 'Living-Learning Communities (LLC)',
+      address: 'Address',
+      bedSize: 'Bed Size',
     },
     actions: {
       addPro: 'Add pro',
@@ -113,6 +115,8 @@ export const TEXT = {
       planImageUrl: '图片链接',
       available: '可预订',
       llc: '学习生活社区（LLC）',
+      address: '地址',
+      bedSize: '床型',
     },
     actions: {
       addPro: '添加优点',

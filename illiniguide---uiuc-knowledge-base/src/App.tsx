@@ -11,7 +11,7 @@ import { DormUserInteractionProvider } from './contexts/DormUserInteractionConte
 import { Language } from './types';
 
 export default function App() {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, isGuest, setIsGuest } = useAuth();
   const [language, setLanguage] = useState<Language>(() => {
     if (typeof navigator !== 'undefined') {
       const browserLang = navigator.language.toLowerCase();
@@ -19,14 +19,13 @@ export default function App() {
     }
     return 'zh';
   });
-  const [isGuest, setIsGuest] = useState(true);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
       setIsGuest(false);
     }
-  }, [user]);
+  }, [user, setIsGuest]);
 
   useEffect(() => {
     const lastId = localStorage.getItem('lastConversationId');
