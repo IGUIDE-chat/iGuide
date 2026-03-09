@@ -62,6 +62,12 @@ export interface RoomOptionLabels {
     secondaryLabel: string;
 }
 
+export interface RoomRangeSummary {
+    occupancyLabel: string;
+    bathroomLabel: string;
+    cardSummary: string;
+}
+
 function parseLegacyRoomType(type?: RoomType) {
     if (!type) {
         return { bedCount: null, bathroomCount: null, specialType: undefined as RoomType | undefined };
@@ -216,6 +222,64 @@ function getBathroomSecondaryLabel(option: RoomLabelOption, language: 'en' | 'zh
     return getBathroomScopeLabel(option.bathroomScope, language);
 }
 
+function getChineseBedStem(bedCount: number) {
+    switch (bedCount) {
+        case 1:
+            return '单';
+        case 2:
+            return '双';
+        case 3:
+            return '三';
+        case 4:
+            return '四';
+        case 5:
+            return '五';
+        default:
+            return `${bedCount}人`;
+    }
+}
+
+function getEnglishStandardOccupancyLabel(bedCounts: number[]) {
+    const labels = bedCounts.map((count) => BED_LABELS[count]?.en ?? `${count}-Bed`);
+    if (labels.length === 1) {
+        return `${labels[0]} room`;
+    }
+
+    const isContiguous = bedCounts.every((count, index) => index === 0 || count - bedCounts[index - 1] === 1);
+    if (isContiguous && labels.length >= 3) {
+        return `${labels[0]} to ${labels[labels.length - 1]} rooms`;
+    }
+
+    return `${labels.join('/')} rooms`;
+}
+
+function getChineseStandardOccupancyLabel(bedCounts: number[]) {
+    if (bedCounts.length === 1) {
+        return getBedCountLabel(bedCounts[0], 'zh');
+    }
+
+    const isContiguous = bedCounts.every((count, index) => index === 0 || count - bedCounts[index - 1] === 1);
+    if (isContiguous && bedCounts.length >= 4) {
+        return `${getChineseBedStem(bedCounts[0])}-${getBedCountLabel(bedCounts[bedCounts.length - 1], 'zh')}`;
+    }
+
+    return `${bedCounts.map((count) => getChineseBedStem(count)).join('/')}人间`;
+}
+
+function getStandardOccupancyLabel(bedCounts: number[], language: 'en' | 'zh') {
+    return language === 'zh'
+        ? getChineseStandardOccupancyLabel(bedCounts)
+        : getEnglishStandardOccupancyLabel(bedCounts);
+}
+
+function getSpecialOccupancyLabel(optionLabels: string[], language: 'en' | 'zh') {
+    if (optionLabels.length <= 1) {
+        return optionLabels[0] ?? (language === 'zh' ? '房型多样' : 'Multiple layouts');
+    }
+
+    return language === 'zh' ? optionLabels.join('、') : optionLabels.join(', ');
+}
+
 function hasMultipleBathroomVariants(option: RoomLabelOption, relatedOptions: RoomLabelOption[]) {
     if (option.bedCount == null || isSpecialRoomType(option.labelCode)) {
         return false;
@@ -249,6 +313,68 @@ export function getRoomOptionLabels(
         shortLabel,
         primaryLabel,
         secondaryLabel,
+    };
+}
+
+export function getRoomRangeSummary(
+    roomOptions: RoomOption[],
+    language: 'en' | 'zh'
+): RoomRangeSummary {
+    if (!roomOptions.length) {
+        const fallback = language === 'zh' ? '房型多样' : 'Multiple layouts';
+        return {
+            occupancyLabel: fallback,
+            bathroomLabel: '',
+            cardSummary: fallback,
+        };
+    }
+
+    const uniqueOptions = Array.from(
+        new Map(roomOptions.map((option) => [getRoomOptionKey(option), option])).values()
+    );
+    const standardBedCounts = Array.from(
+        new Set(
+            uniqueOptions
+                .filter((option) => !isSpecialRoomType(option.labelCode) && option.bedCount != null)
+                .map((option) => option.bedCount as number)
+        )
+    ).sort((a, b) => a - b);
+    const specialLabels = Array.from(
+        new Set(
+            uniqueOptions
+                .filter((option) => isSpecialRoomType(option.labelCode))
+                .map((option) => option.labelCode as RoomType)
+        )
+    );
+
+    const occupancyParts: string[] = [];
+
+    if (specialLabels.length) {
+        occupancyParts.push(getSpecialOccupancyLabel(specialLabels, language));
+    }
+    if (standardBedCounts.length) {
+        occupancyParts.push(getStandardOccupancyLabel(standardBedCounts, language));
+    }
+
+    const occupancyLabel =
+        occupancyParts.length > 0
+            ? language === 'zh'
+                ? occupancyParts.join('、')
+                : occupancyParts.join(', ')
+            : language === 'zh'
+              ? '房型多样'
+              : 'Multiple layouts';
+
+    const scopes = Array.from(new Set(uniqueOptions.map((option) => option.bathroomScope)));
+    const bathroomLabel =
+        scopes.length === 1
+            ? getBathroomScopeLabel(scopes[0], language)
+            : MIXED_BATHROOM_LABELS[language];
+
+    return {
+        occupancyLabel,
+        bathroomLabel,
+        cardSummary: bathroomLabel ? `${occupancyLabel}${language === 'zh' ? '，' : ', '}${bathroomLabel}` : occupancyLabel,
     };
 }
 

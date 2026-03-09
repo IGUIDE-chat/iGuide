@@ -99,6 +99,66 @@ export function getAllTagsSorted(categorizedTags: DormCategorizedTags): DormTag[
     });
 }
 
+export interface CardTagItem {
+    id: string;
+    label: string;
+    layer: 'secondary' | 'vibe';
+}
+
+function getCardTagDisplay(tag: DormTag, categorizedTags: DormCategorizedTags, language: Language): string {
+    if (tag === 'llc' && categorizedTags.llcNames?.length) {
+        return categorizedTags.llcNames[0];
+    }
+
+    return getTagDisplay(tag, language);
+}
+
+export function getCardTagItems(
+    categorizedTags: DormCategorizedTags,
+    language: Language,
+    maxCount = 4
+): { items: CardTagItem[]; overflowCount: number } {
+    const rankedTags = getAllTagsSorted(categorizedTags)
+        .filter((tag) => TAG_REGISTRY[tag]?.cardLayer !== 'hidden')
+        .sort((a, b) => {
+            const layerA = TAG_REGISTRY[a]?.cardLayer === 'secondary' ? 0 : 1;
+            const layerB = TAG_REGISTRY[b]?.cardLayer === 'secondary' ? 0 : 1;
+            if (layerA !== layerB) {
+                return layerA - layerB;
+            }
+
+            const priorityA = TAG_REGISTRY[a]?.cardPriority ?? 99;
+            const priorityB = TAG_REGISTRY[b]?.cardPriority ?? 99;
+            if (priorityA !== priorityB) {
+                return priorityA - priorityB;
+            }
+
+            return (TAG_REGISTRY[a]?.priority ?? 99) - (TAG_REGISTRY[b]?.priority ?? 99);
+        });
+
+    const seenLabels = new Set<string>();
+    const items: CardTagItem[] = [];
+
+    for (const tag of rankedTags) {
+        const label = getCardTagDisplay(tag, categorizedTags, language);
+        if (seenLabels.has(label)) {
+            continue;
+        }
+
+        seenLabels.add(label);
+        items.push({
+            id: tag === 'llc' && categorizedTags.llcNames?.length ? `llc:${categorizedTags.llcNames[0]}` : tag,
+            label,
+            layer: TAG_REGISTRY[tag]?.cardLayer === 'secondary' ? 'secondary' : 'vibe',
+        });
+    }
+
+    return {
+        items: items.slice(0, maxCount),
+        overflowCount: Math.max(items.length - maxCount, 0),
+    };
+}
+
 /**
  * Get hero tags: priority-sorted, capped at maxCount.
  * Tags with priority >= 7 (too common, like Laundry/Kitchen) are excluded.
