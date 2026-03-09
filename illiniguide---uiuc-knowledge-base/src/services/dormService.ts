@@ -35,6 +35,7 @@ function rowToDorm(row: Record<string, unknown>): Dorm {
         pros_zh: (row.pros_zh as string[]) ?? undefined,
         cons: (row.cons as string[]) ?? [],
         cons_zh: (row.cons_zh as string[]) ?? undefined,
+        applicationFee: row.application_fee != null ? Number(row.application_fee) : undefined,
     };
 }
 
