@@ -75,6 +75,10 @@ export interface AuthContextType {
   logout: () => void;
   updateName: (name: string) => Promise<boolean>;
   isLoading: boolean;
+  isGuest: boolean;
+  setIsGuest: (value: boolean) => void;
+  /** Trigger the app-level login screen. */
+  requestLogin: () => void;
 }
 
 export interface LibraryHistoryItem {

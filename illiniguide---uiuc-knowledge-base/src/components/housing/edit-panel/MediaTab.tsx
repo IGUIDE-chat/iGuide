@@ -1,6 +1,6 @@
 import React from 'react';
 import { Loader2, Plus, Trash2, Upload } from 'lucide-react';
-import { BathroomScope, FloorPlan } from '../../../types/housing';
+import { BathroomScope, BedSize, FloorPlan } from '../../../types/housing';
 import { BATHROOM_TYPE_OPTIONS, getLocalizedLabel } from '../../../constants/housing/metadata';
 import { normalizeFloorPlan } from '../../../utils/roomOptions';
 import { EditableList, Field, Toggle, inputCls } from './EditPanelFields';
@@ -214,6 +214,24 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                       }
                       className={inputCls}
                     />
+                  </Field>
+                  <Field label={t.labels.bedSize}>
+                    <select
+                      value={plan.bedSize ?? ''}
+                      onChange={(event) =>
+                        update(
+                          { bedSize: event.target.value === '' ? undefined : event.target.value as BedSize },
+                          false,
+                        )
+                      }
+                      className={inputCls}
+                    >
+                      <option value="">—</option>
+                      <option value="Twin XL">Twin XL</option>
+                      <option value="Full">Full</option>
+                      <option value="Queen">Queen</option>
+                      <option value="King">King</option>
+                    </select>
                   </Field>
                 </div>
                 <Field label={t.labels.shortDescription}>
