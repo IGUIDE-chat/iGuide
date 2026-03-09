@@ -8,7 +8,7 @@ interface BrandMarkProps {
 
 export const BrandMark: React.FC<BrandMarkProps> = ({
     className = 'h-10 w-10 rounded-xl',
-    iconClassName = 'h-5 w-5',
+    iconClassName = 'text-lg',
 }) => (
     <div
         className={`flex items-center justify-center bg-illini-orange text-white shadow-sm ${className}`}

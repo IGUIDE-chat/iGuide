@@ -83,7 +83,7 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
           className="w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm hover:bg-[#212121] transition-colors text-white group"
         >
           <div className="group-hover:scale-110 transition-transform">
-            <BrandMark className="h-5 w-5 rounded-[4px]" iconClassName="h-2.5 w-2.5" />
+            <BrandMark className="h-5 w-5 rounded-[4px]" iconClassName="text-[10px]" />
           </div>
           <SidebarLabel isOpen={isSidebarOpen}>
             <AnimatedText>{guestLabel}</AnimatedText>
