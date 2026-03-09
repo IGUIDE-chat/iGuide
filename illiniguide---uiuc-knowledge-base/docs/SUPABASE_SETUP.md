@@ -21,9 +21,10 @@ To create the `dorms` table with Row Level Security (RLS) policies:
 ```bash
 # Run this SQL script in your Supabase SQL Editor
 scripts/migrations/create_dorms_table.sql
-# And to add the new categorized tags schema:
+# And then run the idempotent follow-up migration for categorized tags and admin editor fields:
 scripts/migrations/add_categorized_tags.sql
 ```
+`add_categorized_tags.sql` is safe to rerun and now also creates the admin-facing `application_fee` and `dining_nearby_detail` columns.
 **Data Maintenance & Synchronization:**
 Whenever you update static dorm data in the codebase or want to migrate admin overrides into the unified table, use the seed script:
 \\ash

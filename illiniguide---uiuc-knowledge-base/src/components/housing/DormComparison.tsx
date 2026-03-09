@@ -14,44 +14,56 @@ interface DormComparisonProps {
 
 interface ComparisonRow {
     label: string;
-    label_zh: string;
     getValue: (dorm: Dorm) => React.ReactNode;
     highlightBest?: boolean;
     bestCondition?: (dorm: Dorm) => boolean;
 }
 
+const TEXT = {
+    en: {
+        title: 'Compare Dorms',
+        close: 'Close',
+        yes: 'Yes',
+        no: 'No',
+        urh: 'URH',
+        pch: 'PCH',
+        feature: 'Feature',
+        bestOption: 'Best option',
+        roomOptions: 'Room Options',
+        bathroom: 'Bathroom',
+        name: 'Name',
+        location: 'Location',
+        housingType: 'Housing Type',
+        price: 'Price',
+        ac: 'Air Conditioning',
+        dining: 'Dining Hall',
+    },
+    zh: {
+        title: '宿舍对比',
+        close: '关闭',
+        yes: '有',
+        no: '无',
+        urh: '校内宿舍',
+        pch: '认证校外宿舍',
+        feature: '项目',
+        bestOption: '推荐项',
+        roomOptions: '房型',
+        bathroom: '卫浴',
+        name: '名称',
+        location: '位置',
+        housingType: '住宿类型',
+        price: '价格',
+        ac: '空调',
+        dining: '食堂',
+    },
+};
+
 const DormComparison: React.FC<DormComparisonProps> = ({ dorms, onClose, language = 'en' }) => {
-    const t = {
-        en: {
-            title: 'Compare Dorms',
-            close: 'Close',
-            yes: 'Yes',
-            no: 'No',
-            urh: 'URH',
-            pch: 'PCH',
-            feature: 'Feature',
-            bestOption: 'Best option',
-            roomOptions: 'Room Options',
-            bathroom: 'Bathroom',
-        },
-        zh: {
-            title: '宿舍对比',
-            close: '关闭',
-            yes: '是',
-            no: '否',
-            urh: '校内宿舍',
-            pch: '认证校外宿舍',
-            feature: '特征',
-            bestOption: '推荐项',
-            roomOptions: '房型',
-            bathroom: '卫浴',
-        }
-    }[language];
+    const t = TEXT[language];
 
     const comparisonRows: ComparisonRow[] = [
         {
-            label: 'Name',
-            label_zh: '名称',
+            label: t.name,
             getValue: (dorm) => {
                 const dormName = language === 'zh' && dorm.name_zh ? dorm.name_zh : dorm.name;
                 return (
@@ -60,19 +72,17 @@ const DormComparison: React.FC<DormComparisonProps> = ({ dorms, onClose, languag
                         <span className="font-medium text-base">{dormName}</span>
                     </div>
                 );
-            }
+            },
         },
         {
-            label: 'Location',
-            label_zh: '位置',
+            label: t.location,
             getValue: (dorm) => {
                 const locationLabel = language === 'zh' && dorm.location_zh ? dorm.location_zh : dorm.location;
                 return <span className="text-sm text-gray-600">{locationLabel}</span>;
-            }
+            },
         },
         {
-            label: 'Housing Type',
-            label_zh: '住宿类型',
+            label: t.housingType,
             getValue: (dorm) => (
                 <span
                     className={`px-2 py-1 text-xs rounded-full ${
@@ -81,18 +91,16 @@ const DormComparison: React.FC<DormComparisonProps> = ({ dorms, onClose, languag
                 >
                     {dorm.housingType === 'URH' ? t.urh : t.pch}
                 </span>
-            )
+            ),
         },
         {
-            label: 'Price Range',
-            label_zh: '价格',
+            label: t.price,
             getValue: (dorm) => <span className="font-bold text-illini-orange">{formatPrice(dorm.price)}</span>,
             highlightBest: true,
-            bestCondition: (dorm) => dorm.price <= 10000
+            bestCondition: (dorm) => dorm.price <= 10000,
         },
         {
-            label: 'Air Conditioning',
-            label_zh: '空调',
+            label: t.ac,
             getValue: (dorm) =>
                 dorm.ac ? (
                     <span className="flex items-center gap-1 text-green-600 text-sm">
@@ -104,11 +112,10 @@ const DormComparison: React.FC<DormComparisonProps> = ({ dorms, onClose, languag
                     </span>
                 ),
             highlightBest: true,
-            bestCondition: (dorm) => dorm.ac
+            bestCondition: (dorm) => dorm.ac,
         },
         {
-            label: 'Dining Hall',
-            label_zh: '食堂',
+            label: t.dining,
             getValue: (dorm) =>
                 dorm.dining === 'inside' ? (
                     <span className="flex items-center gap-1 text-green-600 text-sm">
@@ -120,11 +127,10 @@ const DormComparison: React.FC<DormComparisonProps> = ({ dorms, onClose, languag
                     </span>
                 ),
             highlightBest: true,
-            bestCondition: (dorm) => dorm.dining === 'inside'
+            bestCondition: (dorm) => dorm.dining === 'inside',
         },
         {
             label: t.roomOptions,
-            label_zh: t.roomOptions,
             getValue: (dorm) => {
                 const roomOptions = dorm.roomOptions ?? deriveRoomOptions(dorm.floorPlans, dorm.bathroomType).roomOptions;
                 return (
@@ -134,23 +140,18 @@ const DormComparison: React.FC<DormComparisonProps> = ({ dorms, onClose, languag
                                 key={`${option.labelCode ?? 'custom'}-${option.bedCount ?? 'na'}-${option.bathroomScope}`}
                                 className="px-2 py-0.5 bg-illini-blue/10 text-illini-blue text-xs rounded"
                             >
-                                {getRoomDisplayLabel(option, language === 'zh' ? 'zh' : 'en')}
+                                {getRoomDisplayLabel(option, language)}
                             </span>
                         ))}
-                        {roomOptions.length > 3 && (
-                            <span className="text-xs text-gray-500">+{roomOptions.length - 3}</span>
-                        )}
+                        {roomOptions.length > 3 && <span className="text-xs text-gray-500">+{roomOptions.length - 3}</span>}
                     </div>
                 );
-            }
+            },
         },
         {
             label: t.bathroom,
-            label_zh: t.bathroom,
-            getValue: (dorm) => (
-                <span className="text-sm text-gray-600">{getDormBathroomSummary(dorm, language === 'zh' ? 'zh' : 'en')}</span>
-            )
-        }
+            getValue: (dorm) => <span className="text-sm text-gray-600">{getDormBathroomSummary(dorm, language)}</span>,
+        },
     ];
 
     if (dorms.length < 2) return null;
@@ -217,21 +218,24 @@ const DormComparison: React.FC<DormComparisonProps> = ({ dorms, onClose, languag
                             </thead>
                             <tbody>
                                 {comparisonRows.map((row, rowIndex) => (
-                                    <tr key={rowIndex} className={rowIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                                        <td className="sticky left-0 z-10 px-4 py-3 text-sm font-medium text-gray-700 border-r border-gray-200">
-                                            {language === 'zh' ? row.label_zh : row.label}
+                                    <tr key={row.label} className={rowIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                                        <td className="sticky left-0 z-10 px-4 py-4 text-sm font-medium text-gray-700 border-b border-r border-gray-200 bg-inherit">
+                                            <div className="flex items-center gap-2">
+                                                <span>{row.label}</span>
+                                                {row.highlightBest && (
+                                                    <span className="text-[10px] px-1.5 py-0.5 bg-emerald-100 text-emerald-700 rounded-full">
+                                                        {t.bestOption}
+                                                    </span>
+                                                )}
+                                            </div>
                                         </td>
                                         {dorms.map((dorm) => {
-                                            const isBest = row.highlightBest && row.bestCondition?.(dorm);
-                                            const isWinner = Boolean(
-                                                isBest && row.bestCondition && dorms.some((d) => !row.bestCondition!(d))
-                                            );
-
+                                            const isBest = row.bestCondition?.(dorm);
                                             return (
                                                 <td
-                                                    key={dorm.id}
-                                                    className={`px-4 py-3 align-top border-l border-gray-100 ${
-                                                        isWinner ? 'bg-green-50' : ''
+                                                    key={`${row.label}-${dorm.id}`}
+                                                    className={`px-4 py-4 align-top text-sm border-b border-gray-200 ${
+                                                        isBest ? 'bg-emerald-50/60' : ''
                                                     }`}
                                                 >
                                                     {row.getValue(dorm)}
@@ -242,13 +246,6 @@ const DormComparison: React.FC<DormComparisonProps> = ({ dorms, onClose, languag
                                 ))}
                             </tbody>
                         </table>
-                    </div>
-
-                    <div className="border-t border-gray-200 bg-white px-6 py-3 text-xs text-gray-500 flex items-center gap-2">
-                        <span className="inline-flex items-center gap-1 text-green-700">
-                            <Check size={14} />
-                            <span>{t.bestOption}</span>
-                        </span>
                     </div>
                 </motion.div>
             </motion.div>

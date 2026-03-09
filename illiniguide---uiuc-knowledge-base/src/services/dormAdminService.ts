@@ -33,6 +33,21 @@ export interface DormUpdate {
     cons_zh?: string[] | null;
 }
 
+export interface DormMutationResult {
+    ok: boolean;
+    errorMessage?: string;
+}
+
+export interface EditHistoryEntry {
+    id: string;
+    dorm_id: string;
+    dorm_name: string;
+    changed_by: string;
+    changed_at: string;
+    summary: string;
+    snapshot: Record<string, unknown>;
+}
+
 /**
  * Columns that exist in the Supabase `dorms` table.
  * Any key NOT in this set is stripped before sending.
@@ -47,11 +62,98 @@ const KNOWN_DB_COLUMNS = new Set([
     'application_fee',
 ]);
 
+/** Build a human-readable summary of what changed between dorm and updates. */
+export function buildSummary(dorm: Dorm, updates: DormUpdate): string {
+    const parts: string[] = [];
+    if (updates.name !== undefined && updates.name !== dorm.name) parts.push('名称');
+    if (updates.price !== undefined && updates.price !== dorm.price)
+        parts.push(`价格: $${dorm.price} → $${updates.price}`);
+    if (updates.ac !== undefined && updates.ac !== dorm.ac)
+        parts.push(`空调: ${dorm.ac ? '有' : '无'} → ${updates.ac ? '有' : '无'}`);
+    if (updates.dining !== undefined && updates.dining !== dorm.dining) parts.push('食堂');
+    if (updates.description !== undefined && updates.description !== dorm.description) parts.push('描述');
+    if (updates.pros !== undefined) parts.push('优点');
+    if (updates.cons !== undefined) parts.push('缺点');
+    if (updates.categorized_tags !== undefined) parts.push('标签');
+    if (updates.floor_plans !== undefined) parts.push('户型图');
+    if (updates.gallery_images !== undefined) parts.push('图库');
+    return parts.length > 0 ? `修改: ${parts.join(', ')}` : '保存';
+}
+
+/**
+ * Fetch the last 20 edit history entries for a dorm, newest first.
+ */
+async function getEditHistory(dormId: string): Promise<EditHistoryEntry[]> {
+    const { data, error } = await supabase
+        .from('dorm_edit_history')
+        .select('*')
+        .eq('dorm_id', dormId)
+        .order('changed_at', { ascending: false })
+        .limit(20);
+    if (error) {
+        console.error('[dormAdminService] getEditHistory error:', error);
+        return [];
+    }
+    return (data ?? []) as EditHistoryEntry[];
+}
+
+/**
+ * Fire-and-forget: insert a history entry for an edit. Errors are non-blocking.
+ */
+async function logEdit(
+    dormId: string,
+    dormName: string,
+    changedBy: string,
+    summary: string,
+    snapshotBefore: Record<string, unknown>,
+): Promise<void> {
+    const { error } = await supabase
+        .from('dorm_edit_history')
+        .insert({
+            dorm_id: dormId,
+            dorm_name: dormName,
+            changed_by: changedBy,
+            summary,
+            snapshot: snapshotBefore,
+        });
+    if (error) {
+        console.warn('[dormAdminService] logEdit error (non-blocking):', error);
+    }
+}
+
+/**
+ * Restore a dorm to a previous snapshot, then log the restore action.
+ */
+async function restoreSnapshot(dormId: string, entry: EditHistoryEntry): Promise<boolean> {
+    const safeSnapshot: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(entry.snapshot)) {
+        if (KNOWN_DB_COLUMNS.has(key)) {
+            safeSnapshot[key] = value;
+        }
+    }
+    const { error } = await supabase
+        .from(TABLE)
+        .update(safeSnapshot)
+        .eq('id', dormId);
+    if (error) {
+        console.error('[dormAdminService] restoreSnapshot error:', error);
+        return false;
+    }
+    await logEdit(
+        dormId,
+        entry.dorm_name,
+        entry.changed_by,
+        `由管理员还原至 ${entry.changed_at} 版本`,
+        entry.snapshot,
+    );
+    return true;
+}
+
 /**
  * Update a dorm record directly in the `dorms` table. Requires admin session.
  * Unknown columns are automatically stripped to prevent 400 errors.
  */
-async function updateDorm(dormId: string, updates: DormUpdate): Promise<boolean> {
+async function updateDorm(dormId: string, updates: DormUpdate): Promise<DormMutationResult> {
     // Strip keys that don't exist in the DB yet
     const safeUpdates: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(updates)) {
@@ -66,19 +168,25 @@ async function updateDorm(dormId: string, updates: DormUpdate): Promise<boolean>
         .eq('id', dormId);
     if (error) {
         console.error('[dormAdminService] updateDorm error:', error);
-        return false;
+        const errorMessage = [error.message, error.details, error.hint]
+            .filter(Boolean)
+            .join(' ');
+        return { ok: false, errorMessage };
     }
-    return true;
+    return { ok: true };
 }
 
 /**
  * Reset a dorm to its original static data by overwriting the DB row.
  */
-async function resetDormToStatic(dormId: string): Promise<boolean> {
+async function resetDormToStatic(dormId: string): Promise<DormMutationResult> {
     const staticDorm = UIUC_DORMS.find((d) => d.id === dormId);
     if (!staticDorm) {
         console.error('[dormAdminService] resetDormToStatic: dorm not found in static data:', dormId);
-        return false;
+        return {
+            ok: false,
+            errorMessage: `Dorm "${dormId}" was not found in static data.`,
+        };
     }
 
     const row: DormUpdate = {
@@ -93,7 +201,9 @@ async function resetDormToStatic(dormId: string): Promise<boolean> {
         housing_type: staticDorm.housingType,
         ac: staticDorm.ac,
         dining: staticDorm.dining,
+        dining_nearby_detail: staticDorm.diningNearbyDetail ?? null,
         bathroom_type: staticDorm.bathroomType,
+        application_fee: staticDorm.applicationFee ?? null,
         room_types: staticDorm.roomTypes,
         room_options: staticDorm.roomOptions ?? null,
         categorized_tags: staticDorm.categorizedTags as unknown as Record<string, unknown> ?? null,
@@ -167,4 +277,7 @@ export const dormAdminService = {
     updateDorm,
     resetDormToStatic,
     uploadDormImage,
+    getEditHistory,
+    logEdit,
+    restoreSnapshot,
 };

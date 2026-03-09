@@ -15,24 +15,35 @@ interface DormCardProps {
     language?: Language;
 }
 
+const TEXT = {
+    en: {
+        dining: 'Dining',
+        noAc: 'No AC',
+        unsave: 'Unsave dorm',
+        save: 'Save dorm',
+    },
+    zh: {
+        dining: '食堂',
+        noAc: '无空调',
+        unsave: '取消收藏宿舍',
+        save: '收藏宿舍',
+    },
+};
+
 const DormCard: React.FC<DormCardProps> = ({
     dorm,
     onViewDetails,
     isFavorite = false,
     onToggleFavorite,
     onHoverDorm,
-    language = 'en'
+    language = 'en',
 }) => {
-    const getName = () => (language === 'zh' && dorm.name_zh ? dorm.name_zh : dorm.name);
-    const getDescription = () => (language === 'zh' && dorm.description_zh ? dorm.description_zh : dorm.description);
+    const t = TEXT[language];
+    const dormName = language === 'zh' && dorm.name_zh ? dorm.name_zh : dorm.name;
+    const description = language === 'zh' && dorm.description_zh ? dorm.description_zh : dorm.description;
     const locationLabel = language === 'zh' && dorm.location_zh ? dorm.location_zh : dorm.location;
     const roomOptions = dorm.roomOptions ?? deriveRoomOptions(dorm.floorPlans, dorm.bathroomType).roomOptions;
     const bathroomSummary = getDormBathroomTagSummary(dorm, language);
-
-    const t = {
-        en: { dining: 'Dining' },
-        zh: { dining: '食堂' }
-    }[language];
 
     return (
         <div
@@ -44,7 +55,7 @@ const DormCard: React.FC<DormCardProps> = ({
             <div className="relative h-64 overflow-hidden">
                 <img
                     src={dorm.imageUrl}
-                    alt={getName()}
+                    alt={dormName}
                     loading="lazy"
                     decoding="async"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -63,7 +74,7 @@ const DormCard: React.FC<DormCardProps> = ({
                         }}
                         type="button"
                         className="absolute top-3 left-3 p-2 rounded-full bg-white hover:bg-gray-50 text-gray-400 hover:text-red-500 transition-colors shadow-sm"
-                        aria-label={isFavorite ? 'Unsave dorm' : 'Save dorm'}
+                        aria-label={isFavorite ? t.unsave : t.save}
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -85,7 +96,9 @@ const DormCard: React.FC<DormCardProps> = ({
 
             <div className="p-5 flex flex-col flex-grow">
                 <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-2xl font-bold text-gray-900 leading-tight transition-transform duration-150 hover:scale-[1.03] origin-left antialiased">{getName()}</h3>
+                    <h3 className="text-2xl font-bold text-gray-900 leading-tight transition-transform duration-150 hover:scale-[1.03] origin-left antialiased">
+                        {dormName}
+                    </h3>
                 </div>
 
                 <div className="flex items-center text-gray-500 text-sm mb-4">
@@ -96,7 +109,7 @@ const DormCard: React.FC<DormCardProps> = ({
                 <div className="flex gap-2 mb-4 flex-wrap">
                     {!dorm.ac && (
                         <span className="inline-flex items-center px-2 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-xs font-medium">
-                            <Wind size={10} className="mr-1" /> {language === 'zh' ? '无空调' : 'No AC'}
+                            <Wind size={10} className="mr-1" /> {t.noAc}
                         </span>
                     )}
                     {dorm.dining === 'inside' && (
@@ -116,10 +129,10 @@ const DormCard: React.FC<DormCardProps> = ({
                         {bathroomSummary}
                     </span>
                     {getHeroTags(dorm.categorizedTags ?? { livingConditions: [], facilities: [], lifestyle: [] }, 4)
-                        .filter(tag => tag !== 'noAc')
+                        .filter((tag) => tag !== 'noAc')
                         .flatMap((tag) => {
                             if (tag === 'llc' && dorm.categorizedTags?.llcNames?.length) {
-                                return dorm.categorizedTags.llcNames.map(llcName => (
+                                return dorm.categorizedTags.llcNames.map((llcName) => (
                                     <span
                                         key={llcName}
                                         className="inline-block px-2 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium transition-colors duration-150 hover:bg-gray-200 hover:text-gray-800"
@@ -139,7 +152,9 @@ const DormCard: React.FC<DormCardProps> = ({
                         })}
                 </div>
 
-                <p className="text-gray-700 text-sm leading-relaxed mb-2 line-clamp-3 flex-grow antialiased">{getDescription()}</p>
+                <p className="text-gray-700 text-sm leading-relaxed mb-2 line-clamp-3 flex-grow antialiased">
+                    {description}
+                </p>
             </div>
         </div>
     );
