@@ -113,7 +113,8 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
         priceRange,
         setPriceRange,
         locationFilters,
-        roomTypeFilters,
+        bedCountFilters,
+        bathroomCountFilters,
         housingTypeDetails,
         viewMode,
         setViewMode,
@@ -154,7 +155,8 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
             hasPriceFilter ||
             housingTypeDetails !== 'ALL' ||
             locationFilters.length > 0 ||
-            roomTypeFilters.length > 0 ||
+            bedCountFilters.length > 0 ||
+            bathroomCountFilters.length > 0 ||
             amenityFilters.length > 0 ||
             communityFilters.length > 0 ||
             llcFilters.length > 0 ||
@@ -169,7 +171,8 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
             hasPriceFilter,
             housingTypeDetails,
             locationFilters.length,
-            roomTypeFilters.length,
+            bedCountFilters.length,
+            bathroomCountFilters.length,
             amenityFilters.length,
             communityFilters.length,
             llcFilters.length,
@@ -187,7 +190,8 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
             (hasPriceFilter ? 1 : 0) +
             (housingTypeDetails !== 'ALL' ? 1 : 0) +
             locationFilters.length +
-            roomTypeFilters.length +
+            bedCountFilters.length +
+            bathroomCountFilters.length +
             activeFilters.length +
             amenityFilters.length +
             communityFilters.length +
@@ -202,7 +206,8 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
             hasPriceFilter,
             housingTypeDetails,
             locationFilters.length,
-            roomTypeFilters.length,
+            bedCountFilters.length,
+            bathroomCountFilters.length,
             activeFilters.length,
             amenityFilters.length,
             communityFilters.length,
@@ -228,7 +233,8 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
                 activeFilters,
                 normalizedPriceRange,
                 locationFilters,
-                roomTypeFilters,
+                bedCountFilters,
+                bathroomCountFilters,
                 housingTypeDetails,
                 amenityFilters,
                 communityFilters,
@@ -247,7 +253,8 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
             activeFilters,
             normalizedPriceRange,
             locationFilters,
-            roomTypeFilters,
+            bedCountFilters,
+            bathroomCountFilters,
             housingTypeDetails,
             amenityFilters,
             communityFilters,

@@ -1,4 +1,4 @@
-import { BathroomType, DormTag, FilterOption, RoomType } from '../../../types/housing';
+import { BathroomCountFilter, BathroomScope, BedCountFilter, DormTag, FilterOption } from '../../../types/housing';
 
 export interface DormListText {
     searchPlaceholder: string;
@@ -20,7 +20,8 @@ export interface DormFilterState {
     activeFilters: FilterOption[];
     normalizedPriceRange: [number, number];
     locationFilters: string[];
-    roomTypeFilters: RoomType[];
+    bedCountFilters: BedCountFilter[];
+    bathroomCountFilters: BathroomCountFilter[];
     housingTypeDetails: 'ALL' | 'URH' | 'PCH';
     // Legacy structured tag filters (kept for backward compat)
     amenityFilters: string[];
@@ -33,6 +34,6 @@ export interface DormFilterState {
     lifestyleFilters: DormTag[];
     // Structured filters
     requireAc: boolean;
-    bathroomTypeFilters: BathroomType[];
+    bathroomTypeFilters: BathroomScope[];
     sortBy: string;
 }

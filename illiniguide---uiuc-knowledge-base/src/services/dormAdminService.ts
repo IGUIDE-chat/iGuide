@@ -22,6 +22,7 @@ export interface DormUpdate {
     dining_nearby_detail?: string | null;
     bathroom_type?: string | null;
     room_types?: string[] | null;
+    room_options?: unknown[] | null;
     categorized_tags?: Record<string, unknown> | null;
     application_fee?: number | null;
     floor_plans?: unknown[] | null;
@@ -40,7 +41,7 @@ const KNOWN_DB_COLUMNS = new Set([
     'name', 'name_zh', 'description', 'description_zh',
     'image_url', 'price', 'location', 'location_zh',
     'housing_type', 'ac', 'dining', 'dining_nearby_detail', 'bathroom_type',
-    'room_types', 'categorized_tags',
+    'room_types', 'room_options', 'categorized_tags',
     'floor_plans', 'gallery_images',
     'pros', 'pros_zh', 'cons', 'cons_zh',
     'application_fee',
@@ -94,6 +95,7 @@ async function resetDormToStatic(dormId: string): Promise<boolean> {
         dining: staticDorm.dining,
         bathroom_type: staticDorm.bathroomType,
         room_types: staticDorm.roomTypes,
+        room_options: staticDorm.roomOptions ?? null,
         categorized_tags: staticDorm.categorizedTags as unknown as Record<string, unknown> ?? null,
         floor_plans: staticDorm.floorPlans ?? null,
         gallery_images: staticDorm.galleryImages ?? null,

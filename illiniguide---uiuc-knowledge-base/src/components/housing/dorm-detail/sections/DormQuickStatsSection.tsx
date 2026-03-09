@@ -2,6 +2,7 @@ import React from 'react';
 import { DollarSign, Utensils, MapPin, Wind, Bath } from 'lucide-react';
 import { Dorm } from '../../../../types/housing';
 import { Language } from '../../../../types';
+import { getDormBathroomSummary } from '../../../../utils/roomOptions';
 
 interface DormQuickStatsSectionProps {
     dorm: Dorm;
@@ -19,11 +20,6 @@ const DINING_LABELS: Record<string, Record<Dorm['dining'], string>> = {
     zh: { inside: '楼内', nearby: '附近', none: '无' },
 };
 
-const BATHROOM_LABELS: Record<string, Record<Dorm['bathroomType'], string>> = {
-    en: { communal: 'Communal', 'semi-private': 'Semi-Private', private: 'Private' },
-    zh: { communal: '公共卫浴', 'semi-private': '半独立卫浴', private: '独立卫浴' },
-};
-
 const DormQuickStatsSection: React.FC<DormQuickStatsSectionProps> = ({
     dorm,
     language,
@@ -33,7 +29,7 @@ const DormQuickStatsSection: React.FC<DormQuickStatsSectionProps> = ({
     formatPrice
 }) => {
     const diningText = DINING_LABELS[language]?.[dorm.dining] ?? DINING_LABELS.en[dorm.dining];
-    const bathroomText = BATHROOM_LABELS[language]?.[dorm.bathroomType] ?? BATHROOM_LABELS.en[dorm.bathroomType];
+    const bathroomText = getDormBathroomSummary(dorm, language === 'zh' ? 'zh' : 'en');
     const locationLabel = language === 'zh' && dorm.location_zh ? dorm.location_zh : dorm.location;
 
     return (

@@ -5,11 +5,10 @@ import 'rc-slider/assets/index.css';
 import { useHousingFilters } from '../../contexts/HousingContext';
 import { getPriceRangeFromData } from '../../constants/housing/pricing';
 import { useDormData } from '../../contexts/DormDataContext';
-import { BathroomType, DormTag, FilterOption, RoomType } from '../../types/housing';
+import { BathroomCountFilter, BathroomScope, BedCountFilter, DormTag, FilterOption } from '../../types/housing';
 import { TAGS_BY_CATEGORY } from '../../constants/housing/tagDefinitions';
 import PriceSection from './filter-modal/PriceSection';
 import HousingTypeSection from './filter-modal/HousingTypeSection';
-import RoomTypeSection from './filter-modal/RoomTypeSection';
 import ChipSection from './filter-modal/ChipSection';
 import TagFilterSection from './filter-modal/TagFilterSection';
 import { FilterLanguage, MODAL_TEXT } from './filter-modal/modalText';
@@ -18,6 +17,62 @@ interface FilterModalProps {
     isOpen: boolean;
     onClose: () => void;
     language: FilterLanguage;
+}
+
+const BED_COUNT_OPTIONS: { value: BedCountFilter; label: string }[] = [
+    { value: 1, label: '1+' },
+    { value: 2, label: '2+' },
+    { value: 3, label: '3+' },
+    { value: 4, label: '4+' },
+];
+
+const buildBathroomCountOptions = (t: typeof MODAL_TEXT.en): { value: BathroomCountFilter; label: string }[] => [
+    { value: 0, label: t.zeroBathrooms },
+    { value: 1, label: t.onePlusBathrooms },
+    { value: 2, label: t.twoPlusBathrooms },
+];
+
+const buildBathroomScopeOptions = (t: typeof MODAL_TEXT.en): { value: BathroomScope; label: string }[] => [
+    { value: 'communal', label: t.communalBath },
+    { value: 'semi-private', label: t.semiPrivateBath },
+    { value: 'private', label: t.privateBath },
+];
+
+function ToggleButtonSection<T extends string | number>({
+    title,
+    options,
+    selectedValues,
+    onToggle,
+}: {
+    title: string;
+    options: { value: T; label: string }[];
+    selectedValues: T[];
+    onToggle: (value: T) => void;
+}) {
+    return (
+        <section className="mb-8">
+            <h3 className="text-xl font-bold mb-6">{title}</h3>
+            <div className="flex flex-wrap gap-3">
+                {options.map(({ value, label }) => {
+                    const selected = selectedValues.includes(value);
+                    return (
+                        <button
+                            key={String(value)}
+                            type="button"
+                            onClick={() => onToggle(value)}
+                            className={`px-4 py-2 rounded-full border text-sm font-medium transition-colors ${
+                                selected
+                                    ? 'bg-illini-blue text-white border-illini-blue'
+                                    : 'border-gray-300 text-gray-700 hover:border-illini-blue'
+                            }`}
+                        >
+                            {label}
+                        </button>
+                    );
+                })}
+            </div>
+        </section>
+    );
 }
 
 export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, language }) => {
@@ -29,8 +84,10 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         setPriceRange,
         housingTypeDetails,
         setHousingTypeDetails,
-        roomTypeFilters,
-        setRoomTypeFilters,
+        bedCountFilters,
+        setBedCountFilters,
+        bathroomCountFilters,
+        setBathroomCountFilters,
         locationFilters,
         setLocationFilters,
         setAmenityFilters,
@@ -45,11 +102,13 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         requireAc,
         setRequireAc,
         bathroomTypeFilters,
-        setBathroomTypeFilters
+        setBathroomTypeFilters,
     } = useHousingFilters();
 
     const t = MODAL_TEXT[language];
     const priceLimits = useMemo<[number, number]>(() => getPriceRangeFromData(allDorms), [allDorms]);
+    const bathroomCountOptions = useMemo(() => buildBathroomCountOptions(t), [t]);
+    const bathroomScopeOptions = useMemo(() => buildBathroomScopeOptions(t), [t]);
 
     const normalizeRange = useCallback(
         (range: [number, number]): [number, number] => {
@@ -74,26 +133,24 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         [priceLimits]
     );
 
-    const [localPriceRange, setLocalPriceRange] = useState<[number, number]>(() =>
-        normalizeRange(priceRange)
-    );
-    const [localHousingType, setLocalHousingType] = useState<'ALL' | 'URH' | 'PCH'>(
-        housingTypeDetails
-    );
-    const [localRoomTypes, setLocalRoomTypes] = useState<RoomType[]>(roomTypeFilters);
+    const [localPriceRange, setLocalPriceRange] = useState<[number, number]>(() => normalizeRange(priceRange));
+    const [localHousingType, setLocalHousingType] = useState<'ALL' | 'URH' | 'PCH'>(housingTypeDetails);
+    const [localBedCounts, setLocalBedCounts] = useState<BedCountFilter[]>(bedCountFilters);
+    const [localBathroomCounts, setLocalBathroomCounts] = useState<BathroomCountFilter[]>(bathroomCountFilters);
     const [localAmenities, setLocalAmenities] = useState<FilterOption[]>(activeFilters);
     const [localLocations, setLocalLocations] = useState<string[]>(locationFilters);
     const [localLivingConditions, setLocalLivingConditions] = useState<DormTag[]>(livingConditionFilters);
     const [localFacilities, setLocalFacilities] = useState<DormTag[]>(facilityFilters);
     const [localLifestyle, setLocalLifestyle] = useState<DormTag[]>(lifestyleFilters);
     const [localRequireAc, setLocalRequireAc] = useState(requireAc);
-    const [localBathroomTypes, setLocalBathroomTypes] = useState<BathroomType[]>(bathroomTypeFilters);
+    const [localBathroomTypes, setLocalBathroomTypes] = useState<BathroomScope[]>(bathroomTypeFilters);
 
     useEffect(() => {
         if (!isOpen) return;
         setLocalPriceRange(normalizeRange(priceRange));
         setLocalHousingType(housingTypeDetails);
-        setLocalRoomTypes(roomTypeFilters);
+        setLocalBedCounts(bedCountFilters);
+        setLocalBathroomCounts(bathroomCountFilters);
         setLocalAmenities(activeFilters);
         setLocalLocations(locationFilters);
         setLocalLivingConditions(livingConditionFilters);
@@ -102,28 +159,43 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         setLocalRequireAc(requireAc);
         setLocalBathroomTypes(bathroomTypeFilters);
     }, [
+        activeFilters,
+        bathroomCountFilters,
+        bathroomTypeFilters,
+        bedCountFilters,
+        facilityFilters,
+        housingTypeDetails,
         isOpen,
+        lifestyleFilters,
+        livingConditionFilters,
+        locationFilters,
         normalizeRange,
         priceRange,
-        housingTypeDetails,
-        roomTypeFilters,
-        activeFilters,
-        locationFilters,
-        livingConditionFilters,
-        facilityFilters,
-        lifestyleFilters,
         requireAc,
-        bathroomTypeFilters
     ]);
 
     const locations = useMemo(
         () => Array.from(new Set(allDorms.map((dorm) => dorm.location))).sort(),
         [allDorms]
     );
+
+    const toggleStringArray = useCallback((values: string[], setValues: (next: string[]) => void, value: string) => {
+        setValues(values.includes(value) ? values.filter((item) => item !== value) : [...values, value]);
+    }, []);
+
+    const toggleNumberArray = useCallback(<T extends number,>(values: T[], setValues: (next: T[]) => void, value: T) => {
+        setValues(values.includes(value) ? values.filter((item) => item !== value) : [...values, value]);
+    }, []);
+
+    const toggleDormTag = useCallback((tag: DormTag, values: DormTag[], setValues: (next: DormTag[]) => void) => {
+        setValues(values.includes(tag) ? values.filter((item) => item !== tag) : [...values, tag]);
+    }, []);
+
     const handleApply = useCallback(() => {
         setPriceRange(normalizeRange(localPriceRange));
         setHousingTypeDetails(localHousingType);
-        setRoomTypeFilters(localRoomTypes);
+        setBedCountFilters(localBedCounts);
+        setBathroomCountFilters(localBathroomCounts);
         setActiveFilters(localAmenities);
         setLocationFilters(localLocations);
         setLivingConditionFilters(localLivingConditions);
@@ -134,33 +206,36 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         onClose();
     }, [
         localAmenities,
+        localBathroomCounts,
+        localBathroomTypes,
+        localBedCounts,
+        localFacilities,
         localHousingType,
+        localLifestyle,
+        localLivingConditions,
         localLocations,
         localPriceRange,
-        localRoomTypes,
-        localLivingConditions,
-        localFacilities,
-        localLifestyle,
         localRequireAc,
-        localBathroomTypes,
         normalizeRange,
         onClose,
         setActiveFilters,
+        setBathroomCountFilters,
+        setBathroomTypeFilters,
+        setBedCountFilters,
+        setFacilityFilters,
         setHousingTypeDetails,
+        setLifestyleFilters,
+        setLivingConditionFilters,
         setLocationFilters,
         setPriceRange,
-        setRoomTypeFilters,
-        setLivingConditionFilters,
-        setFacilityFilters,
-        setLifestyleFilters,
         setRequireAc,
-        setBathroomTypeFilters
     ]);
 
     const handleClear = useCallback(() => {
         setLocalPriceRange(priceLimits);
         setLocalHousingType('ALL');
-        setLocalRoomTypes([]);
+        setLocalBedCounts([]);
+        setLocalBathroomCounts([]);
         setLocalAmenities([]);
         setLocalLocations([]);
         setLocalLivingConditions([]);
@@ -171,7 +246,8 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
 
         setPriceRange(priceLimits);
         setHousingTypeDetails('ALL');
-        setRoomTypeFilters([]);
+        setBedCountFilters([]);
+        setBathroomCountFilters([]);
         setActiveFilters([]);
         setLocationFilters([]);
         setAmenityFilters([]);
@@ -188,58 +264,19 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         priceLimits,
         setActiveFilters,
         setAmenityFilters,
+        setBathroomCountFilters,
+        setBathroomTypeFilters,
+        setBedCountFilters,
         setCommunityFilters,
+        setFacilityFilters,
         setHousingTypeDetails,
+        setLifestyleFilters,
+        setLivingConditionFilters,
         setLlcFilters,
         setLocationFilters,
         setPriceRange,
-        setRoomTypeFilters,
-        setLivingConditionFilters,
-        setFacilityFilters,
-        setLifestyleFilters,
         setRequireAc,
-        setBathroomTypeFilters
     ]);
-
-    const toggleStringArray = useCallback(
-        (values: string[], setValues: (next: string[]) => void, value: string) => {
-            if (values.includes(value)) {
-                setValues(values.filter((item) => item !== value));
-                return;
-            }
-            setValues([...values, value]);
-        },
-        []
-    );
-
-    const toggleRoomTypeArray = useCallback(
-        (values: RoomType[], setValues: (next: RoomType[]) => void, value: RoomType) => {
-            if (values.includes(value)) {
-                setValues(values.filter((item) => item !== value));
-                return;
-            }
-            setValues([...values, value]);
-        },
-        []
-    );
-
-    const toggleAmenity = useCallback((option: FilterOption) => {
-        setLocalAmenities((prev) =>
-            prev.includes(option) ? prev.filter((item) => item !== option) : [...prev, option]
-        );
-    }, []);
-
-    const toggleDormTag = useCallback((
-        tag: DormTag,
-        values: DormTag[],
-        setValues: (next: DormTag[]) => void
-    ) => {
-        if (values.includes(tag)) {
-            setValues(values.filter((item) => item !== tag));
-        } else {
-            setValues([...values, tag]);
-        }
-    }, []);
 
     const [showFooterShadow, setShowFooterShadow] = useState(true);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -254,15 +291,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         handleScroll();
         window.addEventListener('resize', handleScroll);
         return () => window.removeEventListener('resize', handleScroll);
-    }, [
-        handleScroll,
-        isOpen,
-        localPriceRange,
-        localHousingType,
-        localLocations,
-        localAmenities,
-        localRoomTypes
-    ]);
+    }, [handleScroll, isOpen, localAmenities, localBathroomCounts, localBathroomTypes, localBedCounts, localHousingType, localLocations, localPriceRange]);
 
     return (
         <Transition appear show={isOpen} as={Fragment}>
@@ -312,9 +341,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
                                         title={t.location}
                                         options={locations}
                                         selectedValues={localLocations}
-                                        onToggle={(value) =>
-                                            toggleStringArray(localLocations, setLocalLocations, value)
-                                        }
+                                        onToggle={(value) => toggleStringArray(localLocations, setLocalLocations, value)}
                                         accentColor="blue"
                                     />
 
@@ -338,57 +365,43 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
 
                                     <hr className="my-8 border-gray-100" />
 
-                                    {/* 卫浴类型 */}
-                                    <section className="mb-8">
-                                        <h3 className="text-xl font-bold mb-6">{t.bathroomType}</h3>
-                                        <div className="flex flex-wrap gap-3">
-                                            {([
-                                                { value: 'communal' as BathroomType, label: t.communalBath },
-                                                { value: 'semi-private' as BathroomType, label: t.semiPrivateBath },
-                                                { value: 'private' as BathroomType, label: t.privateBath },
-                                            ]).map(({ value, label }) => {
-                                                const selected = localBathroomTypes.includes(value);
-                                                return (
-                                                    <button
-                                                        key={value}
-                                                        type="button"
-                                                        onClick={() => setLocalBathroomTypes(prev =>
-                                                            prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]
-                                                        )}
-                                                        className={`px-4 py-2 rounded-full border text-sm font-medium transition-colors ${
-                                                            selected
-                                                                ? 'bg-illini-blue text-white border-illini-blue'
-                                                                : 'border-gray-300 text-gray-700 hover:border-illini-blue'
-                                                        }`}
-                                                    >
-                                                        {label}
-                                                    </button>
-                                                );
-                                            })}
-                                        </div>
-                                    </section>
+                                    <ToggleButtonSection
+                                        title={t.bedCount}
+                                        options={BED_COUNT_OPTIONS}
+                                        selectedValues={localBedCounts}
+                                        onToggle={(value) => toggleNumberArray(localBedCounts, setLocalBedCounts, value)}
+                                    />
 
                                     <hr className="my-8 border-gray-100" />
 
-                                    <RoomTypeSection
-                                        title={t.roomType}
-                                        language={language}
-                                        selectedValues={localRoomTypes}
+                                    <ToggleButtonSection
+                                        title={t.bathroomCount}
+                                        options={bathroomCountOptions}
+                                        selectedValues={localBathroomCounts}
+                                        onToggle={(value) => toggleNumberArray(localBathroomCounts, setLocalBathroomCounts, value)}
+                                    />
+
+                                    <hr className="my-8 border-gray-100" />
+
+                                    <ToggleButtonSection
+                                        title={t.bathroomType}
+                                        options={bathroomScopeOptions}
+                                        selectedValues={localBathroomTypes}
                                         onToggle={(value) =>
-                                            toggleRoomTypeArray(localRoomTypes, setLocalRoomTypes, value)
+                                            setLocalBathroomTypes((prev) =>
+                                                prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]
+                                            )
                                         }
                                     />
 
                                     <hr className="my-8 border-gray-100" />
 
-                                    {/* 居住条件 — AC toggle + noAc/newlyRenovated tags */}
                                     <section className="mb-8">
                                         <h3 className="text-xl font-bold mb-6">{t.livingConditions}</h3>
                                         <div className="flex flex-wrap gap-3">
-                                            {/* 有空调 */}
                                             <button
                                                 type="button"
-                                                onClick={() => setLocalRequireAc(prev => !prev)}
+                                                onClick={() => setLocalRequireAc((prev) => !prev)}
                                                 className={`px-4 py-2 rounded-full border text-sm font-medium transition-colors ${
                                                     localRequireAc
                                                         ? 'bg-illini-blue text-white border-illini-blue'
@@ -397,12 +410,11 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
                                             >
                                                 {t.airConditioning}
                                             </button>
-                                            {/* noAc, newlyRenovated only (olderBuilding excluded) */}
                                             {(['noAc', 'newlyRenovated'] as DormTag[]).map((tag) => {
                                                 const selected = localLivingConditions.includes(tag);
                                                 const label = tag === 'noAc'
                                                     ? (language === 'zh' ? '无空调' : 'No AC')
-                                                    : (language === 'zh' ? '设施全新' : 'Newly Renovated');
+                                                    : (language === 'zh' ? '新近翻修' : 'Newly Renovated');
                                                 return (
                                                     <button
                                                         key={tag}
@@ -443,8 +455,9 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
                                 </div>
 
                                 <div
-                                    className={`flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-white z-10 transition-shadow duration-300 ${showFooterShadow ? 'shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]' : ''
-                                        }`}
+                                    className={`flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-white z-10 transition-shadow duration-300 ${
+                                        showFooterShadow ? 'shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]' : ''
+                                    }`}
                                 >
                                     <button
                                         onClick={handleClear}

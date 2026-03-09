@@ -3,12 +3,13 @@
 import { supabase } from './supabase';
 import { Dorm } from '../types/housing';
 import { UIUC_DORMS } from '../constants/housing/dormData';
+import { normalizeDorm } from '../utils/roomOptions';
 
 const TABLE = 'dorms';
 
 /** Map a snake_case DB row to camelCase Dorm. */
 function rowToDorm(row: Record<string, unknown>): Dorm {
-    return {
+    return normalizeDorm({
         id: row.id as string,
         name: row.name as string,
         name_zh: (row.name_zh as string) ?? undefined,
@@ -30,6 +31,7 @@ function rowToDorm(row: Record<string, unknown>): Dorm {
         structuredTags: (row.structured_tags as Dorm['structuredTags']) ?? undefined,
         categorizedTags: (row.categorized_tags as Dorm['categorizedTags']) ?? { livingConditions: [], facilities: [], lifestyle: [] },
         roomTypes: (row.room_types as Dorm['roomTypes']) ?? [],
+        roomOptions: (row.room_options as Dorm['roomOptions']) ?? undefined,
         floorPlans: (row.floor_plans as Dorm['floorPlans']) ?? undefined,
         galleryImages: (row.gallery_images as string[]) ?? undefined,
         pros: (row.pros as string[]) ?? [],
@@ -37,7 +39,7 @@ function rowToDorm(row: Record<string, unknown>): Dorm {
         cons: (row.cons as string[]) ?? [],
         cons_zh: (row.cons_zh as string[]) ?? undefined,
         applicationFee: row.application_fee != null ? Number(row.application_fee) : undefined,
-    };
+    });
 }
 
 /** Fetch all dorms. Falls back to static data on failure. */
