@@ -60,9 +60,9 @@ export const PrimaryNav: React.FC<PrimaryNavProps> = ({
 }) => {
   return (
     <>
-        <div className="p-3 mb-2 flex items-center justify-between">
+      <div className="p-3 mb-2 flex items-center justify-between">
         <div className="flex items-center gap-2 px-2 py-2 rounded-md hover:bg-white/5 cursor-pointer w-full transition-colors">
-          <BrandMark className="h-9 w-9 rounded-lg" iconClassName="h-4.5 w-4.5" />
+          <BrandMark className="h-9 w-9 rounded-lg" iconClassName="h-3.5 w-3.5" />
           <SidebarLabel
             isOpen={isSidebarOpen}
             className="font-semibold text-sm tracking-tight text-white"
@@ -83,11 +83,10 @@ export const PrimaryNav: React.FC<PrimaryNavProps> = ({
           <button
             key={item.key}
             onClick={item.onClick}
-            className={`w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm transition-colors ${
-              activeTab === item.key
-                ? 'bg-[#212121] text-white'
-                : 'hover:bg-[#212121] text-slate-300'
-            }`}
+            className={`w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm transition-colors ${activeTab === item.key
+              ? 'bg-[#212121] text-white'
+              : 'hover:bg-[#212121] text-slate-300'
+              }`}
           >
             <span>{item.icon}</span>
             <SidebarLabel isOpen={isSidebarOpen}>
