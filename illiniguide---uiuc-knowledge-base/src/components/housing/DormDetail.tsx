@@ -79,7 +79,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
 
     return (
         <div className="h-full overflow-y-auto w-full no-scrollbar">
-            <div className="max-w-6xl mx-auto px-4 sm:px-5 py-8 pb-32 md:pt-14 md:px-6">
+            <div className={`max-w-6xl mx-auto px-4 sm:px-5 py-8 pb-32 md:pt-14 md:px-6 transition-[padding] duration-300 ${editOpen ? 'md:pr-[532px]' : ''}`}>
                 {/* Top bar: back + optional admin edit button */}
                 <div className="flex items-center justify-between mb-6">
                     <button

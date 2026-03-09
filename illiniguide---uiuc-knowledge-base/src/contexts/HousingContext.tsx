@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useMemo, useState, ReactNode, useCallback } from 'react';
-import { BathroomType, DormTag, FilterOption, RoomType } from '../types/housing';
+import { BathroomCountFilter, BathroomScope, BedCountFilter, DormTag, FilterOption } from '../types/housing';
 import { getPriceRangeFromData } from '../constants/housing/pricing';
 import { useDormData } from './DormDataContext';
 
@@ -14,8 +14,10 @@ interface HousingFiltersContextType {
     setPriceRange: React.Dispatch<React.SetStateAction<[number, number]>>;
     locationFilters: string[];
     setLocationFilters: React.Dispatch<React.SetStateAction<string[]>>;
-    roomTypeFilters: RoomType[];
-    setRoomTypeFilters: React.Dispatch<React.SetStateAction<RoomType[]>>;
+    bedCountFilters: BedCountFilter[];
+    setBedCountFilters: React.Dispatch<React.SetStateAction<BedCountFilter[]>>;
+    bathroomCountFilters: BathroomCountFilter[];
+    setBathroomCountFilters: React.Dispatch<React.SetStateAction<BathroomCountFilter[]>>;
     housingTypeDetails: 'ALL' | 'URH' | 'PCH';
     setHousingTypeDetails: (type: 'ALL' | 'URH' | 'PCH') => void;
     viewMode: 'list' | 'map';
@@ -41,8 +43,8 @@ interface HousingFiltersContextType {
     // Structured filters
     requireAc: boolean;
     setRequireAc: React.Dispatch<React.SetStateAction<boolean>>;
-    bathroomTypeFilters: BathroomType[];
-    setBathroomTypeFilters: React.Dispatch<React.SetStateAction<BathroomType[]>>;
+    bathroomTypeFilters: BathroomScope[];
+    setBathroomTypeFilters: React.Dispatch<React.SetStateAction<BathroomScope[]>>;
     clearAllFilters: () => void;
 }
 
@@ -67,7 +69,8 @@ export const HousingProvider: React.FC<{ children: ReactNode }> = ({ children })
     const [activeFilters, setActiveFilters] = useState<FilterOption[]>([]);
     const [priceRange, setPriceRange] = useState<[number, number]>(getPriceRangeFromData(dorms));
     const [locationFilters, setLocationFilters] = useState<string[]>([]);
-    const [roomTypeFilters, setRoomTypeFilters] = useState<RoomType[]>([]);
+    const [bedCountFilters, setBedCountFilters] = useState<BedCountFilter[]>([]);
+    const [bathroomCountFilters, setBathroomCountFilters] = useState<BathroomCountFilter[]>([]);
     const [housingTypeDetails, setHousingTypeDetails] = useState<'ALL' | 'URH' | 'PCH'>('ALL');
     const [viewMode, setViewMode] = useState<'list' | 'map'>('map');
     const [sortBy, setSortBy] = useState('name-asc');
@@ -85,14 +88,15 @@ export const HousingProvider: React.FC<{ children: ReactNode }> = ({ children })
     const [lifestyleFilters, setLifestyleFilters] = useState<DormTag[]>([]);
     // Structured filters
     const [requireAc, setRequireAc] = useState(false);
-    const [bathroomTypeFilters, setBathroomTypeFilters] = useState<BathroomType[]>([]);
+    const [bathroomTypeFilters, setBathroomTypeFilters] = useState<BathroomScope[]>([]);
 
     const clearAllFilters = useCallback(() => {
         setSearchTerm('');
         setActiveFilters([]);
         setPriceRange(getPriceRangeFromData(dorms));
         setLocationFilters([]);
-        setRoomTypeFilters([]);
+        setBedCountFilters([]);
+        setBathroomCountFilters([]);
         setHousingTypeDetails('ALL');
         setAmenityFilters([]);
         setCommunityFilters([]);
@@ -116,8 +120,10 @@ export const HousingProvider: React.FC<{ children: ReactNode }> = ({ children })
         setPriceRange,
         locationFilters,
         setLocationFilters,
-        roomTypeFilters,
-        setRoomTypeFilters,
+        bedCountFilters,
+        setBedCountFilters,
+        bathroomCountFilters,
+        setBathroomCountFilters,
         housingTypeDetails,
         setHousingTypeDetails,
         viewMode,
@@ -149,7 +155,8 @@ export const HousingProvider: React.FC<{ children: ReactNode }> = ({ children })
         activeFilters,
         priceRange,
         locationFilters,
-        roomTypeFilters,
+        bedCountFilters,
+        bathroomCountFilters,
         housingTypeDetails,
         viewMode,
         sortBy,

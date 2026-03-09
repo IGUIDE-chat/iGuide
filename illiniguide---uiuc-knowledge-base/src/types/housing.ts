@@ -50,8 +50,11 @@ export interface DormCategorizedTags {
     llcNames?: string[];  // specific LLC names when 'llc' tag is present
 }
 
-export type BathroomType = 'communal' | 'semi-private' | 'private';
+export type BathroomScope = 'communal' | 'semi-private' | 'private';
+export type BathroomType = BathroomScope;
 export type DiningType = 'inside' | 'nearby' | 'none';
+export type BedCountFilter = 1 | 2 | 3 | 4;
+export type BathroomCountFilter = 0 | 1 | 2;
 
 export interface Dorm {
     id: string;
@@ -72,6 +75,7 @@ export interface Dorm {
     applicationFee?: number; // One-time application fee in USD
     priceRange: '$' | '$$' | '$$$' | '$$$$'; // Keep for backwards compatibility
     roomTypes: RoomType[];
+    roomOptions?: RoomOption[]; // Canonical room/bath combinations derived from floor plans
     floorPlans?: FloorPlan[]; // Detailed floor plans with specific prices and images
     galleryImages?: string[]; // Array of gallery image URLs
     housingType: 'URH' | 'PCH';
@@ -88,6 +92,7 @@ export interface Dorm {
 
 export type RoomType =
     | 'Studio'
+    | '1B0B'
     | '1B1B'
     | '2B0B'
     | '2B1B'
@@ -105,9 +110,20 @@ export type RoomType =
     | 'Suite'
     | 'Cluster';
 
+export interface RoomOption {
+    bedCount: number | null;
+    bathroomCount: number | null;
+    bathroomScope: BathroomScope;
+    labelCode?: string;
+}
+
 // Floor plan with specific pricing and layout image
 export interface FloorPlan {
-    type: RoomType;           // Room type (e.g., "1B1B", "2B1B")
+    type?: RoomType;          // Legacy room type code kept for compatibility
+    bedCount?: number | null;
+    bathroomCount?: number | null;
+    bathroomScope?: BathroomScope;
+    labelCode?: string;
     price: number;            // Annual price for this specific floor plan
     sqft?: number;            // Square footage (optional)
     imageUrl?: string;        // Floor plan layout image URL

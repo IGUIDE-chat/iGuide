@@ -2,6 +2,7 @@ import React from 'react';
 import { DollarSign, Utensils, MapPin, Wind, Bath } from 'lucide-react';
 import { Dorm } from '../../../../types/housing';
 import { Language } from '../../../../types';
+import { getDormBathroomSummary } from '../../../../utils/roomOptions';
 
 interface DormQuickStatsSectionProps {
     dorm: Dorm;
@@ -14,14 +15,9 @@ interface DormQuickStatsSectionProps {
     formatPrice: (price: number) => string;
 }
 
-const DINING_LABELS: Record<string, Record<Dorm['dining'], string>> = {
+const DINING_LABELS: Record<Language, Record<Dorm['dining'], string>> = {
     en: { inside: 'On-site', nearby: 'Nearby', none: 'None' },
     zh: { inside: '楼内', nearby: '附近', none: '无' },
-};
-
-const BATHROOM_LABELS: Record<string, Record<Dorm['bathroomType'], string>> = {
-    en: { communal: 'Communal', 'semi-private': 'Semi-Private', private: 'Private' },
-    zh: { communal: '公共卫浴', 'semi-private': '半独立卫浴', private: '独立卫浴' },
 };
 
 const DormQuickStatsSection: React.FC<DormQuickStatsSectionProps> = ({
@@ -30,17 +26,15 @@ const DormQuickStatsSection: React.FC<DormQuickStatsSectionProps> = ({
     quickStatsLabel,
     diningHallLabel,
     annualPriceLabel,
-    formatPrice
+    formatPrice,
 }) => {
     const diningText = DINING_LABELS[language]?.[dorm.dining] ?? DINING_LABELS.en[dorm.dining];
-    const bathroomText = BATHROOM_LABELS[language]?.[dorm.bathroomType] ?? BATHROOM_LABELS.en[dorm.bathroomType];
+    const bathroomText = getDormBathroomSummary(dorm, language);
     const locationLabel = language === 'zh' && dorm.location_zh ? dorm.location_zh : dorm.location;
 
     return (
         <div>
-            <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">
-                {quickStatsLabel}
-            </h3>
+            <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">{quickStatsLabel}</h3>
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center text-gray-700">
@@ -49,6 +43,7 @@ const DormQuickStatsSection: React.FC<DormQuickStatsSectionProps> = ({
                     </div>
                     <span className="font-medium text-gray-900">{locationLabel}</span>
                 </div>
+
                 <div className="flex items-center justify-between">
                     <div className="flex items-center text-gray-700">
                         <Wind size={18} className="mr-3 text-illini-blue" />
@@ -58,6 +53,7 @@ const DormQuickStatsSection: React.FC<DormQuickStatsSectionProps> = ({
                         {dorm.ac ? (language === 'zh' ? '有' : 'Yes') : (language === 'zh' ? '无' : 'No')}
                     </span>
                 </div>
+
                 <div className="flex items-center justify-between">
                     <div className="flex items-center text-gray-700">
                         <Bath size={18} className="mr-3 text-illini-blue" />
@@ -65,6 +61,7 @@ const DormQuickStatsSection: React.FC<DormQuickStatsSectionProps> = ({
                     </div>
                     <span className="font-medium text-gray-900">{bathroomText}</span>
                 </div>
+
                 <div className="flex items-center justify-between">
                     <div className="flex items-center text-gray-700">
                         <Utensils size={18} className="mr-3 text-illini-blue" />
@@ -74,6 +71,7 @@ const DormQuickStatsSection: React.FC<DormQuickStatsSectionProps> = ({
                         {diningText}
                     </span>
                 </div>
+
                 <div className="flex items-center justify-between">
                     <div className="flex items-center text-gray-700">
                         <DollarSign size={18} className="mr-3 text-illini-blue" />

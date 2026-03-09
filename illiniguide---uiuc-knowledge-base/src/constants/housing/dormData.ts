@@ -1,4 +1,5 @@
 ﻿import { Dorm, DormCategorizedTags } from '../../types/housing';
+import { normalizeDorm } from '../../utils/roomOptions';
 
 // Accurate UIUC dorm coordinates based on campus geography
 // Campus reference: Main Quad (40.1074, -88.2317), Engineering Quad (40.1130, -88.2280)
@@ -8,7 +9,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         id: 'isr',
         name: 'Illinois Street Residence (ISR)',
         name_zh: '',
-        location: 'Main Quad',
+        location: 'Main Quad',
+
         housingType: 'URH',
         ac: true,
         dining: 'inside',
@@ -39,7 +41,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
             livingConditions: ['newlyRenovated'],
             facilities: ['gym', 'studyLounge', 'laundry', 'busStop'],
             lifestyle: ['llc'],
-            llcNames: ['Engineering LLC', 'Innovation LLC']
+            llcNames: ['Innovation LLC', 'Sustainability LLC', 'Honors LLC']
         },
         description: 'Located conveniently close to engineering quad, ISR features a newly renovated dining center and modern rooms. It is a hub for STEM majors.',
         description_zh: '',
@@ -65,7 +67,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         id: 'nugent',
         name: 'Nugent Hall',
         name_zh: '',
-        location: 'Ikenberry',
+        location: 'Ikenberry',
+
         housingType: 'URH',
         ac: true,
         dining: 'inside',
@@ -96,7 +99,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
             livingConditions: ['newlyRenovated'],
             facilities: ['gym', 'laundry'],
             lifestyle: ['socialParty', 'llc'],
-            llcNames: ['LEADS LLC']
+            llcNames: ['Business LLC', 'Beckwith Residential Community']
         },
         description: 'One of the newest halls on campus offering premium amenities. Located near to ARC gym and Memorial Stadium. Known for being very social.',
         description_zh: '',
@@ -120,7 +123,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         id: 'wassaja',
         name: 'Wassaja Hall',
         name_zh: '',
-        location: 'Ikenberry',
+        location: 'Ikenberry',
+
         housingType: 'URH',
         ac: true,
         dining: 'inside',
@@ -167,14 +171,15 @@ const RAW_UIUC_DORMS: Dorm[] = [
             { type: '2B1B', price: 15200, sqft: 220, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/WASSAJA-2B1B.png', description: 'Double room with semi-private bathroom', available: true },
             { type: '4B2B', price: 14800, sqft: 450, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/WASSAJA-4B2B.png', description: 'Quad suite with 2 bathrooms', available: true }
         ],
-        lat: 40.103508532497905, 
+        lat: 40.103508532497905,
         lng: -88.23783939855508
     },
     {
         id: 'bousefield',
         name: 'Bousefield Hall',
         name_zh: '',
-        location: 'Ikenberry',
+        location: 'Ikenberry',
+
         housingType: 'URH',
         ac: true,
         dining: 'inside',
@@ -205,7 +210,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
             livingConditions: ['newlyRenovated'],
             facilities: ['gym', 'laundry'],
             lifestyle: ['llc'],
-            llcNames: ['Focus LLC']
+            llcNames: ['Transfer Community']
         },
         description: 'A modern hall in Ikenberry North featuring the Focus Interdisciplinary Sciences Living-Learning Community.',
         description_zh: '',
@@ -229,7 +234,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         id: 'par',
         name: 'Pennsylvania Avenue Residence (PAR)',
         name_zh: '',
-        location: 'PAR/FAR',
+        location: 'PAR/FAR',
+
         housingType: 'URH',
         ac: true,
         dining: 'inside',
@@ -259,7 +265,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         categorizedTags: {
             livingConditions: ['newlyRenovated'],
             facilities: ['gym', 'studyLounge', 'laundry', 'convenienceStore'],
-            lifestyle: ['socialParty']
+            lifestyle: ['socialParty', 'llc'],
+            llcNames: ['Intersections LLC', 'Global Crossroads LLC']
         },
         description: 'PAR is known for its diversity and famous late-night dining options. It features "Babcock" and "Carr" halls. A bit further south but well connected by bus.',
         description_zh: '',
@@ -283,7 +290,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         id: 'far',
         name: 'Florida Avenue Residence (FAR)',
         name_zh: '',
-        location: 'PAR/FAR',
+        location: 'PAR/FAR',
+
         housingType: 'URH',
         ac: true,
         dining: 'inside',
@@ -313,7 +321,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         categorizedTags: {
             livingConditions: [],
             facilities: ['studyLounge', 'laundry', 'kitchen'],
-            lifestyle: ['quiet', 'internationalFriendly']
+            lifestyle: ['quiet', 'internationalFriendly', 'llc'],
+            llcNames: ['WIMSE LLC', 'Health Professions LLC']
         },
         description: 'Located across from PAR, FAR offers air-conditioned rooms and Oglesby/Trelease halls. Known for a slightly quieter atmosphere than Ike.',
         description_zh: '',
@@ -337,12 +346,13 @@ const RAW_UIUC_DORMS: Dorm[] = [
         id: 'allen',
         name: 'Allen Hall',
         name_zh: '',
-        location: 'Main Quad',
+        location: 'Main Quad',
+
         housingType: 'URH',
         ac: false,
         dining: 'inside',
         bathroomType: 'communal',
-        tags: ['Artsy', 'Unit One', 'Music', 'Near Main Quad', 'No AC', 'Laundry', 'Kitchen', 'Quiet Floors'],
+        tags: ['Artsy', 'Unit One LLC', 'Music', 'Near Main Quad', 'No AC', 'Laundry', 'Kitchen', 'Quiet Floors'],
         structuredTags: {
             elevator: false,
             laundry: true,
@@ -355,7 +365,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
             quietFloors: true,
             substanceFree: false,
             petFriendly: false,
-            llc: ['Unit One'],
+            llc: ['Unit One LLC'],
             // Proximity
             nearMainQuad: true,
             nearEngineering: false,
@@ -368,7 +378,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
             livingConditions: ['noAc', 'olderBuilding'],
             facilities: ['musicRooms', 'studyLounge', 'laundry', 'kitchen'],
             lifestyle: ['artsyCreative', 'internationalFriendly', 'llc', 'quiet'],
-            llcNames: ['Unit One']
+            llcNames: ['Unit One LLC']
         },
         description: 'Home to the Unit One LLC, Allen is a hub for creative students. It features music practice rooms, a recording studio, and guest-in-residence programs.',
         description_zh: '',
@@ -392,7 +402,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         id: 'busey-evans',
         name: 'Busey-Evans',
         name_zh: '',
-        location: 'Main Quad',
+        location: 'Main Quad',
+
         housingType: 'URH',
         ac: false,
         dining: 'nearby',
@@ -447,7 +458,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         id: 'snyder',
         name: 'Snyder Hall',
         name_zh: '',
-        location: 'Ikenberry',
+        location: 'Ikenberry',
+
         housingType: 'URH',
         ac: true,
         dining: 'inside',
@@ -502,7 +514,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         id: 'hopkins',
         name: 'Hopkins Hall',
         name_zh: '',
-        location: 'Ikenberry',
+        location: 'Ikenberry',
+
         housingType: 'URH',
         ac: true,
         dining: 'inside',
@@ -556,7 +569,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         id: 'weston',
         name: 'Weston Hall',
         name_zh: '',
-        location: 'Ikenberry',
+        location: 'Ikenberry',
+
         housingType: 'URH',
         ac: true,
         dining: 'inside',
@@ -587,7 +601,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
             livingConditions: ['newlyRenovated'],
             facilities: ['gym', 'laundry'],
             lifestyle: ['socialParty', 'llc'],
-            llcNames: ['Sustainability LLC']
+            llcNames: ['Exploration LLC', 'LEADS LLC']
         },
         description: 'Located in Ikenberry North, Weston houses the Exploration LLC. It is extremely popular among freshmen and known for being very social.',
         description_zh: '',
@@ -611,7 +625,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         id: 'scott',
         name: 'Scott Hall',
         name_zh: '',
-        location: 'Ikenberry',
+        location: 'Ikenberry',
+
         housingType: 'URH',
         ac: true,
         dining: 'inside',
@@ -659,7 +674,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         id: 'taft',
         name: 'Taft Hall',
         name_zh: '',
-        location: 'Ikenberry',
+        location: 'Ikenberry',
+
         housingType: 'URH',
         ac: true,
         dining: 'inside',
@@ -690,7 +706,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
             livingConditions: ['newlyRenovated'],
             facilities: ['gym', 'laundry'],
             lifestyle: ['socialParty', 'llc'],
-            llcNames: ['Scholars LLC']
+            llcNames: ['Scholars Community']
         },
         description: 'A smaller historic hall in Ikenberry South connected to Van Doren. Known for tight-knit community and unique room layouts.',
         description_zh: '',
@@ -707,14 +723,15 @@ const RAW_UIUC_DORMS: Dorm[] = [
             { type: '2B1B', price: 6200, sqft: 150, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/TAPT-2B1B.png', description: 'Double room with community bathroom', available: true },
             { type: '3B1B', price: 5900, sqft: 200, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/TAPT-3B1B.png', description: 'Triple room with community bathroom', available: true }
         ],
-        lat: 40.10197529283074, 
+        lat: 40.10197529283074,
         lng: -88.23368088266433
     },
     {
         id: 'van-doren',
         name: 'Van Doren Hall',
         name_zh: '',
-        location: 'Ikenberry',
+        location: 'Ikenberry',
+
         housingType: 'URH',
         ac: true,
         dining: 'inside',
@@ -744,8 +761,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         categorizedTags: {
             livingConditions: ['newlyRenovated'],
             facilities: ['gym', 'laundry'],
-            lifestyle: ['socialParty', 'llc'],
-            llcNames: ['Wohlers LLC']
+            lifestyle: ['socialParty']
         },
         description: 'A smaller historic hall in Ikenberry South connected to Taft. Features diverse room shapes and a close community feel.',
         description_zh: '',
@@ -762,14 +778,15 @@ const RAW_UIUC_DORMS: Dorm[] = [
             { type: '2B1B', price: 6200, sqft: 150, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/VANDOREN-2B1B.png', description: 'Double room with community bathroom', available: true },
             { type: '3B1B', price: 5900, sqft: 200, imageUrl: 'https://housing.illinois.edu/Images/FloorPlans/VANDOREN-3B1B.png', description: 'Triple room with community bathroom', available: true }
         ],
-        lat: 40.101684942573044, 
+        lat: 40.101684942573044,
         lng: -88.23406047469018
     },
     {
         id: 'daniels',
         name: 'Daniels Hall',
         name_zh: '',
-        location: 'Main Quad',
+        location: 'Main Quad',
+
         housingType: 'URH',
         ac: false,
         dining: 'nearby',
@@ -824,7 +841,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         id: 'sherman',
         name: 'Sherman Hall',
         name_zh: '',
-        location: 'Campustown',
+        location: 'Campustown',
+
         housingType: 'URH',
         ac: true,
         dining: 'inside',
@@ -879,7 +897,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         id: 'lar',
         name: 'Lincoln Avenue Residence (LAR)',
         name_zh: '',
-        location: 'South Campus',
+        location: 'South Campus',
+
         housingType: 'URH',
         ac: false,
         dining: 'inside',
@@ -909,7 +928,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         categorizedTags: {
             livingConditions: ['noAc', 'olderBuilding'],
             facilities: ['studyLounge', 'laundry', 'kitchen'],
-            lifestyle: ['quiet', 'internationalFriendly']
+            lifestyle: ['quiet', 'internationalFriendly', 'llc'],
+            llcNames: ['Scholars Community']
         },
         description: 'Home to the Scholars (Leonard) and Sustainability (Shelden) communities. A quieter hall connected to Allen Hall, sharing dining facilities.',
         description_zh: '',
@@ -933,7 +953,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         id: 'bromley',
         name: 'Bromley Hall',
         name_zh: '',
-        location: 'Campustown',
+        location: 'Campustown',
+
         housingType: 'PCH',
         ac: true,
         dining: 'nearby',
@@ -987,7 +1008,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         id: 'illini-tower',
         name: 'Illini Tower',
         name_zh: '',
-        location: 'Campustown',
+        location: 'Campustown',
+
         housingType: 'PCH',
         ac: true,
         dining: 'inside',
@@ -1042,7 +1064,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         id: 'newman',
         name: 'Newman Hall',
         name_zh: '',
-        location: 'Campustown',
+        location: 'Campustown',
+
         housingType: 'PCH',
         ac: true,
         dining: 'inside',
@@ -1097,7 +1120,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         id: 'hendrick',
         name: 'Hendrick House',
         name_zh: '',
-        location: 'South Campus',
+        location: 'South Campus',
+
         housingType: 'PCH',
         ac: true,
         dining: 'nearby',
@@ -1152,7 +1176,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         id: 'presby',
         name: 'Presby Hall',
         name_zh: '',
-        location: 'Ikenberry',
+        location: 'Ikenberry',
+
         housingType: 'URH',
         ac: true,
         dining: 'nearby',
@@ -1207,7 +1232,8 @@ const RAW_UIUC_DORMS: Dorm[] = [
         id: 'armory',
         name: 'Armory Hall',
         name_zh: '',
-        location: 'Ikenberry',
+        location: 'Ikenberry',
+
         housingType: 'URH',
         ac: true,
         dining: 'nearby',
@@ -1340,7 +1366,7 @@ const enrichDormZhContent = (dorm: Dorm): Dorm => {
     };
 };
 
-export const UIUC_DORMS: Dorm[] = RAW_UIUC_DORMS.map(enrichDormZhContent);
+export const UIUC_DORMS: Dorm[] = RAW_UIUC_DORMS.map(enrichDormZhContent).map(normalizeDorm);
 
 // Export dorm IDs for individual routes
 export const DORM_IDS = UIUC_DORMS.map((dorm) => dorm.id);
