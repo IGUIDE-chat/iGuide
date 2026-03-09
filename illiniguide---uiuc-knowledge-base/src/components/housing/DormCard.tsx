@@ -238,22 +238,22 @@ const DormCard: React.FC<DormCardProps> = ({
                     <span className="line-clamp-1">{locationLabel}</span>
                 </div>
 
-                <div className="mb-3 grid grid-cols-2 gap-x-4 gap-y-2 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-2.5 text-[13px] text-slate-700">
+                <div className="mb-3 grid grid-cols-[minmax(0,1.3fr)_minmax(0,0.9fr)] gap-x-6 gap-y-2 text-[13px] text-slate-700">
                     <div className="inline-flex min-w-0 items-center gap-1.5">
                         <BedSingle size={14} className="shrink-0 text-slate-400" />
-                        <span className="line-clamp-1">{roomRangeSummary.occupancyLabel}</span>
+                        <span className="line-clamp-2 leading-5">{roomRangeSummary.occupancyLabel}</span>
                     </div>
                     <div className="inline-flex min-w-0 items-center gap-1.5">
                         <Bath size={14} className="shrink-0 text-slate-400" />
-                        <span className="line-clamp-1">{roomRangeSummary.bathroomLabel}</span>
+                        <span className="line-clamp-2 leading-5">{roomRangeSummary.bathroomLabel}</span>
                     </div>
                     <div className="inline-flex min-w-0 items-center gap-1.5">
                         <Wind size={14} className="shrink-0 text-slate-400" />
-                        <span className="line-clamp-1">{dorm.ac ? t.ac : t.noAc}</span>
+                        <span className="line-clamp-1 leading-5">{dorm.ac ? t.ac : t.noAc}</span>
                     </div>
                     <div className="inline-flex min-w-0 items-center gap-1.5">
                         <Utensils size={14} className="shrink-0 text-slate-400" />
-                        <span className="line-clamp-1">{getDiningLabel(dorm, language)}</span>
+                        <span className="line-clamp-1 leading-5">{getDiningLabel(dorm, language)}</span>
                     </div>
                 </div>
 
