@@ -32,17 +32,23 @@ const DormTagDetailSection: React.FC<DormTagDetailSectionProps> = ({ categorized
                             </h4>
                             <div className="flex flex-wrap gap-2">
                                 {tags.map(tag => {
-                                    let label = getTagDisplay(tag, language);
-                                    // Append LLC names if it's the 'llc' tag
+                                    // For 'llc' tag, show each LLC name as a separate badge
                                     if (tag === 'llc' && categorizedTags.llcNames?.length) {
-                                        label += ` (${categorizedTags.llcNames.join(', ')})`;
+                                        return categorizedTags.llcNames.map(llcName => (
+                                            <span
+                                                key={llcName}
+                                                className="px-3 py-1.5 bg-illini-blue/5 text-illini-blue rounded-lg text-sm font-medium border border-illini-blue/10"
+                                            >
+                                                {llcName}
+                                            </span>
+                                        ));
                                     }
                                     return (
                                         <span
                                             key={tag}
                                             className="px-3 py-1.5 bg-illini-blue/5 text-illini-blue rounded-lg text-sm font-medium border border-illini-blue/10"
                                         >
-                                            {label}
+                                            {getTagDisplay(tag, language)}
                                         </span>
                                     );
                                 })}

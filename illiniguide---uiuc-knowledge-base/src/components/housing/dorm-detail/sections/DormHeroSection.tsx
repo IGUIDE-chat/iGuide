@@ -30,14 +30,27 @@ const DormHeroSection: React.FC<DormHeroSectionProps> = ({ dorm, dormName, campu
                     </div>
                     <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-2 antialiased tracking-tight leading-tight">{dormName}</h1>
                     <div className="flex flex-wrap gap-1.5 md:gap-2">
-                        {heroTags.map((tag) => (
-                            <span
-                                key={tag}
-                                className="px-2 py-0.5 md:px-3 md:py-1 bg-white/20 rounded-full text-xs md:text-sm font-medium border border-white/30"
-                            >
-                                {getTagDisplay(tag, language)}
-                            </span>
-                        ))}
+                        {heroTags.flatMap((tag) => {
+                            // For 'llc' tag, show each LLC name individually
+                            if (tag === 'llc' && dorm.categorizedTags?.llcNames?.length) {
+                                return dorm.categorizedTags.llcNames.map(llcName => (
+                                    <span
+                                        key={llcName}
+                                        className="px-2 py-0.5 md:px-3 md:py-1 bg-white/20 rounded-full text-xs md:text-sm font-medium border border-white/30"
+                                    >
+                                        {llcName}
+                                    </span>
+                                ));
+                            }
+                            return (
+                                <span
+                                    key={tag}
+                                    className="px-2 py-0.5 md:px-3 md:py-1 bg-white/20 rounded-full text-xs md:text-sm font-medium border border-white/30"
+                                >
+                                    {getTagDisplay(tag, language)}
+                                </span>
+                            );
+                        })}
                     </div>
                 </div>
             </div>
