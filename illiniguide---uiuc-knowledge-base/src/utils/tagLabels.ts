@@ -108,7 +108,11 @@ export interface CardTagItem {
 
 function getCardTagDisplay(tag: DormTag, categorizedTags: DormCategorizedTags, language: Language): string {
     if (tag === 'llc' && categorizedTags.llcNames?.length) {
-        return categorizedTags.llcNames[0];
+        const llcName = categorizedTags.llcNames[0];
+        if (language === 'en') {
+            return llcName.replace(/\s+(LLC|Community)$/i, '');
+        }
+        return llcName;
     }
 
     return getTagDisplay(tag, language);
@@ -171,9 +175,12 @@ export function getCardTagItems(
         });
     }
 
+    const hasOverflow = items.length > maxCount;
+    const visibleCount = hasOverflow ? Math.max(maxCount - 1, 0) : maxCount;
+
     return {
-        items: items.slice(0, maxCount),
-        overflowCount: Math.max(items.length - maxCount, 0),
+        items: items.slice(0, visibleCount),
+        overflowCount: Math.max(items.length - visibleCount, 0),
     };
 }
 
