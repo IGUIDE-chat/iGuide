@@ -1,8 +1,7 @@
 import React from 'react';
 import { DormCategorizedTags, TagCategory } from '../../../../types/housing';
 import { Language } from '../../../../types';
-import { getTagDisplay } from '../../../../utils/tagLabels';
-import { CATEGORY_LABELS } from '../../../../constants/housing/tagDefinitions';
+import { CATEGORY_LABELS, getTagDisplay } from '../../../../constants/housing/metadata';
 
 interface DormTagDetailSectionProps {
     categorizedTags?: DormCategorizedTags;

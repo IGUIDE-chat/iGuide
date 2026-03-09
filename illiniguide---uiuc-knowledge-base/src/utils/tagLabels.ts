@@ -2,7 +2,7 @@
 // [工具] 标签国际化和 Hero 标签选择工具。
 import { Language } from '../types';
 import { DormCategorizedTags, DormTag } from '../types/housing';
-import { TAG_REGISTRY, TagDefinition } from '../constants/housing/tagDefinitions';
+import { getTagDisplay, TAG_REGISTRY } from '../constants/housing/metadata';
 
 // ── Legacy tag map (kept for backward compat during migration) ──────────────
 
@@ -77,13 +77,6 @@ export function getTagLabel(tag: string, language: Language): string {
 }
 
 // ── New categorized tag utilities ───────────────────────────────────────────
-
-/** Get the display label for a DormTag in the given language. */
-export function getTagDisplay(tag: DormTag, language: Language): string {
-    const def: TagDefinition | undefined = TAG_REGISTRY[tag];
-    if (!def) return tag;
-    return language === 'zh' ? def.zh : def.en;
-}
 
 /** Collect all tags from categorized tags, sorted by priority (ascending = more important first). */
 export function getAllTagsSorted(categorizedTags: DormCategorizedTags): DormTag[] {
