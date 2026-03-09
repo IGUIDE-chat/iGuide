@@ -39,8 +39,8 @@ export const HISTOGRAM_DATA = [4, 8, 12, 25, 35, 42, 45, 30, 20, 15, 10, 5, 2, 1
 export const DISPLAY_AMENITIES = [
     { id: FilterOption.AC, label: { en: 'Air Conditioning', zh: '空调' }, icon: Snowflake },
     { id: FilterOption.DINING_IN_BUILDING, label: { en: 'Dining Hall', zh: '食堂' }, icon: Utensils },
-    { id: FilterOption.NEAR_ENGINEERING, label: { en: 'Near Engineering', zh: '靠近工学院' }, icon: GraduationCap },
-    { id: FilterOption.NEAR_MAIN_QUAD, label: { en: 'Near Main Quad', zh: '靠近主广场' }, icon: MapPin }
+    { id: FilterOption.NEAR_ENGINEERING, label: { en: 'Near Engineering', zh: '靠近工程学院' }, icon: GraduationCap },
+    { id: FilterOption.NEAR_MAIN_QUAD, label: { en: 'Near Main Quad', zh: '靠近主广场' }, icon: MapPin },
 ] as const;
 
 export const MODAL_TEXT: Record<FilterLanguage, ModalText> = {
@@ -71,24 +71,24 @@ export const MODAL_TEXT: Record<FilterLanguage, ModalText> = {
         privateBath: 'Private',
         zeroBathrooms: '0',
         onePlusBathrooms: '1+',
-        twoPlusBathrooms: '2+'
+        twoPlusBathrooms: '2+',
     },
     zh: {
         filters: '筛选',
         priceRange: '价格范围',
         typeOfPlace: '住宿类型',
         amenities: '设施',
-        bedCount: '床位数',
+        bedCount: '床位数量',
         bathroomCount: '卫浴数量',
         clearAll: '清空全部',
-        showPlaces: '显示房源',
+        showPlaces: '显示结果',
         minPrice: '最低价格',
         maxPrice: '最高价格',
         urh: '校内宿舍',
         pch: '认证校外宿舍',
-        avgPrice: '平均年租金约为 $11,500。',
+        avgPrice: '平均年费用约为 $11,500。',
         urhDesc: '学校官方宿舍',
-        pchDesc: '经认证的校外住宿',
+        pchDesc: '经过认证的校外住宿',
         location: '位置',
         livingConditions: '居住条件',
         facilities: '配套设施',
@@ -100,6 +100,6 @@ export const MODAL_TEXT: Record<FilterLanguage, ModalText> = {
         privateBath: '独立卫浴',
         zeroBathrooms: '0',
         onePlusBathrooms: '1+',
-        twoPlusBathrooms: '2+'
-    }
+        twoPlusBathrooms: '2+',
+    },
 };

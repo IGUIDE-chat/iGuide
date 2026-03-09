@@ -22,19 +22,21 @@ const TEXT = {
         sqftLabel: 'sq ft',
         unavailable: 'Floor plan unavailable',
         priceRange: 'Price Range',
+        monthly: '/month',
     },
     zh: {
-        title: '房型图与价格',
-        subtitle: '可选房型配置及年费',
+        title: '户型图与价格',
+        subtitle: '可选房型配置与年费用',
         price: '价格',
         sqft: '面积',
         available: '可预订',
         notAvailable: '有限',
         perYear: '/年',
         sqftLabel: '平方英尺',
-        unavailable: '暂无法显示房型图',
+        unavailable: '暂无可显示的户型图',
         priceRange: '价格范围',
-    }
+        monthly: '/月',
+    },
 };
 
 function normalizeComparableText(value: string) {
@@ -44,45 +46,44 @@ function normalizeComparableText(value: string) {
         .replace(/communal bath/g, 'communal bathroom')
         .replace(/semi-private bath/g, 'semi-private bathroom')
         .replace(/private bath/g, 'private bathroom')
+        .replace(/single room/g, 'single')
+        .replace(/double room/g, 'double')
+        .replace(/triple room/g, 'triple')
+        .replace(/quad room/g, 'quad')
         .replace(/[/.·,-]/g, ' ')
         .replace(/\s+/g, ' ')
         .trim();
 }
 
 function buildPlanNarrative(
-    plan: Pick<RoomOption, 'bedCount' | 'bathroomCount' | 'bathroomScope' | 'labelCode'>,
+    option: Pick<RoomOption, 'bedCount' | 'bathroomCount' | 'bathroomScope' | 'labelCode'>,
     language: 'en' | 'zh'
 ) {
-    const displayLabel = getRoomDisplayLabel(plan, language);
-    if (plan.labelCode === 'Studio' || plan.labelCode === 'Suite' || plan.labelCode === 'Cluster') {
-        return displayLabel;
+    if (option.labelCode === 'Studio' || option.labelCode === 'Suite' || option.labelCode === 'Cluster') {
+        return getRoomDisplayLabel(option, language);
     }
+
+    const roomLabel = language === 'zh'
+        ? getRoomDisplayLabel(option, language)
+        : `${getRoomDisplayLabel({ ...option, bathroomCount: null, bathroomScope: 'private' }, 'en').split(' / ')[0]} room`;
+
     if (language === 'zh') {
-        if (plan.bathroomScope === 'communal') {
-            return `${displayLabel}`;
+        if (option.bathroomScope === 'communal') {
+            return `${roomLabel}，公共卫浴`;
         }
-        if (plan.bathroomCount != null) {
-            return `${displayLabel}`;
+        if (option.bathroomCount != null) {
+            return `${roomLabel}，${option.bathroomCount}卫`;
         }
-        return `${displayLabel}`;
+        return `${roomLabel}，${option.bathroomScope === 'semi-private' ? '半独立卫浴' : '独立卫浴'}`;
     }
 
-    const bedLabel = getRoomDisplayLabel(
-        {
-            bedCount: plan.bedCount ?? null,
-            bathroomCount: null,
-            bathroomScope: 'private',
-        },
-        'en'
-    ).split(' / ')[0];
-
-    if (plan.bathroomScope === 'communal') {
-        return `${bedLabel} room with communal bathroom`;
+    if (option.bathroomScope === 'communal') {
+        return `${roomLabel} with communal bathroom`;
     }
-    if (plan.bathroomCount != null) {
-        return `${bedLabel} room with ${plan.bathroomCount} bathroom${plan.bathroomCount > 1 ? 's' : ''}`;
+    if (option.bathroomCount != null) {
+        return `${roomLabel} with ${option.bathroomCount} bathroom${option.bathroomCount === 1 ? '' : 's'}`;
     }
-    return `${bedLabel} room with ${plan.bathroomScope} bathroom`;
+    return `${roomLabel} with ${option.bathroomScope} bathroom`;
 }
 
 const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, language = 'en' }) => {
@@ -90,7 +91,7 @@ const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, languag
     const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
     const t = TEXT[language];
 
-    if (!floorPlans || floorPlans.length === 0) {
+    if (!floorPlans?.length) {
         return null;
     }
 
@@ -106,48 +107,27 @@ const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, languag
 
             <div className="space-y-3">
                 {sortedPlans.map((plan) => {
-                    const roomLabel = getRoomDisplayLabel({
+                    const option: RoomOption = {
                         bedCount: plan.bedCount ?? null,
                         bathroomCount: plan.bathroomCount ?? null,
                         bathroomScope: plan.bathroomScope ?? 'communal',
                         labelCode: plan.labelCode,
-                    }, language);
-                    const roomDetail = getRoomDetailLabel({
-                        bedCount: plan.bedCount ?? null,
-                        bathroomCount: plan.bathroomCount ?? null,
-                        bathroomScope: plan.bathroomScope ?? 'communal',
-                        labelCode: plan.labelCode,
-                    }, language);
+                    };
+                    const roomLabel = getRoomDisplayLabel(option, language);
+                    const roomDetail = getRoomDetailLabel(option, language);
                     const planDescription = plan.description?.trim();
-                    const hideDetail = normalizeComparableText(roomDetail) === normalizeComparableText(roomLabel);
-                    const hideDescription = !planDescription ? true : [
-                        roomLabel,
-                        roomDetail,
-                        getRoomDisplayLabel({
-                            bedCount: plan.bedCount ?? null,
-                            bathroomCount: plan.bathroomCount ?? null,
-                            bathroomScope: plan.bathroomScope ?? 'communal',
-                            labelCode: plan.labelCode,
-                        }, 'en'),
-                        getRoomDetailLabel({
-                            bedCount: plan.bedCount ?? null,
-                            bathroomCount: plan.bathroomCount ?? null,
-                            bathroomScope: plan.bathroomScope ?? 'communal',
-                            labelCode: plan.labelCode,
-                        }, 'en'),
-                        buildPlanNarrative({
-                            bedCount: plan.bedCount ?? null,
-                            bathroomCount: plan.bathroomCount ?? null,
-                            bathroomScope: plan.bathroomScope ?? 'communal',
-                            labelCode: plan.labelCode,
-                        }, 'en'),
-                    ].some((candidate) => normalizeComparableText(candidate) === normalizeComparableText(planDescription));
-                    const planKey = getRoomOptionKey({
-                        bedCount: plan.bedCount ?? null,
-                        bathroomCount: plan.bathroomCount ?? null,
-                        bathroomScope: plan.bathroomScope ?? 'communal',
-                        labelCode: plan.labelCode,
-                    });
+                    const hideDetail = normalizeComparableText(roomLabel) === normalizeComparableText(roomDetail);
+                    const hideDescription = !planDescription
+                        ? true
+                        : [
+                            roomLabel,
+                            roomDetail,
+                            getRoomDisplayLabel(option, 'en'),
+                            getRoomDetailLabel(option, 'en'),
+                            buildPlanNarrative(option, 'en'),
+                            buildPlanNarrative(option, 'zh'),
+                        ].some((candidate) => normalizeComparableText(candidate) === normalizeComparableText(planDescription));
+                    const planKey = getRoomOptionKey(option);
                     const isExpanded = expandedPlan === planKey;
 
                     return (
@@ -164,9 +144,7 @@ const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, languag
                                         <div className="px-2.5 py-1 rounded-lg text-sm font-semibold border bg-illini-orange/15 text-illini-orange border-illini-orange/40">
                                             {roomLabel}
                                         </div>
-                                        {!hideDetail && (
-                                            <span className="text-xs text-gray-500">{roomDetail}</span>
-                                        )}
+                                        {!hideDetail && <span className="text-xs text-gray-500">{roomDetail}</span>}
                                         <div className="flex items-center gap-0.5">
                                             {plan.available !== false ? (
                                                 <>
@@ -187,7 +165,6 @@ const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, languag
                                             <span className="text-base font-bold text-illini-orange">{formatPrice(plan.price)}</span>
                                             <span className="text-xs text-gray-400">{t.perYear}</span>
                                         </div>
-
                                         <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
                                             <ChevronDown size={16} className="text-gray-400" />
                                         </motion.div>
@@ -241,7 +218,9 @@ const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, languag
                                                 <div className="bg-gray-50 rounded-lg p-2.5">
                                                     <div className="text-[10px] text-gray-400 uppercase tracking-wider">{t.price}</div>
                                                     <div className="text-sm font-bold text-illini-orange mt-0.5">{formatPrice(plan.price)}</div>
-                                                    <div className="text-[10px] text-gray-500">~{formatPrice(Math.round(plan.price / 12))}/month</div>
+                                                    <div className="text-[10px] text-gray-500">
+                                                        ~{formatPrice(Math.round(plan.price / 12))}{t.monthly}
+                                                    </div>
                                                 </div>
                                                 {plan.sqft && (
                                                     <div className="bg-gray-50 rounded-lg p-2.5">

@@ -69,6 +69,7 @@ The application uses Supabase for database and storage.
 To initialize or update the housing data:
 
 1. Create the `dorms` table and run necessary migrations: `scripts/migrations/create_dorms_table.sql` and `scripts/migrations/add_categorized_tags.sql`
+   The second migration also adds the admin editor columns (`application_fee`, `dining_nearby_detail`, categorized tag fields) and is safe to rerun on fresh, partial, or already-migrated databases.
 2. Seed the database using the provided script (requires `SUPABASE_URL` and `SUPABASE_SERVICE_KEY` environment variables):
    ```bash
    npx tsx scripts/seed-dorms-table.ts
