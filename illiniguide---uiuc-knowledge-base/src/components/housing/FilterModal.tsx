@@ -33,8 +33,6 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         setRoomTypeFilters,
         locationFilters,
         setLocationFilters,
-        typeFilters,
-        setTypeFilters,
         setAmenityFilters,
         setCommunityFilters,
         setLlcFilters,
@@ -85,7 +83,6 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
     const [localRoomTypes, setLocalRoomTypes] = useState<RoomType[]>(roomTypeFilters);
     const [localAmenities, setLocalAmenities] = useState<FilterOption[]>(activeFilters);
     const [localLocations, setLocalLocations] = useState<string[]>(locationFilters);
-    const [localTypes, setLocalTypes] = useState<string[]>(typeFilters);
     const [localLivingConditions, setLocalLivingConditions] = useState<DormTag[]>(livingConditionFilters);
     const [localFacilities, setLocalFacilities] = useState<DormTag[]>(facilityFilters);
     const [localLifestyle, setLocalLifestyle] = useState<DormTag[]>(lifestyleFilters);
@@ -99,7 +96,6 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         setLocalRoomTypes(roomTypeFilters);
         setLocalAmenities(activeFilters);
         setLocalLocations(locationFilters);
-        setLocalTypes(typeFilters);
         setLocalLivingConditions(livingConditionFilters);
         setLocalFacilities(facilityFilters);
         setLocalLifestyle(lifestyleFilters);
@@ -113,7 +109,6 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         roomTypeFilters,
         activeFilters,
         locationFilters,
-        typeFilters,
         livingConditionFilters,
         facilityFilters,
         lifestyleFilters,
@@ -125,18 +120,12 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         () => Array.from(new Set(allDorms.map((dorm) => dorm.location))).sort(),
         [allDorms]
     );
-    const buildingTypes = useMemo(
-        () => Array.from(new Set(allDorms.map((dorm) => dorm.type))).sort(),
-        [allDorms]
-    );
-
     const handleApply = useCallback(() => {
         setPriceRange(normalizeRange(localPriceRange));
         setHousingTypeDetails(localHousingType);
         setRoomTypeFilters(localRoomTypes);
         setActiveFilters(localAmenities);
         setLocationFilters(localLocations);
-        setTypeFilters(localTypes);
         setLivingConditionFilters(localLivingConditions);
         setFacilityFilters(localFacilities);
         setLifestyleFilters(localLifestyle);
@@ -149,7 +138,6 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         localLocations,
         localPriceRange,
         localRoomTypes,
-        localTypes,
         localLivingConditions,
         localFacilities,
         localLifestyle,
@@ -162,7 +150,6 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         setLocationFilters,
         setPriceRange,
         setRoomTypeFilters,
-        setTypeFilters,
         setLivingConditionFilters,
         setFacilityFilters,
         setLifestyleFilters,
@@ -176,7 +163,6 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         setLocalRoomTypes([]);
         setLocalAmenities([]);
         setLocalLocations([]);
-        setLocalTypes([]);
         setLocalLivingConditions([]);
         setLocalFacilities([]);
         setLocalLifestyle([]);
@@ -188,7 +174,6 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         setRoomTypeFilters([]);
         setActiveFilters([]);
         setLocationFilters([]);
-        setTypeFilters([]);
         setAmenityFilters([]);
         setCommunityFilters([]);
         setLlcFilters([]);
@@ -209,7 +194,6 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         setLocationFilters,
         setPriceRange,
         setRoomTypeFilters,
-        setTypeFilters,
         setLivingConditionFilters,
         setFacilityFilters,
         setLifestyleFilters,
@@ -276,7 +260,6 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         localPriceRange,
         localHousingType,
         localLocations,
-        localTypes,
         localAmenities,
         localRoomTypes
     ]);

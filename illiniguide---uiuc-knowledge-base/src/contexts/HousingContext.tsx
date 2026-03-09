@@ -14,8 +14,6 @@ interface HousingFiltersContextType {
     setPriceRange: React.Dispatch<React.SetStateAction<[number, number]>>;
     locationFilters: string[];
     setLocationFilters: React.Dispatch<React.SetStateAction<string[]>>;
-    typeFilters: string[];
-    setTypeFilters: React.Dispatch<React.SetStateAction<string[]>>;
     roomTypeFilters: RoomType[];
     setRoomTypeFilters: React.Dispatch<React.SetStateAction<RoomType[]>>;
     housingTypeDetails: 'ALL' | 'URH' | 'PCH';
@@ -69,7 +67,6 @@ export const HousingProvider: React.FC<{ children: ReactNode }> = ({ children })
     const [activeFilters, setActiveFilters] = useState<FilterOption[]>([]);
     const [priceRange, setPriceRange] = useState<[number, number]>(getPriceRangeFromData(dorms));
     const [locationFilters, setLocationFilters] = useState<string[]>([]);
-    const [typeFilters, setTypeFilters] = useState<string[]>([]);
     const [roomTypeFilters, setRoomTypeFilters] = useState<RoomType[]>([]);
     const [housingTypeDetails, setHousingTypeDetails] = useState<'ALL' | 'URH' | 'PCH'>('ALL');
     const [viewMode, setViewMode] = useState<'list' | 'map'>('map');
@@ -95,7 +92,6 @@ export const HousingProvider: React.FC<{ children: ReactNode }> = ({ children })
         setActiveFilters([]);
         setPriceRange(getPriceRangeFromData(dorms));
         setLocationFilters([]);
-        setTypeFilters([]);
         setRoomTypeFilters([]);
         setHousingTypeDetails('ALL');
         setAmenityFilters([]);
@@ -120,8 +116,6 @@ export const HousingProvider: React.FC<{ children: ReactNode }> = ({ children })
         setPriceRange,
         locationFilters,
         setLocationFilters,
-        typeFilters,
-        setTypeFilters,
         roomTypeFilters,
         setRoomTypeFilters,
         housingTypeDetails,
@@ -155,7 +149,6 @@ export const HousingProvider: React.FC<{ children: ReactNode }> = ({ children })
         activeFilters,
         priceRange,
         locationFilters,
-        typeFilters,
         roomTypeFilters,
         housingTypeDetails,
         viewMode,

@@ -4,7 +4,7 @@ import { formatPrice } from '../../constants/housing/pricing';
 import { Language } from '../../types';
 import { X, Check, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getDormTypeLabel, getRoomTypeLabel } from '../../utils/housingLabels';
+import { getRoomTypeLabel } from '../../utils/housingLabels';
 
 interface DormComparisonProps {
     dorms: Dorm[];
@@ -65,15 +65,6 @@ const DormComparison: React.FC<DormComparisonProps> = ({ dorms, onClose, languag
                 const locationLabel = language === 'zh' && dorm.location_zh ? dorm.location_zh : dorm.location;
                 return <span className="text-sm text-gray-600">{locationLabel}</span>;
             }
-        },
-        {
-            label: 'Type',
-            label_zh: '类型',
-            getValue: (dorm) => (
-                <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
-                    {getDormTypeLabel(dorm.type, language === 'zh' ? 'zh' : 'en')}
-                </span>
-            )
         },
         {
             label: 'Housing Type',

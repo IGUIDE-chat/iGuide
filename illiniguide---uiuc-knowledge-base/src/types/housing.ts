@@ -57,7 +57,6 @@ export interface Dorm {
     id: string;
     name: string;
     location: 'Ikenberry' | 'Main Quad' | 'PAR/FAR' | 'Campustown' | 'South Campus';
-    type: 'Traditional' | 'Cluster' | 'Suite' | 'Semi-Suite';
     ac: boolean;
     dining: DiningType;
     bathroomType: BathroomType;
@@ -83,7 +82,6 @@ export interface Dorm {
     pros_zh?: string[];
     cons_zh?: string[];
     location_zh?: string;
-    type_zh?: string;
 }
 
 export type RoomType =

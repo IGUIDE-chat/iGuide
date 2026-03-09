@@ -17,8 +17,6 @@ export interface DormUpdate {
     price_range?: string | null;
     location?: string | null;
     location_zh?: string | null;
-    type?: string | null;
-    type_zh?: string | null;
     housing_type?: string | null;
     ac?: boolean;
     dining?: string;
@@ -70,8 +68,6 @@ async function resetDormToStatic(dormId: string): Promise<boolean> {
         price_range: staticDorm.priceRange,
         location: staticDorm.location,
         location_zh: staticDorm.location_zh ?? null,
-        type: staticDorm.type,
-        type_zh: staticDorm.type_zh ?? null,
         housing_type: staticDorm.housingType,
         ac: staticDorm.ac,
         dining: staticDorm.dining,

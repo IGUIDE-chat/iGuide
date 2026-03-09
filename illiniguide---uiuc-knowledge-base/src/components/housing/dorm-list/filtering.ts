@@ -131,9 +131,6 @@ export const filterAndSortDorms = (dorms: Dorm[], filters: DormFilterState) => {
         if (filters.locationFilters.length > 0 && !filters.locationFilters.includes(dorm.location)) {
             return false;
         }
-        if (filters.typeFilters.length > 0 && !filters.typeFilters.includes(dorm.type)) {
-            return false;
-        }
         if (
             filters.roomTypeFilters.length > 0 &&
             !filters.roomTypeFilters.some((roomType) => dorm.roomTypes?.includes(roomType))
