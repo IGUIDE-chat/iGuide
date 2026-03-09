@@ -34,7 +34,7 @@ export const ChatEmptyState: React.FC<ChatEmptyStateProps> = ({
           className="w-full flex flex-col items-center"
         >
           <div className="flex items-center gap-3 mb-8">
-            <BrandMark className="h-10 w-10 rounded-xl" iconClassName="text-[1.65rem]" />
+            <BrandMark className="h-10 w-10 rounded-xl" iconClassName="text-[1.4rem]" />
             <h2 className="text-2xl font-semibold text-slate-800 text-center tracking-tight">
               {title}
             </h2>
