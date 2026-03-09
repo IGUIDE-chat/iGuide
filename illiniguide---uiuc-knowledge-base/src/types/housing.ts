@@ -59,6 +59,7 @@ export interface Dorm {
     location: string;
     ac: boolean;
     dining: DiningType;
+    diningNearbyDetail?: string; // Free text for nearby dining info
     bathroomType: BathroomType;
     tags: string[];
     structuredTags?: DormTags; // Legacy — kept for migration
