@@ -23,47 +23,18 @@ export const dormViewingService = {
         const user = await authService.getCurrentUser();
         if (!user) return;
 
-        const viewedAt = new Date().toISOString();
-
-        const { data: existing, error: existingError } = await supabase
-            .from(TABLE_NAME)
-            .select('id')
-            .eq('user_id', user.id)
-            .eq('dorm_id', dormId)
-            .maybeSingle();
-
-        if (existingError) {
-            console.error('Error checking existing viewing history:', existingError);
-            throw existingError;
-        }
-
-        if (existing) {
-            const { error } = await supabase
-                .from(TABLE_NAME)
-                .update({
-                    dorm_name: dormName,
-                    dorm_name_zh: dormNameZh || null,
-                    last_viewed_at: viewedAt
-                })
-                .eq('id', existing.id)
-                .eq('user_id', user.id);
-
-            if (error) {
-                console.error('Error updating viewing history:', error);
-                throw error;
-            }
-            return;
-        }
-
         const { error } = await supabase
             .from(TABLE_NAME)
-            .insert({
-                user_id: user.id,
-                dorm_id: dormId,
-                dorm_name: dormName,
-                dorm_name_zh: dormNameZh || null,
-                last_viewed_at: viewedAt
-            });
+            .upsert(
+                {
+                    user_id: user.id,
+                    dorm_id: dormId,
+                    dorm_name: dormName,
+                    dorm_name_zh: dormNameZh || null,
+                    last_viewed_at: new Date().toISOString(),
+                },
+                { onConflict: 'user_id,dorm_id' }
+            );
 
         if (error) {
             console.error('Error adding viewing history:', error);
