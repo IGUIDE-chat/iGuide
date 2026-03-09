@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Utensils, Wind } from 'lucide-react';
+import { Bath, BedSingle, MapPin, Utensils, Wind } from 'lucide-react';
 import { formatPrice } from '../../constants/housing/pricing';
 import { Dorm } from '../../types/housing';
 import { Language } from '../../types';
@@ -233,24 +233,28 @@ const DormCard: React.FC<DormCardProps> = ({
                     {dormName}
                 </h3>
 
-                <div className="mb-3 grid grid-cols-2 gap-x-3 gap-y-1.5 text-[12px] text-gray-600">
-                    <div className="col-span-2 inline-flex min-w-0 items-center gap-1">
-                        <MapPin size={13} className="shrink-0 text-illini-orange" />
-                        <span className="line-clamp-1">{locationLabel}</span>
-                    </div>
-                    <div className="inline-flex items-center gap-1">
-                        <Wind size={13} className="shrink-0 text-gray-400" />
-                        <span>{dorm.ac ? t.ac : t.noAc}</span>
-                    </div>
-                    <div className="inline-flex items-center gap-1">
-                        <Utensils size={13} className="shrink-0 text-gray-400" />
-                        <span>{getDiningLabel(dorm, language)}</span>
-                    </div>
+                <div className="mb-3 inline-flex min-w-0 items-center gap-1 text-[12px] text-gray-500">
+                    <MapPin size={13} className="shrink-0 text-illini-orange" />
+                    <span className="line-clamp-1">{locationLabel}</span>
                 </div>
 
-                <div className="mb-2 text-sm leading-6 text-gray-700">
-                    <span className="mr-1 text-gray-500">{t.roomSummaryLabel}:</span>
-                    <span className="font-medium text-gray-800">{roomRangeSummary.cardSummary}</span>
+                <div className="mb-3 grid grid-cols-2 gap-x-4 gap-y-2 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-2.5 text-[13px] text-slate-700">
+                    <div className="inline-flex min-w-0 items-center gap-1.5">
+                        <BedSingle size={14} className="shrink-0 text-slate-400" />
+                        <span className="line-clamp-1">{roomRangeSummary.occupancyLabel}</span>
+                    </div>
+                    <div className="inline-flex min-w-0 items-center gap-1.5">
+                        <Bath size={14} className="shrink-0 text-slate-400" />
+                        <span className="line-clamp-1">{roomRangeSummary.bathroomLabel}</span>
+                    </div>
+                    <div className="inline-flex min-w-0 items-center gap-1.5">
+                        <Wind size={14} className="shrink-0 text-slate-400" />
+                        <span className="line-clamp-1">{dorm.ac ? t.ac : t.noAc}</span>
+                    </div>
+                    <div className="inline-flex min-w-0 items-center gap-1.5">
+                        <Utensils size={14} className="shrink-0 text-slate-400" />
+                        <span className="line-clamp-1">{getDiningLabel(dorm, language)}</span>
+                    </div>
                 </div>
 
                 {cardSummary && (
