@@ -40,6 +40,112 @@ const TEXT = {
     },
 };
 
+function normalizeCopy(value: string) {
+    return value.toLowerCase().replace(/\s+/g, ' ').trim();
+}
+
+function isRedundantCardCopy(copy: string, locationLabel: string, language: Language) {
+    const normalizedCopy = normalizeCopy(copy);
+    const normalizedLocation = normalizeCopy(locationLabel);
+
+    if (normalizedLocation && normalizedCopy.includes(normalizedLocation)) {
+        return true;
+    }
+
+    if (language === 'zh') {
+        return normalizedCopy.includes('位于') || normalizedCopy.includes('在 main quad') || normalizedCopy.includes('近 main quad');
+    }
+
+    return normalizedCopy.includes('located in') || normalizedCopy.includes('located on') || normalizedCopy.includes('near ');
+}
+
+function getSignalDrivenSummary(dorm: Dorm, language: Language) {
+    const tags = dorm.categorizedTags ?? { livingConditions: [], facilities: [], lifestyle: [] };
+    const llcName = tags.llcNames?.[0];
+
+    if (llcName && tags.lifestyle.includes('artsyCreative') && tags.facilities.includes('musicRooms')) {
+        return language === 'zh'
+            ? `设有 ${llcName} 社群项目，艺术氛围浓，且配有琴房。`
+            : `Home to ${llcName}, with a creative community and dedicated music rooms.`;
+    }
+
+    if (llcName) {
+        return language === 'zh'
+            ? `设有 ${llcName} 社群项目，社区活动和归属感更强。`
+            : `Home to ${llcName}, a distinct living-learning community.`;
+    }
+
+    if (tags.lifestyle.includes('artsyCreative') && tags.facilities.includes('musicRooms')) {
+        return language === 'zh'
+            ? '艺术氛围浓，适合重视创作与音乐练习的学生。'
+            : 'A creative community with dedicated music rooms.';
+    }
+
+    if (tags.livingConditions.includes('newlyRenovated')) {
+        return language === 'zh'
+            ? '居住空间较新，整体设施状态更好。'
+            : 'Recently renovated living spaces with a fresher feel.';
+    }
+
+    if (tags.lifestyle.includes('quiet')) {
+        return language === 'zh'
+            ? '整体氛围更安静，适合规律作息和专注学习。'
+            : 'Known for a quieter community atmosphere.';
+    }
+
+    if (tags.lifestyle.includes('internationalFriendly')) {
+        return language === 'zh'
+            ? '国际生社群更活跃，社区包容度较高。'
+            : 'Popular with international students and a more globally mixed community.';
+    }
+
+    if (tags.lifestyle.includes('socialParty')) {
+        return language === 'zh'
+            ? '社交氛围更活跃，更适合喜欢热闹社区的学生。'
+            : 'A more social community for students who want an active dorm scene.';
+    }
+
+    if (tags.facilities.includes('musicRooms')) {
+        return language === 'zh'
+            ? '配有琴房，对音乐练习更友好。'
+            : 'Includes dedicated music rooms for regular practice.';
+    }
+
+    if (tags.facilities.includes('convenienceStore')) {
+        return language === 'zh'
+            ? '日常补给更方便，买东西不用专门绕路。'
+            : 'Convenience-store access makes daily basics easier.';
+    }
+
+    if (tags.facilities.includes('busStop')) {
+        return language === 'zh'
+            ? '靠近公交站，日常往返校园更方便。'
+            : 'Easy bus access helps with daily campus travel.';
+    }
+
+    return null;
+}
+
+function getCardSummary(dorm: Dorm, description: string | undefined, locationLabel: string, language: Language) {
+    const signalSummary = getSignalDrivenSummary(dorm, language);
+    if (signalSummary) {
+        return signalSummary;
+    }
+
+    const localizedPros =
+        language === 'zh' && dorm.pros_zh?.length ? dorm.pros_zh : dorm.pros;
+    const fallbackPro = localizedPros.find((item) => !isRedundantCardCopy(item, locationLabel, language));
+    if (fallbackPro) {
+        return fallbackPro;
+    }
+
+    if (description && !isRedundantCardCopy(description, locationLabel, language)) {
+        return description;
+    }
+
+    return null;
+}
+
 function getDiningLabel(dorm: Dorm, language: Language) {
     const t = TEXT[language];
     if (dorm.dining === 'inside') {
@@ -71,6 +177,7 @@ const DormCard: React.FC<DormCardProps> = ({
         language,
         4
     );
+    const cardSummary = getCardSummary(dorm, description, locationLabel, language);
 
     return (
         <div
@@ -146,9 +253,9 @@ const DormCard: React.FC<DormCardProps> = ({
                     <span className="font-medium text-gray-800">{roomRangeSummary.cardSummary}</span>
                 </div>
 
-                {description && (
+                {cardSummary && (
                     <p className="mb-3 line-clamp-1 text-sm leading-6 text-gray-600 antialiased">
-                        {description}
+                        {cardSummary}
                     </p>
                 )}
 
@@ -157,8 +264,8 @@ const DormCard: React.FC<DormCardProps> = ({
                         <span
                             key={tag.id}
                             className={`inline-flex items-center rounded-full border px-2 py-1 text-[11px] font-medium ${tag.layer === 'secondary'
-                                    ? 'border-slate-200 bg-slate-50 text-slate-700'
-                                    : 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                                ? 'border-slate-200 bg-slate-50 text-slate-700'
+                                : 'border-emerald-200 bg-emerald-50 text-emerald-700'
                                 }`}
                         >
                             {tag.label}

@@ -10,6 +10,7 @@ export interface TagDefinition {
     priority: number;
     cardLayer: 'secondary' | 'vibe' | 'hidden';
     cardPriority: number;
+    cardTone: 'positive' | 'neutral' | 'muted';
 }
 
 export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
@@ -21,6 +22,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         priority: 1,
         cardLayer: 'hidden',
         cardPriority: 99,
+        cardTone: 'muted',
     },
     newlyRenovated: {
         en: 'Newly Renovated',
@@ -29,6 +31,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         priority: 3,
         cardLayer: 'secondary',
         cardPriority: 1,
+        cardTone: 'positive',
     },
     olderBuilding: {
         en: 'Older Building',
@@ -36,7 +39,8 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         category: 'livingConditions',
         priority: 3,
         cardLayer: 'secondary',
-        cardPriority: 2,
+        cardPriority: 8,
+        cardTone: 'muted',
     },
 
     // Facilities
@@ -47,6 +51,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         priority: 5,
         cardLayer: 'secondary',
         cardPriority: 4,
+        cardTone: 'neutral',
     },
     musicRooms: {
         en: 'Music Rooms',
@@ -55,6 +60,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         priority: 5,
         cardLayer: 'secondary',
         cardPriority: 3,
+        cardTone: 'positive',
     },
     convenienceStore: {
         en: 'Convenience Store',
@@ -63,6 +69,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         priority: 5,
         cardLayer: 'secondary',
         cardPriority: 5,
+        cardTone: 'neutral',
     },
     studyLounge: {
         en: 'Study Lounge',
@@ -71,6 +78,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         priority: 6,
         cardLayer: 'secondary',
         cardPriority: 7,
+        cardTone: 'neutral',
     },
     laundry: {
         en: 'Laundry',
@@ -79,6 +87,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         priority: 7,
         cardLayer: 'hidden',
         cardPriority: 99,
+        cardTone: 'neutral',
     },
     kitchen: {
         en: 'Kitchen',
@@ -87,6 +96,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         priority: 7,
         cardLayer: 'hidden',
         cardPriority: 99,
+        cardTone: 'neutral',
     },
     busStop: {
         en: 'Bus Stop',
@@ -95,6 +105,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         priority: 5,
         cardLayer: 'secondary',
         cardPriority: 6,
+        cardTone: 'neutral',
     },
 
     // Lifestyle
@@ -105,6 +116,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         priority: 3,
         cardLayer: 'vibe',
         cardPriority: 1,
+        cardTone: 'positive',
     },
     socialParty: {
         en: 'Social / Party Vibe',
@@ -113,6 +125,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         priority: 3,
         cardLayer: 'vibe',
         cardPriority: 2,
+        cardTone: 'positive',
     },
     internationalFriendly: {
         en: 'International Friendly',
@@ -121,6 +134,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         priority: 4,
         cardLayer: 'vibe',
         cardPriority: 3,
+        cardTone: 'positive',
     },
     llc: {
         en: 'LLC Community',
@@ -129,6 +143,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         priority: 4,
         cardLayer: 'vibe',
         cardPriority: 4,
+        cardTone: 'positive',
     },
     artsyCreative: {
         en: 'Artsy / Creative',
@@ -137,6 +152,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         priority: 3,
         cardLayer: 'vibe',
         cardPriority: 2,
+        cardTone: 'positive',
     },
 };
 

@@ -103,6 +103,7 @@ export interface CardTagItem {
     id: string;
     label: string;
     layer: 'secondary' | 'vibe';
+    tone: 'positive' | 'neutral' | 'muted';
 }
 
 function getCardTagDisplay(tag: DormTag, categorizedTags: DormCategorizedTags, language: Language): string {
@@ -125,6 +126,22 @@ export function getCardTagItems(
             const layerB = TAG_REGISTRY[b]?.cardLayer === 'secondary' ? 0 : 1;
             if (layerA !== layerB) {
                 return layerA - layerB;
+            }
+
+            const toneWeight = (tag: DormTag) => {
+                switch (TAG_REGISTRY[tag]?.cardTone) {
+                    case 'positive':
+                        return 0;
+                    case 'neutral':
+                        return 1;
+                    default:
+                        return 2;
+                }
+            };
+            const toneA = toneWeight(a);
+            const toneB = toneWeight(b);
+            if (toneA !== toneB) {
+                return toneA - toneB;
             }
 
             const priorityA = TAG_REGISTRY[a]?.cardPriority ?? 99;
@@ -150,6 +167,7 @@ export function getCardTagItems(
             id: tag === 'llc' && categorizedTags.llcNames?.length ? `llc:${categorizedTags.llcNames[0]}` : tag,
             label,
             layer: TAG_REGISTRY[tag]?.cardLayer === 'secondary' ? 'secondary' : 'vibe',
+            tone: TAG_REGISTRY[tag]?.cardTone ?? 'neutral',
         });
     }
 
