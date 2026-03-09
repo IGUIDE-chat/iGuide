@@ -77,11 +77,10 @@ const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, languag
                         <motion.div
                             key={plan.type}
                             layout
-                            className={`bg-gradient-to-br from-white/95 via-white/90 to-gray-50/95 backdrop-blur-md rounded-xl border border-gray-200/80 overflow-hidden transition-shadow ${
-                                isExpanded
+                            className={`bg-gradient-to-br from-white/95 via-white/90 to-gray-50/95 backdrop-blur-md rounded-xl border border-gray-200/80 overflow-hidden transition-shadow ${isExpanded
                                     ? 'shadow-lg border-illini-orange/30'
                                     : 'shadow-sm border-gray-200 hover:shadow-md'
-                            }`}
+                                }`}
                         >
                             <div className="p-3 cursor-pointer" onClick={() => togglePlan(plan.type)}>
                                 <div className="flex items-center justify-between">
@@ -126,10 +125,6 @@ const FloorPlanSection: React.FC<FloorPlanSectionProps> = ({ floorPlans, languag
                                             </span>
                                         </div>
                                     )}
-                                    <div className="flex items-center gap-1">
-                                        <Bed size={14} />
-                                        <span>{roomTypeLabel}</span>
-                                    </div>
                                 </div>
                             </div>
 

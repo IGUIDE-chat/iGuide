@@ -6,7 +6,9 @@ export const AMENITIES = [
 
 export const ROOM_TYPES = [
     { id: '1B1B', label: { en: 'Single (1B1B)', zh: '一居一卫 (1B1B)' } },
+    { id: '2B0B', label: { en: 'Double (2B0B)', zh: '两居零卫 (2B0B)' } },
     { id: '2B1B', label: { en: 'Double (2B1B)', zh: '两居一卫 (2B1B)' } },
+    { id: '3B0B', label: { en: 'Triple (3B0B)', zh: '三居零卫 (3B0B)' } },
     { id: '3B1B', label: { en: 'Triples (3B1B)', zh: '三居一卫 (3B1B)' } },
     { id: '4B2B', label: { en: 'Quad (4B2B)', zh: '四居两卫 (4B2B)' } },
     { id: 'Suite', label: { en: 'Suite', zh: 'Suite' } },

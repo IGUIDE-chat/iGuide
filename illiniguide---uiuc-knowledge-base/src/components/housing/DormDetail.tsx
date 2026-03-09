@@ -139,7 +139,6 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                 dorm={dorm}
                                 language={language}
                                 quickStatsLabel={t.quickStats}
-                                roomTypeLabel={t.roomType}
                                 diningHallLabel={t.diningHall}
                                 onSiteLabel={t.onSite}
                                 nearbyLabel={t.nearby}

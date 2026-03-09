@@ -89,8 +89,10 @@ export interface Dorm {
 export type RoomType =
     | 'Studio'
     | '1B1B'
+    | '2B0B'
     | '2B1B'
     | '2B2B'
+    | '3B0B'
     | '3B1B'
     | '3B2B'
     | '3B3B'
