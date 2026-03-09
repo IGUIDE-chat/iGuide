@@ -70,7 +70,7 @@ function applyOverride(dorm: Dorm, override: DormOverride | undefined): Dorm {
         ...(override.cons != null && { cons: override.cons }),
         ...(override.cons_zh != null && { cons_zh: override.cons_zh }),
         ...(override.ac != null && { ac: override.ac }),
-        ...(override.dining != null && { dining: override.dining as Dorm['dining'] }),
+        ...(override.dining != null && { dining: (override.dining === 'true' || override.dining === true as unknown) ? 'inside' : (override.dining === 'false' || override.dining === false as unknown) ? 'nearby' : override.dining as Dorm['dining'] }),
         ...(override.location != null && { location: override.location as Dorm['location'] }),
         ...(override.location_zh != null && { location_zh: override.location_zh }),
         ...(override.type != null && { type: override.type as Dorm['type'] }),
