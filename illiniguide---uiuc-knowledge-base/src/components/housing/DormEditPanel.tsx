@@ -519,9 +519,9 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                                                         return { ...prev, [category]: next };
                                                     });
                                                 }}
-                                                className={`px-3.5 py-2 rounded-lg text-base font-medium border transition-all ${isChecked
-                                                    ? 'bg-illini-orange text-white border-illini-orange shadow-sm'
-                                                    : 'bg-white text-gray-600 border-gray-300 hover:border-illini-orange hover:text-illini-orange'
+                                                className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-all ${isChecked
+                                                    ? 'bg-illini-blue text-white border-illini-blue shadow-sm'
+                                                    : 'bg-white text-gray-600 border-gray-300 hover:border-illini-blue hover:text-illini-blue'
                                                     }`}
                                             >
                                                 {getTagDisplay(tagId, language)}
