@@ -116,7 +116,7 @@ const DormCard: React.FC<DormCardProps> = ({
                             {getRoomTypeLabel(type, language)}
                         </span>
                     ))}
-                    {getHeroTags(dorm.categorizedTags, 2).map((tag) => (
+                    {getHeroTags(dorm.categorizedTags ?? { livingConditions: [], facilities: [], lifestyle: [] }, 2).map((tag) => (
                         <span
                             key={tag}
                             className="inline-block px-2 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium transition-colors duration-150 hover:bg-gray-200 hover:text-gray-800"

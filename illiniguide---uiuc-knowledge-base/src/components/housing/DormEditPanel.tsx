@@ -103,7 +103,8 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
     const [bathroomType, setBathroomType] = useState<BathroomType>(dorm.bathroomType);
 
     // Categorized tags state
-    const [categorizedTags, setCategorizedTags] = useState<DormCategorizedTags>(dorm.categorizedTags);
+    const emptyCategorized: DormCategorizedTags = { livingConditions: [], facilities: [], lifestyle: [] };
+    const [categorizedTags, setCategorizedTags] = useState<DormCategorizedTags>(dorm.categorizedTags ?? emptyCategorized);
     const [llcNames, setLlcNames] = useState<string[]>(dorm.categorizedTags?.llcNames ?? []);
     const [pros, setPros] = useState<string[]>(dorm.pros);
     const [prosZh, setProsZh] = useState<string[]>(dorm.pros_zh ?? []);
@@ -140,7 +141,7 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
         setCons([...dorm.cons]);
         setConsZh([...(dorm.cons_zh ?? [])]);
         setStructuredTags(dorm.structuredTags ?? {});
-        setCategorizedTags(dorm.categorizedTags);
+        setCategorizedTags(dorm.categorizedTags ?? { livingConditions: [], facilities: [], lifestyle: [] });
         setLlcNames(dorm.categorizedTags?.llcNames ?? []);
     }, [dorm.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
