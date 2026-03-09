@@ -532,19 +532,31 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({ dorm, language, onClose, 
                             </div>
                         ))}
 
-                        {/* LLC names — only visible when 'llc' lifestyle tag is checked */}
-                        {categorizedTags.lifestyle.includes('llc') && (
-                            <div>
-                                <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
-                                    {zh ? '学习生活社区 (LLC)' : 'Living-Learning Communities (LLC)'}
+                        {/* LLC names — always visible as a standalone section */}
+                        <div>
+                            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                                {zh ? '学习生活社区 (LLC)' : 'Living-Learning Communities (LLC)'}
+                            </p>
+                            <EditableList
+                                items={llcNames}
+                                onChange={(next) => {
+                                    setLlcNames(next);
+                                    // Auto-toggle the 'llc' lifestyle tag based on whether there are LLC names
+                                    if (next.filter(n => n.trim()).length > 0 && !categorizedTags.lifestyle.includes('llc')) {
+                                        setCategorizedTags(prev => ({
+                                            ...prev,
+                                            lifestyle: [...prev.lifestyle, 'llc'],
+                                        }));
+                                    }
+                                }}
+                                placeholder={zh ? '添加 LLC 名称' : 'Add LLC name'}
+                            />
+                            {llcNames.filter(n => n.trim()).length === 0 && (
+                                <p className="text-xs text-gray-400 mt-1">
+                                    {zh ? '添加 LLC 后会自动标记为 LLC 宿舍' : 'Adding LLCs will auto-tag this dorm as LLC'}
                                 </p>
-                                <EditableList
-                                    items={llcNames}
-                                    onChange={setLlcNames}
-                                    placeholder={zh ? '添加 LLC' : 'Add LLC'}
-                                />
-                            </div>
-                        )}
+                            )}
+                        </div>
 
                         {/* Custom tags */}
                         <div>
