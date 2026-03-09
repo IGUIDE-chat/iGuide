@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Language } from '../types';
 import { UI_TEXT } from '../i18n/uiText';
+import { mailingListService, MailingListTopic } from '../services/mailingListService';
 
 interface AgentLandingPageProps {
     type: 'courses' | 'dorms' | 'resume';
@@ -30,22 +31,27 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({ type, langua
     const t = UI_TEXT[language];
     const [email, setEmail] = useState('');
     const [submitted, setSubmitted] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const config = AGENT_CONFIG[type];
 
     const title = type === 'courses' ? t.coursesTitle : type === 'dorms' ? t.dormsTitle : t.resumeTitle;
     const desc = type === 'courses' ? t.coursesDesc : type === 'dorms' ? t.dormsDesc : t.resumeDesc;
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!email) return;
+        setSubmitting(true);
+        setError(null);
 
-        const storageKey = `agent_waitlist_${type}`;
-        const existing = JSON.parse(localStorage.getItem(storageKey) || '[]');
-        if (!existing.includes(email)) {
-            existing.push(email);
-            localStorage.setItem(storageKey, JSON.stringify(existing));
+        const result = await mailingListService.subscribe(email, type as MailingListTopic);
+        setSubmitting(false);
+
+        if (result.success) {
+            setSubmitted(true);
+        } else {
+            setError(language === 'zh' ? '提交失败，请重试。' : 'Failed to submit. Please try again.');
         }
-        setSubmitted(true);
     };
 
     return (
@@ -99,15 +105,19 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({ type, langua
                             <motion.button
                                 key={language + '-btn'}
                                 type="submit"
+                                disabled={submitting}
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
                                 transition={{ duration: 0.15 }}
-                                className="w-full py-3 rounded-full font-semibold text-sm text-white bg-illini-orange hover:bg-illini-orange/90 transition-colors shadow-md active:scale-[0.98]"
+                                className="w-full py-3 rounded-full font-semibold text-sm text-white bg-illini-orange hover:bg-illini-orange/90 transition-colors shadow-md active:scale-[0.98] disabled:opacity-60"
                             >
-                                {t.notifyMe}
+                                {submitting ? (language === 'zh' ? '提交中…' : 'Submitting…') : t.notifyMe}
                             </motion.button>
                         </AnimatePresence>
+                        {error && (
+                            <p className="text-xs text-red-500 text-center">{error}</p>
+                        )}
                     </form>
                 ) : (
                     <div className="bg-slate-50 border border-slate-100 rounded-2xl p-5 max-w-xs mx-auto">
