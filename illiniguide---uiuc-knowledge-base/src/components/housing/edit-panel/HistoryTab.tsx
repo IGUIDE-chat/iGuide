@@ -13,7 +13,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ form }) => {
     return (
       <div className="flex items-center justify-center py-12 text-gray-400">
         <Loader2 size={20} className="animate-spin mr-2" />
-        <span className="text-sm">{t.actions.saving}</span>
+        <span className="text-sm">{t.actions.loading}</span>
       </div>
     );
   }
