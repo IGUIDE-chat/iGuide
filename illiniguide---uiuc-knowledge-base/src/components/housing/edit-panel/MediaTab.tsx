@@ -242,7 +242,35 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                     className={inputCls}
                   />
                 </Field>
-                <Field label={t.labels.planImageUrl}>
+                <Field label={form.language === 'zh' ? '展示图' : 'Room Photo'}>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={plan.photoUrl ?? ''}
+                      onChange={(event) => update({ photoUrl: event.target.value }, false)}
+                      className={inputCls}
+                      placeholder="https://..."
+                    />
+                    <label className="flex-shrink-0 flex items-center justify-center gap-1 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-lg px-3 cursor-pointer transition-colors text-gray-700">
+                      <Upload size={14} />
+                      <span className="text-xs font-medium">{t.actions.upload}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(event) => {
+                          if (event.target.files?.[0]) {
+                            void form.uploadImage(event.target.files[0], (url) =>
+                              update({ photoUrl: url }, false),
+                            );
+                          }
+                          event.target.value = '';
+                        }}
+                      />
+                    </label>
+                  </div>
+                </Field>
+                <Field label={form.language === 'zh' ? '户型图' : 'Floor Plan'}>
                   <div className="flex gap-2">
                     <input
                       type="text"
