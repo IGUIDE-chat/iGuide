@@ -7,6 +7,7 @@ import { FavoriteFlyEffect } from './dorm-list/FavoriteFlyEffect';
 import { ListEmptyState } from './dorm-list/EmptyStates';
 import { DormListMapPane } from './dorm-list/DormListMapPane';
 import { useDormListController } from './dorm-list/useDormListController';
+import { useDormCommentStats } from '../../hooks/useDormCommentStats';
 
 interface DormListProps {
   language: Language;
@@ -14,6 +15,7 @@ interface DormListProps {
 
 const DormList: React.FC<DormListProps> = ({ language }) => {
   const controller = useDormListController(language);
+  const commentStats = useDormCommentStats();
 
   return (
     <div className="h-full flex flex-col bg-gray-50">
@@ -50,6 +52,7 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
               onViewDetails={controller.handleViewDetails}
               onHoverDorm={controller.setHoveredDormId}
               language={language}
+              commentStats={commentStats}
             />
           ) : (
             <ListEmptyState t={controller.t} onClearFilters={controller.clearAllFilters} />

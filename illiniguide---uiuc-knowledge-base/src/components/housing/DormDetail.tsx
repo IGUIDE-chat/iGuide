@@ -18,6 +18,7 @@ import { useDormComments } from '../../hooks/useDormComments';
 import { Dorm, DormTag } from '../../types/housing';
 import { Language } from '../../types';
 import DormEditPanel from './DormEditPanel';
+import ImageLightbox from './ImageLightbox';
 import { dormDetailTexts } from './i18n/dormTexts';
 import { getRoomOptionLabels, normalizeFloorPlan } from '../../utils/roomOptions';
 
@@ -51,6 +52,10 @@ const fadeUp: Variants = {
 const cardHover = { y: -3, scale: 1.02 } as const;
 const cardTap   = { scale: 0.97 };
 
+/** Detect if text is primarily Chinese (has CJK characters) */
+const isChinese = (text: string) => /[\u4e00-\u9fff]/.test(text);
+const detectLang = (text: string): 'zh' | 'en' => isChinese(text) ? 'zh' : 'en';
+
 // ─── Props ─────────────────────────────────────────────────────────────────
 interface DormDetailProps {
     language?: Language;
@@ -78,11 +83,17 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
     const [compareIds,      setCompareIds]      = useState<string[]>([]);
     const [imageErrors,     setImageErrors]     = useState<Record<string, boolean>>({});
     const [showAllReviews,  setShowAllReviews]  = useState(false);
+    const [lightbox, setLightbox] = useState<{ images: { src: string; alt?: string; label?: string }[]; index: number } | null>(null);
 
     // ── Comment form state ─────────────────────────────────────────────────
     const [commentContent, setCommentContent] = useState('');
     const [commentVote,    setCommentVote]    = useState<1 | -1 | null>(null);
     const [submitting,     setSubmitting]     = useState(false);
+
+    // ── Translation state ────────────────────────────────────────────────
+    const [translations,    setTranslations]    = useState<Record<string, string>>({});
+    const [translating,     setTranslating]     = useState<Record<string, boolean>>({});
+    const [translateErrors, setTranslateErrors] = useState<Record<string, boolean>>({});
 
     const t = dormDetailTexts[language];
 
@@ -115,6 +126,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
     const dormName      = language === 'zh' && dorm.name_zh       ? dorm.name_zh       : dorm.name;
     const dormDesc      = language === 'zh' && dorm.description_zh ? dorm.description_zh : dorm.description;
     const dormLocation  = language === 'zh' && dorm.location_zh   ? dorm.location_zh   : dorm.location;
+    const dormAddress   = language === 'zh' && dorm.address_zh   ? dorm.address_zh   : dorm.address;
     const heroImage     = dorm.galleryImages?.[0] ?? dorm.imageUrl;
     const housingMeta   = getHousingTypeMeta(dorm.housingType);
 
@@ -165,13 +177,56 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
         }
     };
 
+    const handleDeleteComment = (commentId: string) => {
+        const msg = language === 'zh' ? '确定要删除这条评论吗？' : 'Delete this comment?';
+        if (!window.confirm(msg)) return;
+        deleteComment(commentId);
+    };
+
+    const handleTranslate = async (commentId: string, text: string) => {
+        if (translations[commentId]) {
+            // Toggle off
+            setTranslations((prev) => { const next = { ...prev }; delete next[commentId]; return next; });
+            return;
+        }
+        setTranslating((prev) => ({ ...prev, [commentId]: true }));
+        setTranslateErrors((prev) => { const next = { ...prev }; delete next[commentId]; return next; });
+        try {
+            const targetLang = language === 'zh' ? 'English' : '中文';
+            const res = await fetch('/api/deepseek', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    messages: [
+                        { role: 'system', content: `You are a translator. Translate the following text to ${targetLang}. Return ONLY the translation, nothing else.` },
+                        { role: 'user', content: text },
+                    ],
+                }),
+            });
+            if (res.ok) {
+                const data = await res.json() as Record<string, unknown>;
+                const choices = data.choices as Array<{ message?: { content?: string } }> | undefined;
+                const translated = choices?.[0]?.message?.content ?? (data.reply as string) ?? text;
+                setTranslations((prev) => ({ ...prev, [commentId]: translated }));
+            } else {
+                setTranslateErrors((prev) => ({ ...prev, [commentId]: true }));
+            }
+        } catch {
+            setTranslateErrors((prev) => ({ ...prev, [commentId]: true }));
+        } finally {
+            setTranslating((prev) => ({ ...prev, [commentId]: false }));
+        }
+    };
+
     // ── Render ─────────────────────────────────────────────────────────────
     return (
         <motion.div
             variants={pageVariants}
             initial="hidden"
             animate="visible"
-            className="h-full overflow-y-auto w-full no-scrollbar font-sans text-slate-800 pb-24 bg-slate-50"
+            className={`h-full overflow-y-auto w-full no-scrollbar font-sans text-slate-800 pb-24 bg-slate-50 transition-[margin] duration-300 ease-in-out ${
+                editOpen ? 'lg:mr-[32rem]' : ''
+            }`}
         >
             {/* ── Top bar ── */}
             <div className="sticky top-0 z-40 bg-white/70 backdrop-blur-xl border-b border-white/50 shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
@@ -186,26 +241,38 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                         <span className="text-[13px] md:text-[14px] font-semibold sm:hidden">{language === 'zh' ? '返回' : 'Back'}</span>
                     </button>
 
-                    <motion.button
-                        type="button"
-                        onClick={async () => { await toggleFavorite(dorm.id, dorm.name, dorm.name_zh); }}
-                        aria-label={isSaved ? t.saved : t.save}
-                        whileTap={{ scale: 1.35 }}
-                        transition={{ type: 'spring', stiffness: 400, damping: 12 }}
-                        className="p-2 -mr-1 text-slate-500 hover:text-illini-orange transition-colors rounded-full hover:bg-slate-100/50"
-                    >
-                        <AnimatePresence mode="wait" initial={false}>
-                            <motion.div
-                                key={isSaved ? 'saved' : 'unsaved'}
-                                initial={{ scale: 0.6, opacity: 0 }}
-                                animate={{ scale: 1,   opacity: 1 }}
-                                exit={{   scale: 0.6, opacity: 0 }}
-                                transition={{ duration: 0.15 }}
+                    <div className="flex items-center gap-1">
+                        {user?.isAdmin && (
+                            <button
+                                type="button"
+                                onClick={() => setEditOpen(true)}
+                                className="p-2 text-slate-400 hover:text-illini-blue transition-colors rounded-full hover:bg-slate-100/50"
+                                aria-label="Edit"
                             >
-                                <Heart className={`w-5 h-5 transition-colors duration-200 ${isSaved ? 'fill-illini-orange text-illini-orange' : ''}`} />
-                            </motion.div>
-                        </AnimatePresence>
-                    </motion.button>
+                                <Pencil className="w-4 h-4" />
+                            </button>
+                        )}
+                        <motion.button
+                            type="button"
+                            onClick={async () => { await toggleFavorite(dorm.id, dorm.name, dorm.name_zh); }}
+                            aria-label={isSaved ? t.saved : t.save}
+                            whileTap={{ scale: 1.35 }}
+                            transition={{ type: 'spring', stiffness: 400, damping: 12 }}
+                            className="p-2 -mr-1 text-slate-500 hover:text-illini-orange transition-colors rounded-full hover:bg-slate-100/50"
+                        >
+                            <AnimatePresence mode="wait" initial={false}>
+                                <motion.div
+                                    key={isSaved ? 'saved' : 'unsaved'}
+                                    initial={{ scale: 0.6, opacity: 0 }}
+                                    animate={{ scale: 1,   opacity: 1 }}
+                                    exit={{   scale: 0.6, opacity: 0 }}
+                                    transition={{ duration: 0.15 }}
+                                >
+                                    <Heart className={`w-5 h-5 transition-colors duration-200 ${isSaved ? 'fill-illini-orange text-illini-orange' : ''}`} />
+                                </motion.div>
+                            </AnimatePresence>
+                        </motion.button>
+                    </div>
                 </div>
             </div>
 
@@ -215,7 +282,14 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                     {/* ── Hero Section ── */}
                     <motion.section variants={fadeUp} className="space-y-5 md:space-y-6">
                         {heroImage && (
-                            <div className="w-full aspect-[4/3] sm:aspect-video md:aspect-[21/9] rounded-2xl md:rounded-3xl overflow-hidden relative bg-slate-100 border border-white/60 shadow-sm">
+                            <div
+                                className="w-full aspect-[4/3] sm:aspect-video md:aspect-[21/9] rounded-2xl md:rounded-3xl overflow-hidden relative bg-slate-100 border border-white/60 shadow-sm cursor-zoom-in"
+                                onClick={() => {
+                                    const gallery = (dorm.galleryImages ?? []).map((src, i) => ({ src, alt: `${dormName} ${i + 1}` }));
+                                    if (gallery.length === 0 && heroImage) gallery.push({ src: heroImage, alt: dormName });
+                                    setLightbox({ images: gallery, index: 0 });
+                                }}
+                            >
                                 <motion.img
                                     src={heroImage}
                                     alt={dormName}
@@ -233,7 +307,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                     >
                                         <ThumbsUp className="w-3.5 h-3.5 md:w-4 md:h-4 text-illini-orange fill-illini-orange" />
                                         <span className="text-[12px] md:text-[13px] font-bold text-slate-900">
-                                            {positivePercent}{t.positiveRating}
+                                            {positivePercent}{t.positiveRating} ({totalReviews})
                                         </span>
                                     </motion.div>
                                 )}
@@ -247,16 +321,22 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                     <span className="px-3 py-1 text-[11px] md:text-[12px] font-bold text-slate-700 bg-slate-200/60 rounded-full">
                                         {getLocalizedLabel(housingMeta, language)} ({housingMeta.shortLabel})
                                     </span>
+                                    <span className="px-3 py-1 text-[11px] md:text-[12px] font-bold text-slate-700 bg-slate-200/60 rounded-full inline-flex items-center gap-1">
+                                        <MapPin className="w-3 h-3" />
+                                        {dormLocation}
+                                    </span>
                                 </div>
 
                                 <h1 className="text-3xl md:text-4xl font-extrabold text-illini-blue tracking-tight">
                                     {dormName}
                                 </h1>
 
-                                <div className="flex items-start md:items-center gap-1.5 text-slate-500 text-[13px] md:text-[14px] font-medium">
-                                    <MapPin className="w-4 h-4 mt-0.5 md:mt-0 shrink-0" />
-                                    <span className="leading-tight">{dormLocation}</span>
-                                </div>
+                                {dormAddress && (
+                                    <div className="flex items-start md:items-center gap-1.5 text-slate-500 text-[13px] md:text-[14px] font-medium">
+                                        <MapPin className="w-4 h-4 mt-0.5 md:mt-0 shrink-0" />
+                                        <span className="leading-tight">{dormAddress}</span>
+                                    </div>
+                                )}
 
                                 {positiveTags.length > 0 && (
                                     <div className="flex flex-wrap gap-2 pt-1">
@@ -322,15 +402,17 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                             <p className="text-slate-600 text-[14px] md:text-[15px] leading-relaxed max-w-4xl font-medium">
                                 {dormDesc}
                             </p>
-                            <a
-                                href="https://housing.illinois.edu/"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 text-[11px] md:text-[12px] font-semibold text-slate-500 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-full transition-colors w-fit"
-                            >
-                                <span>{t.viewWebsite}</span>
-                                <ExternalLink className="w-3 h-3" />
-                            </a>
+                            {(dorm.website || dorm.housingType === 'URH') && (
+                                <a
+                                    href={dorm.website || 'https://housing.illinois.edu/'}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1 text-[11px] md:text-[12px] font-semibold text-slate-500 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-full transition-colors w-fit"
+                                >
+                                    <span>{t.viewWebsite}</span>
+                                    <ExternalLink className="w-3 h-3" />
+                                </a>
+                            )}
                         </div>
                     </motion.section>
 
@@ -412,7 +494,14 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                     const planKey   = getPlanKey(idx, plan.price, plan.labelCode);
                                     const isExpanded = expandedPlanId === planKey;
                                     const isCompared = compareIds.includes(planKey);
-                                    const hasImage   = Boolean(plan.imageUrl) && !imageErrors[planKey];
+                                    const thumbSrc   = plan.photoUrl || plan.imageUrl;
+                                    const layoutSrc  = plan.imageUrl;
+                                    const hasThumb   = Boolean(thumbSrc) && !imageErrors[`${planKey}-thumb`];
+                                    const hasLayout  = Boolean(layoutSrc) && !imageErrors[`${planKey}-layout`];
+                                    // Collect all available images for this plan's lightbox
+                                    const planImages: { src: string; alt?: string; label?: string }[] = [];
+                                    if (plan.photoUrl) planImages.push({ src: plan.photoUrl, alt: labels.primaryLabel, label: language === 'zh' ? '展示图' : 'Photo' });
+                                    if (plan.imageUrl) planImages.push({ src: plan.imageUrl, alt: labels.primaryLabel, label: language === 'zh' ? '户型图' : 'Floor Plan' });
 
                                     return (
                                         <motion.div
@@ -424,14 +513,17 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                             className="group bg-white rounded-xl md:rounded-2xl border border-slate-100 hover:-translate-y-px hover:shadow-[0_6px_20px_rgba(0,0,0,0.08)] transition-[box-shadow] duration-150 cursor-pointer overflow-hidden shadow-sm"
                                         >
                                             <div className="p-3 md:p-5 flex flex-row items-center md:items-start gap-4 md:gap-6">
-                                                {/* Thumbnail */}
-                                                <div className="w-20 h-20 md:w-36 md:h-28 shrink-0 bg-slate-50 rounded-lg md:rounded-xl overflow-hidden border border-slate-200/60 relative group-hover:border-slate-300 transition-colors">
-                                                    {hasImage ? (
+                                                {/* Thumbnail (展示图 > 户型图 > placeholder) */}
+                                                <div
+                                                    className="w-20 h-20 md:w-36 md:h-28 shrink-0 bg-slate-50 rounded-lg md:rounded-xl overflow-hidden border border-slate-200/60 relative group-hover:border-slate-300 transition-colors"
+                                                    onClick={(e) => { if (planImages.length > 0) { e.stopPropagation(); setLightbox({ images: planImages, index: 0 }); } }}
+                                                >
+                                                    {hasThumb ? (
                                                         <img
-                                                            src={plan.imageUrl}
+                                                            src={thumbSrc}
                                                             alt={labels.primaryLabel}
                                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                                                            onError={() => setImageErrors((prev) => ({ ...prev, [planKey]: true }))}
+                                                            onError={() => setImageErrors((prev) => ({ ...prev, [`${planKey}-thumb`]: true }))}
                                                         />
                                                     ) : (
                                                         <div className="w-full h-full flex items-center justify-center text-slate-300">
@@ -581,12 +673,13 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                                         className="overflow-hidden"
                                                     >
                                                         <div className="p-4 md:p-5 pt-0 border-t border-slate-100/50 mx-4 md:mx-5 mt-2">
-                                                            {hasImage ? (
+                                                            {hasLayout ? (
                                                                 <img
-                                                                    src={plan.imageUrl}
+                                                                    src={layoutSrc}
                                                                     alt={`${labels.primaryLabel} floor plan`}
-                                                                    className="w-full h-auto rounded-xl border border-slate-200/50 bg-slate-50 mt-3 md:mt-4"
-                                                                    onError={() => setImageErrors((prev) => ({ ...prev, [planKey]: true }))}
+                                                                    className="w-full h-auto rounded-xl border border-slate-200/50 bg-slate-50 mt-3 md:mt-4 cursor-zoom-in hover:opacity-90 transition-opacity"
+                                                                    onClick={(e) => { e.stopPropagation(); setLightbox({ images: planImages, index: planImages.findIndex((img) => img.src === layoutSrc) }); }}
+                                                                    onError={() => setImageErrors((prev) => ({ ...prev, [`${planKey}-layout`]: true }))}
                                                                 />
                                                             ) : (
                                                                 <div className="bg-slate-50/50 rounded-xl p-6 md:p-8 flex items-center justify-center text-slate-400 border border-slate-200/50 border-dashed mt-3 md:mt-4 font-medium text-[13px] md:text-[14px]">
@@ -750,7 +843,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                                             <motion.button
                                                                 type="button"
                                                                 whileTap={{ scale: 0.9 }}
-                                                                onClick={() => deleteComment(comment.id)}
+                                                                onClick={() => handleDeleteComment(comment.id)}
                                                                 className="text-slate-300 hover:text-red-400 transition-colors p-1"
                                                                 aria-label={t.deleteComment}
                                                             >
@@ -759,9 +852,25 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                                         )}
                                                     </div>
                                                 </div>
-                                                <p className="text-[13px] md:text-[14px] text-slate-600 leading-relaxed font-medium">
-                                                    {comment.content}
-                                                </p>
+                                                {translations[comment.id] ? (
+                                                    <>
+                                                        <p className="text-[13px] md:text-[14px] text-slate-600 leading-relaxed font-medium">
+                                                            {translations[comment.id]}
+                                                        </p>
+                                                        <p className="text-[12px] text-slate-400 leading-relaxed mt-1.5 pl-3 border-l-2 border-slate-200">
+                                                            {comment.content}
+                                                        </p>
+                                                    </>
+                                                ) : (
+                                                    <p className="text-[13px] md:text-[14px] text-slate-600 leading-relaxed font-medium">
+                                                        {comment.content}
+                                                    </p>
+                                                )}
+                                                {translateErrors[comment.id] && (
+                                                    <p className="text-[12px] text-red-400 mt-1">
+                                                        {language === 'zh' ? '翻译失败，点击重试' : 'Translation failed, click to retry'}
+                                                    </p>
+                                                )}
                                                 <div className="flex items-center gap-4 mt-4 pt-3 border-t border-slate-100/50">
                                                     <motion.button
                                                         type="button"
@@ -776,6 +885,21 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                                             {t.helpful}{comment.upvotes > 0 ? ` (${comment.upvotes})` : ''}
                                                         </span>
                                                     </motion.button>
+                                                    {detectLang(comment.content) !== language && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleTranslate(comment.id, comment.content)}
+                                                            disabled={translating[comment.id]}
+                                                            className="flex items-center gap-1 text-[12px] font-semibold text-slate-400 hover:text-illini-blue transition-colors disabled:opacity-50"
+                                                        >
+                                                            <Globe className="w-3.5 h-3.5" />
+                                                            {translating[comment.id]
+                                                                ? (language === 'zh' ? '翻译中...' : 'Translating...')
+                                                                : translations[comment.id]
+                                                                    ? (language === 'zh' ? '显示原文' : 'Original')
+                                                                    : (language === 'zh' ? '翻译' : 'Translate')}
+                                                        </button>
+                                                    )}
                                                 </div>
                                             </motion.div>
                                         ))}
@@ -802,6 +926,17 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                 </motion.div>
             </main>
 
+            {/* Image lightbox */}
+            <AnimatePresence>
+                {lightbox && (
+                    <ImageLightbox
+                        images={lightbox.images}
+                        initialIndex={Math.max(lightbox.index, 0)}
+                        onClose={() => setLightbox(null)}
+                    />
+                )}
+            </AnimatePresence>
+
             {/* Admin edit panel */}
             {editOpen && (
                 <DormEditPanel
@@ -819,7 +954,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setEditOpen(true)}
-                    className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-illini-blue text-white text-[13px] font-bold px-4 py-2.5 rounded-full shadow-lg hover:bg-illini-blue/90 transition-colors"
+                    className="fixed bottom-20 right-6 z-50 flex items-center gap-2 bg-illini-blue text-white text-[13px] font-bold px-4 py-2.5 rounded-full shadow-lg hover:bg-illini-blue/90 transition-colors"
                 >
                     <Pencil className="w-3.5 h-3.5" />
                     {language === 'zh' ? '编辑' : 'Edit'}

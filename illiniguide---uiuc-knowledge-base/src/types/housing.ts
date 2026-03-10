@@ -86,6 +86,7 @@ export interface Dorm {
     // Address
     address?: string;         // Street address (e.g. "1010 W. Illinois St, Urbana, IL 61801")
     address_zh?: string;      // Address in Chinese (optional)
+    website?: string;         // Official website URL
     // Localization
     name_zh?: string;
     description_zh?: string;
@@ -131,7 +132,8 @@ export interface FloorPlan {
     price: number;            // Annual price for this specific floor plan
     sqft?: number;            // Square footage (optional)
     bedSize?: BedSize;        // Bed size provided in this floor plan
-    imageUrl?: string;        // Floor plan layout image URL
+    imageUrl?: string;        // Floor plan layout diagram URL
+    photoUrl?: string;        // Room showcase photo URL
     description?: string;     // Description of this floor plan
     available?: boolean;      // Whether this floor plan is currently available
 }

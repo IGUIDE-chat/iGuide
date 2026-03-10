@@ -1,5 +1,5 @@
 import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Bath, BedSingle, MapPin, Utensils, Wind } from 'lucide-react';
+import { Bath, BedSingle, MapPin, ThumbsUp, Utensils, Wind } from 'lucide-react';
 import { formatPrice } from '../../constants/housing/pricing';
 import { Dorm } from '../../types/housing';
 import { Language } from '../../types';
@@ -13,6 +13,8 @@ interface DormCardProps {
     onToggleFavorite?: (dorm: Dorm, e?: React.MouseEvent) => void;
     onHoverDorm?: (dormId: string | null) => void;
     language?: Language;
+    positivePercent?: number | null;
+    totalReviews?: number;
 }
 
 const CARD_TAG_GAP_PX = 6;
@@ -276,6 +278,8 @@ const DormCard: React.FC<DormCardProps> = ({
     onToggleFavorite,
     onHoverDorm,
     language = 'en',
+    positivePercent,
+    totalReviews,
 }) => {
     const t = TEXT[language];
     const dormName = language === 'zh' && dorm.name_zh ? dorm.name_zh : dorm.name;
@@ -305,11 +309,14 @@ const DormCard: React.FC<DormCardProps> = ({
                     decoding="async"
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
-                <div className="absolute right-3 top-3 flex items-end">
-                    <div className="origin-top-right rounded-md bg-white px-2 py-1 text-xs font-bold text-illini-blue shadow-sm transition-transform duration-200 group-hover:scale-105">
-                        {formatPrice(dorm.price)}
+                {positivePercent != null && totalReviews != null && totalReviews > 0 && (
+                    <div className="absolute right-3 top-3">
+                        <div className="rounded-md bg-white px-2 py-1 text-xs font-bold text-slate-800 shadow-sm transition-transform duration-200 group-hover:scale-105 flex items-center gap-1">
+                            <ThumbsUp size={11} className="text-slate-500" />
+                            {positivePercent}% ({totalReviews})
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {onToggleFavorite && (
                     <button
@@ -344,9 +351,12 @@ const DormCard: React.FC<DormCardProps> = ({
                     {dormName}
                 </h3>
 
-                <div className="mb-3 inline-flex min-w-0 items-center gap-1 text-[12px] text-gray-500">
-                    <MapPin size={13} className="shrink-0 text-illini-orange" />
-                    <span className="line-clamp-1">{locationLabel}</span>
+                <div className="mb-3 grid grid-cols-[minmax(0,1.3fr)_minmax(0,0.9fr)] gap-x-6 text-[12px] text-gray-500">
+                    <div className="inline-flex min-w-0 items-center gap-1">
+                        <MapPin size={13} className="shrink-0 text-illini-orange" />
+                        <span className="line-clamp-1">{locationLabel}</span>
+                    </div>
+                    <span className="text-[12px] font-bold text-illini-blue">{formatPrice(dorm.price)}</span>
                 </div>
 
                 <div className="mb-3 grid grid-cols-[minmax(0,1.3fr)_minmax(0,0.9fr)] gap-x-6 gap-y-2 text-[13px] text-slate-700">

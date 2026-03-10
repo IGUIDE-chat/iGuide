@@ -60,7 +60,47 @@ function aggregateComment(raw: RawComment, currentUserId: string | null): DormCo
     };
 }
 
+export interface DormCommentStats {
+    dormId: string;
+    totalComments: number;
+    thumbsUp: number;
+    positivePercent: number | null;
+}
+
 export const dormCommentsService = {
+    /**
+     * Fetch aggregate comment stats for all dorms (total count + thumbs up count).
+     */
+    async getAllDormStats(): Promise<Record<string, DormCommentStats>> {
+        const { data, error } = await supabase
+            .from('dorm_comments')
+            .select('dorm_id, dorm_vote');
+
+        if (error) {
+            console.error('Error fetching dorm comment stats:', error);
+            return {};
+        }
+
+        const statsMap: Record<string, { total: number; up: number }> = {};
+        for (const row of data ?? []) {
+            const id = row.dorm_id as string;
+            if (!statsMap[id]) statsMap[id] = { total: 0, up: 0 };
+            statsMap[id].total++;
+            if (row.dorm_vote === 1) statsMap[id].up++;
+        }
+
+        const result: Record<string, DormCommentStats> = {};
+        for (const [dormId, s] of Object.entries(statsMap)) {
+            result[dormId] = {
+                dormId,
+                totalComments: s.total,
+                thumbsUp: s.up,
+                positivePercent: s.total > 0 ? Math.round((s.up / s.total) * 100) : null,
+            };
+        }
+        return result;
+    },
+
     /**
      * Fetch all comments + vote counts + current user's vote for one dorm.
      */

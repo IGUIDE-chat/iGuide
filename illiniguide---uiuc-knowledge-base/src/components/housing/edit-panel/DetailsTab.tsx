@@ -88,6 +88,33 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
           ))}
         </select>
       </Field>
+      <Field label={t.labels.address}>
+        <input
+          type="text"
+          value={form.address}
+          onChange={(event) => form.setAddress(event.target.value)}
+          className={inputCls}
+          placeholder="e.g. 1010 W. Illinois St, Urbana, IL 61801"
+        />
+      </Field>
+      <Field label={t.labels.addressZh}>
+        <input
+          type="text"
+          value={form.addressZh}
+          onChange={(event) => form.setAddressZh(event.target.value)}
+          className={inputCls}
+          placeholder="e.g. 伊利诺伊街1010号"
+        />
+      </Field>
+      <Field label={t.labels.website}>
+        <input
+          type="url"
+          value={form.website}
+          onChange={(event) => form.setWebsite(event.target.value)}
+          className={inputCls}
+          placeholder="https://housing.illinois.edu/..."
+        />
+      </Field>
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
         <p className="text-xs font-medium text-gray-500 mb-1.5">{t.labels.roomOptions}</p>
         <p className="text-[11px] text-gray-400 mb-2">{t.hints.roomOptions}</p>

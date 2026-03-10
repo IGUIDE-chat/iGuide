@@ -41,6 +41,7 @@ function rowToDorm(row: Record<string, unknown>): Dorm {
         applicationFee: row.application_fee != null ? Number(row.application_fee) : undefined,
         address: (row.address as string) ?? undefined,
         address_zh: (row.address_zh as string) ?? undefined,
+        website: (row.website as string) ?? undefined,
     });
 }
 
