@@ -351,12 +351,12 @@ const DormCard: React.FC<DormCardProps> = ({
                     {dormName}
                 </h3>
 
-                <div className="mb-3 flex min-w-0 items-center justify-between gap-2 text-[12px] text-gray-500">
+                <div className="mb-3 grid grid-cols-[minmax(0,1.3fr)_minmax(0,0.9fr)] gap-x-6 text-[12px] text-gray-500">
                     <div className="inline-flex min-w-0 items-center gap-1">
                         <MapPin size={13} className="shrink-0 text-illini-orange" />
                         <span className="line-clamp-1">{locationLabel}</span>
                     </div>
-                    <span className="shrink-0 text-[12px] font-bold text-illini-blue">{formatPrice(dorm.price)}</span>
+                    <span className="text-[12px] font-bold text-illini-blue">{formatPrice(dorm.price)}</span>
                 </div>
 
                 <div className="mb-3 grid grid-cols-[minmax(0,1.3fr)_minmax(0,0.9fr)] gap-x-6 gap-y-2 text-[13px] text-slate-700">
