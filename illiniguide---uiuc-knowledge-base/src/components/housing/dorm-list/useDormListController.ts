@@ -79,10 +79,6 @@ export const useDormListController = (language: Language) => {
     setViewMode,
     sortBy,
     setSortBy,
-    amenityFilters,
-    communityFilters,
-    llcFilters,
-    proximityFilters,
     livingConditionFilters,
     facilityFilters,
     lifestyleFilters,
@@ -110,10 +106,6 @@ export const useDormListController = (language: Language) => {
       locationFilters.length > 0 ||
       bedCountFilters.length > 0 ||
       bathroomCountFilters.length > 0 ||
-      amenityFilters.length > 0 ||
-      communityFilters.length > 0 ||
-      llcFilters.length > 0 ||
-      proximityFilters.length > 0 ||
       livingConditionFilters.length > 0 ||
       facilityFilters.length > 0 ||
       lifestyleFilters.length > 0 ||
@@ -121,19 +113,15 @@ export const useDormListController = (language: Language) => {
       bathroomTypeFilters.length > 0,
     [
       activeFilters.length,
-      amenityFilters.length,
       bathroomCountFilters.length,
       bathroomTypeFilters.length,
       bedCountFilters.length,
-      communityFilters.length,
       facilityFilters.length,
       hasPriceFilter,
       housingTypeDetails,
       lifestyleFilters.length,
       livingConditionFilters.length,
-      llcFilters.length,
       locationFilters.length,
-      proximityFilters.length,
       requireAc,
     ],
   );
@@ -146,10 +134,6 @@ export const useDormListController = (language: Language) => {
       bedCountFilters.length +
       bathroomCountFilters.length +
       activeFilters.length +
-      amenityFilters.length +
-      communityFilters.length +
-      llcFilters.length +
-      proximityFilters.length +
       livingConditionFilters.length +
       facilityFilters.length +
       lifestyleFilters.length +
@@ -157,19 +141,15 @@ export const useDormListController = (language: Language) => {
       bathroomTypeFilters.length,
     [
       activeFilters.length,
-      amenityFilters.length,
       bathroomCountFilters.length,
       bathroomTypeFilters.length,
       bedCountFilters.length,
-      communityFilters.length,
       facilityFilters.length,
       hasPriceFilter,
       housingTypeDetails,
       lifestyleFilters.length,
       livingConditionFilters.length,
-      llcFilters.length,
       locationFilters.length,
-      proximityFilters.length,
       requireAc,
     ],
   );
@@ -189,10 +169,6 @@ export const useDormListController = (language: Language) => {
         bedCountFilters,
         bathroomCountFilters,
         housingTypeDetails,
-        amenityFilters,
-        communityFilters,
-        llcFilters,
-        proximityFilters,
         livingConditionFilters,
         facilityFilters,
         lifestyleFilters,
@@ -203,19 +179,15 @@ export const useDormListController = (language: Language) => {
     [
       activeFilters,
       allDorms,
-      amenityFilters,
       bathroomCountFilters,
       bathroomTypeFilters,
       bedCountFilters,
-      communityFilters,
       facilityFilters,
       housingTypeDetails,
       lifestyleFilters,
       livingConditionFilters,
-      llcFilters,
       locationFilters,
       normalizedPriceRange,
-      proximityFilters,
       requireAc,
       searchTerm,
       sortBy,

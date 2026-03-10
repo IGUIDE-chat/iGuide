@@ -24,16 +24,7 @@ interface HousingFiltersContextType {
     setViewMode: (mode: 'list' | 'map') => void;
     sortBy: string;
     setSortBy: (sort: string) => void;
-    // Legacy structured tag filters
-    amenityFilters: string[];
-    setAmenityFilters: React.Dispatch<React.SetStateAction<string[]>>;
-    communityFilters: string[];
-    setCommunityFilters: React.Dispatch<React.SetStateAction<string[]>>;
-    llcFilters: string[];
-    setLlcFilters: React.Dispatch<React.SetStateAction<string[]>>;
-    proximityFilters: string[];
-    setProximityFilters: React.Dispatch<React.SetStateAction<string[]>>;
-    // New categorized tag filters
+    // Categorized tag filters
     livingConditionFilters: DormTag[];
     setLivingConditionFilters: React.Dispatch<React.SetStateAction<DormTag[]>>;
     facilityFilters: DormTag[];
@@ -77,12 +68,7 @@ export const HousingProvider: React.FC<{ children: ReactNode }> = ({ children })
     const [showZones, setShowZones] = useState(true);
     const [showZoneLabels, setShowZoneLabels] = useState(true);
     const [showLandmarks, setShowLandmarks] = useState(true);
-    // Legacy structured tag filters
-    const [amenityFilters, setAmenityFilters] = useState<string[]>([]);
-    const [communityFilters, setCommunityFilters] = useState<string[]>([]);
-    const [llcFilters, setLlcFilters] = useState<string[]>([]);
-    const [proximityFilters, setProximityFilters] = useState<string[]>([]);
-    // New categorized tag filters
+    // Categorized tag filters
     const [livingConditionFilters, setLivingConditionFilters] = useState<DormTag[]>([]);
     const [facilityFilters, setFacilityFilters] = useState<DormTag[]>([]);
     const [lifestyleFilters, setLifestyleFilters] = useState<DormTag[]>([]);
@@ -98,10 +84,6 @@ export const HousingProvider: React.FC<{ children: ReactNode }> = ({ children })
         setBedCountFilters([]);
         setBathroomCountFilters([]);
         setHousingTypeDetails('ALL');
-        setAmenityFilters([]);
-        setCommunityFilters([]);
-        setLlcFilters([]);
-        setProximityFilters([]);
         setLivingConditionFilters([]);
         setFacilityFilters([]);
         setLifestyleFilters([]);
@@ -130,14 +112,6 @@ export const HousingProvider: React.FC<{ children: ReactNode }> = ({ children })
         setViewMode,
         sortBy,
         setSortBy,
-        amenityFilters,
-        setAmenityFilters,
-        communityFilters,
-        setCommunityFilters,
-        llcFilters,
-        setLlcFilters,
-        proximityFilters,
-        setProximityFilters,
         livingConditionFilters,
         setLivingConditionFilters,
         facilityFilters,
@@ -160,10 +134,6 @@ export const HousingProvider: React.FC<{ children: ReactNode }> = ({ children })
         housingTypeDetails,
         viewMode,
         sortBy,
-        amenityFilters,
-        communityFilters,
-        llcFilters,
-        proximityFilters,
         livingConditionFilters,
         facilityFilters,
         lifestyleFilters,

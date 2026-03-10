@@ -11,10 +11,6 @@ export const useDormFilterBadge = () => {
     bathroomCountFilters,
     bathroomTypeFilters,
     housingTypeDetails,
-    amenityFilters,
-    communityFilters,
-    llcFilters,
-    proximityFilters,
   } = useHousingFilters();
 
   const defaultPriceRange = getPriceRangeFromData();
@@ -29,11 +25,7 @@ export const useDormFilterBadge = () => {
       locationFilters.length > 0 ||
       bedCountFilters.length > 0 ||
       bathroomCountFilters.length > 0 ||
-      bathroomTypeFilters.length > 0 ||
-      amenityFilters.length > 0 ||
-      communityFilters.length > 0 ||
-      llcFilters.length > 0 ||
-      proximityFilters.length > 0;
+      bathroomTypeFilters.length > 0;
 
     const activeDormFilterCount =
       (hasPriceFilter ? 1 : 0) +
@@ -42,11 +34,7 @@ export const useDormFilterBadge = () => {
       bedCountFilters.length +
       bathroomCountFilters.length +
       bathroomTypeFilters.length +
-      activeFilters.length +
-      amenityFilters.length +
-      communityFilters.length +
-      llcFilters.length +
-      proximityFilters.length;
+      activeFilters.length;
 
     return {
       hasActiveDormFilters,
@@ -54,15 +42,11 @@ export const useDormFilterBadge = () => {
     };
   }, [
     activeFilters.length,
-    amenityFilters.length,
     bathroomCountFilters.length,
     bathroomTypeFilters.length,
     bedCountFilters.length,
-    communityFilters.length,
     hasPriceFilter,
     housingTypeDetails,
-    llcFilters.length,
     locationFilters.length,
-    proximityFilters.length,
   ]);
 };

@@ -34,6 +34,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
                 bedCount: 2,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 185,
                 price: 14558,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/snyder-double.pdf'),
                 photoUrls: urls(
@@ -46,6 +47,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
                 bedCount: 3,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 235,
                 price: 13774,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/snyder-triple.pdf'),
                 photoUrls: urls(
@@ -87,6 +89,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
                 bedCount: 2,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 185,
                 price: 14558,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/hopkins-double.pdf'),
                 photoUrls: urls('https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Ikenberry-Standard-Iso.jpg?itok=GPuiHdpQ'),
@@ -96,6 +99,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
                 bedCount: 3,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 235,
                 price: 13774,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/hopkins-triple.pdf'),
                 photoUrls: urls(
@@ -139,6 +143,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
                 bedCount: 2,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 185,
                 price: 14558,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/Weston_Double.pdf'),
                 photoUrls: urls(
@@ -151,6 +156,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
                 bedCount: 3,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 235,
                 price: 13774,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/Weston_Triple_Reg.pdf'),
                 photoUrls: urls(
@@ -196,6 +202,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
                 bedCount: 2,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 185,
                 price: 14558,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/scott-double.pdf'),
                 photoUrls: urls(
@@ -208,6 +215,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
                 bedCount: 3,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 235,
                 price: 13774,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/scott-triple-corner.pdf'),
                 photoUrls: urls(
@@ -251,6 +259,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
                 bedCount: 2,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 165,
                 price: 14116,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/tvd_double_0.pdf'),
                 photoUrls: urls(
@@ -263,6 +272,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
                 bedCount: 1,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 115,
                 price: 16416,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/tvd_double_0.pdf'),
                 photoUrls: urls(
@@ -306,6 +316,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
                 bedCount: 2,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 165,
                 price: 14116,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/tvd_double_0.pdf'),
                 photoUrls: urls(
@@ -318,6 +329,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
                 bedCount: 1,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 115,
                 price: 16416,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/tvd_double_0.pdf'),
                 photoUrls: urls(
@@ -365,6 +377,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
                 bedCount: 1,
                 bathroomCount: 1,
                 bathroomScope: 'private',
+                sqft: 160,
                 price: 9522,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/daniels_single.pdf'),
                 photoUrls: urls(
@@ -377,6 +390,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
                 bedCount: 1,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 140,
                 price: 9140,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/Daniels_single_shared.pdf'),
                 photoUrls: urls(
@@ -389,6 +403,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
                 bedCount: 2,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 200,
                 price: 8340,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/daniels_double.pdf'),
                 photoUrls: urls(
@@ -434,6 +449,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
                 bedCount: 1,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 120,
                 price: 7212,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/sherman-single-shared.pdf'),
                 photoUrls: urls(
@@ -446,6 +462,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
                 bedCount: 2,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 180,
                 price: 6906,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/sherman-double-shared.pdf'),
                 photoUrls: urls(
@@ -489,6 +506,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
                 bedCount: 1,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 110,
                 price: 16564,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/lar_single.pdf'),
                 photoUrls: urls(
@@ -501,6 +519,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
                 bedCount: 2,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 165,
                 price: 14558,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/lar_double_reg.pdf'),
                 photoUrls: urls(
@@ -513,6 +532,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
                 bedCount: 3,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 220,
                 price: 13774,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/lar_triple.pdf'),
                 photoUrls: urls(

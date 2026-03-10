@@ -11,8 +11,7 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
             'https://bromleyhall.com/wp-content/uploads/2024/02/gal05-550x500.jpg',
             'https://bromleyhall.com/wp-content/uploads/2024/02/gal06-550x500.jpg',
             'https://bromleyhall.com/wp-content/uploads/2024/02/gal08-550x500.jpg',
-            'https://bromleyhall.com/wp-content/uploads/2024/02/gal09-550x500.jpg',
-            'https://certified.housing.illinois.edu/wp-content/uploads/2015/07/POOL-group-tiki-470x311-3.jpg'
+            'https://bromleyhall.com/wp-content/uploads/2024/02/gal09-550x500.jpg'
         ),
         dining: 'inside',
         diningNearbyDetail: 'Bromley operates an all-inclusive dining program and snack bar on site.',
@@ -38,6 +37,7 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
                 bedCount: 1,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
+                sqft: 180,
                 price: 22016,
                 imageUrls: urls('https://bromleyhall.com/wp-content/uploads/2025/04/BH-Room-Descriptions.pdf'),
                 photoUrls: urls(
@@ -52,6 +52,7 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
                 bedCount: 2,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
+                sqft: 280,
                 price: 17632,
                 imageUrls: urls('https://bromleyhall.com/wp-content/uploads/2025/04/BH-Room-Descriptions.pdf'),
                 photoUrls: urls(
@@ -66,6 +67,7 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
                 bedCount: 3,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
+                sqft: 320,
                 price: 15320,
                 imageUrls: urls('https://bromleyhall.com/wp-content/uploads/2025/04/BH-Room-Descriptions.pdf'),
                 photoUrls: urls(
@@ -79,6 +81,7 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
                 bedCount: 4,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
+                sqft: 400,
                 price: 13744,
                 imageUrls: urls('https://bromleyhall.com/wp-content/uploads/2025/04/BH-Room-Descriptions.pdf'),
                 photoUrls: urls(
@@ -128,6 +131,7 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
                 bedCount: 1,
                 bathroomCount: 1,
                 bathroomScope: 'private',
+                sqft: 200,
                 price: 25850,
                 imageUrls: urls(
                     'https://wp.propertyjs.app/illini-tower/wp-content/uploads/sites/10/2024/10/S1.jpg',
@@ -144,6 +148,7 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
                 bedCount: 2,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
+                sqft: 320,
                 price: 12500,
                 imageUrls: urls(
                     'https://wp.propertyjs.app/illini-tower/wp-content/uploads/sites/10/2024/11/B1-Shared.jpg',
@@ -162,6 +167,7 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
                 bedCount: 3,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
+                sqft: 450,
                 price: 17750,
                 imageUrls: urls('https://wp.propertyjs.app/illini-tower/wp-content/uploads/sites/10/2024/10/C1.jpg'),
                 photoUrls: urls('https://wp.propertyjs.app/illini-tower/wp-content/uploads/sites/10/2024/10/C1-Gallery.jpg'),
@@ -172,6 +178,7 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
                 bedCount: 4,
                 bathroomCount: 2,
                 bathroomScope: 'semi-private',
+                sqft: 580,
                 price: 18750,
                 imageUrls: urls('https://wp.propertyjs.app/illini-tower/wp-content/uploads/sites/10/2024/10/D1.jpg'),
                 photoUrls: urls('https://wp.propertyjs.app/illini-tower/wp-content/uploads/sites/10/2024/10/D1-Gallery.jpg'),
@@ -183,14 +190,13 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
         website: 'https://www.sjcnc.org/housing',
         address: '604 E. Armory Ave., Champaign, IL 61820',
         applicationFee: 0,
-        imageUrl: 'https://certified.housing.illinois.edu/wp-content/uploads/2015/07/pt-newman-409x270.jpg',
+        imageUrl: 'https://www.sjcnc.org/image/115/1800',
         galleryImages: urls(
             'https://www.sjcnc.org/image/115/1800',
             'https://www.sjcnc.org/image/114/1800',
             'https://www.sjcnc.org/image/122/1800',
             'https://www.sjcnc.org/image/94/1800',
-            'https://certified.housing.illinois.edu/wp-content/uploads/2025/02/Newman_DiningHall.jpg',
-            'https://certified.housing.illinois.edu/wp-content/uploads/2024/04/Students.jpg'
+            'https://certified.housing.illinois.edu/wp-content/uploads/2025/02/Newman_DiningHall.jpg'
         ),
         dining: 'inside',
         categorizedTags: {
@@ -216,6 +222,7 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
                 bedCount: 2,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 190,
                 price: 15725,
                 photoUrls: urls(
                     'https://www.sjcnc.org/image/115/1800',
@@ -228,6 +235,7 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
                 bedCount: 3,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 220,
                 price: 15725,
                 photoUrls: urls(
                     'https://certified.housing.illinois.edu/wp-content/uploads/2024/04/Room.jpg',
@@ -240,6 +248,7 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
                 bedCount: 2,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
+                sqft: 240,
                 price: 17325,
                 photoUrls: urls('https://www.sjcnc.org/image/114/1800'),
                 description: 'North double suite with shared living room and bathroom.',
@@ -249,6 +258,7 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
                 bedCount: 1,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
+                sqft: 125,
                 price: 17500,
                 photoUrls: urls(
                     'https://www.sjcnc.org/image/122/1800',
@@ -261,14 +271,12 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
     hendrick: {
         website: 'https://www.hendrickhouse.com/',
         address: '904 W. Green St., Urbana, IL 61801',
-        imageUrl: 'https://www.hendrickhouse.com/wp-content/uploads/2019/03/parent-img.jpg',
+        imageUrl: 'https://www.hendrickhouse.com/wp-content/uploads/2019/04/12a.jpg',
         galleryImages: urls(
             'https://www.hendrickhouse.com/wp-content/uploads/2019/04/hh-1-1024x681.jpg',
             'https://www.hendrickhouse.com/wp-content/uploads/2019/04/2-1024x736.jpg',
             'https://www.hendrickhouse.com/wp-content/uploads/2019/04/12a.jpg',
             'https://www.hendrickhouse.com/wp-content/uploads/2019/04/16-1024x768.jpg',
-            'https://certified.housing.illinois.edu/wp-content/uploads/2025/02/Hendrick_East-Double-Room_450x300.jpg',
-            'https://certified.housing.illinois.edu/wp-content/uploads/2025/02/Hendrick_West-Room_450x300.jpg',
             'https://www.hendrickhouse.com/wp-content/uploads/2019/04/amenities-bg-img1.jpg'
         ),
         dining: 'inside',
@@ -295,12 +303,10 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
                 bedCount: 2,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
+                sqft: 250,
                 price: 14550,
                 imageUrls: urls('https://www.hendrickhouse.com/wp-content/uploads/2019/05/East_Double-852x1024.jpg'),
-                photoUrls: urls(
-                    'https://certified.housing.illinois.edu/wp-content/uploads/2025/02/Hendrick_East-Double-Room_450x300.jpg',
-                    'https://www.hendrickhouse.com/wp-content/uploads/2019/04/12a.jpg'
-                ),
+                photoUrls: urls('https://www.hendrickhouse.com/wp-content/uploads/2019/04/12a.jpg'),
                 description: 'East double standard room with a semi-private bath; annual rate shown for the 14-meal academic-year contract.',
             }),
             plan({
@@ -308,12 +314,10 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
                 bedCount: 2,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
+                sqft: 250,
                 price: 15750,
                 imageUrls: urls('https://www.hendrickhouse.com/wp-content/uploads/2019/05/West-Double-724x1024.jpg'),
-                photoUrls: urls(
-                    'https://certified.housing.illinois.edu/wp-content/uploads/2025/02/Hendrick_West-Room_450x300.jpg',
-                    'https://www.hendrickhouse.com/wp-content/uploads/2019/04/11-1024x768.jpg'
-                ),
+                photoUrls: urls('https://www.hendrickhouse.com/wp-content/uploads/2019/04/11-1024x768.jpg'),
                 description: 'West double standard room with a semi-private bath; annual rate shown for the 14-meal academic-year contract.',
             }),
             plan({
@@ -321,6 +325,7 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
                 bedCount: 2,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
+                sqft: 380,
                 price: 24450,
                 imageUrls: urls('https://www.hendrickhouse.com/wp-content/uploads/2019/05/Deluxe_Double-1024x761.jpg'),
                 photoUrls: urls(
@@ -334,6 +339,7 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
                 bedCount: 1,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
+                sqft: 140,
                 price: 25450,
                 imageUrls: urls('https://www.hendrickhouse.com/wp-content/uploads/2019/04/East_Single-1024x861.jpg'),
                 photoUrls: urls(
@@ -347,6 +353,7 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
                 bedCount: 1,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
+                sqft: 140,
                 price: 27150,
                 imageUrls: urls('https://www.hendrickhouse.com/wp-content/uploads/2019/05/West-Single-724x1024.jpg'),
                 photoUrls: urls(
@@ -397,6 +404,7 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
                 bedCount: 2,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
+                sqft: 200,
                 price: 11775,
                 imageUrls: urls(
                     'https://presbyhall.com/wp-content/uploads/2018/05/5-bed-floorplan.png',
@@ -413,6 +421,7 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
                 bedCount: 2,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
+                sqft: 240,
                 price: 12375,
                 imageUrls: urls('https://presbyhall.com/wp-content/uploads/2018/05/5-bed-floorplan.png'),
                 photoUrls: urls(
@@ -426,6 +435,7 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
                 bedCount: 1,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
+                sqft: 130,
                 price: 14025,
                 imageUrls: urls(
                     'https://presbyhall.com/wp-content/uploads/2018/05/5-bed-floorplan.png',
@@ -445,7 +455,7 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
         location: 'Campustown',
         website: 'https://www.armoryhouse.com/',
         address: '1010 S. Second St., Champaign, IL 61820',
-        imageUrl: 'https://certified.housing.illinois.edu/wp-content/uploads/2018/03/AH1-409x270-2.jpg',
+        imageUrl: 'https://www.armoryhouse.com/sites/default/files/2020-01/main-photo.jpg',
         galleryImages: urls(
             'https://www.armoryhouse.com/sites/default/files/styles/photo_side_by_side/public/2020-01/main-photo.jpg?itok=S7woTSNh',
             'https://www.armoryhouse.com/sites/default/files/styles/photo_side_by_side/public/2020-01/main-photo-2.jpg?itok=s4eXC1VT',
@@ -482,7 +492,9 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
                 bedCount: 2,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
+                sqft: 250,
                 price: 14000,
+                imageUrls: urls('https://www.armoryhouse.com/sites/default/files/2020-02/floorplan-double_0.jpg'),
                 photoUrls: urls(
                     'https://www.armoryhouse.com/sites/default/files/styles/photo_side_by_side/public/2020-01/main-photo.jpg?itok=S7woTSNh',
                     'https://www.armoryhouse.com/sites/default/files/styles/photo_side_by_side/public/2020-01/main-photo-2.jpg?itok=s4eXC1VT'
@@ -494,7 +506,9 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
                 bedCount: 2,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
+                sqft: 320,
                 price: 14600,
+                imageUrls: urls('https://www.armoryhouse.com/sites/default/files/2020-02/AH%20Suite3d%20F8_2.jpg'),
                 photoUrls: urls(
                     'https://www.armoryhouse.com/sites/default/files/styles/photo_side_by_side/public/2020-02/6.JPG?itok=BLjVYEj6',
                     'https://www.armoryhouse.com/sites/default/files/styles/photo_side_by_side/public/2020-02/10_1.JPG?itok=o3ELCuQf'
@@ -506,11 +520,10 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
                 bedCount: 1,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
+                sqft: 180,
                 price: 18650,
-                photoUrls: urls(
-                    'https://www.armoryhouse.com/sites/default/files/styles/photo_side_by_side/public/2020-02/10_0.JPG?itok=tWDPM2le',
-                    'https://www.armoryhouse.com/sites/default/files/styles/photo_side_by_side/public/2020-02/IMG_0529.jpg?itok=GGTF2JsL'
-                ),
+                imageUrls: urls('https://www.armoryhouse.com/sites/default/files/2020-02/floorplan-single_1.jpg'),
+                photoUrls: urls('https://www.armoryhouse.com/sites/default/files/inline-images/IMG_8771.jpg'),
                 description: 'Main single with 10-meal plan.',
             }),
             plan({
@@ -518,10 +531,15 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
                 bedCount: 1,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
+                sqft: 220,
                 price: 20950,
+                imageUrls: urls(
+                    'https://www.armoryhouse.com/sites/default/files/2020-02/AH%20Suite3d%20F8_0.jpg',
+                    'https://www.armoryhouse.com/sites/default/files/2020-02/AH%20Suite3d%20F8_1.jpg'
+                ),
                 photoUrls: urls(
-                    'https://www.armoryhouse.com/sites/default/files/styles/photo_side_by_side/public/2020-02/5_1.jpg?itok=V6QUdzCM',
-                    'https://www.armoryhouse.com/sites/default/files/styles/photo_side_by_side/public/2020-02/IMG_5488.JPG?itok=NJW8o6gW'
+                    'https://www.armoryhouse.com/sites/default/files/inline-images/DSC05144_1.JPG',
+                    'https://www.armoryhouse.com/sites/default/files/inline-images/Suites%20Corner%20Room.jpg'
                 ),
                 description: 'Suite or corner single with 10-meal plan.',
             }),

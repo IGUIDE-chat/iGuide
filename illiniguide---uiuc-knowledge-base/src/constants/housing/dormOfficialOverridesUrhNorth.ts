@@ -33,6 +33,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 bedCount: 2,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 190,
                 price: 14558,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/wardall-double.pdf'),
                 photoUrls: urls('https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/ISR%20Double%20Top.jpg?itok=UvYDb4tJ'),
@@ -42,6 +43,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 bedCount: 3,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 250,
                 price: 13774,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/townsend-triple.pdf'),
                 photoUrls: urls(
@@ -54,6 +56,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 bedCount: 3,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 310,
                 price: 13774,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/townsend-large-triple.pdf'),
                 photoUrls: urls(
@@ -97,6 +100,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 bedCount: 2,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 185,
                 price: 15042,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/NUGT-RoomLayouts.pdf'),
                 photoUrls: urls(
@@ -109,6 +113,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 bedCount: 1,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
+                sqft: 135,
                 price: 17832,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/NUGT-RoomLayouts.pdf'),
                 photoUrls: urls(
@@ -121,6 +126,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 bedCount: 1,
                 bathroomCount: 1,
                 bathroomScope: 'private',
+                sqft: 145,
                 price: 18612,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/NUGT-RoomLayouts.pdf'),
                 photoUrls: urls(
@@ -164,6 +170,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 bedCount: 2,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
+                sqft: 180,
                 price: 15440,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/wassaja-doubles.pdf'),
                 description: 'Double room with a shared individual-use bathroom.',
@@ -172,6 +179,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 bedCount: 1,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
+                sqft: 125,
                 price: 17488,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/wassaja-singles.pdf'),
                 photoUrls: urls(
@@ -184,6 +192,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 bedCount: 1,
                 bathroomCount: 1,
                 bathroomScope: 'private',
+                sqft: 135,
                 price: 18612,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/wassaja-singles.pdf'),
                 photoUrls: urls(
@@ -229,6 +238,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 bedCount: 2,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
+                sqft: 320,
                 price: 15754,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/bousfield-firstfloor.pdf'),
                 photoUrls: urls(
@@ -241,6 +251,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 bedCount: 1,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
+                sqft: 160,
                 price: 17832,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/bousfield-firstfloor.pdf'),
                 photoUrls: urls(
@@ -253,6 +264,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 bedCount: 1,
                 bathroomCount: 1,
                 bathroomScope: 'private',
+                sqft: 180,
                 price: 18612,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/bousfield-firstfloor.pdf'),
                 photoUrls: urls(
@@ -296,6 +308,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 bedCount: 2,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
+                sqft: 175,
                 price: 14558,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/par_double.pdf'),
                 photoUrls: urls(
@@ -308,6 +321,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 bedCount: 1,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
+                sqft: 125,
                 price: 16564,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/par_double.pdf'),
                 description: 'PAR single room with individual-use bathroom access.',
@@ -347,6 +361,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 bedCount: 2,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 170,
                 price: 14558,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/far_double.pdf'),
                 photoUrls: urls(
@@ -359,6 +374,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 bedCount: 1,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 110,
                 price: 16564,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/far_double.pdf'),
                 photoUrls: urls(
@@ -401,6 +417,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 bedCount: 2,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 160,
                 price: 14558,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/allen-double.pdf'),
                 photoUrls: urls(
@@ -413,6 +430,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 bedCount: 3,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 230,
                 price: 13774,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/allen-triple.pdf'),
                 photoUrls: urls(
@@ -425,6 +443,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 bedCount: 4,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 280,
                 price: 13202,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/allen-quad.pdf'),
                 photoUrls: urls(
@@ -467,6 +486,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 bedCount: 1,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 130,
                 price: 16564,
                 photoUrls: urls(
                     'https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Busey-Evans-Single-Top.jpg?itok=DVTEd68p',
@@ -478,6 +498,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 bedCount: 2,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 180,
                 price: 14558,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/busey-evans_double.pdf'),
                 photoUrls: urls(
@@ -490,6 +511,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 bedCount: 3,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
+                sqft: 220,
                 price: 13774,
                 photoUrls: urls(
                     'https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Busey-Evans-Triple-Top.jpg?itok=v6URnPea',
