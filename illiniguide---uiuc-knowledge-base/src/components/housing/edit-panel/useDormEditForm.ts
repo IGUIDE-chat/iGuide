@@ -20,6 +20,11 @@ import {
   getRoomDisplayLabel,
   normalizeFloorPlan,
 } from '../../../utils/roomOptions';
+import {
+  buildLegacyDormTags,
+  getDormPriceRange,
+  sanitizeFloorPlansForStorage,
+} from '../../../utils/dormData';
 import { TEXT } from './editPanelText';
 
 interface UseDormEditFormOptions {
@@ -64,6 +69,7 @@ function dormToSnapshot(dorm: Dorm): Record<string, unknown> {
     description_zh: dorm.description_zh ?? null,
     image_url: dorm.imageUrl ?? null,
     price: dorm.price,
+    price_range: dorm.priceRange,
     application_fee: dorm.applicationFee ?? null,
     location: dorm.location,
     location_zh: dorm.location_zh ?? null,
@@ -74,8 +80,10 @@ function dormToSnapshot(dorm: Dorm): Record<string, unknown> {
     bathroom_type: dorm.bathroomType,
     room_types: dorm.roomTypes ?? null,
     room_options: dorm.roomOptions ?? null,
+    tags: dorm.tags ?? null,
+    structured_tags: dorm.structuredTags ?? null,
     categorized_tags: dorm.categorizedTags ?? null,
-    floor_plans: dorm.floorPlans ?? null,
+    floor_plans: sanitizeFloorPlansForStorage(dorm.floorPlans) ?? null,
     gallery_images: dorm.galleryImages ?? null,
     pros: dorm.pros,
     pros_zh: dorm.pros_zh ?? null,
@@ -120,7 +128,9 @@ export const useDormEditForm = ({
   const [locationZh, setLocationZh] = useState(dorm.location_zh ?? '');
   const [housingType, setHousingType] = useState(dorm.housingType);
   const [floorPlans, setFloorPlans] = useState<FloorPlan[]>(
-    (dorm.floorPlans ?? []).map((plan) => normalizeFloorPlan(plan, dorm.bathroomType)),
+    (sanitizeFloorPlansForStorage(dorm.floorPlans) ?? []).map((plan) =>
+      normalizeFloorPlan(plan, dorm.bathroomType),
+    ),
   );
   const [galleryImages, setGalleryImages] = useState<string[]>(dorm.galleryImages ?? []);
   const [ac, setAc] = useState(dorm.ac);
@@ -139,6 +149,7 @@ export const useDormEditForm = ({
   const [address, setAddress] = useState(dorm.address ?? '');
   const [addressZh, setAddressZh] = useState(dorm.address_zh ?? '');
   const [website, setWebsite] = useState(dorm.website ?? '');
+  const [petFriendly, setPetFriendly] = useState(dorm.structuredTags?.petFriendly ?? false);
 
   useEffect(() => {
     setName(dorm.name);
@@ -151,7 +162,11 @@ export const useDormEditForm = ({
     setLocation(dorm.location);
     setLocationZh(dorm.location_zh ?? '');
     setHousingType(dorm.housingType);
-    setFloorPlans((dorm.floorPlans ?? []).map((plan) => normalizeFloorPlan(plan, dorm.bathroomType)));
+    setFloorPlans(
+      (sanitizeFloorPlansForStorage(dorm.floorPlans) ?? []).map((plan) =>
+        normalizeFloorPlan(plan, dorm.bathroomType),
+      ),
+    );
     setGalleryImages([...(dorm.galleryImages ?? [])]);
     setAc(dorm.ac);
     setDining(dorm.dining);
@@ -165,6 +180,7 @@ export const useDormEditForm = ({
     setAddress(dorm.address ?? '');
     setAddressZh(dorm.address_zh ?? '');
     setWebsite(dorm.website ?? '');
+    setPetFriendly(dorm.structuredTags?.petFriendly ?? false);
   }, [dorm]);
 
   useEffect(() => {
@@ -184,7 +200,10 @@ export const useDormEditForm = ({
   }, [activeTab, dorm.id]);
 
   const normalizedFloorPlans = useMemo(
-    () => floorPlans.map((plan) => normalizeFloorPlan(plan, bathroomType)),
+    () =>
+      sanitizeFloorPlansForStorage(
+        floorPlans.map((plan) => normalizeFloorPlan(plan, bathroomType)),
+      ) ?? [],
     [bathroomType, floorPlans],
   );
 
@@ -198,7 +217,7 @@ export const useDormEditForm = ({
       current.map((plan, currentIndex) => (currentIndex === index ? updater(plan) : plan)),
     );
 
-  const buildUpdate = (): DormUpdate => {
+    const buildUpdate = (): DormUpdate => {
     const derived = deriveRoomOptions(normalizedFloorPlans, bathroomType);
     const finalCategorized: DormCategorizedTags = {
       ...categorizedTags,
@@ -208,6 +227,37 @@ export const useDormEditForm = ({
           ? categorizedTags.llcNames
           : undefined,
     };
+    const numericPrice = price !== '' ? Number(price) : null;
+    const nextDormLike: Dorm = {
+      ...dorm,
+      name,
+      name_zh: nameZh || undefined,
+      description,
+      description_zh: descriptionZh || undefined,
+      imageUrl: imageUrl || '',
+      price: numericPrice ?? dorm.price,
+      location,
+      location_zh: locationZh || undefined,
+      housingType,
+      ac,
+      dining,
+      diningNearbyDetail: diningNearbyDetail || undefined,
+      bathroomType,
+      roomTypes: derived.roomTypes,
+      roomOptions: derived.roomOptions,
+      categorizedTags: finalCategorized,
+      floorPlans: normalizedFloorPlans,
+      galleryImages,
+      pros,
+      pros_zh: prosZh,
+      cons,
+      cons_zh: consZh,
+      applicationFee: applicationFee !== '' ? Number(applicationFee) : undefined,
+      address: address || undefined,
+      address_zh: addressZh || undefined,
+      website: website || undefined,
+    };
+    const syncedTags = buildLegacyDormTags(nextDormLike);
 
     return {
       name,
@@ -215,13 +265,15 @@ export const useDormEditForm = ({
       description,
       description_zh: descriptionZh || null,
       image_url: imageUrl || null,
-      price: price !== '' ? Number(price) : null,
+      price: numericPrice,
+      price_range: numericPrice != null ? getDormPriceRange(numericPrice) : null,
       application_fee: applicationFee !== '' ? Number(applicationFee) : null,
       location,
       location_zh: locationZh || null,
       housing_type: housingType,
       room_types: derived.roomTypes.length ? derived.roomTypes : null,
       room_options: derived.roomOptions.length ? derived.roomOptions : null,
+      tags: syncedTags.length ? syncedTags : null,
       categorized_tags: finalCategorized as unknown as Record<string, unknown>,
       floor_plans: normalizedFloorPlans.length ? normalizedFloorPlans : null,
       gallery_images: galleryImages.length ? galleryImages : null,
@@ -236,6 +288,20 @@ export const useDormEditForm = ({
       address: address || null,
       address_zh: addressZh || null,
       website: website || null,
+      structured_tags: {
+        // Synced from categorizedTags
+        laundry: finalCategorized.facilities.includes('laundry'),
+        studyRooms: finalCategorized.facilities.includes('studyLounge'),
+        kitchen: finalCategorized.facilities.includes('kitchen'),
+        gymNearby: finalCategorized.facilities.includes('gym'),
+        llc: finalCategorized.lifestyle.includes('llc')
+          ? [...(finalCategorized.llcNames ?? [])]
+          : [],
+        // Admin-editable
+        petFriendly,
+        // Preserve existing values for legacy fields that are still used in filters
+        quietFloors: finalCategorized.lifestyle.includes('quiet'),
+      } as unknown as Record<string, unknown>,
     };
   };
 
@@ -389,6 +455,8 @@ export const useDormEditForm = ({
     setAddressZh,
     website,
     setWebsite,
+    petFriendly,
+    setPetFriendly,
     normalizedFloorPlans,
     derivedRoomOptions,
     updateFloorPlan,

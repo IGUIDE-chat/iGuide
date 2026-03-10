@@ -1,5 +1,7 @@
 ﻿import { Dorm, DormCategorizedTags } from '../../types/housing';
 import { normalizeDorm } from '../../utils/roomOptions';
+import { finalizeDormRecord } from '../../utils/dormData';
+import { applyDormOfficialOverride } from './dormOfficialOverrides';
 
 // Accurate UIUC dorm coordinates based on campus geography
 // Campus reference: Main Quad (40.1074, -88.2317), Engineering Quad (40.1130, -88.2280)
@@ -1366,7 +1368,11 @@ const enrichDormZhContent = (dorm: Dorm): Dorm => {
     };
 };
 
-export const UIUC_DORMS: Dorm[] = RAW_UIUC_DORMS.map(enrichDormZhContent).map(normalizeDorm);
+export const UIUC_DORMS: Dorm[] = RAW_UIUC_DORMS
+    .map(applyDormOfficialOverride)
+    .map(finalizeDormRecord)
+    .map(enrichDormZhContent)
+    .map(normalizeDorm);
 
 // Export dorm IDs for individual routes
 export const DORM_IDS = UIUC_DORMS.map((dorm) => dorm.id);

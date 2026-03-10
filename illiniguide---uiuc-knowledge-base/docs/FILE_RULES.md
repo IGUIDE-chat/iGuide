@@ -51,6 +51,7 @@ illiniguide---uiuc-knowledge-base/
 |   |   |   |-- filter-modal/
 |   |   |   `-- i18n/
 |   |   `-- layout/
+|   |-- config/
 |   |-- constants/
 |   |   `-- housing/
 |   |-- contexts/
@@ -67,6 +68,7 @@ illiniguide---uiuc-knowledge-base/
 |   |   `-- resume/
 |   |-- scripts/
 |   |-- services/
+|   |   `-- ai/
 |   |-- types/
 |   `-- utils/
 `-- tests/
@@ -98,8 +100,10 @@ Notes:
 | `src/components/housing/dorm-detail/` | Dorm detail feature sections. | Yes | Active |
 | `src/components/housing/dorm-list/` | Dorm list feature subcomponents and controllers. | Yes | Active |
 | `src/components/housing/dorm-map/` | Map builders, layers, and map-specific helpers. | Yes | Active |
-| `src/components/housing/edit-panel/` | Dorm admin edit panel shell, tabs, and form orchestration. | Yes | Active |
+| `src/components/housing/edit-panel/` | Dorm admin edit panel shell, tabs, form orchestration, and media management. | Yes | Active |
 | `src/components/housing/filter-modal/` | Dorm filter modal sections and helpers. | Yes | Active |
+| `src/components/housing/i18n/` | Housing-specific i18n texts (dorm detail, edit panel labels). | Yes | Active |
+| `src/config/` | Runtime app configuration modules. | Yes | Active |
 | `src/constants/` | Shared constants and static definitions. | Yes | Active |
 | `src/constants/housing/` | Housing constants and source datasets. | Yes | Active |
 | `src/contexts/` | React context providers and shared app state boundaries. | Yes | Active |
