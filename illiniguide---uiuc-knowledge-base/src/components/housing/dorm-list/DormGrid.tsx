@@ -1,6 +1,7 @@
 import React from 'react';
 import { Dorm } from '../../../types/housing';
 import { Language } from '../../../types';
+import { DormCommentStats } from '../../../services/dormCommentsService';
 import DormCard from '../DormCard';
 
 interface DormGridProps {
@@ -11,6 +12,7 @@ interface DormGridProps {
     onViewDetails: (dorm: Dorm) => void;
     onHoverDorm?: (dormId: string | null) => void;
     language: Language;
+    commentStats?: Record<string, DormCommentStats>;
 }
 
 const DormGrid: React.FC<DormGridProps> = ({
@@ -20,7 +22,8 @@ const DormGrid: React.FC<DormGridProps> = ({
     onToggleFavorite,
     onViewDetails,
     onHoverDorm,
-    language
+    language,
+    commentStats,
 }) => {
     return (
         <div
@@ -32,17 +35,22 @@ const DormGrid: React.FC<DormGridProps> = ({
                 }
             `}
         >
-            {dorms.map((dorm) => (
-                <DormCard
-                    key={dorm.id}
-                    dorm={dorm}
-                    onViewDetails={onViewDetails}
-                    isFavorite={favoritesSet.has(dorm.id)}
-                    onToggleFavorite={(dorm, e) => onToggleFavorite(dorm, e)}
-                    onHoverDorm={onHoverDorm}
-                    language={language}
-                />
-            ))}
+            {dorms.map((dorm) => {
+                const stats = commentStats?.[dorm.id];
+                return (
+                    <DormCard
+                        key={dorm.id}
+                        dorm={dorm}
+                        onViewDetails={onViewDetails}
+                        isFavorite={favoritesSet.has(dorm.id)}
+                        onToggleFavorite={(d, e) => onToggleFavorite(d, e)}
+                        onHoverDorm={onHoverDorm}
+                        language={language}
+                        positivePercent={stats?.positivePercent}
+                        totalReviews={stats?.totalComments}
+                    />
+                );
+            })}
         </div>
     );
 };
