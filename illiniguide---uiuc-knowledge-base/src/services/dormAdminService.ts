@@ -3,6 +3,7 @@
 import { supabase } from './supabase';
 import { Dorm } from '../types/housing';
 import { UIUC_DORMS } from '../constants/housing/dormData';
+import { sanitizeFloorPlansForStorage } from '../utils/dormData';
 
 const TABLE = 'dorms';
 
@@ -14,6 +15,7 @@ export interface DormUpdate {
     description_zh?: string | null;
     image_url?: string | null;
     price?: number | null;
+    price_range?: Dorm['priceRange'] | null;
     location?: string | null;
     location_zh?: string | null;
     housing_type?: string | null;
@@ -23,6 +25,8 @@ export interface DormUpdate {
     bathroom_type?: string | null;
     room_types?: string[] | null;
     room_options?: unknown[] | null;
+    tags?: string[] | null;
+    structured_tags?: Record<string, unknown> | null;
     categorized_tags?: Record<string, unknown> | null;
     application_fee?: number | null;
     floor_plans?: unknown[] | null;
@@ -57,13 +61,13 @@ export interface EditHistoryEntry {
  */
 const KNOWN_DB_COLUMNS = new Set([
     'name', 'name_zh', 'description', 'description_zh',
-    'image_url', 'price', 'location', 'location_zh',
+    'image_url', 'price', 'price_range', 'location', 'location_zh',
     'housing_type', 'ac', 'dining', 'dining_nearby_detail', 'bathroom_type',
-    'room_types', 'room_options', 'categorized_tags',
+    'room_types', 'room_options', 'tags', 'structured_tags', 'categorized_tags',
     'floor_plans', 'gallery_images',
     'pros', 'pros_zh', 'cons', 'cons_zh',
     'application_fee',
-    'address', 'address_zh',
+    'address', 'address_zh', 'website',
 ]);
 
 /** Build a human-readable summary of what changed between dorm and updates. */
@@ -133,7 +137,9 @@ async function restoreSnapshot(dormId: string, entry: EditHistoryEntry): Promise
     const safeSnapshot: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(entry.snapshot)) {
         if (KNOWN_DB_COLUMNS.has(key)) {
-            safeSnapshot[key] = value;
+            safeSnapshot[key] = key === 'floor_plans'
+                ? sanitizeFloorPlansForStorage(value as Dorm['floorPlans']) ?? []
+                : value;
         }
     }
     const { error } = await supabase
@@ -163,7 +169,9 @@ async function updateDorm(dormId: string, updates: DormUpdate): Promise<DormMuta
     const safeUpdates: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(updates)) {
         if (KNOWN_DB_COLUMNS.has(key)) {
-            safeUpdates[key] = value;
+            safeUpdates[key] = key === 'floor_plans'
+                ? sanitizeFloorPlansForStorage(value as Dorm['floorPlans']) ?? null
+                : value;
         }
     }
 
@@ -201,6 +209,7 @@ async function resetDormToStatic(dormId: string): Promise<DormMutationResult> {
         description_zh: staticDorm.description_zh ?? null,
         image_url: staticDorm.imageUrl,
         price: staticDorm.price,
+        price_range: staticDorm.priceRange,
         location: staticDorm.location,
         location_zh: staticDorm.location_zh ?? null,
         housing_type: staticDorm.housingType,
@@ -211,8 +220,10 @@ async function resetDormToStatic(dormId: string): Promise<DormMutationResult> {
         application_fee: staticDorm.applicationFee ?? null,
         room_types: staticDorm.roomTypes,
         room_options: staticDorm.roomOptions ?? null,
+        tags: staticDorm.tags,
+        structured_tags: staticDorm.structuredTags as unknown as Record<string, unknown> ?? null,
         categorized_tags: staticDorm.categorizedTags as unknown as Record<string, unknown> ?? null,
-        floor_plans: staticDorm.floorPlans ?? null,
+        floor_plans: sanitizeFloorPlansForStorage(staticDorm.floorPlans) ?? null,
         gallery_images: staticDorm.galleryImages ?? null,
         pros: staticDorm.pros,
         pros_zh: staticDorm.pros_zh ?? null,
@@ -220,6 +231,7 @@ async function resetDormToStatic(dormId: string): Promise<DormMutationResult> {
         cons_zh: staticDorm.cons_zh ?? null,
         address: staticDorm.address ?? null,
         address_zh: staticDorm.address_zh ?? null,
+        website: staticDorm.website ?? null,
     };
 
     return updateDorm(dormId, row);

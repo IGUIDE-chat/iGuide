@@ -496,6 +496,10 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                     const planKey   = getPlanKey(idx, plan.price, plan.labelCode);
                                     const isExpanded = expandedPlanId === planKey;
                                     const isCompared = compareIds.includes(planKey);
+                                    const planDisplayTitle = plan.officialName || labels.primaryLabel;
+                                    const normalizedSummary = plan.officialName && plan.officialName !== labels.primaryLabel
+                                        ? [labels.primaryLabel, labels.secondaryLabel].filter(Boolean).join(' · ')
+                                        : labels.secondaryLabel;
                                     // Multi-image arrays (fallback to legacy single fields)
                                     const photos  = plan.photoUrls?.length ? plan.photoUrls : plan.photoUrl ? [plan.photoUrl] : [];
                                     const layouts = plan.imageUrls?.length ? plan.imageUrls : plan.imageUrl ? [plan.imageUrl] : [];
@@ -526,7 +530,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                                     {hasThumb ? (
                                                         <img
                                                             src={thumbSrc}
-                                                            alt={labels.primaryLabel}
+                                                            alt={planDisplayTitle}
                                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                                                             onError={() => setImageErrors((prev) => ({ ...prev, [`${planKey}-thumb`]: true }))}
                                                         />
@@ -544,11 +548,11 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                                         <div className="flex items-center justify-between md:justify-start w-full gap-2">
                                                             <div className="flex items-center flex-wrap gap-1.5 md:gap-3 min-w-0">
                                                                 <h4 className="text-[15px] md:text-[18px] font-extrabold text-slate-900 truncate">
-                                                                    {labels.primaryLabel}
+                                                                    {planDisplayTitle}
                                                                 </h4>
-                                                                {labels.secondaryLabel && (
+                                                                {normalizedSummary && (
                                                                     <span className="text-[12px] md:text-[14px] text-slate-500 font-medium">
-                                                                        {labels.secondaryLabel}
+                                                                        {normalizedSummary}
                                                                     </span>
                                                                 )}
                                                                 {plan.available !== false && (

@@ -4,12 +4,13 @@ import { supabase } from './supabase';
 import { Dorm } from '../types/housing';
 import { UIUC_DORMS } from '../constants/housing/dormData';
 import { normalizeDorm } from '../utils/roomOptions';
+import { finalizeDormRecord, sanitizeFloorPlansForStorage } from '../utils/dormData';
 
 const TABLE = 'dorms';
 
 /** Map a snake_case DB row to camelCase Dorm. */
 function rowToDorm(row: Record<string, unknown>): Dorm {
-    return normalizeDorm({
+    return finalizeDormRecord(normalizeDorm({
         id: row.id as string,
         name: row.name as string,
         name_zh: (row.name_zh as string) ?? undefined,
@@ -32,7 +33,7 @@ function rowToDorm(row: Record<string, unknown>): Dorm {
         categorizedTags: (row.categorized_tags as Dorm['categorizedTags']) ?? { livingConditions: [], facilities: [], lifestyle: [] },
         roomTypes: (row.room_types as Dorm['roomTypes']) ?? [],
         roomOptions: (row.room_options as Dorm['roomOptions']) ?? undefined,
-        floorPlans: (row.floor_plans as Dorm['floorPlans']) ?? undefined,
+        floorPlans: sanitizeFloorPlansForStorage(row.floor_plans as Dorm['floorPlans']) ?? undefined,
         galleryImages: (row.gallery_images as string[]) ?? undefined,
         pros: (row.pros as string[]) ?? [],
         pros_zh: (row.pros_zh as string[]) ?? undefined,
@@ -42,7 +43,7 @@ function rowToDorm(row: Record<string, unknown>): Dorm {
         address: (row.address as string) ?? undefined,
         address_zh: (row.address_zh as string) ?? undefined,
         website: (row.website as string) ?? undefined,
-    });
+    }));
 }
 
 /** Fetch all dorms. Falls back to static data on failure. */
