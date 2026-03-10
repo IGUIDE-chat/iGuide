@@ -18,6 +18,7 @@ import { useDormComments } from '../../hooks/useDormComments';
 import { Dorm, DormTag } from '../../types/housing';
 import { Language } from '../../types';
 import DormEditPanel from './DormEditPanel';
+import ImageLightbox from './ImageLightbox';
 import { dormDetailTexts } from './i18n/dormTexts';
 import { getRoomOptionLabels, normalizeFloorPlan } from '../../utils/roomOptions';
 
@@ -82,6 +83,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
     const [compareIds,      setCompareIds]      = useState<string[]>([]);
     const [imageErrors,     setImageErrors]     = useState<Record<string, boolean>>({});
     const [showAllReviews,  setShowAllReviews]  = useState(false);
+    const [lightbox, setLightbox] = useState<{ images: { src: string; alt?: string; label?: string }[]; index: number } | null>(null);
 
     // ── Comment form state ─────────────────────────────────────────────────
     const [commentContent, setCommentContent] = useState('');
@@ -278,7 +280,14 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                     {/* ── Hero Section ── */}
                     <motion.section variants={fadeUp} className="space-y-5 md:space-y-6">
                         {heroImage && (
-                            <div className="w-full aspect-[4/3] sm:aspect-video md:aspect-[21/9] rounded-2xl md:rounded-3xl overflow-hidden relative bg-slate-100 border border-white/60 shadow-sm">
+                            <div
+                                className="w-full aspect-[4/3] sm:aspect-video md:aspect-[21/9] rounded-2xl md:rounded-3xl overflow-hidden relative bg-slate-100 border border-white/60 shadow-sm cursor-zoom-in"
+                                onClick={() => {
+                                    const gallery = (dorm.galleryImages ?? []).map((src, i) => ({ src, alt: `${dormName} ${i + 1}` }));
+                                    if (gallery.length === 0 && heroImage) gallery.push({ src: heroImage, alt: dormName });
+                                    setLightbox({ images: gallery, index: 0 });
+                                }}
+                            >
                                 <motion.img
                                     src={heroImage}
                                     alt={dormName}
@@ -310,10 +319,10 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                     <span className="px-3 py-1 text-[11px] md:text-[12px] font-bold text-slate-700 bg-slate-200/60 rounded-full">
                                         {getLocalizedLabel(housingMeta, language)} ({housingMeta.shortLabel})
                                     </span>
-                                    <div className="flex items-center gap-1.5 text-slate-500 text-[13px] md:text-[14px] font-medium">
-                                        <MapPin className="w-3.5 h-3.5 shrink-0" />
-                                        <span className="leading-tight">{dormLocation}</span>
-                                    </div>
+                                    <span className="px-3 py-1 text-[11px] md:text-[12px] font-bold text-slate-700 bg-slate-200/60 rounded-full inline-flex items-center gap-1">
+                                        <MapPin className="w-3 h-3" />
+                                        {dormLocation}
+                                    </span>
                                 </div>
 
                                 <h1 className="text-3xl md:text-4xl font-extrabold text-illini-blue tracking-tight">
@@ -483,7 +492,14 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                     const planKey   = getPlanKey(idx, plan.price, plan.labelCode);
                                     const isExpanded = expandedPlanId === planKey;
                                     const isCompared = compareIds.includes(planKey);
-                                    const hasImage   = Boolean(plan.imageUrl) && !imageErrors[planKey];
+                                    const thumbSrc   = plan.photoUrl || plan.imageUrl;
+                                    const layoutSrc  = plan.imageUrl;
+                                    const hasThumb   = Boolean(thumbSrc) && !imageErrors[`${planKey}-thumb`];
+                                    const hasLayout  = Boolean(layoutSrc) && !imageErrors[`${planKey}-layout`];
+                                    // Collect all available images for this plan's lightbox
+                                    const planImages: { src: string; alt?: string; label?: string }[] = [];
+                                    if (plan.photoUrl) planImages.push({ src: plan.photoUrl, alt: labels.primaryLabel, label: language === 'zh' ? '展示图' : 'Photo' });
+                                    if (plan.imageUrl) planImages.push({ src: plan.imageUrl, alt: labels.primaryLabel, label: language === 'zh' ? '户型图' : 'Floor Plan' });
 
                                     return (
                                         <motion.div
@@ -495,14 +511,17 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                             className="group bg-white rounded-xl md:rounded-2xl border border-slate-100 hover:-translate-y-px hover:shadow-[0_6px_20px_rgba(0,0,0,0.08)] transition-[box-shadow] duration-150 cursor-pointer overflow-hidden shadow-sm"
                                         >
                                             <div className="p-3 md:p-5 flex flex-row items-center md:items-start gap-4 md:gap-6">
-                                                {/* Thumbnail */}
-                                                <div className="w-20 h-20 md:w-36 md:h-28 shrink-0 bg-slate-50 rounded-lg md:rounded-xl overflow-hidden border border-slate-200/60 relative group-hover:border-slate-300 transition-colors">
-                                                    {hasImage ? (
+                                                {/* Thumbnail (展示图 > 户型图 > placeholder) */}
+                                                <div
+                                                    className="w-20 h-20 md:w-36 md:h-28 shrink-0 bg-slate-50 rounded-lg md:rounded-xl overflow-hidden border border-slate-200/60 relative group-hover:border-slate-300 transition-colors"
+                                                    onClick={(e) => { if (planImages.length > 0) { e.stopPropagation(); setLightbox({ images: planImages, index: 0 }); } }}
+                                                >
+                                                    {hasThumb ? (
                                                         <img
-                                                            src={plan.imageUrl}
+                                                            src={thumbSrc}
                                                             alt={labels.primaryLabel}
                                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                                                            onError={() => setImageErrors((prev) => ({ ...prev, [planKey]: true }))}
+                                                            onError={() => setImageErrors((prev) => ({ ...prev, [`${planKey}-thumb`]: true }))}
                                                         />
                                                     ) : (
                                                         <div className="w-full h-full flex items-center justify-center text-slate-300">
@@ -652,12 +671,13 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                                         className="overflow-hidden"
                                                     >
                                                         <div className="p-4 md:p-5 pt-0 border-t border-slate-100/50 mx-4 md:mx-5 mt-2">
-                                                            {hasImage ? (
+                                                            {hasLayout ? (
                                                                 <img
-                                                                    src={plan.imageUrl}
+                                                                    src={layoutSrc}
                                                                     alt={`${labels.primaryLabel} floor plan`}
-                                                                    className="w-full h-auto rounded-xl border border-slate-200/50 bg-slate-50 mt-3 md:mt-4"
-                                                                    onError={() => setImageErrors((prev) => ({ ...prev, [planKey]: true }))}
+                                                                    className="w-full h-auto rounded-xl border border-slate-200/50 bg-slate-50 mt-3 md:mt-4 cursor-zoom-in hover:opacity-90 transition-opacity"
+                                                                    onClick={(e) => { e.stopPropagation(); setLightbox({ images: planImages, index: planImages.findIndex((img) => img.src === layoutSrc) }); }}
+                                                                    onError={() => setImageErrors((prev) => ({ ...prev, [`${planKey}-layout`]: true }))}
                                                                 />
                                                             ) : (
                                                                 <div className="bg-slate-50/50 rounded-xl p-6 md:p-8 flex items-center justify-center text-slate-400 border border-slate-200/50 border-dashed mt-3 md:mt-4 font-medium text-[13px] md:text-[14px]">
@@ -903,6 +923,17 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
 
                 </motion.div>
             </main>
+
+            {/* Image lightbox */}
+            <AnimatePresence>
+                {lightbox && (
+                    <ImageLightbox
+                        images={lightbox.images}
+                        initialIndex={Math.max(lightbox.index, 0)}
+                        onClose={() => setLightbox(null)}
+                    />
+                )}
+            </AnimatePresence>
 
             {/* Admin edit panel */}
             {editOpen && (
