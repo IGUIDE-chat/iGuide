@@ -1,5 +1,5 @@
 import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Bath, BedSingle, MapPin, Utensils, Wind } from 'lucide-react';
+import { Bath, BedSingle, MapPin, ThumbsUp, Utensils, Wind } from 'lucide-react';
 import { formatPrice } from '../../constants/housing/pricing';
 import { Dorm } from '../../types/housing';
 import { Language } from '../../types';
@@ -13,6 +13,8 @@ interface DormCardProps {
     onToggleFavorite?: (dorm: Dorm, e?: React.MouseEvent) => void;
     onHoverDorm?: (dormId: string | null) => void;
     language?: Language;
+    positivePercent?: number | null;
+    totalReviews?: number;
 }
 
 const CARD_TAG_GAP_PX = 6;
@@ -276,6 +278,8 @@ const DormCard: React.FC<DormCardProps> = ({
     onToggleFavorite,
     onHoverDorm,
     language = 'en',
+    positivePercent,
+    totalReviews,
 }) => {
     const t = TEXT[language];
     const dormName = language === 'zh' && dorm.name_zh ? dorm.name_zh : dorm.name;
@@ -306,9 +310,16 @@ const DormCard: React.FC<DormCardProps> = ({
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <div className="absolute right-3 top-3 flex items-end">
-                    <div className="origin-top-right rounded-md bg-white px-2 py-1 text-xs font-bold text-illini-blue shadow-sm transition-transform duration-200 group-hover:scale-105">
-                        {formatPrice(dorm.price)}
-                    </div>
+                    {positivePercent != null && totalReviews && totalReviews > 0 ? (
+                        <div className="origin-top-right rounded-full bg-white/90 backdrop-blur-sm px-2.5 py-1 text-xs font-bold text-illini-orange shadow-sm transition-transform duration-200 group-hover:scale-105 flex items-center gap-1">
+                            <ThumbsUp size={12} className="fill-illini-orange" />
+                            {positivePercent}% ({totalReviews})
+                        </div>
+                    ) : (
+                        <div className="origin-top-right rounded-md bg-white px-2 py-1 text-xs font-bold text-illini-blue shadow-sm transition-transform duration-200 group-hover:scale-105">
+                            {formatPrice(dorm.price)}
+                        </div>
+                    )}
                 </div>
 
                 {onToggleFavorite && (

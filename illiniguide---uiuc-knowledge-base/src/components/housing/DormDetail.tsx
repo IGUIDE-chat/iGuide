@@ -51,6 +51,10 @@ const fadeUp: Variants = {
 const cardHover = { y: -3, scale: 1.02 } as const;
 const cardTap   = { scale: 0.97 };
 
+/** Detect if text is primarily Chinese (has CJK characters) */
+const isChinese = (text: string) => /[\u4e00-\u9fff]/.test(text);
+const detectLang = (text: string): 'zh' | 'en' => isChinese(text) ? 'zh' : 'en';
+
 // ─── Props ─────────────────────────────────────────────────────────────────
 interface DormDetailProps {
     language?: Language;
@@ -83,6 +87,11 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
     const [commentContent, setCommentContent] = useState('');
     const [commentVote,    setCommentVote]    = useState<1 | -1 | null>(null);
     const [submitting,     setSubmitting]     = useState(false);
+
+    // ── Translation state ────────────────────────────────────────────────
+    const [translations,    setTranslations]    = useState<Record<string, string>>({});
+    const [translating,     setTranslating]     = useState<Record<string, boolean>>({});
+    const [translateErrors, setTranslateErrors] = useState<Record<string, boolean>>({});
 
     const t = dormDetailTexts[language];
 
@@ -166,6 +175,47 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
         }
     };
 
+    const handleDeleteComment = (commentId: string) => {
+        const msg = language === 'zh' ? '确定要删除这条评论吗？' : 'Delete this comment?';
+        if (!window.confirm(msg)) return;
+        deleteComment(commentId);
+    };
+
+    const handleTranslate = async (commentId: string, text: string) => {
+        if (translations[commentId]) {
+            // Toggle off
+            setTranslations((prev) => { const next = { ...prev }; delete next[commentId]; return next; });
+            return;
+        }
+        setTranslating((prev) => ({ ...prev, [commentId]: true }));
+        setTranslateErrors((prev) => { const next = { ...prev }; delete next[commentId]; return next; });
+        try {
+            const targetLang = language === 'zh' ? 'English' : '中文';
+            const res = await fetch('/api/deepseek', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    messages: [
+                        { role: 'system', content: `You are a translator. Translate the following text to ${targetLang}. Return ONLY the translation, nothing else.` },
+                        { role: 'user', content: text },
+                    ],
+                }),
+            });
+            if (res.ok) {
+                const data = await res.json() as Record<string, unknown>;
+                const choices = data.choices as Array<{ message?: { content?: string } }> | undefined;
+                const translated = choices?.[0]?.message?.content ?? (data.reply as string) ?? text;
+                setTranslations((prev) => ({ ...prev, [commentId]: translated }));
+            } else {
+                setTranslateErrors((prev) => ({ ...prev, [commentId]: true }));
+            }
+        } catch {
+            setTranslateErrors((prev) => ({ ...prev, [commentId]: true }));
+        } finally {
+            setTranslating((prev) => ({ ...prev, [commentId]: false }));
+        }
+    };
+
     // ── Render ─────────────────────────────────────────────────────────────
     return (
         <motion.div
@@ -187,26 +237,38 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                         <span className="text-[13px] md:text-[14px] font-semibold sm:hidden">{language === 'zh' ? '返回' : 'Back'}</span>
                     </button>
 
-                    <motion.button
-                        type="button"
-                        onClick={async () => { await toggleFavorite(dorm.id, dorm.name, dorm.name_zh); }}
-                        aria-label={isSaved ? t.saved : t.save}
-                        whileTap={{ scale: 1.35 }}
-                        transition={{ type: 'spring', stiffness: 400, damping: 12 }}
-                        className="p-2 -mr-1 text-slate-500 hover:text-illini-orange transition-colors rounded-full hover:bg-slate-100/50"
-                    >
-                        <AnimatePresence mode="wait" initial={false}>
-                            <motion.div
-                                key={isSaved ? 'saved' : 'unsaved'}
-                                initial={{ scale: 0.6, opacity: 0 }}
-                                animate={{ scale: 1,   opacity: 1 }}
-                                exit={{   scale: 0.6, opacity: 0 }}
-                                transition={{ duration: 0.15 }}
+                    <div className="flex items-center gap-1">
+                        {user?.isAdmin && (
+                            <button
+                                type="button"
+                                onClick={() => setEditOpen(true)}
+                                className="p-2 text-slate-400 hover:text-illini-blue transition-colors rounded-full hover:bg-slate-100/50"
+                                aria-label="Edit"
                             >
-                                <Heart className={`w-5 h-5 transition-colors duration-200 ${isSaved ? 'fill-illini-orange text-illini-orange' : ''}`} />
-                            </motion.div>
-                        </AnimatePresence>
-                    </motion.button>
+                                <Pencil className="w-4 h-4" />
+                            </button>
+                        )}
+                        <motion.button
+                            type="button"
+                            onClick={async () => { await toggleFavorite(dorm.id, dorm.name, dorm.name_zh); }}
+                            aria-label={isSaved ? t.saved : t.save}
+                            whileTap={{ scale: 1.35 }}
+                            transition={{ type: 'spring', stiffness: 400, damping: 12 }}
+                            className="p-2 -mr-1 text-slate-500 hover:text-illini-orange transition-colors rounded-full hover:bg-slate-100/50"
+                        >
+                            <AnimatePresence mode="wait" initial={false}>
+                                <motion.div
+                                    key={isSaved ? 'saved' : 'unsaved'}
+                                    initial={{ scale: 0.6, opacity: 0 }}
+                                    animate={{ scale: 1,   opacity: 1 }}
+                                    exit={{   scale: 0.6, opacity: 0 }}
+                                    transition={{ duration: 0.15 }}
+                                >
+                                    <Heart className={`w-5 h-5 transition-colors duration-200 ${isSaved ? 'fill-illini-orange text-illini-orange' : ''}`} />
+                                </motion.div>
+                            </AnimatePresence>
+                        </motion.button>
+                    </div>
                 </div>
             </div>
 
@@ -234,7 +296,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                     >
                                         <ThumbsUp className="w-3.5 h-3.5 md:w-4 md:h-4 text-illini-orange fill-illini-orange" />
                                         <span className="text-[12px] md:text-[13px] font-bold text-slate-900">
-                                            {positivePercent}{t.positiveRating}
+                                            {positivePercent}{t.positiveRating} ({totalReviews})
                                         </span>
                                     </motion.div>
                                 )}
@@ -248,6 +310,12 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                     <span className="px-3 py-1 text-[11px] md:text-[12px] font-bold text-slate-700 bg-slate-200/60 rounded-full">
                                         {getLocalizedLabel(housingMeta, language)} ({housingMeta.shortLabel})
                                     </span>
+                                    {positivePercent !== null && (
+                                        <span className="px-2.5 py-1 text-[11px] md:text-[12px] font-bold text-illini-orange bg-illini-orange/10 rounded-full inline-flex items-center gap-1">
+                                            <ThumbsUp className="w-3 h-3 fill-illini-orange" />
+                                            {positivePercent}{t.positiveRating} ({totalReviews})
+                                        </span>
+                                    )}
                                 </div>
 
                                 <h1 className="text-3xl md:text-4xl font-extrabold text-illini-blue tracking-tight">
@@ -758,7 +826,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                                             <motion.button
                                                                 type="button"
                                                                 whileTap={{ scale: 0.9 }}
-                                                                onClick={() => deleteComment(comment.id)}
+                                                                onClick={() => handleDeleteComment(comment.id)}
                                                                 className="text-slate-300 hover:text-red-400 transition-colors p-1"
                                                                 aria-label={t.deleteComment}
                                                             >
@@ -767,9 +835,25 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                                         )}
                                                     </div>
                                                 </div>
-                                                <p className="text-[13px] md:text-[14px] text-slate-600 leading-relaxed font-medium">
-                                                    {comment.content}
-                                                </p>
+                                                {translations[comment.id] ? (
+                                                    <>
+                                                        <p className="text-[13px] md:text-[14px] text-slate-600 leading-relaxed font-medium">
+                                                            {translations[comment.id]}
+                                                        </p>
+                                                        <p className="text-[12px] text-slate-400 leading-relaxed mt-1.5 pl-3 border-l-2 border-slate-200">
+                                                            {comment.content}
+                                                        </p>
+                                                    </>
+                                                ) : (
+                                                    <p className="text-[13px] md:text-[14px] text-slate-600 leading-relaxed font-medium">
+                                                        {comment.content}
+                                                    </p>
+                                                )}
+                                                {translateErrors[comment.id] && (
+                                                    <p className="text-[12px] text-red-400 mt-1">
+                                                        {language === 'zh' ? '翻译失败，点击重试' : 'Translation failed, click to retry'}
+                                                    </p>
+                                                )}
                                                 <div className="flex items-center gap-4 mt-4 pt-3 border-t border-slate-100/50">
                                                     <motion.button
                                                         type="button"
@@ -784,6 +868,21 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                                             {t.helpful}{comment.upvotes > 0 ? ` (${comment.upvotes})` : ''}
                                                         </span>
                                                     </motion.button>
+                                                    {detectLang(comment.content) !== language && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleTranslate(comment.id, comment.content)}
+                                                            disabled={translating[comment.id]}
+                                                            className="flex items-center gap-1 text-[12px] font-semibold text-slate-400 hover:text-illini-blue transition-colors disabled:opacity-50"
+                                                        >
+                                                            <Globe className="w-3.5 h-3.5" />
+                                                            {translating[comment.id]
+                                                                ? (language === 'zh' ? '翻译中...' : 'Translating...')
+                                                                : translations[comment.id]
+                                                                    ? (language === 'zh' ? '显示原文' : 'Original')
+                                                                    : (language === 'zh' ? '翻译' : 'Translate')}
+                                                        </button>
+                                                    )}
                                                 </div>
                                             </motion.div>
                                         ))}
