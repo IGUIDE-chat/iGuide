@@ -224,9 +224,11 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
             variants={pageVariants}
             initial="hidden"
             animate="visible"
-            className={`h-full overflow-y-auto w-full no-scrollbar font-sans text-slate-800 pb-24 bg-slate-50 transition-[margin] duration-300 ease-in-out ${
-                editOpen ? 'lg:mr-[32rem]' : ''
-            }`}
+            className="h-full overflow-y-auto w-full no-scrollbar font-sans text-slate-800 pb-24 bg-slate-50"
+            style={{
+                marginRight: editOpen ? '32rem' : 0,
+                transition: 'margin-right 0.3s ease-in-out',
+            }}
         >
             {/* ── Top bar ── */}
             <div className="sticky top-0 z-40 bg-white/70 backdrop-blur-xl border-b border-white/50 shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
