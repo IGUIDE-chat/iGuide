@@ -494,14 +494,17 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                     const planKey   = getPlanKey(idx, plan.price, plan.labelCode);
                                     const isExpanded = expandedPlanId === planKey;
                                     const isCompared = compareIds.includes(planKey);
-                                    const thumbSrc   = plan.photoUrl || plan.imageUrl;
-                                    const layoutSrc  = plan.imageUrl;
+                                    // Multi-image arrays (fallback to legacy single fields)
+                                    const photos  = plan.photoUrls?.length ? plan.photoUrls : plan.photoUrl ? [plan.photoUrl] : [];
+                                    const layouts = plan.imageUrls?.length ? plan.imageUrls : plan.imageUrl ? [plan.imageUrl] : [];
+                                    const thumbSrc   = photos[0] || layouts[0];
+                                    const layoutSrc  = layouts[0];
                                     const hasThumb   = Boolean(thumbSrc) && !imageErrors[`${planKey}-thumb`];
                                     const hasLayout  = Boolean(layoutSrc) && !imageErrors[`${planKey}-layout`];
                                     // Collect all available images for this plan's lightbox
                                     const planImages: { src: string; alt?: string; label?: string }[] = [];
-                                    if (plan.photoUrl) planImages.push({ src: plan.photoUrl, alt: labels.primaryLabel, label: language === 'zh' ? '展示图' : 'Photo' });
-                                    if (plan.imageUrl) planImages.push({ src: plan.imageUrl, alt: labels.primaryLabel, label: language === 'zh' ? '户型图' : 'Floor Plan' });
+                                    photos.forEach((src, i) => planImages.push({ src, alt: labels.primaryLabel, label: `${language === 'zh' ? '展示图' : 'Photo'}${photos.length > 1 ? ` ${i + 1}` : ''}` }));
+                                    layouts.forEach((src, i) => planImages.push({ src, alt: labels.primaryLabel, label: `${language === 'zh' ? '户型图' : 'Floor Plan'}${layouts.length > 1 ? ` ${i + 1}` : ''}` }));
 
                                     return (
                                         <motion.div

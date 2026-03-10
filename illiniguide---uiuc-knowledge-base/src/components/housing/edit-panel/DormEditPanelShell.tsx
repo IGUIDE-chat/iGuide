@@ -43,13 +43,7 @@ export const DormEditPanelShell: React.FC<DormEditPanelShellProps> = ({
 }) => {
   return (
     <>
-      {/* Backdrop — click to close, transparent so left side stays visible */}
-      <div
-        className="fixed inset-0 z-40"
-        onClick={onClose}
-        aria-hidden="true"
-      />
-
+      {/* No full-page backdrop — left side stays fully interactive and scrollable */}
       <div className="fixed right-0 top-0 h-full w-full max-w-lg z-50 bg-white shadow-2xl flex flex-col border-l border-gray-200">
         <div className="flex items-center justify-between px-4 py-3 bg-illini-blue text-white flex-shrink-0">
           <span className="font-bold text-base truncate">{title}</span>
