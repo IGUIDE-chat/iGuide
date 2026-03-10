@@ -4,9 +4,7 @@ import { motion, AnimatePresence, Variants } from 'framer-motion';
 import {
     ArrowLeft, Heart, MapPin, Snowflake, Utensils, Bath,
     ChevronDown, Check, ThumbsUp, SquareDashed, ArrowRightLeft,
-    BedSingle, MessageSquare, User, Pencil, X, ExternalLink,
-    Palette, Users, Music, BookOpen, VolumeX, Globe, ShoppingBag,
-    Bus, LucideIcon,
+    BedSingle, MessageSquare, User, Pencil, X, ExternalLink, Globe,
 } from 'lucide-react';
 import { formatPrice } from '../../constants/housing/pricing';
 import { TAG_REGISTRY, getHousingTypeMeta, getLocalizedLabel } from '../../constants/housing/metadata';
@@ -22,35 +20,21 @@ import ImageLightbox from './ImageLightbox';
 import { dormDetailTexts } from './i18n/dormTexts';
 import { getRoomOptionLabels, normalizeFloorPlan } from '../../utils/roomOptions';
 
-// ─── Tag → icon mapping ────────────────────────────────────────────────────
-const TAG_ICONS: Partial<Record<DormTag, LucideIcon>> = {
-    artsyCreative:        Palette,
-    llc:                  Users,
-    musicRooms:           Music,
-    studyLounge:          BookOpen,
-    quiet:                VolumeX,
-    socialParty:          Users,
-    internationalFriendly: Globe,
-    convenienceStore:     ShoppingBag,
-    busStop:              Bus,
-    kitchen:              Utensils,
-};
-
 // ─── Animation variants ────────────────────────────────────────────────────
 const pageVariants: Variants = {
-    hidden:  { opacity: 0, y: 10 },
-    visible: { opacity: 1, y: 0,  transition: { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] } },
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] } },
 };
 const staggerContainer: Variants = {
-    hidden:  { opacity: 0 },
+    hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.15 } },
 };
 const fadeUp: Variants = {
-    hidden:  { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0,  transition: { duration: 0.45, ease: [0.25, 0.1, 0.25, 1] } },
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.25, 0.1, 0.25, 1] } },
 };
 const cardHover = { y: -3, scale: 1.02 } as const;
-const cardTap   = { scale: 0.97 };
+const cardTap = { scale: 0.97 };
 
 /** Detect if text is primarily Chinese (has CJK characters) */
 const isChinese = (text: string) => /[\u4e00-\u9fff]/.test(text);
@@ -78,21 +62,21 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
     const [dorm, setDorm] = useState<Dorm | undefined>(getFromContext(dormId));
 
     // ── UI state ───────────────────────────────────────────────────────────
-    const [editOpen,        setEditOpen]        = useState(false);
-    const [expandedPlanId,  setExpandedPlanId]  = useState<string | null>(null);
-    const [compareIds,      setCompareIds]      = useState<string[]>([]);
-    const [imageErrors,     setImageErrors]     = useState<Record<string, boolean>>({});
-    const [showAllReviews,  setShowAllReviews]  = useState(false);
+    const [editOpen, setEditOpen] = useState(false);
+    const [expandedPlanId, setExpandedPlanId] = useState<string | null>(null);
+    const [compareIds, setCompareIds] = useState<string[]>([]);
+    const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+    const [showAllReviews, setShowAllReviews] = useState(false);
     const [lightbox, setLightbox] = useState<{ images: { src: string; alt?: string; label?: string }[]; index: number } | null>(null);
 
     // ── Comment form state ─────────────────────────────────────────────────
     const [commentContent, setCommentContent] = useState('');
-    const [commentVote,    setCommentVote]    = useState<1 | -1 | null>(null);
-    const [submitting,     setSubmitting]     = useState(false);
+    const [commentVote, setCommentVote] = useState<1 | -1 | null>(null);
+    const [submitting, setSubmitting] = useState(false);
 
     // ── Translation state ────────────────────────────────────────────────
-    const [translations,    setTranslations]    = useState<Record<string, string>>({});
-    const [translating,     setTranslating]     = useState<Record<string, boolean>>({});
+    const [translations, setTranslations] = useState<Record<string, string>>({});
+    const [translating, setTranslating] = useState<Record<string, boolean>>({});
     const [translateErrors, setTranslateErrors] = useState<Record<string, boolean>>({});
 
     const t = dormDetailTexts[language];
@@ -122,29 +106,29 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
     }
 
     // ── Derived data ───────────────────────────────────────────────────────
-    const isSaved       = isFavorite(dorm.id);
-    const dormName      = language === 'zh' && dorm.name_zh       ? dorm.name_zh       : dorm.name;
-    const dormDesc      = language === 'zh' && dorm.description_zh ? dorm.description_zh : dorm.description;
-    const dormLocation  = language === 'zh' && dorm.location_zh   ? dorm.location_zh   : dorm.location;
-    const dormAddress   = language === 'zh' && dorm.address_zh   ? dorm.address_zh   : dorm.address;
-    const heroImage     = dorm.galleryImages?.[0] ?? dorm.imageUrl;
-    const housingMeta   = getHousingTypeMeta(dorm.housingType);
+    const isSaved = isFavorite(dorm.id);
+    const dormName = language === 'zh' && dorm.name_zh ? dorm.name_zh : dorm.name;
+    const dormDesc = language === 'zh' && dorm.description_zh ? dorm.description_zh : dorm.description;
+    const dormLocation = language === 'zh' && dorm.location_zh ? dorm.location_zh : dorm.location;
+    const dormAddress = language === 'zh' && dorm.address_zh ? dorm.address_zh : dorm.address;
+    const heroImage = dorm.galleryImages?.[0] ?? dorm.imageUrl;
+    const housingMeta = getHousingTypeMeta(dorm.housingType);
 
     const allTags: DormTag[] = [
         ...(dorm.categorizedTags?.livingConditions ?? []),
-        ...(dorm.categorizedTags?.facilities       ?? []),
-        ...(dorm.categorizedTags?.lifestyle        ?? []),
+        ...(dorm.categorizedTags?.facilities ?? []),
+        ...(dorm.categorizedTags?.lifestyle ?? []),
     ];
     const positiveTags = allTags.filter((t) => TAG_REGISTRY[t]?.cardTone === 'positive');
-    const neutralTags  = allTags.filter((t) => TAG_REGISTRY[t]?.cardTone === 'neutral');
-    const mutedTags    = allTags.filter((t) => TAG_REGISTRY[t]?.cardTone === 'muted');
+    const neutralTags = allTags.filter((t) => TAG_REGISTRY[t]?.cardTone === 'neutral');
+    const mutedTags = allTags.filter((t) => TAG_REGISTRY[t]?.cardTone === 'muted');
 
     const diningLabel = dorm.dining === 'inside'
         ? (language === 'zh' ? '自带食堂' : 'Dining Hall')
         : dorm.dining === 'nearby'
             ? (language === 'zh' ? '附近食堂' : 'Dining Nearby')
             : (language === 'zh' ? '无食堂' : 'No Dining');
-    const bathroomLabel = dorm.bathroomType === 'private'      ? t.privateBath
+    const bathroomLabel = dorm.bathroomType === 'private' ? t.privateBath
         : dorm.bathroomType === 'semi-private' ? t.semiPrivateBath
             : t.communalBath;
 
@@ -157,8 +141,8 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
     const getPlanKey = (idx: number, price: number, code?: string) => `${code ?? 'plan'}-${price}-${idx}`;
 
     // Reviews
-    const totalReviews     = comments.length;
-    const positivePercent  = totalReviews > 0 ? Math.round((thumbsUp / totalReviews) * 100) : null;
+    const totalReviews = comments.length;
+    const positivePercent = totalReviews > 0 ? Math.round((thumbsUp / totalReviews) * 100) : null;
     const displayedComments = showAllReviews ? comments : comments.slice(0, 3);
 
     // ── Handlers ───────────────────────────────────────────────────────────
@@ -266,8 +250,8 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                 <motion.div
                                     key={isSaved ? 'saved' : 'unsaved'}
                                     initial={{ scale: 0.6, opacity: 0 }}
-                                    animate={{ scale: 1,   opacity: 1 }}
-                                    exit={{   scale: 0.6, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    exit={{ scale: 0.6, opacity: 0 }}
                                     transition={{ duration: 0.15 }}
                                 >
                                     <Heart className={`w-5 h-5 transition-colors duration-200 ${isSaved ? 'fill-illini-orange text-illini-orange' : ''}`} />
@@ -342,17 +326,21 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
 
                                 {positiveTags.length > 0 && (
                                     <div className="flex flex-wrap gap-2 pt-1">
-                                        {positiveTags.map((tag, i) => (
-                                            <motion.span
-                                                key={tag}
-                                                initial={{ opacity: 0, scale: 0.85 }}
-                                                animate={{ opacity: 1, scale: 1 }}
-                                                transition={{ delay: 0.3 + i * 0.06 }}
-                                                className="px-3 py-1 text-[12px] md:text-[13px] font-bold text-illini-orange bg-illini-orange/10 rounded-full"
-                                            >
-                                                {getLocalizedLabel(TAG_REGISTRY[tag], language)}
-                                            </motion.span>
-                                        ))}
+                                        {positiveTags.map((tag, i) => {
+                                            const Icon = TAG_REGISTRY[tag]?.icon;
+                                            return (
+                                                <motion.span
+                                                    key={tag}
+                                                    initial={{ opacity: 0, scale: 0.85 }}
+                                                    animate={{ opacity: 1, scale: 1 }}
+                                                    transition={{ delay: 0.3 + i * 0.06 }}
+                                                    className="inline-flex items-center gap-1 px-3 py-1 text-[12px] md:text-[13px] font-bold text-illini-orange bg-illini-orange/10 rounded-full"
+                                                >
+                                                    {Icon && <Icon className="w-3.5 h-3.5" strokeWidth={1.5} />}
+                                                    {getLocalizedLabel(TAG_REGISTRY[tag], language)}
+                                                </motion.span>
+                                            );
+                                        })}
                                     </div>
                                 )}
                             </div>
@@ -360,9 +348,8 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                             {/* Hard Facts cards */}
                             <div className="flex gap-2 md:gap-3 w-full md:w-auto mt-2 md:mt-0">
                                 {/* AC */}
-                                <div className={`rounded-2xl p-2 md:p-3 flex flex-col items-center justify-center min-w-[88px] md:min-w-[100px] h-[88px] md:h-[100px] shadow-sm border flex-1 md:flex-none ${
-                                    dorm.ac ? 'bg-white border-slate-100' : 'bg-amber-50 border-amber-200'
-                                }`}>
+                                <div className={`rounded-2xl p-2 md:p-3 flex flex-col items-center justify-center min-w-[88px] md:min-w-[100px] h-[88px] md:h-[100px] shadow-sm border flex-1 md:flex-none ${dorm.ac ? 'bg-white border-slate-100' : 'bg-amber-50 border-amber-200'
+                                    }`}>
                                     {/* Snowflake with strikethrough when no AC */}
                                     <div className="relative mb-1.5">
                                         <Snowflake
@@ -424,7 +411,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                             <h3 className="text-[16px] md:text-[18px] font-bold text-slate-900">{t.amenities}</h3>
                             <div className="flex flex-wrap gap-2 md:gap-2.5">
                                 {neutralTags.map((tag, i) => {
-                                    const Icon = TAG_ICONS[tag];
+                                    const Icon = TAG_REGISTRY[tag]?.icon;
                                     return (
                                         <motion.div
                                             key={tag}
@@ -442,7 +429,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                     );
                                 })}
                                 {mutedTags.map((tag, i) => {
-                                    const Icon = TAG_ICONS[tag];
+                                    const Icon = TAG_REGISTRY[tag]?.icon;
                                     return (
                                         <motion.div
                                             key={tag}
@@ -487,22 +474,26 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                             <div className="space-y-3">
                                 {sortedPlans.map((plan, idx) => {
                                     const option = {
-                                        bedCount:      plan.bedCount      ?? null,
+                                        bedCount: plan.bedCount ?? null,
                                         bathroomCount: plan.bathroomCount ?? null,
                                         bathroomScope: plan.bathroomScope ?? ('communal' as const),
-                                        labelCode:     plan.labelCode,
+                                        labelCode: plan.labelCode,
                                     };
-                                    const labels    = getRoomOptionLabels(option, language);
-                                    const planKey   = getPlanKey(idx, plan.price, plan.labelCode);
+                                    const labels = getRoomOptionLabels(option, language);
+                                    const planKey = getPlanKey(idx, plan.price, plan.labelCode);
                                     const isExpanded = expandedPlanId === planKey;
                                     const isCompared = compareIds.includes(planKey);
+                                    const planDisplayTitle = plan.officialName || labels.primaryLabel;
+                                    const normalizedSummary = plan.officialName && plan.officialName !== labels.primaryLabel
+                                        ? [labels.primaryLabel, labels.secondaryLabel].filter(Boolean).join(' · ')
+                                        : labels.secondaryLabel;
                                     // Multi-image arrays (fallback to legacy single fields)
-                                    const photos  = plan.photoUrls?.length ? plan.photoUrls : plan.photoUrl ? [plan.photoUrl] : [];
+                                    const photos = plan.photoUrls?.length ? plan.photoUrls : plan.photoUrl ? [plan.photoUrl] : [];
                                     const layouts = plan.imageUrls?.length ? plan.imageUrls : plan.imageUrl ? [plan.imageUrl] : [];
-                                    const thumbSrc   = photos[0] || layouts[0];
-                                    const layoutSrc  = layouts[0];
-                                    const hasThumb   = Boolean(thumbSrc) && !imageErrors[`${planKey}-thumb`];
-                                    const hasLayout  = Boolean(layoutSrc) && !imageErrors[`${planKey}-layout`];
+                                    const thumbSrc = photos[0] || layouts[0];
+                                    const layoutSrc = layouts[0];
+                                    const hasThumb = Boolean(thumbSrc) && !imageErrors[`${planKey}-thumb`];
+                                    const hasLayout = Boolean(layoutSrc) && !imageErrors[`${planKey}-layout`];
                                     // Collect all available images for this plan's lightbox
                                     const planImages: { src: string; alt?: string; label?: string }[] = [];
                                     photos.forEach((src, i) => planImages.push({ src, alt: labels.primaryLabel, label: `${language === 'zh' ? '展示图' : 'Photo'}${photos.length > 1 ? ` ${i + 1}` : ''}` }));
@@ -526,7 +517,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                                     {hasThumb ? (
                                                         <img
                                                             src={thumbSrc}
-                                                            alt={labels.primaryLabel}
+                                                            alt={planDisplayTitle}
                                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                                                             onError={() => setImageErrors((prev) => ({ ...prev, [`${planKey}-thumb`]: true }))}
                                                         />
@@ -544,11 +535,11 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                                         <div className="flex items-center justify-between md:justify-start w-full gap-2">
                                                             <div className="flex items-center flex-wrap gap-1.5 md:gap-3 min-w-0">
                                                                 <h4 className="text-[15px] md:text-[18px] font-extrabold text-slate-900 truncate">
-                                                                    {labels.primaryLabel}
+                                                                    {planDisplayTitle}
                                                                 </h4>
-                                                                {labels.secondaryLabel && (
+                                                                {normalizedSummary && (
                                                                     <span className="text-[12px] md:text-[14px] text-slate-500 font-medium">
-                                                                        {labels.secondaryLabel}
+                                                                        {normalizedSummary}
                                                                     </span>
                                                                 )}
                                                                 {plan.available !== false && (
@@ -575,7 +566,9 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                                                     <div className="flex items-center gap-1 md:gap-1.5">
                                                                         <BedSingle className="w-3.5 h-3.5 md:w-4 md:h-4 text-slate-400" />
                                                                         <span className="text-[12px] md:text-[14px] font-semibold">
-                                                                            {plan.bedCount} {language === 'zh' ? '张床' : plan.bedCount === 1 ? 'Bed' : 'Beds'}
+                                                                            {plan.bedSize
+                                                                                ? plan.bedSize
+                                                                                : `${plan.bedCount} ${language === 'zh' ? '张床' : plan.bedCount === 1 ? 'Bed' : 'Beds'}`}
                                                                         </span>
                                                                     </div>
                                                                     <div className="w-0.5 h-0.5 md:w-1 md:h-1 rounded-full bg-slate-300" />
@@ -583,7 +576,11 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                                             )}
                                                             <div className="flex items-center gap-1 md:gap-1.5">
                                                                 <Bath className="w-3.5 h-3.5 md:w-4 md:h-4 text-slate-400" />
-                                                                <span className="text-[12px] md:text-[14px] font-semibold">{bathroomLabel}</span>
+                                                                <span className="text-[12px] md:text-[14px] font-semibold">
+                                                                    {plan.bathroomCount != null && plan.bathroomCount > 0
+                                                                        ? `${plan.bathroomCount} ${language === 'zh' ? '卫' : plan.bathroomCount === 1 ? 'Bath' : 'Baths'}`
+                                                                        : bathroomLabel}
+                                                                </span>
                                                             </div>
                                                             {plan.sqft && (
                                                                 <>
@@ -591,7 +588,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                                                     <div className="flex items-center gap-1 md:gap-1.5">
                                                                         <SquareDashed className="w-3.5 h-3.5 md:w-4 md:h-4 text-slate-400" />
                                                                         <span className="text-[12px] md:text-[14px] font-semibold tabular-nums">
-                                                                            {plan.sqft} {t.sqft}
+                                                                            {plan.sqft} {t.sqft || (language === 'zh' ? '平方英尺' : 'sqft')}
                                                                             <span className="text-slate-400 font-medium ml-1">
                                                                                 (~{Math.round(plan.sqft * 0.092903)}㎡)
                                                                             </span>
@@ -633,11 +630,10 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                                                 whileHover={{ scale: 1.04 }}
                                                                 whileTap={{ scale: 0.96 }}
                                                                 onClick={(e) => { e.stopPropagation(); toggleCompare(planKey); }}
-                                                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[12px] font-semibold transition-colors ${
-                                                                    isCompared
-                                                                        ? 'bg-illini-blue/5 text-illini-blue border-illini-blue/30'
-                                                                        : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:text-slate-700'
-                                                                }`}
+                                                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[12px] font-semibold transition-colors ${isCompared
+                                                                    ? 'bg-illini-blue/5 text-illini-blue border-illini-blue/30'
+                                                                    : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:text-slate-700'
+                                                                    }`}
                                                             >
                                                                 <div className={`w-3.5 h-3.5 rounded-[4px] border flex items-center justify-center transition-colors ${isCompared ? 'bg-illini-blue border-illini-blue text-white' : 'border-slate-300'}`}>
                                                                     <AnimatePresence>
@@ -765,13 +761,12 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                             whileHover={{ scale: 1.04 }}
                                             whileTap={{ scale: 0.94 }}
                                             onClick={() => setCommentVote(commentVote === vote ? null : vote)}
-                                            className={`flex items-center gap-1.5 text-[12px] font-semibold px-3 py-1.5 rounded-lg border transition-colors ${
-                                                commentVote === vote && vote === 1
-                                                    ? 'bg-illini-orange/10 border-illini-orange/30 text-illini-orange'
-                                                    : commentVote === vote && vote === -1
-                                                        ? 'bg-red-50 border-red-200 text-red-600'
-                                                        : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300'
-                                            }`}
+                                            className={`flex items-center gap-1.5 text-[12px] font-semibold px-3 py-1.5 rounded-lg border transition-colors ${commentVote === vote && vote === 1
+                                                ? 'bg-illini-orange/10 border-illini-orange/30 text-illini-orange'
+                                                : commentVote === vote && vote === -1
+                                                    ? 'bg-red-50 border-red-200 text-red-600'
+                                                    : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300'
+                                                }`}
                                         >
                                             <ThumbsUp className={`w-3.5 h-3.5 ${vote === -1 ? 'rotate-180' : ''} ${commentVote === vote && vote === 1 ? 'fill-illini-orange/20' : ''}`} />
                                             {vote === 1 ? t.thumbsUpDorm : t.thumbsDownDorm}
@@ -881,9 +876,8 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                                         type="button"
                                                         whileTap={{ scale: 0.88 }}
                                                         onClick={() => voteOnComment(comment.id, comment.myVote === 1 ? null : 1)}
-                                                        className={`flex items-center gap-1.5 transition-colors group ${
-                                                            comment.myVote === 1 ? 'text-illini-orange' : 'text-slate-400 hover:text-illini-orange'
-                                                        }`}
+                                                        className={`flex items-center gap-1.5 transition-colors group ${comment.myVote === 1 ? 'text-illini-orange' : 'text-slate-400 hover:text-illini-orange'
+                                                            }`}
                                                     >
                                                         <ThumbsUp className={`w-3.5 h-3.5 ${comment.myVote === 1 ? 'fill-illini-orange/20' : 'group-hover:fill-illini-orange/20'}`} />
                                                         <span className="text-[12px] font-semibold">

@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "audit:dorm-media": "npx tsx scripts/audit-dorm-media.ts",
+    "validate:dorm-data": "npx tsx scripts/validate-dorm-data.ts"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",

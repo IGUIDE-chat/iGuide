@@ -253,9 +253,16 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                       <span className="text-xs font-bold text-gray-500">
                         #{index + 1}
                       </span>
-                      <span className="text-xs text-gray-400 ml-2 truncate">
-                        {preview}
-                      </span>
+                      <div className="mt-0.5 min-w-0">
+                        {plan.officialName && (
+                          <div className="text-xs font-semibold text-gray-700 truncate">
+                            {plan.officialName}
+                          </div>
+                        )}
+                        <span className="text-xs text-gray-400 truncate block">
+                          {preview}
+                        </span>
+                      </div>
                       {plan.price > 0 && (
                         <span className="text-xs text-illini-blue font-medium ml-2">
                           ${plan.price.toLocaleString()}/yr
@@ -290,6 +297,22 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                 {isExpanded && (
                   <div className="px-3 pb-3 pt-1 border-t border-gray-200 space-y-3">
                     <div className="grid grid-cols-2 gap-2">
+                      <Field label="Official Room Name">
+                        <input
+                          type="text"
+                          value={plan.officialName ?? ''}
+                          onChange={(event) =>
+                            update(
+                              {
+                                officialName: event.target.value || undefined,
+                              },
+                              false,
+                            )
+                          }
+                          className={inputCls}
+                          placeholder="e.g. East Double Standard Room"
+                        />
+                      </Field>
                       <Field label={t.labels.layoutKind}>
                         <select
                           value={layoutKind}
@@ -457,7 +480,7 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                         update(
                           {
                             photoUrls: urls.length ? urls : undefined,
-                            photoUrl: urls[0] || undefined,
+                            photoUrl: undefined,
                           },
                           false,
                         )
@@ -473,7 +496,7 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                         update(
                           {
                             imageUrls: urls.length ? urls : undefined,
-                            imageUrl: urls[0] || undefined,
+                            imageUrl: undefined,
                           },
                           false,
                         )

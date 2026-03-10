@@ -47,6 +47,25 @@ export const TagsTab: React.FC<TagsTabProps> = ({ form }) => {
 
       <div>
         <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+          {form.language === 'zh' ? '社区' : 'Community'}
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => form.setPetFriendly(!form.petFriendly)}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-all ${
+              form.petFriendly
+                ? 'bg-illini-blue text-white border-illini-blue shadow-sm'
+                : 'bg-white text-gray-600 border-gray-300 hover:border-illini-blue hover:text-illini-blue'
+            }`}
+          >
+            {form.language === 'zh' ? '允许宠物' : 'Pet-Friendly'}
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
           {t.labels.llc}
         </p>
         <div className="flex flex-wrap gap-2">

@@ -1,5 +1,12 @@
 import { Language } from '../../types';
 import { BathroomScope, DiningType, Dorm, DormTag, TagCategory } from '../../types/housing';
+import {
+    Snowflake, Hammer, Building2, Dumbbell, Music, Store,
+    BookOpen, WashingMachine, CookingPot, Bus,
+    Volume2, PartyPopper, Globe, GraduationCap, Palette,
+    PawPrint,
+} from 'lucide-react';
+import { ComponentType } from 'react';
 
 export interface LocalizedCopy {
     en: string;
@@ -17,6 +24,7 @@ export interface TagDefinition extends LocalizedCopy {
     cardLayer: 'secondary' | 'vibe' | 'hidden';
     cardPriority: number;
     cardTone: 'positive' | 'neutral' | 'muted';
+    icon?: ComponentType<{ size?: number; className?: string; strokeWidth?: number }>;
 }
 
 export interface HousingTypeOption extends LocalizedOption<Dorm['housingType']> {
@@ -34,6 +42,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         cardLayer: 'hidden',
         cardPriority: 99,
         cardTone: 'muted',
+        icon: Snowflake,
     },
     newlyRenovated: {
         en: 'Newly Renovated',
@@ -43,6 +52,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         cardLayer: 'secondary',
         cardPriority: 1,
         cardTone: 'neutral',
+        icon: Hammer,
     },
     olderBuilding: {
         en: 'Older Building',
@@ -52,6 +62,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         cardLayer: 'secondary',
         cardPriority: 8,
         cardTone: 'muted',
+        icon: Building2,
     },
     gym: {
         en: 'Gym',
@@ -61,6 +72,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         cardLayer: 'secondary',
         cardPriority: 4,
         cardTone: 'neutral',
+        icon: Dumbbell,
     },
     musicRooms: {
         en: 'Music Rooms',
@@ -70,6 +82,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         cardLayer: 'secondary',
         cardPriority: 3,
         cardTone: 'neutral',
+        icon: Music,
     },
     convenienceStore: {
         en: 'Convenience Store',
@@ -79,6 +92,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         cardLayer: 'secondary',
         cardPriority: 5,
         cardTone: 'neutral',
+        icon: Store,
     },
     studyLounge: {
         en: 'Study Lounge',
@@ -88,6 +102,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         cardLayer: 'secondary',
         cardPriority: 7,
         cardTone: 'neutral',
+        icon: BookOpen,
     },
     laundry: {
         en: 'Laundry',
@@ -97,6 +112,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         cardLayer: 'hidden',
         cardPriority: 99,
         cardTone: 'neutral',
+        icon: WashingMachine,
     },
     kitchen: {
         en: 'Kitchen',
@@ -106,6 +122,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         cardLayer: 'hidden',
         cardPriority: 99,
         cardTone: 'neutral',
+        icon: CookingPot,
     },
     busStop: {
         en: 'Bus Stop',
@@ -115,6 +132,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         cardLayer: 'secondary',
         cardPriority: 6,
         cardTone: 'neutral',
+        icon: Bus,
     },
     quiet: {
         en: 'Quiet',
@@ -124,6 +142,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         cardLayer: 'vibe',
         cardPriority: 1,
         cardTone: 'positive',
+        icon: Volume2,
     },
     socialParty: {
         en: 'Social / Party Vibe',
@@ -133,6 +152,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         cardLayer: 'vibe',
         cardPriority: 2,
         cardTone: 'positive',
+        icon: PartyPopper,
     },
     internationalFriendly: {
         en: 'International Friendly',
@@ -142,6 +162,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         cardLayer: 'vibe',
         cardPriority: 3,
         cardTone: 'positive',
+        icon: Globe,
     },
     llc: {
         en: 'LLC Community',
@@ -151,6 +172,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         cardLayer: 'vibe',
         cardPriority: 4,
         cardTone: 'positive',
+        icon: GraduationCap,
     },
     artsyCreative: {
         en: 'Artsy / Creative',
@@ -160,6 +182,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         cardLayer: 'vibe',
         cardPriority: 2,
         cardTone: 'positive',
+        icon: Palette,
     },
 };
 

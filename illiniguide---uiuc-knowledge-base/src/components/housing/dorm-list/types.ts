@@ -23,12 +23,7 @@ export interface DormFilterState {
     bedCountFilters: BedCountFilter[];
     bathroomCountFilters: BathroomCountFilter[];
     housingTypeDetails: 'ALL' | 'URH' | 'PCH';
-    // Legacy structured tag filters (kept for backward compat)
-    amenityFilters: string[];
-    communityFilters: string[];
-    llcFilters: string[];
-    proximityFilters: string[];
-    // New categorized tag filters
+    // Categorized tag filters
     livingConditionFilters: DormTag[];
     facilityFilters: DormTag[];
     lifestyleFilters: DormTag[];

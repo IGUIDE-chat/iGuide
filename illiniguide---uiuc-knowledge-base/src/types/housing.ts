@@ -125,6 +125,7 @@ export interface RoomOption {
 // Floor plan with specific pricing and layout image
 export interface FloorPlan {
     type?: RoomType;          // Legacy room type code kept for compatibility
+    officialName?: string;    // Official room/floor-plan name published by the property
     bedCount?: number | null;
     bathroomCount?: number | null;
     bathroomScope?: BathroomScope;

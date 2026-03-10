@@ -91,9 +91,6 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         setBathroomCountFilters,
         locationFilters,
         setLocationFilters,
-        setAmenityFilters,
-        setCommunityFilters,
-        setLlcFilters,
         livingConditionFilters,
         setLivingConditionFilters,
         facilityFilters,
@@ -262,9 +259,6 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         setBathroomCountFilters([]);
         setActiveFilters([]);
         setLocationFilters([]);
-        setAmenityFilters([]);
-        setCommunityFilters([]);
-        setLlcFilters([]);
         setLivingConditionFilters([]);
         setFacilityFilters([]);
         setLifestyleFilters([]);
@@ -275,16 +269,13 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
         onClose,
         priceLimits,
         setActiveFilters,
-        setAmenityFilters,
         setBathroomCountFilters,
         setBathroomTypeFilters,
         setBedCountFilters,
-        setCommunityFilters,
         setFacilityFilters,
         setHousingTypeDetails,
         setLifestyleFilters,
         setLivingConditionFilters,
-        setLlcFilters,
         setLocationFilters,
         setPriceRange,
         setRequireAc,

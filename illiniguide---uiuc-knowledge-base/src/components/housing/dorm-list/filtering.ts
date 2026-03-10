@@ -2,55 +2,7 @@ import { Dorm, DormTag, FilterOption } from '../../../types/housing';
 import { DormFilterState } from './types';
 import { deriveRoomOptions } from '../../../utils/roomOptions';
 
-// ── Legacy structured tag matchers (kept for backward compat) ───────────────
-
-const matchesAmenityFilters = (dorm: Dorm, amenityFilters: string[]) => {
-    if (amenityFilters.length === 0) return true;
-
-    return amenityFilters.every((amenity) => {
-        if (amenity === 'Elevator') return dorm.structuredTags?.elevator;
-        if (amenity === 'Laundry') return dorm.structuredTags?.laundry;
-        if (amenity === 'Study Rooms') return dorm.structuredTags?.studyRooms;
-        if (amenity === 'Kitchen') return dorm.structuredTags?.kitchen;
-        if (amenity === 'Parking') return dorm.structuredTags?.parking;
-        if (amenity === 'Gym Nearby') return dorm.structuredTags?.gymNearby;
-        if (amenity === 'Pool') return dorm.structuredTags?.pool;
-        return true;
-    });
-};
-
-const matchesCommunityFilters = (dorm: Dorm, communityFilters: string[]) => {
-    if (communityFilters.length === 0) return true;
-
-    return communityFilters.some((community) => {
-        if (community === 'Gender-Inclusive') return dorm.structuredTags?.genderInclusive;
-        if (community === 'Quiet Floors') return dorm.structuredTags?.quietFloors;
-        if (community === 'Substance-Free') return dorm.structuredTags?.substanceFree;
-        if (community === 'Pet-Friendly') return dorm.structuredTags?.petFriendly;
-        return false;
-    });
-};
-
-const matchesLlcFilters = (dorm: Dorm, llcFilters: string[]) => {
-    if (llcFilters.length === 0) return true;
-    return llcFilters.some((llc) => dorm.structuredTags?.llc?.includes(llc));
-};
-
-const matchesProximityFilters = (dorm: Dorm, proximityFilters: string[]) => {
-    if (proximityFilters.length === 0) return true;
-
-    return proximityFilters.some((proximity) => {
-        if (proximity === 'Near Main Quad') return dorm.structuredTags?.nearMainQuad;
-        if (proximity === 'Near Engineering') return dorm.structuredTags?.nearEngineering;
-        if (proximity === 'Near Business') return dorm.structuredTags?.nearBusiness;
-        if (proximity === 'Near ARC/CRCE') return dorm.structuredTags?.nearARC;
-        if (proximity === 'Near Green Street') return dorm.structuredTags?.nearGreenStreet;
-        if (proximity === 'Near Ikenberry Dining') return dorm.structuredTags?.nearIkenberryDining;
-        return false;
-    });
-};
-
-// ── New categorized tag matchers ────────────────────────────────────────────
+// ── Categorized tag matchers ─────────────────────────────────────────────
 
 /** All selected tags must be present in the dorm's categorized tags (AND logic). */
 const matchesCategorizedTagFilters = (dorm: Dorm, filters: DormTag[]): boolean => {
@@ -156,13 +108,7 @@ export const filterAndSortDorms = (dorms: Dorm[], filters: DormFilterState) => {
             return false;
         }
 
-        // Legacy structured tag filters
-        if (!matchesAmenityFilters(dorm, filters.amenityFilters)) return false;
-        if (!matchesCommunityFilters(dorm, filters.communityFilters)) return false;
-        if (!matchesLlcFilters(dorm, filters.llcFilters)) return false;
-        if (!matchesProximityFilters(dorm, filters.proximityFilters)) return false;
-
-        // New categorized tag filters (combined — AND logic)
+        // Categorized tag filters (combined — AND logic)
         const allCategoryFilters: DormTag[] = [
             ...(filters.livingConditionFilters ?? []),
             ...(filters.facilityFilters ?? []),
