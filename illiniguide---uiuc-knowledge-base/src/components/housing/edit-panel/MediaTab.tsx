@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   ChevronDown,
   ChevronUp,
-  GripVertical,
   Loader2,
   Plus,
   Trash2,
@@ -218,53 +217,52 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                 className="bg-gray-50 border border-gray-200 rounded-lg overflow-hidden"
               >
                 {/* Collapsed header — always visible */}
-                <div
-                  className="flex items-center gap-2 px-3 py-2.5 cursor-pointer hover:bg-gray-100 transition-colors"
-                  onClick={() => toggleExpand(index)}
-                >
-                  {/* Drag/reorder grip */}
-                  <div className="flex flex-col gap-0.5 shrink-0">
+                <div className="flex items-center gap-0">
+                  {/* Reorder buttons — separate from toggle zone */}
+                  <div className="flex flex-col shrink-0 border-r border-gray-200">
                     <button
                       type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
+                      onClick={() => {
                         if (index > 0) moveFloorPlan(index, index - 1);
                       }}
                       disabled={index === 0}
-                      className="text-gray-400 hover:text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed p-0"
+                      className="flex items-center justify-center w-8 h-6 hover:bg-blue-50 text-gray-400 hover:text-illini-blue disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
                       title={form.language === 'zh' ? '上移' : 'Move up'}
                     >
-                      <ChevronUp size={12} />
+                      <ChevronUp size={14} strokeWidth={2.5} />
                     </button>
                     <button
                       type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
+                      onClick={() => {
                         if (index < form.normalizedFloorPlans.length - 1)
                           moveFloorPlan(index, index + 1);
                       }}
                       disabled={index === form.normalizedFloorPlans.length - 1}
-                      className="text-gray-400 hover:text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed p-0"
+                      className="flex items-center justify-center w-8 h-6 hover:bg-blue-50 text-gray-400 hover:text-illini-blue disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
                       title={form.language === 'zh' ? '下移' : 'Move down'}
                     >
-                      <ChevronDown size={12} />
+                      <ChevronDown size={14} strokeWidth={2.5} />
                     </button>
                   </div>
-                  <GripVertical size={14} className="text-gray-300 shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <span className="text-xs font-bold text-gray-500">
-                      #{index + 1}
-                    </span>
-                    <span className="text-xs text-gray-400 ml-2 truncate">
-                      {preview}
-                    </span>
-                    {plan.price > 0 && (
-                      <span className="text-xs text-illini-blue font-medium ml-2">
-                        ${plan.price.toLocaleString()}/yr
+                  {/* Toggle expand zone */}
+                  <div
+                    className="flex-1 flex items-center gap-2 px-3 py-2.5 cursor-pointer hover:bg-gray-100 transition-colors min-w-0"
+                    onClick={() => toggleExpand(index)}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <span className="text-xs font-bold text-gray-500">
+                        #{index + 1}
                       </span>
-                    )}
-                  </div>
-                  <button
+                      <span className="text-xs text-gray-400 ml-2 truncate">
+                        {preview}
+                      </span>
+                      {plan.price > 0 && (
+                        <span className="text-xs text-illini-blue font-medium ml-2">
+                          ${plan.price.toLocaleString()}/yr
+                        </span>
+                      )}
+                    </div>
+                    <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -285,6 +283,7 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                       isExpanded ? 'rotate-180' : ''
                     }`}
                   />
+                  </div>
                 </div>
 
                 {/* Expanded body */}
