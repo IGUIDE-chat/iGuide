@@ -115,6 +115,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
     const dormName      = language === 'zh' && dorm.name_zh       ? dorm.name_zh       : dorm.name;
     const dormDesc      = language === 'zh' && dorm.description_zh ? dorm.description_zh : dorm.description;
     const dormLocation  = language === 'zh' && dorm.location_zh   ? dorm.location_zh   : dorm.location;
+    const dormAddress   = language === 'zh' && dorm.address_zh   ? dorm.address_zh   : dorm.address;
     const heroImage     = dorm.galleryImages?.[0] ?? dorm.imageUrl;
     const housingMeta   = getHousingTypeMeta(dorm.housingType);
 
@@ -253,9 +254,14 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                     {dormName}
                                 </h1>
 
-                                <div className="flex items-start md:items-center gap-1.5 text-slate-500 text-[13px] md:text-[14px] font-medium">
-                                    <MapPin className="w-4 h-4 mt-0.5 md:mt-0 shrink-0" />
-                                    <span className="leading-tight">{dormLocation}</span>
+                                <div className="space-y-1">
+                                    <div className="flex items-start md:items-center gap-1.5 text-slate-500 text-[13px] md:text-[14px] font-medium">
+                                        <MapPin className="w-4 h-4 mt-0.5 md:mt-0 shrink-0" />
+                                        <span className="leading-tight">{dormLocation}</span>
+                                    </div>
+                                    {dormAddress && (
+                                        <p className="text-slate-400 text-[12px] md:text-[13px] pl-[22px] leading-tight">{dormAddress}</p>
+                                    )}
                                 </div>
 
                                 {positiveTags.length > 0 && (
@@ -322,15 +328,17 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                             <p className="text-slate-600 text-[14px] md:text-[15px] leading-relaxed max-w-4xl font-medium">
                                 {dormDesc}
                             </p>
-                            <a
-                                href="https://housing.illinois.edu/"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 text-[11px] md:text-[12px] font-semibold text-slate-500 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-full transition-colors w-fit"
-                            >
-                                <span>{t.viewWebsite}</span>
-                                <ExternalLink className="w-3 h-3" />
-                            </a>
+                            {(dorm.website || dorm.housingType === 'URH') && (
+                                <a
+                                    href={dorm.website || 'https://housing.illinois.edu/'}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1 text-[11px] md:text-[12px] font-semibold text-slate-500 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-full transition-colors w-fit"
+                                >
+                                    <span>{t.viewWebsite}</span>
+                                    <ExternalLink className="w-3 h-3" />
+                                </a>
+                            )}
                         </div>
                     </motion.section>
 

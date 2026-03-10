@@ -135,7 +135,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 
     return (
         <AuthContext.Provider
-            value={{ user, login, register, logout, loginWithGoogle, loginWithMicrosoft, updateName, isLoading }}
+            value={{ user, login, register, logout, loginWithGoogle, loginWithMicrosoft, updateName, isLoading, isGuest: !user, setIsGuest: () => {}, requestLogin: () => {} }}
         >
             {children}
         </AuthContext.Provider>

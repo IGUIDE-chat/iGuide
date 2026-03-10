@@ -33,6 +33,8 @@ export const TEXT = {
       available: 'Available',
       llc: 'Living-Learning Communities (LLC)',
       address: 'Address',
+      addressZh: 'Address (Chinese)',
+      website: 'Website URL',
       bedSize: 'Bed Size',
     },
     actions: {
@@ -116,6 +118,8 @@ export const TEXT = {
       available: '可预订',
       llc: '学习生活社区（LLC）',
       address: '地址',
+      addressZh: '地址（中文）',
+      website: '官网链接',
       bedSize: '床型',
     },
     actions: {

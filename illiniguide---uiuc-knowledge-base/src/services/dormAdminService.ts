@@ -33,6 +33,7 @@ export interface DormUpdate {
     cons_zh?: string[] | null;
     address?: string | null;
     address_zh?: string | null;
+    website?: string | null;
 }
 
 export interface DormMutationResult {
