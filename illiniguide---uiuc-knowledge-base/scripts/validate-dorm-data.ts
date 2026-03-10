@@ -2,6 +2,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { UIUC_DORMS } from '../src/constants/housing/dormData';
 import { TAGS_BY_CATEGORY, LLC_OPTIONS } from '../src/constants/housing/metadata';
+import {
+    hasPeopleishFilename,
+    isLikelyLowQualityMediaUrl,
+} from '../src/constants/housing/dormOfficialOverrideUtils';
 import { getDormPriceRange } from '../src/utils/dormData';
 
 const EXPECTED_IDS = [
@@ -46,6 +50,7 @@ const REQUIRED_SYNC_FIELDS = [
     'structured_tags',
     'price_range',
 ];
+const LOW_QUALITY_ALLOWLIST = new Set<string>([]);
 
 const errors: string[] = [];
 
@@ -55,13 +60,25 @@ function check(condition: unknown, message: string) {
     }
 }
 
+function checkMediaUrl(dormId: string, slot: string, url: string) {
+    check(
+        LOW_QUALITY_ALLOWLIST.has(url) || !isLikelyLowQualityMediaUrl(url),
+        `${dormId} uses a low-quality media URL in ${slot}: ${url}`,
+    );
+    check(!hasPeopleishFilename(url), `${dormId} uses a likely people-containing media URL in ${slot}: ${url}`);
+}
+
 const actualIds = UIUC_DORMS.map((dorm) => dorm.id).sort();
 check(UIUC_DORMS.length === 23, `Expected 23 dorms but found ${UIUC_DORMS.length}.`);
 check(JSON.stringify(actualIds) === JSON.stringify(EXPECTED_IDS), 'Dorm ID set changed unexpectedly.');
 
 for (const dorm of UIUC_DORMS) {
     check(!dorm.imageUrl.includes('picsum.photos'), `${dorm.id} still uses a placeholder hero image.`);
+    checkMediaUrl(dorm.id, 'imageUrl', dorm.imageUrl);
     check((dorm.galleryImages?.length ?? 0) > 0, `${dorm.id} is missing gallery images.`);
+    for (const [index, url] of (dorm.galleryImages ?? []).entries()) {
+        checkMediaUrl(dorm.id, `galleryImages[${index}]`, url);
+    }
     check(Boolean(dorm.address), `${dorm.id} is missing an address.`);
     check(Boolean(dorm.website), `${dorm.id} is missing a website.`);
     check(getDormPriceRange(dorm.price) === dorm.priceRange, `${dorm.id} has an unsynchronized priceRange.`);
@@ -84,6 +101,12 @@ for (const dorm of UIUC_DORMS) {
         check(!plan.imageUrl, `${dorm.id} still uses legacy floorPlans.imageUrl.`);
         check(!plan.photoUrl, `${dorm.id} still uses legacy floorPlans.photoUrl.`);
         check(plan.bathroomScope != null, `${dorm.id} has a floor plan without bathroomScope.`);
+        for (const [index, url] of (plan.photoUrls ?? []).entries()) {
+            checkMediaUrl(dorm.id, `floorPlans.photoUrls[${index}]`, url);
+        }
+        for (const [index, url] of (plan.imageUrls ?? []).entries()) {
+            checkMediaUrl(dorm.id, `floorPlans.imageUrls[${index}]`, url);
+        }
         if (plan.labelCode == null) {
             console.warn(`Warning: ${dorm.id} has a floor plan without labelCode.`);
         }
