@@ -311,8 +311,8 @@ const DormCard: React.FC<DormCardProps> = ({
                 />
                 <div className="absolute right-3 top-3 flex items-end">
                     {positivePercent != null && totalReviews && totalReviews > 0 ? (
-                        <div className="origin-top-right rounded-full bg-white/90 backdrop-blur-sm px-2.5 py-1 text-xs font-bold text-illini-orange shadow-sm transition-transform duration-200 group-hover:scale-105 flex items-center gap-1">
-                            <ThumbsUp size={12} className="fill-illini-orange" />
+                        <div className="origin-top-right rounded-md bg-white px-2 py-1 text-xs font-bold text-slate-800 shadow-sm transition-transform duration-200 group-hover:scale-105 flex items-center gap-1">
+                            <ThumbsUp size={11} className="text-slate-500" />
                             {positivePercent}% ({totalReviews})
                         </div>
                     ) : (

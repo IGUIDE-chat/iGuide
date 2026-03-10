@@ -310,27 +310,22 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                     <span className="px-3 py-1 text-[11px] md:text-[12px] font-bold text-slate-700 bg-slate-200/60 rounded-full">
                                         {getLocalizedLabel(housingMeta, language)} ({housingMeta.shortLabel})
                                     </span>
-                                    {positivePercent !== null && (
-                                        <span className="px-2.5 py-1 text-[11px] md:text-[12px] font-bold text-illini-orange bg-illini-orange/10 rounded-full inline-flex items-center gap-1">
-                                            <ThumbsUp className="w-3 h-3 fill-illini-orange" />
-                                            {positivePercent}{t.positiveRating} ({totalReviews})
-                                        </span>
-                                    )}
+                                    <div className="flex items-center gap-1.5 text-slate-500 text-[13px] md:text-[14px] font-medium">
+                                        <MapPin className="w-3.5 h-3.5 shrink-0" />
+                                        <span className="leading-tight">{dormLocation}</span>
+                                    </div>
                                 </div>
 
                                 <h1 className="text-3xl md:text-4xl font-extrabold text-illini-blue tracking-tight">
                                     {dormName}
                                 </h1>
 
-                                <div className="space-y-1">
+                                {dormAddress && (
                                     <div className="flex items-start md:items-center gap-1.5 text-slate-500 text-[13px] md:text-[14px] font-medium">
                                         <MapPin className="w-4 h-4 mt-0.5 md:mt-0 shrink-0" />
-                                        <span className="leading-tight">{dormLocation}</span>
+                                        <span className="leading-tight">{dormAddress}</span>
                                     </div>
-                                    {dormAddress && (
-                                        <p className="text-slate-400 text-[12px] md:text-[13px] pl-[22px] leading-tight">{dormAddress}</p>
-                                    )}
-                                </div>
+                                )}
 
                                 {positiveTags.length > 0 && (
                                     <div className="flex flex-wrap gap-2 pt-1">
