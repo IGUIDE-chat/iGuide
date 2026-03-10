@@ -78,15 +78,6 @@ export const ContentTab: React.FC<ContentTabProps> = ({ form }) => {
                             />
                         </div>
                     </Field>
-                    <Field label={t.labels.address}>
-                        <input
-                            type="text"
-                            value={form.address}
-                            onChange={(event) => form.setAddress(event.target.value)}
-                            className={inputCls}
-                            placeholder="e.g. 1010 W. Illinois St, Urbana, IL 61801"
-                        />
-                    </Field>
                     <Field label={t.labels.pros}>
                         <EditableList items={form.pros} onChange={form.setPros} placeholder={t.actions.addPro} />
                     </Field>
@@ -141,14 +132,6 @@ export const ContentTab: React.FC<ContentTabProps> = ({ form }) => {
                                 placeholder={t.hints.customLocation}
                             />
                         </div>
-                    </Field>
-                    <Field label={t.labels.address}>
-                        <input
-                            type="text"
-                            value={form.addressZh}
-                            onChange={(event) => form.setAddressZh(event.target.value)}
-                            className={inputCls}
-                        />
                     </Field>
                     <Field label={t.labels.pros}>
                         <EditableList items={form.prosZh} onChange={form.setProsZh} placeholder={t.actions.addPro} />
