@@ -43,14 +43,14 @@ export const DormEditPanelShell: React.FC<DormEditPanelShellProps> = ({
 }) => {
   return (
     <>
-      <button
-        type="button"
+      {/* Backdrop — click to close, transparent so left side stays visible */}
+      <div
+        className="fixed inset-0 z-40"
         onClick={onClose}
-        aria-label={cancelLabel}
-        className="fixed inset-0 z-40 bg-slate-900/20 backdrop-blur-[1px]"
+        aria-hidden="true"
       />
 
-      <div className="fixed right-0 top-0 h-full w-full max-w-lg z-50 bg-white shadow-2xl flex flex-col">
+      <div className="fixed right-0 top-0 h-full w-full max-w-lg z-50 bg-white shadow-2xl flex flex-col border-l border-gray-200">
         <div className="flex items-center justify-between px-4 py-3 bg-illini-blue text-white flex-shrink-0">
           <span className="font-bold text-base truncate">{title}</span>
           <button type="button" onClick={onClose} className="hover:text-gray-300 flex-shrink-0 ml-2">

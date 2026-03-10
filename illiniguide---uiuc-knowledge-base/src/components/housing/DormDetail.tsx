@@ -224,7 +224,9 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
             variants={pageVariants}
             initial="hidden"
             animate="visible"
-            className="h-full overflow-y-auto w-full no-scrollbar font-sans text-slate-800 pb-24 bg-slate-50"
+            className={`h-full overflow-y-auto w-full no-scrollbar font-sans text-slate-800 pb-24 bg-slate-50 transition-[margin] duration-300 ease-in-out ${
+                editOpen ? 'lg:mr-[32rem]' : ''
+            }`}
         >
             {/* ── Top bar ── */}
             <div className="sticky top-0 z-40 bg-white/70 backdrop-blur-xl border-b border-white/50 shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
@@ -952,7 +954,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setEditOpen(true)}
-                    className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-illini-blue text-white text-[13px] font-bold px-4 py-2.5 rounded-full shadow-lg hover:bg-illini-blue/90 transition-colors"
+                    className="fixed bottom-20 right-6 z-50 flex items-center gap-2 bg-illini-blue text-white text-[13px] font-bold px-4 py-2.5 rounded-full shadow-lg hover:bg-illini-blue/90 transition-colors"
                 >
                     <Pencil className="w-3.5 h-3.5" />
                     {language === 'zh' ? '编辑' : 'Edit'}
