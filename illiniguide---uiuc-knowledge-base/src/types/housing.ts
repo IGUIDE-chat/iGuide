@@ -132,8 +132,10 @@ export interface FloorPlan {
     price: number;            // Annual price for this specific floor plan
     sqft?: number;            // Square footage (optional)
     bedSize?: BedSize;        // Bed size provided in this floor plan
-    imageUrl?: string;        // Floor plan layout diagram URL
-    photoUrl?: string;        // Room showcase photo URL
+    imageUrl?: string;        // Floor plan layout diagram URL (legacy single)
+    photoUrl?: string;        // Room showcase photo URL (legacy single)
+    imageUrls?: string[];     // Floor plan layout diagram URLs (multiple)
+    photoUrls?: string[];     // Room showcase photo URLs (multiple)
     description?: string;     // Description of this floor plan
     available?: boolean;      // Whether this floor plan is currently available
 }
