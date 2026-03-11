@@ -137,7 +137,7 @@ export interface FloorPlan {
     bathroomCount?: number | null;
     bathroomScope?: BathroomScope;
     labelCode?: string;
-    price: number;            // Annual price for this specific floor plan
+    price?: number;           // Annual price for this specific floor plan when officially published
     sqft?: number;            // Square footage (optional)
     bedSize?: BedSize;        // Bed size provided in this floor plan
     imageUrl?: string;        // Floor plan layout diagram URL (legacy single)

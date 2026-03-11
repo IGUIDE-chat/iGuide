@@ -62,6 +62,11 @@ const STRUCTURED_AMENITY_LABELS: Array<[keyof DormTags, string]> = [
     ['petFriendly', 'Pet-Friendly'],
 ];
 
+const OFFICIAL_SQFT_ALLOWLIST: Record<string, Set<string>> = {
+    bromley: new Set(['Standard Double', 'Triple', 'Quad']),
+    'illini-tower': new Set(['S1', 'S2', 'B1 Shared', 'B2 Shared', 'B2 Private', 'C1', 'D1']),
+};
+
 function uniqueStrings<T extends string>(items: Array<T | undefined | null>): T[] {
     return Array.from(new Set(items.filter((value): value is T => Boolean(value))));
 }
@@ -174,11 +179,26 @@ export function buildLegacyDormTags(dorm: Pick<
 export function finalizeDormRecord(dorm: Dorm): Dorm {
     const categorizedTags = normalizeCategorizedTags(dorm.categorizedTags);
     const structuredTags = syncStructuredTags(dorm.structuredTags, categorizedTags);
+    const allowedSqftPlans = OFFICIAL_SQFT_ALLOWLIST[dorm.id] ?? new Set<string>();
+    const floorPlans = dorm.floorPlans?.map((plan) => {
+        if (plan.sqft == null) {
+            return plan;
+        }
+
+        const planName = plan.officialName ?? plan.labelCode ?? plan.type;
+        if (!planName || !allowedSqftPlans.has(planName)) {
+            const { sqft, ...rest } = plan;
+            return rest;
+        }
+
+        return plan;
+    });
 
     return {
         ...dorm,
         categorizedTags,
         structuredTags,
+        floorPlans,
         tags: buildLegacyDormTags({
             housingType: dorm.housingType,
             dining: dorm.dining,
@@ -198,6 +218,8 @@ export function sanitizeFloorPlanForStorage(plan: FloorPlan): FloorPlan {
         photoUrls,
         officialName,
         description,
+        price,
+        sqft,
         ...rest
     } = plan;
     const normalizedImageUrls = sanitizeUrlList([...(imageUrls ?? []), legacyImageUrl]);
@@ -205,6 +227,12 @@ export function sanitizeFloorPlanForStorage(plan: FloorPlan): FloorPlan {
 
     return {
         ...rest,
+        ...(typeof price === 'number' && Number.isFinite(price) && price > 0
+            ? { price }
+            : {}),
+        ...(typeof sqft === 'number' && Number.isFinite(sqft) && sqft > 0
+            ? { sqft }
+            : {}),
         ...(sanitizeOptionalString(officialName) ? { officialName: sanitizeOptionalString(officialName) } : {}),
         ...(sanitizeOptionalString(description) ? { description: sanitizeOptionalString(description) } : {}),
         ...(normalizedImageUrls.length ? { imageUrls: normalizedImageUrls } : {}),
