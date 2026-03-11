@@ -1,6 +1,13 @@
+/**
+ * @file ./src/components/chat/ChatEmptyState.tsx
+ * @description Chat (AI) Component / Module
+ * @description_zh 此文件属于 Chat 业务域。请保持业务内聚，不要随意挂载到全局域。
+ * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
+ */
+
 import { AnimatePresence, motion } from 'framer-motion';
 import { Language } from '../../types';
-import { BrandMark } from '../branding/BrandMark';
+import { BrandMark } from '../ui/branding/BrandMark';
 
 interface Suggestion {
   icon: string;

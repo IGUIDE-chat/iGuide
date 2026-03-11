@@ -1,8 +1,15 @@
+/**
+ * @file ./src/components/housing/dorm-list/MapCarousel.tsx
+ * @description Housing (Dorms) Component / Module
+ * @description_zh 此文件属于 Housing 业务域（限界上下文）。请勿在此引入其他业务（如 chat, library）的代码。保持高内聚，不要把 Housing 独有的逻辑泄露到外层全局目录。
+ * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
+ */
+
 import React from 'react';
 import { Heart } from 'lucide-react';
-import { Dorm } from '../../../types/housing';
+import { Dorm } from '../types/index';
 import { Language } from '../../../types';
-import { formatPrice } from '../../../constants/housing/pricing';
+import { formatPrice } from '../constants/pricing';
 
 interface MapCarouselProps {
     dorms: Dorm[];

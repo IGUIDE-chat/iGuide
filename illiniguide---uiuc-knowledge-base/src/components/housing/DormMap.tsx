@@ -1,7 +1,14 @@
+/**
+ * @file ./src/components/housing/DormMap.tsx
+ * @description Housing (Dorms) Component / Module
+ * @description_zh 此文件属于 Housing 业务域（限界上下文）。请勿在此引入其他业务（如 chat, library）的代码。保持高内聚，不要把 Housing 独有的逻辑泄露到外层全局目录。
+ * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
+ */
+
 import React, { Component, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Dorm } from '../../types/housing';
-import { useHousingMapUi } from '../../contexts/HousingContext';
-import { CAMPUS_LANDMARKS, CAMPUS_ZONES, Landmark } from '../../constants/housing/mapData';
+import { Dorm } from './types/index';
+import { useHousingMapUi } from './store/HousingContext';
+import { CAMPUS_LANDMARKS, CAMPUS_ZONES, Landmark } from './constants/mapData';
 import { Language } from '../../types';
 import Map, { Layer, MapRef, NavigationControl, Popup, Source } from 'react-map-gl/mapbox';
 import mapboxgl from 'mapbox-gl';
@@ -9,7 +16,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { buildDormFeatureCollection, buildLandmarkFeatureCollection } from './dorm-map/mapFeatureBuilders';
 import { DEFAULT_CENTER, DEFAULT_ZOOM } from './dorm-map/mapConstants';
 import { registerMapAssets } from './dorm-map/mapAssets';
-import { getHousingTypeMeta } from '../../constants/housing/metadata';
+import { getHousingTypeMeta } from './constants/metadata';
 import {
     buildLandmarksLayer,
     buildZonesFillLayer,

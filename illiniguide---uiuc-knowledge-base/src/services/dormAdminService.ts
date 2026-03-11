@@ -1,8 +1,15 @@
+/**
+ * @file ./src/services/dormAdminService.ts
+ * @description Global Shared Component / Module
+ * @description_zh 此文件不属于特定业务流，而是全局共享逻辑，只能包含与其他业务解耦的代码。如果该文件只为一个特定业务服务，请将其移动到对应的 src/components/<feature>/ 目录下。
+ * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
+ */
+
 // [SERVICE] Admin-only operations for the `dorms` table.
 // [服务] 管理员专用——直接操作 `dorms` 表（替代旧的 override 模式）。
 import { supabase } from './supabase';
-import { Dorm } from '../types/housing';
-import { UIUC_DORMS } from '../constants/housing/dormData';
+import { Dorm } from '../components/housing/types/index';
+import { UIUC_DORMS } from '../components/housing/constants/dormData';
 import { sanitizeFloorPlansForStorage } from '../utils/dormData';
 
 const TABLE = 'dorms';

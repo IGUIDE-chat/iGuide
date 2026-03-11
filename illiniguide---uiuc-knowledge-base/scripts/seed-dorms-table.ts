@@ -19,8 +19,8 @@ import { createClient } from '@supabase/supabase-js';
 // For simplicity, use ts-node / tsx which can resolve TypeScript imports.
 
 // We import directly from the source; tsx handles TS resolution.
-import { UIUC_DORMS } from '../src/constants/housing/dormData';
-import type { Dorm } from '../src/types/housing';
+import { UIUC_DORMS } from '../src/components/housing/constants/dormData';
+import type { Dorm } from '../src/components/housing/types/index';
 import { finalizeDormRecord, sanitizeFloorPlansForStorage } from '../src/utils/dormData';
 
 const SUPABASE_URL = process.env.SUPABASE_URL;

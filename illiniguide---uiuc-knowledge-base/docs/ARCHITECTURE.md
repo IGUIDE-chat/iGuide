@@ -19,65 +19,82 @@
 4. Page Layer
 - `src/pages/**`
 - Owns route-level orchestration.
-- Page-local hooks are allowed here when they are route-specific.
+- Page-local hooks are allowed when they are route-specific.
 - Example: `src/pages/chat/ChatPage.tsx` and `src/pages/chat/useChatSession.ts`.
 
 5. Feature / Component Layer
 - `src/components/**`
 - Owns reusable UI and feature presentation.
 - Should not become the route owner for persistence-heavy flows.
-- Example: `src/components/ChatScreen.tsx` is presentation, while conversation
-  loading/sending now lives in the page layer.
+- Example: `src/components/chat/ChatScreen.tsx` is presentation, while
+  conversation loading and sending live in the page layer.
 
 6. Shared Layout Layer
 - `src/components/layout/**`
 - Owns app shell, nav, sidebar, and layout-only composition.
 - Must not absorb dorm-specific or chat-specific domain logic.
 
-7. Feature Submodule Layer
+7. Shared UI Layer
+- `src/components/ui/**`
+- Owns business-agnostic dumb UI, icons, and presentational wrappers.
+- Must not own feature-specific API calls or context-dependent behavior.
+
+8. Feature Submodule Layer
+- `src/components/housing/constants/**`
 - `src/components/housing/dorm-list/**`
 - `src/components/housing/dorm-detail/**`
 - `src/components/housing/dorm-map/**`
 - `src/components/housing/edit-panel/**`
 - `src/components/housing/filter-modal/**`
+- `src/components/housing/hooks/**`
+- `src/components/housing/store/**`
+- `src/components/housing/types/**`
 - Use these folders for feature-local shells, tabs, sections, and controllers.
 
-8. Shared Hook Layer
+9. Shared Hook Layer
 - `src/hooks/**`
 - Only for hooks reused across pages or features.
-- Example: `src/hooks/useDormFilterBadge.ts`.
 
-9. Data / Config Layer
+10. Data / Config Layer
 - `src/constants/**`
 - `src/i18n/**`
 - `src/data/**`
 - Static config, text, and source data only.
 
-10. Service Layer
+11. Service Layer
 - `src/services/**`
 - API, database, storage, and persistence integration.
 
+12. Legacy Isolation Layer
+- `src/legacy/**`
+- Stores unused reference code only.
+- Active runtime modules must not import from legacy paths.
+
 ## Current Structure Implications
 
-- `src/components/App.tsx` is no longer part of the active runtime structure.
+- `src/App.tsx` is the only active app-composition file.
 - `src/pages/**` should own orchestration before `src/components/**`.
+- Shared branding and generic typewriter UI belong under `src/components/ui/**`.
+- Layout decomposition belongs under `src/components/layout/**`.
 - Large feature files should be decomposed into subfolders before they become
   page-orchestration bottlenecks.
 
 Recent examples now aligned with this rule:
 
-- Chat orchestration moved to `src/pages/chat/useChatSession.ts`.
-- Layout decomposition lives under `src/components/layout/**`.
-- Dorm admin edit panel decomposition lives under
+- Chat orchestration lives in `src/pages/chat/useChatSession.ts`.
+- Chat presentation lives in `src/components/chat/**`.
+- Layout composition lives in `src/components/layout/**`.
+- Shared branding and generic UI live in `src/components/ui/**`.
+- Dorm admin edit-panel decomposition lives in
   `src/components/housing/edit-panel/**`.
-- Dorm list controller/map/favorite animation logic lives under
+- Dorm list controller, map, and favorite animation logic live in
   `src/components/housing/dorm-list/**`.
 
 ## Legacy Policy
 
-This package currently has no active legacy directories checked into the runtime tree.
+This package keeps isolated unused reference code under `src/legacy/**`.
 
-If legacy code is reintroduced, it must live under one of these reserved paths:
+Reserved legacy paths:
 
 - `src/legacy/**`
 - `src/components/housing/legacy/**`
@@ -85,16 +102,12 @@ If legacy code is reintroduced, it must live under one of these reserved paths:
 
 Active modules must not import from those paths.
 
-## Enforced Checks
-
-- `npm run verify:architecture` checks:
-  - no active imports from reserved legacy boundaries
-  - route and page registry parity
-  - single active app/auth source
-  - only one active root Vite config
+## Checks
 
 - `npm run typecheck` validates module boundaries after refactors.
 - `npm run build` validates runtime bundling after structural moves.
+- `rg "src/legacy/" src` should only match legacy files or documentation,
+  never active runtime imports.
 
 ---
 
@@ -103,6 +116,6 @@ Active modules must not import from those paths.
 1. `src/pages/**` owns page orchestration.
 2. `src/components/**` owns presentation and feature-local composition.
 3. `src/components/layout/**` is the layout-only boundary.
-4. `src/components/housing/edit-panel/**` and
-   `src/components/housing/dorm-list/**` are the current housing submodule boundaries.
-5. If legacy code returns later, it must move into a reserved legacy path.
+4. `src/components/ui/**` is the business-agnostic shared UI boundary.
+5. Housing submodules stay under `src/components/housing/**`.
+6. Legacy code must stay inside a reserved legacy path.

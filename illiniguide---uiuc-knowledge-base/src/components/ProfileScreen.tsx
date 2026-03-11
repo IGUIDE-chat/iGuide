@@ -1,3 +1,10 @@
+/**
+ * @file ./src/components/ProfileScreen.tsx
+ * @description Global Shared Component / Module
+ * @description_zh 此文件不属于特定业务流，而是全局共享逻辑，只能包含与其他业务解耦的代码。如果该文件只为一个特定业务服务，请将其移动到对应的 src/components/<feature>/ 目录下。
+ * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
+ */
+
 // [PAGE] User profile management and settings.
 // [页面] 用户个人资料管理和设置页面。
 import React, { useState } from 'react';

@@ -1,3 +1,10 @@
+/**
+ * @file ./src/components/housing/DormDetail.tsx
+ * @description Housing (Dorms) Component / Module
+ * @description_zh 此文件属于 Housing 业务域（限界上下文）。请勿在此引入其他业务（如 chat, library）的代码。保持高内聚，不要把 Housing 独有的逻辑泄露到外层全局目录。
+ * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
+ */
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
@@ -6,14 +13,14 @@ import {
     ChevronDown, Check, ThumbsUp, SquareDashed, ArrowRightLeft,
     BedSingle, MessageSquare, User, Pencil, X, ExternalLink, Globe,
 } from 'lucide-react';
-import { formatPrice } from '../../constants/housing/pricing';
-import { TAG_REGISTRY, getHousingTypeMeta, getLocalizedLabel } from '../../constants/housing/metadata';
-import { useSharedDormInteraction } from '../../contexts/DormUserInteractionContext';
-import { useDormData } from '../../contexts/DormDataContext';
+import { formatPrice } from './constants/pricing';
+import { TAG_REGISTRY, getHousingTypeMeta, getLocalizedLabel } from './constants/metadata';
+import { useSharedDormInteraction } from './store/DormUserInteractionContext';
+import { useDormData } from './store/DormDataContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { dormService } from '../../services/dormService';
-import { useDormComments } from '../../hooks/useDormComments';
-import { Dorm, DormTag } from '../../types/housing';
+import { useDormComments } from './hooks/useDormComments';
+import { Dorm, DormTag } from './types/index';
 import { Language } from '../../types';
 import DormEditPanel from './DormEditPanel';
 import ImageLightbox from './ImageLightbox';

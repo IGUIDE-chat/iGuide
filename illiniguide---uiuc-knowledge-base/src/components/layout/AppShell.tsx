@@ -1,3 +1,10 @@
+/**
+ * @file ./src/components/layout/AppShell.tsx
+ * @description Layout Component / Module
+ * @description_zh 此文件属于 Layout 层，仅负责布局、导航。严禁在此处堆积业务逻辑。
+ * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
+ */
+
 import React from 'react';
 
 interface AppShellProps {
