@@ -25,8 +25,8 @@ For fuller explanations, see:
    Default to local placement before promoting code into global folders.
 3. Keep `src/pages/**` thin.
    Pages should handle route-level orchestration, not become feature owners.
-4. Treat `src/components/chat/**` and `src/components/housing/**` as the primary
-   homes for chat-specific and housing-specific UI.
+4. Treat `src/components/<feature>/**` as the primary home for feature-specific
+   UI.
 5. Keep `src/components/layout/**` layout-only.
    Layout code can know about shell structure and navigation, but not feature
    business logic.

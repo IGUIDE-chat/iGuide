@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { ProfileScreen } from '../../components/ProfileScreen';
+import { ProfileScreen } from '../../components/profile/ProfileScreen';
 import { Language } from '../../types';
 
 interface ProfilePageProps {

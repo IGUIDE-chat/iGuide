@@ -46,6 +46,7 @@ illiniguide---uiuc-knowledge-base/
 |-- src/
 |   |-- app/                    # routes and app-level composition metadata
 |   |-- components/
+|   |   |-- auth/               # auth-specific full-screen UI
 |   |   |-- ui/                 # business-agnostic dumb UI only
 |   |   |   `-- branding/
 |   |   |-- layout/             # app shell, nav, sidebar, layout-only pieces
@@ -61,6 +62,8 @@ illiniguide---uiuc-knowledge-base/
 |   |       |-- i18n/
 |   |       |-- store/
 |   |       `-- types/
+|   |   |-- library/            # library/article feature UI
+|   |   `-- profile/            # profile feature UI
 |   |-- constants/
 |   |-- contexts/
 |   |-- data/
@@ -92,8 +95,8 @@ Important:
 
 - `src/App.tsx` is the only active app-composition file.
 - `src/legacy/**` is an explicit isolation boundary for unused reference code.
-- A small number of active display components may remain directly under
-  `src/components/` when they do not yet have a stable documented subtree.
+- Cross-feature components may remain directly under `src/components/` only
+  when they do not yet have a stable documented subtree.
 - Do not declare a new canonical root such as `src/features/**` in docs unless
   the runtime imports and build have actually moved there.
 
@@ -119,8 +122,7 @@ Not allowed:
 
 ### 4.2 Feature UI
 
-`src/components/chat/**` and `src/components/housing/**` own feature-local UI
-composition.
+`src/components/<feature>/**` owns feature-local UI composition.
 
 Put code here when it is specific to one feature, such as:
 
@@ -163,8 +165,7 @@ Not allowed:
 ### 4.5 Root-Level Active Components
 
 Some active components may remain directly under `src/components/` when they do
-not belong in `ui/`, `layout/`, `chat/`, or `housing/`, and the repo does not
-yet have a stable documented subtree for them.
+not belong in a stable feature subtree yet.
 
 Do not invent a new canonical subtree just to relocate a single file.
 
