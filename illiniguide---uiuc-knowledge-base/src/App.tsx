@@ -8,7 +8,7 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { LoginScreen } from './components/LoginScreen';
+import { LoginScreen } from './components/auth/LoginScreen';
 import { Layout } from './components/layout/Layout';
 import { AppRoutes } from './app/routes';
 import { useAuth } from './contexts/AuthContext';
