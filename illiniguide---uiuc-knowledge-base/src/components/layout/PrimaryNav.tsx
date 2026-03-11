@@ -1,6 +1,13 @@
+/**
+ * @file ./src/components/layout/PrimaryNav.tsx
+ * @description Layout Component / Module
+ * @description_zh 此文件属于 Layout 层，仅负责布局、导航。严禁在此处堆积业务逻辑。
+ * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
+ */
+
 import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { BrandMark } from '../branding/BrandMark';
+import { BrandMark } from '../ui/branding/BrandMark';
 
 interface NavItem {
   key: string;

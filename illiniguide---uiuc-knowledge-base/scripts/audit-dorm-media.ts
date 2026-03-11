@@ -1,9 +1,9 @@
-import { UIUC_DORMS } from '../src/constants/housing/dormData';
+import { UIUC_DORMS } from '../src/components/housing/constants/dormData';
 import {
     hasPeopleishFilename,
     isLikelyLowQualityMediaUrl,
     normalizeOfficialMediaUrl,
-} from '../src/constants/housing/dormOfficialOverrideUtils';
+} from '../src/components/housing/constants/dormOfficialOverrideUtils';
 
 interface MediaEntry {
     dormId: string;

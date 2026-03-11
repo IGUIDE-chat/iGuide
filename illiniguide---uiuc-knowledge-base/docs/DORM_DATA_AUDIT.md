@@ -12,6 +12,15 @@
   - `Armory` 首页轮播里带人物的单人间图
 - 已新增媒体审计脚本 `scripts/audit-dorm-media.ts`，并在校验中阻止重新引入低清缩略图 URL、旧版单图字段、以及明显人物文件名。
 
+## 本轮面积复核结论
+- 重新核查了当前 23 个宿舍所有 `floorPlans[].sqft`。
+- 保留规则：只有官方页面或官方 PDF 明确写出 square footage，才保留 `sqft`。
+- 删除规则：如果官方只给房间照片、平面图、家具尺寸、房间长宽，或只给区间/“over”这类非单一精确值，就不再保留结构化 `sqft`。
+- 本轮删除了大部分历史手填面积，避免前台继续显示未经官方明确发布的数字。
+- 当前仅保留 5 个可直接落到官方文本的 `sqft`：
+  - `Bromley`：`Standard Double` 285、`Triple` 375、`Quad` 375
+  - `Illini Tower`：`C1` 760、`D1` 860
+
 ## 媒体质量状态
 
 | 宿舍 | 已替换为原图 | 已移除含人物图片 | 官方仅提供低清/待补 |
@@ -40,12 +49,42 @@
 | Presby Hall | hero 已从 Certified Housing 缩略图升级为原图 | 无 | Suite 级别媒体仍以整套空间照为主 |
 | Armory House | hero、gallery、room photo 已从 `photo_side_by_side` 升级为原图；单人间改用 living-options 原图 | 已移除首页轮播里的单人间人物图 | 官方没有统一导出的完整 floor plan 套图包 |
 
+## 面积状态
+
+| 宿舍 | 已确认面积 | 已删除/修正面积 | 说明 |
+| --- | --- | --- | --- |
+| ISR | 无 | 已删除全部旧 `sqft` | Illinois Housing hall 页只给家具尺寸说明和 layout PDF，没有明确 square footage |
+| Nugent | 无 | 已删除全部旧 `sqft` | 官方只给 `NUGT-RoomLayouts.pdf` 和家具尺寸说明，没有逐房型面积 |
+| Wassaja | 无 | 已删除全部旧 `sqft` | 官方只给 singles / doubles PDF，没有明确 square footage |
+| Bousfield | 无 | 已删除全部旧 `sqft` | 官方只给 suite floor plan PDF，没有明确 square footage |
+| PAR | 无 | 已删除全部旧 `sqft` | 官方只给平面图和房间照，没有明确 square footage |
+| FAR | 无 | 已删除全部旧 `sqft` | 官方只给平面图和房间照，没有明确 square footage |
+| Allen | 无 | 已删除全部旧 `sqft` | 官方只给 double / triple / quad PDF，没有明确 square footage |
+| Busey-Evans | 无 | 已删除全部旧 `sqft` | 官方房间页没有公布 single / triple 的明确面积 |
+| Snyder | 无 | 已删除全部旧 `sqft` | 官方只给 double / triple PDF，没有明确 square footage |
+| Hopkins | 无 | 已删除全部旧 `sqft` | 官方只给 double / triple PDF，没有明确 square footage |
+| Weston | 无 | 已删除全部旧 `sqft` | 官方只给 double / triple PDF，没有明确 square footage |
+| Scott | 无 | 已删除全部旧 `sqft` | 官方只给 double / triple PDF，没有明确 square footage |
+| Taft | 无 | 已删除全部旧 `sqft` | 官方只给房间 layout 和家具尺寸说明，没有明确 square footage |
+| Van Doren | 无 | 已删除全部旧 `sqft` | 官方只给房间 layout 和家具尺寸说明，没有明确 square footage |
+| Daniels | 无 | 已删除全部旧 `sqft` | 官方 Daniels 页面只给 layout PDF 和 furniture dimensions，没有明确 square footage |
+| Sherman | 无 | 已删除全部旧 `sqft` | 官方只给 shared single / double layout PDF，没有明确 square footage |
+| LAR | 无 | 已删除全部旧 `sqft` | 官方只给 single / double / triple PDF，没有明确 square footage |
+| Bromley | `Standard Double` 285，`Triple` 375，`Quad` 375 | 删除 `Single` 的结构化 `sqft`；把旧的 280 / 320 / 400 修正为 285 / 375 / 375 | `BH-Room-Descriptions.pdf` 明确写了 double / triple / quad 面积；single 只写 “over 145 square feet”，不是单一精确值 |
+| Illini Tower | `C1` 760，`D1` 860 | 删除 `S1 / S2 Studio` 与 `B1 Shared / B2 Shared / B2 Private` 的结构化 `sqft`；把旧的 `C1` 450、`D1` 580 修正为 760、860 | 官方 `floor-plans` 页面把 Studio 写成 465-560、Two Bedroom 写成 630-700；当前产品模型是聚合房型，不能安全落单一数值 |
+| Newman | 无 | 已删除全部旧 `sqft` | Newman 官方 room-floorplans 页和房间图未公布明确 square footage |
+| Hendrick House | 无 | 已删除全部旧 `sqft` | 当前 Hendrick 官方站点公开了房型和价格，但未公开明确 square footage |
+| Presby Hall | 无 | 已删除全部旧 `sqft` | Presby floorplans 页描述的是 5/6-bedroom suite 结构与设施，没有逐房型面积 |
+| Armory House | 无 | 已删除全部旧 `sqft` | Armory 官方页给的是房间长宽近似值，如 `13' x 16'`、`11' x 12'`、`12' x 14'`、`10' x 12'`，不是统一发布的 square footage |
+
 ## 仍待确认 / 无信息
 - `Newman`：缺少统一可下载的 floor plan PNG/PDF，当前只能用官方 room profile 图和房间照覆盖。
-- `Hendrick House`：官网没有把所有 East/West 变体都做成完整可下载的平面图集合。
-- `Armory House`：虽然 main / suite 的主要房型已补到 living-options 原图，但仍没有统一打包的完整 floor plan 手册。
-- `Bromley`：`Corner Standard Double` 价格仍未在官方价目页单独列出。
+- `Hendrick House`：官网没有把所有 East/West 变体都做成完整可下载的平面图集合，也没有发布统一的 `sqft`。
+- `Armory House`：虽然 main / suite 的主要房型已补到 living-options 原图，但仍没有统一打包的完整 floor plan 手册；官方目前主要给房间长宽，不给标准化 `sqft`。
+- `Bromley`：`Corner Standard Double` 价格仍未在官方价目页单独列出；`Single` 只有 “over 145 square feet”，没有单一精确面积。
+- `Illini Tower`：Studio 与 Two Bedroom 当前仍是聚合房型；如果后续要前台逐卡显示精确面积，需要把 `S1 / S2` 和 `B1 / B2` 拆开。
 - `PAR / FAR / LAR / Busey-Evans`：当前产品模型仍是聚合记录，不会为每个子楼单独维护独立图库。
+- `University Housing` 多数 hall 页面：公开的是 furniture dimensions 与 layout PDF，不是逐房型 square footage。
 
 ## 主要来源
 - Illinois Housing: `https://www.housing.illinois.edu/`

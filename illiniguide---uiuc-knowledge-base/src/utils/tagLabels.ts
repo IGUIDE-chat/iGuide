@@ -1,8 +1,15 @@
+/**
+ * @file ./src/utils/tagLabels.ts
+ * @description Global Shared Component / Module
+ * @description_zh 此文件不属于特定业务流，而是全局共享逻辑，只能包含与其他业务解耦的代码。如果该文件只为一个特定业务服务，请将其移动到对应的 src/components/<feature>/ 目录下。
+ * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
+ */
+
 // [UTILITY] Tag label i18n and hero tag selection utilities.
 // [工具] 标签国际化和 Hero 标签选择工具。
 import { Language } from '../types';
-import { DormCategorizedTags, DormTag } from '../types/housing';
-import { getTagDisplay, TAG_REGISTRY } from '../constants/housing/metadata';
+import { DormCategorizedTags, DormTag } from '../components/housing/types/index';
+import { getTagDisplay, TAG_REGISTRY } from '../components/housing/constants/metadata';
 
 // ── Legacy tag map (kept for backward compat during migration) ──────────────
 
