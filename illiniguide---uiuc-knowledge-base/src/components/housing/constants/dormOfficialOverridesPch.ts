@@ -249,7 +249,7 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
                 officialName: 'South Double Room',
                 bedCount: 2,
                 bathroomCount: 0,
-                bathroomScope: 'communal',
+                bathroomScope: 'semi-private',
                 price: 15725,
                 photoUrls: urls(
                     'https://www.sjcnc.org/image/115/1800',

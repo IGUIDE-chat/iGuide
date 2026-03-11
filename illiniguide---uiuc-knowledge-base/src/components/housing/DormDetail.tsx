@@ -513,6 +513,11 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                     const labels = getRoomOptionLabels(option, language);
                                     const planKey = getPlanKey(plan, idx);
                                     const planPrice = getPublishedPlanPrice(plan);
+                                    const planBathroomLabel = plan.bathroomScope === 'private'
+                                        ? t.privateBath
+                                        : plan.bathroomScope === 'semi-private'
+                                            ? t.semiPrivateBath
+                                            : t.communalBath;
                                     const isExpanded = expandedPlanId === planKey;
                                     const isCompared = compareIds.includes(planKey);
                                     const planDisplayTitle = plan.officialName || labels.primaryLabel;
@@ -621,7 +626,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                                                 <span className="text-[12px] md:text-[14px] font-semibold">
                                                                     {plan.bathroomCount != null && plan.bathroomCount > 0
                                                                         ? `${plan.bathroomCount} ${language === 'zh' ? '卫' : plan.bathroomCount === 1 ? 'Bath' : 'Baths'}`
-                                                                        : bathroomLabel}
+                                                                        : planBathroomLabel}
                                                                 </span>
                                                             </div>
                                                             {plan.sqft && (
