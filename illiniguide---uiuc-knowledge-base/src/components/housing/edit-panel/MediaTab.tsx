@@ -29,6 +29,9 @@ interface MediaTabProps {
   form: DormEditFormState;
 }
 
+const hasPublishedPrice = (price: FloorPlan['price']): price is number =>
+  typeof price === 'number' && Number.isFinite(price) && price > 0;
+
 /** Small thumbnail chip for an uploaded image URL */
 const ImageChip: React.FC<{
   url: string;
@@ -270,7 +273,7 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                           {preview}
                         </span>
                       </div>
-                      {plan.price > 0 && (
+                      {hasPublishedPrice(plan.price) && (
                         <span className="text-xs text-illini-blue font-medium ml-2">
                           ${plan.price.toLocaleString()}/yr
                         </span>
@@ -420,9 +423,17 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                         <input
                           type="number"
                           min={0}
-                          value={plan.price}
+                          value={plan.price ?? ''}
                           onChange={(event) =>
-                            update({ price: Number(event.target.value) }, false)
+                            update(
+                              {
+                                price:
+                                  event.target.value === ''
+                                    ? undefined
+                                    : Number(event.target.value),
+                              },
+                              false,
+                            )
                           }
                           className={inputCls}
                         />

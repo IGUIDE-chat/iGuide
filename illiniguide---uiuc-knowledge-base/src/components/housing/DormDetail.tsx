@@ -20,7 +20,7 @@ import { useDormData } from './store/DormDataContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { dormService } from '../../services/dormService';
 import { useDormComments } from './hooks/useDormComments';
-import { Dorm, DormTag } from './types/index';
+import { Dorm, DormTag, FloorPlan } from './types/index';
 import { Language } from '../../types';
 import DormEditPanel from './DormEditPanel';
 import ImageLightbox from './ImageLightbox';
@@ -46,6 +46,17 @@ const cardTap = { scale: 0.97 };
 /** Detect if text is primarily Chinese (has CJK characters) */
 const isChinese = (text: string) => /[\u4e00-\u9fff]/.test(text);
 const detectLang = (text: string): 'zh' | 'en' => isChinese(text) ? 'zh' : 'en';
+const hasPublishedPlanPrice = (price: FloorPlan['price']): price is number =>
+    typeof price === 'number' && Number.isFinite(price) && price > 0;
+const getPublishedPlanPrice = (plan: FloorPlan) => hasPublishedPlanPrice(plan.price) ? plan.price : null;
+const getPlanKey = (plan: FloorPlan, idx: number) =>
+    [
+        plan.labelCode ?? 'plan',
+        plan.officialName ?? 'unnamed',
+        plan.bedCount ?? 'na',
+        plan.bathroomCount ?? 'na',
+        idx,
+    ].join(':');
 
 // ─── Props ─────────────────────────────────────────────────────────────────
 interface DormDetailProps {
@@ -142,10 +153,23 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
     // Floor plans
     const sortedPlans = (dorm.floorPlans ?? [])
         .map((p) => normalizeFloorPlan(p, p.bathroomScope ?? 'communal'))
-        .sort((a, b) => (a.bedCount ?? 99) - (b.bedCount ?? 99) || a.price - b.price);
-    const minPrice = sortedPlans.length ? Math.min(...sortedPlans.map((p) => p.price)) : null;
-    const maxPrice = sortedPlans.length ? Math.max(...sortedPlans.map((p) => p.price)) : null;
-    const getPlanKey = (idx: number, price: number, code?: string) => `${code ?? 'plan'}-${price}-${idx}`;
+        .sort((a, b) => {
+            const bedDelta = (a.bedCount ?? 99) - (b.bedCount ?? 99);
+            if (bedDelta !== 0) return bedDelta;
+
+            const priceDelta = (getPublishedPlanPrice(a) ?? Number.POSITIVE_INFINITY)
+                - (getPublishedPlanPrice(b) ?? Number.POSITIVE_INFINITY);
+            if (priceDelta !== 0) return priceDelta;
+
+            return (a.officialName ?? a.labelCode ?? '').localeCompare(b.officialName ?? b.labelCode ?? '');
+        });
+    const pricedPlans = sortedPlans.filter((plan) => getPublishedPlanPrice(plan) != null);
+    const minPrice = pricedPlans.length
+        ? Math.min(...pricedPlans.map((plan) => getPublishedPlanPrice(plan) as number))
+        : null;
+    const maxPrice = pricedPlans.length
+        ? Math.max(...pricedPlans.map((plan) => getPublishedPlanPrice(plan) as number))
+        : null;
 
     // Reviews
     const totalReviews = comments.length;
@@ -487,13 +511,24 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                         labelCode: plan.labelCode,
                                     };
                                     const labels = getRoomOptionLabels(option, language);
-                                    const planKey = getPlanKey(idx, plan.price, plan.labelCode);
+                                    const planKey = getPlanKey(plan, idx);
+                                    const planPrice = getPublishedPlanPrice(plan);
+                                    const planBathroomLabel = plan.bathroomScope === 'private'
+                                        ? t.privateBath
+                                        : plan.bathroomScope === 'semi-private'
+                                            ? t.semiPrivateBath
+                                            : t.communalBath;
                                     const isExpanded = expandedPlanId === planKey;
                                     const isCompared = compareIds.includes(planKey);
                                     const planDisplayTitle = plan.officialName || labels.primaryLabel;
                                     const normalizedSummary = plan.officialName && plan.officialName !== labels.primaryLabel
                                         ? [labels.primaryLabel, labels.secondaryLabel].filter(Boolean).join(' · ')
                                         : labels.secondaryLabel;
+                                    const availabilityLabel = plan.available === false
+                                        ? (language === 'zh' ? '暂不可订' : 'Sold out')
+                                        : planPrice == null
+                                            ? (language === 'zh' ? '价格待公布' : 'Price unavailable')
+                                            : t.available;
                                     // Multi-image arrays (fallback to legacy single fields)
                                     const photos = plan.photoUrls?.length ? plan.photoUrls : plan.photoUrl ? [plan.photoUrl] : [];
                                     const layouts = plan.imageUrls?.length ? plan.imageUrls : plan.imageUrl ? [plan.imageUrl] : [];
@@ -549,12 +584,17 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                                                         {normalizedSummary}
                                                                     </span>
                                                                 )}
-                                                                {plan.available !== false && (
-                                                                    <span className="flex items-center gap-0.5 md:gap-1 px-1.5 py-0.5 md:px-2.5 md:py-1 text-[10px] md:text-[13px] text-[#059669] bg-[#ECFDF5] border border-[#D1FAE5] rounded-md md:rounded-xl font-bold whitespace-nowrap">
+                                                                <span className={`flex items-center gap-0.5 md:gap-1 px-1.5 py-0.5 md:px-2.5 md:py-1 text-[10px] md:text-[13px] rounded-md md:rounded-xl font-bold whitespace-nowrap border ${plan.available === false
+                                                                    ? 'text-red-600 bg-red-50 border-red-200'
+                                                                    : planPrice == null
+                                                                        ? 'text-amber-700 bg-amber-50 border-amber-200'
+                                                                        : 'text-[#059669] bg-[#ECFDF5] border-[#D1FAE5]'
+                                                                    }`}>
+                                                                    {plan.available !== false && planPrice != null && (
                                                                         <Check className="w-2.5 h-2.5 md:w-3.5 md:h-3.5" strokeWidth={3} />
-                                                                        {t.available}
-                                                                    </span>
-                                                                )}
+                                                                    )}
+                                                                    {availabilityLabel}
+                                                                </span>
                                                             </div>
                                                             {/* Mobile chevron */}
                                                             <motion.div
@@ -586,7 +626,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                                                 <span className="text-[12px] md:text-[14px] font-semibold">
                                                                     {plan.bathroomCount != null && plan.bathroomCount > 0
                                                                         ? `${plan.bathroomCount} ${language === 'zh' ? '卫' : plan.bathroomCount === 1 ? 'Bath' : 'Baths'}`
-                                                                        : bathroomLabel}
+                                                                        : planBathroomLabel}
                                                                 </span>
                                                             </div>
                                                             {plan.sqft && (
@@ -606,30 +646,42 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                                         </div>
 
                                                         {/* Mobile price */}
-                                                        <div className="flex md:hidden items-baseline gap-1 mt-0.5">
-                                                            <span className="text-[16px] font-extrabold text-slate-900 tabular-nums tracking-tight">
-                                                                {formatPrice(plan.price)}
-                                                            </span>
-                                                            <span className="text-[11px] text-slate-500 font-medium">{t.yr}</span>
-                                                            <span className="text-[11px] text-slate-400 ml-1 font-medium tabular-nums">
-                                                                (~{formatPrice(Math.round(plan.price / 12))}{t.mo})
-                                                            </span>
-                                                        </div>
+                                                        {planPrice != null ? (
+                                                            <div className="flex md:hidden items-baseline gap-1 mt-0.5">
+                                                                <span className="text-[16px] font-extrabold text-slate-900 tabular-nums tracking-tight">
+                                                                    {formatPrice(planPrice)}
+                                                                </span>
+                                                                <span className="text-[11px] text-slate-500 font-medium">{t.yr}</span>
+                                                                <span className="text-[11px] text-slate-400 ml-1 font-medium tabular-nums">
+                                                                    (~{formatPrice(Math.round(planPrice / 12))}{t.mo})
+                                                                </span>
+                                                            </div>
+                                                        ) : (
+                                                            <div className={`md:hidden mt-0.5 text-[12px] font-semibold ${plan.available === false ? 'text-red-500' : 'text-amber-600'}`}>
+                                                                {availabilityLabel}
+                                                            </div>
+                                                        )}
                                                     </div>
 
                                                     {/* Right: desktop price + actions */}
                                                     <div className="hidden md:flex flex-col items-end justify-between gap-2 h-full py-0.5 shrink-0">
-                                                        <div className="flex flex-col items-end">
-                                                            <div className="flex items-baseline gap-0.5">
-                                                                <span className="text-[24px] font-extrabold text-slate-900 tabular-nums tracking-tight">
-                                                                    {formatPrice(plan.price)}
-                                                                </span>
-                                                                <span className="text-[13px] text-slate-500 font-medium">{t.yr}</span>
+                                                        {planPrice != null ? (
+                                                            <div className="flex flex-col items-end">
+                                                                <div className="flex items-baseline gap-0.5">
+                                                                    <span className="text-[24px] font-extrabold text-slate-900 tabular-nums tracking-tight">
+                                                                        {formatPrice(planPrice)}
+                                                                    </span>
+                                                                    <span className="text-[13px] text-slate-500 font-medium">{t.yr}</span>
+                                                                </div>
+                                                                <div className="inline-flex items-center px-1.5 py-0.5 mt-1 rounded-md bg-slate-100 text-[12px] text-slate-500 font-medium tabular-nums">
+                                                                    ~{formatPrice(Math.round(planPrice / 12))}{t.mo}
+                                                                </div>
                                                             </div>
-                                                            <div className="inline-flex items-center px-1.5 py-0.5 mt-1 rounded-md bg-slate-100 text-[12px] text-slate-500 font-medium tabular-nums">
-                                                                ~{formatPrice(Math.round(plan.price / 12))}{t.mo}
+                                                        ) : (
+                                                            <div className={`text-[13px] font-semibold ${plan.available === false ? 'text-red-500' : 'text-amber-600'}`}>
+                                                                {availabilityLabel}
                                                             </div>
-                                                        </div>
+                                                        )}
 
                                                         <div className="flex items-center gap-3">
                                                             <motion.button

@@ -51,6 +51,10 @@ const REQUIRED_SYNC_FIELDS = [
     'price_range',
 ];
 const LOW_QUALITY_ALLOWLIST = new Set<string>([]);
+const FLOOR_PLAN_SQFT_ALLOWLIST: Record<string, Set<string>> = {
+    bromley: new Set(['Standard Double', 'Triple', 'Quad']),
+    'illini-tower': new Set(['S1', 'S2', 'B1 Shared', 'B2 Shared', 'B2 Private', 'C1', 'D1']),
+};
 
 const errors: string[] = [];
 
@@ -101,8 +105,20 @@ for (const dorm of UIUC_DORMS) {
         check(!plan.imageUrl, `${dorm.id} still uses legacy floorPlans.imageUrl.`);
         check(!plan.photoUrl, `${dorm.id} still uses legacy floorPlans.photoUrl.`);
         check(plan.bathroomScope != null, `${dorm.id} has a floor plan without bathroomScope.`);
+        if (plan.price != null) {
+            check(
+                Number.isFinite(plan.price) && plan.price > 0,
+                `${dorm.id} has an invalid floor plan price value.`,
+            );
+        }
         if (plan.sqft != null) {
             check(Number.isFinite(plan.sqft) && plan.sqft > 0, `${dorm.id} has an invalid floor plan sqft value.`);
+            const allowedNames = FLOOR_PLAN_SQFT_ALLOWLIST[dorm.id] ?? new Set<string>();
+            const planName = plan.officialName ?? plan.labelCode ?? plan.type;
+            check(
+                Boolean(planName) && allowedNames.has(planName),
+                `${dorm.id} keeps sqft on an unapproved floor plan (${planName ?? 'unknown'}).`,
+            );
         }
         for (const [index, url] of (plan.photoUrls ?? []).entries()) {
             checkMediaUrl(dorm.id, `floorPlans.photoUrls[${index}]`, url);
@@ -118,10 +134,10 @@ for (const dorm of UIUC_DORMS) {
 
 const repoRoot = process.cwd();
 const seedScript = fs.readFileSync(path.join(repoRoot, 'scripts', 'seed-dorms-table.ts'), 'utf8');
-const adminService = fs.readFileSync(path.join(repoRoot, 'src', 'features', 'housing', 'api', 'dormAdminService.ts'), 'utf8');
-const dormService = fs.readFileSync(path.join(repoRoot, 'src', 'features', 'housing', 'api', 'dormService.ts'), 'utf8');
-const mediaTab = fs.readFileSync(path.join(repoRoot, 'src', 'features', 'housing', 'components', 'edit-panel', 'MediaTab.tsx'), 'utf8');
-const editForm = fs.readFileSync(path.join(repoRoot, 'src', 'features', 'housing', 'components', 'edit-panel', 'useDormEditForm.ts'), 'utf8');
+const adminService = fs.readFileSync(path.join(repoRoot, 'src', 'services', 'dormAdminService.ts'), 'utf8');
+const dormService = fs.readFileSync(path.join(repoRoot, 'src', 'services', 'dormService.ts'), 'utf8');
+const mediaTab = fs.readFileSync(path.join(repoRoot, 'src', 'components', 'housing', 'edit-panel', 'MediaTab.tsx'), 'utf8');
+const editForm = fs.readFileSync(path.join(repoRoot, 'src', 'components', 'housing', 'edit-panel', 'useDormEditForm.ts'), 'utf8');
 
 for (const field of REQUIRED_SYNC_FIELDS) {
     check(seedScript.includes(field), `Seed script is missing sync field "${field}".`);
