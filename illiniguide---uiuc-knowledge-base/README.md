@@ -23,18 +23,23 @@ illiniguide---uiuc-knowledge-base/
 |-- src/
 |   |-- app/
 |   |-- components/
+|   |   |-- ui/
+|   |   |   `-- branding/
 |   |   |-- chat/
 |   |   |-- housing/
+|   |   |   |-- constants/
 |   |   |   |-- dorm-detail/
 |   |   |   |   `-- sections/
 |   |   |   |-- dorm-list/
 |   |   |   |-- dorm-map/
 |   |   |   |-- edit-panel/
 |   |   |   |-- filter-modal/
-|   |   |   `-- i18n/
+|   |   |   |-- hooks/
+|   |   |   |-- i18n/
+|   |   |   |-- store/
+|   |   |   `-- types/
 |   |   `-- layout/
 |   |-- constants/
-|   |   `-- housing/
 |   |-- contexts/
 |   |-- data/
 |   |   `-- articles/
@@ -47,11 +52,19 @@ illiniguide---uiuc-knowledge-base/
 |   |   |-- library/
 |   |   |-- profile/
 |   |   `-- resume/
+|   |-- legacy/
+|   |   |-- auth/
+|   |   `-- components/
 |   |-- scripts/
 |   |-- services/
-|   |-- types/
-|   `-- utils/
+|   |-- App.tsx
+|   |-- constants.ts
+|   |-- index.css
+|   |-- index.tsx
+|   |-- utils/
+|   `-- types.ts
 `-- tests/
+    `-- artifacts/
 ```
 
 ## Architecture Rules
@@ -59,6 +72,9 @@ illiniguide---uiuc-knowledge-base/
 - `src/App.tsx` is the only active app-composition entry in this package.
 - Route-level orchestration belongs in `src/pages/**` and page-local hooks.
 - `src/components/**` should stay presentation-first and feature-local.
+- `src/components/ui/**` is for business-agnostic shared UI only.
+- `src/legacy/**` stores isolated unused reference code; active runtime modules must not import from it.
+- A small number of active display components may remain at `src/components/` root until a stable documented subtree exists.
 - Active runtime code must not import from reserved legacy boundaries:
   - `src/legacy/**`
   - `src/components/housing/legacy/**`
@@ -88,5 +104,4 @@ npm install
 npm run dev
 npm run typecheck
 npm run build
-npm run verify:architecture
 ```

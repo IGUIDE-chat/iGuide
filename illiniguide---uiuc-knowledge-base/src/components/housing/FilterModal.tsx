@@ -1,11 +1,18 @@
+/**
+ * @file ./src/components/housing/FilterModal.tsx
+ * @description Housing (Dorms) Component / Module
+ * @description_zh 此文件属于 Housing 业务域（限界上下文）。请勿在此引入其他业务（如 chat, library）的代码。保持高内聚，不要把 Housing 独有的逻辑泄露到外层全局目录。
+ * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
+ */
+
 import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { X } from 'lucide-react';
 import { Dialog, Transition } from '@headlessui/react';
 import 'rc-slider/assets/index.css';
-import { useHousingFilters } from '../../contexts/HousingContext';
-import { getPriceRangeFromData } from '../../constants/housing/pricing';
-import { useDormData } from '../../contexts/DormDataContext';
-import { BathroomCountFilter, BathroomScope, BedCountFilter, DormTag, FilterOption } from '../../types/housing';
+import { useHousingFilters } from './store/HousingContext';
+import { getPriceRangeFromData } from './constants/pricing';
+import { useDormData } from './store/DormDataContext';
+import { BathroomCountFilter, BathroomScope, BedCountFilter, DormTag, FilterOption } from './types/index';
 import {
     BATHROOM_TYPE_OPTIONS,
     FILTERABLE_LIVING_CONDITION_TAGS,
@@ -13,7 +20,7 @@ import {
     getTagDisplay,
     mergeLocationOptions,
     TAGS_BY_CATEGORY,
-} from '../../constants/housing/metadata';
+} from './constants/metadata';
 import PriceSection from './filter-modal/PriceSection';
 import HousingTypeSection from './filter-modal/HousingTypeSection';
 import ChipSection from './filter-modal/ChipSection';

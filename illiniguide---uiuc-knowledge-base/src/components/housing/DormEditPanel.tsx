@@ -1,8 +1,15 @@
+/**
+ * @file ./src/components/housing/DormEditPanel.tsx
+ * @description Housing (Dorms) Component / Module
+ * @description_zh 此文件属于 Housing 业务域（限界上下文）。请勿在此引入其他业务（如 chat, library）的代码。保持高内聚，不要把 Housing 独有的逻辑泄露到外层全局目录。
+ * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
+ */
+
 // [COMPONENT] Entry point for the admin edit panel — wires form hook + shell + tab components.
 // [组件] 管理员编辑面板入口，将表单 hook、外壳和各 Tab 组件组合在一起。
 import React from 'react';
 import { FileText, History, Image, Info, Tag } from 'lucide-react';
-import { Dorm } from '../../types/housing';
+import { Dorm } from './types/index';
 import { Language } from '../../types';
 import { useDormEditForm } from './edit-panel/useDormEditForm';
 import { DormEditPanelShell } from './edit-panel/DormEditPanelShell';

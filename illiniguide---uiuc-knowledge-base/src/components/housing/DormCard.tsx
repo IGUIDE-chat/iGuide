@@ -1,7 +1,14 @@
+/**
+ * @file ./src/components/housing/DormCard.tsx
+ * @description Housing (Dorms) Component / Module
+ * @description_zh 此文件属于 Housing 业务域（限界上下文）。请勿在此引入其他业务（如 chat, library）的代码。保持高内聚，不要把 Housing 独有的逻辑泄露到外层全局目录。
+ * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
+ */
+
 import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Bath, BedSingle, MapPin, ThumbsUp, Utensils, Wind } from 'lucide-react';
-import { formatPrice } from '../../constants/housing/pricing';
-import { Dorm } from '../../types/housing';
+import { formatPrice } from './constants/pricing';
+import { Dorm } from './types/index';
 import { Language } from '../../types';
 import { deriveRoomOptions, getRoomRangeSummary } from '../../utils/roomOptions';
 import { CardTagItem, getCardTagCandidates } from '../../utils/tagLabels';

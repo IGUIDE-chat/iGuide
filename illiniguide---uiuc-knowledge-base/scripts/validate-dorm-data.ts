@@ -1,11 +1,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { UIUC_DORMS } from '../src/constants/housing/dormData';
-import { TAGS_BY_CATEGORY, LLC_OPTIONS } from '../src/constants/housing/metadata';
+import { UIUC_DORMS } from '../src/components/housing/constants/dormData';
+import { TAGS_BY_CATEGORY, LLC_OPTIONS } from '../src/components/housing/constants/metadata';
 import {
     hasPeopleishFilename,
     isLikelyLowQualityMediaUrl,
-} from '../src/constants/housing/dormOfficialOverrideUtils';
+} from '../src/components/housing/constants/dormOfficialOverrideUtils';
 import { getDormPriceRange } from '../src/utils/dormData';
 
 const EXPECTED_IDS = [
@@ -101,6 +101,9 @@ for (const dorm of UIUC_DORMS) {
         check(!plan.imageUrl, `${dorm.id} still uses legacy floorPlans.imageUrl.`);
         check(!plan.photoUrl, `${dorm.id} still uses legacy floorPlans.photoUrl.`);
         check(plan.bathroomScope != null, `${dorm.id} has a floor plan without bathroomScope.`);
+        if (plan.sqft != null) {
+            check(Number.isFinite(plan.sqft) && plan.sqft > 0, `${dorm.id} has an invalid floor plan sqft value.`);
+        }
         for (const [index, url] of (plan.photoUrls ?? []).entries()) {
             checkMediaUrl(dorm.id, `floorPlans.photoUrls[${index}]`, url);
         }
@@ -115,10 +118,10 @@ for (const dorm of UIUC_DORMS) {
 
 const repoRoot = process.cwd();
 const seedScript = fs.readFileSync(path.join(repoRoot, 'scripts', 'seed-dorms-table.ts'), 'utf8');
-const adminService = fs.readFileSync(path.join(repoRoot, 'src', 'services', 'dormAdminService.ts'), 'utf8');
-const dormService = fs.readFileSync(path.join(repoRoot, 'src', 'services', 'dormService.ts'), 'utf8');
-const mediaTab = fs.readFileSync(path.join(repoRoot, 'src', 'components', 'housing', 'edit-panel', 'MediaTab.tsx'), 'utf8');
-const editForm = fs.readFileSync(path.join(repoRoot, 'src', 'components', 'housing', 'edit-panel', 'useDormEditForm.ts'), 'utf8');
+const adminService = fs.readFileSync(path.join(repoRoot, 'src', 'features', 'housing', 'api', 'dormAdminService.ts'), 'utf8');
+const dormService = fs.readFileSync(path.join(repoRoot, 'src', 'features', 'housing', 'api', 'dormService.ts'), 'utf8');
+const mediaTab = fs.readFileSync(path.join(repoRoot, 'src', 'features', 'housing', 'components', 'edit-panel', 'MediaTab.tsx'), 'utf8');
+const editForm = fs.readFileSync(path.join(repoRoot, 'src', 'features', 'housing', 'components', 'edit-panel', 'useDormEditForm.ts'), 'utf8');
 
 for (const field of REQUIRED_SYNC_FIELDS) {
     check(seedScript.includes(field), `Seed script is missing sync field "${field}".`);

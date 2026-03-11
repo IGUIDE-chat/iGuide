@@ -1,11 +1,18 @@
+/**
+ * @file ./src/components/housing/edit-panel/DetailsTab.tsx
+ * @description Housing (Dorms) Component / Module
+ * @description_zh 此文件属于 Housing 业务域（限界上下文）。请勿在此引入其他业务（如 chat, library）的代码。保持高内聚，不要把 Housing 独有的逻辑泄露到外层全局目录。
+ * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
+ */
+
 import React from 'react';
-import { BathroomType, DiningType, Dorm } from '../../../types/housing';
+import { BathroomType, DiningType, Dorm } from '../types/index';
 import {
   BATHROOM_TYPE_OPTIONS,
   DINING_OPTIONS,
   getLocalizedLabel,
   HOUSING_TYPE_OPTIONS,
-} from '../../../constants/housing/metadata';
+} from '../constants/metadata';
 import { DormEditFormState } from './useDormEditForm';
 import { Field, Toggle, inputCls } from './EditPanelFields';
 
