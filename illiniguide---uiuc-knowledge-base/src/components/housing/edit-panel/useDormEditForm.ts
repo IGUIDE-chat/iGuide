@@ -64,7 +64,6 @@ export const createFloorPlan = (): FloorPlan => ({
   bedCount: 1,
   bathroomCount: 0,
   bathroomScope: 'communal',
-  price: 0,
   available: true,
 });
 
