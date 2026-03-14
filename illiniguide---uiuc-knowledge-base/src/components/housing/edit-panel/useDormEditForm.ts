@@ -300,6 +300,9 @@ export const useDormEditForm = ({
         studyRooms: finalCategorized.facilities.includes('studyLounge'),
         kitchen: finalCategorized.facilities.includes('kitchen'),
         gymNearby: finalCategorized.facilities.includes('gym'),
+        genderInclusive:
+          dorm.structuredTags?.genderInclusive ||
+          finalCategorized.lifestyle.includes('genderInclusive'),
         llc: finalCategorized.lifestyle.includes('llc')
           ? [...(finalCategorized.llcNames ?? [])]
           : [],

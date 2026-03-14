@@ -41,11 +41,12 @@ export type LivingConditionTag =
 
 export type FacilityTag =
     | 'gym' | 'musicRooms' | 'convenienceStore'
-    | 'studyLounge' | 'laundry' | 'kitchen' | 'busStop';
+    | 'studyLounge' | 'laundry' | 'kitchen' | 'busStop'
+    | 'computerLab' | 'library';
 
 export type LifestyleTag =
     | 'quiet' | 'socialParty' | 'internationalFriendly'
-    | 'llc' | 'artsyCreative';
+    | 'llc' | 'artsyCreative' | 'genderInclusive';
 
 export type DormTag = LivingConditionTag | FacilityTag | LifestyleTag;
 export type TagCategory = 'livingConditions' | 'facilities' | 'lifestyle';
@@ -59,7 +60,7 @@ export interface DormCategorizedTags {
 
 export type BedSize = 'Twin XL' | 'Full' | 'Queen' | 'King';
 export type BathroomScope = 'communal' | 'semi-private' | 'private';
-export type BathroomType = BathroomScope;
+export type BathroomType = BathroomScope | 'mixed';
 export type DiningType = 'inside' | 'nearby' | 'none';
 export type BedCountFilter = 1 | 2 | 3 | 4;
 export type BathroomCountFilter = 0 | 1 | 2;

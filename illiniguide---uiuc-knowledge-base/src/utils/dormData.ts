@@ -24,6 +24,8 @@ const LIVING_CONDITION_LABELS: Record<LivingConditionTag, string> = {
 const FACILITY_LABELS: Record<FacilityTag, string> = {
     gym: 'Gym Nearby',
     musicRooms: 'Music Rooms',
+    computerLab: 'Computer Lab',
+    library: 'Library',
     convenienceStore: 'Convenience Store',
     studyLounge: 'Study Rooms',
     laundry: 'Laundry',
@@ -37,6 +39,7 @@ const LIFESTYLE_LABELS: Record<LifestyleTag, string> = {
     internationalFriendly: 'International Friendly',
     llc: 'LLC',
     artsyCreative: 'Artsy',
+    genderInclusive: 'Gender-Inclusive',
 };
 
 const PROXIMITY_LABELS: Array<[keyof DormTags, string]> = [
@@ -115,6 +118,8 @@ function syncStructuredTags(
         studyRooms: structuredTags.studyRooms || categorizedTags.facilities.includes('studyLounge'),
         kitchen: structuredTags.kitchen || categorizedTags.facilities.includes('kitchen'),
         gymNearby: structuredTags.gymNearby || categorizedTags.facilities.includes('gym'),
+        genderInclusive:
+            structuredTags.genderInclusive || categorizedTags.lifestyle.includes('genderInclusive'),
         llc: categorizedTags.lifestyle.includes('llc')
             ? [...(categorizedTags.llcNames ?? [])]
             : [],

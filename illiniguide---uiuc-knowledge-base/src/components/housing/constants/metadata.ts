@@ -6,12 +6,12 @@
  */
 
 import { Language } from '../../../types';
-import { BathroomScope, DiningType, Dorm, DormTag, TagCategory } from '../types/index';
+import { BathroomScope, BathroomType, DiningType, Dorm, DormTag, TagCategory } from '../types/index';
 import {
     Snowflake, Hammer, Building2, Dumbbell, Music, Store,
     BookOpen, WashingMachine, CookingPot, Bus,
-    Volume2, PartyPopper, Globe, GraduationCap, Palette,
-    PawPrint,
+    Monitor, LibraryBig, Volume2, PartyPopper, Globe, GraduationCap, Palette,
+    UsersRound,
 } from 'lucide-react';
 import { ComponentType } from 'react';
 
@@ -83,13 +83,33 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
     },
     musicRooms: {
         en: 'Music Rooms',
-        zh: '琴房',
+        zh: '音乐房',
         category: 'facilities',
         priority: 5,
         cardLayer: 'secondary',
         cardPriority: 3,
         cardTone: 'neutral',
         icon: Music,
+    },
+    computerLab: {
+        en: 'Computer Lab',
+        zh: '电脑房',
+        category: 'facilities',
+        priority: 5,
+        cardLayer: 'secondary',
+        cardPriority: 3,
+        cardTone: 'neutral',
+        icon: Monitor,
+    },
+    library: {
+        en: 'Library',
+        zh: '图书室',
+        category: 'facilities',
+        priority: 5,
+        cardLayer: 'secondary',
+        cardPriority: 4,
+        cardTone: 'neutral',
+        icon: LibraryBig,
     },
     convenienceStore: {
         en: 'Convenience Store',
@@ -191,12 +211,22 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
         cardTone: 'positive',
         icon: Palette,
     },
+    genderInclusive: {
+        en: 'Gender-Inclusive',
+        zh: '性别包容',
+        category: 'lifestyle',
+        priority: 4,
+        cardLayer: 'vibe',
+        cardPriority: 5,
+        cardTone: 'positive',
+        icon: UsersRound,
+    },
 };
 
 export const TAGS_BY_CATEGORY: Record<TagCategory, DormTag[]> = {
     livingConditions: ['noAc', 'newlyRenovated', 'olderBuilding'],
-    facilities: ['gym', 'musicRooms', 'convenienceStore', 'studyLounge', 'laundry', 'kitchen', 'busStop'],
-    lifestyle: ['quiet', 'socialParty', 'internationalFriendly', 'llc', 'artsyCreative'],
+    facilities: ['gym', 'musicRooms', 'computerLab', 'library', 'convenienceStore', 'studyLounge', 'laundry', 'kitchen', 'busStop'],
+    lifestyle: ['quiet', 'socialParty', 'internationalFriendly', 'llc', 'artsyCreative', 'genderInclusive'],
 };
 
 export const CATEGORY_LABELS: Record<TagCategory, LocalizedCopy> = {
@@ -246,10 +276,15 @@ export const DINING_OPTIONS: LocalizedOption<DiningType>[] = [
     { value: 'none', en: 'None', zh: '无' },
 ];
 
-export const BATHROOM_TYPE_OPTIONS: LocalizedOption<BathroomScope>[] = [
+export const BATHROOM_SCOPE_OPTIONS: LocalizedOption<BathroomScope>[] = [
     { value: 'communal', en: 'Communal', zh: '公共卫浴' },
     { value: 'semi-private', en: 'Semi-Private', zh: '半独立卫浴' },
     { value: 'private', en: 'Private', zh: '独立卫浴' },
+];
+
+export const BATHROOM_TYPE_OPTIONS: LocalizedOption<BathroomType>[] = [
+    ...BATHROOM_SCOPE_OPTIONS,
+    { value: 'mixed', en: 'Mixed', zh: '混合卫浴' },
 ];
 
 export const LLC_OPTIONS = [

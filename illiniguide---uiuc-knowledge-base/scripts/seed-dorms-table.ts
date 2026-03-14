@@ -22,6 +22,7 @@ import { createClient } from '@supabase/supabase-js';
 import { UIUC_DORMS } from '../src/components/housing/constants/dormData';
 import type { Dorm } from '../src/components/housing/types/index';
 import { finalizeDormRecord, sanitizeFloorPlansForStorage } from '../src/utils/dormData';
+import { deriveRoomOptions, normalizeFloorPlan } from '../src/utils/roomOptions';
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
@@ -32,6 +33,154 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
 }
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+type StoredFloorPlan = NonNullable<Dorm['floorPlans']>[number];
+
+function hasNonEmptyString(value: unknown): value is string {
+    return typeof value === 'string' && value.trim().length > 0;
+}
+
+function hasNonEmptyArray<T>(value: T[] | null | undefined): value is T[] {
+    return Array.isArray(value) && value.length > 0;
+}
+
+function asStringArray(value: unknown): string[] {
+    if (!Array.isArray(value)) {
+        return [];
+    }
+
+    return value.filter(hasNonEmptyString);
+}
+
+function unionStringArrays(existing: string[], source: string[]): string[] {
+    const seen = new Set(existing);
+    const merged = [...existing];
+
+    for (const item of source) {
+        if (seen.has(item)) {
+            continue;
+        }
+        seen.add(item);
+        merged.push(item);
+    }
+
+    return merged;
+}
+
+function asObjectRecord(value: unknown): Record<string, unknown> {
+    return value && typeof value === 'object' && !Array.isArray(value)
+        ? value as Record<string, unknown>
+        : {};
+}
+
+function mergeStructuredTags(existingValue: unknown, sourceValue: unknown): Record<string, unknown> {
+    const existing = asObjectRecord(existingValue);
+    const source = asObjectRecord(sourceValue);
+    const merged: Record<string, unknown> = { ...source, ...existing };
+
+    for (const key of new Set([...Object.keys(source), ...Object.keys(existing)])) {
+        if (key === 'llc') {
+            merged[key] = unionStringArrays(asStringArray(existing[key]), asStringArray(source[key]));
+            continue;
+        }
+
+        if (typeof existing[key] === 'boolean' || typeof source[key] === 'boolean') {
+            merged[key] = Boolean(existing[key]) || Boolean(source[key]);
+            continue;
+        }
+
+        if (existing[key] !== undefined) {
+            merged[key] = existing[key];
+            continue;
+        }
+
+        merged[key] = source[key];
+    }
+
+    return merged;
+}
+
+function mergeCategorizedTags(existingValue: unknown, sourceValue: unknown): Record<string, unknown> {
+    const existing = asObjectRecord(existingValue);
+    const source = asObjectRecord(sourceValue);
+    const livingConditions = unionStringArrays(
+        asStringArray(existing.livingConditions),
+        asStringArray(source.livingConditions)
+    );
+    const facilities = unionStringArrays(
+        asStringArray(existing.facilities),
+        asStringArray(source.facilities)
+    );
+    const lifestyle = unionStringArrays(
+        asStringArray(existing.lifestyle),
+        asStringArray(source.lifestyle)
+    );
+    const llcNames = unionStringArrays(
+        asStringArray(existing.llcNames),
+        asStringArray(source.llcNames)
+    );
+
+    return {
+        ...source,
+        ...existing,
+        livingConditions,
+        facilities,
+        lifestyle,
+        ...(llcNames.length > 0 ? { llcNames } : {}),
+    };
+}
+
+function getFloorPlanGroupKey(plan: StoredFloorPlan, fallbackScope: Dorm['bathroomType']) {
+    const normalized = normalizeFloorPlan(plan, fallbackScope);
+    return [
+        normalized.officialName?.trim().toLowerCase() ?? '',
+        normalized.labelCode ?? '',
+        normalized.bedCount ?? 'na',
+        normalized.bathroomCount ?? 'na',
+        normalized.bathroomScope ?? fallbackScope,
+        normalized.type ?? '',
+    ].join('|');
+}
+
+function mergeFloorPlans(
+    sourcePlans: Dorm['floorPlans'],
+    existingPlans: unknown,
+    fallbackScope: Dorm['bathroomType']
+) {
+    const nextSourcePlans = sanitizeFloorPlansForStorage(sourcePlans) ?? [];
+    const nextExistingPlans = sanitizeFloorPlansForStorage(existingPlans as Dorm['floorPlans']) ?? [];
+
+    if (!nextExistingPlans.length) {
+        return nextSourcePlans;
+    }
+
+    const existingByKey = new Map<string, StoredFloorPlan[]>();
+    for (const plan of nextExistingPlans) {
+        const key = getFloorPlanGroupKey(plan, fallbackScope);
+        const bucket = existingByKey.get(key);
+        if (bucket) {
+            bucket.push(plan);
+            continue;
+        }
+        existingByKey.set(key, [plan]);
+    }
+
+    const mergedPlans = nextSourcePlans.map((plan) => {
+        const key = getFloorPlanGroupKey(plan, fallbackScope);
+        const existingPlan = existingByKey.get(key)?.shift();
+        if (!existingPlan) {
+            return plan;
+        }
+
+        return {
+            ...plan,
+            ...(hasNonEmptyArray(existingPlan.imageUrls) ? { imageUrls: existingPlan.imageUrls } : {}),
+            ...(hasNonEmptyArray(existingPlan.photoUrls) ? { photoUrls: existingPlan.photoUrls } : {}),
+        };
+    });
+
+    const appendedExistingPlans = Array.from(existingByKey.values()).flat();
+    return sanitizeFloorPlansForStorage([...mergedPlans, ...appendedExistingPlans]) ?? [];
+}
 
 /** Convert camelCase Dorm to snake_case DB row */
 function dormToRow(dorm: Dorm) {
@@ -71,12 +220,55 @@ function dormToRow(dorm: Dorm) {
     };
 }
 
+type DormRow = ReturnType<typeof dormToRow>;
+
+function mergeDormRow(sourceRow: DormRow, existingRow?: Record<string, unknown>): DormRow {
+    if (!existingRow) {
+        return sourceRow;
+    }
+
+    const floorPlans = mergeFloorPlans(
+        sourceRow.floor_plans as Dorm['floorPlans'],
+        existingRow.floor_plans,
+        sourceRow.bathroom_type
+    );
+    const derived = deriveRoomOptions(floorPlans, sourceRow.bathroom_type);
+
+    return {
+        ...sourceRow,
+        image_url: hasNonEmptyString(existingRow.image_url) ? existingRow.image_url : sourceRow.image_url,
+        tags: unionStringArrays(
+            asStringArray(existingRow.tags),
+            asStringArray(sourceRow.tags)
+        ),
+        structured_tags: mergeStructuredTags(existingRow.structured_tags, sourceRow.structured_tags),
+        categorized_tags: mergeCategorizedTags(existingRow.categorized_tags, sourceRow.categorized_tags),
+        floor_plans: floorPlans,
+        gallery_images: hasNonEmptyArray(existingRow.gallery_images as string[] | null | undefined)
+            ? existingRow.gallery_images as string[]
+            : sourceRow.gallery_images,
+        room_types: derived.roomTypes,
+        room_options: derived.roomOptions,
+    };
+}
+
 async function main() {
     console.log(`Seeding ${UIUC_DORMS.length} dorms into the dorms table...`);
 
-    const rows = UIUC_DORMS.map((dorm) => dormToRow(finalizeDormRecord(dorm)));
+    const sourceRows = UIUC_DORMS.map((dorm) => dormToRow(finalizeDormRecord(dorm)));
+    const { data: existingRows, error: existingRowsErr } = await supabase
+        .from('dorms')
+        .select('id, image_url, tags, structured_tags, categorized_tags, floor_plans, gallery_images');
 
-    // Upsert into dorms table
+    if (existingRowsErr) {
+        console.error('Failed to fetch existing dorm rows before reseed:', existingRowsErr);
+        process.exit(1);
+    }
+
+    const existingById = new Map((existingRows ?? []).map((row) => [row.id as string, row]));
+    const rows = sourceRows.map((sourceRow) => mergeDormRow(sourceRow, existingById.get(sourceRow.id)));
+
+    // Upsert refreshed source facts while preserving admin-managed media and additively merging tags.
     const { error: upsertErr } = await supabase
         .from('dorms')
         .upsert(rows, { onConflict: 'id' });

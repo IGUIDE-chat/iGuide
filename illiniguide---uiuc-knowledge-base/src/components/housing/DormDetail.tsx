@@ -12,6 +12,7 @@ import {
     ArrowLeft, Heart, MapPin, Snowflake, Utensils, Bath,
     ChevronDown, Check, ThumbsUp, SquareDashed, ArrowRightLeft,
     BedSingle, MessageSquare, User, Pencil, X, ExternalLink, Globe,
+    ChevronLeft, ChevronRight,
 } from 'lucide-react';
 import { formatPrice } from './constants/pricing';
 import { TAG_REGISTRY, getHousingTypeMeta, getLocalizedLabel } from './constants/metadata';
@@ -26,6 +27,7 @@ import DormEditPanel from './DormEditPanel';
 import ImageLightbox from './ImageLightbox';
 import { dormDetailTexts } from './i18n/dormTexts';
 import { getRoomOptionLabels, normalizeFloorPlan } from '../../utils/roomOptions';
+import { getDetailTagDisplay } from '../../utils/tagLabels';
 
 // ─── Animation variants ────────────────────────────────────────────────────
 const pageVariants: Variants = {
@@ -63,6 +65,33 @@ interface DormDetailProps {
     language?: Language;
 }
 
+interface InlineImageNavButtonProps {
+    direction: 'prev' | 'next';
+    label: string;
+    onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
+    className?: string;
+}
+
+const InlineImageNavButton: React.FC<InlineImageNavButtonProps> = ({
+    direction,
+    label,
+    onClick,
+    className = '',
+}) => {
+    const Icon = direction === 'prev' ? ChevronLeft : ChevronRight;
+
+    return (
+        <button
+            type="button"
+            aria-label={label}
+            onClick={onClick}
+            className={`absolute top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-black/35 text-white backdrop-blur-sm transition-colors hover:bg-black/55 ${className}`}
+        >
+            <Icon className="h-5 w-5" />
+        </button>
+    );
+};
+
 // ─── Component ─────────────────────────────────────────────────────────────
 const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
     const { id } = useParams<{ id: string }>();
@@ -84,6 +113,8 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
     const [expandedPlanId, setExpandedPlanId] = useState<string | null>(null);
     const [compareIds, setCompareIds] = useState<string[]>([]);
     const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+    const [heroImageIndex, setHeroImageIndex] = useState(0);
+    const [planImageIndices, setPlanImageIndices] = useState<Record<string, number>>({});
     const [showAllReviews, setShowAllReviews] = useState(false);
     const [lightbox, setLightbox] = useState<{ images: { src: string; alt?: string; label?: string }[]; index: number } | null>(null);
 
@@ -111,6 +142,11 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
         if (dorm) addToHistory(dorm);
     }, [dorm?.id, addToHistory]); // eslint-disable-line react-hooks/exhaustive-deps
 
+    useEffect(() => {
+        setHeroImageIndex(0);
+        setPlanImageIndices({});
+    }, [dorm?.id]);
+
     // ── Loading state ──────────────────────────────────────────────────────
     if (!dorm) {
         return (
@@ -129,7 +165,12 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
     const dormDesc = language === 'zh' && dorm.description_zh ? dorm.description_zh : dorm.description;
     const dormLocation = language === 'zh' && dorm.location_zh ? dorm.location_zh : dorm.location;
     const dormAddress = language === 'zh' && dorm.address_zh ? dorm.address_zh : dorm.address;
-    const heroImage = dorm.galleryImages?.[0] ?? dorm.imageUrl;
+    const heroImages = (dorm.galleryImages?.length ? dorm.galleryImages : [dorm.imageUrl])
+        .filter((src): src is string => Boolean(src));
+    const safeHeroImageIndex = heroImages.length > 0
+        ? Math.min(heroImageIndex, heroImages.length - 1)
+        : 0;
+    const heroImage = heroImages[safeHeroImageIndex];
     const housingMeta = getHousingTypeMeta(dorm.housingType);
 
     const allTags: DormTag[] = [
@@ -302,9 +343,8 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                             <div
                                 className="w-full aspect-[4/3] sm:aspect-video md:aspect-[21/9] rounded-2xl md:rounded-3xl overflow-hidden relative bg-slate-100 border border-white/60 shadow-sm cursor-zoom-in"
                                 onClick={() => {
-                                    const gallery = (dorm.galleryImages ?? []).map((src, i) => ({ src, alt: `${dormName} ${i + 1}` }));
-                                    if (gallery.length === 0 && heroImage) gallery.push({ src: heroImage, alt: dormName });
-                                    setLightbox({ images: gallery, index: 0 });
+                                    const gallery = heroImages.map((src, i) => ({ src, alt: `${dormName} ${i + 1}` }));
+                                    setLightbox({ images: gallery, index: safeHeroImageIndex });
                                 }}
                             >
                                 <motion.img
@@ -327,6 +367,31 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                             {positivePercent}{t.positiveRating} ({totalReviews})
                                         </span>
                                     </motion.div>
+                                )}
+                                {heroImages.length > 1 && (
+                                    <>
+                                        <InlineImageNavButton
+                                            direction="prev"
+                                            label={language === 'zh' ? '上一张主图' : 'Previous main image'}
+                                            onClick={(event) => {
+                                                event.stopPropagation();
+                                                setHeroImageIndex((prev) => (prev - 1 + heroImages.length) % heroImages.length);
+                                            }}
+                                            className="left-3 md:left-4"
+                                        />
+                                        <InlineImageNavButton
+                                            direction="next"
+                                            label={language === 'zh' ? '下一张主图' : 'Next main image'}
+                                            onClick={(event) => {
+                                                event.stopPropagation();
+                                                setHeroImageIndex((prev) => (prev + 1) % heroImages.length);
+                                            }}
+                                            className="right-3 md:right-4"
+                                        />
+                                        <div className="absolute bottom-3 right-3 rounded-full bg-black/40 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-sm md:bottom-4 md:right-4">
+                                            {safeHeroImageIndex + 1} / {heroImages.length}
+                                        </div>
+                                    </>
                                 )}
                             </div>
                         )}
@@ -368,7 +433,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                                     className="inline-flex items-center gap-1 px-3 py-1 text-[12px] md:text-[13px] font-bold text-illini-orange bg-illini-orange/10 rounded-full"
                                                 >
                                                     {Icon && <Icon className="w-3.5 h-3.5" strokeWidth={1.5} />}
-                                                    {getLocalizedLabel(TAG_REGISTRY[tag], language)}
+                                                    {getDetailTagDisplay(tag, dorm.categorizedTags, language)}
                                                 </motion.span>
                                             );
                                         })}
@@ -454,7 +519,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                         >
                                             {Icon && <Icon className="w-3.5 h-3.5 md:w-4 md:h-4 text-slate-500" strokeWidth={1.5} />}
                                             <span className="text-[12px] md:text-[13px] text-slate-700 font-semibold">
-                                                {getLocalizedLabel(TAG_REGISTRY[tag], language)}
+                                                {getDetailTagDisplay(tag, dorm.categorizedTags, language)}
                                             </span>
                                         </motion.div>
                                     );
@@ -472,7 +537,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                         >
                                             {Icon && <Icon className="w-3.5 h-3.5 md:w-4 md:h-4 text-slate-400" strokeWidth={1.5} />}
                                             <span className="text-[12px] md:text-[13px] text-slate-500 font-semibold">
-                                                {getLocalizedLabel(TAG_REGISTRY[tag], language)}
+                                                {getDetailTagDisplay(tag, dorm.categorizedTags, language)}
                                             </span>
                                         </motion.div>
                                     );
@@ -533,13 +598,17 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                     const photos = plan.photoUrls?.length ? plan.photoUrls : plan.photoUrl ? [plan.photoUrl] : [];
                                     const layouts = plan.imageUrls?.length ? plan.imageUrls : plan.imageUrl ? [plan.imageUrl] : [];
                                     const thumbSrc = photos[0] || layouts[0];
-                                    const layoutSrc = layouts[0];
                                     const hasThumb = Boolean(thumbSrc) && !imageErrors[`${planKey}-thumb`];
-                                    const hasLayout = Boolean(layoutSrc) && !imageErrors[`${planKey}-layout`];
                                     // Collect all available images for this plan's lightbox
                                     const planImages: { src: string; alt?: string; label?: string }[] = [];
                                     photos.forEach((src, i) => planImages.push({ src, alt: labels.primaryLabel, label: `${language === 'zh' ? '展示图' : 'Photo'}${photos.length > 1 ? ` ${i + 1}` : ''}` }));
                                     layouts.forEach((src, i) => planImages.push({ src, alt: labels.primaryLabel, label: `${language === 'zh' ? '户型图' : 'Floor Plan'}${layouts.length > 1 ? ` ${i + 1}` : ''}` }));
+                                    const safeLayoutIndex = layouts.length > 0
+                                        ? Math.min(planImageIndices[planKey] ?? 0, layouts.length - 1)
+                                        : 0;
+                                    const layoutSrc = layouts[safeLayoutIndex];
+                                    const hasLayout = Boolean(layoutSrc) && !imageErrors[`${planKey}-layout`];
+                                    const layoutLightboxIndex = photos.length + safeLayoutIndex;
 
                                     return (
                                         <motion.div
@@ -734,13 +803,49 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                                     >
                                                         <div className="p-4 md:p-5 pt-0 border-t border-slate-100/50 mx-4 md:mx-5 mt-2">
                                                             {hasLayout ? (
-                                                                <img
-                                                                    src={layoutSrc}
-                                                                    alt={`${labels.primaryLabel} floor plan`}
-                                                                    className="w-full h-auto rounded-xl border border-slate-200/50 bg-slate-50 mt-3 md:mt-4 cursor-zoom-in hover:opacity-90 transition-opacity"
-                                                                    onClick={(e) => { e.stopPropagation(); setLightbox({ images: planImages, index: planImages.findIndex((img) => img.src === layoutSrc) }); }}
-                                                                    onError={() => setImageErrors((prev) => ({ ...prev, [`${planKey}-layout`]: true }))}
-                                                                />
+                                                                <div className="relative mt-3 md:mt-4">
+                                                                    <img
+                                                                        src={layoutSrc}
+                                                                        alt={`${labels.primaryLabel} floor plan`}
+                                                                        className="w-full h-auto rounded-xl border border-slate-200/50 bg-slate-50 cursor-zoom-in hover:opacity-90 transition-opacity"
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            setLightbox({ images: planImages, index: layoutLightboxIndex });
+                                                                        }}
+                                                                        onError={() => setImageErrors((prev) => ({ ...prev, [`${planKey}-layout`]: true }))}
+                                                                    />
+                                                                    {layouts.length > 1 && (
+                                                                        <>
+                                                                            <InlineImageNavButton
+                                                                                direction="prev"
+                                                                                label={language === 'zh' ? '上一张户型图' : 'Previous floor plan image'}
+                                                                                onClick={(event) => {
+                                                                                    event.stopPropagation();
+                                                                                    setPlanImageIndices((prev) => ({
+                                                                                        ...prev,
+                                                                                        [planKey]: (safeLayoutIndex - 1 + layouts.length) % layouts.length,
+                                                                                    }));
+                                                                                }}
+                                                                                className="left-3"
+                                                                            />
+                                                                            <InlineImageNavButton
+                                                                                direction="next"
+                                                                                label={language === 'zh' ? '下一张户型图' : 'Next floor plan image'}
+                                                                                onClick={(event) => {
+                                                                                    event.stopPropagation();
+                                                                                    setPlanImageIndices((prev) => ({
+                                                                                        ...prev,
+                                                                                        [planKey]: (safeLayoutIndex + 1) % layouts.length,
+                                                                                    }));
+                                                                                }}
+                                                                                className="right-3"
+                                                                            />
+                                                                            <div className="absolute bottom-3 right-3 rounded-full bg-black/40 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
+                                                                                {safeLayoutIndex + 1} / {layouts.length}
+                                                                            </div>
+                                                                        </>
+                                                                    )}
+                                                                </div>
                                                             ) : (
                                                                 <div className="bg-slate-50/50 rounded-xl p-6 md:p-8 flex items-center justify-center text-slate-400 border border-slate-200/50 border-dashed mt-3 md:mt-4 font-medium text-[13px] md:text-[14px]">
                                                                     {language === 'zh' ? '暂无户型图' : 'Floor plan image unavailable'}
