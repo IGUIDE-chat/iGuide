@@ -306,7 +306,7 @@ const DormCard: React.FC<DormCardProps> = ({
             onClick={() => onViewDetails(dorm)}
             onMouseEnter={() => onHoverDorm?.(dorm.id)}
             onMouseLeave={() => onHoverDorm?.(null)}
-            className="dorm-card group relative flex h-full max-w-[420px] cursor-pointer flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-shadow duration-300 hover:shadow-md"
+            className="dorm-card group relative flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-shadow duration-300 hover:shadow-md"
         >
             <div className="relative h-48 overflow-hidden">
                 <img
