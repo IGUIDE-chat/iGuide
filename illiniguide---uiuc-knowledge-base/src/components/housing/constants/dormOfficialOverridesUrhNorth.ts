@@ -7,6 +7,8 @@
 
 import { DormOverride, clean, plan, urhPage, urls } from './dormOfficialOverrideUtils';
 
+const twinXl = (value: Parameters<typeof plan>[0]) => plan({ bedSize: 'Twin XL', ...value });
+
 export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
     isr: {
         website: urhPage('isr'),
@@ -22,8 +24,8 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
         diningNearbyDetail: 'ISR Dining Center is inside the Townsend/Wardall complex.',
         categorizedTags: {
             livingConditions: ['newlyRenovated'],
-            facilities: ['studyLounge', 'laundry'],
-            lifestyle: ['llc'],
+            facilities: ['studyLounge', 'laundry', 'computerLab'],
+            lifestyle: ['llc', 'genderInclusive'],
             llcNames: ['Honors LLC', 'Innovation LLC', 'Sustainability LLC'],
         },
         structuredTags: {
@@ -36,7 +38,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
         price: 14558,
         bathroomType: 'communal',
         floorPlans: [
-            plan({
+            twinXl({
                 bedCount: 2,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
@@ -46,7 +48,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 photoUrls: urls('https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/ISR%20Double%20Top.jpg?itok=UvYDb4tJ'),
                 description: 'Wardall/Townsend double room with communal bathroom access.',
             }),
-            plan({
+            twinXl({
                 bedCount: 3,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
@@ -59,7 +61,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 ),
                 description: 'Townsend triple room with communal bathroom access.',
             }),
-            plan({
+            twinXl({
                 bedCount: 3,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
@@ -88,8 +90,8 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
         diningNearbyDetail: 'Connected to SDRP dining by an interior walkway.',
         categorizedTags: {
             livingConditions: ['newlyRenovated'],
-            facilities: ['laundry', 'studyLounge'],
-            lifestyle: ['quiet', 'llc'],
+            facilities: ['laundry', 'studyLounge', 'computerLab'],
+            lifestyle: ['quiet', 'llc', 'genderInclusive'],
             llcNames: ['Business LLC', 'Beckwith Residential Community'],
         },
         structuredTags: {
@@ -103,7 +105,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
         price: 15042,
         bathroomType: 'semi-private',
         floorPlans: [
-            plan({
+            twinXl({
                 bedCount: 2,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
@@ -116,7 +118,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 ),
                 description: 'Traditional double layout; shared bath configuration varies by section.',
             }),
-            plan({
+            twinXl({
                 bedCount: 1,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
@@ -129,7 +131,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 ),
                 description: 'Single room with shared bath.',
             }),
-            plan({
+            twinXl({
                 bedCount: 1,
                 bathroomCount: 1,
                 bathroomScope: 'private',
@@ -160,8 +162,8 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
         diningNearbyDetail: 'SDRP dining and social spaces are a short walk away.',
         categorizedTags: {
             livingConditions: ['newlyRenovated'],
-            facilities: ['laundry', 'studyLounge'],
-            lifestyle: ['quiet'],
+            facilities: ['laundry', 'studyLounge', 'computerLab', 'library'],
+            lifestyle: ['quiet', 'genderInclusive'],
         },
         structuredTags: {
             studyRooms: true,
@@ -173,7 +175,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
         price: 15440,
         bathroomType: 'semi-private',
         floorPlans: [
-            plan({
+            twinXl({
                 bedCount: 2,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
@@ -182,7 +184,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/wassaja-doubles.pdf'),
                 description: 'Double room with a shared individual-use bathroom.',
             }),
-            plan({
+            twinXl({
                 bedCount: 1,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
@@ -195,7 +197,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 ),
                 description: 'Single room with a shared individual-use bathroom.',
             }),
-            plan({
+            twinXl({
                 bedCount: 1,
                 bathroomCount: 1,
                 bathroomScope: 'private',
@@ -225,8 +227,8 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
         diningNearbyDetail: 'SDRP dining is a short walk from Bousfield.',
         categorizedTags: {
             livingConditions: ['newlyRenovated'],
-            facilities: ['gym', 'laundry', 'studyLounge', 'kitchen'],
-            lifestyle: ['llc'],
+            facilities: ['gym', 'laundry', 'studyLounge', 'kitchen', 'computerLab', 'library'],
+            lifestyle: ['llc', 'genderInclusive'],
             llcNames: ['Transfer Community'],
         },
         structuredTags: {
@@ -241,7 +243,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
         price: 15754,
         bathroomType: 'semi-private',
         floorPlans: [
-            plan({
+            twinXl({
                 bedCount: 2,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
@@ -254,7 +256,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 ),
                 description: 'Double suite with shared bath.',
             }),
-            plan({
+            twinXl({
                 bedCount: 1,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
@@ -267,7 +269,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 ),
                 description: 'Single suite with shared bath.',
             }),
-            plan({
+            twinXl({
                 bedCount: 1,
                 bathroomCount: 1,
                 bathroomScope: 'private',
@@ -297,8 +299,8 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
         dining: 'inside',
         categorizedTags: {
             livingConditions: [],
-            facilities: ['laundry', 'busStop'],
-            lifestyle: ['llc'],
+            facilities: ['laundry', 'busStop', 'computerLab'],
+            lifestyle: ['llc', 'genderInclusive'],
             llcNames: ['Global Crossroads LLC', 'Intersections LLC'],
         },
         structuredTags: {
@@ -311,7 +313,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
         price: 14558,
         bathroomType: 'semi-private',
         floorPlans: [
-            plan({
+            twinXl({
                 bedCount: 2,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
@@ -324,13 +326,12 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 ),
                 description: 'PAR double room with individual-use bathroom access.',
             }),
-            plan({
+            twinXl({
                 bedCount: 1,
                 bathroomCount: 1,
                 bathroomScope: 'semi-private',
                 sqft: 125,
                 price: 16564,
-                imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/par_double.pdf'),
                 description: 'PAR single room with individual-use bathroom access.',
             }),
         ],
@@ -350,8 +351,8 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
         dining: 'inside',
         categorizedTags: {
             livingConditions: [],
-            facilities: ['laundry', 'busStop'],
-            lifestyle: ['llc'],
+            facilities: ['laundry', 'busStop', 'computerLab'],
+            lifestyle: ['llc', 'genderInclusive'],
             llcNames: ['WIMSE LLC'],
         },
         structuredTags: {
@@ -364,7 +365,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
         price: 14558,
         bathroomType: 'communal',
         floorPlans: [
-            plan({
+            twinXl({
                 bedCount: 2,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
@@ -377,7 +378,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 ),
                 description: 'Oglesby/Trelease double room with community bath access.',
             }),
-            plan({
+            twinXl({
                 bedCount: 1,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
@@ -405,8 +406,8 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
         ),
         categorizedTags: {
             livingConditions: [],
-            facilities: ['musicRooms', 'laundry', 'studyLounge'],
-            lifestyle: ['artsyCreative', 'llc'],
+            facilities: ['musicRooms', 'laundry', 'studyLounge', 'computerLab'],
+            lifestyle: ['artsyCreative', 'llc', 'genderInclusive'],
             llcNames: ['Unit One LLC'],
         },
         structuredTags: {
@@ -420,7 +421,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
         price: 13202,
         bathroomType: 'communal',
         floorPlans: [
-            plan({
+            twinXl({
                 bedCount: 2,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
@@ -433,7 +434,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 ),
                 description: 'Allen double room with communal bathroom access.',
             }),
-            plan({
+            twinXl({
                 bedCount: 3,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
@@ -446,7 +447,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 ),
                 description: 'Allen triple room with communal bathroom access.',
             }),
-            plan({
+            twinXl({
                 bedCount: 4,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
@@ -476,7 +477,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
         diningNearbyDetail: 'Residents use nearby University Housing dining locations rather than a hall dining room.',
         categorizedTags: {
             livingConditions: ['olderBuilding'],
-            facilities: ['laundry', 'studyLounge'],
+            facilities: ['laundry', 'studyLounge', 'computerLab'],
             lifestyle: ['quiet'],
         },
         structuredTags: {
@@ -489,7 +490,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
         price: 13774,
         bathroomType: 'communal',
         floorPlans: [
-            plan({
+            twinXl({
                 bedCount: 1,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
@@ -501,7 +502,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 ),
                 description: 'Busey-Evans single room.',
             }),
-            plan({
+            twinXl({
                 bedCount: 2,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
@@ -514,7 +515,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                 ),
                 description: 'Standard double room.',
             }),
-            plan({
+            twinXl({
                 bedCount: 3,
                 bathroomCount: 0,
                 bathroomScope: 'communal',

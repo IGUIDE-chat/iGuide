@@ -40,6 +40,7 @@ const VALID_TAGS = new Set([
     ...TAGS_BY_CATEGORY.lifestyle,
 ]);
 const VALID_LLCS = new Set(LLC_OPTIONS);
+const VALID_BED_SIZES = new Set(['Twin XL', 'Full', 'Queen', 'King']);
 const REQUIRED_SYNC_FIELDS = [
     'address',
     'address_zh',
@@ -51,6 +52,72 @@ const REQUIRED_SYNC_FIELDS = [
     'price_range',
 ];
 const LOW_QUALITY_ALLOWLIST = new Set<string>([]);
+const BED_SIZE_REQUIRED_IDS = new Set([
+    'allen',
+    'bousefield',
+    'busey-evans',
+    'daniels',
+    'far',
+    'hopkins',
+    'isr',
+    'lar',
+    'nugent',
+    'par',
+    'scott',
+    'sherman',
+    'snyder',
+    'taft',
+    'van-doren',
+    'wassaja',
+    'weston',
+]);
+const GENDER_INCLUSIVE_IDS = new Set([
+    'allen',
+    'bousefield',
+    'daniels',
+    'far',
+    'isr',
+    'nugent',
+    'par',
+    'sherman',
+    'snyder',
+    'wassaja',
+    'weston',
+]);
+const COMPUTER_LAB_IDS = new Set([
+    'allen',
+    'armory',
+    'bousefield',
+    'bromley',
+    'busey-evans',
+    'daniels',
+    'far',
+    'hendrick',
+    'hopkins',
+    'illini-tower',
+    'isr',
+    'lar',
+    'newman',
+    'nugent',
+    'par',
+    'scott',
+    'sherman',
+    'snyder',
+    'taft',
+    'van-doren',
+    'wassaja',
+    'weston',
+]);
+const LIBRARY_IDS = new Set([
+    'bousefield',
+    'hopkins',
+    'newman',
+    'scott',
+    'taft',
+    'van-doren',
+    'wassaja',
+    'weston',
+]);
 const FLOOR_PLAN_SQFT_ALLOWLIST: Record<string, Set<string>> = {
     bromley: new Set(['Standard Double', 'Triple', 'Quad']),
     'illini-tower': new Set(['S1', 'S2', 'B1 Shared', 'B2 Shared', 'B2 Private', 'C1', 'D1']),
@@ -100,6 +167,22 @@ for (const dorm of UIUC_DORMS) {
         check(VALID_LLCS.has(llc as (typeof LLC_OPTIONS)[number]), `${dorm.id} uses unknown LLC "${llc}".`);
     }
 
+    const hasGenderInclusive = categorized.lifestyle.includes('genderInclusive');
+    const hasComputerLab = categorized.facilities.includes('computerLab');
+    const hasLibrary = categorized.facilities.includes('library');
+    check(
+        hasGenderInclusive === GENDER_INCLUSIVE_IDS.has(dorm.id),
+        `${dorm.id} has unexpected genderInclusive tag state.`,
+    );
+    check(
+        hasComputerLab === COMPUTER_LAB_IDS.has(dorm.id),
+        `${dorm.id} has unexpected computerLab tag state.`,
+    );
+    check(
+        hasLibrary === LIBRARY_IDS.has(dorm.id),
+        `${dorm.id} has unexpected library tag state.`,
+    );
+
     check((dorm.floorPlans?.length ?? 0) > 0, `${dorm.id} is missing floor plans.`);
     for (const plan of dorm.floorPlans ?? []) {
         check(!plan.imageUrl, `${dorm.id} still uses legacy floorPlans.imageUrl.`);
@@ -120,6 +203,12 @@ for (const dorm of UIUC_DORMS) {
                 `${dorm.id} keeps sqft on an unapproved floor plan (${planName ?? 'unknown'}).`,
             );
         }
+        if (BED_SIZE_REQUIRED_IDS.has(dorm.id)) {
+            check(Boolean(plan.bedSize), `${dorm.id} has a floor plan without bedSize.`);
+        }
+        if (plan.bedSize != null) {
+            check(VALID_BED_SIZES.has(plan.bedSize), `${dorm.id} uses invalid bedSize "${plan.bedSize}".`);
+        }
         for (const [index, url] of (plan.photoUrls ?? []).entries()) {
             checkMediaUrl(dorm.id, `floorPlans.photoUrls[${index}]`, url);
         }
@@ -131,6 +220,44 @@ for (const dorm of UIUC_DORMS) {
         }
     }
 }
+
+const allen = UIUC_DORMS.find((dorm) => dorm.id === 'allen');
+const weston = UIUC_DORMS.find((dorm) => dorm.id === 'weston');
+const newman = UIUC_DORMS.find((dorm) => dorm.id === 'newman');
+const presby = UIUC_DORMS.find((dorm) => dorm.id === 'presby');
+
+check(Boolean(allen), 'allen dorm is missing from static data.');
+check(
+    Boolean(allen)
+    && allen!.categorizedTags.lifestyle.includes('genderInclusive')
+    && allen!.categorizedTags.facilities.includes('computerLab')
+    && !allen!.categorizedTags.facilities.includes('library'),
+    'allen should have genderInclusive and computerLab, but not library.',
+);
+check(Boolean(weston), 'weston dorm is missing from static data.');
+check(
+    Boolean(weston)
+    && weston!.categorizedTags.lifestyle.includes('genderInclusive')
+    && weston!.categorizedTags.facilities.includes('computerLab')
+    && weston!.categorizedTags.facilities.includes('library'),
+    'weston should have genderInclusive, computerLab, and library.',
+);
+check(Boolean(newman), 'newman dorm is missing from static data.');
+check(
+    Boolean(newman)
+    && !newman!.categorizedTags.lifestyle.includes('genderInclusive')
+    && newman!.categorizedTags.facilities.includes('computerLab')
+    && newman!.categorizedTags.facilities.includes('library'),
+    'newman should have computerLab and library, but not genderInclusive.',
+);
+check(Boolean(presby), 'presby dorm is missing from static data.');
+check(
+    Boolean(presby)
+    && !presby!.categorizedTags.lifestyle.includes('genderInclusive')
+    && !presby!.categorizedTags.facilities.includes('computerLab')
+    && !presby!.categorizedTags.facilities.includes('library'),
+    'presby should not have genderInclusive, computerLab, or library.',
+);
 
 const repoRoot = process.cwd();
 const seedScript = fs.readFileSync(path.join(repoRoot, 'scripts', 'seed-dorms-table.ts'), 'utf8');
@@ -145,6 +272,7 @@ for (const field of REQUIRED_SYNC_FIELDS) {
 }
 
 check(seedScript.includes('sanitizeFloorPlansForStorage'), 'Seed script does not sanitize floor_plans.');
+check(seedScript.includes('mergeFloorPlans'), 'Seed script does not preserve admin-managed floor plan media.');
 check(adminService.includes('sanitizeFloorPlansForStorage'), 'Admin service does not sanitize floor_plans.');
 check(dormService.includes('sanitizeFloorPlansForStorage'), 'Dorm service does not sanitize floor_plans from DB rows.');
 check(editForm.includes('sanitizeFloorPlansForStorage'), 'Admin edit form does not sanitize floor_plans before save.');

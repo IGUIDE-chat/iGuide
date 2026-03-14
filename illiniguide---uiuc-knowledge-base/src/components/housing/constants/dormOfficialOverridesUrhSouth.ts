@@ -7,6 +7,8 @@
 
 import { DormOverride, clean, plan, urhPage, urls } from './dormOfficialOverrideUtils';
 
+const twinXl = (value: Parameters<typeof plan>[0]) => plan({ bedSize: 'Twin XL', ...value });
+
 export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
     snyder: {
         website: urhPage('snyder'),
@@ -23,8 +25,8 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         diningNearbyDetail: 'SDRP dining is a short walk from Snyder Hall.',
         categorizedTags: {
             livingConditions: [],
-            facilities: ['laundry', 'studyLounge'],
-            lifestyle: ['quiet'],
+            facilities: ['laundry', 'studyLounge', 'computerLab'],
+            lifestyle: ['quiet', 'genderInclusive'],
         },
         structuredTags: {
             substanceFree: true,
@@ -37,7 +39,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         price: 13774,
         bathroomType: 'communal',
         floorPlans: [
-            plan({
+            twinXl({
                 bedCount: 2,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
@@ -50,7 +52,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
                 ),
                 description: 'Standard double room.',
             }),
-            plan({
+            twinXl({
                 bedCount: 3,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
@@ -80,7 +82,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         diningNearbyDetail: 'SDRP dining, library, and programs are a short walk from Hopkins.',
         categorizedTags: {
             livingConditions: [],
-            facilities: ['laundry', 'studyLounge'],
+            facilities: ['laundry', 'studyLounge', 'computerLab', 'library'],
             lifestyle: ['socialParty'],
         },
         structuredTags: {
@@ -92,7 +94,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         price: 13774,
         bathroomType: 'communal',
         floorPlans: [
-            plan({
+            twinXl({
                 bedCount: 2,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
@@ -102,7 +104,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
                 photoUrls: urls('https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Ikenberry-Standard-Iso.jpg?itok=GPuiHdpQ'),
                 description: 'Standard double room.',
             }),
-            plan({
+            twinXl({
                 bedCount: 3,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
@@ -132,8 +134,8 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         diningNearbyDetail: 'SDRP dining and library spaces are just around the corner.',
         categorizedTags: {
             livingConditions: [],
-            facilities: ['laundry', 'studyLounge'],
-            lifestyle: ['socialParty', 'llc'],
+            facilities: ['laundry', 'studyLounge', 'computerLab', 'library'],
+            lifestyle: ['socialParty', 'llc', 'genderInclusive'],
             llcNames: ['Exploration LLC', 'LEADS LLC'],
         },
         structuredTags: {
@@ -146,7 +148,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         price: 13774,
         bathroomType: 'communal',
         floorPlans: [
-            plan({
+            twinXl({
                 bedCount: 2,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
@@ -159,7 +161,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
                 ),
                 description: 'Standard double room.',
             }),
-            plan({
+            twinXl({
                 bedCount: 3,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
@@ -189,7 +191,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         diningNearbyDetail: 'SDRP dining is a short walk; ARC is directly across the street.',
         categorizedTags: {
             livingConditions: [],
-            facilities: ['gym', 'laundry', 'studyLounge'],
+            facilities: ['gym', 'laundry', 'studyLounge', 'computerLab', 'library'],
             lifestyle: ['quiet', 'llc'],
             llcNames: ['Transfer Community'],
         },
@@ -205,7 +207,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         price: 13774,
         bathroomType: 'communal',
         floorPlans: [
-            plan({
+            twinXl({
                 bedCount: 2,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
@@ -218,7 +220,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
                 ),
                 description: 'Standard double room.',
             }),
-            plan({
+            twinXl({
                 bedCount: 3,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
@@ -248,7 +250,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         diningNearbyDetail: 'Residents use nearby SDRP dining rather than an in-hall dining room.',
         categorizedTags: {
             livingConditions: ['noAc', 'olderBuilding'],
-            facilities: ['laundry', 'studyLounge'],
+            facilities: ['laundry', 'studyLounge', 'computerLab', 'library'],
             lifestyle: ['quiet'],
         },
         structuredTags: {
@@ -262,7 +264,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         ac: false,
         bathroomType: 'communal',
         floorPlans: [
-            plan({
+            twinXl({
                 bedCount: 2,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
@@ -275,7 +277,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
                 ),
                 description: 'Taft double room.',
             }),
-            plan({
+            twinXl({
                 bedCount: 1,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
@@ -305,7 +307,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         diningNearbyDetail: 'Residents use nearby SDRP dining rather than an in-hall dining room.',
         categorizedTags: {
             livingConditions: ['noAc', 'olderBuilding'],
-            facilities: ['laundry', 'studyLounge'],
+            facilities: ['laundry', 'studyLounge', 'computerLab', 'library'],
             lifestyle: ['quiet'],
         },
         structuredTags: {
@@ -319,7 +321,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         ac: false,
         bathroomType: 'communal',
         floorPlans: [
-            plan({
+            twinXl({
                 bedCount: 2,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
@@ -332,7 +334,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
                 ),
                 description: 'Van Doren double room.',
             }),
-            plan({
+            twinXl({
                 bedCount: 1,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
@@ -364,8 +366,8 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         diningNearbyDetail: 'Daniels stays close to Green Street restaurants; University Housing publishes Daniels rates separately from meal plans.',
         categorizedTags: {
             livingConditions: [],
-            facilities: ['laundry', 'studyLounge', 'kitchen'],
-            lifestyle: ['quiet'],
+            facilities: ['laundry', 'studyLounge', 'kitchen', 'computerLab'],
+            lifestyle: ['quiet', 'genderInclusive'],
         },
         structuredTags: {
             kitchen: true,
@@ -380,7 +382,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         price: 8340,
         bathroomType: 'communal',
         floorPlans: [
-            plan({
+            twinXl({
                 bedCount: 1,
                 bathroomCount: 1,
                 bathroomScope: 'private',
@@ -393,7 +395,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
                 ),
                 description: 'Single room with private bathroom.',
             }),
-            plan({
+            twinXl({
                 bedCount: 1,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
@@ -406,7 +408,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
                 ),
                 description: 'Single room with shared bathroom.',
             }),
-            plan({
+            twinXl({
                 bedCount: 2,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
@@ -437,8 +439,8 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         diningNearbyDetail: 'Sherman is walkable to campus restaurants and stays open over Fall, Winter, and Spring breaks.',
         categorizedTags: {
             livingConditions: [],
-            facilities: ['laundry', 'studyLounge', 'kitchen'],
-            lifestyle: ['quiet'],
+            facilities: ['laundry', 'studyLounge', 'kitchen', 'computerLab'],
+            lifestyle: ['quiet', 'genderInclusive'],
         },
         structuredTags: {
             kitchen: true,
@@ -452,7 +454,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         price: 6906,
         bathroomType: 'communal',
         floorPlans: [
-            plan({
+            twinXl({
                 bedCount: 1,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
@@ -465,7 +467,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
                 ),
                 description: 'Single room with shared bathroom.',
             }),
-            plan({
+            twinXl({
                 bedCount: 2,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
@@ -494,7 +496,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         ),
         categorizedTags: {
             livingConditions: [],
-            facilities: ['laundry', 'studyLounge'],
+            facilities: ['laundry', 'studyLounge', 'computerLab'],
             lifestyle: ['quiet', 'llc'],
             llcNames: ['Scholars Community'],
         },
@@ -509,7 +511,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         price: 13774,
         bathroomType: 'communal',
         floorPlans: [
-            plan({
+            twinXl({
                 bedCount: 1,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
@@ -522,7 +524,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
                 ),
                 description: 'Single room.',
             }),
-            plan({
+            twinXl({
                 bedCount: 2,
                 bathroomCount: 0,
                 bathroomScope: 'communal',
@@ -535,7 +537,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
                 ),
                 description: 'Regular double room.',
             }),
-            plan({
+            twinXl({
                 bedCount: 3,
                 bathroomCount: 0,
                 bathroomScope: 'communal',

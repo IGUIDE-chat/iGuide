@@ -24,7 +24,7 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
         diningNearbyDetail: 'Bromley operates an all-inclusive dining program and snack bar on site.',
         categorizedTags: {
             livingConditions: [],
-            facilities: ['laundry', 'studyLounge', 'busStop'],
+            facilities: ['laundry', 'studyLounge', 'busStop', 'computerLab'],
             lifestyle: [],
         },
         structuredTags: {
@@ -113,7 +113,7 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
         dining: 'inside',
         categorizedTags: {
             livingConditions: [],
-            facilities: ['laundry', 'studyLounge', 'convenienceStore', 'busStop', 'kitchen'],
+            facilities: ['laundry', 'studyLounge', 'convenienceStore', 'busStop', 'kitchen', 'computerLab'],
             lifestyle: [],
         },
         structuredTags: {
@@ -229,7 +229,7 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
         dining: 'inside',
         categorizedTags: {
             livingConditions: [],
-            facilities: ['laundry', 'studyLounge'],
+            facilities: ['laundry', 'studyLounge', 'computerLab', 'library'],
             lifestyle: ['quiet'],
         },
         structuredTags: {
@@ -332,7 +332,7 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
         dining: 'inside',
         categorizedTags: {
             livingConditions: [],
-            facilities: ['laundry', 'studyLounge', 'gym'],
+            facilities: ['laundry', 'studyLounge', 'gym', 'computerLab'],
             lifestyle: ['quiet'],
         },
         structuredTags: {
@@ -514,7 +514,7 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
         bathroomType: 'semi-private',
         categorizedTags: {
             livingConditions: [],
-            facilities: ['laundry', 'gym', 'studyLounge', 'kitchen'],
+            facilities: ['laundry', 'gym', 'studyLounge', 'kitchen', 'computerLab'],
             lifestyle: ['internationalFriendly'],
         },
         structuredTags: {

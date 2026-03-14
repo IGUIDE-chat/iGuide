@@ -50,6 +50,9 @@ const TAG_ZH_MAP: Record<string, string> = {
     'Gym Nearby': '健身房附近',
     'Pool': '泳池',
     'Gender-Inclusive': '性别包容',
+    'Computer Lab': '电脑房',
+    'Library': '图书室',
+    'Music Rooms': '音乐房',
     'Quiet Floors': '安静楼层',
     'Substance-Free': '无烟无酒',
     'Near Main Quad': '近 Main Quad',
@@ -113,6 +116,24 @@ function getCardTagDisplay(tag: DormTag, categorizedTags: DormCategorizedTags, l
             return llcName.replace(/\s+(LLC|Community)$/i, '');
         }
         return llcName;
+    }
+
+    return getTagDisplay(tag, language);
+}
+
+export function getDetailTagDisplay(
+    tag: DormTag,
+    categorizedTags: DormCategorizedTags,
+    language: Language
+): string {
+    if (tag === 'llc') {
+        const llcNames = categorizedTags.llcNames ?? [];
+        if (llcNames.length === 1) {
+            return llcNames[0];
+        }
+        if (llcNames.length > 1) {
+            return language === 'zh' ? '多个 LLC' : 'Multiple LLCs';
+        }
     }
 
     return getTagDisplay(tag, language);
