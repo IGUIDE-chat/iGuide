@@ -14,7 +14,7 @@ import { getPriceRangeFromData } from './constants/pricing';
 import { useDormData } from './store/DormDataContext';
 import { BathroomCountFilter, BathroomScope, BedCountFilter, DormTag, FilterOption } from './types/index';
 import {
-    BATHROOM_TYPE_OPTIONS,
+    BATHROOM_SCOPE_OPTIONS,
     FILTERABLE_LIVING_CONDITION_TAGS,
     getLocalizedLabel,
     getTagDisplay,
@@ -115,7 +115,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, langu
     const bathroomCountOptions = useMemo(() => buildBathroomCountOptions(t), [t]);
     const bathroomScopeOptions = useMemo(
         () =>
-            BATHROOM_TYPE_OPTIONS.map((option) => ({
+            BATHROOM_SCOPE_OPTIONS.map((option) => ({
                 value: option.value,
                 label: getLocalizedLabel(option, language),
             })),

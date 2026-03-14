@@ -5,7 +5,7 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { BathroomScope, Dorm, FloorPlan, RoomOption, RoomType } from '../components/housing/types/index';
+import { BathroomScope, BathroomType, Dorm, FloorPlan, RoomOption, RoomType } from '../components/housing/types/index';
 
 const LEGACY_CODE_RE = /^(\d)B(\d)B$/;
 const SPECIAL_ROOM_TYPES = new Set<RoomType>(['Studio', 'Suite', 'Cluster']);
@@ -41,12 +41,14 @@ const BED_LABELS: Record<number, { en: string; zh: string }> = {
 
 const BATHROOM_SCOPE_LABELS: Record<BathroomScope, { en: string; zh: string }> = {
     communal: { en: 'Communal Bath', zh: '公共卫浴' },
+    'individual-use': { en: 'Individual-Use Bath', zh: '独用卫浴' },
     'semi-private': { en: 'Semi-Private Bath', zh: '半独立卫浴' },
     private: { en: 'Private Bath', zh: '独立卫浴' },
 };
 
 const BATHROOM_TAG_LABELS: Record<BathroomScope, { en: string; zh: string }> = {
     communal: { en: 'Communal', zh: '公共卫浴' },
+    'individual-use': { en: 'Individual-Use', zh: '独用卫浴' },
     'semi-private': { en: 'Semi-Private', zh: '半独立卫浴' },
     private: { en: 'Private', zh: '独立卫浴' },
 };
@@ -60,6 +62,7 @@ const MIXED_BATHROOM_TAG_LABELS = {
     en: 'Mixed',
     zh: '多种卫浴',
 };
+const BATHROOM_SCOPE_PRIORITY: BathroomScope[] = ['communal', 'individual-use', 'semi-private', 'private'];
 
 type RoomLabelOption = Pick<RoomOption, 'bedCount' | 'bathroomCount' | 'bathroomScope' | 'labelCode'>;
 
@@ -73,6 +76,30 @@ export interface RoomRangeSummary {
     occupancyLabel: string;
     bathroomLabel: string;
     cardSummary: string;
+}
+
+function getUniqueBathroomScopes(scopes: Array<BathroomScope | undefined | null>): BathroomScope[] {
+    return BATHROOM_SCOPE_PRIORITY.filter((scope) => scopes.includes(scope));
+}
+
+export function getStorageBathroomScope(
+    bathroomType: BathroomType,
+    scopeSource?: Array<{ bathroomScope?: BathroomScope | null }>
+): BathroomScope {
+    if (bathroomType !== 'mixed') {
+        return bathroomType;
+    }
+
+    const scopes = getUniqueBathroomScopes((scopeSource ?? []).map((item) => item.bathroomScope));
+    return scopes[0] ?? 'communal';
+}
+
+export function getPersistedBathroomType(
+    bathroomType: BathroomType,
+    scopeSource?: Array<{ bathroomScope?: BathroomScope | null }>
+): Exclude<BathroomScope, 'individual-use'> {
+    const resolvedScope = getStorageBathroomScope(bathroomType, scopeSource);
+    return resolvedScope === 'individual-use' ? 'semi-private' : resolvedScope;
 }
 
 function parseLegacyRoomType(type?: RoomType) {
@@ -111,6 +138,9 @@ function inferScopeFromDescription(description: string | undefined, fallback: Ba
     ) {
         return 'communal';
     }
+    if (text.includes('individual-use') || text.includes('individual use')) {
+        return 'individual-use';
+    }
     if (text.includes('semi-private')) {
         return 'semi-private';
     }
@@ -142,6 +172,10 @@ function inferBathroomCount(
     }
 
     if (specialType === 'Studio' && scope === 'private') {
+        return 1;
+    }
+
+    if (scope === 'individual-use') {
         return 1;
     }
 
@@ -218,7 +252,7 @@ function getBathroomCountLabel(bathroomCount: number, language: 'en' | 'zh') {
 }
 
 function getBathroomSecondaryLabel(option: RoomLabelOption, language: 'en' | 'zh') {
-    if (option.bathroomScope === 'communal') {
+    if (option.bathroomScope === 'communal' || option.bathroomScope === 'individual-use') {
         return getBathroomScopeLabel(option.bathroomScope, language);
     }
 
@@ -379,6 +413,7 @@ export function getRoomRangeSummary(
                 ? (
                     {
                         communal: 'Shared bath',
+                        'individual-use': 'Individual-use',
                         'semi-private': 'Semi-private',
                         private: 'Private bath',
                     } satisfies Record<BathroomScope, string>
@@ -415,7 +450,7 @@ export function getRoomDisplayLabel(
 
     const bedLabel = getBedCountLabel(option.bedCount, language);
 
-    if (option.bathroomScope === 'communal') {
+    if (option.bathroomScope === 'communal' || option.bathroomScope === 'individual-use') {
         return `${bedLabel} / ${getBathroomScopeLabel(option.bathroomScope, language)}`;
     }
 
@@ -438,7 +473,7 @@ export function getRoomDetailLabel(
 
     const bedLabel = getBedCountLabel(option.bedCount, language);
 
-    if (option.bathroomScope === 'communal') {
+    if (option.bathroomScope === 'communal' || option.bathroomScope === 'individual-use') {
         return `${bedLabel} / ${getBathroomScopeLabel(option.bathroomScope, language)}`;
     }
 
@@ -485,7 +520,8 @@ export function normalizeFloorPlan(plan: FloorPlan, fallbackScope: BathroomScope
     };
 }
 
-export function deriveRoomOptions(floorPlans: FloorPlan[] | undefined, fallbackScope: BathroomScope) {
+export function deriveRoomOptions(floorPlans: FloorPlan[] | undefined, fallbackType: BathroomType) {
+    const fallbackScope = getStorageBathroomScope(fallbackType, floorPlans);
     const normalizedPlans = (floorPlans ?? []).map((plan) => normalizeFloorPlan(plan, fallbackScope));
     const options = Array.from(
         new Map(
@@ -512,36 +548,41 @@ export function deriveRoomOptions(floorPlans: FloorPlan[] | undefined, fallbackS
 
 export function getDormBathroomSummary(dorm: Dorm, language: 'en' | 'zh') {
     const roomOptions = dorm.roomOptions ?? deriveRoomOptions(dorm.floorPlans, dorm.bathroomType).roomOptions;
-    const scopes = Array.from(new Set(roomOptions.map((option) => option.bathroomScope)));
+    const scopes = getUniqueBathroomScopes(roomOptions.map((option) => option.bathroomScope));
 
     if (scopes.length === 1) {
         return getBathroomScopeLabel(scopes[0], language);
     }
-    if (scopes.length > 1) {
+    if (scopes.length > 1 || dorm.bathroomType === 'mixed') {
         return MIXED_BATHROOM_LABELS[language];
     }
 
-    return getBathroomScopeLabel(dorm.bathroomType, language);
+    return getBathroomScopeLabel(getStorageBathroomScope(dorm.bathroomType), language);
 }
 
 export function getDormBathroomTagSummary(dorm: Dorm, language: 'en' | 'zh') {
     const roomOptions = dorm.roomOptions ?? deriveRoomOptions(dorm.floorPlans, dorm.bathroomType).roomOptions;
-    const scopes = Array.from(new Set(roomOptions.map((option) => option.bathroomScope)));
+    const scopes = getUniqueBathroomScopes(roomOptions.map((option) => option.bathroomScope));
 
     if (scopes.length === 1) {
         return getBathroomTagLabel(scopes[0], language);
     }
-    if (scopes.length > 1) {
+    if (scopes.length > 1 || dorm.bathroomType === 'mixed') {
         return MIXED_BATHROOM_TAG_LABELS[language];
     }
 
-    return getBathroomTagLabel(dorm.bathroomType, language);
+    return getBathroomTagLabel(getStorageBathroomScope(dorm.bathroomType), language);
 }
 
 export function normalizeDorm(dorm: Dorm): Dorm {
     const normalized = deriveRoomOptions(dorm.floorPlans, dorm.bathroomType);
-    const scopes = Array.from(new Set(normalized.roomOptions.map((option) => option.bathroomScope)));
-    const bathroomType = scopes.length === 1 ? scopes[0] : dorm.bathroomType;
+    const scopes = getUniqueBathroomScopes(normalized.roomOptions.map((option) => option.bathroomScope));
+    const bathroomType =
+        scopes.length > 1
+            ? 'mixed'
+            : scopes.length === 1
+                ? scopes[0]
+                : dorm.bathroomType;
 
     return {
         ...dorm,

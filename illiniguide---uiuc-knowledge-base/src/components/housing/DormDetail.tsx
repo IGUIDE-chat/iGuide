@@ -26,7 +26,13 @@ import { Language } from '../../types';
 import DormEditPanel from './DormEditPanel';
 import ImageLightbox from './ImageLightbox';
 import { dormDetailTexts } from './i18n/dormTexts';
-import { getRoomOptionLabels, normalizeFloorPlan } from '../../utils/roomOptions';
+import {
+    getBathroomScopeLabel,
+    getDormBathroomSummary,
+    getRoomOptionLabels,
+    getStorageBathroomScope,
+    normalizeFloorPlan,
+} from '../../utils/roomOptions';
 import { getDetailTagDisplay } from '../../utils/tagLabels';
 
 // ─── Animation variants ────────────────────────────────────────────────────
@@ -187,13 +193,12 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
         : dorm.dining === 'nearby'
             ? (language === 'zh' ? '附近食堂' : 'Dining Nearby')
             : (language === 'zh' ? '无食堂' : 'No Dining');
-    const bathroomLabel = dorm.bathroomType === 'private' ? t.privateBath
-        : dorm.bathroomType === 'semi-private' ? t.semiPrivateBath
-            : t.communalBath;
+    const bathroomLabel = getDormBathroomSummary(dorm, language);
+    const defaultPlanScope = getStorageBathroomScope(dorm.bathroomType, dorm.floorPlans);
 
     // Floor plans
     const sortedPlans = (dorm.floorPlans ?? [])
-        .map((p) => normalizeFloorPlan(p, p.bathroomScope ?? 'communal'))
+        .map((p) => normalizeFloorPlan(p, p.bathroomScope ?? defaultPlanScope))
         .sort((a, b) => {
             const bedDelta = (a.bedCount ?? 99) - (b.bedCount ?? 99);
             if (bedDelta !== 0) return bedDelta;
@@ -569,20 +574,17 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
 
                             <div className="space-y-3">
                                 {sortedPlans.map((plan, idx) => {
+                                    const resolvedBathroomScope = plan.bathroomScope ?? defaultPlanScope;
                                     const option = {
                                         bedCount: plan.bedCount ?? null,
                                         bathroomCount: plan.bathroomCount ?? null,
-                                        bathroomScope: plan.bathroomScope ?? ('communal' as const),
+                                        bathroomScope: resolvedBathroomScope,
                                         labelCode: plan.labelCode,
                                     };
                                     const labels = getRoomOptionLabels(option, language);
                                     const planKey = getPlanKey(plan, idx);
                                     const planPrice = getPublishedPlanPrice(plan);
-                                    const planBathroomLabel = plan.bathroomScope === 'private'
-                                        ? t.privateBath
-                                        : plan.bathroomScope === 'semi-private'
-                                            ? t.semiPrivateBath
-                                            : t.communalBath;
+                                    const planBathroomLabel = getBathroomScopeLabel(resolvedBathroomScope, language);
                                     const isExpanded = expandedPlanId === planKey;
                                     const isCompared = compareIds.includes(planKey);
                                     const planDisplayTitle = plan.officialName || labels.primaryLabel;

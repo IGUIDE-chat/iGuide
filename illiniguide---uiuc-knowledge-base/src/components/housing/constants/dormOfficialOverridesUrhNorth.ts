@@ -32,26 +32,26 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
             llc: ['Honors LLC', 'Innovation LLC', 'Sustainability LLC'],
             studyRooms: true,
         },
-        description: 'ISR (Townsend and Wardall) sits beside the engineering-side campus and combines recently renovated traditional rooms with a large dining center and program spaces.',
-        pros: ['Walkable to engineering and north-campus classrooms', 'Recently renovated commons and dining center', 'Hosts Honors, Innovation, and Sustainability LLCs'],
-        cons: ['Standard rooms still rely on communal bathrooms', 'Higher annual rate than older traditional halls', 'South-campus facilities take longer to reach'],
+        description: 'ISR (Townsend and Wardall) sits beside the engineering-side campus and combines recently renovated traditional rooms, individual-use bathrooms, a large dining center, and program spaces.',
+        pros: ['Walkable to engineering and north-campus classrooms', 'Recently renovated commons, dining, and individual-use bathroom layouts', 'Hosts Honors, Innovation, and Sustainability LLCs'],
+        cons: ['Rates are higher than older traditional halls', 'Official inventory is concentrated in double and triple layouts', 'South-campus recreation facilities take longer to reach'],
         price: 14558,
-        bathroomType: 'communal',
+        bathroomType: 'individual-use',
         floorPlans: [
             twinXl({
                 bedCount: 2,
-                bathroomCount: 0,
-                bathroomScope: 'communal',
+                bathroomCount: 1,
+                bathroomScope: 'individual-use',
                 sqft: 190,
                 price: 14558,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/wardall-double.pdf'),
                 photoUrls: urls('https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/ISR%20Double%20Top.jpg?itok=UvYDb4tJ'),
-                description: 'Wardall/Townsend double room with communal bathroom access.',
+                description: 'Wardall/Townsend double room with individual-use bathroom access.',
             }),
             twinXl({
                 bedCount: 3,
-                bathroomCount: 0,
-                bathroomScope: 'communal',
+                bathroomCount: 1,
+                bathroomScope: 'individual-use',
                 sqft: 250,
                 price: 13774,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/townsend-triple.pdf'),
@@ -59,12 +59,12 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                     'https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/ISR%20Townsend%20Triple%20Top.jpg?itok=tcGbE3v3',
                     'https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/ISR%20Townsend%20Triple%20Iso.jpg?itok=LJlEDlqP'
                 ),
-                description: 'Townsend triple room with communal bathroom access.',
+                description: 'Townsend triple room with individual-use bathroom access.',
             }),
             twinXl({
                 bedCount: 3,
-                bathroomCount: 0,
-                bathroomScope: 'communal',
+                bathroomCount: 1,
+                bathroomScope: 'individual-use',
                 sqft: 310,
                 price: 13774,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/townsend-large-triple.pdf'),
@@ -72,7 +72,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                     'https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/ISR%20Townsend%20Triple%202%20top.jpg?itok=R2W5H2P-',
                     'https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/ISR%20Townsend%20Triple%202%20Iso.jpg?itok=kpi7z6Oo'
                 ),
-                description: 'Large or corner triple layout in Townsend.',
+                description: 'Large or corner triple layout in Townsend with individual-use bathroom access.',
             }),
         ],
     },
@@ -103,7 +103,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
         pros: ['Modern finishes and lounges', 'Interior connection to SDRP dining', 'Business LLC and Beckwith Residential Community on site'],
         cons: ['Premium pricing within University Housing', 'Engineering-side classes require a longer walk', 'Some bathroom configurations vary by room type'],
         price: 15042,
-        bathroomType: 'semi-private',
+        bathroomType: 'mixed',
         floorPlans: [
             twinXl({
                 bedCount: 2,
@@ -121,7 +121,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
             twinXl({
                 bedCount: 1,
                 bathroomCount: 1,
-                bathroomScope: 'semi-private',
+                bathroomScope: 'individual-use',
                 sqft: 135,
                 price: 17832,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/NUGT-RoomLayouts.pdf'),
@@ -129,7 +129,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
                     'https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Nugent-single-top.jpg?itok=HmBb5Ndm',
                     'https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Nugent-single-iso.jpg?itok=NO8E0wzq'
                 ),
-                description: 'Single room with shared bath.',
+                description: 'Single room with shared individual-use bathroom.',
             }),
             twinXl({
                 bedCount: 1,
@@ -173,12 +173,12 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
         pros: ['Modern finishes and lounges', 'Mostly single and double layouts with individual-use bathrooms', 'Convenient to SDRP and south-campus recreation'],
         cons: ['Higher annual rate than traditional halls', 'Limited room-layout variety', 'North-campus classes take longer to reach'],
         price: 15440,
-        bathroomType: 'semi-private',
+        bathroomType: 'mixed',
         floorPlans: [
             twinXl({
                 bedCount: 2,
                 bathroomCount: 1,
-                bathroomScope: 'semi-private',
+                bathroomScope: 'individual-use',
                 sqft: 180,
                 price: 15440,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/wassaja-doubles.pdf'),
@@ -187,7 +187,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
             twinXl({
                 bedCount: 1,
                 bathroomCount: 1,
-                bathroomScope: 'semi-private',
+                bathroomScope: 'individual-use',
                 sqft: 125,
                 price: 17488,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/wassaja-singles.pdf'),
@@ -311,12 +311,12 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
         pros: ['Dining center inside the PAR complex', 'Global Crossroads and Intersections LLCs', 'Individual-use bathroom layouts in the residence complex'],
         cons: ['South-campus location is far from north engineering', 'Official room inventory is concentrated in singles and doubles', 'Outdoor walk to the Quad takes longer than ISR or Allen'],
         price: 14558,
-        bathroomType: 'semi-private',
+        bathroomType: 'individual-use',
         floorPlans: [
             twinXl({
                 bedCount: 2,
                 bathroomCount: 1,
-                bathroomScope: 'semi-private',
+                bathroomScope: 'individual-use',
                 sqft: 175,
                 price: 14558,
                 imageUrls: urls('https://www.housing.illinois.edu/sites/default/files/2023-01/par_double.pdf'),
@@ -329,7 +329,7 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
             twinXl({
                 bedCount: 1,
                 bathroomCount: 1,
-                bathroomScope: 'semi-private',
+                bathroomScope: 'individual-use',
                 sqft: 125,
                 price: 16564,
                 description: 'PAR single room with individual-use bathroom access.',

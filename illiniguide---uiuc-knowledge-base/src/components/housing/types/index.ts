@@ -59,7 +59,7 @@ export interface DormCategorizedTags {
 }
 
 export type BedSize = 'Twin XL' | 'Full' | 'Queen' | 'King';
-export type BathroomScope = 'communal' | 'semi-private' | 'private';
+export type BathroomScope = 'communal' | 'individual-use' | 'semi-private' | 'private';
 export type BathroomType = BathroomScope | 'mixed';
 export type DiningType = 'inside' | 'nearby' | 'none';
 export type BedCountFilter = 1 | 2 | 3 | 4;
