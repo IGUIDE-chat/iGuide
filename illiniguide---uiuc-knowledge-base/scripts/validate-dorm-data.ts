@@ -41,6 +41,7 @@ const VALID_TAGS = new Set([
 ]);
 const VALID_LLCS = new Set(LLC_OPTIONS);
 const VALID_BED_SIZES = new Set(['Twin XL', 'Full', 'Queen', 'King']);
+const VALID_BATHROOM_SCOPES = new Set(['communal', 'individual-use', 'semi-private', 'private']);
 const REQUIRED_SYNC_FIELDS = [
     'address',
     'address_zh',
@@ -131,6 +132,20 @@ function check(condition: unknown, message: string) {
     }
 }
 
+function getDormBathroomScopes(dormId: string) {
+    const dorm = UIUC_DORMS.find((item) => item.id === dormId);
+    return new Set((dorm?.floorPlans ?? []).map((plan) => plan.bathroomScope));
+}
+
+function checkDormBathroomScopes(dormId: string, expectedScopes: string[], message: string) {
+    const actualScopes = Array.from(getDormBathroomScopes(dormId)).sort();
+    const expected = [...expectedScopes].sort();
+    check(
+        JSON.stringify(actualScopes) === JSON.stringify(expected),
+        `${message}. Expected ${expected.join(', ')}, got ${actualScopes.join(', ') || 'none'}.`,
+    );
+}
+
 function checkMediaUrl(dormId: string, slot: string, url: string) {
     check(
         LOW_QUALITY_ALLOWLIST.has(url) || !isLikelyLowQualityMediaUrl(url),
@@ -188,6 +203,12 @@ for (const dorm of UIUC_DORMS) {
         check(!plan.imageUrl, `${dorm.id} still uses legacy floorPlans.imageUrl.`);
         check(!plan.photoUrl, `${dorm.id} still uses legacy floorPlans.photoUrl.`);
         check(plan.bathroomScope != null, `${dorm.id} has a floor plan without bathroomScope.`);
+        if (plan.bathroomScope != null) {
+            check(
+                VALID_BATHROOM_SCOPES.has(plan.bathroomScope),
+                `${dorm.id} uses invalid bathroomScope "${plan.bathroomScope}".`,
+            );
+        }
         if (plan.price != null) {
             check(
                 Number.isFinite(plan.price) && plan.price > 0,
@@ -258,6 +279,11 @@ check(
     && !presby!.categorizedTags.facilities.includes('library'),
     'presby should not have genderInclusive, computerLab, or library.',
 );
+checkDormBathroomScopes('isr', ['individual-use'], 'isr should only expose individual-use floor plans');
+checkDormBathroomScopes('par', ['individual-use'], 'par should only expose individual-use floor plans');
+checkDormBathroomScopes('wassaja', ['individual-use', 'private'], 'wassaja should expose individual-use and private floor plans');
+checkDormBathroomScopes('nugent', ['communal', 'individual-use', 'private'], 'nugent should expose communal, individual-use, and private floor plans');
+checkDormBathroomScopes('daniels', ['individual-use', 'semi-private'], 'daniels should expose individual-use and semi-private floor plans');
 
 const repoRoot = process.cwd();
 const seedScript = fs.readFileSync(path.join(repoRoot, 'scripts', 'seed-dorms-table.ts'), 'utf8');
@@ -273,9 +299,12 @@ for (const field of REQUIRED_SYNC_FIELDS) {
 
 check(seedScript.includes('sanitizeFloorPlansForStorage'), 'Seed script does not sanitize floor_plans.');
 check(seedScript.includes('mergeFloorPlans'), 'Seed script does not preserve admin-managed floor plan media.');
+check(seedScript.includes('getPersistedBathroomType'), 'Seed script does not persist bathroom_type safely.');
 check(adminService.includes('sanitizeFloorPlansForStorage'), 'Admin service does not sanitize floor_plans.');
+check(adminService.includes('getPersistedBathroomType'), 'Admin service does not persist bathroom_type safely.');
 check(dormService.includes('sanitizeFloorPlansForStorage'), 'Dorm service does not sanitize floor_plans from DB rows.');
 check(editForm.includes('sanitizeFloorPlansForStorage'), 'Admin edit form does not sanitize floor_plans before save.');
+check(editForm.includes('getPersistedBathroomType'), 'Admin edit form does not persist bathroom_type safely.');
 check(mediaTab.includes('officialName'), 'Admin media tab does not expose official room names.');
 check(!mediaTab.includes('photoUrl: urls[0]'), 'Admin media tab still writes legacy floorPlans.photoUrl.');
 check(!mediaTab.includes('imageUrl: urls[0]'), 'Admin media tab still writes legacy floorPlans.imageUrl.');

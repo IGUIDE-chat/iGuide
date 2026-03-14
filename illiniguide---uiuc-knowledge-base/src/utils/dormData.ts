@@ -14,6 +14,7 @@ import {
     LifestyleTag,
     LivingConditionTag,
 } from '../components/housing/types/index';
+import { deriveRoomOptions } from './roomOptions';
 
 const LIVING_CONDITION_LABELS: Record<LivingConditionTag, string> = {
     noAc: 'No AC',
@@ -128,7 +129,7 @@ function syncStructuredTags(
 
 export function buildLegacyDormTags(dorm: Pick<
     Dorm,
-    'housingType' | 'dining' | 'bathroomType' | 'categorizedTags' | 'structuredTags'
+    'housingType' | 'dining' | 'bathroomType' | 'categorizedTags' | 'structuredTags' | 'floorPlans' | 'roomOptions'
 >): string[] {
     const categorizedTags = normalizeCategorizedTags(dorm.categorizedTags);
     const tags: string[] = [];
@@ -156,10 +157,17 @@ export function buildLegacyDormTags(dorm: Pick<
     if (dorm.dining === 'inside') {
         tags.push('Dining Hall');
     }
-    if (dorm.bathroomType === 'private') {
+    const bathroomScopes = new Set(
+        (dorm.roomOptions ?? deriveRoomOptions(dorm.floorPlans, dorm.bathroomType).roomOptions)
+            .map((option) => option.bathroomScope)
+    );
+    if (bathroomScopes.has('private') || dorm.bathroomType === 'private') {
         tags.push('Private Bath');
     }
-    if (dorm.bathroomType === 'semi-private') {
+    if (bathroomScopes.has('individual-use') || dorm.bathroomType === 'individual-use') {
+        tags.push('Individual-Use Bath');
+    }
+    if (bathroomScopes.has('semi-private') || dorm.bathroomType === 'semi-private') {
         tags.push('Semi-Private Bath');
     }
 
@@ -210,6 +218,8 @@ export function finalizeDormRecord(dorm: Dorm): Dorm {
             bathroomType: dorm.bathroomType,
             categorizedTags,
             structuredTags,
+            floorPlans,
+            roomOptions: dorm.roomOptions,
         }),
         priceRange: getDormPriceRange(dorm.price),
     };

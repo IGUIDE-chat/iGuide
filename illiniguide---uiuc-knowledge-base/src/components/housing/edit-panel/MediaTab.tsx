@@ -16,8 +16,8 @@ import {
   X,
 } from 'lucide-react';
 import { BathroomScope, BedSize, FloorPlan } from '../types/index';
-import { BATHROOM_TYPE_OPTIONS, getLocalizedLabel } from '../constants/metadata';
-import { normalizeFloorPlan } from '../../../utils/roomOptions';
+import { BATHROOM_SCOPE_OPTIONS, getLocalizedLabel } from '../constants/metadata';
+import { getStorageBathroomScope, normalizeFloorPlan } from '../../../utils/roomOptions';
 import { EditableList, Field, Toggle, inputCls } from './EditPanelFields';
 import {
   createFloorPlan,
@@ -198,7 +198,7 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
         <div className="space-y-2">
           {form.normalizedFloorPlans.map((plan, index) => {
             const layoutKind = getLayoutKind(plan);
-            const scope = plan.bathroomScope ?? form.bathroomType;
+            const scope = plan.bathroomScope ?? getStorageBathroomScope(form.bathroomType, form.normalizedFloorPlans);
             const preview = form.getRoomDisplayLabel(
               {
                 bedCount: plan.bedCount ?? null,
@@ -211,7 +211,10 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
             const update = (patch: Partial<FloorPlan>, renormalize = true) =>
               form.updateFloorPlan(index, (current) =>
                 renormalize
-                  ? normalizeFloorPlan({ ...current, ...patch }, form.bathroomType)
+                  ? normalizeFloorPlan(
+                    { ...current, ...patch },
+                    getStorageBathroomScope(form.bathroomType, form.normalizedFloorPlans),
+                  )
                   : ({ ...current, ...patch } as FloorPlan),
               );
 
@@ -366,7 +369,7 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                           }
                           className={inputCls}
                         >
-                          {BATHROOM_TYPE_OPTIONS.map((option) => (
+                          {BATHROOM_SCOPE_OPTIONS.map((option) => (
                             <option key={option.value} value={option.value}>
                               {getLocalizedLabel(option, form.language)}
                             </option>

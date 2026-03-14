@@ -11,6 +11,7 @@ import { supabase } from './supabase';
 import { Dorm } from '../components/housing/types/index';
 import { UIUC_DORMS } from '../components/housing/constants/dormData';
 import { sanitizeFloorPlansForStorage } from '../utils/dormData';
+import { getPersistedBathroomType } from '../utils/roomOptions';
 
 const TABLE = 'dorms';
 
@@ -223,7 +224,7 @@ async function resetDormToStatic(dormId: string): Promise<DormMutationResult> {
         ac: staticDorm.ac,
         dining: staticDorm.dining,
         dining_nearby_detail: staticDorm.diningNearbyDetail ?? null,
-        bathroom_type: staticDorm.bathroomType,
+        bathroom_type: getPersistedBathroomType(staticDorm.bathroomType, staticDorm.roomOptions),
         application_fee: staticDorm.applicationFee ?? null,
         room_types: staticDorm.roomTypes,
         room_options: staticDorm.roomOptions ?? null,

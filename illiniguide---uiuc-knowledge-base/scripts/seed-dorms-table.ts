@@ -22,7 +22,12 @@ import { createClient } from '@supabase/supabase-js';
 import { UIUC_DORMS } from '../src/components/housing/constants/dormData';
 import type { Dorm } from '../src/components/housing/types/index';
 import { finalizeDormRecord, sanitizeFloorPlansForStorage } from '../src/utils/dormData';
-import { deriveRoomOptions, normalizeFloorPlan } from '../src/utils/roomOptions';
+import {
+    deriveRoomOptions,
+    getPersistedBathroomType,
+    getStorageBathroomScope,
+    normalizeFloorPlan,
+} from '../src/utils/roomOptions';
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
@@ -129,7 +134,8 @@ function mergeCategorizedTags(existingValue: unknown, sourceValue: unknown): Rec
     };
 }
 
-function getFloorPlanGroupKey(plan: StoredFloorPlan, fallbackScope: Dorm['bathroomType']) {
+function getFloorPlanGroupKey(plan: StoredFloorPlan, fallbackType: Dorm['bathroomType']) {
+    const fallbackScope = getStorageBathroomScope(fallbackType, [plan]);
     const normalized = normalizeFloorPlan(plan, fallbackScope);
     return [
         normalized.officialName?.trim().toLowerCase() ?? '',
@@ -204,7 +210,7 @@ function dormToRow(dorm: Dorm) {
         tags: dorm.tags,
         structured_tags: dorm.structuredTags ?? {},
         categorized_tags: dorm.categorizedTags ?? {},
-        bathroom_type: dorm.bathroomType,
+        bathroom_type: getPersistedBathroomType(dorm.bathroomType, dorm.roomOptions),
         room_types: dorm.roomTypes,
         room_options: dorm.roomOptions ?? [],
         floor_plans: sanitizeFloorPlansForStorage(dorm.floorPlans) ?? [],
@@ -227,12 +233,16 @@ function mergeDormRow(sourceRow: DormRow, existingRow?: Record<string, unknown>)
         return sourceRow;
     }
 
+    const floorPlanFallback = getStorageBathroomScope(
+        'mixed',
+        sourceRow.room_options as Array<{ bathroomScope?: Dorm['bathroomType'] | null }>
+    );
     const floorPlans = mergeFloorPlans(
         sourceRow.floor_plans as Dorm['floorPlans'],
         existingRow.floor_plans,
-        sourceRow.bathroom_type
+        floorPlanFallback
     );
-    const derived = deriveRoomOptions(floorPlans, sourceRow.bathroom_type);
+    const derived = deriveRoomOptions(floorPlans, floorPlanFallback);
 
     return {
         ...sourceRow,

@@ -24,6 +24,8 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { dormService } from '../../../services/dormService';
 import {
   deriveRoomOptions,
+  getPersistedBathroomType,
+  getStorageBathroomScope,
   getRoomDisplayLabel,
   normalizeFloorPlan,
 } from '../../../utils/roomOptions';
@@ -50,6 +52,11 @@ const emptyCategorized: DormCategorizedTags = {
   lifestyle: [],
   llcNames: [],
 };
+
+const getBathroomScopeFallback = (
+  bathroomType: Dorm['bathroomType'],
+  floorPlans?: FloorPlan[],
+) => getStorageBathroomScope(bathroomType, floorPlans);
 
 export const getLayoutKind = (plan: FloorPlan): LayoutKind =>
   plan.type === 'Studio' || plan.labelCode === 'Studio'
@@ -135,7 +142,7 @@ export const useDormEditForm = ({
   const [housingType, setHousingType] = useState(dorm.housingType);
   const [floorPlans, setFloorPlans] = useState<FloorPlan[]>(
     (sanitizeFloorPlansForStorage(dorm.floorPlans) ?? []).map((plan) =>
-      normalizeFloorPlan(plan, dorm.bathroomType),
+      normalizeFloorPlan(plan, getBathroomScopeFallback(dorm.bathroomType, dorm.floorPlans)),
     ),
   );
   const [galleryImages, setGalleryImages] = useState<string[]>(dorm.galleryImages ?? []);
@@ -170,7 +177,7 @@ export const useDormEditForm = ({
     setHousingType(dorm.housingType);
     setFloorPlans(
       (sanitizeFloorPlansForStorage(dorm.floorPlans) ?? []).map((plan) =>
-        normalizeFloorPlan(plan, dorm.bathroomType),
+        normalizeFloorPlan(plan, getBathroomScopeFallback(dorm.bathroomType, dorm.floorPlans)),
       ),
     );
     setGalleryImages([...(dorm.galleryImages ?? [])]);
@@ -208,7 +215,9 @@ export const useDormEditForm = ({
   const normalizedFloorPlans = useMemo(
     () =>
       sanitizeFloorPlansForStorage(
-        floorPlans.map((plan) => normalizeFloorPlan(plan, bathroomType)),
+        floorPlans.map((plan) =>
+          normalizeFloorPlan(plan, getBathroomScopeFallback(bathroomType, floorPlans)),
+        ),
       ) ?? [],
     [bathroomType, floorPlans],
   );
@@ -223,7 +232,7 @@ export const useDormEditForm = ({
       current.map((plan, currentIndex) => (currentIndex === index ? updater(plan) : plan)),
     );
 
-    const buildUpdate = (): DormUpdate => {
+  const buildUpdate = (): DormUpdate => {
     const derived = deriveRoomOptions(normalizedFloorPlans, bathroomType);
     const finalCategorized: DormCategorizedTags = {
       ...categorizedTags,
@@ -286,7 +295,7 @@ export const useDormEditForm = ({
       ac,
       dining,
       dining_nearby_detail: diningNearbyDetail || null,
-      bathroom_type: bathroomType,
+      bathroom_type: getPersistedBathroomType(bathroomType, derived.roomOptions),
       pros,
       pros_zh: prosZh.length ? prosZh : null,
       cons,
