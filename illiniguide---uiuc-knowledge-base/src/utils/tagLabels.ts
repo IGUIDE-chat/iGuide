@@ -95,11 +95,13 @@ export function getAllTagsSorted(categorizedTags: DormCategorizedTags): DormTag[
         ...(categorizedTags.facilities ?? []),
         ...(categorizedTags.lifestyle ?? []),
     ];
-    return all.sort((a, b) => {
-        const pa = TAG_REGISTRY[a]?.priority ?? 99;
-        const pb = TAG_REGISTRY[b]?.priority ?? 99;
-        return pa - pb;
-    });
+    return all
+        .filter((tag) => Object.prototype.hasOwnProperty.call(TAG_REGISTRY, tag))
+        .sort((a, b) => {
+            const pa = TAG_REGISTRY[a]?.priority ?? 99;
+            const pb = TAG_REGISTRY[b]?.priority ?? 99;
+            return pa - pb;
+        });
 }
 
 export interface CardTagItem {
