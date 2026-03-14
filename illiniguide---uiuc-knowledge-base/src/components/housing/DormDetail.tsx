@@ -427,8 +427,22 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
 
                                 {positiveTags.length > 0 && (
                                     <div className="flex flex-wrap gap-2 pt-1">
-                                        {positiveTags.map((tag, i) => {
+                                        {positiveTags.flatMap((tag, i) => {
                                             const Icon = TAG_REGISTRY[tag]?.icon;
+                                            if (tag === 'llc' && (dorm.categorizedTags?.llcNames?.length ?? 0) > 1) {
+                                                return dorm.categorizedTags.llcNames!.map((llcName, j) => (
+                                                    <motion.span
+                                                        key={`llc-${j}`}
+                                                        initial={{ opacity: 0, scale: 0.85 }}
+                                                        animate={{ opacity: 1, scale: 1 }}
+                                                        transition={{ delay: 0.3 + (i + j) * 0.06 }}
+                                                        className="inline-flex items-center gap-1 px-3 py-1 text-[12px] md:text-[13px] font-bold text-illini-orange bg-illini-orange/10 rounded-full"
+                                                    >
+                                                        {Icon && <Icon className="w-3.5 h-3.5" strokeWidth={1.5} />}
+                                                        {llcName}
+                                                    </motion.span>
+                                                ));
+                                            }
                                             return (
                                                 <motion.span
                                                     key={tag}
