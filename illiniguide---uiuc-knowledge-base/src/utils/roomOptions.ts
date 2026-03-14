@@ -41,14 +41,14 @@ const BED_LABELS: Record<number, { en: string; zh: string }> = {
 
 const BATHROOM_SCOPE_LABELS: Record<BathroomScope, { en: string; zh: string }> = {
     communal: { en: 'Communal Bath', zh: '公共卫浴' },
-    'individual-use': { en: 'Individual-Use Bath', zh: '独用卫浴' },
+    'individual-use': { en: 'Shared Single-Use Bath', zh: '公共单人卫浴' },
     'semi-private': { en: 'Semi-Private Bath', zh: '半独立卫浴' },
     private: { en: 'Private Bath', zh: '独立卫浴' },
 };
 
 const BATHROOM_TAG_LABELS: Record<BathroomScope, { en: string; zh: string }> = {
     communal: { en: 'Communal', zh: '公共卫浴' },
-    'individual-use': { en: 'Individual-Use', zh: '独用卫浴' },
+    'individual-use': { en: 'Shared Single-Use', zh: '公共单人卫浴' },
     'semi-private': { en: 'Semi-Private', zh: '半独立卫浴' },
     private: { en: 'Private', zh: '独立卫浴' },
 };
@@ -412,7 +412,7 @@ export function getRoomRangeSummary(
                 ? (
                     {
                         communal: 'Shared bath',
-                        'individual-use': 'Individual-use',
+                        'individual-use': 'Shared single-use',
                         'semi-private': 'Semi-private',
                         private: 'Private bath',
                     } satisfies Record<BathroomScope, string>

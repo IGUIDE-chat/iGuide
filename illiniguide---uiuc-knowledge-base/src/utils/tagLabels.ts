@@ -32,7 +32,7 @@ const TAG_ZH_MAP: Record<string, string> = {
     'South Campus': '南校区',
     'No AC': '无空调',
     'Private Bath': '独立卫浴',
-    'Individual-Use Bath': '独用卫浴',
+    'Shared Single-Use Bath': '公共单人卫浴',
     'Singles': '单人间',
     'Graduate': '研究生',
     'Upperclassmen': '高年级生',

@@ -278,7 +278,7 @@ export const DINING_OPTIONS: LocalizedOption<DiningType>[] = [
 
 export const BATHROOM_SCOPE_OPTIONS: LocalizedOption<BathroomScope>[] = [
     { value: 'communal', en: 'Communal', zh: '公共卫浴' },
-    { value: 'individual-use', en: 'Individual-Use', zh: '独用卫浴' },
+    { value: 'individual-use', en: 'Shared Single-Use', zh: '公共单人卫浴' },
     { value: 'semi-private', en: 'Semi-Private', zh: '半独立卫浴' },
     { value: 'private', en: 'Private', zh: '独立卫浴' },
 ];
