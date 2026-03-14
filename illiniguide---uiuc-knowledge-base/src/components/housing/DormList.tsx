@@ -46,7 +46,7 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
             ${
               controller.isListView
                 ? 'w-full p-4 xl:p-6 opacity-100 z-10'
-                : 'absolute inset-0 xl:static xl:w-[360px] xl:shrink-0 xl:min-w-0 xl:opacity-100 xl:border-r xl:border-gray-200 xl:z-auto opacity-0 pointer-events-none xl:pointer-events-auto p-3 xl:p-3'
+                : 'absolute inset-0 xl:static xl:w-[360px] 2xl:w-[40%] xl:shrink-0 xl:min-w-0 xl:opacity-100 xl:border-r xl:border-gray-200 xl:z-auto opacity-0 pointer-events-none xl:pointer-events-auto p-3 xl:p-3 2xl:p-4'
             }
           `}
         >
