@@ -309,7 +309,7 @@ export function getLocalizedLabel(copy: LocalizedCopy, language: Language) {
 }
 
 export function getTagDisplay(tag: DormTag, language: Language) {
-    return getLocalizedLabel(TAG_REGISTRY[tag], language);
+    return getLocalizedLabel(TAG_REGISTRY[tag] ?? { en: tag, zh: tag }, language);
 }
 
 export function getHousingTypeMeta(housingType: Dorm['housingType']) {
