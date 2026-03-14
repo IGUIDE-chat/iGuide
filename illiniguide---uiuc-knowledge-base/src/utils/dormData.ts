@@ -165,7 +165,7 @@ export function buildLegacyDormTags(dorm: Pick<
         tags.push('Private Bath');
     }
     if (bathroomScopes.has('individual-use') || dorm.bathroomType === 'individual-use') {
-        tags.push('Individual-Use Bath');
+        tags.push('Shared Single-Use Bath');
     }
     if (bathroomScopes.has('semi-private') || dorm.bathroomType === 'semi-private') {
         tags.push('Semi-Private Bath');
