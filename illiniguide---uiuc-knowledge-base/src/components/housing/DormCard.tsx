@@ -25,7 +25,7 @@ interface DormCardProps {
 }
 
 const CARD_TAG_GAP_PX = 6;
-const MAX_VISIBLE_CARD_TAGS = 4;
+const MAX_VISIBLE_CARD_TAGS = 8;
 
 const TEXT = {
     en: {
