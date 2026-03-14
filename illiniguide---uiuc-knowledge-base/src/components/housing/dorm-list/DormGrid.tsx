@@ -37,7 +37,7 @@ const DormGrid: React.FC<DormGridProps> = ({
             className={`
                 grid gap-6 pb-20 xl:pb-6
                 ${isListView
-                    ? 'grid-cols-[repeat(auto-fill,minmax(min(100%,320px),1fr))]'
+                    ? 'grid-cols-[repeat(auto-fill,minmax(min(100%,320px),1fr))] justify-items-center'
                     : 'grid-cols-1 2xl:grid-cols-2'
                 }
             `}
