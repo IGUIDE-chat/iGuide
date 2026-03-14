@@ -60,7 +60,7 @@ export const DormListMapPane: React.FC<DormListMapPaneProps> = ({
         h-full transition-opacity duration-200 flex flex-col min-w-0
         ${
           isMapView
-            ? 'absolute inset-0 xl:static xl:w-[60%] xl:min-w-0 opacity-100 z-20 xl:z-auto'
+            ? 'absolute inset-0 xl:static xl:flex-1 xl:min-w-0 opacity-100 z-20 xl:z-auto'
             : 'absolute inset-0 xl:static xl:hidden opacity-0 pointer-events-none'
         }
       `}

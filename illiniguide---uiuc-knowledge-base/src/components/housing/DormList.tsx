@@ -42,11 +42,11 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
       <div className="flex-1 overflow-hidden bg-gray-50/50 relative z-0 flex flex-row min-w-0">
         <div
           className={`
-            h-full overflow-y-auto p-4 xl:p-6 transition-opacity duration-200 scrollbar-thin min-w-0
+            h-full overflow-y-auto transition-opacity duration-200 scrollbar-thin min-w-0
             ${
               controller.isListView
-                ? 'w-full opacity-100 z-10'
-                : 'absolute inset-0 xl:static xl:w-[40%] xl:min-w-0 xl:opacity-100 xl:border-r xl:border-gray-200 xl:z-auto opacity-0 pointer-events-none xl:pointer-events-auto'
+                ? 'w-full p-4 xl:p-6 opacity-100 z-10'
+                : 'absolute inset-0 xl:static xl:w-[360px] xl:shrink-0 xl:min-w-0 xl:opacity-100 xl:border-r xl:border-gray-200 xl:z-auto opacity-0 pointer-events-none xl:pointer-events-auto p-3 xl:p-3'
             }
           `}
         >
