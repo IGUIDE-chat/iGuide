@@ -10,7 +10,7 @@
 import { supabase } from './supabase';
 import { Dorm } from '../components/housing/types/index';
 import { UIUC_DORMS } from '../components/housing/constants/dormData';
-import { sanitizeFloorPlansForStorage } from '../utils/dormData';
+import { getDormPriceRange, sanitizeFloorPlansForStorage } from '../utils/dormData';
 import { getPersistedBathroomType } from '../utils/roomOptions';
 
 const TABLE = 'dorms';
@@ -181,6 +181,11 @@ async function updateDorm(dormId: string, updates: DormUpdate): Promise<DormMuta
                 ? sanitizeFloorPlansForStorage(value as Dorm['floorPlans']) ?? null
                 : value;
         }
+    }
+
+    // Auto-recalculate price_range when price changes
+    if (safeUpdates.price != null && typeof safeUpdates.price === 'number') {
+        safeUpdates.price_range = getDormPriceRange(safeUpdates.price as number);
     }
 
     const { error } = await supabase

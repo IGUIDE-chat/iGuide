@@ -97,9 +97,8 @@ export function getStorageBathroomScope(
 export function getPersistedBathroomType(
     bathroomType: BathroomType,
     scopeSource?: Array<{ bathroomScope?: BathroomScope | null }>
-): Exclude<BathroomScope, 'individual-use'> {
-    const resolvedScope = getStorageBathroomScope(bathroomType, scopeSource);
-    return resolvedScope === 'individual-use' ? 'semi-private' : resolvedScope;
+): BathroomScope {
+    return getStorageBathroomScope(bathroomType, scopeSource);
 }
 
 function parseLegacyRoomType(type?: RoomType) {

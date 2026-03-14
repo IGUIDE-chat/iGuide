@@ -137,13 +137,22 @@ function mergeCategorizedTags(existingValue: unknown, sourceValue: unknown): Rec
 function getFloorPlanGroupKey(plan: StoredFloorPlan, fallbackType: Dorm['bathroomType']) {
     const fallbackScope = getStorageBathroomScope(fallbackType, [plan]);
     const normalized = normalizeFloorPlan(plan, fallbackScope);
+    const specialType = normalized.bedCount == null ? normalized.type ?? '' : '';
     return [
         normalized.officialName?.trim().toLowerCase() ?? '',
-        normalized.labelCode ?? '',
         normalized.bedCount ?? 'na',
-        normalized.bathroomCount ?? 'na',
-        normalized.bathroomScope ?? fallbackScope,
-        normalized.type ?? '',
+        normalized.sqft ?? 'na',
+        specialType,
+    ].join('|');
+}
+
+function getFloorPlanCarryForwardKey(plan: StoredFloorPlan, fallbackType: Dorm['bathroomType']) {
+    const fallbackScope = getStorageBathroomScope(fallbackType, [plan]);
+    const normalized = normalizeFloorPlan(plan, fallbackScope);
+    return [
+        normalized.officialName?.trim().toLowerCase() ?? '',
+        normalized.bedCount ?? 'na',
+        normalized.description?.trim().toLowerCase() ?? '',
     ].join('|');
 }
 
@@ -154,6 +163,10 @@ function mergeFloorPlans(
 ) {
     const nextSourcePlans = sanitizeFloorPlansForStorage(sourcePlans) ?? [];
     const nextExistingPlans = sanitizeFloorPlansForStorage(existingPlans as Dorm['floorPlans']) ?? [];
+    const sourceKeys = new Set(nextSourcePlans.map((plan) => getFloorPlanGroupKey(plan, fallbackScope)));
+    const sourceCarryForwardKeys = new Set(
+        nextSourcePlans.map((plan) => getFloorPlanCarryForwardKey(plan, fallbackScope))
+    );
 
     if (!nextExistingPlans.length) {
         return nextSourcePlans;
@@ -184,7 +197,13 @@ function mergeFloorPlans(
         };
     });
 
-    const appendedExistingPlans = Array.from(existingByKey.values()).flat();
+    const appendedExistingPlans = Array.from(existingByKey.entries()).flatMap(([key, bucket]) =>
+        sourceKeys.has(key)
+            ? []
+            : bucket.filter(
+                (plan) => !sourceCarryForwardKeys.has(getFloorPlanCarryForwardKey(plan, fallbackScope))
+            )
+    );
     return sanitizeFloorPlansForStorage([...mergedPlans, ...appendedExistingPlans]) ?? [];
 }
 
