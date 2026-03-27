@@ -6,9 +6,7 @@
  */
 
 import * as React from 'react';
-// [ROOT] Main application component handling routing and global layout.
-// [根组件] 处理路由和全局布局的应用程序主组件。
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { LoginScreen } from './components/auth/LoginScreen';
 import { Layout } from './components/layout/Layout';
@@ -30,22 +28,18 @@ export default function App() {
   });
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
 
-  // Sync guest state with user auth status
   useEffect(() => {
     if (user) {
       setIsGuest(false);
     }
   }, [user, setIsGuest]);
 
-  // Load last conversation on mount
   useEffect(() => {
     const lastId = localStorage.getItem('lastConversationId');
     if (lastId && !isGuest) {
       setCurrentConversationId(lastId);
     }
   }, [isGuest]);
-
-
 
   const handleNewConversation = () => {
     setCurrentConversationId(null);
@@ -60,12 +54,11 @@ export default function App() {
     }
   };
 
-  // Show loading state while checking auth
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-illini-blue/10 via-white to-illini-orange/10">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-illini-orange border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-illini-orange border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-slate-600">{language === 'zh' ? '加载中...' : 'Loading...'}</p>
         </div>
       </div>
@@ -97,7 +90,7 @@ export default function App() {
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
+          transition={{ duration: 0.4, ease: 'easeOut' }}
           className="h-full w-full"
         >
           <DormDataProvider>
