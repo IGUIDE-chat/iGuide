@@ -1,8 +1,12 @@
-# Landing page routes → proxy to iGuide-landing
+# Landing page routes → proxy to iGuide-landing (200 = transparent proxy, URL stays iguide.chat)
+/about https://iguide-landing.pages.dev/about 200
 /about/* https://iguide-landing.pages.dev/about/:splat 200
+/terms https://iguide-landing.pages.dev/terms 200
 /terms/* https://iguide-landing.pages.dev/terms/:splat 200
+/featureA https://iguide-landing.pages.dev/featureA 200
 /featureA/* https://iguide-landing.pages.dev/featureA/:splat 200
+/featureB https://iguide-landing.pages.dev/featureB 200
 /featureB/* https://iguide-landing.pages.dev/featureB/:splat 200
 
-# SPA fallback for main app routes
+# SPA fallback for main app routes (must be last)
 /* /index.html 200
