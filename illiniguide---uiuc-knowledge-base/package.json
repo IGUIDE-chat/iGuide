@@ -12,11 +12,16 @@
     "validate:dorm-data": "npx tsx scripts/validate-dorm-data.ts"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.9",
     "@supabase/supabase-js": "^2.90.1",
     "framer-motion": "^12.26.2",
+    "lucide-react": "^0.563.0",
+    "mapbox-gl": "^3.18.1",
+    "rc-slider": "^11.1.9",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-markdown": "^10.1.0",
+    "react-map-gl": "^8.1.0",
     "react-router-dom": "^7.12.0",
     "remark-gfm": "^4.0.1"
   },
