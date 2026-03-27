@@ -1,8 +1,13 @@
 # [TEST] Script to verify Coze API connection and bilingual performance.
 # [测试] 用于验证 Coze API 连接和双语性能的脚本。
-import requests
+import pytest
+
+requests = pytest.importorskip("requests")
 import json
 import time
+from pathlib import Path
+
+RESULTS_PATH = Path(__file__).resolve().parent / "artifacts" / "test_results.json"
 
 # Coze Configuration
 COZE_API_KEY = 'pat_69hIiNSLjqAXFejtV1XErY8UrFoma2HNxEqSpbCzSxS6w0w97yV8f60x1JgYXBSc'
@@ -202,9 +207,10 @@ def test_coze():
     print(f"{'='*80}")
     
     # Save detailed results
-    with open('test_results.json', 'w', encoding='utf-8') as f:
+    RESULTS_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with RESULTS_PATH.open('w', encoding='utf-8') as f:
         json.dump(results, f, indent=2, ensure_ascii=False)
-    print("\n[SAVED] Detailed results saved to test_results.json")
+    print(f"\n[SAVED] Detailed results saved to {RESULTS_PATH}")
 
 if __name__ == "__main__":
     test_coze()

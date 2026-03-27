@@ -1,6 +1,11 @@
-import requests
+import pytest
+
+requests = pytest.importorskip("requests")
 import json
 import time
+from pathlib import Path
+
+RESULTS_PATH = Path(__file__).resolve().parent / "artifacts" / "test_results_quick.json"
 
 # Coze Configuration
 COZE_API_KEY = 'pat_69hIiNSLjqAXFejtV1XErY8UrFoma2HNxEqSpbCzSxS6w0w97yV8f60x1JgYXBSc'
@@ -162,9 +167,10 @@ def test_coze():
     print(f"{'='*80}")
     
     # Save detailed results
-    with open('test_results_quick.json', 'w', encoding='utf-8') as f:
+    RESULTS_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with RESULTS_PATH.open('w', encoding='utf-8') as f:
         json.dump(results, f, indent=2, ensure_ascii=False)
-    print("\n[SAVED] Results saved to test_results_quick.json")
+    print(f"\n[SAVED] Results saved to {RESULTS_PATH}")
 
 if __name__ == "__main__":
     test_coze()

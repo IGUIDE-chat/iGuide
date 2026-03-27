@@ -1,3 +1,10 @@
+/**
+ * @file ./src/types.ts
+ * @description Global Shared Component / Module
+ * @description_zh 此文件不属于特定业务流，而是全局共享逻辑，只能包含与其他业务解耦的代码。如果该文件只为一个特定业务服务，请将其移动到对应的 src/components/<feature>/ 目录下。
+ * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
+ */
+
 export type Language = 'en' | 'zh';
 export type AIProvider = 'cloud' | 'local' | 'coze';
 
@@ -63,6 +70,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  isAdmin: boolean;
 }
 
 export interface AuthContextType {
@@ -70,9 +78,14 @@ export interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>;
   register: (name: string, email: string, password: string) => Promise<boolean>;
   loginWithGoogle: () => Promise<boolean>;
+  loginWithMicrosoft: () => Promise<boolean>;
   logout: () => void;
   updateName: (name: string) => Promise<boolean>;
   isLoading: boolean;
+  isGuest: boolean;
+  setIsGuest: (value: boolean) => void;
+  /** Trigger the app-level login screen. */
+  requestLogin: () => void;
 }
 
 export interface LibraryHistoryItem {

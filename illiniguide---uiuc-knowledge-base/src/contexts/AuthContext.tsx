@@ -1,3 +1,10 @@
+/**
+ * @file ./src/contexts/AuthContext.tsx
+ * @description Global Shared Component / Module
+ * @description_zh 此文件不属于特定业务流，而是全局共享逻辑，只能包含与其他业务解耦的代码。如果该文件只为一个特定业务服务，请将其移动到对应的 src/components/<feature>/ 目录下。
+ * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
+ */
+
 // [CONTEXT] Authentication provider managing user login state and session persistence.
 // [上下文] 管理用户登录状态和会话持久化的身份验证提供者。
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
@@ -22,6 +29,7 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isGuest, setIsGuest] = useState(true);
 
     useEffect(() => {
         // Check current session
@@ -59,7 +67,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return {
             id: supabaseUser.id,
             name: supabaseUser.user_metadata?.display_name || supabaseUser.email?.split('@')[0] || 'User',
-            email: supabaseUser.email || ''
+            email: supabaseUser.email || '',
+            isAdmin: supabaseUser.user_metadata?.is_admin === true
         };
     };
 
@@ -140,14 +149,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
     };
 
+    const loginWithMicrosoft = async () => {
+        try {
+            const { error } = await authService.signInWithMicrosoft();
+            if (error) {
+                console.error('Microsoft login error:', error);
+                return false;
+            }
+            return true;
+        } catch (error) {
+            console.error('Microsoft login exception:', error);
+            return false;
+        }
+    };
+
+    const requestLogin = () => setIsGuest(false);
+
     const value: AuthContextType = {
         user,
         login,
         register,
         loginWithGoogle,
+        loginWithMicrosoft,
         logout,
         updateName,
-        isLoading
+        isLoading,
+        isGuest,
+        setIsGuest,
+        requestLogin
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
