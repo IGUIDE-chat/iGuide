@@ -16,6 +16,12 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/coze/, ''),
           secure: false
+        },
+        // QMD search proxy — forwards to local QMD daemon in dev
+        '/api/search': {
+          target: 'http://127.0.0.1:3100',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api\/search/, '/query'),
         }
       }
     },
