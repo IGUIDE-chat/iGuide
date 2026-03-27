@@ -20,7 +20,7 @@ import { createClient } from '@supabase/supabase-js';
 
 // We import directly from the source; tsx handles TS resolution.
 import { UIUC_DORMS } from '../src/components/housing/constants/dormData';
-import type { Dorm } from '../src/components/housing/types/index';
+import type { BathroomScope, Dorm } from '../src/components/housing/types/index';
 import { finalizeDormRecord, sanitizeFloorPlansForStorage } from '../src/utils/dormData';
 import {
     deriveRoomOptions,
@@ -254,7 +254,7 @@ function mergeDormRow(sourceRow: DormRow, existingRow?: Record<string, unknown>)
 
     const floorPlanFallback = getStorageBathroomScope(
         'mixed',
-        sourceRow.room_options as Array<{ bathroomScope?: Dorm['bathroomType'] | null }>
+        sourceRow.room_options as Array<{ bathroomScope?: BathroomScope | null }>
     );
     const floorPlans = mergeFloorPlans(
         sourceRow.floor_plans as Dorm['floorPlans'],
