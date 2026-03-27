@@ -9,7 +9,9 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "audit:dorm-media": "npx tsx scripts/audit-dorm-media.ts",
-    "validate:dorm-data": "npx tsx scripts/validate-dorm-data.ts"
+    "validate:dorm-data": "npx tsx scripts/validate-dorm-data.ts",
+    "generate:qmd-content": "npx tsx scripts/generate-qmd-markdown.ts",
+    "sync:qmd": "npx tsx scripts/sync-qmd-index.ts"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",

@@ -88,6 +88,28 @@ export interface AuthContextType {
   requestLogin: () => void;
 }
 
+// QMD Knowledge Base Search types
+export type SearchMode = 'bm25' | 'vector' | 'hybrid';
+export type SearchResultType = 'dorm' | 'article' | 'crawled';
+
+export interface SearchResult {
+  docid: string;
+  score: number;
+  file: string;
+  title: string;
+  snippet: string;
+  /** Parsed from frontmatter */
+  type?: SearchResultType;
+  id?: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface SearchResponse {
+  results: SearchResult[];
+  query: string;
+  region?: 'cn' | 'global';
+}
+
 export interface LibraryHistoryItem {
   id: string;
   articleId: string;
