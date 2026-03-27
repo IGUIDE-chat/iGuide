@@ -1,5 +1,5 @@
-﻿<!-- [ROOT] HTML entry point defining document structure and meta tags. -->
-<!-- [鏍圭粍浠禲 瀹氫箟鏂囨。缁撴瀯鍜屽厓鏁版嵁鐨?HTML 鍏ュ彛鐐广€?-->
+<!-- [ROOT] HTML entry point defining document structure and meta tags. -->
+<!-- [根组件] 定义文档结构和元数据的 HTML 入口点。 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 
@@ -7,7 +7,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport"
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content" />
-  <title>IlliniGuide - UIUC New Student Knowledge Base</title>
+  <title>伊利诺伊指南 - UIUC 新生知识库</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
     rel="stylesheet">
   <style>
@@ -66,6 +67,16 @@
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
     }
   </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3"
+  }
+}
+</script>
+  <link rel="stylesheet" href="/src/index.css">
 </head>
 
 <body

@@ -1,16 +1,12 @@
 /* [ROOT] Global styles and Tailwind CSS directives. */
 /* [根组件] 全局样式和 Tailwind CSS 指令。 */
 @tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 /* Fade-in-up animation */
 @keyframes fade-in-up {
   from {
     opacity: 0;
     transform: translateY(10px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -26,7 +22,6 @@
   from {
     opacity: 0;
   }
-
   to {
     opacity: 1;
   }
@@ -101,8 +96,7 @@
   margin-bottom: 0;
 }
 
-.prose ul,
-.prose ol {
+.prose ul, .prose ol {
   margin: 0.5rem 0;
   padding-left: 1.5rem;
 }
@@ -142,30 +136,16 @@
   color: #64748b;
 }
 
-.prose h1,
-.prose h2,
-.prose h3,
-.prose h4 {
+.prose h1, .prose h2, .prose h3, .prose h4 {
   font-weight: 600;
   margin-top: 1.25rem;
   margin-bottom: 0.5rem;
 }
 
-.prose h1 {
-  font-size: 1.5rem;
-}
-
-.prose h2 {
-  font-size: 1.25rem;
-}
-
-.prose h3 {
-  font-size: 1.125rem;
-}
-
-.prose h4 {
-  font-size: 1rem;
-}
+.prose h1 { font-size: 1.5rem; }
+.prose h2 { font-size: 1.25rem; }
+.prose h3 { font-size: 1.125rem; }
+.prose h4 { font-size: 1rem; }
 
 .prose table {
   width: 100%;
@@ -173,8 +153,7 @@
   margin: 0.75rem 0;
 }
 
-.prose th,
-.prose td {
+.prose th, .prose td {
   border: 1px solid #e2e8f0;
   padding: 0.5rem 0.75rem;
   text-align: left;
@@ -194,223 +173,4 @@ html {
 ::selection {
   background-color: #fed7aa;
   color: #7c2d12;
-}
-
-/* UIUC Brand Custom Properties */
-:root {
-  --illini-blue: #13294B;
-  --illini-orange: #FF5F05;
-  --illini-blue-light: #1E3A5F;
-  --illini-orange-light: #FF7A30;
-}
-
-/* Custom Scrollbar Styles - Thin & Fashionable */
-/* For Webkit browsers (Chrome, Safari, Edge) */
-.scrollbar-thin::-webkit-scrollbar {
-  width: 6px;
-}
-
-.scrollbar-thin::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 3px;
-}
-
-.scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(255, 95, 5, 0.4);
-  border-radius: 3px;
-  transition: background 0.2s ease;
-}
-
-.scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 95, 5, 0.6);
-}
-
-/* For Firefox */
-.scrollbar-thin {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 95, 5, 0.4) rgba(255, 255, 255, 0.05);
-}
-
-/* Hide Scrollbar Utility */
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  /* IE and Edge */
-  scrollbar-width: none;
-  /* Firefox */
-}
-
-/* Lightweight modal scroll behavior */
-.modal-scroll-smooth {
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* Grey Scrollbar Utility */
-.scrollbar-grey::-webkit-scrollbar {
-  width: 6px;
-}
-
-.scrollbar-grey::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 3px;
-}
-
-.scrollbar-grey::-webkit-scrollbar-thumb {
-  background: rgba(107, 114, 128, 0.5);
-  /* gray-500/50 */
-  border-radius: 3px;
-  transition: background 0.2s ease;
-}
-
-.scrollbar-grey::-webkit-scrollbar-thumb:hover {
-  background: rgba(107, 114, 128, 0.7);
-  /* gray-500/70 */
-}
-
-/* For Firefox */
-.scrollbar-grey {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(107, 114, 128, 0.5) rgba(0, 0, 0, 0.05);
-}
-
-
-/* Custom Range Slider Styles - Modern & Premium */
-.slider-modern {
-  z-index: 10;
-  touch-action: pan-x;
-  -webkit-user-select: none;
-  user-select: none;
-}
-
-/* Base thumb style for common properties */
-.slider-thumb-orange::-webkit-slider-thumb,
-.slider-thumb-blue::-webkit-slider-thumb {
-  appearance: none;
-  pointer-events: auto;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  border: 2.5px solid #ffffff;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
-  cursor: grab;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
-}
-
-.slider-thumb-orange::-webkit-slider-thumb:active,
-.slider-thumb-blue::-webkit-slider-thumb:active {
-  cursor: grabbing;
-  transform: scale(1.25);
-}
-
-/* Orange thumb (Min Price) */
-.slider-thumb-orange::-webkit-slider-thumb {
-  background: var(--illini-orange);
-}
-
-.slider-thumb-orange:hover::-webkit-slider-thumb {
-  box-shadow: 0 4px 12px rgba(255, 95, 5, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.2);
-  transform: scale(1.15);
-}
-
-/* Blue thumb (Max Price) */
-.slider-thumb-blue::-webkit-slider-thumb {
-  background: var(--illini-blue);
-}
-
-.slider-thumb-blue:hover::-webkit-slider-thumb {
-  box-shadow: 0 4px 12px rgba(19, 41, 75, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.2);
-  transform: scale(1.15);
-}
-
-/* Firefox compatibility */
-.slider-thumb-orange::-moz-range-thumb,
-.slider-thumb-blue::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 2.5px solid #ffffff;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
-  cursor: grab;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.slider-thumb-orange::-moz-range-thumb {
-  background: var(--illini-orange);
-}
-
-.slider-thumb-blue::-moz-range-thumb {
-  background: var(--illini-blue);
-}
-
-.slider-thumb-orange:active::-moz-range-thumb,
-.slider-thumb-blue:active::-moz-range-thumb {
-  transform: scale(1.2);
-}
-
-/* rc-slider Customization - Illini Theme */
-.rc-slider {
-  position: relative;
-  height: 14px;
-  padding: 5px 0;
-}
-
-.rc-slider-rail {
-  background-color: rgba(255, 255, 255, 0.1) !important;
-  height: 4px !important;
-  border-radius: 2px;
-}
-
-.rc-slider-track {
-  background: linear-gradient(90deg, #FF5F05 0%, #13294B 100%) !important;
-  height: 4px !important;
-  border-radius: 2px;
-}
-
-.rc-slider-handle {
-  width: 20px !important;
-  height: 20px !important;
-  margin-top: -8px !important;
-  border: 3px solid #ffffff !important;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease !important;
-}
-
-.rc-slider-handle:hover,
-.rc-slider-handle:focus {
-  transform: scale(1.08) !important;
-}
-
-.rc-slider-handle:active {
-  transform: scale(1.12) !important;
-  cursor: grabbing !important;
-}
-
-.rc-slider-handle-1 {
-  background-color: #FF5F05 !important;
-}
-
-.rc-slider-handle-2 {
-  background-color: #13294B !important;
-}
-
-.rc-slider-handle-1:hover {
-  box-shadow: 0 4px 12px rgba(255, 95, 5, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.2) !important;
-}
-
-.rc-slider-handle-2:hover {
-  box-shadow: 0 4px 12px rgba(19, 41, 75, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.2) !important;
-}
-
-/* Modal uses a lighter slider transform profile for smoother scrolling/dragging. */
-.modal-scroll-smooth .rc-slider-handle:hover,
-.modal-scroll-smooth .rc-slider-handle:focus {
-  transform: scale(1.03) !important;
-}
-
-.modal-scroll-smooth .rc-slider-handle:active {
-  transform: scale(1.05) !important;
 }
