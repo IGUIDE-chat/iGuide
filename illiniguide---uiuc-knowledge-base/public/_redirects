@@ -1,2 +1,8 @@
-/about/* https://iguide-landing.pages.dev/:splat 200
-/features/* https://iguide-landing.pages.dev/:splat 200
+# Landing page routes → proxy to iGuide-landing
+/about/* https://iguide-landing.pages.dev/about/:splat 200
+/terms/* https://iguide-landing.pages.dev/terms/:splat 200
+/featureA/* https://iguide-landing.pages.dev/featureA/:splat 200
+/featureB/* https://iguide-landing.pages.dev/featureB/:splat 200
+
+# SPA fallback for main app routes
+/* /index.html 200
