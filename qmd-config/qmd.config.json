@@ -1,0 +1,25 @@
+{
+  "collections": {
+    "uiuc-en": {
+      "paths": [
+        "../qmd-content/dorms",
+        "../qmd-content/articles",
+        "../qmd-content/crawled"
+      ],
+      "extensions": [".md"],
+      "context": "UIUC IlliniGuide Knowledge Base — English content covering university housing, campus life, dining, transportation, and student resources at the University of Illinois Urbana-Champaign."
+    },
+    "uiuc-zh": {
+      "paths": [
+        "../qmd-content/dorms-zh",
+        "../qmd-content/articles-zh"
+      ],
+      "extensions": [".md"],
+      "context": "UIUC IlliniGuide 知识库 — 中文内容，涵盖伊利诺伊大学厄巴纳-香槟分校的大学宿舍、校园生活、餐饮、交通和学生资源。"
+    }
+  },
+  "daemon": {
+    "port": 3100,
+    "host": "127.0.0.1"
+  }
+}

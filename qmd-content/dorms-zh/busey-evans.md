@@ -1,0 +1,45 @@
+---
+id: busey-evans
+type: dorm
+name: Busey-Evans
+housingType: URH
+location: Main Quad
+price: 13774
+priceRange: $$
+lang: zh
+---
+
+# Busey-Evans
+
+## 概述
+
+Busey-Evans位于Main Quad，属于University Housing。年住宿费用约 $13,774，配有空调，需前往附近区域就餐。
+
+## 位置
+
+区域: Main Quad
+地址: 1111 W. Nevada St.; 1115 W. Nevada St.
+
+## 设施
+
+- 空调: 有
+- 餐饮: 附近食堂
+- 卫浴: communal
+
+## 房型与价格
+
+- **1B0B** | $16,564/年
+- **2B0B** | $14,558/年
+- **3B0B** | $13,774/年
+
+## 优点
+
+- 位于Main Quad，日常通勤较方便
+- 配备空调，夏季居住更舒适
+- 可选择周边餐饮，选择更灵活
+
+## 缺点
+
+- 年费用约 $13,774，请结合预算评估
+- 高峰时段公共区域可能较拥挤
+- 热门时段周边人流较多
