@@ -22,6 +22,12 @@ export default defineConfig(({ mode }) => {
           target: 'http://127.0.0.1:3100',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/search/, '/query'),
+        },
+        // DeepSeek chat proxy — in dev, forwards to DeepSeek API directly
+        '/api/deepseek-raw': {
+          target: 'https://api.deepseek.com',
+          changeOrigin: true,
+          rewrite: () => '/chat/completions',
         }
       }
     },

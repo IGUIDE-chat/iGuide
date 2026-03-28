@@ -40,12 +40,23 @@ export interface Category {
   description_zh?: string;
 }
 
+export interface ThinkingStep {
+  id: string;
+  type: 'reasoning' | 'searching' | 'tool_call' | 'processing';
+  label: string;
+  detail?: string;
+  timestamp: number;
+  done: boolean;
+}
+
 export interface ChatMessage {
   id: string;
   role: 'user' | 'model';
   text: string;
   isStreaming?: boolean;
   followUpQuestions?: string[];
+  thinkingSteps?: ThinkingStep[];
+  isThinking?: boolean;
 }
 
 export interface ConversationSummary {
