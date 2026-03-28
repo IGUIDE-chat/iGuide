@@ -5,16 +5,20 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from 'react';
-import { Dorm } from './types/index';
+import React, { useState, useMemo } from 'react';
+import { Dorm, FloorPlan } from './types/index';
 import { formatPrice } from './constants/pricing';
 import { getHousingTypeMeta, getLocalizedLabel } from './constants/metadata';
 import { Language } from '../../types';
-import { X, Check, AlertCircle } from 'lucide-react';
+import { X, Check, AlertCircle, ChevronDown, BedSingle, Bath, SquareDashed } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     deriveRoomOptions,
     getRoomRangeSummary,
+    normalizeFloorPlan,
+    getBathroomScopeLabel,
+    getRoomOptionLabels,
+    getStorageBathroomScope,
 } from '../../utils/roomOptions';
 
 interface DormComparisonProps {
@@ -69,8 +73,30 @@ const TEXT = {
     },
 };
 
+const hasPublishedPrice = (price: FloorPlan['price']): price is number =>
+    typeof price === 'number' && Number.isFinite(price) && price > 0;
+
 const DormComparison: React.FC<DormComparisonProps> = ({ dorms, onClose, language = 'en' }) => {
     const t = TEXT[language];
+
+    // Per-dorm selected floor plan index
+    const [selectedPlanIdx, setSelectedPlanIdx] = useState<Record<string, number>>(() => {
+        const init: Record<string, number> = {};
+        dorms.forEach((d) => { init[d.id] = 0; });
+        return init;
+    });
+
+    // Normalized floor plans per dorm
+    const dormPlans = useMemo(() => {
+        const map: Record<string, FloorPlan[]> = {};
+        dorms.forEach((dorm) => {
+            const defaultScope = getStorageBathroomScope(dorm.bathroomType, dorm.floorPlans);
+            map[dorm.id] = (dorm.floorPlans ?? []).map((p) =>
+                normalizeFloorPlan(p, p.bathroomScope ?? defaultScope),
+            );
+        });
+        return map;
+    }, [dorms]);
 
     const comparisonRows: ComparisonRow[] = [
         {
@@ -249,6 +275,165 @@ const DormComparison: React.FC<DormComparisonProps> = ({ dorms, onClose, languag
                                 ))}
                             </tbody>
                         </table>
+
+                        {/* ── Cross-dorm floor plan comparison ── */}
+                        {dorms.some((d) => (dormPlans[d.id]?.length ?? 0) > 0) && (
+                            <div className="border-t-4 border-gray-100">
+                                <div className="px-4 md:px-6 py-4 bg-gray-50 border-b border-gray-200">
+                                    <h3 className="text-[15px] md:text-base font-bold text-gray-900">
+                                        {language === 'zh' ? '房型对比' : 'Floor Plan Comparison'}
+                                    </h3>
+                                    <p className="text-[12px] md:text-[13px] text-gray-500 mt-0.5">
+                                        {language === 'zh' ? '选择每个宿舍的房型进行对比' : 'Select a floor plan from each dorm to compare'}
+                                    </p>
+                                </div>
+
+                                {/* Plan selectors */}
+                                <div className="grid border-b border-gray-200" style={{ gridTemplateColumns: `140px repeat(${dorms.length}, 1fr)` }}>
+                                    <div className="px-4 py-3 text-sm font-medium text-gray-500 border-r border-gray-200 bg-gray-50 flex items-center">
+                                        {language === 'zh' ? '选择房型' : 'Select Plan'}
+                                    </div>
+                                    {dorms.map((dorm) => {
+                                        const plans = dormPlans[dorm.id] ?? [];
+                                        if (plans.length === 0) {
+                                            return (
+                                                <div key={dorm.id} className="px-3 py-3 text-sm text-gray-400 italic border-r border-gray-200 last:border-r-0 flex items-center">
+                                                    {language === 'zh' ? '暂无房型' : 'No plans'}
+                                                </div>
+                                            );
+                                        }
+                                        const currentIdx = selectedPlanIdx[dorm.id] ?? 0;
+                                        return (
+                                            <div key={dorm.id} className="px-3 py-3 border-r border-gray-200 last:border-r-0">
+                                                <div className="relative">
+                                                    <select
+                                                        value={currentIdx}
+                                                        onChange={(e) => setSelectedPlanIdx((prev) => ({ ...prev, [dorm.id]: Number(e.target.value) }))}
+                                                        className="w-full appearance-none bg-white border border-gray-200 rounded-lg px-3 py-2 pr-8 text-[13px] font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-illini-blue/30 focus:border-illini-blue cursor-pointer"
+                                                    >
+                                                        {plans.map((plan, i) => {
+                                                            const opt = { bedCount: plan.bedCount ?? null, bathroomCount: plan.bathroomCount ?? null, bathroomScope: plan.bathroomScope ?? 'communal' as const, labelCode: plan.labelCode };
+                                                            const label = plan.officialName || getRoomOptionLabels(opt, language).primaryLabel;
+                                                            const price = hasPublishedPrice(plan.price) ? ` · ${formatPrice(plan.price)}` : '';
+                                                            return <option key={i} value={i}>{label}{price}</option>;
+                                                        })}
+                                                    </select>
+                                                    <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+
+                                {/* Plan comparison rows */}
+                                {(() => {
+                                    const selectedPlans = dorms.map((dorm) => {
+                                        const plans = dormPlans[dorm.id] ?? [];
+                                        const idx = selectedPlanIdx[dorm.id] ?? 0;
+                                        return plans[idx] ?? null;
+                                    });
+
+                                    const planRows: { label: string; icon?: React.ReactNode; values: React.ReactNode[] }[] = [
+                                        {
+                                            label: language === 'zh' ? '房型' : 'Room Type',
+                                            values: selectedPlans.map((plan) => {
+                                                if (!plan) return '—';
+                                                const opt = { bedCount: plan.bedCount ?? null, bathroomCount: plan.bathroomCount ?? null, bathroomScope: plan.bathroomScope ?? 'communal' as const, labelCode: plan.labelCode };
+                                                return <span className="font-semibold text-gray-800">{plan.officialName || getRoomOptionLabels(opt, language).primaryLabel}</span>;
+                                            }),
+                                        },
+                                        {
+                                            label: language === 'zh' ? '床位' : 'Beds',
+                                            icon: <BedSingle className="w-3.5 h-3.5 text-gray-400" />,
+                                            values: selectedPlans.map((plan) => {
+                                                if (!plan) return '—';
+                                                if (plan.bedSize) return plan.bedSize;
+                                                if (plan.bedCount != null) return `${plan.bedCount} ${language === 'zh' ? '张床' : plan.bedCount === 1 ? 'Bed' : 'Beds'}`;
+                                                return '—';
+                                            }),
+                                        },
+                                        {
+                                            label: language === 'zh' ? '卫浴' : 'Bathroom',
+                                            icon: <Bath className="w-3.5 h-3.5 text-gray-400" />,
+                                            values: selectedPlans.map((plan) => {
+                                                if (!plan) return '—';
+                                                const scope = plan.bathroomScope ?? 'communal';
+                                                const scopeLabel = getBathroomScopeLabel(scope, language);
+                                                if (plan.bathroomCount != null && plan.bathroomCount > 0) {
+                                                    return `${plan.bathroomCount} ${language === 'zh' ? '卫' : plan.bathroomCount === 1 ? 'Bath' : 'Baths'} · ${scopeLabel}`;
+                                                }
+                                                return scopeLabel;
+                                            }),
+                                        },
+                                        {
+                                            label: language === 'zh' ? '面积' : 'Area',
+                                            icon: <SquareDashed className="w-3.5 h-3.5 text-gray-400" />,
+                                            values: selectedPlans.map((plan) => {
+                                                if (!plan?.sqft) return '—';
+                                                return `${plan.sqft} sqft (~${Math.round(plan.sqft * 0.092903)}㎡)`;
+                                            }),
+                                        },
+                                        {
+                                            label: language === 'zh' ? '年租金' : 'Annual Price',
+                                            values: selectedPlans.map((plan) => {
+                                                if (!plan) return '—';
+                                                const p = hasPublishedPrice(plan.price) ? plan.price : null;
+                                                if (p != null) return <span className="font-bold text-illini-orange">{formatPrice(p)}</span>;
+                                                if (plan.available === false) return <span className="text-red-500 text-[13px]">{language === 'zh' ? '暂不可订' : 'Sold out'}</span>;
+                                                return '—';
+                                            }),
+                                        },
+                                        {
+                                            label: language === 'zh' ? '月租金' : 'Monthly',
+                                            values: selectedPlans.map((plan) => {
+                                                if (!plan) return '—';
+                                                const p = hasPublishedPrice(plan.price) ? plan.price : null;
+                                                return p != null ? <span className="font-semibold text-gray-700">~{formatPrice(Math.round(p / 12))}</span> : '—';
+                                            }),
+                                        },
+                                    ];
+
+                                    // Find cheapest for highlighting
+                                    const prices = selectedPlans.map((p) => p && hasPublishedPrice(p.price) ? p.price : null);
+                                    const validPrices = prices.filter((p): p is number => p !== null);
+                                    const minPrice = validPrices.length > 0 ? Math.min(...validPrices) : null;
+
+                                    return (
+                                        <table className="w-full min-w-[760px] border-collapse">
+                                            <tbody>
+                                                {planRows.map((row, ri) => (
+                                                    <tr key={ri} className={ri % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                                                        <td className="sticky left-0 z-10 px-4 py-3 text-sm font-medium text-gray-600 border-b border-r border-gray-200 bg-inherit w-[140px]">
+                                                            <div className="flex items-center gap-1.5">
+                                                                {row.icon}
+                                                                <span>{row.label}</span>
+                                                            </div>
+                                                        </td>
+                                                        {row.values.map((val, ci) => {
+                                                            const isAnnualPrice = row.label === (language === 'zh' ? '年租金' : 'Annual Price');
+                                                            const isCheapest = isAnnualPrice && minPrice !== null && prices[ci] === minPrice && validPrices.length > 1;
+                                                            return (
+                                                                <td
+                                                                    key={ci}
+                                                                    className={`px-4 py-3 text-sm border-b border-gray-200 ${isCheapest ? 'bg-emerald-50/60' : ''}`}
+                                                                >
+                                                                    {val}
+                                                                    {isCheapest && (
+                                                                        <span className="ml-1.5 text-[10px] px-1.5 py-0.5 bg-emerald-100 text-emerald-700 rounded-full font-medium">
+                                                                            {language === 'zh' ? '最低' : 'Lowest'}
+                                                                        </span>
+                                                                    )}
+                                                                </td>
+                                                            );
+                                                        })}
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    );
+                                })()}
+                            </div>
+                        )}
                     </div>
                 </motion.div>
             </motion.div>
