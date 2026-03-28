@@ -88,7 +88,12 @@ function resolveQmdCli() {
     );
 }
 
-const QMD_CLI = resolveQmdCli();
+let QMD_CLI: string | null = null;
+try {
+    QMD_CLI = resolveQmdCli();
+} catch {
+    // QMD CLI not available (e.g. CI/CD build environment) — plugin will be a no-op
+}
 
 function normalizeMode(mode: unknown): SearchMode {
     if (mode === 'bm25' || mode === 'vector' || mode === 'hybrid') {
@@ -140,6 +145,9 @@ function matchesLang(filePath: string, lang: 'en' | 'zh') {
 }
 
 async function queryQmd(body: SearchRequest): Promise<QmdSearchResult[]> {
+    if (!QMD_CLI) {
+        throw new Error('QMD CLI is not available in this environment.');
+    }
     const query = typeof body.query === 'string' ? body.query.trim() : '';
     if (!query) {
         throw new Error('Missing search query.');
