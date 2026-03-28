@@ -17,6 +17,7 @@ import { useAuth } from './contexts/AuthContext';
 import { HousingProvider } from './components/housing/store/HousingContext';
 import { DormDataProvider } from './components/housing/store/DormDataContext';
 import { DormUserInteractionProvider } from './components/housing/store/DormUserInteractionContext';
+import { CompareProvider } from './components/housing/store/CompareContext';
 import { Language } from './types';
 
 export default function App() {
@@ -96,6 +97,7 @@ export default function App() {
           className="h-full w-full"
         >
           <DormDataProvider>
+            <CompareProvider>
             <HousingProvider>
               <DormUserInteractionProvider>
                 <Layout
@@ -115,6 +117,7 @@ export default function App() {
                 </Layout>
               </DormUserInteractionProvider>
             </HousingProvider>
+            </CompareProvider>
           </DormDataProvider>
         </motion.div>
       )}
