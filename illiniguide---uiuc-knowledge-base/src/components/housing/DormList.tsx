@@ -6,6 +6,8 @@
  */
 
 import React from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { GitCompareArrows, X } from 'lucide-react';
 import { Language } from '../../types';
 import { FilterModal } from './FilterModal';
 import DormListHeader from './dorm-list/DormListHeader';
@@ -15,6 +17,21 @@ import { ListEmptyState } from './dorm-list/EmptyStates';
 import { DormListMapPane } from './dorm-list/DormListMapPane';
 import { useDormListController } from './dorm-list/useDormListController';
 import { useDormCommentStats } from './hooks/useDormCommentStats';
+import { useCompare } from './store/CompareContext';
+import DormComparison from './DormComparison';
+
+const COMPARE_TEXT = {
+  en: {
+    compareBar: (n: number) => `${n} dorm${n > 1 ? 's' : ''} selected`,
+    compare: 'Compare',
+    clear: 'Clear',
+  },
+  zh: {
+    compareBar: (n: number) => `已选 ${n} 个宿舍`,
+    compare: '对比',
+    clear: '清除',
+  },
+};
 
 interface DormListProps {
   language: Language;
@@ -23,6 +40,8 @@ interface DormListProps {
 const DormList: React.FC<DormListProps> = ({ language }) => {
   const controller = useDormListController(language);
   const commentStats = useDormCommentStats();
+  const { compareIds, compareDorms, isCompareOpen, toggleCompare, clearCompare, openCompare, closeCompare } = useCompare();
+  const ct = COMPARE_TEXT[language];
 
   return (
     <div className="h-full flex flex-col bg-gray-50">
@@ -58,6 +77,8 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
               onToggleFavorite={controller.handleToggleFavorite}
               onViewDetails={controller.handleViewDetails}
               onHoverDorm={controller.setHoveredDormId}
+              compareIds={compareIds}
+              onToggleCompare={(dorm) => toggleCompare(dorm.id)}
               language={language}
               commentStats={commentStats}
             />
@@ -99,6 +120,45 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
           targetX={controller.flyingHeart.targetX}
           targetY={controller.flyingHeart.targetY}
           onComplete={() => controller.setFlyingHeart(null)}
+        />
+      )}
+
+      {/* Floating compare bar */}
+      <AnimatePresence>
+        {compareIds.length > 0 && (
+          <motion.div
+            initial={{ y: 80, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 80, opacity: 0 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-full bg-illini-blue px-5 py-3 text-white shadow-xl"
+          >
+            <GitCompareArrows className="h-4 w-4 shrink-0" />
+            <span className="text-sm font-medium whitespace-nowrap">{ct.compareBar(compareIds.length)}</span>
+            <button
+              onClick={openCompare}
+              disabled={compareIds.length < 2}
+              className="rounded-full bg-white/20 px-4 py-1.5 text-sm font-semibold transition-colors hover:bg-white/30 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {ct.compare}
+            </button>
+            <button
+              onClick={clearCompare}
+              className="rounded-full p-1.5 transition-colors hover:bg-white/20"
+              aria-label={ct.clear}
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Comparison modal */}
+      {isCompareOpen && compareDorms.length >= 2 && (
+        <DormComparison
+          dorms={compareDorms}
+          onClose={closeCompare}
+          language={language}
         />
       )}
     </div>

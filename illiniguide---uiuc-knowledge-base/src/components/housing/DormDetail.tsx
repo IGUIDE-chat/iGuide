@@ -118,6 +118,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
     const [editOpen, setEditOpen] = useState(false);
     const [expandedPlanId, setExpandedPlanId] = useState<string | null>(null);
     const [compareIds, setCompareIds] = useState<string[]>([]);
+    const [showPlanCompare, setShowPlanCompare] = useState(false);
     const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
     const [heroImageIndex, setHeroImageIndex] = useState(0);
     const [planImageIndices, setPlanImageIndices] = useState<Record<string, number>>({});
@@ -579,10 +580,15 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                     type="button"
                                     whileHover={{ scale: 1.03 }}
                                     whileTap={{ scale: 0.97 }}
-                                    className="hidden md:flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 bg-white/80 backdrop-blur-md border border-white/60 shadow-[0_2px_10px_rgba(0,0,0,0.02)] rounded-xl text-[12px] md:text-[13px] font-bold text-illini-blue hover:bg-white hover:shadow-[0_4px_15px_rgba(0,0,0,0.04)] transition-all"
+                                    onClick={() => setShowPlanCompare(!showPlanCompare)}
+                                    className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 backdrop-blur-md border shadow-[0_2px_10px_rgba(0,0,0,0.02)] rounded-xl text-[12px] md:text-[13px] font-bold transition-all ${
+                                        showPlanCompare
+                                            ? 'bg-illini-blue text-white border-illini-blue'
+                                            : 'bg-white/80 border-white/60 text-illini-blue hover:bg-white hover:shadow-[0_4px_15px_rgba(0,0,0,0.04)]'
+                                    }`}
                                 >
                                     <ArrowRightLeft className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                                    {t.comparePlans}
+                                    {showPlanCompare ? (language === 'zh' ? '退出对比' : 'Exit Compare') : t.comparePlans}
                                 </motion.button>
                             </div>
 

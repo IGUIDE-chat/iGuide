@@ -18,6 +18,8 @@ interface DormGridProps {
     onToggleFavorite: (dorm: Dorm, e?: React.MouseEvent) => void;
     onViewDetails: (dorm: Dorm) => void;
     onHoverDorm?: (dormId: string | null) => void;
+    compareIds?: string[];
+    onToggleCompare?: (dorm: Dorm) => void;
     language: Language;
     commentStats?: Record<string, DormCommentStats>;
 }
@@ -29,6 +31,8 @@ const DormGrid: React.FC<DormGridProps> = ({
     onToggleFavorite,
     onViewDetails,
     onHoverDorm,
+    compareIds,
+    onToggleCompare,
     language,
     commentStats,
 }) => {
@@ -51,6 +55,8 @@ const DormGrid: React.FC<DormGridProps> = ({
                         onViewDetails={onViewDetails}
                         isFavorite={favoritesSet.has(dorm.id)}
                         onToggleFavorite={(d, e) => onToggleFavorite(d, e)}
+                        isCompared={compareIds?.includes(dorm.id)}
+                        onToggleCompare={onToggleCompare}
                         onHoverDorm={onHoverDorm}
                         language={language}
                         positivePercent={stats?.positivePercent}
