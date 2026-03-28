@@ -38,10 +38,14 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
 }) => {
   const t = UI_TEXT[language];
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const previousMessagesLength = useRef(0);
   const containerClass = 'w-full max-w-3xl mx-auto px-4';
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messages.length > previousMessagesLength.current) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+    previousMessagesLength.current = messages.length;
   }, [messages]);
 
   return (

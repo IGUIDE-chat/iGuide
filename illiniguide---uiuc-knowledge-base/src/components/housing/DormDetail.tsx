@@ -118,6 +118,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
     const [editOpen, setEditOpen] = useState(false);
     const [expandedPlanId, setExpandedPlanId] = useState<string | null>(null);
     const [compareIds, setCompareIds] = useState<string[]>([]);
+    const [showPlanCompare, setShowPlanCompare] = useState(false);
     const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
     const [heroImageIndex, setHeroImageIndex] = useState(0);
     const [planImageIndices, setPlanImageIndices] = useState<Record<string, number>>({});
@@ -291,17 +292,16 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                 transition: 'margin-right 0.3s ease-in-out',
             }}
         >
-            {/* ── Top bar ── */}
-            <div className="sticky top-0 z-40 bg-white/70 backdrop-blur-xl border-b border-white/50 shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
-                <div className="max-w-[1000px] mx-auto px-4 md:px-6 h-14 flex items-center justify-between">
+            {/* ── Top bar (desktop: sticky bar; mobile: overlay on hero) ── */}
+            <div className="hidden md:block sticky top-0 z-40 bg-white/70 backdrop-blur-xl border-b border-white/50 shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
+                <div className="max-w-[1000px] mx-auto px-6 h-14 flex items-center justify-between">
                     <button
                         type="button"
                         onClick={() => navigate('/dorms')}
                         className="flex items-center gap-1.5 text-slate-500 hover:text-illini-blue transition-colors group py-2"
                     >
                         <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-                        <span className="text-[13px] md:text-[14px] font-semibold hidden sm:inline">{t.backToBrowse}</span>
-                        <span className="text-[13px] md:text-[14px] font-semibold sm:hidden">{language === 'zh' ? '返回' : 'Back'}</span>
+                        <span className="text-[14px] font-semibold">{t.backToBrowse}</span>
                     </button>
 
                     <div className="flex items-center gap-1">
@@ -339,14 +339,37 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                 </div>
             </div>
 
-            <main className="max-w-[1000px] mx-auto px-4 md:px-6 mt-6 md:mt-8">
+            <main className="max-w-[1000px] mx-auto px-4 md:px-6 mt-0 md:mt-8">
                 <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="space-y-8 md:space-y-10">
+
+                    {/* Mobile fallback top bar when no hero image */}
+                    {!heroImage && (
+                        <div className="md:hidden flex items-center justify-between px-1 pt-2">
+                            <button
+                                type="button"
+                                onClick={() => navigate('/dorms')}
+                                className="flex items-center gap-1 text-slate-500 hover:text-illini-blue transition-colors py-1"
+                            >
+                                <ArrowLeft className="w-4 h-4" />
+                                <span className="text-[13px] font-semibold">{language === 'zh' ? '返回' : 'Back'}</span>
+                            </button>
+                            <motion.button
+                                type="button"
+                                onClick={async () => { await toggleFavorite(dorm.id, dorm.name, dorm.name_zh); }}
+                                aria-label={isSaved ? t.saved : t.save}
+                                whileTap={{ scale: 1.35 }}
+                                className="p-2 text-slate-500 hover:text-illini-orange transition-colors"
+                            >
+                                <Heart className={`w-5 h-5 ${isSaved ? 'fill-illini-orange text-illini-orange' : ''}`} />
+                            </motion.button>
+                        </div>
+                    )}
 
                     {/* ── Hero Section ── */}
                     <motion.section variants={fadeUp} className="space-y-5 md:space-y-6">
                         {heroImage && (
                             <div
-                                className="w-full aspect-[4/3] sm:aspect-video md:aspect-[21/9] rounded-2xl md:rounded-3xl overflow-hidden relative bg-slate-100 border border-white/60 shadow-sm cursor-zoom-in"
+                                className="w-full aspect-[4/3] sm:aspect-video md:aspect-[21/9] md:rounded-2xl md:rounded-3xl overflow-hidden relative bg-slate-100 md:border md:border-white/60 shadow-sm cursor-zoom-in"
                                 onClick={() => {
                                     const gallery = heroImages.map((src, i) => ({ src, alt: `${dormName} ${i + 1}` }));
                                     setLightbox({ images: gallery, index: safeHeroImageIndex });
@@ -360,6 +383,38 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                     animate={{ scale: 1 }}
                                     transition={{ duration: 0.8, ease: 'easeOut' }}
                                 />
+                                {/* Mobile overlay: back + favorite */}
+                                <div className="md:hidden absolute top-0 left-0 right-0 flex items-center justify-between px-3 pt-3 z-10">
+                                    <button
+                                        type="button"
+                                        onClick={(e) => { e.stopPropagation(); navigate('/dorms'); }}
+                                        className="w-9 h-9 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center text-white shadow-sm active:scale-95 transition-transform"
+                                    >
+                                        <ArrowLeft className="w-4.5 h-4.5" />
+                                    </button>
+                                    <div className="flex items-center gap-2">
+                                        {user?.isAdmin && (
+                                            <button
+                                                type="button"
+                                                onClick={(e) => { e.stopPropagation(); setEditOpen(true); }}
+                                                className="w-9 h-9 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center text-white shadow-sm active:scale-95 transition-transform"
+                                                aria-label="Edit"
+                                            >
+                                                <Pencil className="w-4 h-4" />
+                                            </button>
+                                        )}
+                                        <motion.button
+                                            type="button"
+                                            onClick={async (e) => { e.stopPropagation(); await toggleFavorite(dorm.id, dorm.name, dorm.name_zh); }}
+                                            aria-label={isSaved ? t.saved : t.save}
+                                            whileTap={{ scale: 1.3 }}
+                                            transition={{ type: 'spring', stiffness: 400, damping: 12 }}
+                                            className="w-9 h-9 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center text-white shadow-sm"
+                                        >
+                                            <Heart className={`w-[18px] h-[18px] transition-colors duration-200 ${isSaved ? 'fill-illini-orange text-illini-orange' : ''}`} />
+                                        </motion.button>
+                                    </div>
+                                </div>
                                 {positivePercent !== null && (
                                     <motion.div
                                         initial={{ opacity: 0, x: 8 }}
@@ -579,10 +634,15 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                     type="button"
                                     whileHover={{ scale: 1.03 }}
                                     whileTap={{ scale: 0.97 }}
-                                    className="hidden md:flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 bg-white/80 backdrop-blur-md border border-white/60 shadow-[0_2px_10px_rgba(0,0,0,0.02)] rounded-xl text-[12px] md:text-[13px] font-bold text-illini-blue hover:bg-white hover:shadow-[0_4px_15px_rgba(0,0,0,0.04)] transition-all"
+                                    onClick={() => setShowPlanCompare(!showPlanCompare)}
+                                    className={`flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 backdrop-blur-md border shadow-[0_2px_10px_rgba(0,0,0,0.02)] rounded-xl text-[12px] md:text-[13px] font-bold transition-all ${
+                                        showPlanCompare
+                                            ? 'bg-illini-blue text-white border-illini-blue'
+                                            : 'bg-white/80 border-white/60 text-illini-blue hover:bg-white hover:shadow-[0_4px_15px_rgba(0,0,0,0.04)]'
+                                    }`}
                                 >
                                     <ArrowRightLeft className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                                    {t.comparePlans}
+                                    {showPlanCompare ? (language === 'zh' ? '退出对比' : 'Exit Compare') : t.comparePlans}
                                 </motion.button>
                             </div>
 
@@ -746,6 +806,24 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                                                 {availabilityLabel}
                                                             </div>
                                                         )}
+
+                                                        {/* Mobile compare button */}
+                                                        {showPlanCompare && (
+                                                            <motion.button
+                                                                type="button"
+                                                                whileTap={{ scale: 0.96 }}
+                                                                onClick={(e) => { e.stopPropagation(); toggleCompare(planKey); }}
+                                                                className={`md:hidden flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[11px] font-semibold mt-1 transition-colors ${isCompared
+                                                                    ? 'bg-illini-blue/5 text-illini-blue border-illini-blue/30'
+                                                                    : 'bg-white text-slate-500 border-slate-200'
+                                                                }`}
+                                                            >
+                                                                <div className={`w-3 h-3 rounded-[3px] border flex items-center justify-center transition-colors ${isCompared ? 'bg-illini-blue border-illini-blue text-white' : 'border-slate-300'}`}>
+                                                                    {isCompared && <Check className="w-2 h-2" strokeWidth={3} />}
+                                                                </div>
+                                                                {t.compareAdd}
+                                                            </motion.button>
+                                                        )}
                                                     </div>
 
                                                     {/* Right: desktop price + actions */}
@@ -769,32 +847,36 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                                         )}
 
                                                         <div className="flex items-center gap-3">
-                                                            <motion.button
-                                                                type="button"
-                                                                whileHover={{ scale: 1.04 }}
-                                                                whileTap={{ scale: 0.96 }}
-                                                                onClick={(e) => { e.stopPropagation(); toggleCompare(planKey); }}
-                                                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[12px] font-semibold transition-colors ${isCompared
-                                                                    ? 'bg-illini-blue/5 text-illini-blue border-illini-blue/30'
-                                                                    : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:text-slate-700'
-                                                                    }`}
-                                                            >
-                                                                <div className={`w-3.5 h-3.5 rounded-[4px] border flex items-center justify-center transition-colors ${isCompared ? 'bg-illini-blue border-illini-blue text-white' : 'border-slate-300'}`}>
-                                                                    <AnimatePresence>
-                                                                        {isCompared && (
-                                                                            <motion.div
-                                                                                initial={{ scale: 0 }}
-                                                                                animate={{ scale: 1 }}
-                                                                                exit={{ scale: 0 }}
-                                                                                transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-                                                                            >
-                                                                                <Check className="w-2.5 h-2.5" strokeWidth={3} />
-                                                                            </motion.div>
-                                                                        )}
-                                                                    </AnimatePresence>
-                                                                </div>
-                                                                {t.compareAdd}
-                                                            </motion.button>
+                                                            {showPlanCompare && (
+                                                                <motion.button
+                                                                    type="button"
+                                                                    initial={{ opacity: 0, scale: 0.9 }}
+                                                                    animate={{ opacity: 1, scale: 1 }}
+                                                                    whileHover={{ scale: 1.04 }}
+                                                                    whileTap={{ scale: 0.96 }}
+                                                                    onClick={(e) => { e.stopPropagation(); toggleCompare(planKey); }}
+                                                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[12px] font-semibold transition-colors ${isCompared
+                                                                        ? 'bg-illini-blue/5 text-illini-blue border-illini-blue/30'
+                                                                        : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:text-slate-700'
+                                                                        }`}
+                                                                >
+                                                                    <div className={`w-3.5 h-3.5 rounded-[4px] border flex items-center justify-center transition-colors ${isCompared ? 'bg-illini-blue border-illini-blue text-white' : 'border-slate-300'}`}>
+                                                                        <AnimatePresence>
+                                                                            {isCompared && (
+                                                                                <motion.div
+                                                                                    initial={{ scale: 0 }}
+                                                                                    animate={{ scale: 1 }}
+                                                                                    exit={{ scale: 0 }}
+                                                                                    transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                                                                                >
+                                                                                    <Check className="w-2.5 h-2.5" strokeWidth={3} />
+                                                                                </motion.div>
+                                                                            )}
+                                                                        </AnimatePresence>
+                                                                    </div>
+                                                                    {t.compareAdd}
+                                                                </motion.button>
+                                                            )}
                                                             <motion.div
                                                                 animate={{ rotate: isExpanded ? 180 : 0 }}
                                                                 transition={{ duration: 0.25 }}
@@ -875,6 +957,104 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                     );
                                 })}
                             </div>
+
+                            {/* Floor plan comparison table */}
+                            <AnimatePresence>
+                                {showPlanCompare && compareIds.length >= 2 && (() => {
+                                    const compared = compareIds
+                                        .map((key) => {
+                                            const idx = sortedPlans.findIndex((p, i) => getPlanKey(p, i) === key);
+                                            return idx >= 0 ? { plan: sortedPlans[idx], idx } : null;
+                                        })
+                                        .filter((x): x is { plan: FloorPlan; idx: number } => x !== null);
+                                    if (compared.length < 2) return null;
+
+                                    const rows: { label: string; values: string[] }[] = [
+                                        {
+                                            label: language === 'zh' ? '房型' : 'Room Type',
+                                            values: compared.map(({ plan }) => {
+                                                const opt = { bedCount: plan.bedCount ?? null, bathroomCount: plan.bathroomCount ?? null, bathroomScope: plan.bathroomScope ?? defaultPlanScope, labelCode: plan.labelCode };
+                                                return plan.officialName || getRoomOptionLabels(opt, language).primaryLabel;
+                                            }),
+                                        },
+                                        {
+                                            label: language === 'zh' ? '床位' : 'Beds',
+                                            values: compared.map(({ plan }) =>
+                                                plan.bedSize ? plan.bedSize : plan.bedCount != null ? `${plan.bedCount}` : '—',
+                                            ),
+                                        },
+                                        {
+                                            label: language === 'zh' ? '卫浴' : 'Bathroom',
+                                            values: compared.map(({ plan }) => {
+                                                const scope = plan.bathroomScope ?? defaultPlanScope;
+                                                if (plan.bathroomCount != null && plan.bathroomCount > 0) {
+                                                    return `${plan.bathroomCount} ${language === 'zh' ? '卫' : plan.bathroomCount === 1 ? 'Bath' : 'Baths'} · ${getBathroomScopeLabel(scope, language)}`;
+                                                }
+                                                return getBathroomScopeLabel(scope, language);
+                                            }),
+                                        },
+                                        {
+                                            label: language === 'zh' ? '面积' : 'Area',
+                                            values: compared.map(({ plan }) =>
+                                                plan.sqft ? `${plan.sqft} sqft (~${Math.round(plan.sqft * 0.092903)}㎡)` : '—',
+                                            ),
+                                        },
+                                        {
+                                            label: language === 'zh' ? '年租金' : 'Annual Price',
+                                            values: compared.map(({ plan }) => {
+                                                const p = getPublishedPlanPrice(plan);
+                                                return p != null ? `${formatPrice(p)}${t.yr}` : (plan.available === false ? (language === 'zh' ? '暂不可订' : 'Sold out') : '—');
+                                            }),
+                                        },
+                                        {
+                                            label: language === 'zh' ? '月租金' : 'Monthly',
+                                            values: compared.map(({ plan }) => {
+                                                const p = getPublishedPlanPrice(plan);
+                                                return p != null ? `~${formatPrice(Math.round(p / 12))}${t.mo}` : '—';
+                                            }),
+                                        },
+                                    ];
+
+                                    return (
+                                        <motion.div
+                                            key="plan-compare-table"
+                                            initial={{ opacity: 0, height: 0 }}
+                                            animate={{ opacity: 1, height: 'auto' }}
+                                            exit={{ opacity: 0, height: 0 }}
+                                            transition={{ duration: 0.3, ease: 'easeInOut' }}
+                                            className="overflow-hidden mt-4"
+                                        >
+                                            <div className="bg-white rounded-xl md:rounded-2xl border border-illini-blue/20 shadow-[0_4px_20px_rgba(19,41,75,0.06)] overflow-x-auto">
+                                                <div className="px-4 py-3 md:px-5 md:py-4 border-b border-slate-100 flex items-center gap-2">
+                                                    <ArrowRightLeft className="w-4 h-4 text-illini-blue" />
+                                                    <span className="text-[14px] md:text-[15px] font-bold text-slate-900">
+                                                        {language === 'zh' ? '房型对比' : 'Plan Comparison'}
+                                                    </span>
+                                                    <span className="text-[12px] text-slate-400 font-medium ml-auto">
+                                                        {compared.length} {language === 'zh' ? '个房型' : 'plans'}
+                                                    </span>
+                                                </div>
+                                                <table className="w-full text-[12px] md:text-[13px]">
+                                                    <tbody>
+                                                        {rows.map((row, ri) => (
+                                                            <tr key={ri} className={ri % 2 === 0 ? 'bg-slate-50/50' : 'bg-white'}>
+                                                                <td className="px-4 py-2.5 md:px-5 md:py-3 font-semibold text-slate-500 whitespace-nowrap border-r border-slate-100 w-[100px] md:w-[120px]">
+                                                                    {row.label}
+                                                                </td>
+                                                                {row.values.map((val, ci) => (
+                                                                    <td key={ci} className="px-3 py-2.5 md:px-4 md:py-3 font-semibold text-slate-800 text-center border-r border-slate-100 last:border-r-0 min-w-[100px]">
+                                                                        {val}
+                                                                    </td>
+                                                                ))}
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </motion.div>
+                                    );
+                                })()}
+                            </AnimatePresence>
 
                             {/* Price range footer */}
                             {minPrice !== null && maxPrice !== null && (

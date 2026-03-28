@@ -3,6 +3,7 @@
 import path from 'path';
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
+import { qmdSearchPlugin } from './scripts/qmdSearchGateway';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '.', '');
@@ -17,15 +18,15 @@ export default defineConfig(({ mode }) => {
           rewrite: (path) => path.replace(/^\/api\/coze/, ''),
           secure: false
         },
-        // QMD search proxy — forwards to local QMD daemon in dev
-        '/api/search': {
-          target: 'http://127.0.0.1:3100',
+        // DeepSeek chat proxy — in dev, forwards to DeepSeek API directly
+        '/api/deepseek-raw': {
+          target: 'https://api.deepseek.com',
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/search/, '/query'),
+          rewrite: () => '/chat/completions',
         }
       }
     },
-    plugins: [react()],
+    plugins: [qmdSearchPlugin(), react()],
     define: {
       'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
       'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),

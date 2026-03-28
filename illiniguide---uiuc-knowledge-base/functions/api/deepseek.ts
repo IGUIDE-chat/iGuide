@@ -1,3 +1,5 @@
+// [FUNCTION] DeepSeek Chat API proxy — supports both streaming (SSE) and non-streaming.
+// [函数] DeepSeek 聊天 API 代理 — 支持流式 (SSE) 和非流式响应。
 type PagesFunction<T = unknown> = (context: {
     request: Request;
     env: T;
@@ -22,10 +24,44 @@ interface DeepSeekBody {
     newMessage?: string;
     systemInstruction?: string;
     messages?: Array<{ role: string; content: string }>;
+    stream?: boolean;
+    lang?: 'en' | 'zh';
 }
 
-const DEFAULT_SYSTEM_PROMPT =
-    'You are the IlliniGuide Housing Assistant for UIUC dorm selection. Be concise and practical.';
+const DEFAULT_SYSTEM_PROMPT = `# Role: UIUC 资深学长姐顾问 (Illini Spirit Advisor)
+
+## 👤 设定与职责
+深谙 UIUC 选课、签证及提早排坑的校友，为 2026 届新生传授“人话”指南。自称“咱学长姐”或“UIUC 顾问”（性别中立），语气极度亲切元气 🌽🧡💙，严禁任何机械的 AI 腔调。
+
+## ⚙️ 交互准则
+1. **语言镜像**：严格使用与用户提问完全相同的语言作答。
+2. **红线必报**：绝不脑补事实。凡涉及学费、签证、疫苗，必须高亮警告逾期风险！`;
+
+function buildMessages(body: DeepSeekBody): Array<{ role: string; content: string }> {
+    if (Array.isArray(body.messages) && body.messages.length > 0) {
+        return body.messages;
+    }
+
+    const history = Array.isArray(body.history) ? body.history : [];
+    const newMessage = typeof body.newMessage === 'string' ? body.newMessage.trim() : '';
+    const systemInstruction =
+        typeof body.systemInstruction === 'string' && body.systemInstruction.trim()
+            ? body.systemInstruction
+            : DEFAULT_SYSTEM_PROMPT;
+
+    const langHint = body.lang === 'zh'
+        ? '\n\nThe user prefers Chinese. Respond in Chinese unless they write in English.'
+        : '';
+
+    return [
+        { role: 'system', content: systemInstruction + langHint },
+        ...history.map((item) => ({
+            role: item.role === 'model' ? 'assistant' : 'user',
+            content: item.text,
+        })),
+        ...(newMessage ? [{ role: 'user', content: newMessage }] : []),
+    ];
+}
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
     const { request, env } = context;
@@ -35,82 +71,72 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         if (!apiKey) {
             return new Response(
                 JSON.stringify({ error: 'Missing DEEPSEEK_API_KEY in server environment.' }),
-                { status: 500, headers: { 'Content-Type': 'application/json' } }
+                { status: 500, headers: { 'Content-Type': 'application/json' } },
             );
         }
 
         const body = (await request.json()) as DeepSeekBody;
+        const messages = buildMessages(body);
+        const useStream = body.stream !== false; // default to streaming
 
-        let messages: Array<{ role: string; content: string }>;
+        if (!useStream) {
+            // ── Non-streaming (legacy: translation, etc.) ──
+            const resp = await fetch('https://api.deepseek.com/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${apiKey}`,
+                },
+                body: JSON.stringify({ model: 'deepseek-chat', messages, stream: false, temperature: 1.0 }),
+            });
 
-        if (Array.isArray(body.messages) && body.messages.length > 0) {
-            // Direct messages format (used by DormDetail translation)
-            messages = body.messages;
-        } else {
-            // Legacy format: { newMessage, systemInstruction, history }
-            const history = Array.isArray(body.history) ? body.history : [];
-            const newMessage = typeof body.newMessage === 'string' ? body.newMessage.trim() : '';
-            const systemInstruction =
-                typeof body.systemInstruction === 'string' && body.systemInstruction.trim()
-                    ? body.systemInstruction
-                    : DEFAULT_SYSTEM_PROMPT;
-
-            if (!newMessage) {
-                return new Response(JSON.stringify({ error: 'newMessage is required.' }), {
-                    status: 400,
-                    headers: { 'Content-Type': 'application/json' }
-                });
+            if (!resp.ok) {
+                const errText = await resp.text().catch(() => '');
+                return new Response(
+                    JSON.stringify({ error: 'DeepSeek request failed.', status: resp.status, details: errText }),
+                    { status: resp.status, headers: { 'Content-Type': 'application/json' } },
+                );
             }
 
-            messages = [
-                { role: 'system', content: systemInstruction },
-                ...history.map((item) => ({
-                    role: item.role === 'model' ? 'assistant' : 'user',
-                    content: item.text
-                })),
-                { role: 'user', content: newMessage }
-            ];
+            const data = (await resp.json()) as any;
+            const reply = data?.choices?.[0]?.message?.content || '';
+            return new Response(JSON.stringify({ reply }), {
+                status: 200,
+                headers: { 'Content-Type': 'application/json' },
+            });
         }
 
-        const deepSeekResponse = await fetch('https://api.deepseek.com/chat/completions', {
+        // ── Streaming (SSE) ──
+        const resp = await fetch('https://api.deepseek.com/chat/completions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${apiKey}`
+                Authorization: `Bearer ${apiKey}`,
             },
-            body: JSON.stringify({
-                model: 'deepseek-chat',
-                messages,
-                stream: false
-            })
+            body: JSON.stringify({ model: 'deepseek-chat', messages, stream: true, temperature: 1.0 }),
         });
 
-        if (!deepSeekResponse.ok) {
-            const errorText = await deepSeekResponse.text().catch(() => '');
+        if (!resp.ok) {
+            const errText = await resp.text().catch(() => '');
             return new Response(
-                JSON.stringify({
-                    error: 'DeepSeek request failed.',
-                    status: deepSeekResponse.status,
-                    details: errorText
-                }),
-                {
-                    status: deepSeekResponse.status,
-                    headers: { 'Content-Type': 'application/json' }
-                }
+                JSON.stringify({ error: 'DeepSeek request failed.', status: resp.status, details: errText }),
+                { status: resp.status, headers: { 'Content-Type': 'application/json' } },
             );
         }
 
-        const data = (await deepSeekResponse.json()) as any;
-        const reply = data?.choices?.[0]?.message?.content || '';
-
-        return new Response(JSON.stringify({ reply }), {
+        // Pipe the SSE stream directly to the client
+        return new Response(resp.body, {
             status: 200,
-            headers: { 'Content-Type': 'application/json' }
+            headers: {
+                'Content-Type': 'text/event-stream',
+                'Cache-Control': 'no-cache',
+                'Connection': 'keep-alive',
+            },
         });
     } catch (error: any) {
         return new Response(
             JSON.stringify({ error: error?.message || 'Unexpected server error.' }),
-            { status: 500, headers: { 'Content-Type': 'application/json' } }
+            { status: 500, headers: { 'Content-Type': 'application/json' } },
         );
     }
 };

@@ -8,6 +8,11 @@
 export interface StreamChunk {
   text: string;
   followUpQuestions?: string[];
+  thinkingStep?: {
+    type: 'reasoning' | 'searching' | 'tool_call' | 'processing';
+    label: string;
+    detail?: string;
+  };
 }
 
 export interface ChatHistoryItem {
@@ -24,6 +29,6 @@ export type StreamChatResponseFn = (
 ) => AsyncGenerator<StreamChunk>;
 
 export interface AIProvider {
-  id: 'coze' | 'gemini';
+  id: 'coze' | 'gemini' | 'deepseek';
   streamChatResponse: StreamChatResponseFn;
 }

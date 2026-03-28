@@ -7,12 +7,15 @@
 
 import { cozeProvider } from './providers/cozeProvider';
 import { geminiProvider } from './providers/geminiProvider';
+import { deepseekProvider } from './providers/deepseekProvider';
 import { StreamChatResponseFn } from './types';
 
-type ProviderKey = 'coze' | 'gemini';
+type ProviderKey = 'coze' | 'gemini' | 'deepseek';
 
-const providerKey = (import.meta.env.VITE_AI_PROVIDER || 'coze') as ProviderKey;
-const activeProvider = providerKey === 'gemini' ? geminiProvider : cozeProvider;
+// Force deepseek to ensure the transition from Coze takes effect regardless of Cloudflare env vars
+const providerKey = 'deepseek';
+const providers = { coze: cozeProvider, gemini: geminiProvider, deepseek: deepseekProvider };
+const activeProvider = providers[providerKey];
 
 export const getActiveAIProvider = () => activeProvider.id;
 

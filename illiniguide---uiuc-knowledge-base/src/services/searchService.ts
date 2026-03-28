@@ -10,11 +10,12 @@ import type { SearchResult, SearchResponse, SearchMode } from '../types';
 const SEARCH_ENDPOINT = '/api/search';
 
 /**
- * Search the QMD knowledge base via the gateway proxy.
+ * Search the QMD knowledge base via the local/prod gateway.
  *
- * In dev mode, Vite proxies /api/search → localhost:3100.
- * In production, the CF Worker gateway routes to the appropriate
- * QMD node (CN or Global) based on user geo-IP.
+ * In local Vite runs, /api/search is handled by the Vite-side
+ * QMD gateway plugin.
+ * In production, the API gateway is expected to route the request
+ * to the appropriate QMD backend.
  */
 export async function searchKnowledgeBase(
     query: string,
@@ -71,7 +72,7 @@ function parseResultType(filePath: string): SearchResult['type'] {
 }
 
 function parseResultId(filePath: string): string | undefined {
-    // Extract filename without extension: …/dorms/isr.md ��� isr
-    const match = filePath.match(/\/([^/]+)\.md$/);
+    // Extract filename without extension: .../articles/isr.md -> isr
+    const match = filePath.match(/\/([^/]+)\.md$/i);
     return match?.[1];
 }

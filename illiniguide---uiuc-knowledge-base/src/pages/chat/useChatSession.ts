@@ -6,7 +6,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
-import { Language, ChatMessage } from '../../types';
+import { Language, ChatMessage, ThinkingStep } from '../../types';
 import { streamChatResponse } from '../../services/ai';
 import { conversationService } from '../../services/conversationService';
 import { localConversationService } from '../../services/localConversationService';
@@ -156,7 +156,22 @@ export const useChatSession = ({
         const aiMsgId = (Date.now() + 1).toString();
         setMessages((prev) => [
           ...prev,
-          { id: aiMsgId, role: 'model', text: '', isStreaming: true },
+          {
+            id: aiMsgId,
+            role: 'model',
+            text: '',
+            isStreaming: true,
+            isThinking: true,
+            thinkingSteps: [
+              {
+                id: `step-${Date.now()}-init`,
+                type: 'processing' as const,
+                label: '理解问题...',
+                timestamp: Date.now(),
+                done: false,
+              },
+            ],
+          },
         ]);
 
         const stream = await streamChatResponse(
@@ -169,17 +184,47 @@ export const useChatSession = ({
 
         let fullText = '';
         let followUpQuestions: string[] | undefined;
+        const thinkingSteps: ThinkingStep[] = [];
         let lastUpdateTime = Date.now();
         const updateInterval = 50;
 
         for await (const chunk of stream) {
+          if (chunk.thinkingStep) {
+            // Mark previous step as done
+            if (thinkingSteps.length > 0) {
+              thinkingSteps[thinkingSteps.length - 1].done = true;
+            }
+            const step: ThinkingStep = {
+              id: `step-${Date.now()}-${thinkingSteps.length}`,
+              type: chunk.thinkingStep.type,
+              label: chunk.thinkingStep.label,
+              detail: chunk.thinkingStep.detail,
+              timestamp: Date.now(),
+              done: false,
+            };
+            thinkingSteps.push(step);
+            setMessages((prev) =>
+              prev.map((message) =>
+                message.id === aiMsgId
+                  ? { ...message, thinkingSteps: [...thinkingSteps] }
+                  : message,
+              ),
+            );
+          }
+
           if (chunk.text) {
             fullText += chunk.text;
             const now = Date.now();
+            // First text chunk means thinking is done
+            if (fullText === chunk.text && thinkingSteps.length > 0) {
+              thinkingSteps.forEach((s) => (s.done = true));
+            }
             if (now - lastUpdateTime >= updateInterval) {
               setMessages((prev) =>
                 prev.map((message) =>
-                  message.id === aiMsgId ? { ...message, text: fullText } : message,
+                  message.id === aiMsgId
+                    ? { ...message, text: fullText, isThinking: false, thinkingSteps: [...thinkingSteps] }
+                    : message,
                 ),
               );
               lastUpdateTime = now;
@@ -202,12 +247,33 @@ export const useChatSession = ({
           fullText = INVALID_RESPONSE[language];
         }
 
+        // Extract "💡 你可能还想了解：" section to followUpQuestions
+        const followUpHeaderMatch = fullText.match(/\n+.*💡.*[你您]可能还想.*[:：\n]/);
+        if (followUpHeaderMatch && (!followUpQuestions || followUpQuestions.length === 0)) {
+          const splitIndex = followUpHeaderMatch.index!;
+          const followUpText = fullText.substring(splitIndex + followUpHeaderMatch[0].length);
+          
+          const questions = followUpText.split('\n')
+            .map(line => line.replace(/^[>\s\d\.\-\*\[\]]+/, '').replace(/\]?$/, '').trim())
+            .filter(line => line.length > 0 && line.length < 150);
+            
+          if (questions.length > 0) {
+            followUpQuestions = questions;
+            fullText = fullText.substring(0, splitIndex).trim();
+          }
+        }
+
+        // Mark all steps done
+        thinkingSteps.forEach((s) => (s.done = true));
+
         const aiMsg: ChatMessage = {
           id: aiMsgId,
           role: 'model',
           text: fullText,
           isStreaming: false,
+          isThinking: false,
           followUpQuestions,
+          thinkingSteps: thinkingSteps.length > 0 ? thinkingSteps : undefined,
         };
 
         setMessages((prev) =>

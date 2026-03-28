@@ -5,7 +5,7 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { createContext, useContext, ReactNode, RefObject } from 'react';
+import React, { createContext, useContext, ReactNode, RefObject, useState, useCallback } from 'react';
 
 interface LayoutContextType {
     isSidebarOpen: boolean;
@@ -15,6 +15,9 @@ interface LayoutContextType {
     sidebarToggleButtonRef: RefObject<HTMLButtonElement | null>;
     /** Ref for the mobile sidebar toggle button (flying-heart target when sidebar closed, &lt;md) */
     mobileSidebarButtonRef: RefObject<HTMLButtonElement | null>;
+    /** Custom mobile header slot — when set, replaces the default mobileHeader content */
+    mobileHeaderSlot: ReactNode | null;
+    setMobileHeaderSlot: (node: ReactNode | null) => void;
 }
 
 const LayoutContext = createContext<LayoutContextType | null>(null);
@@ -26,8 +29,10 @@ export const LayoutProvider: React.FC<{
     sidebarToggleButtonRef: RefObject<HTMLButtonElement | null>;
     mobileSidebarButtonRef: RefObject<HTMLButtonElement | null>;
 }> = ({ children, isSidebarOpen, favoritesIconRef, sidebarToggleButtonRef, mobileSidebarButtonRef }) => {
+    const [mobileHeaderSlot, setMobileHeaderSlotState] = useState<ReactNode | null>(null);
+    const setMobileHeaderSlot = useCallback((node: ReactNode | null) => setMobileHeaderSlotState(node), []);
     return (
-        <LayoutContext.Provider value={{ isSidebarOpen, favoritesIconRef, sidebarToggleButtonRef, mobileSidebarButtonRef }}>
+        <LayoutContext.Provider value={{ isSidebarOpen, favoritesIconRef, sidebarToggleButtonRef, mobileSidebarButtonRef, mobileHeaderSlot, setMobileHeaderSlot }}>
             {children}
         </LayoutContext.Provider>
     );
@@ -40,7 +45,9 @@ export const useLayout = (): LayoutContextType => {
             isSidebarOpen: true,
             favoritesIconRef: { current: null } as React.RefObject<SVGSVGElement | null>,
             sidebarToggleButtonRef: { current: null } as React.RefObject<HTMLButtonElement | null>,
-            mobileSidebarButtonRef: { current: null } as React.RefObject<HTMLButtonElement | null>
+            mobileSidebarButtonRef: { current: null } as React.RefObject<HTMLButtonElement | null>,
+            mobileHeaderSlot: null,
+            setMobileHeaderSlot: () => {},
         };
     }
     return ctx;

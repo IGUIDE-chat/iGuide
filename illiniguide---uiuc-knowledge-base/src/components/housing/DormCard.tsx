@@ -6,7 +6,7 @@
  */
 
 import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Bath, BedSingle, MapPin, ThumbsUp, Utensils, Wind } from 'lucide-react';
+import { Bath, BedSingle, Check, GitCompareArrows, MapPin, ThumbsUp, Utensils, Wind } from 'lucide-react';
 import { formatPrice } from './constants/pricing';
 import { Dorm } from './types/index';
 import { Language } from '../../types';
@@ -18,6 +18,8 @@ interface DormCardProps {
     onViewDetails: (dorm: Dorm) => void;
     isFavorite?: boolean;
     onToggleFavorite?: (dorm: Dorm, e?: React.MouseEvent) => void;
+    isCompared?: boolean;
+    onToggleCompare?: (dorm: Dorm) => void;
     onHoverDorm?: (dormId: string | null) => void;
     language?: Language;
     positivePercent?: number | null;
@@ -283,6 +285,8 @@ const DormCard: React.FC<DormCardProps> = ({
     onViewDetails,
     isFavorite = false,
     onToggleFavorite,
+    isCompared = false,
+    onToggleCompare,
     onHoverDorm,
     language = 'en',
     positivePercent,
@@ -323,6 +327,24 @@ const DormCard: React.FC<DormCardProps> = ({
                             {positivePercent}% ({totalReviews})
                         </div>
                     </div>
+                )}
+
+                {onToggleCompare && (
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onToggleCompare(dorm);
+                        }}
+                        type="button"
+                        className={`absolute right-3 bottom-3 rounded-full p-1.5 shadow-sm transition-all duration-200 ${
+                            isCompared
+                                ? 'bg-illini-blue text-white scale-105'
+                                : 'bg-white/90 text-gray-400 hover:bg-white hover:text-illini-blue'
+                        }`}
+                        aria-label={isCompared ? 'Remove from compare' : 'Add to compare'}
+                    >
+                        {isCompared ? <Check className="h-4 w-4" /> : <GitCompareArrows className="h-4 w-4" />}
+                    </button>
                 )}
 
                 {onToggleFavorite && (

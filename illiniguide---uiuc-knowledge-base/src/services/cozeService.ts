@@ -22,6 +22,11 @@ const COZE_CONVERSATION_API_URL = "https://api.coze.com/v1/conversation/create";
 export interface StreamResponse {
   text: string;
   followUpQuestions?: string[];
+  thinkingStep?: {
+    type: 'reasoning' | 'searching' | 'tool_call' | 'processing';
+    label: string;
+    detail?: string;
+  };
 }
 
 /**
@@ -190,6 +195,61 @@ export const streamChatResponse = async function* (
             sawAnswerDelta = true;
             outputs.push({ text: data.content });
           }
+        } else if (currentEvent === 'conversation.message.delta' && data.type === 'verbose') {
+          // Reasoning / thinking content from the bot
+          if (data.content) {
+            outputs.push({
+              text: '',
+              thinkingStep: {
+                type: 'reasoning',
+                label: '正在思考...',
+                detail: data.content,
+              },
+            });
+          }
+        } else if (currentEvent === 'conversation.message.delta' && data.type === 'function_call') {
+          // Bot is calling a tool/function
+          if (data.content) {
+            try {
+              const callInfo = JSON.parse(data.content);
+              outputs.push({
+                text: '',
+                thinkingStep: {
+                  type: 'tool_call',
+                  label: `调用工具: ${callInfo.name || '插件'}`,
+                  detail: callInfo.arguments ? JSON.stringify(callInfo.arguments).substring(0, 120) : undefined,
+                },
+              });
+            } catch {
+              outputs.push({
+                text: '',
+                thinkingStep: {
+                  type: 'tool_call',
+                  label: '调用工具...',
+                  detail: data.content.substring(0, 120),
+                },
+              });
+            }
+          }
+        } else if (currentEvent === 'conversation.message.delta' && data.type === 'tool_output') {
+          // Tool execution result
+          outputs.push({
+            text: '',
+            thinkingStep: {
+              type: 'searching',
+              label: '获取结果...',
+              detail: data.content ? data.content.substring(0, 120) : undefined,
+            },
+          });
+        } else if (currentEvent === 'conversation.message.delta' && data.type === 'tool_response') {
+          // Tool response
+          outputs.push({
+            text: '',
+            thinkingStep: {
+              type: 'searching',
+              label: '处理工具结果...',
+            },
+          });
         } else if (currentEvent === 'conversation.message.completed' && data.type === 'answer') {
           const completedText = typeof data.content === 'string' ? data.content : '';
           console.log('[Coze] Message completed, content length:', completedText.length || 0);
