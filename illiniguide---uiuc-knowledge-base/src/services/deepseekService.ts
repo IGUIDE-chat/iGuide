@@ -264,7 +264,7 @@ export const streamDeepSeekChat = async function* (
     // 2. Build system instruction with RAG context
     const systemInstruction = ragContext
       ? `${DEFAULT_SYSTEM_PROMPT}${ragContext}`
-      : undefined;
+      : DEFAULT_SYSTEM_PROMPT;
 
     // 3. Call DeepSeek — dev calls API directly, prod uses CF Function
     let response: Response;
