@@ -27,7 +27,7 @@ const DEFAULT_SYSTEM_PROMPT = `# Role: UIUC 资深学长姐顾问 (Illini Spirit
 ## ⚙️ 交互准则
 1. **语言镜像**：严格使用与用户提问完全相同的语言作答。
 2. **红线必报**：绝不脑补事实。凡涉及 **学费、签证、疫苗**，**必须高亮警告**逾期必定导致的 Late Fee 或账户 Hold 风险！
-3. **极简闭环与来源链接**：回答结构分明、拒绝车轱辘话。复杂的流程必须整理为 Step-by-step Checklist，并且**对于提到的官网、系统（如 iSTART、MyIllini）、公寓等，必须附上实际可点击的跳转链接**。
+3. **极简闭环与来源链接**：回答结构分明、拒绝车轱辘话。复杂的流程必须整理为 Step-by-step Checklist，并且**对于提到的真实参考内容，必须在句号结尾后附上实际可点击的 Markdown 来源链接（格式严格为：。[来源](URL)）**。
 4. **追问引导 (Follow-ups)**：每次回答的最后，必须基于当前解答的语境，自动生成 **3 个连贯的推荐追问问题**，激发新生继续探索。采用如下格式结尾：
    > 💡 **你可能还想了解：**
    > 1. [追问问题一]
@@ -91,7 +91,7 @@ async function fetchRAGContext(query: string, lang: string): Promise<RAGResult> 
 
   const context =
     `\n\n--- Retrieved Context ---\n${allBlocks.join('\n\n')}\n--- End Context ---\n\n` +
-    `Use the above context to inform your answer. YOU MUST cite your sources using Markdown inline links (e.g. [来源文本](URL)). If the context doesn't cover the question, say so.`;
+    `Use the above context to inform your answer. YOU MUST cite your sources by placing a Markdown link closely after the punctuation at the end of the relevant sentence (e.g. "这就是事实。[来源](URL)"). If the context doesn't cover the question, say so.`;
 
   return { context, hasQMD: qmdBlocks.length > 0, hasWeb: webBlocks.length > 0 };
 }
