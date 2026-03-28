@@ -87,7 +87,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${apiKey}`,
                 },
-                body: JSON.stringify({ model: 'deepseek-chat', messages, stream: false, temperature: 0.8 }),
+                body: JSON.stringify({ model: 'deepseek-chat', messages, stream: false, temperature: 1.0 }),
             });
 
             if (!resp.ok) {
@@ -113,7 +113,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${apiKey}`,
             },
-            body: JSON.stringify({ model: 'deepseek-chat', messages, stream: true, temperature: 0.8 }),
+            body: JSON.stringify({ model: 'deepseek-chat', messages, stream: true, temperature: 1.0 }),
         });
 
         if (!resp.ok) {

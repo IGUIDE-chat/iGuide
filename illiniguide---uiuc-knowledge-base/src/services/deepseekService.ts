@@ -282,7 +282,7 @@ export const streamDeepSeekChat = async function* (
           model: 'deepseek-chat',
           messages,
           stream: true,
-          temperature: 0.8,
+          temperature: 1.0,
         }),
       });
     } else {
