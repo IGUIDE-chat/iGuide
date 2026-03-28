@@ -71,7 +71,7 @@ function parseResultType(filePath: string): SearchResult['type'] {
 }
 
 function parseResultId(filePath: string): string | undefined {
-    // Extract filename without extension: …/dorms/isr.md ��� isr
-    const match = filePath.match(/\/([^/]+)\.md$/);
+    // Extract filename without extension: .../articles/isr.md -> isr
+    const match = filePath.match(/\/([^/]+)\.md$/i);
     return match?.[1];
 }

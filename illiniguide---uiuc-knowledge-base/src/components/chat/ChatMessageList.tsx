@@ -8,6 +8,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChatMessage } from '../../types';
 import { TypewriterMarkdown } from './TypewriterMarkdown';
+import { ThinkingProcess } from './ThinkingProcess';
 
 interface ChatMessageListProps {
   messages: ChatMessage[];
@@ -78,6 +79,13 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
                 <div className="font-semibold text-xs text-slate-900 mb-1">
                   {message.role === 'user' ? userRole : botName}
                 </div>
+                {message.role === 'model' &&
+                  (message.thinkingSteps?.length || message.isThinking) && (
+                    <ThinkingProcess
+                      steps={message.thinkingSteps || []}
+                      isThinking={!!message.isThinking}
+                    />
+                  )}
                 <div className="prose prose-slate prose-sm max-w-none leading-relaxed text-slate-800">
                   {message.role === 'user' ? (
                     <div className="whitespace-pre-wrap">{message.text}</div>
