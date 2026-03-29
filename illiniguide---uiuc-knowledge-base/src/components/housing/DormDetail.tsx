@@ -162,7 +162,6 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
             setMobileHeaderSlot(null);
             return () => { setMobileHeaderSlot(null); };
         }
-        const dormName = language === 'zh' && dorm.name_zh ? dorm.name_zh : dorm.name;
         setMobileHeaderSlot(
             <div className="flex-1 min-w-0 flex items-center justify-between">
                 <button
@@ -173,7 +172,6 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                     <ArrowLeft className="w-4 h-4" />
                     <span className="text-[13px] font-semibold">{language === 'zh' ? '返回' : 'Back'}</span>
                 </button>
-                <span className="text-[14px] font-bold text-slate-800 truncate mx-3">{dormName}</span>
                 <div className="flex items-center gap-1 shrink-0">
                     {user?.isAdmin && (
                         <button
