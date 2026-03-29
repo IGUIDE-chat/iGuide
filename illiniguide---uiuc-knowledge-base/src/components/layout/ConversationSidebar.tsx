@@ -168,7 +168,7 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
 
     return (
         <>
-            <div className="flex flex-col h-full px-3">
+            <div className="flex flex-col h-full min-h-0 px-3">
                 {/* Conversations List */}
                 <div className="flex-1 overflow-y-auto no-scrollbar">
                     {isLoading ? (

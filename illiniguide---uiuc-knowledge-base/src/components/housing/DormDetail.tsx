@@ -114,6 +114,10 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
     const { comments, loading: commentsLoading, saveComment, deleteComment, voteOnComment, thumbsUp } =
         useDormComments(dormId);
 
+    // ── Review stats (computed early for mobile header) ───────────────────
+    const totalReviews = comments.length;
+    const positivePercent = totalReviews > 0 ? Math.round((thumbsUp / totalReviews) * 100) : null;
+
     // ── Local dorm data ────────────────────────────────────────────────────
     const [dorm, setDorm] = useState<Dorm | undefined>(getFromContext(dormId));
 
@@ -183,6 +187,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                     <ArrowLeft className="w-4 h-4" />
                     <span className="text-[13px] font-semibold">{language === 'zh' ? '返回' : 'Back'}</span>
                 </button>
+                <div className="flex-1" />
                 <div className="flex items-center gap-1 shrink-0">
                     {user?.isAdmin && (
                         <button
@@ -205,7 +210,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
             </div>
         );
         return () => { setMobileHeaderSlot(null); };
-    }, [dorm?.id, dorm?.name, dorm?.name_zh, language, user?.isAdmin, navigate, toggleFavorite, isFavorite, setMobileHeaderSlot]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [dorm?.id, language, user?.isAdmin, navigate, toggleFavorite, isFavorite, setMobileHeaderSlot]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // ── Loading state ──────────────────────────────────────────────────────
     if (!dorm) {
@@ -272,8 +277,6 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
         : null;
 
     // Reviews
-    const totalReviews = comments.length;
-    const positivePercent = totalReviews > 0 ? Math.round((thumbsUp / totalReviews) * 100) : null;
     const displayedComments = showAllReviews ? comments : comments.slice(0, 3);
 
     // ── Handlers ───────────────────────────────────────────────────────────
