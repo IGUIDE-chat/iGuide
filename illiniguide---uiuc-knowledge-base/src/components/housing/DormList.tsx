@@ -144,7 +144,7 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 80, opacity: 0 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-full bg-illini-blue px-5 py-3 text-white shadow-xl"
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 md:gap-3 rounded-full bg-illini-blue px-3 md:px-5 py-2.5 md:py-3 text-white shadow-xl max-w-[calc(100vw-2rem)]"
           >
             <GitCompareArrows className="h-4 w-4 shrink-0" />
             <span className="text-sm font-medium whitespace-nowrap">{ct.compareBar(compareIds.length)}</span>

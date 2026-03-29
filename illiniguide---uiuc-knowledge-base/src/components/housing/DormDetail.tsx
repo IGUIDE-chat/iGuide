@@ -187,18 +187,8 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                     <ArrowLeft className="w-4 h-4" />
                     <span className="text-[13px] font-semibold">{language === 'zh' ? '返回' : 'Back'}</span>
                 </button>
-                <span className="text-[13px] font-bold text-slate-800 truncate mx-2">{dormName}</span>
+                <div className="flex-1" />
                 <div className="flex items-center gap-1 shrink-0">
-                    {positivePercent !== null && totalReviews > 0 && (
-                        <button
-                            type="button"
-                            onClick={() => document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-                            className="flex items-center gap-1 px-2 py-1 rounded-full bg-illini-orange/10 text-illini-orange"
-                        >
-                            <ThumbsUp className="w-3 h-3 fill-illini-orange" />
-                            <span className="text-[11px] font-bold">{positivePercent}%</span>
-                        </button>
-                    )}
                     {user?.isAdmin && (
                         <button
                             type="button"
@@ -220,7 +210,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
             </div>
         );
         return () => { setMobileHeaderSlot(null); };
-    }, [dorm?.id, dorm?.name, dorm?.name_zh, language, user?.isAdmin, navigate, toggleFavorite, isFavorite, setMobileHeaderSlot, positivePercent, totalReviews]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [dorm?.id, language, user?.isAdmin, navigate, toggleFavorite, isFavorite, setMobileHeaderSlot]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // ── Loading state ──────────────────────────────────────────────────────
     if (!dorm) {
