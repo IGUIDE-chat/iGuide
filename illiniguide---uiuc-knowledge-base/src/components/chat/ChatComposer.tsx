@@ -74,7 +74,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
             )}
           </button>
         </form>
-        <div className="text-center mt-3 text-xs text-slate-400">{helperText}</div>
+        <div className="hidden md:block text-center mt-3 text-xs text-slate-400">{helperText}</div>
       </div>
     </div>
   );
