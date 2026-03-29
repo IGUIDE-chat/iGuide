@@ -10,6 +10,7 @@ import { Language, ChatMessage, ThinkingStep } from '../../types';
 import { streamChatResponse } from '../../services/ai';
 import { conversationService } from '../../services/conversationService';
 import { localConversationService } from '../../services/localConversationService';
+import { memoryService } from '../../services/memoryService';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface UseChatSessionOptions {
@@ -260,6 +261,26 @@ export const useChatSession = ({
           if (questions.length > 0) {
             followUpQuestions = questions;
             fullText = fullText.substring(0, splitIndex).trim();
+          }
+        }
+
+        // Extract and strip memory tags (invisible to user)
+        const userMemoryMatch = fullText.match(/<user_memory>([\s\S]*?)<\/user_memory>/);
+        const convMemoryMatch = fullText.match(/<conv_memory>([\s\S]*?)<\/conv_memory>/);
+        fullText = fullText
+          .replace(/<user_memory>[\s\S]*?<\/user_memory>/g, '')
+          .replace(/<conv_memory>[\s\S]*?<\/conv_memory>/g, '')
+          .trim();
+
+        // Persist extracted memories (fire-and-forget)
+        if (user && (userMemoryMatch || convMemoryMatch)) {
+          const uid = user.id;
+          const cid = conversationId;
+          if (userMemoryMatch?.[1]?.trim()) {
+            void memoryService.appendUserMemory(uid, userMemoryMatch[1].trim());
+          }
+          if (convMemoryMatch?.[1]?.trim() && cid) {
+            void memoryService.updateConversationMemory(cid, convMemoryMatch[1].trim());
           }
         }
 

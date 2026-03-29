@@ -79,3 +79,23 @@ export interface Message {
     follow_up_questions?: string[];
     created_at: string;
 }
+
+export interface UserSoul {
+    user_id: string;
+    soul_prompt: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface UserMemory {
+    user_id: string;
+    memory_text: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface ConversationMemory {
+    conversation_id: string;
+    memory_text: string;
+    updated_at: string;
+}

@@ -7,11 +7,12 @@
 
 // [PAGE] User profile management and settings.
 // [页面] 用户个人资料管理和设置页面。
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { UI_TEXT } from '../../i18n/uiText';
 import { Language } from '../../types';
+import { memoryService } from '../../services/memoryService';
 
 interface ProfileScreenProps {
     language: Language;
@@ -25,6 +26,45 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ language, onBack }
     const [newName, setNewName] = useState(user?.name || '');
     const [isLoading, setIsLoading] = useState(false);
 
+    // Soul editor state
+    const [soul, setSoul] = useState('');
+    const [isSoulEditing, setIsSoulEditing] = useState(false);
+    const [isSoulSaving, setIsSoulSaving] = useState(false);
+
+    // User memory state
+    const [userMemory, setUserMemory] = useState('');
+    const [isMemoryEditing, setIsMemoryEditing] = useState(false);
+    const [isMemorySaving, setIsMemorySaving] = useState(false);
+
+    // Load soul and memory on mount
+    useEffect(() => {
+        if (!user) return;
+        void memoryService.getSoul(user.id).then(setSoul);
+        void memoryService.getUserMemory(user.id).then(setUserMemory);
+    }, [user]);
+
+    const handleSaveSoul = async () => {
+        if (!user) return;
+        setIsSoulSaving(true);
+        await memoryService.updateSoul(user.id, soul);
+        setIsSoulSaving(false);
+        setIsSoulEditing(false);
+    };
+
+    const handleSaveMemory = async () => {
+        if (!user) return;
+        setIsMemorySaving(true);
+        await memoryService.updateUserMemory(user.id, userMemory);
+        setIsMemorySaving(false);
+        setIsMemoryEditing(false);
+    };
+
+    const handleClearMemory = async () => {
+        if (!user || !confirm(language === 'zh' ? '确定要清空 AI 对你的记忆吗？' : 'Clear all AI memory about you?')) return;
+        setUserMemory('');
+        await memoryService.updateUserMemory(user.id, '');
+    };
+
     const t = {
         en: {
             profile: 'Profile',
@@ -37,7 +77,15 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ language, onBack }
             nickname: 'Nickname',
             edit: 'Edit',
             save: 'Save',
-            saving: 'Saving...'
+            saving: 'Saving...',
+            soulTitle: 'AI Persona',
+            soulDesc: 'Customize how the AI assistant talks to you',
+            soulPlaceholder: 'e.g. Be more casual, use slang, focus on CS topics...',
+            memoryTitle: 'AI Memory',
+            memoryDesc: 'What the AI remembers about you across conversations',
+            memoryPlaceholder: 'No memories yet. Chat with the AI and it will remember key info about you.',
+            clearMemory: 'Clear Memory',
+            charCount: 'chars',
         },
         zh: {
             profile: '个人资料',
@@ -50,7 +98,15 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ language, onBack }
             nickname: '昵称',
             edit: '修改',
             save: '保存',
-            saving: '保存中...'
+            saving: '保存中...',
+            soulTitle: 'AI 人设',
+            soulDesc: '自定义 AI 助手的说话风格和关注点',
+            soulPlaceholder: '例如：更随意一点，多用网络用语，重点关注 CS 相关话题...',
+            memoryTitle: 'AI 记忆',
+            memoryDesc: 'AI 跨对话记住的你的信息',
+            memoryPlaceholder: '暂无记忆。和 AI 聊天后，它会自动记住你的关键信息。',
+            clearMemory: '清空记忆',
+            charCount: '字符',
         }
     }[language];
 
@@ -151,6 +207,124 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ language, onBack }
                             </div>
                         </div>
                     </div>
+                </div>
+
+                {/* Soul Editor */}
+                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm mb-6">
+                    <div className="flex items-center justify-between mb-3">
+                        <div>
+                            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                                <span>🎭</span> {t.soulTitle}
+                            </h3>
+                            <p className="text-xs text-slate-400 mt-0.5">{t.soulDesc}</p>
+                        </div>
+                        {!isSoulEditing && (
+                            <button
+                                onClick={() => setIsSoulEditing(true)}
+                                className="text-xs text-illini-orange hover:text-illini-blue font-medium transition-colors"
+                            >
+                                {t.edit}
+                            </button>
+                        )}
+                    </div>
+                    {isSoulEditing ? (
+                        <>
+                            <textarea
+                                value={soul}
+                                onChange={(e) => setSoul(e.target.value)}
+                                maxLength={500}
+                                rows={4}
+                                placeholder={t.soulPlaceholder}
+                                className="w-full p-3 text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-illini-orange/30 focus:border-illini-orange resize-none"
+                            />
+                            <div className="flex items-center justify-between mt-2">
+                                <span className="text-xs text-slate-400">{soul.length}/500 {t.charCount}</span>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => setIsSoulEditing(false)}
+                                        className="px-3 py-1 text-xs font-medium text-slate-500 bg-slate-100 rounded-full hover:bg-slate-200 transition-colors"
+                                    >
+                                        {t.cancel}
+                                    </button>
+                                    <button
+                                        onClick={handleSaveSoul}
+                                        disabled={isSoulSaving}
+                                        className="px-3 py-1 text-xs font-medium text-white bg-illini-orange rounded-full hover:bg-illini-blue transition-colors disabled:opacity-50"
+                                    >
+                                        {isSoulSaving ? t.saving : t.save}
+                                    </button>
+                                </div>
+                            </div>
+                        </>
+                    ) : (
+                        <div className="p-3 bg-slate-50 rounded-lg text-sm text-slate-600 border border-slate-100 min-h-[60px]">
+                            {soul || <span className="text-slate-400 italic">{t.soulPlaceholder}</span>}
+                        </div>
+                    )}
+                </div>
+
+                {/* User Memory */}
+                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm mb-6">
+                    <div className="flex items-center justify-between mb-3">
+                        <div>
+                            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                                <span>🧠</span> {t.memoryTitle}
+                            </h3>
+                            <p className="text-xs text-slate-400 mt-0.5">{t.memoryDesc}</p>
+                        </div>
+                        <div className="flex gap-2">
+                            {!isMemoryEditing && userMemory && (
+                                <button
+                                    onClick={handleClearMemory}
+                                    className="text-xs text-red-400 hover:text-red-600 font-medium transition-colors"
+                                >
+                                    {t.clearMemory}
+                                </button>
+                            )}
+                            {!isMemoryEditing && (
+                                <button
+                                    onClick={() => setIsMemoryEditing(true)}
+                                    className="text-xs text-illini-orange hover:text-illini-blue font-medium transition-colors"
+                                >
+                                    {t.edit}
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                    {isMemoryEditing ? (
+                        <>
+                            <textarea
+                                value={userMemory}
+                                onChange={(e) => setUserMemory(e.target.value)}
+                                maxLength={1500}
+                                rows={6}
+                                placeholder={t.memoryPlaceholder}
+                                className="w-full p-3 text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-illini-orange/30 focus:border-illini-orange resize-none"
+                            />
+                            <div className="flex items-center justify-between mt-2">
+                                <span className="text-xs text-slate-400">{userMemory.length}/1500 {t.charCount}</span>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => setIsMemoryEditing(false)}
+                                        className="px-3 py-1 text-xs font-medium text-slate-500 bg-slate-100 rounded-full hover:bg-slate-200 transition-colors"
+                                    >
+                                        {t.cancel}
+                                    </button>
+                                    <button
+                                        onClick={handleSaveMemory}
+                                        disabled={isMemorySaving}
+                                        className="px-3 py-1 text-xs font-medium text-white bg-illini-orange rounded-full hover:bg-illini-blue transition-colors disabled:opacity-50"
+                                    >
+                                        {isMemorySaving ? t.saving : t.save}
+                                    </button>
+                                </div>
+                            </div>
+                        </>
+                    ) : (
+                        <div className="p-3 bg-slate-50 rounded-lg text-sm text-slate-600 border border-slate-100 min-h-[60px] whitespace-pre-wrap">
+                            {userMemory || <span className="text-slate-400 italic">{t.memoryPlaceholder}</span>}
+                        </div>
+                    )}
                 </div>
 
                 {/* Actions */}
