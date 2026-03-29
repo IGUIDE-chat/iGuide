@@ -7,10 +7,11 @@
 
 import React, { useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { GitCompareArrows, X } from 'lucide-react';
+import { GitCompareArrows, X, Search, SlidersHorizontal } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Language } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
+import SortingDropdown from './SortingDropdown';
 import { FilterModal } from './FilterModal';
 import DormListHeader from './dorm-list/DormListHeader';
 import DormGrid from './dorm-list/DormGrid';
@@ -69,6 +70,43 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
         viewMode={controller.viewMode}
         setViewMode={controller.setViewMode}
       />
+
+      {/* Mobile toolbar (search + filter + sort) */}
+      <div className="md:hidden flex items-center gap-2 px-3 py-2 bg-white border-b border-gray-200 sticky top-0 z-30">
+        <div className="relative flex-1 min-w-0">
+          <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+            <Search className="h-3.5 w-3.5 text-gray-400" />
+          </div>
+          <input
+            type="text"
+            className="block w-full pl-8 pr-3 py-2 border border-gray-200 rounded-full text-sm bg-gray-50/50 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-illini-blue/20 focus:border-illini-blue/30"
+            placeholder={controller.t.searchPlaceholder}
+            value={controller.searchTerm}
+            onChange={(e) => controller.setSearchTerm(e.target.value)}
+          />
+        </div>
+        <div className="relative shrink-0">
+          <button
+            onClick={() => controller.setIsFilterModalOpen(true)}
+            type="button"
+            className={`w-9 h-9 rounded-full flex items-center justify-center border transition-colors ${
+              controller.hasActiveFilters
+                ? 'border-illini-orange/40 text-illini-orange bg-illini-orange/10'
+                : 'border-gray-200 text-gray-500 bg-white'
+            }`}
+          >
+            <SlidersHorizontal size={16} />
+          </button>
+          {controller.hasActiveFilters && (
+            <div className="absolute -top-1 -right-1 bg-illini-orange text-white text-[9px] font-bold h-4 w-4 flex items-center justify-center rounded-full border-2 border-white">
+              {controller.activeFilterCount}
+            </div>
+          )}
+        </div>
+        <div className="shrink-0">
+          <SortingDropdown sortBy={controller.sortBy} onSortChange={controller.setSortBy} viewMode={controller.viewMode} />
+        </div>
+      </div>
 
       <div className="flex-1 overflow-hidden bg-gray-50/50 relative z-0 flex flex-row min-w-0">
         <div

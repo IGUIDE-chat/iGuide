@@ -114,6 +114,10 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
     const { comments, loading: commentsLoading, saveComment, deleteComment, voteOnComment, thumbsUp } =
         useDormComments(dormId);
 
+    // ── Review stats (computed early for mobile header) ───────────────────
+    const totalReviews = comments.length;
+    const positivePercent = totalReviews > 0 ? Math.round((thumbsUp / totalReviews) * 100) : null;
+
     // ── Local dorm data ────────────────────────────────────────────────────
     const [dorm, setDorm] = useState<Dorm | undefined>(getFromContext(dormId));
 
@@ -183,7 +187,18 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                     <ArrowLeft className="w-4 h-4" />
                     <span className="text-[13px] font-semibold">{language === 'zh' ? '返回' : 'Back'}</span>
                 </button>
+                <span className="text-[13px] font-bold text-slate-800 truncate mx-2">{dormName}</span>
                 <div className="flex items-center gap-1 shrink-0">
+                    {positivePercent !== null && totalReviews > 0 && (
+                        <button
+                            type="button"
+                            onClick={() => document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                            className="flex items-center gap-1 px-2 py-1 rounded-full bg-illini-orange/10 text-illini-orange"
+                        >
+                            <ThumbsUp className="w-3 h-3 fill-illini-orange" />
+                            <span className="text-[11px] font-bold">{positivePercent}%</span>
+                        </button>
+                    )}
                     {user?.isAdmin && (
                         <button
                             type="button"
@@ -205,7 +220,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
             </div>
         );
         return () => { setMobileHeaderSlot(null); };
-    }, [dorm?.id, dorm?.name, dorm?.name_zh, language, user?.isAdmin, navigate, toggleFavorite, isFavorite, setMobileHeaderSlot]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [dorm?.id, dorm?.name, dorm?.name_zh, language, user?.isAdmin, navigate, toggleFavorite, isFavorite, setMobileHeaderSlot, positivePercent, totalReviews]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // ── Loading state ──────────────────────────────────────────────────────
     if (!dorm) {
@@ -272,8 +287,6 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
         : null;
 
     // Reviews
-    const totalReviews = comments.length;
-    const positivePercent = totalReviews > 0 ? Math.round((thumbsUp / totalReviews) * 100) : null;
     const displayedComments = showAllReviews ? comments : comments.slice(0, 3);
 
     // ── Handlers ───────────────────────────────────────────────────────────
