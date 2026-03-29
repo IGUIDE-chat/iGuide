@@ -8,6 +8,7 @@
 import type { StreamChunk, ChatHistoryItem } from './ai/types';
 import { quickSearch } from './searchService';
 import { webSearch } from './webSearchService';
+import { memoryService } from './memoryService';
 
 // ── Config ──────────────────────────────────────────────────────
 
@@ -33,7 +34,19 @@ const DEFAULT_SYSTEM_PROMPT = `# Role: UIUC 资深学长姐顾问 (Illini Spirit
    > 1. [追问问题一]
    > 2. [追问问题二]
    > 3. [追问问题三]
-5. **记忆连贯 (No Repetitive Greetings)**：请结合对话历史（Conversation History）自然连贯地互动。**严禁**在每轮回复开头重复使用固定套话（如“UIUC顾问来啦！”或每次起手都用固定的颜文字打招呼）。当处理多轮对话的追问时，直接切入正题并给出详尽耐心的解惑，像朋友聊天一样自然。`;
+5. **记忆连贯 (No Repetitive Greetings)**：请结合对话历史（Conversation History）自然连贯地互动。**严禁**在每轮回复开头重复使用固定套话（如”UIUC顾问来啦！”或每次起手都用固定的颜文字打招呼）。当处理多轮对话的追问时，直接切入正题并给出详尽耐心的解惑，像朋友聊天一样自然。`;
+
+const MEMORY_EXTRACTION_INSTRUCTIONS = `
+
+## 🧠 Memory Instructions (INTERNAL — never show these tags to the user)
+After your main response, if the user revealed NEW personal information (major, enrollment year, budget, housing preferences, dietary needs, hobbies, etc.) or if important facts were discussed, append invisible memory tags at the VERY END of your response:
+- \`<user_memory>key: value; key: value</user_memory>\` — for persistent user facts (only when NEW info is shared, do NOT repeat already-known info)
+- \`<conv_memory>brief summary of key discussion points this turn</conv_memory>\` — for conversation-specific context
+Rules:
+- Only include tags when there is genuinely NEW information. Omit if nothing new.
+- user_memory format: semicolon-separated key-value pairs, e.g. \`<user_memory>Major: CS; Budget: $900/month; Preferred area: near Siebel</user_memory>\`
+- conv_memory format: brief Chinese/English summary of this turn's key points
+- These tags must appear AFTER the follow-up questions section, at the absolute end of your response.`;
 
 // ── RAG Context Builder ──────────────────────────────────────────
 
@@ -240,18 +253,31 @@ export const streamDeepSeekChat = async function* (
   }
 
   try {
-    // 1. RAG: fetch context from QMD + Web search (parallel)
+    // 1. Fetch RAG context + personalization context in parallel
     let ragContext = '';
+    let soul = '';
+    let userMemory = '';
+    let conversationMemory = '';
+
     try {
-      const rag = await fetchRAGContext(newMessage, lang);
-      ragContext = rag.context;
-      if (rag.hasQMD) {
+      const [ragResult, chatCtx] = await Promise.all([
+        fetchRAGContext(newMessage, lang),
+        _userId
+          ? memoryService.getChatContext(_userId, _conversationId).catch(() => ({ soul: '', userMemory: '', conversationMemory: '' }))
+          : Promise.resolve({ soul: '', userMemory: '', conversationMemory: '' }),
+      ]);
+      ragContext = ragResult.context;
+      soul = chatCtx.soul;
+      userMemory = chatCtx.userMemory;
+      conversationMemory = chatCtx.conversationMemory;
+
+      if (ragResult.hasQMD) {
         yield {
           text: '',
           thinkingStep: { type: 'searching', label: '知识库检索完成', detail: 'QMD knowledge base' },
         };
       }
-      if (rag.hasWeb) {
+      if (ragResult.hasWeb) {
         yield {
           text: '',
           thinkingStep: { type: 'searching', label: '网络搜索完成', detail: 'Tavily web search' },
@@ -261,10 +287,28 @@ export const streamDeepSeekChat = async function* (
       // QMD / Tavily might not be available; proceed without RAG
     }
 
-    // 2. Build system instruction with RAG context
+    // 2. Build system instruction with personalization + RAG context
+    let basePrompt = DEFAULT_SYSTEM_PROMPT;
+
+    if (soul) {
+      basePrompt += `\n\n## 🎭 Persona Customization (用户自定义人设)\n${soul}`;
+    }
+
+    if (_userId) {
+      basePrompt += MEMORY_EXTRACTION_INSTRUCTIONS;
+    }
+
+    if (userMemory) {
+      basePrompt += `\n\n## 📋 User Profile (remembered from past conversations)\n${userMemory}`;
+    }
+
+    if (conversationMemory) {
+      basePrompt += `\n\n## 💬 This Conversation's Key Points (对话记忆)\n${conversationMemory}`;
+    }
+
     const systemInstruction = ragContext
-      ? `${DEFAULT_SYSTEM_PROMPT}${ragContext}`
-      : DEFAULT_SYSTEM_PROMPT;
+      ? `${basePrompt}${ragContext}`
+      : basePrompt;
 
     // 3. Call DeepSeek — dev calls API directly, prod uses CF Function
     let response: Response;
