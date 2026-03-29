@@ -6,6 +6,7 @@
  */
 
 import React from 'react';
+import { useLayout } from '../../contexts/LayoutContext';
 
 interface AppShellProps {
   isSidebarOpen: boolean;
@@ -30,6 +31,9 @@ export const AppShell: React.FC<AppShellProps> = ({
   onOpenSidebar,
   onToggleSidebar,
 }) => {
+  const layout = useLayout();
+  const headerSlot = layout.mobileHeaderSlot;
+
   return (
     <div className="flex h-[100dvh] w-full bg-white text-slate-900 font-sans overflow-hidden">
       <div
@@ -89,7 +93,7 @@ export const AppShell: React.FC<AppShellProps> = ({
               />
             </svg>
           </button>
-          {mobileHeader}
+          {headerSlot ?? mobileHeader}
         </div>
 
         <div className="flex-1 overflow-hidden relative min-w-0">{children}</div>

@@ -34,6 +34,7 @@ import {
     normalizeFloorPlan,
 } from '../../utils/roomOptions';
 import { getDetailTagDisplay } from '../../utils/tagLabels';
+import { useLayout } from '../../contexts/LayoutContext';
 
 // ─── Animation variants ────────────────────────────────────────────────────
 const pageVariants: Variants = {
@@ -107,6 +108,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
     const { addToHistory, toggleFavorite, isFavorite } = useSharedDormInteraction();
     const { user, requestLogin } = useAuth();
     const { getDormById: getFromContext, refreshDorms } = useDormData();
+    const { setMobileHeaderSlot } = useLayout();
     const dormId = id ?? '';
     const { comments, loading: commentsLoading, saveComment, deleteComment, voteOnComment, thumbsUp } =
         useDormComments(dormId);
@@ -153,6 +155,48 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
         setHeroImageIndex(0);
         setPlanImageIndices({});
     }, [dorm?.id]);
+
+    // ── Mobile header slot: back + favorite in the AppShell header bar ────
+    useEffect(() => {
+        if (!dorm) {
+            setMobileHeaderSlot(null);
+            return () => { setMobileHeaderSlot(null); };
+        }
+        const dormName = language === 'zh' && dorm.name_zh ? dorm.name_zh : dorm.name;
+        setMobileHeaderSlot(
+            <div className="flex-1 min-w-0 flex items-center justify-between">
+                <button
+                    type="button"
+                    onClick={() => navigate('/dorms')}
+                    className="flex items-center gap-1 text-slate-500 hover:text-illini-blue transition-colors shrink-0"
+                >
+                    <ArrowLeft className="w-4 h-4" />
+                    <span className="text-[13px] font-semibold">{language === 'zh' ? '返回' : 'Back'}</span>
+                </button>
+                <span className="text-[14px] font-bold text-slate-800 truncate mx-3">{dormName}</span>
+                <div className="flex items-center gap-1 shrink-0">
+                    {user?.isAdmin && (
+                        <button
+                            type="button"
+                            onClick={() => setEditOpen(true)}
+                            className="p-1.5 text-slate-400 hover:text-illini-blue transition-colors rounded-full"
+                            aria-label="Edit"
+                        >
+                            <Pencil className="w-4 h-4" />
+                        </button>
+                    )}
+                    <button
+                        type="button"
+                        onClick={() => { toggleFavorite(dorm.id, dorm.name, dorm.name_zh); }}
+                        className="p-1.5 text-slate-400 hover:text-illini-orange transition-colors rounded-full"
+                    >
+                        <Heart className={`w-5 h-5 transition-colors duration-200 ${isFavorite(dorm.id) ? 'fill-illini-orange text-illini-orange' : ''}`} />
+                    </button>
+                </div>
+            </div>
+        );
+        return () => { setMobileHeaderSlot(null); };
+    }, [dorm?.id, dorm?.name, dorm?.name_zh, language, user?.isAdmin, navigate, toggleFavorite, isFavorite, setMobileHeaderSlot]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // ── Loading state ──────────────────────────────────────────────────────
     if (!dorm) {
@@ -342,29 +386,6 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
             <main className="max-w-[1000px] mx-auto px-4 md:px-6 mt-0 md:mt-8">
                 <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="space-y-8 md:space-y-10">
 
-                    {/* Mobile fallback top bar when no hero image */}
-                    {!heroImage && (
-                        <div className="md:hidden flex items-center justify-between px-1 pt-2">
-                            <button
-                                type="button"
-                                onClick={() => navigate('/dorms')}
-                                className="flex items-center gap-1 text-slate-500 hover:text-illini-blue transition-colors py-1"
-                            >
-                                <ArrowLeft className="w-4 h-4" />
-                                <span className="text-[13px] font-semibold">{language === 'zh' ? '返回' : 'Back'}</span>
-                            </button>
-                            <motion.button
-                                type="button"
-                                onClick={async () => { await toggleFavorite(dorm.id, dorm.name, dorm.name_zh); }}
-                                aria-label={isSaved ? t.saved : t.save}
-                                whileTap={{ scale: 1.35 }}
-                                className="p-2 text-slate-500 hover:text-illini-orange transition-colors"
-                            >
-                                <Heart className={`w-5 h-5 ${isSaved ? 'fill-illini-orange text-illini-orange' : ''}`} />
-                            </motion.button>
-                        </div>
-                    )}
-
                     {/* ── Hero Section ── */}
                     <motion.section variants={fadeUp} className="space-y-5 md:space-y-6">
                         {heroImage && (
@@ -383,38 +404,6 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                     animate={{ scale: 1 }}
                                     transition={{ duration: 0.8, ease: 'easeOut' }}
                                 />
-                                {/* Mobile overlay: back + favorite */}
-                                <div className="md:hidden absolute top-0 left-0 right-0 flex items-center justify-between px-3 pt-3 z-10">
-                                    <button
-                                        type="button"
-                                        onClick={(e) => { e.stopPropagation(); navigate('/dorms'); }}
-                                        className="w-9 h-9 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center text-white shadow-sm active:scale-95 transition-transform"
-                                    >
-                                        <ArrowLeft className="w-4.5 h-4.5" />
-                                    </button>
-                                    <div className="flex items-center gap-2">
-                                        {user?.isAdmin && (
-                                            <button
-                                                type="button"
-                                                onClick={(e) => { e.stopPropagation(); setEditOpen(true); }}
-                                                className="w-9 h-9 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center text-white shadow-sm active:scale-95 transition-transform"
-                                                aria-label="Edit"
-                                            >
-                                                <Pencil className="w-4 h-4" />
-                                            </button>
-                                        )}
-                                        <motion.button
-                                            type="button"
-                                            onClick={async (e) => { e.stopPropagation(); await toggleFavorite(dorm.id, dorm.name, dorm.name_zh); }}
-                                            aria-label={isSaved ? t.saved : t.save}
-                                            whileTap={{ scale: 1.3 }}
-                                            transition={{ type: 'spring', stiffness: 400, damping: 12 }}
-                                            className="w-9 h-9 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center text-white shadow-sm"
-                                        >
-                                            <Heart className={`w-[18px] h-[18px] transition-colors duration-200 ${isSaved ? 'fill-illini-orange text-illini-orange' : ''}`} />
-                                        </motion.button>
-                                    </div>
-                                </div>
                                 {positivePercent !== null && (
                                     <motion.div
                                         initial={{ opacity: 0, x: 8 }}
