@@ -21,6 +21,7 @@ interface DormCardProps {
     isCompared?: boolean;
     onToggleCompare?: (dorm: Dorm) => void;
     onHoverDorm?: (dormId: string | null) => void;
+    onRatingClick?: (dorm: Dorm, e: React.MouseEvent) => void;
     language?: Language;
     positivePercent?: number | null;
     totalReviews?: number;
@@ -288,6 +289,7 @@ const DormCard: React.FC<DormCardProps> = ({
     isCompared = false,
     onToggleCompare,
     onHoverDorm,
+    onRatingClick,
     language = 'en',
     positivePercent,
     totalReviews,
@@ -321,12 +323,17 @@ const DormCard: React.FC<DormCardProps> = ({
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 {positivePercent != null && totalReviews != null && totalReviews > 0 && (
-                    <div className="absolute right-3 top-3">
-                        <div className="rounded-md bg-white px-2 py-1 text-xs font-bold text-slate-800 shadow-sm transition-transform duration-200 group-hover:scale-105 flex items-center gap-1">
-                            <ThumbsUp size={11} className="text-slate-500" />
-                            {positivePercent}% ({totalReviews})
-                        </div>
-                    </div>
+                    <button
+                        type="button"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onRatingClick?.(dorm, e);
+                        }}
+                        className="absolute right-3 top-3 rounded-md bg-white px-2 py-1 text-xs font-bold text-slate-800 shadow-sm transition-all duration-200 group-hover:scale-105 hover:bg-illini-orange/10 hover:border-illini-orange/30 flex items-center gap-1 border border-transparent"
+                    >
+                        <ThumbsUp size={11} className="text-slate-500" />
+                        {positivePercent}% ({totalReviews})
+                    </button>
                 )}
 
                 {onToggleCompare && (

@@ -6,7 +6,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import {
     ArrowLeft, Heart, MapPin, Snowflake, Utensils, Bath,
@@ -103,6 +103,7 @@ const InlineImageNavButton: React.FC<InlineImageNavButtonProps> = ({
 const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const location = useLocation();
 
     // ── Cross-component state (from Contexts / hooks) ──────────────────────
     const { addToHistory, toggleFavorite, isFavorite } = useSharedDormInteraction();
@@ -155,6 +156,16 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
         setHeroImageIndex(0);
         setPlanImageIndices({});
     }, [dorm?.id]);
+
+    // Scroll to reviews section when navigated with #reviews hash
+    useEffect(() => {
+        if (location.hash === '#reviews' && dorm) {
+            const el = document.getElementById('reviews');
+            if (el) {
+                setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
+            }
+        }
+    }, [location.hash, dorm?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // ── Mobile header slot: back + favorite in the AppShell header bar ────
     useEffect(() => {
@@ -403,17 +414,22 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                     transition={{ duration: 0.8, ease: 'easeOut' }}
                                 />
                                 {positivePercent !== null && (
-                                    <motion.div
+                                    <motion.button
+                                        type="button"
                                         initial={{ opacity: 0, x: 8 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         transition={{ delay: 0.5, duration: 0.3 }}
-                                        className="absolute top-3 right-3 md:top-4 md:right-4 bg-white/80 backdrop-blur-md px-2.5 py-1 md:px-3 md:py-1.5 rounded-full flex items-center gap-1 md:gap-1.5 shadow-sm border border-white/50"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                        }}
+                                        className="absolute top-3 right-3 md:top-4 md:right-4 bg-white/80 backdrop-blur-md px-2.5 py-1 md:px-3 md:py-1.5 rounded-full flex items-center gap-1 md:gap-1.5 shadow-sm border border-white/50 hover:bg-white/95 transition-colors cursor-pointer"
                                     >
                                         <ThumbsUp className="w-3.5 h-3.5 md:w-4 md:h-4 text-illini-orange fill-illini-orange" />
                                         <span className="text-[12px] md:text-[13px] font-bold text-slate-900">
                                             {positivePercent}{t.positiveRating} ({totalReviews})
                                         </span>
-                                    </motion.div>
+                                    </motion.button>
                                 )}
                                 {heroImages.length > 1 && (
                                     <>
@@ -1061,7 +1077,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                     )}
 
                     {/* ── Reviews ── */}
-                    <motion.section variants={fadeUp} className="space-y-4 pt-6 pb-8 border-t border-slate-200/50">
+                    <motion.section id="reviews" variants={fadeUp} className="space-y-4 pt-6 pb-8 border-t border-slate-200/50">
                         <div className="flex items-center justify-between mb-2">
                             <h3 className="text-[16px] md:text-[18px] font-bold text-slate-900">{t.ratingsAndReviews}</h3>
                             {totalReviews > 0 && (

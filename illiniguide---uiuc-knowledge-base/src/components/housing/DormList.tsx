@@ -5,10 +5,12 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { GitCompareArrows, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Language } from '../../types';
+import { useAuth } from '../../contexts/AuthContext';
 import { FilterModal } from './FilterModal';
 import DormListHeader from './dorm-list/DormListHeader';
 import DormGrid from './dorm-list/DormGrid';
@@ -41,7 +43,17 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
   const controller = useDormListController(language);
   const commentStats = useDormCommentStats();
   const { compareIds, compareDorms, isCompareOpen, toggleCompare, clearCompare, openCompare, closeCompare } = useCompare();
+  const { user, requestLogin } = useAuth();
+  const navigate = useNavigate();
   const ct = COMPARE_TEXT[language];
+
+  const handleRatingClick = useCallback((dorm: { id: string }) => {
+    if (!user) {
+      requestLogin();
+    } else {
+      navigate(`/dorms/${dorm.id}#reviews`);
+    }
+  }, [user, requestLogin, navigate]);
 
   return (
     <div className="h-full flex flex-col bg-gray-50">
@@ -77,6 +89,7 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
               onToggleFavorite={controller.handleToggleFavorite}
               onViewDetails={controller.handleViewDetails}
               onHoverDorm={controller.setHoveredDormId}
+              onRatingClick={handleRatingClick}
               compareIds={compareIds}
               onToggleCompare={(dorm) => toggleCompare(dorm.id)}
               language={language}
