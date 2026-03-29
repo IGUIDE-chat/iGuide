@@ -414,17 +414,22 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                     transition={{ duration: 0.8, ease: 'easeOut' }}
                                 />
                                 {positivePercent !== null && (
-                                    <motion.div
+                                    <motion.button
+                                        type="button"
                                         initial={{ opacity: 0, x: 8 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         transition={{ delay: 0.5, duration: 0.3 }}
-                                        className="absolute top-3 right-3 md:top-4 md:right-4 bg-white/80 backdrop-blur-md px-2.5 py-1 md:px-3 md:py-1.5 rounded-full flex items-center gap-1 md:gap-1.5 shadow-sm border border-white/50"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                        }}
+                                        className="absolute top-3 right-3 md:top-4 md:right-4 bg-white/80 backdrop-blur-md px-2.5 py-1 md:px-3 md:py-1.5 rounded-full flex items-center gap-1 md:gap-1.5 shadow-sm border border-white/50 hover:bg-white/95 transition-colors cursor-pointer"
                                     >
                                         <ThumbsUp className="w-3.5 h-3.5 md:w-4 md:h-4 text-illini-orange fill-illini-orange" />
                                         <span className="text-[12px] md:text-[13px] font-bold text-slate-900">
                                             {positivePercent}{t.positiveRating} ({totalReviews})
                                         </span>
-                                    </motion.div>
+                                    </motion.button>
                                 )}
                                 {heroImages.length > 1 && (
                                     <>
