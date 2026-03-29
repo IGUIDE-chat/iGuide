@@ -157,7 +157,7 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                     ? 'opacity-100 scale-100 translate-y-0'
                     : 'opacity-0 scale-95 translate-y-10 pointer-events-none'
                     }`}
-                style={{ height: '800px', maxHeight: '85vh' }}
+                style={{ height: '70vh', maxHeight: '85vh' }}
             >
                 <div className="bg-illini-blue p-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -171,7 +171,7 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                     </div>
                 </div>
 
-                <div className="flex-grow overflow-y-auto p-4 space-y-4 bg-gray-50/50">
+                <div className="flex-grow overflow-y-auto overflow-x-hidden p-4 space-y-4 bg-gray-50/50">
                     <AnimatePresence initial={false}>
                         {messages.map((msg, index) => {
                             const isRecent = index === messages.length - 1 && msg.role === 'model';
@@ -188,7 +188,7 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                                     <div
                                         className={`rounded-2xl px-5 py-4 text-sm shadow-sm leading-relaxed overflow-hidden ${msg.role === 'user'
                                             ? 'max-w-[85%] bg-illini-blue text-white font-medium rounded-br-none'
-                                            : 'w-full bg-white text-gray-800 border border-gray-100 rounded-bl-none'
+                                            : 'max-w-full bg-white text-gray-800 border border-gray-100 rounded-bl-none'
                                             }`}
                                     >
                                         {msg.role === 'model' && isRecent ? (
@@ -196,7 +196,7 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                                         ) : msg.role === 'user' ? (
                                             <span className="whitespace-pre-wrap text-white font-medium">{msg.text}</span>
                                         ) : (
-                                            <div className="prose prose-sm max-w-none prose-p:leading-relaxed prose-pre:bg-gray-100 text-gray-800">
+                                            <div className="prose prose-sm max-w-none prose-p:leading-relaxed prose-pre:bg-gray-100 prose-pre:overflow-x-auto text-gray-800 break-words overflow-wrap-anywhere">
                                                 <ReactMarkdown
                                                     remarkPlugins={[remarkGfm]}
                                                     components={{

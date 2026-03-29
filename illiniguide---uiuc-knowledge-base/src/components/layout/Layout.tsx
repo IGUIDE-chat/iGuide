@@ -8,7 +8,7 @@
 import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Search, SlidersHorizontal } from 'lucide-react';
+import { Search, SlidersHorizontal, Map as MapIcon, List } from 'lucide-react';
 import { Language } from '../../types';
 import { UI_TEXT } from '../../i18n/uiText';
 import { useAuth } from '../../contexts/AuthContext';
@@ -46,7 +46,7 @@ export const Layout: React.FC<LayoutProps> = ({
 }) => {
   const t = UI_TEXT[language];
   const { user } = useAuth();
-  const { searchTerm, setSearchTerm, setIsFilterModalOpen } = useHousingFilters();
+  const { searchTerm, setSearchTerm, setIsFilterModalOpen, viewMode, setViewMode } = useHousingFilters();
   const { hasActiveDormFilters, activeDormFilterCount } = useDormFilterBadge();
   const navigate = useNavigate();
   const location = useLocation();
@@ -217,6 +217,14 @@ export const Layout: React.FC<LayoutProps> = ({
           </div>
         )}
       </div>
+      <button
+        type="button"
+        aria-label={viewMode === 'list' ? (language === 'zh' ? '地图' : 'Map') : (language === 'zh' ? '列表' : 'List')}
+        onClick={() => setViewMode(viewMode === 'list' ? 'map' : 'list')}
+        className="w-10 h-10 shrink-0 rounded-full border border-gray-200 bg-white text-gray-700 flex items-center justify-center transition-all duration-200 active:scale-95"
+      >
+        {viewMode === 'list' ? <MapIcon size={18} strokeWidth={2} /> : <List size={18} strokeWidth={2} />}
+      </button>
     </div>
   ) : (
     <span className="font-semibold text-slate-700 text-sm">
