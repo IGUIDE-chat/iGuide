@@ -11,6 +11,29 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { dormCommentsService, DormComment } from '../../../services/dormCommentsService';
 
+// ── Guest vote localStorage helpers ──────────────────────────────────────
+const GUEST_VOTES_KEY = 'guest_comment_votes';
+
+function getGuestVotes(): Record<string, 1 | -1 | null> {
+    try {
+        const raw = localStorage.getItem(GUEST_VOTES_KEY);
+        return raw ? JSON.parse(raw) : {};
+    } catch {
+        return {};
+    }
+}
+
+function setGuestVote(commentId: string, vote: 1 | -1 | null) {
+    const votes = getGuestVotes();
+    if (vote === null) {
+        delete votes[commentId];
+    } else {
+        votes[commentId] = vote;
+    }
+    localStorage.setItem(GUEST_VOTES_KEY, JSON.stringify(votes));
+}
+
+// ── Hook ─────────────────────────────────────────────────────────────────
 export function useDormComments(dormId: string) {
     const { user } = useAuth();
     const [comments, setComments] = useState<DormComment[]>([]);
@@ -19,9 +42,26 @@ export function useDormComments(dormId: string) {
     const load = useCallback(async () => {
         setLoading(true);
         const data = await dormCommentsService.getComments(dormId);
-        setComments(data);
+
+        // Merge guest votes from localStorage when not logged in
+        if (!user) {
+            const guestVotes = getGuestVotes();
+            const merged = data.map(c => {
+                const gv = guestVotes[c.id];
+                if (gv == null) return c;
+                return {
+                    ...c,
+                    myVote: gv,
+                    upvotes: c.upvotes + (gv === 1 ? 1 : 0),
+                    downvotes: c.downvotes + (gv === -1 ? 1 : 0),
+                };
+            });
+            setComments(merged);
+        } else {
+            setComments(data);
+        }
         setLoading(false);
-    }, [dormId]);
+    }, [dormId, user]);
 
     useEffect(() => {
         load();
@@ -41,16 +81,21 @@ export function useDormComments(dormId: string) {
     };
 
     const voteOnComment = async (commentId: string, vote: 1 | -1 | null) => {
-        await dormCommentsService.voteOnComment(commentId, vote);
+        if (user) {
+            await dormCommentsService.voteOnComment(commentId, vote);
+        } else {
+            // Guest: persist in localStorage only
+            setGuestVote(commentId, vote);
+        }
+
+        // Optimistic UI update (works for both guest and logged-in)
         setComments(prev =>
             prev.map(c => {
                 if (c.id !== commentId) return c;
                 const prevVote = c.myVote;
                 let { upvotes, downvotes } = c;
-                // Undo previous vote
                 if (prevVote === 1) upvotes--;
                 if (prevVote === -1) downvotes--;
-                // Apply new vote
                 if (vote === 1) upvotes++;
                 if (vote === -1) downvotes++;
                 return { ...c, upvotes, downvotes, myVote: vote };

@@ -6,7 +6,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import {
     ArrowLeft, Heart, MapPin, Snowflake, Utensils, Bath,
@@ -103,6 +103,7 @@ const InlineImageNavButton: React.FC<InlineImageNavButtonProps> = ({
 const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const location = useLocation();
 
     // ── Cross-component state (from Contexts / hooks) ──────────────────────
     const { addToHistory, toggleFavorite, isFavorite } = useSharedDormInteraction();
@@ -155,6 +156,16 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
         setHeroImageIndex(0);
         setPlanImageIndices({});
     }, [dorm?.id]);
+
+    // Scroll to reviews section when navigated with #reviews hash
+    useEffect(() => {
+        if (location.hash === '#reviews' && dorm) {
+            const el = document.getElementById('reviews');
+            if (el) {
+                setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
+            }
+        }
+    }, [location.hash, dorm?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // ── Mobile header slot: back + favorite in the AppShell header bar ────
     useEffect(() => {
@@ -1061,7 +1072,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                     )}
 
                     {/* ── Reviews ── */}
-                    <motion.section variants={fadeUp} className="space-y-4 pt-6 pb-8 border-t border-slate-200/50">
+                    <motion.section id="reviews" variants={fadeUp} className="space-y-4 pt-6 pb-8 border-t border-slate-200/50">
                         <div className="flex items-center justify-between mb-2">
                             <h3 className="text-[16px] md:text-[18px] font-bold text-slate-900">{t.ratingsAndReviews}</h3>
                             {totalReviews > 0 && (
