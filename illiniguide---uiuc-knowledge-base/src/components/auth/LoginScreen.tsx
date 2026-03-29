@@ -56,7 +56,9 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onGuestLogin, language
     };
 
     return (
-        <div className="min-h-screen flex items-start justify-center pt-16 md:pt-32 bg-gradient-to-br from-illini-blue/10 via-white to-illini-orange/10 overflow-y-auto relative px-4">
+        <div
+            onClick={(e) => { if (e.target === e.currentTarget) onGuestLogin?.(); }}
+            className="min-h-screen flex items-start justify-center pt-16 md:pt-32 bg-gradient-to-br from-illini-blue/10 via-white to-illini-orange/10 overflow-y-auto relative px-4 cursor-default">
             {/* Language Switcher - Responsive Position */}
             <div className="absolute top-4 right-4 md:top-8 md:right-8 z-50">
                 <button
