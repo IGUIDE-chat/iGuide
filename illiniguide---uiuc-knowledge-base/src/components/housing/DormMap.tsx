@@ -535,60 +535,109 @@ const DormMap: React.FC<DormMapProps> = ({
                         closeOnClick={false}
                         className="dorm-hover-popup"
                     >
-                        <div
-                            className="w-56 cursor-pointer"
-                            onClick={() => {
+                        <PopupDormPreview
+                            dorm={hoveredDorm}
+                            popupT={popupT}
+                            isChinese={isChinese}
+                            formatPopupPrice={formatPopupPrice}
+                            onOpenDetails={() => {
                                 setHoveredDorm(null);
                                 onSelectDorm(hoveredDorm);
                             }}
-                        >
-                            <div className="h-28 overflow-hidden">
-                                <img
-                                    src={hoveredDorm.imageUrl}
-                                    alt={hoveredDorm.name}
-                                    className="w-full h-full object-cover"
-                                    onError={(e) => {
-                                        e.currentTarget.src =
-                                            'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400';
-                                    }}
-                                />
-                            </div>
-                            <div className="p-3">
-                                <div className="flex items-center justify-between mb-1">
-                                    <h4 className="font-bold text-gray-900 text-sm truncate flex-1">
-                                        {isChinese && hoveredDorm.name_zh ? hoveredDorm.name_zh : hoveredDorm.name}
-                                    </h4>
-                                    {(() => {
-                                        const housingTypeMeta = getHousingTypeMeta(hoveredDorm.housingType);
-                                        return (
-                                            <span
-                                                className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ml-2 flex-shrink-0 ${housingTypeMeta.badgeClassName}`}
-                                            >
-                                                {housingTypeMeta.shortLabel}
-                                            </span>
-                                        );
-                                    })()}
-                                </div>
-                                <div className="flex items-center gap-2 text-[11px] text-gray-500 mb-2">
-                                    {hoveredDorm.ac && <span>{popupT.ac}</span>}
-                                    {hoveredDorm.dining === 'inside' && <span>{popupT.dining}</span>}
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-base font-bold text-gray-900">
-                                        {formatPopupPrice(hoveredDorm.price)}
-                                        <span className="text-[10px] text-gray-400 font-normal ml-0.5">
-                                            {popupT.perSem}
-                                        </span>
-                                    </span>
-                                    <span className="text-[11px] text-blue-600 font-semibold">
-                                        {popupT.viewDetails}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
+                        />
                     </Popup>
                 )}
             </Map>
+        </div>
+    );
+};
+
+/** Pointer-friendly preview (tap opens details; works when `click` is not synthesized on touch). */
+const POPUP_TAP_PX = 14;
+
+const PopupDormPreview: React.FC<{
+    dorm: Dorm;
+    popupT: { perSem: string; viewDetails: string; ac: string; dining: string };
+    isChinese: boolean;
+    formatPopupPrice: (price: number) => string;
+    onOpenDetails: () => void;
+}> = ({ dorm, popupT, isChinese, formatPopupPrice, onOpenDetails }) => {
+    const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
+
+    const tryOpen = (e: React.PointerEvent) => {
+        if (!pointerStartRef.current) return;
+        const dx = e.clientX - pointerStartRef.current.x;
+        const dy = e.clientY - pointerStartRef.current.y;
+        pointerStartRef.current = null;
+        if (Math.hypot(dx, dy) > POPUP_TAP_PX) return;
+        onOpenDetails();
+    };
+
+    return (
+        <div
+            className="w-56 cursor-pointer [touch-action:manipulation]"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onOpenDetails();
+                }
+            }}
+            onPointerDown={(e) => {
+                if (e.pointerType === 'mouse' && e.button !== 0) return;
+                pointerStartRef.current = { x: e.clientX, y: e.clientY };
+            }}
+            onPointerUp={(e) => {
+                tryOpen(e);
+            }}
+            onPointerCancel={() => {
+                pointerStartRef.current = null;
+            }}
+        >
+            <div className="h-28 overflow-hidden">
+                <img
+                    src={dorm.imageUrl}
+                    alt={dorm.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                        e.currentTarget.src =
+                            'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400';
+                    }}
+                />
+            </div>
+            <div className="p-3">
+                <div className="flex items-center justify-between mb-1">
+                    <h4 className="font-bold text-gray-900 text-sm truncate flex-1">
+                        {isChinese && dorm.name_zh ? dorm.name_zh : dorm.name}
+                    </h4>
+                    {(() => {
+                        const housingTypeMeta = getHousingTypeMeta(dorm.housingType);
+                        return (
+                            <span
+                                className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ml-2 flex-shrink-0 ${housingTypeMeta.badgeClassName}`}
+                            >
+                                {housingTypeMeta.shortLabel}
+                            </span>
+                        );
+                    })()}
+                </div>
+                <div className="flex items-center gap-2 text-[11px] text-gray-500 mb-2">
+                    {dorm.ac && <span>{popupT.ac}</span>}
+                    {dorm.dining === 'inside' && <span>{popupT.dining}</span>}
+                </div>
+                <div className="flex items-center justify-between">
+                    <span className="text-base font-bold text-gray-900">
+                        {formatPopupPrice(dorm.price)}
+                        <span className="text-[10px] text-gray-400 font-normal ml-0.5">
+                            {popupT.perSem}
+                        </span>
+                    </span>
+                    <span className="text-[11px] text-blue-600 font-semibold">
+                        {popupT.viewDetails}
+                    </span>
+                </div>
+            </div>
         </div>
     );
 };
