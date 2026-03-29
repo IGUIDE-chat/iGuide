@@ -46,10 +46,11 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
           >
             <div
               className={`${containerClass} flex gap-4 ${
-                message.role === 'user' ? 'flex-row-reverse' : ''
+                message.role === 'user' ? 'flex-row-reverse' : 'md:flex-row flex-col'
               }`}
             >
-              <div className="flex-shrink-0 flex flex-col relative items-end">
+              {/* Avatar: hidden on mobile for AI, always shown on desktop */}
+              <div className={`flex-shrink-0 flex flex-col relative items-end ${message.role === 'model' ? 'hidden md:flex' : ''}`}>
                 {message.role === 'user' ? (
                   <div className="w-6 h-6 bg-slate-200 rounded-lg flex items-center justify-center text-slate-500">
                     <svg
@@ -76,7 +77,7 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
                   message.role === 'user' ? 'flex flex-col items-end' : ''
                 }`}
               >
-                <div className="font-semibold text-xs text-slate-900 mb-1">
+                <div className={`font-semibold text-xs text-slate-900 mb-1 ${message.role === 'model' ? 'hidden md:block' : ''}`}>
                   {message.role === 'user' ? userRole : botName}
                 </div>
                 {message.role === 'model' &&
