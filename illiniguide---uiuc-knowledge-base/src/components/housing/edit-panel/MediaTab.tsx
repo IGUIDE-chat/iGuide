@@ -376,7 +376,7 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                           ))}
                         </select>
                       </Field>
-                      {layoutKind === 'standard' && (
+                      {layoutKind !== 'Studio' && (
                         <Field label={t.labels.bedCount}>
                           <select
                             value={plan.bedCount ?? 1}
@@ -384,8 +384,6 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                               update(
                                 {
                                   bedCount: Number(event.target.value),
-                                  type: undefined,
-                                  labelCode: undefined,
                                 },
                                 true,
                               )
