@@ -8,7 +8,7 @@
 import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Search, SlidersHorizontal, Map as MapIcon, List } from 'lucide-react';
+import { Search, SlidersHorizontal, Map as MapIcon, List, ArrowUpDown } from 'lucide-react';
 import { Language } from '../../types';
 import { UI_TEXT } from '../../i18n/uiText';
 import { useAuth } from '../../contexts/AuthContext';
@@ -19,6 +19,53 @@ import { AppShell } from './AppShell';
 import { PrimaryNav } from './PrimaryNav';
 import { SidebarPanel } from './SidebarPanel';
 import { SidebarFooter } from './SidebarFooter';
+
+// ── Lightweight mobile sort dropdown (avoids cross-domain import) ─────────
+const SORT_OPTIONS = [
+  { value: 'name-asc', label: 'A-Z' },
+  { value: 'name-desc', label: 'Z-A' },
+  { value: 'price-asc', label: 'Price ↑' },
+  { value: 'price-desc', label: 'Price ↓' },
+] as const;
+
+const SortDropdownMobile: React.FC<{ sortBy: string; onSortChange: (v: string) => void }> = ({ sortBy, onSortChange }) => {
+  const [open, setOpen] = React.useState(false);
+  const ref = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  return (
+    <div className="relative shrink-0" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all duration-200 ${
+          open ? 'border-illini-blue/50 bg-illini-blue/10 text-illini-blue' : 'border-gray-200 bg-white text-gray-700'
+        }`}
+      >
+        <ArrowUpDown size={18} strokeWidth={2} />
+      </button>
+      {open && (
+        <div className="absolute right-0 mt-2 w-36 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
+          {SORT_OPTIONS.map((o) => (
+            <button
+              key={o.value}
+              type="button"
+              onClick={() => { onSortChange(o.value); setOpen(false); }}
+              className={`w-full px-4 py-2 text-sm text-left transition-colors ${sortBy === o.value ? 'font-medium text-illini-blue bg-illini-blue/5' : 'text-gray-600 hover:bg-gray-50'}`}
+            >
+              {o.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -46,7 +93,7 @@ export const Layout: React.FC<LayoutProps> = ({
 }) => {
   const t = UI_TEXT[language];
   const { user } = useAuth();
-  const { searchTerm, setSearchTerm, setIsFilterModalOpen, viewMode, setViewMode } = useHousingFilters();
+  const { searchTerm, setSearchTerm, setIsFilterModalOpen, viewMode, setViewMode, sortBy, setSortBy } = useHousingFilters();
   const { hasActiveDormFilters, activeDormFilterCount } = useDormFilterBadge();
   const navigate = useNavigate();
   const location = useLocation();
@@ -217,6 +264,7 @@ export const Layout: React.FC<LayoutProps> = ({
           </div>
         )}
       </div>
+      <SortDropdownMobile sortBy={sortBy} onSortChange={setSortBy} />
       <button
         type="button"
         aria-label={viewMode === 'list' ? (language === 'zh' ? '地图' : 'Map') : (language === 'zh' ? '列表' : 'List')}
