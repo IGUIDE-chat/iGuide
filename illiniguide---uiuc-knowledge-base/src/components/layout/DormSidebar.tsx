@@ -202,8 +202,8 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({ language, currentDormI
     };
 
     return (
-        <div className="flex flex-col h-full px-3">
-            <div className="pt-2 space-y-4">
+        <div className="flex flex-col h-full min-h-0 px-3">
+            <div className="flex-1 overflow-y-auto no-scrollbar pt-2 space-y-4">
                 <section>
                     <div className="flex items-center justify-between px-1 mb-1.5">
                         <div className="flex items-center gap-1.5 text-slate-400">
