@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+dist/
+
+# Environment variables
+.dev.vars
+.env
+
+# Wrangler
+.wrangler/
+wrangler.toml.backup
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
