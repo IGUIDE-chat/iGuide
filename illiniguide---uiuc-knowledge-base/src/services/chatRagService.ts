@@ -134,7 +134,7 @@ function dedupeStrings(values: string[]): string[] {
 }
 
 function extractAsciiKeywords(query: string): string[] {
-  const matches = query.match(/[A-Za-z][A-Za-z0-9&-]*/g) ?? [];
+  const matches: string[] = query.match(/[A-Za-z][A-Za-z0-9&-]*/g) ?? [];
 
   return matches.filter((token) => {
     const normalized = token.toLowerCase();
