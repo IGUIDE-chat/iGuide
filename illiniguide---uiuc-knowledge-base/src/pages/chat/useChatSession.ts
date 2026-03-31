@@ -265,17 +265,22 @@ export const useChatSession = ({
         }
 
         // Extract and strip memory tags (invisible to user)
+        const userSoulMatch = fullText.match(/<user_soul>([\s\S]*?)<\/user_soul>/);
         const userMemoryMatch = fullText.match(/<user_memory>([\s\S]*?)<\/user_memory>/);
         const convMemoryMatch = fullText.match(/<conv_memory>([\s\S]*?)<\/conv_memory>/);
         fullText = fullText
+          .replace(/<user_soul>[\s\S]*?<\/user_soul>/g, '')
           .replace(/<user_memory>[\s\S]*?<\/user_memory>/g, '')
           .replace(/<conv_memory>[\s\S]*?<\/conv_memory>/g, '')
           .trim();
 
         // Persist extracted memories (fire-and-forget)
-        if (user && (userMemoryMatch || convMemoryMatch)) {
+        if (user && (userSoulMatch || userMemoryMatch || convMemoryMatch)) {
           const uid = user.id;
           const cid = conversationId;
+          if (userSoulMatch?.[1]?.trim()) {
+            void memoryService.appendSoul(uid, userSoulMatch[1].trim());
+          }
           if (userMemoryMatch?.[1]?.trim()) {
             void memoryService.appendUserMemory(uid, userMemoryMatch[1].trim());
           }
