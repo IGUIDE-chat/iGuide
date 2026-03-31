@@ -7,6 +7,33 @@ interface Env {
     DEEPSEEK_API_KEY: string;
     SILICONFLOW_API_KEY: string;
     BACKEND_URL: string; // Argo Tunnel URL to VPS
+    QMD_CN_URL: string;  // Alibaba Cloud QMD service
+    QMD_US_URL: string;  // Chicago VPS QMD service
+    QMD_API_KEY: string; // QMD service auth key
+}
+
+async function fetchQmd(
+    baseUrl: string,
+    body: string,
+    apiKey: string,
+    timeoutMs: number,
+): Promise<Response> {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+        const res = await fetch(`${baseUrl}/api/search`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                ...(apiKey ? { 'Authorization': `Bearer ${apiKey}` } : {}),
+            },
+            body,
+            signal: controller.signal,
+        });
+        return res;
+    } finally {
+        clearTimeout(timer);
+    }
 }
 
 export default {
@@ -167,12 +194,68 @@ export default {
                 });
             }
 
+            // QMD Search endpoint - dual-node with fallback
+            if (pathname === '/api/search' || pathname === '/search') {
+                if (request.method !== 'POST') {
+                    return new Response(
+                        JSON.stringify({ error: 'Method not allowed' }),
+                        { status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+                    );
+                }
+
+                const body = await request.text();
+                const [primaryUrl, fallbackUrl] = isCN
+                    ? [env.QMD_CN_URL, env.QMD_US_URL]
+                    : [env.QMD_US_URL, env.QMD_CN_URL];
+
+                let qmdRegion = isCN ? 'cn' : 'us';
+                let res: Response | null = null;
+
+                // Try primary node
+                if (primaryUrl) {
+                    try {
+                        res = await fetchQmd(primaryUrl, body, env.QMD_API_KEY, 5000);
+                        if (!res.ok) res = null;
+                    } catch {
+                        console.warn(`[QMD] Primary node (${qmdRegion}) failed, trying fallback`);
+                        res = null;
+                    }
+                }
+
+                // Fallback to secondary node
+                if (!res && fallbackUrl) {
+                    try {
+                        qmdRegion = isCN ? 'us' : 'cn';
+                        res = await fetchQmd(fallbackUrl, body, env.QMD_API_KEY, 8000);
+                    } catch (err: any) {
+                        console.error(`[QMD] Fallback node also failed:`, err.message);
+                    }
+                }
+
+                if (res && res.ok) {
+                    const data = await res.text();
+                    return new Response(data, {
+                        status: 200,
+                        headers: {
+                            ...corsHeaders,
+                            'Content-Type': 'application/json',
+                            'X-QMD-Region': qmdRegion,
+                        },
+                    });
+                }
+
+                return new Response(
+                    JSON.stringify({ error: 'QMD search unavailable on all nodes' }),
+                    { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+                );
+            }
+
             // 404 for unknown paths
             return new Response(
                 JSON.stringify({
                     error: 'Not found',
                     path: pathname,
-                    availableEndpoints: ['/health', '/chat'],
+                    availableEndpoints: ['/health', '/chat', '/api/search'],
                 }),
                 {
                     status: 404,
