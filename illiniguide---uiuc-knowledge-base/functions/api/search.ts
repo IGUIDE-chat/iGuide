@@ -1,5 +1,5 @@
-// [FUNCTION] QMD search proxy — forwards to api-gateway Worker for geo-routed QMD search.
-// [函数] QMD 搜索代理 — 转发到 api-gateway Worker 进行地理路由搜索。
+// [FUNCTION] QMD search proxy — calls api-gateway Worker via Service Binding.
+// [函数] QMD 搜索代理 — 通过 Service Binding 调用 api-gateway Worker。
 type PagesFunction<T = unknown> = (context: {
     request: Request;
     env: T;
@@ -10,115 +10,55 @@ type PagesFunction<T = unknown> = (context: {
 }) => Promise<Response>;
 
 interface Env {
-    API_GATEWAY_URL?: string; // e.g. https://api.iguide.chat
-    QMD_CN_URL?: string;     // Direct fallback: Alibaba Cloud QMD
-    QMD_US_URL?: string;     // Direct fallback: Chicago VPS QMD
-    QMD_API_KEY?: string;
+    QMD_WORKER?: { fetch: typeof fetch }; // Service Binding to api-gateway Worker
 }
 
-async function fetchWithTimeout(url: string, body: string, apiKey: string, timeoutMs: number): Promise<Response> {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
-    try {
-        return await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                ...(apiKey ? { 'Authorization': `Bearer ${apiKey}` } : {}),
-            },
-            body,
-            signal: controller.signal,
-        });
-    } finally {
-        clearTimeout(timer);
-    }
-}
+const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+};
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
     const { request, env } = context;
-    const body = await request.text();
 
-    const corsHeaders = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
-    };
-
-    const apiKey = env.QMD_API_KEY || '';
-    const errors: string[] = [];
-
-    // Strategy 1: Direct to QMD nodes
-    const nodes = [
-        { url: env.QMD_CN_URL, region: 'cn', timeout: 15000 },
-        { url: env.QMD_US_URL, region: 'us', timeout: 15000 },
-    ].filter(n => n.url);
-
-    for (const node of nodes) {
-        try {
-            const res = await fetchWithTimeout(`${node.url}/api/search`, body, apiKey, node.timeout);
-            if (res.ok) {
-                const data = await res.text();
-                return new Response(data, {
-                    status: 200,
-                    headers: {
-                        ...corsHeaders,
-                        'Content-Type': 'application/json',
-                        'X-QMD-Region': node.region,
-                    },
-                });
-            }
-            errors.push(`${node.region}: HTTP ${res.status}`);
-        } catch (e: any) {
-            errors.push(`${node.region}: ${e?.message || e}`);
-        }
+    if (!env.QMD_WORKER) {
+        return new Response(
+            JSON.stringify({ error: 'QMD_WORKER service binding not configured' }),
+            { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+        );
     }
 
-    // Strategy 2: Fallback to api-gateway
-    if (env.API_GATEWAY_URL) {
-        try {
-            const res = await fetchWithTimeout(
-                `${env.API_GATEWAY_URL}/api/search`,
-                body,
-                '',
-                15000,
-            );
-            if (res.ok) {
-                const data = await res.text();
-                return new Response(data, {
-                    status: 200,
-                    headers: {
-                        ...corsHeaders,
-                        'Content-Type': 'application/json',
-                        'X-QMD-Region': res.headers.get('X-QMD-Region') || 'gateway',
-                    },
-                });
-            }
-            errors.push(`gateway: HTTP ${res.status}`);
-        } catch (e: any) {
-            errors.push(`gateway: ${e?.message || e}`);
-        }
-    }
+    try {
+        // Call api-gateway Worker directly via Service Binding (no network hop)
+        const res = await env.QMD_WORKER.fetch(
+            new Request('https://api-gateway/api/search', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: request.body,
+            }),
+        );
 
-    return new Response(
-        JSON.stringify({
-            error: 'QMD search unavailable',
-            debug: {
-                cnUrl: env.QMD_CN_URL || 'NOT_SET',
-                gwUrl: env.API_GATEWAY_URL || 'NOT_SET',
-                errors,
+        const data = await res.text();
+        return new Response(data, {
+            status: res.status,
+            headers: {
+                ...corsHeaders,
+                'Content-Type': 'application/json',
+                'X-QMD-Region': res.headers.get('X-QMD-Region') || 'binding',
             },
-        }),
-        { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-    );
+        });
+    } catch (e: any) {
+        return new Response(
+            JSON.stringify({ error: 'QMD search failed', detail: e?.message || String(e) }),
+            { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+        );
+    }
 };
 
 export const onRequestOptions: PagesFunction = async () => {
     return new Response(null, {
         status: 204,
-        headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'POST, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type',
-        },
+        headers: corsHeaders,
     });
 };
