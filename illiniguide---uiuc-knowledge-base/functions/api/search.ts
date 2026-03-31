@@ -98,7 +98,16 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     }
 
     return new Response(
-        JSON.stringify({ error: 'QMD search unavailable' }),
+        JSON.stringify({
+            error: 'QMD search unavailable',
+            debug: {
+                hasGateway: !!env.API_GATEWAY_URL,
+                hasCN: !!env.QMD_CN_URL,
+                hasUS: !!env.QMD_US_URL,
+                hasKey: !!env.QMD_API_KEY,
+                nodesCount: nodes.length,
+            },
+        }),
         { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
     );
 };
