@@ -45,9 +45,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     };
 
     const apiKey = env.QMD_API_KEY || '';
+    const errors: string[] = [];
 
-    // Strategy 1: Direct to QMD nodes (faster than routing through api-gateway)
-    // Try CN first (most users are in China), then US as fallback.
+    // Strategy 1: Direct to QMD nodes
     const nodes = [
         { url: env.QMD_CN_URL, region: 'cn', timeout: 15000 },
         { url: env.QMD_US_URL, region: 'us', timeout: 15000 },
@@ -67,12 +67,13 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
                     },
                 });
             }
-        } catch {
-            console.warn(`[search] Node ${node.region} failed`);
+            errors.push(`${node.region}: HTTP ${res.status}`);
+        } catch (e: any) {
+            errors.push(`${node.region}: ${e?.message || e}`);
         }
     }
 
-    // Strategy 2: Fallback to api-gateway Worker (has its own geo-routing)
+    // Strategy 2: Fallback to api-gateway
     if (env.API_GATEWAY_URL) {
         try {
             const res = await fetchWithTimeout(
@@ -92,8 +93,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
                     },
                 });
             }
-        } catch {
-            console.warn('[search] api-gateway also unreachable');
+            errors.push(`gateway: HTTP ${res.status}`);
+        } catch (e: any) {
+            errors.push(`gateway: ${e?.message || e}`);
         }
     }
 
@@ -101,11 +103,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         JSON.stringify({
             error: 'QMD search unavailable',
             debug: {
-                hasGateway: !!env.API_GATEWAY_URL,
-                hasCN: !!env.QMD_CN_URL,
-                hasUS: !!env.QMD_US_URL,
-                hasKey: !!env.QMD_API_KEY,
-                nodesCount: nodes.length,
+                cnUrl: env.QMD_CN_URL || 'NOT_SET',
+                gwUrl: env.API_GATEWAY_URL || 'NOT_SET',
+                errors,
             },
         }),
         { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
