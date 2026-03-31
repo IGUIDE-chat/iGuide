@@ -214,7 +214,7 @@ export default {
                 // Try primary node
                 if (primaryUrl) {
                     try {
-                        res = await fetchQmd(primaryUrl, body, env.QMD_API_KEY, 5000);
+                        res = await fetchQmd(primaryUrl, body, env.QMD_API_KEY, 15000);
                         if (!res.ok) res = null;
                     } catch {
                         console.warn(`[QMD] Primary node (${qmdRegion}) failed, trying fallback`);
@@ -226,7 +226,7 @@ export default {
                 if (!res && fallbackUrl) {
                     try {
                         qmdRegion = isCN ? 'us' : 'cn';
-                        res = await fetchQmd(fallbackUrl, body, env.QMD_API_KEY, 8000);
+                        res = await fetchQmd(fallbackUrl, body, env.QMD_API_KEY, 15000);
                     } catch (err: any) {
                         console.error(`[QMD] Fallback node also failed:`, err.message);
                     }
