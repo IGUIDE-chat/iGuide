@@ -44,36 +44,13 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         'Access-Control-Allow-Headers': 'Content-Type',
     };
 
-    // Strategy 1: Proxy through api-gateway Worker (has built-in geo-routing)
-    if (env.API_GATEWAY_URL) {
-        try {
-            const res = await fetchWithTimeout(
-                `${env.API_GATEWAY_URL}/api/search`,
-                body,
-                '',
-                10000,
-            );
-            if (res.ok) {
-                const data = await res.text();
-                return new Response(data, {
-                    status: 200,
-                    headers: {
-                        ...corsHeaders,
-                        'Content-Type': 'application/json',
-                        'X-QMD-Region': res.headers.get('X-QMD-Region') || 'gateway',
-                    },
-                });
-            }
-        } catch {
-            console.warn('[search] api-gateway unreachable, trying direct nodes');
-        }
-    }
-
-    // Strategy 2: Direct to QMD nodes with fallback
     const apiKey = env.QMD_API_KEY || '';
+
+    // Strategy 1: Direct to QMD nodes (faster than routing through api-gateway)
+    // Try CN first (most users are in China), then US as fallback.
     const nodes = [
-        { url: env.QMD_US_URL, region: 'us', timeout: 5000 },
-        { url: env.QMD_CN_URL, region: 'cn', timeout: 8000 },
+        { url: env.QMD_CN_URL, region: 'cn', timeout: 15000 },
+        { url: env.QMD_US_URL, region: 'us', timeout: 15000 },
     ].filter(n => n.url);
 
     for (const node of nodes) {
@@ -92,6 +69,31 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             }
         } catch {
             console.warn(`[search] Node ${node.region} failed`);
+        }
+    }
+
+    // Strategy 2: Fallback to api-gateway Worker (has its own geo-routing)
+    if (env.API_GATEWAY_URL) {
+        try {
+            const res = await fetchWithTimeout(
+                `${env.API_GATEWAY_URL}/api/search`,
+                body,
+                '',
+                15000,
+            );
+            if (res.ok) {
+                const data = await res.text();
+                return new Response(data, {
+                    status: 200,
+                    headers: {
+                        ...corsHeaders,
+                        'Content-Type': 'application/json',
+                        'X-QMD-Region': res.headers.get('X-QMD-Region') || 'gateway',
+                    },
+                });
+            }
+        } catch {
+            console.warn('[search] api-gateway also unreachable');
         }
     }
 
