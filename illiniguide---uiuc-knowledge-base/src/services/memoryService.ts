@@ -12,6 +12,38 @@ const USER_MEMORY_MAX_LENGTH = 1500;
 const CONV_MEMORY_MAX_LENGTH = 1000;
 
 /**
+ * Merge new soul preference entries into existing soul prompt.
+ * Entries can be freeform lines or key-value pairs like "Tone: casual".
+ */
+function mergeSoul(existing: string, incoming: string): string {
+  const existingLines = existing.split('\n').map(l => l.trim()).filter(Boolean);
+  const newEntries = incoming.split(/[;\n]/).map(l => l.trim()).filter(Boolean);
+
+  for (const entry of newEntries) {
+    const colonIdx = entry.indexOf(':');
+    if (colonIdx > 0) {
+      const key = entry.substring(0, colonIdx).trim().toLowerCase();
+      const idx = existingLines.findIndex(line => {
+        const lineColonIdx = line.indexOf(':');
+        return lineColonIdx > 0 && line.substring(0, lineColonIdx).trim().toLowerCase() === key;
+      });
+      if (idx !== -1) existingLines.splice(idx, 1);
+    } else {
+      const idx = existingLines.findIndex(line => line.toLowerCase() === entry.toLowerCase());
+      if (idx !== -1) existingLines.splice(idx, 1);
+    }
+    existingLines.push(entry);
+  }
+
+  let result = existingLines.join('\n');
+  while (result.length > SOUL_MAX_LENGTH && existingLines.length > 1) {
+    existingLines.shift();
+    result = existingLines.join('\n');
+  }
+  return result;
+}
+
+/**
  * Merge new key-value entries into existing memory text, deduplicating by key prefix.
  * Each entry is a line like "Major: CS" or "Budget: $800".
  */
@@ -46,11 +78,15 @@ export const memoryService = {
   // ── Soul ──────────────────────────────────────────────────────
 
   async getSoul(userId: string): Promise<string> {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('user_souls')
       .select('soul_prompt')
       .eq('user_id', userId)
-      .single();
+      .maybeSingle();
+    if (error) {
+      console.error('[memoryService] Failed to get soul:', { userId, error });
+      return '';
+    }
     return data?.soul_prompt || '';
   },
 
@@ -67,12 +103,25 @@ export const memoryService = {
 
   // ── User Memory ──────────────────────────────────────────────
 
+  /**
+   * Merge new entries into the user's soul/persona preferences.
+   */
+  async appendSoul(userId: string, newEntries: string): Promise<void> {
+    const existing = await this.getSoul(userId);
+    const merged = mergeSoul(existing, newEntries);
+    await this.updateSoul(userId, merged);
+  },
+
   async getUserMemory(userId: string): Promise<string> {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('user_memories')
       .select('memory_text')
       .eq('user_id', userId)
-      .single();
+      .maybeSingle();
+    if (error) {
+      console.error('[memoryService] Failed to get user memory:', { userId, error });
+      return '';
+    }
     return data?.memory_text || '';
   },
 
@@ -99,11 +148,15 @@ export const memoryService = {
   // ── Conversation Memory ──────────────────────────────────────
 
   async getConversationMemory(conversationId: string): Promise<string> {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('conversation_memories')
       .select('memory_text')
       .eq('conversation_id', conversationId)
-      .single();
+      .maybeSingle();
+    if (error) {
+      console.error('[memoryService] Failed to get conversation memory:', { conversationId, error });
+      return '';
+    }
     return data?.memory_text || '';
   },
 
