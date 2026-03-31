@@ -1,0 +1,17 @@
+# Development environment variables
+# Copy this file to .dev.vars and fill in your actual values
+# .dev.vars is gitignored and used for local development
+
+# Supabase Configuration
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+# LLM API Keys
+DEEPSEEK_API_KEY=sk-deepseek-...
+SILICONFLOW_API_KEY=sk-siliconflow-...
+
+# Backend URL (Argo Tunnel)
+BACKEND_URL=https://backend.iguide.chat/api/v1/chat
+
+# For local development, you can use localhost:
+# BACKEND_URL=http://localhost:8000/api/v1/chat
