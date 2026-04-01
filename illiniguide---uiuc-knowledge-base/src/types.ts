@@ -100,7 +100,7 @@ export interface AuthContextType {
 }
 
 // QMD Knowledge Base Search types
-export type SearchMode = 'bm25' | 'vector' | 'hybrid';
+export type SearchMode = 'bm25' | 'vector' | 'hybrid' | 'fusion';
 export type SearchResultType = 'dorm' | 'article' | 'crawled';
 
 export interface SearchResult {

@@ -1,4 +1,4 @@
-// [FUNCTION] QMD search proxy — direct fetch to QMD server.
+// [FUNCTION] QMD search proxy — routes through api-gateway Worker via Service Binding.
 type PagesFunction<T = unknown> = (context: {
     request: Request;
     env: T;
@@ -9,9 +9,8 @@ type PagesFunction<T = unknown> = (context: {
 }) => Promise<Response>;
 
 interface Env {
-    QMD_CN_URL?: string;
-    QMD_US_URL?: string;
-    QMD_API_KEY?: string;
+    QMD_WORKER?: { fetch: (request: Request | string, init?: RequestInit) => Promise<Response> };
+    API_GATEWAY_URL?: string;
 }
 
 const corsHeaders = {
@@ -22,46 +21,48 @@ const corsHeaders = {
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
     const { request, env } = context;
-    const body = await request.text();
-    const apiKey = env.QMD_API_KEY || '';
-    const errors: string[] = [];
 
-    const nodes = [
-        { url: env.QMD_CN_URL, region: 'cn' },
-        { url: env.QMD_US_URL, region: 'us' },
-    ].filter(n => n.url);
+    try {
+        let res: Response;
 
-    for (const node of nodes) {
-        try {
-            const res = await fetch(`${node.url}/api/search`, {
+        if (env.QMD_WORKER) {
+            // Service Binding: direct Worker-to-Worker call (no network hop)
+            res = await env.QMD_WORKER.fetch(
+                new Request('https://api-gateway/api/search', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: request.body,
+                }),
+            );
+        } else if (env.API_GATEWAY_URL) {
+            // Fallback: fetch via URL
+            res = await fetch(`${env.API_GATEWAY_URL}/api/search`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(apiKey ? { 'Authorization': `Bearer ${apiKey}` } : {}),
-                },
-                body,
+                headers: { 'Content-Type': 'application/json' },
+                body: request.body,
             });
-            if (res.ok) {
-                const data = await res.text();
-                return new Response(data, {
-                    status: 200,
-                    headers: {
-                        ...corsHeaders,
-                        'Content-Type': 'application/json',
-                        'X-QMD-Region': node.region,
-                    },
-                });
-            }
-            errors.push(`${node.region}: HTTP ${res.status}`);
-        } catch (e: any) {
-            errors.push(`${node.region}: ${e?.message || e}`);
+        } else {
+            return new Response(
+                JSON.stringify({ error: 'No search backend configured' }),
+                { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+            );
         }
-    }
 
-    return new Response(
-        JSON.stringify({ error: 'QMD search unavailable', debug: { urls: nodes.map(n => n.url), errors } }),
-        { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-    );
+        const data = await res.text();
+        return new Response(data, {
+            status: res.status,
+            headers: {
+                ...corsHeaders,
+                'Content-Type': 'application/json',
+                'X-QMD-Region': res.headers.get('X-QMD-Region') || 'unknown',
+            },
+        });
+    } catch (e: any) {
+        return new Response(
+            JSON.stringify({ error: 'QMD search unavailable', detail: e?.message }),
+            { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+        );
+    }
 };
 
 export const onRequestOptions: PagesFunction = async () => {

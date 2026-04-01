@@ -7,7 +7,23 @@
 
 import type { SearchResult, SearchResponse, SearchMode } from '../types';
 
-const SEARCH_ENDPOINT = '/api/search';
+const SEARCH_ENDPOINT = import.meta.env.PROD
+    ? (import.meta.env.VITE_API_GATEWAY_URL || 'https://api.iguide.chat') + '/api/search'
+    : '/api/search';
+
+// ── Session-level search cache ──────────────────────────────────
+const sessionCache = new Map<string, { data: SearchResponse; ts: number }>();
+const SESSION_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+function getSessionCache(key: string): SearchResponse | null {
+    const entry = sessionCache.get(key);
+    if (!entry) return null;
+    if (Date.now() - entry.ts > SESSION_CACHE_TTL) {
+        sessionCache.delete(key);
+        return null;
+    }
+    return entry.data;
+}
 
 /**
  * Search the QMD knowledge base via the local/prod gateway.
@@ -21,8 +37,12 @@ export async function searchKnowledgeBase(
     query: string,
     lang: 'en' | 'zh' = 'en',
     limit = 10,
-    mode: SearchMode = 'hybrid',
+    mode: SearchMode = 'fusion',
 ): Promise<SearchResponse> {
+    const cacheKey = JSON.stringify({ query: query.trim().toLowerCase(), lang, limit, mode });
+    const cached = getSessionCache(cacheKey);
+    if (cached) return cached;
+
     const response = await fetch(SEARCH_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -50,7 +70,9 @@ export async function searchKnowledgeBase(
         },
     );
 
-    return { results, query, region: region ?? undefined };
+    const result: SearchResponse = { results, query, region: region ?? undefined };
+    sessionCache.set(cacheKey, { data: result, ts: Date.now() });
+    return result;
 }
 
 /** Quick BM25-only search (no LLM, faster). */
@@ -59,7 +81,7 @@ export async function quickSearch(
     lang: 'en' | 'zh' = 'en',
     limit = 5,
 ): Promise<SearchResponse> {
-    return searchKnowledgeBase(query, lang, limit, 'bm25');
+    return searchKnowledgeBase(query, lang, limit, 'fusion');
 }
 
 // ── Helpers ──────────────────────────────────────────────────────
