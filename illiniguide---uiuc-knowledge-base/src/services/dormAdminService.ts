@@ -9,7 +9,6 @@
 // [服务] 管理员专用——直接操作 `dorms` 表（替代旧的 override 模式）。
 import { supabase } from './supabase';
 import { Dorm } from '../components/housing/types/index';
-import { UIUC_DORMS } from '../components/housing/constants/dormData';
 import { getDormPriceRange, sanitizeFloorPlansForStorage } from '../utils/dormData';
 import { getPersistedBathroomType } from '../utils/roomOptions';
 
@@ -206,6 +205,7 @@ async function updateDorm(dormId: string, updates: DormUpdate): Promise<DormMuta
  * Reset a dorm to its original static data by overwriting the DB row.
  */
 async function resetDormToStatic(dormId: string): Promise<DormMutationResult> {
+    const { UIUC_DORMS } = await import('../components/housing/constants/dormData');
     const staticDorm = UIUC_DORMS.find((d) => d.id === dormId);
     if (!staticDorm) {
         console.error('[dormAdminService] resetDormToStatic: dorm not found in static data:', dormId);
