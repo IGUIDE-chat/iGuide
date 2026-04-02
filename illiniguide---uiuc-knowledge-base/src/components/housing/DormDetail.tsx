@@ -691,6 +691,16 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                     const layoutSrc = layouts[safeLayoutIndex];
                                     const hasLayout = Boolean(layoutSrc) && !imageErrors[`${planKey}-layout`];
                                     const layoutLightboxIndex = photos.length + safeLayoutIndex;
+                                    // Fallback: if no layout diagrams, use photos for the expanded view
+                                    const allExpandedImages = layouts.length > 0 ? layouts : photos;
+                                    const safeExpandedIndex = allExpandedImages.length > 0
+                                        ? Math.min(planImageIndices[planKey] ?? 0, allExpandedImages.length - 1)
+                                        : 0;
+                                    const expandedSrc = allExpandedImages[safeExpandedIndex];
+                                    const hasExpandedImage = Boolean(expandedSrc) && !imageErrors[`${planKey}-layout`];
+                                    const expandedLightboxIndex = layouts.length > 0
+                                        ? photos.length + safeExpandedIndex  // layout images are after photos
+                                        : safeExpandedIndex;                 // photos start at 0
 
                                     return (
                                         <motion.div
@@ -906,19 +916,19 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                                         className="overflow-hidden"
                                                     >
                                                         <div className="p-4 md:p-5 pt-0 border-t border-slate-100/50 mx-4 md:mx-5 mt-2">
-                                                            {hasLayout ? (
+                                                            {hasExpandedImage ? (
                                                                 <div className="relative mt-3 md:mt-4">
                                                                     <img
-                                                                        src={layoutSrc}
+                                                                        src={expandedSrc}
                                                                         alt={`${labels.primaryLabel} floor plan`}
                                                                         className="w-full h-auto rounded-xl border border-slate-200/50 bg-slate-50 cursor-zoom-in hover:opacity-90 transition-opacity"
                                                                         onClick={(e) => {
                                                                             e.stopPropagation();
-                                                                            setLightbox({ images: planImages, index: layoutLightboxIndex });
+                                                                            setLightbox({ images: planImages, index: expandedLightboxIndex });
                                                                         }}
                                                                         onError={() => setImageErrors((prev) => ({ ...prev, [`${planKey}-layout`]: true }))}
                                                                     />
-                                                                    {layouts.length > 1 && (
+                                                                    {allExpandedImages.length > 1 && (
                                                                         <>
                                                                             <InlineImageNavButton
                                                                                 direction="prev"
@@ -927,7 +937,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                                                                     event.stopPropagation();
                                                                                     setPlanImageIndices((prev) => ({
                                                                                         ...prev,
-                                                                                        [planKey]: (safeLayoutIndex - 1 + layouts.length) % layouts.length,
+                                                                                        [planKey]: (safeExpandedIndex - 1 + allExpandedImages.length) % allExpandedImages.length,
                                                                                     }));
                                                                                 }}
                                                                                 className="left-3"
@@ -939,13 +949,13 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                                                                     event.stopPropagation();
                                                                                     setPlanImageIndices((prev) => ({
                                                                                         ...prev,
-                                                                                        [planKey]: (safeLayoutIndex + 1) % layouts.length,
+                                                                                        [planKey]: (safeExpandedIndex + 1) % allExpandedImages.length,
                                                                                     }));
                                                                                 }}
                                                                                 className="right-3"
                                                                             />
                                                                             <div className="absolute bottom-3 right-3 rounded-full bg-black/40 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
-                                                                                {safeLayoutIndex + 1} / {layouts.length}
+                                                                                {safeExpandedIndex + 1} / {allExpandedImages.length}
                                                                             </div>
                                                                         </>
                                                                     )}
