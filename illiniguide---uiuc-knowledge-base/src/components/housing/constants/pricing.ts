@@ -6,7 +6,6 @@
  */
 
 import { Dorm } from '../types/index';
-import { UIUC_DORMS } from './dormData';
 
 // Price tier definitions with approximate dollar amounts
 export const PRICE_TIERS = {
@@ -19,7 +18,7 @@ export const PRICE_TIERS = {
 export type PriceTier = keyof typeof PRICE_TIERS;
 
 // Calculate dynamic min/max from actual data
-export const getPriceRangeFromData = (dorms: Dorm[] = UIUC_DORMS): [number, number] => {
+export const getPriceRangeFromData = (dorms: Dorm[] = []): [number, number] => {
     const prices = dorms.map(d => d.price).filter(p => p != null && p > 0);
     if (prices.length === 0) return [0, 20000];
     return [Math.min(...prices), Math.max(...prices)];

@@ -9,11 +9,16 @@
 // [服务] 从 Supabase `dorms` 表读取宿舍数据，静态数据作为 fallback。
 import { supabase } from './supabase';
 import { Dorm } from '../components/housing/types/index';
-import { UIUC_DORMS } from '../components/housing/constants/dormData';
 import { normalizeDorm } from '../utils/roomOptions';
 import { finalizeDormRecord, sanitizeFloorPlansForStorage } from '../utils/dormData';
 
 const TABLE = 'dorms';
+
+/** Lazy-load static dorm data to avoid pulling ~160KB into the initial bundle. */
+async function getStaticDorms(): Promise<Dorm[]> {
+    const { UIUC_DORMS } = await import('../components/housing/constants/dormData');
+    return UIUC_DORMS;
+}
 
 /** Map a snake_case DB row to camelCase Dorm. */
 function rowToDorm(row: Record<string, unknown>): Dorm {
@@ -59,15 +64,15 @@ async function getAllDorms(): Promise<Dorm[]> {
         const { data, error } = await supabase.from(TABLE).select('*');
         if (error) {
             console.error('[dormService] getAllDorms error:', error);
-            return UIUC_DORMS;
+            return getStaticDorms();
         }
         if (!data || data.length === 0) {
-            return UIUC_DORMS;
+            return getStaticDorms();
         }
         return data.map(rowToDorm);
     } catch (err) {
         console.error('[dormService] getAllDorms exception:', err);
-        return UIUC_DORMS;
+        return getStaticDorms();
     }
 }
 
@@ -81,15 +86,18 @@ async function getDormById(id: string): Promise<Dorm | undefined> {
             .maybeSingle();
         if (error) {
             console.error('[dormService] getDormById error:', error);
-            return UIUC_DORMS.find((d) => d.id === id);
+            const all = await getStaticDorms();
+            return all.find((d) => d.id === id);
         }
         if (!data) {
-            return UIUC_DORMS.find((d) => d.id === id);
+            const all = await getStaticDorms();
+            return all.find((d) => d.id === id);
         }
         return rowToDorm(data);
     } catch (err) {
         console.error('[dormService] getDormById exception:', err);
-        return UIUC_DORMS.find((d) => d.id === id);
+        const all = await getStaticDorms();
+        return all.find((d) => d.id === id);
     }
 }
 
@@ -98,3 +106,4 @@ export const dormService = {
     getDormById,
     rowToDorm,
 };
+
