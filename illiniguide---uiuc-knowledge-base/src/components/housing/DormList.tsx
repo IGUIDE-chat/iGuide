@@ -5,7 +5,7 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { useCallback } from 'react';
+import React, { Suspense, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { GitCompareArrows, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -20,7 +20,8 @@ import { DormListMapPane } from './dorm-list/DormListMapPane';
 import { useDormListController } from './dorm-list/useDormListController';
 import { useDormCommentStats } from './hooks/useDormCommentStats';
 import { useCompare } from './store/CompareContext';
-import DormComparison from './DormComparison';
+
+const DormComparison = React.lazy(() => import('./DormComparison'));
 
 const COMPARE_TEXT = {
   en: {
@@ -168,11 +169,13 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
 
       {/* Comparison modal */}
       {isCompareOpen && compareDorms.length >= 2 && (
-        <DormComparison
-          dorms={compareDorms}
-          onClose={closeCompare}
-          language={language}
-        />
+        <Suspense fallback={null}>
+          <DormComparison
+            dorms={compareDorms}
+            onClose={closeCompare}
+            language={language}
+          />
+        </Suspense>
       )}
     </div>
   );

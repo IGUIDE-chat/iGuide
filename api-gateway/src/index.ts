@@ -118,8 +118,32 @@ export default {
                 }
             }
 
-            // 3. Route based on path
+            // 3. Rate limiting for search (per-IP, 20 req/min)
             const pathname = url.pathname;
+            if (pathname === '/api/search' || pathname === '/search') {
+                const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+                const minute = Math.floor(Date.now() / 60000);
+                const rateLimitKey = `https://rate-limit/${ip}:${minute}`;
+                const cacheStore = caches.default;
+                const cachedCount = await cacheStore.match(new Request(rateLimitKey));
+                let count = cachedCount ? parseInt(await cachedCount.text()) : 0;
+                if (count >= 20) {
+                    return new Response(
+                        JSON.stringify({ error: 'Rate limited, try again later' }),
+                        {
+                            status: 429,
+                            headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Retry-After': '30' },
+                        },
+                    );
+                }
+                count++;
+                ctx.waitUntil(
+                    cacheStore.put(
+                        new Request(rateLimitKey),
+                        new Response(String(count), { headers: { 'Cache-Control': 'max-age=60' } }),
+                    ),
+                );
+            }
 
             // Health check endpoint
             if (pathname === '/health' || pathname === '/api/health') {

@@ -6,11 +6,10 @@
  */
 
 // [CONTEXT] Provides dorm data from Supabase with static fallback.
-// Static data (UIUC_DORMS) is used as the initial value for instant rendering.
+// Static data is lazy-loaded via dynamic import to avoid bloating the initial bundle.
 // DB data replaces it once loaded.
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
 import { Dorm } from '../types/index';
-import { UIUC_DORMS } from '../constants/dormData';
 import { dormService } from '../../../services/dormService';
 
 interface DormDataContextType {
@@ -23,7 +22,7 @@ interface DormDataContextType {
 const DormDataContext = createContext<DormDataContextType | undefined>(undefined);
 
 export const DormDataProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [dorms, setDorms] = useState<Dorm[]>(UIUC_DORMS);
+    const [dorms, setDorms] = useState<Dorm[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     const loadDorms = useCallback(async () => {
@@ -32,8 +31,14 @@ export const DormDataProvider: React.FC<{ children: ReactNode }> = ({ children }
             const dbDorms = await dormService.getAllDorms();
             setDorms(dbDorms);
         } catch (err) {
-            console.error('[DormDataContext] Failed to load dorms:', err);
-            // Keep existing data (static fallback already set)
+            console.error('[DormDataContext] Failed to load from DB, loading static fallback:', err);
+            // Lazy-load static data only as a fallback
+            try {
+                const { UIUC_DORMS } = await import('../constants/dormData');
+                setDorms(UIUC_DORMS);
+            } catch (importErr) {
+                console.error('[DormDataContext] Failed to load static fallback:', importErr);
+            }
         } finally {
             setIsLoading(false);
         }

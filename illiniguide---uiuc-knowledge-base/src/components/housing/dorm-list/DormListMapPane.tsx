@@ -5,13 +5,25 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Dorm } from '../types/index';
 import { Language } from '../../../types';
-import DormMap from '../DormMap';
 import MapCarousel from './MapCarousel';
 import { MapEmptyViewportOverlay, MapNoResultsOverlay } from './EmptyStates';
 import { DormListText } from './types';
+
+// Lazy-load DormMap to defer mapbox-gl (~700KB) until map view is actually used
+const DormMap = React.lazy(() => import('../DormMap'));
+
+/** Skeleton placeholder while mapbox is loading */
+const MapLoadingSkeleton: React.FC = () => (
+  <div className="w-full h-full bg-gray-100 flex items-center justify-center animate-pulse">
+    <div className="text-center">
+      <div className="w-10 h-10 border-3 border-illini-orange border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+      <p className="text-sm text-gray-400">Loading map...</p>
+    </div>
+  </div>
+);
 
 interface DormListMapPaneProps {
   isMapView: boolean;
@@ -67,15 +79,17 @@ export const DormListMapPane: React.FC<DormListMapPaneProps> = ({
     >
       <div className="flex-1 min-h-0 min-w-0 relative flex flex-col">
         <div className="flex-1 min-h-[200px] w-full bg-gray-100">
-          <DormMap
-            dorms={filteredDorms}
-            onSelectDorm={onViewDetails}
-            language={language}
-            isVisible={isMapView}
-            highlightedDormId={highlightedDormId}
-            disableScrollZoom={disableScrollZoom}
-            onVisibleDormsChange={onVisibleDormsChange}
-          />
+          <Suspense fallback={<MapLoadingSkeleton />}>
+            <DormMap
+              dorms={filteredDorms}
+              onSelectDorm={onViewDetails}
+              language={language}
+              isVisible={isMapView}
+              highlightedDormId={highlightedDormId}
+              disableScrollZoom={disableScrollZoom}
+              onVisibleDormsChange={onVisibleDormsChange}
+            />
+          </Suspense>
 
           {isMapView && filteredDorms.length === 0 && (
             <MapNoResultsOverlay
@@ -106,3 +120,4 @@ export const DormListMapPane: React.FC<DormListMapPaneProps> = ({
     </div>
   );
 };
+
