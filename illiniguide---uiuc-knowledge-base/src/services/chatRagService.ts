@@ -6,7 +6,7 @@ import {
   webSearchWithOfficialPriority,
 } from './webSearchService';
 
-const DEEPSEEK_API_KEY = import.meta.env.VITE_DEEPSEEK_API_KEY as string | undefined;
+const DEEPSEEK_API_KEY = import.meta.env.DEEPSEEK_API_KEY as string | undefined;
 const IS_DEV = import.meta.env.DEV;
 const QMD_RESULT_LIMIT = 5;
 const WEB_RESULT_LIMIT = 3;

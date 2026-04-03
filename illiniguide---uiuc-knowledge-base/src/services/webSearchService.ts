@@ -4,7 +4,10 @@
  * @description_zh Tavily 网络搜索服务，为 RAG 管道提供实时网页检索。
  */
 
-const TAVILY_API_KEY = import.meta.env.VITE_TAVILY_API_KEY as string | undefined;
+// Security: Do NOT use VITE_ prefix for sensitive keys
+// In production, use backend proxy
+// In development, keys are handled by server/proxy
+const TAVILY_API_KEY = import.meta.env.TAVILY_API_KEY as string | undefined;
 const TAVILY_API_URL = 'https://api.tavily.com/search';
 const UIUC_OFFICIAL_HOST = 'illinois.edu';
 
@@ -136,7 +139,7 @@ export async function webSearch(
   } = {},
 ): Promise<WebSearchResult[]> {
   if (!TAVILY_API_KEY) {
-    console.warn('[WebSearch] VITE_TAVILY_API_KEY not set, skipping web search');
+    console.warn('[WebSearch] TAVILY_API_KEY not set, skipping web search');
     return [];
   }
 
@@ -156,7 +159,7 @@ export async function webSearchWithOfficialPriority(
   } = {},
 ): Promise<WebSearchResult[]> {
   if (!TAVILY_API_KEY) {
-    console.warn('[WebSearch] VITE_TAVILY_API_KEY not set, skipping web search');
+    console.warn('[WebSearch] TAVILY_API_KEY not set, skipping web search');
     return [];
   }
 

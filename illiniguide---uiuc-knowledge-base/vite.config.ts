@@ -26,11 +26,13 @@ export default defineConfig(({ mode }) => {
         }
       }
     },
-    plugins: [qmdSearchPlugin(), react()],
+    plugins: [
+      qmdSearchPlugin(),
+      react()
+    ],
     define: {
-      'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-      // Explicitly inject Supabase vars to ensure availability
+      // Only inject public keys that are safe for frontend
+      // NEVER inject sensitive API keys here
       'import.meta.env.VITE_SUPABASE_URL': JSON.stringify(env.VITE_SUPABASE_URL),
       'import.meta.env.VITE_SUPABASE_ANON_KEY': JSON.stringify(env.VITE_SUPABASE_ANON_KEY),
       'import.meta.env.VITE_MAPBOX_TOKEN': JSON.stringify(env.VITE_MAPBOX_TOKEN || '')
