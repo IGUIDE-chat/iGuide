@@ -1,13 +1,13 @@
 /**
  * @file ./src/services/webSearchService.ts
- * @description Tavily Web Search service for RAG pipeline.
- * @description_zh Tavily 网络搜索服务，为 RAG 管道提供实时网页检索。
+ * @description Web Search service for RAG pipeline.
+ * @description_zh 网络搜索服务，为 RAG 管道提供实时网页检索。
  */
 
 // Security: API key is NEVER exposed to frontend.
-// DEV:  Vite proxy /api/tavily → https://api.tavily.com (key injected by vite.config.ts server proxy)
-// PROD: Cloudflare Pages Function /api/tavily injects TAVILY_API_KEY from CF env vars
-const TAVILY_PROXY_URL = '/api/tavily'; // CF Pages Function (prod) or Vite proxy (dev)
+// DEV:  Vite proxy /api/search → external search API (key injected by vite.config.ts server proxy)
+// PROD: Edge Function /api/search injects the API key from server-side environment variables
+const TAVILY_PROXY_URL = '/api/tavily'; // Edge Function (prod) or Vite proxy (dev)
 const UIUC_OFFICIAL_HOST = 'illinois.edu';
 
 export interface WebSearchResult {
@@ -91,8 +91,8 @@ async function runTavilySearch(
     includeDomains,
   } = options;
 
-  // DEV: proxy forwards to Tavily with key from vite.config.ts server proxy header
-  // PROD: CF Pages Function /api/tavily injects key from CF environment variables
+  // DEV: proxy forwards to external search API with key from vite.config.ts server proxy header
+  // PROD: Edge Function /api/search injects key from server-side environment variables
   const body: Record<string, unknown> = {
     query: searchQuery,
     search_depth: searchDepth,
@@ -107,7 +107,7 @@ async function runTavilySearch(
   });
 
   if (!response.ok) {
-    console.warn('[WebSearch] Tavily API error:', response.status);
+    console.warn('[WebSearch] Search API error:', response.status);
     return [];
   }
 
@@ -129,7 +129,7 @@ async function runTavilySearch(
 }
 
 /**
- * Search the web via Tavily API.
+ * Search the web via the configured search API proxy.
  * Scoped to UIUC-related queries by default.
  */
 export async function webSearch(
@@ -143,7 +143,7 @@ export async function webSearch(
   try {
     return await runTavilySearch(`UIUC ${query}`, options);
   } catch (err) {
-    console.warn('[WebSearch] Tavily search failed:', err);
+    console.warn('[WebSearch] Search failed:', err);
     return [];
   }
 }

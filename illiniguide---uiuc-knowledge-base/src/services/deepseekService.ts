@@ -185,7 +185,7 @@ async function* parseDeepSeekSSE(
             text: '',
             thinkingStep: {
               type: 'reasoning',
-              label: '正在思考...',
+              label: lang === 'en' ? 'Thinking...' : '正在思考...',
               detail: reasoningBuffer,
             },
           };
@@ -291,13 +291,13 @@ export const streamDeepSeekChat = async function* (
       if (ragResult.hasQMD) {
         yield {
           text: '',
-          thinkingStep: { type: 'searching', label: '知识库检索完成', detail: 'QMD knowledge base' },
+          thinkingStep: { type: 'searching', label: lang === 'en' ? 'Knowledge base retrieved' : '知识库检索完成', detail: 'QMD knowledge base' },
         };
       }
       if (ragResult.hasWeb) {
         yield {
           text: '',
-          thinkingStep: { type: 'searching', label: '网络搜索完成', detail: 'Tavily web search' },
+          thinkingStep: { type: 'searching', label: lang === 'en' ? 'Web search complete' : '网络搜索完成', detail: 'Web search' },
         };
       }
     } catch {
