@@ -203,7 +203,7 @@ function parseDeepSeekReply(data: unknown): string | null {
 }
 
 async function rewriteQueryToEnglish(query: string, staticQuery: string | null): Promise<string | null> {
-  if (IS_DEV && !DEEPSEEK_API_KEY) return null;
+
 
   const messages = [
     {
