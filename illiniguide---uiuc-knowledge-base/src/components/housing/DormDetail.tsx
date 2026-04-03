@@ -52,9 +52,19 @@ const fadeUp: Variants = {
 const cardHover = { y: -3, scale: 1.02 } as const;
 const cardTap = { scale: 0.97 };
 
-/** Detect if text is primarily Chinese (has CJK characters) */
-const isChinese = (text: string) => /[\u4e00-\u9fff]/.test(text);
-const detectLang = (text: string): 'zh' | 'en' => isChinese(text) ? 'zh' : 'en';
+/** Detect the primary script of a text for translation-need comparison */
+const detectScript = (text: string): 'zh' | 'ja' | 'ko' | 'en' => {
+    if (/[\u3040-\u30ff\u31f0-\u31ff]/.test(text)) return 'ja';   // Hiragana / Katakana
+    if (/[\uac00-\ud7af\u1100-\u11ff]/.test(text)) return 'ko';   // Hangul
+    if (/[\u4e00-\u9fff\u3400-\u4dbf]/.test(text)) return 'zh';   // CJK Unified
+    return 'en';
+};
+/** Returns true when the comment's script differs from the UI language */
+const needsTranslation = (text: string, uiLang: Language): boolean => {
+    const script = detectScript(text);
+    if (uiLang === 'zh') return script === 'en' || script === 'ja' || script === 'ko';
+    return script === 'zh' || script === 'ja' || script === 'ko';
+};
 const hasPublishedPlanPrice = (price: FloorPlan['price']): price is number =>
     typeof price === 'number' && Number.isFinite(price) && price > 0;
 const getPublishedPlanPrice = (plan: FloorPlan) => hasPublishedPlanPrice(plan.price) ? plan.price : null;
@@ -141,6 +151,9 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
     const [translations, setTranslations] = useState<Record<string, string>>({});
     const [translating, setTranslating] = useState<Record<string, boolean>>({});
     const [translateErrors, setTranslateErrors] = useState<Record<string, boolean>>({});
+    const [autoTranslate, setAutoTranslate] = useState<boolean>(() => {
+        try { return localStorage.getItem('comment_auto_translate') === '1'; } catch { return false; }
+    });
 
     const t = dormDetailTexts[language];
 
@@ -310,21 +323,29 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
         setTranslating((prev) => ({ ...prev, [commentId]: true }));
         setTranslateErrors((prev) => { const next = { ...prev }; delete next[commentId]; return next; });
         try {
-            const targetLang = language === 'zh' ? 'English' : '中文';
+            const script = detectScript(text);
+            // Determine the most natural target language
+            const targetLang = language === 'zh'
+                ? 'English'
+                : script === 'ja' ? 'Japanese to English'
+                : script === 'ko' ? 'Korean to English'
+                : 'Chinese (Simplified)';
+            const systemPrompt = `You are a professional translator. Translate the following text to ${targetLang}. Preserve the original tone, emotion, and any slang or emoji. Return ONLY the translated text, nothing else.`;
             const res = await fetch('/api/deepseek', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
+                    stream: false,
                     messages: [
-                        { role: 'system', content: `You are a translator. Translate the following text to ${targetLang}. Return ONLY the translation, nothing else.` },
+                        { role: 'system', content: systemPrompt },
                         { role: 'user', content: text },
                     ],
                 }),
             });
             if (res.ok) {
                 const data = await res.json() as Record<string, unknown>;
-                const choices = data.choices as Array<{ message?: { content?: string } }> | undefined;
-                const translated = choices?.[0]?.message?.content ?? (data.reply as string) ?? text;
+                // CF function non-streaming returns { reply: string }
+                const translated = (data.reply as string) || text;
                 setTranslations((prev) => ({ ...prev, [commentId]: translated }));
             } else {
                 setTranslateErrors((prev) => ({ ...prev, [commentId]: true }));
@@ -335,6 +356,34 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
             setTranslating((prev) => ({ ...prev, [commentId]: false }));
         }
     };
+
+    const handleToggleAutoTranslate = () => {
+        const next = !autoTranslate;
+        setAutoTranslate(next);
+        try { localStorage.setItem('comment_auto_translate', next ? '1' : '0'); } catch { /* ignore */ }
+        if (next) {
+            // Immediately translate all foreign-language comments
+            comments.forEach((c) => {
+                if (needsTranslation(c.content, language) && !translations[c.id] && !translating[c.id]) {
+                    handleTranslate(c.id, c.content);
+                }
+            });
+        } else {
+            // Clear all auto-translations
+            setTranslations({});
+        }
+    };
+
+    // Auto-translate newly loaded comments when the preference is on
+    useEffect(() => {
+        if (!autoTranslate) return;
+        comments.forEach((c) => {
+            if (needsTranslation(c.content, language) && !translations[c.id] && !translating[c.id]) {
+                handleTranslate(c.id, c.content);
+            }
+        });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [comments, autoTranslate]);
 
     // ── Render ─────────────────────────────────────────────────────────────
     return (
@@ -1093,12 +1142,32 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                     <motion.section id="reviews" variants={fadeUp} className="space-y-4 pt-6 pb-8 border-t border-slate-200/50">
                         <div className="flex items-center justify-between mb-2">
                             <h3 className="text-[16px] md:text-[18px] font-bold text-slate-900">{t.ratingsAndReviews}</h3>
-                            {totalReviews > 0 && (
-                                <span className="text-[12px] md:text-[13px] text-slate-500 font-medium">
-                                    {totalReviews} {language === 'zh' ? '条评价' : 'Reviews'}
-                                    {positivePercent !== null && ` · ${positivePercent}${t.positiveRating}`}
-                                </span>
-                            )}
+                            <div className="flex items-center gap-3">
+                                {totalReviews > 0 && (
+                                    <span className="text-[12px] md:text-[13px] text-slate-500 font-medium">
+                                        {totalReviews} {language === 'zh' ? '条评价' : 'Reviews'}
+                                        {positivePercent !== null && ` · ${positivePercent}${t.positiveRating}`}
+                                    </span>
+                                )}
+                                {totalReviews > 0 && (
+                                    <button
+                                        type="button"
+                                        onClick={handleToggleAutoTranslate}
+                                        className={`flex items-center gap-1.5 text-[11px] md:text-[12px] font-semibold px-2.5 py-1 rounded-lg border transition-colors ${autoTranslate
+                                            ? 'bg-illini-blue/5 text-illini-blue border-illini-blue/30'
+                                            : 'bg-white text-slate-400 border-slate-200 hover:border-slate-300 hover:text-slate-600'
+                                        }`}
+                                        title={autoTranslate
+                                            ? (language === 'zh' ? '关闭自动翻译' : 'Disable auto-translate')
+                                            : (language === 'zh' ? '开启自动翻译' : 'Auto-translate')}
+                                    >
+                                        <Globe className="w-3 h-3" />
+                                        {autoTranslate
+                                            ? (language === 'zh' ? '翻译: 开' : 'Auto')
+                                            : (language === 'zh' ? '翻译' : 'Translate')}
+                                    </button>
+                                )}
+                            </div>
                         </div>
 
                         {/* Login prompt / form */}
@@ -1230,22 +1299,31 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                                 </div>
                                                 {translations[comment.id] ? (
                                                     <>
-                                                        <p className="text-[13px] md:text-[14px] text-slate-600 leading-relaxed font-medium">
+                                                        <p className="text-[13px] md:text-[14px] text-slate-700 leading-relaxed font-medium">
                                                             {translations[comment.id]}
                                                         </p>
-                                                        <p className="text-[12px] text-slate-400 leading-relaxed mt-1.5 pl-3 border-l-2 border-slate-200">
+                                                        <p className="text-[12px] text-slate-400 leading-relaxed mt-1.5 pl-3 border-l-2 border-slate-200 italic">
                                                             {comment.content}
                                                         </p>
                                                     </>
+                                                ) : translating[comment.id] ? (
+                                                    <div className="flex items-center gap-2 text-[12px] text-slate-400 py-1">
+                                                        <span className="inline-block w-3 h-3 border-2 border-slate-300 border-t-illini-blue rounded-full animate-spin" />
+                                                        {language === 'zh' ? '翻译中...' : 'Translating...'}
+                                                    </div>
                                                 ) : (
                                                     <p className="text-[13px] md:text-[14px] text-slate-600 leading-relaxed font-medium">
                                                         {comment.content}
                                                     </p>
                                                 )}
                                                 {translateErrors[comment.id] && (
-                                                    <p className="text-[12px] text-red-400 mt-1">
-                                                        {language === 'zh' ? '翻译失败，点击重试' : 'Translation failed, click to retry'}
-                                                    </p>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleTranslate(comment.id, comment.content)}
+                                                        className="text-[12px] text-red-400 mt-1 hover:text-red-500 transition-colors"
+                                                    >
+                                                        {language === 'zh' ? '翻译失败，点击重试' : 'Translation failed — tap to retry'}
+                                                    </button>
                                                 )}
                                                 <div className="flex items-center gap-4 mt-4 pt-3 border-t border-slate-100/50">
                                                     <motion.button
@@ -1260,19 +1338,17 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                                             {t.helpful}{comment.upvotes > 0 ? ` (${comment.upvotes})` : ''}
                                                         </span>
                                                     </motion.button>
-                                                    {detectLang(comment.content) !== language && (
+                                                    {needsTranslation(comment.content, language) && (
                                                         <button
                                                             type="button"
                                                             onClick={() => handleTranslate(comment.id, comment.content)}
                                                             disabled={translating[comment.id]}
-                                                            className="flex items-center gap-1 text-[12px] font-semibold text-slate-400 hover:text-illini-blue transition-colors disabled:opacity-50"
+                                                            className={`flex items-center gap-1 text-[12px] font-semibold transition-colors disabled:opacity-50 ${translations[comment.id] ? 'text-illini-blue hover:text-illini-blue/70' : 'text-slate-400 hover:text-illini-blue'}`}
                                                         >
                                                             <Globe className="w-3.5 h-3.5" />
-                                                            {translating[comment.id]
-                                                                ? (language === 'zh' ? '翻译中...' : 'Translating...')
-                                                                : translations[comment.id]
-                                                                    ? (language === 'zh' ? '显示原文' : 'Original')
-                                                                    : (language === 'zh' ? '翻译' : 'Translate')}
+                                                            {translations[comment.id]
+                                                                ? (language === 'zh' ? '显示原文' : 'Original')
+                                                                : (language === 'zh' ? '翻译' : 'Translate')}
                                                         </button>
                                                     )}
                                                 </div>
