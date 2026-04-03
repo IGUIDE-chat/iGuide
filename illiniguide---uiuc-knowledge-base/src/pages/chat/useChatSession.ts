@@ -175,6 +175,19 @@ export const useChatSession = ({
         }
       }
 
+      // Variables hoisted outside try so catch/finally can access them
+      let aiMsgId = '';
+      let fullText = '';
+      const thinkingSteps: ThinkingStep[] = [];
+
+      // Returns displayable text by stripping any trailing follow-up section
+      // that starts with a 💡 header (e.g. "💡你可能还想了解"). This ensures
+      // the follow-up block never appears as raw Markdown during streaming.
+      const getDisplayText = (raw: string): string => {
+        const idx = raw.search(/\n+.*💡/);
+        return idx >= 0 ? raw.substring(0, idx).trim() : raw;
+      };
+
       try {
         // Create a new AbortController for this request
         const abortController = new AbortController();
@@ -185,7 +198,7 @@ export const useChatSession = ({
           abortController.abort('timeout');
         }, STREAM_TIMEOUT_MS);
 
-        const aiMsgId = (Date.now() + 1).toString();
+        aiMsgId = (Date.now() + 1).toString();
         setMessages((prev) => [
           ...prev,
           {
@@ -198,7 +211,7 @@ export const useChatSession = ({
               {
                 id: `step-${Date.now()}-init`,
                 type: 'processing' as const,
-                label: '理解问题...',
+                label: language === 'en' ? 'Understanding...' : '理解问题...',
                 timestamp: Date.now(),
                 done: false,
               },
@@ -215,9 +228,7 @@ export const useChatSession = ({
           abortController.signal,
         );
 
-        let fullText = '';
         let followUpQuestions: string[] | undefined;
-        const thinkingSteps: ThinkingStep[] = [];
         let lastUpdateTime = Date.now();
         const updateInterval = 50;
 
@@ -253,10 +264,13 @@ export const useChatSession = ({
               thinkingSteps.forEach((s) => (s.done = true));
             }
             if (now - lastUpdateTime >= updateInterval) {
+              // Strip any in-progress 💡 follow-up section from the display text
+              // so follow-up questions never appear as raw Markdown while streaming.
+              const displayText = getDisplayText(fullText);
               setMessages((prev) =>
                 prev.map((message) =>
                   message.id === aiMsgId
-                    ? { ...message, text: fullText, isThinking: false, thinkingSteps: [...thinkingSteps] }
+                    ? { ...message, text: displayText, isThinking: false, thinkingSteps: [...thinkingSteps] }
                     : message,
                 ),
               );
@@ -356,8 +370,22 @@ export const useChatSession = ({
         const isTimeout = isAbort && abortControllerRef.current?.signal.reason === 'timeout';
 
         if (isAbort && !isTimeout) {
-          // User-initiated stop — keep partial content, no error message
+          // User-initiated stop — flush whatever was accumulated so far
           console.log('[Chat] Stream aborted by user');
+          if (fullText.trim()) {
+            // Preserve partial content; strip any trailing 💡 section and clear stream flags
+            const displayText = getDisplayText(fullText);
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === aiMsgId
+                  ? { ...m, text: displayText, isStreaming: false, isThinking: false }
+                  : m,
+              ),
+            );
+          } else {
+            // No content received at all — remove the empty placeholder bubble
+            setMessages((prev) => prev.filter((m) => m.id !== aiMsgId));
+          }
         } else {
           const errorType: ChatErrorType = isTimeout
             ? 'timeout'
@@ -397,7 +425,6 @@ export const useChatSession = ({
           });
         }
       } finally {
-        clearTimeout(abortControllerRef.current ? undefined : undefined); // timeout already cleared on success
         abortControllerRef.current = null;
         setIsLoading(false);
       }
