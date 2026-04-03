@@ -18,11 +18,43 @@ export default defineConfig(({ mode }) => {
           rewrite: (path) => path.replace(/^\/api\/coze/, ''),
           secure: false
         },
-        // DeepSeek chat proxy — in dev, forwards to DeepSeek API directly
+        // DeepSeek chat proxy — in dev, injects Authorization header server-side (key never in bundle)
         '/api/deepseek-raw': {
           target: 'https://api.deepseek.com',
           changeOrigin: true,
           rewrite: () => '/chat/completions',
+          configure: (proxy) => {
+            proxy.on('proxyReq', (proxyReq) => {
+              const apiKey = env.DEEPSEEK_API_KEY;
+              if (apiKey) {
+                proxyReq.setHeader('Authorization', `Bearer ${apiKey}`);
+              }
+            });
+          },
+        },
+        // Gemini proxy — in dev, injects API key server-side (key never in bundle)
+        '/api/gemini': {
+          target: 'https://generativelanguage.googleapis.com',
+          changeOrigin: true,
+          configure: (proxy) => {
+            proxy.on('proxyReq', (proxyReq, req) => {
+              const apiKey = env.GOOGLE_API_KEY;
+              if (!apiKey) return;
+              let body = '';
+              req.on('data', (chunk: Buffer) => { body += chunk.toString(); });
+              req.on('end', () => {
+                try {
+                  const parsed = JSON.parse(body);
+                  const model = parsed.model || 'gemini-1.5-flash';
+                  delete parsed.model;
+                  const newBody = JSON.stringify(parsed);
+                  proxyReq.path = `/v1beta/models/${model}:generateContent?key=${apiKey}`;
+                  proxyReq.setHeader('Content-Length', Buffer.byteLength(newBody));
+                  proxyReq.write(newBody);
+                } catch { /* pass through as-is */ }
+              });
+            });
+          },
         },
         // Tavily search proxy — in dev, injects API key server-side (key never in bundle)
         '/api/tavily': {
