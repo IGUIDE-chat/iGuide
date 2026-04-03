@@ -23,6 +23,30 @@ export default defineConfig(({ mode }) => {
           target: 'https://api.deepseek.com',
           changeOrigin: true,
           rewrite: () => '/chat/completions',
+        },
+        // Tavily search proxy — in dev, injects API key server-side (key never in bundle)
+        '/api/tavily': {
+          target: 'https://api.tavily.com',
+          changeOrigin: true,
+          rewrite: () => '/search',
+          configure: (proxy) => {
+            proxy.on('proxyReq', (proxyReq, req) => {
+              // Inject API key into the forwarded request body
+              const apiKey = env.TAVILY_API_KEY;
+              if (!apiKey) return;
+              let body = '';
+              req.on('data', (chunk: Buffer) => { body += chunk.toString(); });
+              req.on('end', () => {
+                try {
+                  const parsed = JSON.parse(body);
+                  if (!parsed.api_key) parsed.api_key = apiKey;
+                  const newBody = JSON.stringify(parsed);
+                  proxyReq.setHeader('Content-Length', Buffer.byteLength(newBody));
+                  proxyReq.write(newBody);
+                } catch { /* pass through as-is */ }
+              });
+            });
+          },
         }
       }
     },
