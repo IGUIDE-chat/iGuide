@@ -203,8 +203,6 @@ function parseDeepSeekReply(data: unknown): string | null {
 }
 
 async function rewriteQueryToEnglish(query: string, staticQuery: string | null): Promise<string | null> {
-
-
   const messages = [
     {
       role: 'system',
