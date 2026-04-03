@@ -141,6 +141,7 @@ async function fetchRAGContext(query: string, lang: string): Promise<RAGResult> 
  */
 async function* parseDeepSeekSSE(
   reader: ReadableStreamDefaultReader<Uint8Array>,
+  lang: string = 'en',
 ): AsyncGenerator<StreamChunk> {
   const decoder = new TextDecoder('utf-8');
   let buffer = '';
@@ -371,7 +372,7 @@ export const streamDeepSeekChat = async function* (
     if (contentType.includes('text/event-stream') && response.body) {
       // SSE streaming
       const reader = response.body.getReader();
-      yield* parseDeepSeekSSE(reader);
+      yield* parseDeepSeekSSE(reader, lang);
     } else {
       // Fallback: non-streaming JSON response
       const data = (await response.json()) as { reply?: string };
