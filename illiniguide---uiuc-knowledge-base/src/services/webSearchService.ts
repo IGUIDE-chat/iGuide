@@ -4,11 +4,12 @@
  * @description_zh Tavily 网络搜索服务，为 RAG 管道提供实时网页检索。
  */
 
-// Security: Do NOT use VITE_ prefix for sensitive keys
-// In production, use backend proxy
-// In development, keys are handled by server/proxy
-const TAVILY_API_KEY = import.meta.env.TAVILY_API_KEY as string | undefined;
-const TAVILY_API_URL = 'https://api.tavily.com/search';
+// Security: API key is NEVER exposed to frontend.
+// DEV:  Vite proxy /api/tavily → https://api.tavily.com (key injected by vite.config.ts server proxy)
+// PROD: Cloudflare Pages Function /api/tavily injects TAVILY_API_KEY from CF env vars
+const IS_DEV = import.meta.env.DEV;
+const TAVILY_API_KEY = import.meta.env.TAVILY_API_KEY as string | undefined; // only available in dev via vite proxy
+const TAVILY_PROXY_URL = '/api/tavily'; // CF Pages Function (prod) or Vite proxy (dev)
 const UIUC_OFFICIAL_HOST = 'illinois.edu';
 
 export interface WebSearchResult {
@@ -92,16 +93,22 @@ async function runTavilySearch(
     includeDomains,
   } = options;
 
-  const response = await fetch(TAVILY_API_URL, {
+  // DEV: proxy forwards to Tavily with key from vite.config.ts server proxy header
+  // PROD: CF Pages Function /api/tavily injects key from CF environment variables
+  const body: Record<string, unknown> = {
+    query: searchQuery,
+    search_depth: searchDepth,
+    max_results: maxResults,
+  };
+  if (includeDomains?.length) body.include_domains = includeDomains;
+
+  // In dev mode, inject key directly (still goes through proxy, not exposed in bundle)
+  if (IS_DEV && TAVILY_API_KEY) body.api_key = TAVILY_API_KEY;
+
+  const response = await fetch(TAVILY_PROXY_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      api_key: TAVILY_API_KEY,
-      query: searchQuery,
-      search_depth: searchDepth,
-      max_results: maxResults,
-      include_domains: includeDomains,
-    }),
+    body: JSON.stringify(body),
   });
 
   if (!response.ok) {
@@ -138,8 +145,9 @@ export async function webSearch(
     includeDomains?: string[];
   } = {},
 ): Promise<WebSearchResult[]> {
-  if (!TAVILY_API_KEY) {
-    console.warn('[WebSearch] TAVILY_API_KEY not set, skipping web search');
+  // In dev, warn if key missing (won't work without it)
+  if (IS_DEV && !TAVILY_API_KEY) {
+    console.warn('[WebSearch] TAVILY_API_KEY not set in .env.local, skipping web search');
     return [];
   }
 
@@ -158,8 +166,9 @@ export async function webSearchWithOfficialPriority(
     searchDepth?: 'basic' | 'advanced';
   } = {},
 ): Promise<WebSearchResult[]> {
-  if (!TAVILY_API_KEY) {
-    console.warn('[WebSearch] TAVILY_API_KEY not set, skipping web search');
+  // In dev, warn if key missing
+  if (IS_DEV && !TAVILY_API_KEY) {
+    console.warn('[WebSearch] TAVILY_API_KEY not set in .env.local, skipping web search');
     return [];
   }
 
