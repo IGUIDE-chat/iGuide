@@ -7,8 +7,6 @@
 // Security: API key is NEVER exposed to frontend.
 // DEV:  Vite proxy /api/tavily → https://api.tavily.com (key injected by vite.config.ts server proxy)
 // PROD: Cloudflare Pages Function /api/tavily injects TAVILY_API_KEY from CF env vars
-const IS_DEV = import.meta.env.DEV;
-const TAVILY_API_KEY = import.meta.env.TAVILY_API_KEY as string | undefined; // only available in dev via vite proxy
 const TAVILY_PROXY_URL = '/api/tavily'; // CF Pages Function (prod) or Vite proxy (dev)
 const UIUC_OFFICIAL_HOST = 'illinois.edu';
 
@@ -102,9 +100,6 @@ async function runTavilySearch(
   };
   if (includeDomains?.length) body.include_domains = includeDomains;
 
-  // In dev mode, inject key directly (still goes through proxy, not exposed in bundle)
-  if (IS_DEV && TAVILY_API_KEY) body.api_key = TAVILY_API_KEY;
-
   const response = await fetch(TAVILY_PROXY_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -145,12 +140,6 @@ export async function webSearch(
     includeDomains?: string[];
   } = {},
 ): Promise<WebSearchResult[]> {
-  // In dev, warn if key missing (won't work without it)
-  if (IS_DEV && !TAVILY_API_KEY) {
-    console.warn('[WebSearch] TAVILY_API_KEY not set in .env.local, skipping web search');
-    return [];
-  }
-
   try {
     return await runTavilySearch(`UIUC ${query}`, options);
   } catch (err) {
@@ -166,12 +155,6 @@ export async function webSearchWithOfficialPriority(
     searchDepth?: 'basic' | 'advanced';
   } = {},
 ): Promise<WebSearchResult[]> {
-  // In dev, warn if key missing
-  if (IS_DEV && !TAVILY_API_KEY) {
-    console.warn('[WebSearch] TAVILY_API_KEY not set in .env.local, skipping web search');
-    return [];
-  }
-
   const { maxResults = 5, searchDepth = 'basic' } = options;
   const uniqueQueries = [...new Set(queries.map((query) => query.trim()).filter(Boolean))];
   if (!uniqueQueries.length) return [];

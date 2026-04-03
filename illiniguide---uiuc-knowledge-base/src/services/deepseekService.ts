@@ -216,7 +216,7 @@ function buildOpenAIMessages(
   const systemContent = systemInstruction || DEFAULT_SYSTEM_PROMPT;
   const langHint = lang === 'zh'
     ? '\n\nIMPORTANT: The user prefers Chinese. Reply in Chinese (简体中文) unless they write in English.'
-    : '';
+    : '\n\nIMPORTANT: The user has selected English mode. You MUST reply exclusively in English regardless of the language of your instructions above. Do NOT use Chinese in your response.';
   messages.push({ role: 'system', content: systemContent + langHint });
 
   // Conversation history
