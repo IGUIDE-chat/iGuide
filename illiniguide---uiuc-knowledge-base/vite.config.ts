@@ -103,7 +103,7 @@ export default defineConfig(({ mode }) => {
                 const { text, targetLang } = JSON.parse(raw) as { text: string; targetLang: string };
                 const prompt = `Translate the following user comment to ${targetLang}. Preserve the original tone, emotion, humor, slang, internet language, and emoji exactly. Return ONLY the translated text — no explanations, no quotes, nothing else.\n\n${text}`;
                 const geminiRes = await fetch(
-                  `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+                  `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
                   {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },

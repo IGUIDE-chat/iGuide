@@ -43,7 +43,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         }
 
         const body = (await request.json()) as GeminiRequestBody;
-        const model = (typeof body.model === 'string' && body.model) ? body.model : 'gemini-2.0-flash';
+        const model = (typeof body.model === 'string' && body.model) ? body.model : 'gemini-2.5-flash';
 
         // Remove model from body before forwarding
         const { model: _model, ...forwardBody } = body;

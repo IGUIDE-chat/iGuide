@@ -9,7 +9,7 @@
 
 // Security: API key is NEVER in the frontend bundle.
 // All Gemini calls go through CF Pages Function /api/gemini which injects GOOGLE_API_KEY server-side.
-const GEMINI_MODEL = 'gemini-2.0-flash';
+const GEMINI_MODEL = 'gemini-2.5-flash';
 
 interface GeminiResponsePart {
   text?: string;
