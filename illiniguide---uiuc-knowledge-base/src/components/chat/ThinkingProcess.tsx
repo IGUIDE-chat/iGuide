@@ -12,6 +12,8 @@ import { ThinkingStep } from '../../types';
 interface ThinkingProcessProps {
   steps: ThinkingStep[];
   isThinking: boolean;
+  isError?: boolean;
+  language?: 'en' | 'zh';
 }
 
 const stepIcons: Record<ThinkingStep['type'], string> = {
@@ -34,7 +36,12 @@ const ThinkingDots = () => (
   </span>
 );
 
-export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({ steps, isThinking }) => {
+export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({ steps, isThinking, isError, language = 'zh' }) => {
+  const labels = {
+    thinking: language === 'en' ? 'Thinking' : '思考中',
+    done: language === 'en' ? 'Thought' : '思考完成',
+    error: language === 'en' ? 'Interrupted' : '已中断',
+  };
   const [isExpanded, setIsExpanded] = useState(true);
   const wasThinking = useRef(true);
 
@@ -57,7 +64,11 @@ export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({ steps, isThink
         onClick={() => setIsExpanded(!isExpanded)}
         className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-700 transition-colors group"
       >
-        {isThinking ? (
+        {isError ? (
+          <svg className="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+          </svg>
+        ) : isThinking ? (
           <motion.div
             className="w-3.5 h-3.5 rounded-full border-2 border-illini-orange border-t-transparent"
             animate={{ rotate: 360 }}
@@ -73,7 +84,7 @@ export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({ steps, isThink
           </svg>
         )}
         <span className="font-medium">
-          {isThinking ? '思考中' : '思考完成'}
+          {isError ? labels.error : isThinking ? labels.thinking : labels.done}
         </span>
         {isThinking && latestStep && (
           <span className="text-slate-400">

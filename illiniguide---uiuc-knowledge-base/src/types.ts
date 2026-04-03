@@ -49,11 +49,16 @@ export interface ThinkingStep {
   done: boolean;
 }
 
+export type ChatErrorType = 'timeout' | 'api_error' | 'unknown';
+
 export interface ChatMessage {
   id: string;
   role: 'user' | 'model';
   text: string;
   isStreaming?: boolean;
+  /** True for error sentinel messages — never persisted to DB or used in memory extraction */
+  isError?: boolean;
+  errorType?: ChatErrorType;
   followUpQuestions?: string[];
   thinkingSteps?: ThinkingStep[];
   isThinking?: boolean;

@@ -267,6 +267,7 @@ export const streamDeepSeekChat = async function* (
   lang: string = 'en',
   _conversationId?: string,
   _userId?: string,
+  signal?: AbortSignal,
 ): AsyncGenerator<StreamChunk> {
   try {
     // 1. Fetch RAG context + personalization context in parallel
@@ -336,6 +337,7 @@ export const streamDeepSeekChat = async function* (
       response = await fetch('/api/deepseek-raw', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal,
         body: JSON.stringify({
           model: 'deepseek-chat',
           messages,
@@ -348,6 +350,7 @@ export const streamDeepSeekChat = async function* (
       response = await fetch('/api/deepseek', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal,
         body: JSON.stringify({
           history,
           newMessage,
@@ -377,8 +380,9 @@ export const streamDeepSeekChat = async function* (
       }
     }
   } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[DeepSeek] Stream error:', msg);
-    yield { text: `\n(Error: ${msg})` };
+    // Re-throw so useChatSession can classify the error type.
+    // Do NOT yield error text into the content stream.
+    console.error('[DeepSeek] Stream error:', error instanceof Error ? error.message : error);
+    throw error;
   }
 };

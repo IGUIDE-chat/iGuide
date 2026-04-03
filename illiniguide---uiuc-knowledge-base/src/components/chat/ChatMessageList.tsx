@@ -85,11 +85,19 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
                     <ThinkingProcess
                       steps={message.thinkingSteps || []}
                       isThinking={!!message.isThinking}
+                      isError={!!message.isError}
                     />
                   )}
                 <div className="prose prose-slate prose-sm max-w-none leading-relaxed text-slate-800">
                   {message.role === 'user' ? (
                     <div className="whitespace-pre-wrap">{message.text}</div>
+                  ) : message.isError ? (
+                    <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 not-prose">
+                      <svg className="w-4 h-4 mt-0.5 flex-shrink-0 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                      </svg>
+                      <span className="text-sm leading-snug">{message.text}</span>
+                    </div>
                   ) : (
                     <TypewriterMarkdown
                       content={message.text || ''}

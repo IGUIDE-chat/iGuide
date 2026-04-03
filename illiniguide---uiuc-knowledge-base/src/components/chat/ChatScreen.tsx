@@ -24,6 +24,7 @@ interface ChatScreenProps {
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   onSuggestionClick: (text: string) => void;
   onFollowUpClick: (text: string) => void;
+  onStop?: () => void;
 }
 
 export const ChatScreen: React.FC<ChatScreenProps> = ({
@@ -35,6 +36,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
   onSubmit,
   onSuggestionClick,
   onFollowUpClick,
+  onStop,
 }) => {
   const t = UI_TEXT[language];
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -82,6 +84,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
         containerClass={containerClass}
         onInputChange={onInputChange}
         onSubmit={onSubmit}
+        onStop={onStop}
       />
     </div>
   );

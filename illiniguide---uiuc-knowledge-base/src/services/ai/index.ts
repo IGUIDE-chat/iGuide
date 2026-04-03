@@ -25,6 +25,7 @@ export const streamChatResponse: StreamChatResponseFn = (
   lang,
   conversationId,
   userId,
+  signal,
 ) => {
-  return activeProvider.streamChatResponse(history, newMessage, lang, conversationId, userId);
+  return activeProvider.streamChatResponse(history, newMessage, lang, conversationId, userId, signal);
 };

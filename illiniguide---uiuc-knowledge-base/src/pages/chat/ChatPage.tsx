@@ -21,7 +21,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
   currentConversationId,
   onConversationCreated,
 }) => {
-  const { messages, input, isLoading, setInput, sendMessage, handleSubmit } =
+  const { messages, input, isLoading, setInput, sendMessage, handleSubmit, stopStreaming } =
     useChatSession({
       language,
       currentConversationId,
@@ -36,6 +36,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
       isLoading={isLoading}
       onInputChange={setInput}
       onSubmit={handleSubmit}
+      onStop={stopStreaming}
       onSuggestionClick={(text) => {
         void sendMessage(text);
       }}

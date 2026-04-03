@@ -5,8 +5,8 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { useCallback, useEffect, useState } from 'react';
-import { Language, ChatMessage, ThinkingStep } from '../../types';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Language, ChatMessage, ChatErrorType, ThinkingStep } from '../../types';
 import { streamChatResponse } from '../../services/ai';
 import { conversationService } from '../../services/conversationService';
 import { localConversationService } from '../../services/localConversationService';
@@ -29,10 +29,22 @@ const INVALID_RESPONSE = {
   zh: '暂时没有收到回复，请重试。',
 } as const;
 
-const CONNECTION_ERROR = {
-  en: 'Connection error. Please try again.',
-  zh: '连接失败，请重试。',
-} as const;
+const ERROR_MESSAGES: Record<ChatErrorType, Record<Language, string>> = {
+  timeout: {
+    en: 'Request timed out. Please try again.',
+    zh: '请求超时，请重试。',
+  },
+  api_error: {
+    en: 'The service is temporarily unavailable. Please try again later.',
+    zh: '服务暂时不可用，请稍后重试。',
+  },
+  unknown: {
+    en: 'Connection error. Please try again.',
+    zh: '连接失败，请重试。',
+  },
+};
+
+const STREAM_TIMEOUT_MS = 30_000;
 
 const LOGGED_IN_ID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -64,6 +76,9 @@ export const useChatSession = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
+  // AbortController ref — does not trigger re-renders
+  const abortControllerRef = useRef<AbortController | null>(null);
+
   const loadConversation = useCallback(
     async (conversationId: string) => {
       setIsLoadingHistory(true);
@@ -79,6 +94,13 @@ export const useChatSession = ({
         }
       } catch (error) {
         console.error('Failed to load conversation:', error);
+        setMessages([{
+          id: Date.now().toString(),
+          role: 'model',
+          text: language === 'zh' ? '历史消息加载失败，请刷新重试。' : 'Failed to load history. Please refresh.',
+          isError: true,
+          errorType: 'unknown',
+        }]);
       } finally {
         setIsLoadingHistory(false);
       }
@@ -154,6 +176,15 @@ export const useChatSession = ({
       }
 
       try {
+        // Create a new AbortController for this request
+        const abortController = new AbortController();
+        abortControllerRef.current = abortController;
+
+        // 30s timeout — auto-abort if no response completes in time
+        const timeoutId = setTimeout(() => {
+          abortController.abort('timeout');
+        }, STREAM_TIMEOUT_MS);
+
         const aiMsgId = (Date.now() + 1).toString();
         setMessages((prev) => [
           ...prev,
@@ -181,6 +212,7 @@ export const useChatSession = ({
           language,
           conversationId || undefined,
           user?.id,
+          abortController.signal,
         );
 
         let fullText = '';
@@ -244,6 +276,10 @@ export const useChatSession = ({
           }
         }
 
+        // Stream completed — clear timeout and abort ref
+        clearTimeout(timeoutId);
+        abortControllerRef.current = null;
+
         if (!fullText.trim()) {
           fullText = INVALID_RESPONSE[language];
         }
@@ -306,7 +342,7 @@ export const useChatSession = ({
           prev.map((message) => (message.id === aiMsgId ? aiMsg : message)),
         );
 
-        if (conversationId && aiMsg.text.trim()) {
+        if (conversationId && aiMsg.text.trim() && !aiMsg.isError) {
           try {
             const service = user ? conversationService : localConversationService;
             await service.saveMessage(conversationId, aiMsg);
@@ -315,15 +351,54 @@ export const useChatSession = ({
           }
         }
       } catch (error) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: Date.now().toString(),
-            role: 'model',
-            text: CONNECTION_ERROR[language],
-          },
-        ]);
+        // Classify the error type
+        const isAbort = error instanceof DOMException && error.name === 'AbortError';
+        const isTimeout = isAbort && abortControllerRef.current?.signal.reason === 'timeout';
+
+        if (isAbort && !isTimeout) {
+          // User-initiated stop — keep partial content, no error message
+          console.log('[Chat] Stream aborted by user');
+        } else {
+          const errorType: ChatErrorType = isTimeout
+            ? 'timeout'
+            : error instanceof Error && /4\d\d|5\d\d/.test(error.message)
+              ? 'api_error'
+              : 'unknown';
+
+          console.error('[Chat] Stream error:', error instanceof Error ? error.message : error);
+
+          setMessages((prev) => {
+            // Mark the in-progress AI message as error (if exists), or append a new one
+            const hasAiMsg = prev.some(m => m.isStreaming);
+            if (hasAiMsg) {
+              return prev.map(m =>
+                m.isStreaming
+                  ? {
+                      ...m,
+                      text: ERROR_MESSAGES[errorType][language],
+                      isStreaming: false,
+                      isThinking: false,
+                      isError: true,
+                      errorType,
+                    }
+                  : m,
+              );
+            }
+            return [
+              ...prev,
+              {
+                id: Date.now().toString(),
+                role: 'model' as const,
+                text: ERROR_MESSAGES[errorType][language],
+                isError: true,
+                errorType,
+              },
+            ];
+          });
+        }
       } finally {
+        clearTimeout(abortControllerRef.current ? undefined : undefined); // timeout already cleared on success
+        abortControllerRef.current = null;
         setIsLoading(false);
       }
     },
@@ -338,6 +413,14 @@ export const useChatSession = ({
     [input, sendMessage],
   );
 
+  const stopStreaming = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    setIsLoading(false);
+  }, []);
+
   return {
     messages,
     input,
@@ -346,5 +429,6 @@ export const useChatSession = ({
     setInput,
     sendMessage,
     handleSubmit,
+    stopStreaming,
   };
 };
