@@ -324,13 +324,9 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
         setTranslating((prev) => ({ ...prev, [commentId]: true }));
         setTranslateErrors((prev) => { const next = { ...prev }; delete next[commentId]; return next; });
         try {
-            const script = detectScript(text);
-            // Target language for Gemini free-tier translation
-            const targetLang = language === 'zh'
-                ? 'English'
-                : script === 'ja' ? 'English'
-                : script === 'ko' ? 'English'
-                : 'Chinese (Simplified)';
+            // Target language = UI language (translate INTO what the user reads)
+            const targetLang = language === 'zh' ? 'Chinese (Simplified)' : 'English';
+            const langKey = language === 'zh' ? 'zh' : 'en';
             const res = await fetch('/api/translate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -343,7 +339,6 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                 // Persist to DB so future visitors get it instantly (fire-and-forget)
                 // Skip Google Maps simulation comments (prefixed 'gm-')
                 if (!commentId.startsWith('gm-')) {
-                    const langKey = language === 'zh' ? 'en' : 'zh';
                     dormCommentsService.saveTranslation(commentId, langKey, translated);
                 }
             } else {
@@ -373,17 +368,17 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
         }
     };
 
-    // Pre-populate translations state from DB-cached translations on comments load
+    // When language changes or comments load: clear stale translations, then pre-fill DB-cached ones
     useEffect(() => {
-        const langKey = language === 'zh' ? 'en' : 'zh';
-        setTranslations((prev) => {
-            const updates: Record<string, string> = {};
+        const langKey = language === 'zh' ? 'zh' : 'en';
+        setTranslations(() => {
+            const fresh: Record<string, string> = {};
             for (const c of comments) {
-                if (c.translation?.[langKey] && !prev[c.id]) {
-                    updates[c.id] = c.translation[langKey];
+                if (c.translation?.[langKey]) {
+                    fresh[c.id] = c.translation[langKey];
                 }
             }
-            return Object.keys(updates).length ? { ...prev, ...updates } : prev;
+            return fresh;
         });
     }, [comments, language]);
 
