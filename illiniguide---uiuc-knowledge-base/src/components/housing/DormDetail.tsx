@@ -155,6 +155,8 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
     const [autoTranslate, setAutoTranslate] = useState<boolean>(() => {
         try { return localStorage.getItem('comment_auto_translate') === '1'; } catch { return false; }
     });
+    // Track comments where user explicitly clicked "Original" (hide translation)
+    const [userDismissed, setUserDismissed] = useState<Set<string>>(new Set());
 
     const t = dormDetailTexts[language];
 
@@ -317,10 +319,13 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
 
     const handleTranslate = async (commentId: string, text: string) => {
         if (translations[commentId]) {
-            // Toggle off
+            // User explicitly toggled off — remember this so DB cache won't re-show it
+            setUserDismissed((prev) => new Set(prev).add(commentId));
             setTranslations((prev) => { const next = { ...prev }; delete next[commentId]; return next; });
             return;
         }
+        // User is actively requesting translation — clear any previous dismiss
+        setUserDismissed((prev) => { const next = new Set(prev); next.delete(commentId); return next; });
         setTranslating((prev) => ({ ...prev, [commentId]: true }));
         setTranslateErrors((prev) => { const next = { ...prev }; delete next[commentId]; return next; });
         try {
@@ -369,8 +374,10 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
     };
 
     // When language changes or comments load: clear stale translations, then pre-fill DB-cached ones
+    // Respect userDismissed: don't re-show translations the user explicitly hid
     useEffect(() => {
         const langKey = language === 'zh' ? 'zh' : 'en';
+        setUserDismissed(new Set()); // language switch resets dismissed state
         setTranslations(() => {
             const fresh: Record<string, string> = {};
             for (const c of comments) {
@@ -380,7 +387,21 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
             }
             return fresh;
         });
-    }, [comments, language]);
+    }, [language]); // language change → full reset
+
+    // When new comments arrive, fill DB cache for ones not yet in state and not dismissed
+    useEffect(() => {
+        const langKey = language === 'zh' ? 'zh' : 'en';
+        setTranslations((prev) => {
+            const updates: Record<string, string> = {};
+            for (const c of comments) {
+                if (c.translation?.[langKey] && !prev[c.id] && !userDismissed.has(c.id)) {
+                    updates[c.id] = c.translation[langKey];
+                }
+            }
+            return Object.keys(updates).length ? { ...prev, ...updates } : prev;
+        });
+    }, [comments]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Auto-translate newly loaded comments when the preference is on
 
@@ -392,7 +413,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
             }
         });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [comments, autoTranslate]);
+    }, [comments, autoTranslate, language]);
 
     // ── Render ─────────────────────────────────────────────────────────────
     return (
@@ -1347,7 +1368,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                                             {t.helpful}{comment.upvotes > 0 ? ` (${comment.upvotes})` : ''}
                                                         </span>
                                                     </motion.button>
-                                                    {needsTranslation(comment.content, language) && (
+                                                    {(needsTranslation(comment.content, language) || !!translations[comment.id]) && (
                                                         <button
                                                             type="button"
                                                             onClick={() => handleTranslate(comment.id, comment.content)}
