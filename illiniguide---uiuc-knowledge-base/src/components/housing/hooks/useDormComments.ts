@@ -10,6 +10,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { dormCommentsService, DormComment } from '../../../services/dormCommentsService';
+import { SHOW_GOOGLE_REVIEWS } from '../constants/featureFlags';
 
 // ── Guest vote localStorage helpers ──────────────────────────────────────
 const GUEST_VOTES_KEY = 'guest_comment_votes';
@@ -43,10 +44,12 @@ export function useDormComments(dormId: string) {
         setLoading(true);
         let data = await dormCommentsService.getComments(dormId);
         
-        // Merge Google Maps simulation comments
-        const { GOOGLE_REVIEWS } = await import('../constants/googleReviews');
-        const googleCommentsForDorm = GOOGLE_REVIEWS.filter(c => c.dorm_id === dormId);
-        data = [...data, ...googleCommentsForDorm];
+        // Merge Google Maps simulation comments (controlled by feature flag)
+        if (SHOW_GOOGLE_REVIEWS) {
+            const { GOOGLE_REVIEWS } = await import('../constants/googleReviews');
+            const googleCommentsForDorm = GOOGLE_REVIEWS.filter(c => c.dorm_id === dormId);
+            data = [...data, ...googleCommentsForDorm];
+        }
 
         // Merge guest votes from localStorage when not logged in
         if (!user) {
@@ -86,7 +89,10 @@ export function useDormComments(dormId: string) {
     };
 
     const voteOnComment = async (commentId: string, vote: 1 | -1 | null) => {
-        if (user) {
+        // Google Reviews 模拟评论不写 Supabase（防御性守卫）
+        if (commentId.startsWith('gm-')) {
+            if (!user) setGuestVote(commentId, vote);
+        } else if (user) {
             await dormCommentsService.voteOnComment(commentId, vote);
         } else {
             // Guest: persist in localStorage only
