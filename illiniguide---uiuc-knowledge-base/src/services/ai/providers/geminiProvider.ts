@@ -7,8 +7,9 @@
 
 ﻿import { AIProvider, ChatHistoryItem } from '../types';
 
-const GEMINI_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
-const GEMINI_MODEL = import.meta.env.VITE_GEMINI_MODEL || 'gemini-1.5-flash';
+// Security: API key is NEVER in the frontend bundle.
+// All Gemini calls go through CF Pages Function /api/gemini which injects GOOGLE_API_KEY server-side.
+const GEMINI_MODEL = 'gemini-1.5-flash';
 
 interface GeminiResponsePart {
   text?: string;
@@ -39,25 +40,16 @@ const getErrorText = (lang: string | undefined, reason: string) => {
 export const geminiProvider: AIProvider = {
   id: 'gemini',
   streamChatResponse: async function* (history, newMessage, lang) {
-    if (!GEMINI_API_KEY) {
-      yield { text: getErrorText(lang, 'VITE_GOOGLE_API_KEY is missing.') };
-      return;
-    }
-
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
     const payload = {
+      model: GEMINI_MODEL,
       contents: [{ parts: [{ text: buildPrompt(history, newMessage) }] }],
-      generationConfig: {
-        temperature: 0.3,
-      },
+      generationConfig: { temperature: 0.3 },
     };
 
     try {
-      const response = await fetch(endpoint, {
+      const response = await fetch('/api/gemini', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 

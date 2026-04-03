@@ -6,7 +6,6 @@ import {
   webSearchWithOfficialPriority,
 } from './webSearchService';
 
-const DEEPSEEK_API_KEY = import.meta.env.DEEPSEEK_API_KEY as string | undefined;
 const IS_DEV = import.meta.env.DEV;
 const QMD_RESULT_LIMIT = 5;
 const WEB_RESULT_LIMIT = 3;
@@ -229,10 +228,7 @@ async function rewriteQueryToEnglish(query: string, staticQuery: string | null):
     const response = IS_DEV
       ? await fetch('/api/deepseek-raw', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             model: 'deepseek-chat',
             messages,

@@ -13,8 +13,9 @@ import { memoryService } from './memoryService';
 
 // ── Config ──────────────────────────────────────────────────────
 
-// Security: Do NOT use VITE_ prefix for sensitive keys
-const DEEPSEEK_API_KEY = import.meta.env.DEEPSEEK_API_KEY as string | undefined;
+// Security: API key is NEVER in the frontend bundle.
+// DEV: Vite proxy /api/deepseek-raw injects Authorization header from .env.local
+// PROD: CF Pages Function /api/deepseek injects key from CF environment variables
 const IS_DEV = import.meta.env.DEV;
 
 const DEFAULT_SYSTEM_PROMPT = `# Role: UIUC 资深学长姐顾问 (Illini Spirit Advisor)
@@ -248,12 +249,6 @@ export const streamDeepSeekChat = async function* (
   _conversationId?: string,
   _userId?: string,
 ): AsyncGenerator<StreamChunk> {
-  // Validate API key in dev
-  if (IS_DEV && !DEEPSEEK_API_KEY) {
-    yield { text: 'Error: DEEPSEEK_API_KEY missing in .env.local (Dev Mode).' };
-    return;
-  }
-
   try {
     // 1. Fetch RAG context + personalization context in parallel
     let ragContext = '';
@@ -317,14 +312,11 @@ export const streamDeepSeekChat = async function* (
     let response: Response;
 
     if (IS_DEV) {
-      // DEV: build OpenAI-format messages, call via Vite proxy
+      // DEV: build OpenAI-format messages, call via Vite proxy (proxy injects Authorization header)
       const messages = buildOpenAIMessages(history, newMessage, lang, systemInstruction);
       response = await fetch('/api/deepseek-raw', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: 'deepseek-chat',
           messages,
