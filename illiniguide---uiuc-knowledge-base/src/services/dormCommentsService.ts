@@ -22,6 +22,8 @@ export interface DormComment {
     upvotes: number;
     downvotes: number;
     myVote: 1 | -1 | null;
+    /** Cached translations keyed by language code, e.g. { en: "...", zh: "..." } */
+    translation?: Record<string, string>;
 }
 
 interface RawVote {
@@ -37,6 +39,7 @@ interface RawComment {
     content: string;
     dorm_vote: number | null;
     created_at: string;
+    translation?: Record<string, string> | null;
     dorm_comment_votes: RawVote[];
 }
 
@@ -61,6 +64,7 @@ function aggregateComment(raw: RawComment, currentUserId: string | null): DormCo
         content: raw.content,
         dorm_vote: raw.dorm_vote as 1 | -1 | null,
         created_at: raw.created_at,
+        translation: raw.translation ?? undefined,
         upvotes,
         downvotes,
         myVote,
@@ -204,6 +208,25 @@ export const dormCommentsService = {
                 console.error('Error saving comment vote:', error);
                 throw error;
             }
+        }
+    },
+
+    /**
+     * Persist a translation for a comment into the `translation` JSONB column.
+     * Merges new lang key into existing object so multiple languages accumulate.
+     * @param commentId - The comment UUID
+     * @param langKey   - e.g. 'en' or 'zh'
+     * @param text      - Translated text
+     */
+    async saveTranslation(commentId: string, langKey: string, text: string): Promise<void> {
+        const { error } = await supabase.rpc('merge_comment_translation', {
+            p_comment_id: commentId,
+            p_lang: langKey,
+            p_text: text,
+        });
+        if (error) {
+            // Non-fatal: next visitor will just re-translate
+            console.warn('Failed to persist translation:', error.message);
         }
     },
 };

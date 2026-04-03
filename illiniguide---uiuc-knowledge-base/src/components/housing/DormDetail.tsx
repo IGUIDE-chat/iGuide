@@ -21,6 +21,7 @@ import { useDormData } from './store/DormDataContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { dormService } from '../../services/dormService';
 import { useDormComments } from './hooks/useDormComments';
+import { dormCommentsService } from '../../services/dormCommentsService';
 import { Dorm, DormTag, FloorPlan } from './types/index';
 import { Language } from '../../types';
 import DormEditPanel from './DormEditPanel';
@@ -324,29 +325,27 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
         setTranslateErrors((prev) => { const next = { ...prev }; delete next[commentId]; return next; });
         try {
             const script = detectScript(text);
-            // Determine the most natural target language
+            // Target language for Gemini free-tier translation
             const targetLang = language === 'zh'
                 ? 'English'
-                : script === 'ja' ? 'Japanese to English'
-                : script === 'ko' ? 'Korean to English'
+                : script === 'ja' ? 'English'
+                : script === 'ko' ? 'English'
                 : 'Chinese (Simplified)';
-            const systemPrompt = `You are a professional translator. Translate the following text to ${targetLang}. Preserve the original tone, emotion, and any slang or emoji. Return ONLY the translated text, nothing else.`;
-            const res = await fetch('/api/deepseek', {
+            const res = await fetch('/api/translate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    stream: false,
-                    messages: [
-                        { role: 'system', content: systemPrompt },
-                        { role: 'user', content: text },
-                    ],
-                }),
+                body: JSON.stringify({ text, targetLang }),
             });
             if (res.ok) {
                 const data = await res.json() as Record<string, unknown>;
-                // CF function non-streaming returns { reply: string }
                 const translated = (data.reply as string) || text;
                 setTranslations((prev) => ({ ...prev, [commentId]: translated }));
+                // Persist to DB so future visitors get it instantly (fire-and-forget)
+                // Skip Google Maps simulation comments (prefixed 'gm-')
+                if (!commentId.startsWith('gm-')) {
+                    const langKey = language === 'zh' ? 'en' : 'zh';
+                    dormCommentsService.saveTranslation(commentId, langKey, translated);
+                }
             } else {
                 setTranslateErrors((prev) => ({ ...prev, [commentId]: true }));
             }
@@ -374,7 +373,22 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
         }
     };
 
+    // Pre-populate translations state from DB-cached translations on comments load
+    useEffect(() => {
+        const langKey = language === 'zh' ? 'en' : 'zh';
+        setTranslations((prev) => {
+            const updates: Record<string, string> = {};
+            for (const c of comments) {
+                if (c.translation?.[langKey] && !prev[c.id]) {
+                    updates[c.id] = c.translation[langKey];
+                }
+            }
+            return Object.keys(updates).length ? { ...prev, ...updates } : prev;
+        });
+    }, [comments, language]);
+
     // Auto-translate newly loaded comments when the preference is on
+
     useEffect(() => {
         if (!autoTranslate) return;
         comments.forEach((c) => {
