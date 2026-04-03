@@ -4,6 +4,59 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Body base style */
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: #F8FAFC;
+  background-image:
+    radial-gradient(at 0% 0%, rgba(19, 41, 75, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(255, 95, 5, 0.05) 0px, transparent 50%);
+  background-attachment: fixed;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Custom UIUC Colors extensions */
+.bg-illini-blue {
+  background-color: #13294B;
+}
+
+.text-illini-blue {
+  color: #13294B;
+}
+
+.bg-illini-orange {
+  background-color: #FF5F05;
+}
+
+.text-illini-orange {
+  color: #FF5F05;
+}
+
+/* Glassmorphism utilities */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
 /* Fade-in-up animation */
 @keyframes fade-in-up {
   from {

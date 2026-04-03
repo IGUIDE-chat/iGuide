@@ -13,7 +13,8 @@ import { memoryService } from './memoryService';
 
 // ── Config ──────────────────────────────────────────────────────
 
-const DEEPSEEK_API_KEY = import.meta.env.VITE_DEEPSEEK_API_KEY as string | undefined;
+// Security: Do NOT use VITE_ prefix for sensitive keys
+const DEEPSEEK_API_KEY = import.meta.env.DEEPSEEK_API_KEY as string | undefined;
 const IS_DEV = import.meta.env.DEV;
 
 const DEFAULT_SYSTEM_PROMPT = `# Role: UIUC 资深学长姐顾问 (Illini Spirit Advisor)
@@ -249,7 +250,7 @@ export const streamDeepSeekChat = async function* (
 ): AsyncGenerator<StreamChunk> {
   // Validate API key in dev
   if (IS_DEV && !DEEPSEEK_API_KEY) {
-    yield { text: 'Error: VITE_DEEPSEEK_API_KEY missing in .env.local (Dev Mode).' };
+    yield { text: 'Error: DEEPSEEK_API_KEY missing in .env.local (Dev Mode).' };
     return;
   }
 

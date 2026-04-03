@@ -14,7 +14,8 @@
 // ==========================================
 // 🛠️ COZE CONFIGURATION
 // ==========================================
-const COZE_API_KEY = import.meta.env.VITE_COZE_API_KEY;
+// In production, use backend proxy (no keys needed on frontend)
+// In development, use proxy - keys are handled by vite.config.ts proxy
 const COZE_BOT_ID = import.meta.env.VITE_COZE_BOT_ID;
 const COZE_API_URL = "https://api.coze.com/v3/chat";
 const COZE_CONVERSATION_API_URL = "https://api.coze.com/v1/conversation/create";
@@ -40,9 +41,8 @@ export const streamChatResponse = async function* (
   userId?: string           // Optional: Pass Supabase User ID or Guest ID
 ): AsyncGenerator<StreamResponse> {
 
-  // In DEV mode, we need the keys to call Coze directly.
-  // In PROD mode, we use a backend proxy, so the client doesn't need the keys.
-  if (import.meta.env.DEV && (!COZE_API_KEY || !COZE_BOT_ID)) {
+  // Configuration check for DEV mode
+  if (import.meta.env.DEV && !COZE_BOT_ID) {
     yield { text: "Error: Coze configuration missing in .env.local (Dev Mode)." };
     return;
   }
@@ -82,15 +82,14 @@ export const streamChatResponse = async function* (
     let response;
 
     // HYBRID MODE:
-    // Local Dev: Call Coze directly (requires VITE_COZE_API_KEY in .env.local)
+    // Local Dev: Use Vite proxy (server-side handles keys)
     // Production: Call Cloudflare Backend Proxy (secure, handles CORS & Secrets)
     if (import.meta.env.DEV) {
-      console.log('[Dev] Using proxy Coze API call');
-      // Use local proxy path defined in vite.config.ts to avoid CORS
+      console.log('[Dev] Using proxy Coze API call via Vite proxy');
+      // Proxy will add the Authorization header from server-side env
       response = await fetch('/api/coze/v3/chat', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${COZE_API_KEY}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
