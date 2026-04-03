@@ -16,7 +16,21 @@ export function useDormCommentStats() {
     const [stats, setStats] = useState<Record<string, DormCommentStats>>({});
 
     useEffect(() => {
-        dormCommentsService.getAllDormStats().then(setStats);
+        dormCommentsService.getAllDormStats().then(async data => {
+            const { GOOGLE_REVIEWS } = await import('../constants/googleReviews');
+            const updatedStats = { ...data };
+            GOOGLE_REVIEWS.forEach(review => {
+                const dormId = review.dorm_id;
+                if (!updatedStats[dormId]) {
+                    updatedStats[dormId] = { dormId, totalComments: 0, positivePercent: 0, thumbsUp: 0 };
+                }
+                const st = updatedStats[dormId];
+                st.totalComments += 1;
+                if (review.dorm_vote === 1) st.thumbsUp += 1;
+                st.positivePercent = st.totalComments > 0 ? Math.round((st.thumbsUp / st.totalComments) * 100) : 0;
+            });
+            setStats(updatedStats);
+        });
     }, []);
 
     return stats;

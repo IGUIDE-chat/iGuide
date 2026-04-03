@@ -41,7 +41,12 @@ export function useDormComments(dormId: string) {
 
     const load = useCallback(async () => {
         setLoading(true);
-        const data = await dormCommentsService.getComments(dormId);
+        let data = await dormCommentsService.getComments(dormId);
+        
+        // Merge Google Maps simulation comments
+        const { GOOGLE_REVIEWS } = await import('../constants/googleReviews');
+        const googleCommentsForDorm = GOOGLE_REVIEWS.filter(c => c.dorm_id === dormId);
+        data = [...data, ...googleCommentsForDorm];
 
         // Merge guest votes from localStorage when not logged in
         if (!user) {
