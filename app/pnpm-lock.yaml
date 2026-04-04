@@ -29,15 +29,6 @@ importers:
       pnpm:
         specifier: ^10.33.0
         version: 10.33.0
-      puppeteer:
-        specifier: ^24.40.0
-        version: 24.40.0(typescript@5.8.3)
-      puppeteer-extra:
-        specifier: ^3.3.6
-        version: 3.3.6(puppeteer-core@24.40.0)(puppeteer@24.40.0(typescript@5.8.3))
-      puppeteer-extra-plugin-stealth:
-        specifier: ^2.11.2
-        version: 2.11.2(puppeteer-extra@3.3.6(puppeteer-core@24.40.0)(puppeteer@24.40.0(typescript@5.8.3)))
       rc-slider:
         specifier: ^11.1.9
         version: 11.1.9(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -90,6 +81,15 @@ importers:
       prettier:
         specifier: ^3.8.1
         version: 3.8.1
+      puppeteer:
+        specifier: ^24.40.0
+        version: 24.40.0(typescript@5.8.3)
+      puppeteer-extra:
+        specifier: ^3.3.6
+        version: 3.3.6(puppeteer-core@24.40.0)(puppeteer@24.40.0(typescript@5.8.3))
+      puppeteer-extra-plugin-stealth:
+        specifier: ^2.11.2
+        version: 2.11.2(puppeteer-extra@3.3.6(puppeteer-core@24.40.0)(puppeteer@24.40.0(typescript@5.8.3)))
       tailwindcss:
         specifier: ^3.4.19
         version: 3.4.19
