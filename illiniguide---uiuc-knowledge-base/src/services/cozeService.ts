@@ -17,8 +17,6 @@
 // In production, use backend proxy (no keys needed on frontend)
 // In development, use proxy - keys are handled by vite.config.ts proxy
 const COZE_BOT_ID = import.meta.env.VITE_COZE_BOT_ID;
-const COZE_API_URL = "https://api.coze.com/v3/chat";
-const COZE_CONVERSATION_API_URL = "https://api.coze.com/v1/conversation/create";
 
 export interface StreamResponse {
   text: string;
