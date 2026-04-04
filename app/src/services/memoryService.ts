@@ -112,16 +112,14 @@ export const memoryService = {
 
   async updateSoul(userId: string, soulPrompt: string): Promise<void> {
     const trimmed = soulPrompt.slice(0, SOUL_MAX_LENGTH)
-    const { error } = await supabase
-      .from('user_souls')
-      .upsert(
-        {
-          user_id: userId,
-          soul_prompt: trimmed,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'user_id' }
-      )
+    const { error } = await supabase.from('user_souls').upsert(
+      {
+        user_id: userId,
+        soul_prompt: trimmed,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'user_id' }
+    )
     if (error) console.error('[memoryService] Failed to update soul:', error)
   },
 
@@ -154,16 +152,14 @@ export const memoryService = {
 
   async updateUserMemory(userId: string, memoryText: string): Promise<void> {
     const trimmed = memoryText.slice(0, USER_MEMORY_MAX_LENGTH)
-    const { error } = await supabase
-      .from('user_memories')
-      .upsert(
-        {
-          user_id: userId,
-          memory_text: trimmed,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'user_id' }
-      )
+    const { error } = await supabase.from('user_memories').upsert(
+      {
+        user_id: userId,
+        memory_text: trimmed,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'user_id' }
+    )
     if (error)
       console.error('[memoryService] Failed to update user memory:', error)
   },
@@ -200,16 +196,14 @@ export const memoryService = {
     memoryText: string
   ): Promise<void> {
     const trimmed = memoryText.slice(0, CONV_MEMORY_MAX_LENGTH)
-    const { error } = await supabase
-      .from('conversation_memories')
-      .upsert(
-        {
-          conversation_id: conversationId,
-          memory_text: trimmed,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'conversation_id' }
-      )
+    const { error } = await supabase.from('conversation_memories').upsert(
+      {
+        conversation_id: conversationId,
+        memory_text: trimmed,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'conversation_id' }
+    )
     if (error)
       console.error(
         '[memoryService] Failed to update conversation memory:',

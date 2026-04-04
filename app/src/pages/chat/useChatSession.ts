@@ -221,7 +221,9 @@ export const useChatSession = ({
             const now = Date.now()
             // First text chunk means thinking is done
             if (fullText === chunk.text && thinkingSteps.length > 0) {
-              thinkingSteps.forEach((s) => (s.done = true))
+              thinkingSteps.forEach((s) => {
+                s.done = true
+              })
             }
             if (now - lastUpdateTime >= updateInterval) {
               setMessages((prev) =>
@@ -273,7 +275,7 @@ export const useChatSession = ({
             .split('\n')
             .map((line) =>
               line
-                .replace(/^[>\s\d\.\-\*\[\]]+/, '')
+                .replace(/^[>\s\d.*[\]-]+/, '')
                 .replace(/\]?$/, '')
                 .trim()
             )
@@ -320,7 +322,9 @@ export const useChatSession = ({
         }
 
         // Mark all steps done
-        thinkingSteps.forEach((s) => (s.done = true))
+        thinkingSteps.forEach((s) => {
+          s.done = true
+        })
 
         const aiMsg: ChatMessage = {
           id: aiMsgId,

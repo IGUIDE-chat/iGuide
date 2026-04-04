@@ -95,9 +95,8 @@ export async function quickSearch(
 // ── Helpers ──────────────────────────────────────────────────────
 
 function parseResultType(filePath: string): SearchResult['type'] {
-  if (/\/dorms[\-\/]/.test(filePath) || /\/dorms\//.test(filePath))
-    return 'dorm'
-  if (/\/articles[\-\/]/.test(filePath) || /\/articles\//.test(filePath))
+  if (/\/dorms[-/]/.test(filePath) || /\/dorms\//.test(filePath)) return 'dorm'
+  if (/\/articles[-/]/.test(filePath) || /\/articles\//.test(filePath))
     return 'article'
   if (/\/crawled\//.test(filePath)) return 'crawled'
   return undefined
