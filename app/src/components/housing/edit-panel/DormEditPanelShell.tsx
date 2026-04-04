@@ -5,31 +5,31 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from 'react';
-import { X } from 'lucide-react';
-import { ActiveTab } from './useDormEditForm';
+import React from 'react'
+import { X } from 'lucide-react'
+import { ActiveTab } from './useDormEditForm'
 
 interface TabConfig {
-  id: ActiveTab;
-  icon: React.ReactNode;
-  label: string;
+  id: ActiveTab
+  icon: React.ReactNode
+  label: string
 }
 
 interface DormEditPanelShellProps {
-  title: string;
-  activeTab: ActiveTab;
-  tabs: TabConfig[];
-  saving: boolean;
-  saveSuccess: boolean;
-  saveError: string | null;
-  saveLabel: string;
-  savingLabel: string;
-  savedLabel: string;
-  cancelLabel: string;
-  onClose: () => void;
-  onSave: () => void;
-  onTabChange: (tab: ActiveTab) => void;
-  children: React.ReactNode;
+  title: string
+  activeTab: ActiveTab
+  tabs: TabConfig[]
+  saving: boolean
+  saveSuccess: boolean
+  saveError: string | null
+  saveLabel: string
+  savingLabel: string
+  savedLabel: string
+  cancelLabel: string
+  onClose: () => void
+  onSave: () => void
+  onTabChange: (tab: ActiveTab) => void
+  children: React.ReactNode
 }
 
 export const DormEditPanelShell: React.FC<DormEditPanelShellProps> = ({
@@ -51,20 +51,24 @@ export const DormEditPanelShell: React.FC<DormEditPanelShellProps> = ({
   return (
     <>
       {/* No full-page backdrop — left side stays fully interactive and scrollable */}
-      <div className="fixed right-0 top-0 h-full w-full max-w-lg z-50 bg-white shadow-2xl flex flex-col border-l border-gray-200">
-        <div className="flex items-center justify-between px-4 py-3 bg-illini-blue text-white flex-shrink-0">
-          <span className="font-bold text-base truncate">{title}</span>
-          <button type="button" onClick={onClose} className="hover:text-gray-300 flex-shrink-0 ml-2">
+      <div className="fixed right-0 top-0 z-50 flex h-full w-full max-w-lg flex-col border-l border-gray-200 bg-white shadow-2xl">
+        <div className="flex flex-shrink-0 items-center justify-between bg-illini-blue px-4 py-3 text-white">
+          <span className="truncate text-base font-bold">{title}</span>
+          <button
+            type="button"
+            onClick={onClose}
+            className="ml-2 flex-shrink-0 hover:text-gray-300"
+          >
             <X size={20} />
           </button>
         </div>
-        <div className="flex border-b border-gray-200 flex-shrink-0">
+        <div className="flex flex-shrink-0 border-b border-gray-200">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               type="button"
               onClick={() => onTabChange(tab.id)}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium transition-colors ${
+              className={`flex flex-1 items-center justify-center gap-1.5 py-2.5 text-xs font-medium transition-colors ${
                 activeTab === tab.id
                   ? 'border-b-2 border-illini-orange text-illini-blue'
                   : 'text-gray-500 hover:text-illini-blue'
@@ -75,29 +79,39 @@ export const DormEditPanelShell: React.FC<DormEditPanelShellProps> = ({
             </button>
           ))}
         </div>
-        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 text-sm">{children}</div>
-        <div className="border-t border-gray-200 px-4 py-3 flex items-center gap-3 flex-shrink-0 bg-white">
+        <div className="flex-1 space-y-4 overflow-y-auto px-4 py-4 text-sm">
+          {children}
+        </div>
+        <div className="flex flex-shrink-0 items-center gap-3 border-t border-gray-200 bg-white px-4 py-3">
           {activeTab !== 'history' && (
             <button
               type="button"
               onClick={onSave}
               disabled={saving}
-              className="flex items-center justify-center gap-2 bg-illini-orange hover:bg-illini-orange-dark text-white font-bold px-4 py-2 rounded-lg transition-colors disabled:opacity-60 text-sm"
+              className="flex items-center justify-center gap-2 rounded-lg bg-illini-orange px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-illini-orange-dark disabled:opacity-60"
             >
               {saving ? savingLabel : saveLabel}
             </button>
           )}
-          {saveSuccess && <span className="text-xs text-emerald-600 font-medium">{savedLabel}</span>}
-          {saveError && <span className="text-xs text-red-600 font-medium">{saveError}</span>}
+          {saveSuccess && (
+            <span className="text-xs font-medium text-emerald-600">
+              {savedLabel}
+            </span>
+          )}
+          {saveError && (
+            <span className="text-xs font-medium text-red-600">
+              {saveError}
+            </span>
+          )}
           <button
             type="button"
             onClick={onClose}
-            className="ml-auto text-xs text-gray-500 hover:text-gray-700 px-3 py-2 border border-gray-300 rounded-lg transition-colors"
+            className="ml-auto rounded-lg border border-gray-300 px-3 py-2 text-xs text-gray-500 transition-colors hover:text-gray-700"
           >
             {cancelLabel}
           </button>
         </div>
       </div>
     </>
-  );
-};
+  )
+}

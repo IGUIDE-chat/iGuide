@@ -6,18 +6,18 @@
  */
 
 export interface StreamChunk {
-  text: string;
-  followUpQuestions?: string[];
+  text: string
+  followUpQuestions?: string[]
   thinkingStep?: {
-    type: 'reasoning' | 'searching' | 'tool_call' | 'processing';
-    label: string;
-    detail?: string;
-  };
+    type: 'reasoning' | 'searching' | 'tool_call' | 'processing'
+    label: string
+    detail?: string
+  }
 }
 
 export interface ChatHistoryItem {
-  role: 'user' | 'model';
-  text: string;
+  role: 'user' | 'model'
+  text: string
 }
 
 export type StreamChatResponseFn = (
@@ -25,10 +25,10 @@ export type StreamChatResponseFn = (
   newMessage: string,
   lang?: string,
   conversationId?: string,
-  userId?: string,
-) => AsyncGenerator<StreamChunk>;
+  userId?: string
+) => AsyncGenerator<StreamChunk>
 
 export interface AIProvider {
-  id: 'coze' | 'gemini' | 'deepseek';
-  streamChatResponse: StreamChatResponseFn;
+  id: 'coze' | 'gemini' | 'deepseek'
+  streamChatResponse: StreamChatResponseFn
 }

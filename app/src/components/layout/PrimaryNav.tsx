@@ -5,23 +5,23 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { BrandMark } from '../ui/branding/BrandMark';
+import React from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { BrandMark } from '../ui/branding/BrandMark'
 
 interface NavItem {
-  key: string;
-  label: string;
-  icon: React.ReactNode;
-  onClick: () => void;
+  key: string
+  label: string
+  icon: React.ReactNode
+  onClick: () => void
 }
 
 interface PrimaryNavProps {
-  appTitle: string;
-  activeTab: string;
-  isSidebarOpen: boolean;
-  navItems: NavItem[];
-  onCloseSidebar: () => void;
+  appTitle: string
+  activeTab: string
+  isSidebarOpen: boolean
+  navItems: NavItem[]
+  onCloseSidebar: () => void
 }
 
 const AnimatedText = ({ children }: { children: React.ReactNode }) => (
@@ -37,26 +37,30 @@ const AnimatedText = ({ children }: { children: React.ReactNode }) => (
       {children}
     </motion.span>
   </AnimatePresence>
-);
+)
 
 const SidebarLabel = ({
   isOpen,
   children,
   className = '',
 }: {
-  isOpen: boolean;
-  children: React.ReactNode;
-  className?: string;
+  isOpen: boolean
+  children: React.ReactNode
+  className?: string
 }) => (
   <motion.span
     initial={false}
-    animate={isOpen ? { opacity: 1, x: 0, maxWidth: 220 } : { opacity: 0, x: -6, maxWidth: 0 }}
+    animate={
+      isOpen
+        ? { opacity: 1, x: 0, maxWidth: 220 }
+        : { opacity: 0, x: -6, maxWidth: 0 }
+    }
     transition={{ duration: 0.2, ease: 'easeOut' }}
     className={`inline-block overflow-hidden whitespace-nowrap ${className}`}
   >
     {children}
   </motion.span>
-);
+)
 
 export const PrimaryNav: React.FC<PrimaryNavProps> = ({
   appTitle,
@@ -67,33 +71,37 @@ export const PrimaryNav: React.FC<PrimaryNavProps> = ({
 }) => {
   return (
     <>
-      <div className="p-3 mb-2 flex items-center justify-between">
-        <div className="flex items-center gap-2 px-2 py-2 rounded-md hover:bg-white/5 cursor-pointer w-full transition-colors">
-          <BrandMark className="h-[26px] w-[26px] rounded-md" iconClassName="text-[10px]" />
+      <div className="mb-2 flex items-center justify-between p-3">
+        <div className="flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-2 transition-colors hover:bg-white/5">
+          <BrandMark
+            className="h-[26px] w-[26px] rounded-md"
+            iconClassName="text-[10px]"
+          />
           <SidebarLabel
             isOpen={isSidebarOpen}
-            className="font-bold text-[15px] tracking-tight text-white"
+            className="text-[15px] font-bold tracking-tight text-white"
           >
             <AnimatedText>{appTitle}</AnimatedText>
           </SidebarLabel>
         </div>
         <button
           onClick={onCloseSidebar}
-          className="md:hidden text-slate-400 p-2 hover:text-white"
+          className="p-2 text-slate-400 hover:text-white md:hidden"
         >
           ×
         </button>
       </div>
 
-      <nav className="px-3 space-y-1 mb-2">
+      <nav className="mb-2 space-y-1 px-3">
         {navItems.map((item) => (
           <button
             key={item.key}
             onClick={item.onClick}
-            className={`w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm transition-colors ${activeTab === item.key
-              ? 'bg-[#212121] text-white'
-              : 'hover:bg-[#212121] text-slate-300'
-              }`}
+            className={`flex w-full items-center gap-3 rounded-md px-3 py-3 text-sm transition-colors ${
+              activeTab === item.key
+                ? 'bg-[#212121] text-white'
+                : 'text-slate-300 hover:bg-[#212121]'
+            }`}
           >
             <span>{item.icon}</span>
             <SidebarLabel isOpen={isSidebarOpen}>
@@ -103,5 +111,5 @@ export const PrimaryNav: React.FC<PrimaryNavProps> = ({
         ))}
       </nav>
     </>
-  );
-};
+  )
+}

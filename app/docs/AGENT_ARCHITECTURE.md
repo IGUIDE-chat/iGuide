@@ -7,7 +7,7 @@
 ```mermaid
 graph TD
     UserInput[用户输入] --> Router{意图路由 Intent Router}
-    
+
     Router -->|通用问答| RAG[标准 RAG 机器人]
     Router -->|查询课程| CourseAgent[选课 Agent]
     Router -->|查询宿舍| DormAgent[选宿舍 Agent]
@@ -18,7 +18,7 @@ graph TD
         check_slots --> CallTool[调用 get_courses]
         CallTool --> CourseResult[结构化列表]
     end
-    
+
     subgraph "行动 Agent (Action Agent)"
         ActionAgent --> Confirm[人工确认 Human-in-the-loop]
         Confirm -->|批准| Browser[Playwright 浏览器自动化]
@@ -29,9 +29,11 @@ graph TD
 ## 2. 选课 Agent (Course Selection Agent)
 
 ### 2.1 目标
+
 帮助学生根据特定要求（通识教育类别 GenEd、学分、GPA、主题）查找课程，以优化他们的课程表。
 
 ### 2.2 数据 Schema (SQL)
+
 我们需要在 `knowledge.db` (或 Supabase) 中建立一个结构化的 `courses` 表。
 
 ```sql
@@ -54,6 +56,7 @@ CREATE INDEX idx_course_gen_ed ON courses(gen_ed_categories);
 ```
 
 ### 2.3 工具定义 (Function Calling)
+
 我们将向 LLM 提供以下工具定义。
 
 ```json
@@ -63,11 +66,23 @@ CREATE INDEX idx_course_gen_ed ON courses(gen_ed_categories);
   "parameters": {
     "type": "object",
     "properties": {
-      "subject": { "type": "string", "description": "课程科目代码 (例如 CS, ECE)" },
+      "subject": {
+        "type": "string",
+        "description": "课程科目代码 (例如 CS, ECE)"
+      },
       "min_gpa": { "type": "number", "description": "最低平均 GPA 要求" },
-      "gen_ed": { "type": "string", "description": "通识教育类别 (例如 'Humanities', 'Quantitative Reasoning')" },
-      "level_min": { "type": "integer", "description": "最低课程等级 (例如 400)" },
-      "keywords": { "type": "string", "description": "主题关键词 (例如 'machine learning')" }
+      "gen_ed": {
+        "type": "string",
+        "description": "通识教育类别 (例如 'Humanities', 'Quantitative Reasoning')"
+      },
+      "level_min": {
+        "type": "integer",
+        "description": "最低课程等级 (例如 400)"
+      },
+      "keywords": {
+        "type": "string",
+        "description": "主题关键词 (例如 'machine learning')"
+      }
     }
   }
 }
@@ -76,9 +91,11 @@ CREATE INDEX idx_course_gen_ed ON courses(gen_ed_categories);
 ## 3. 选宿舍 Agent (Dorm Selection Agent)
 
 ### 3.1 目标
+
 帮助学生根据生活方式偏好、预算和位置选择住房。
 
 ### 3.2 数据 Schema (SQL)
+
 我们需要一个 `dorms` 表。
 
 ```sql
@@ -95,6 +112,7 @@ CREATE TABLE dorms (
 ```
 
 ### 3.3 工具定义 (Tool Definition)
+
 ```json
 {
   "name": "search_dorms",
@@ -103,9 +121,19 @@ CREATE TABLE dorms (
     "type": "object",
     "properties": {
       "has_ac": { "type": "boolean", "description": "是否必须有空调" },
-      "max_price_tier": { "type": "integer", "enum": [1,2,3,4,5], "description": "最高价格等级 (1-5)" },
-      "location": { "type": "string", "description": "偏好区域 (例如 'near engineering quad')" },
-      "vibe": { "type": "string", "description": "社交氛围 (例如 'quiet' 安静, 'social' 社交)" }
+      "max_price_tier": {
+        "type": "integer",
+        "enum": [1, 2, 3, 4, 5],
+        "description": "最高价格等级 (1-5)"
+      },
+      "location": {
+        "type": "string",
+        "description": "偏好区域 (例如 'near engineering quad')"
+      },
+      "vibe": {
+        "type": "string",
+        "description": "社交氛围 (例如 'quiet' 安静, 'social' 社交)"
+      }
     }
   }
 }
@@ -114,17 +142,21 @@ CREATE TABLE dorms (
 ## 4. 行动 Agent (Action Agent) - 提交表格
 
 ### 4.1 目标
+
 使 Agent 具备在外部网站上**填写并提交表格**的能力（例如：填写“联系我们”、提交住房意向、模拟选课）。
 
 ### 4.2 技术方案：浏览器自动化 (Browser Automation)
+
 使用 **Playwright** (或 Puppeteer) 在安全沙箱中运行无头浏览器。
 
 ### 4.3 流程与安全 (Security Protocol)
+
 1.  **数据收集**: Agent 通过多轮对话向用户收集所需信息。
 2.  **人工确认 (Confirmation)**: **关键步骤！** Agent 必须向用户展示即将填写的 JSON 数据，并**获得用户明确点击“确认提交”**后，才启动 Playwright。
 3.  **执行 (Execution)**: Playwright 脚本导航到目标 URL -> 寻找输入框 -> 填入数据 -> 点击提交。
 
 ### 4.4 工具定义 (Tool Definition)
+
 ```json
 {
   "name": "submit_form_action",
@@ -134,9 +166,9 @@ CREATE TABLE dorms (
     "required": ["target_url", "form_data"],
     "properties": {
       "target_url": { "type": "string", "description": "目标表单页面的 URL" },
-      "form_data": { 
-        "type": "object", 
-        "description": "键值对，对应表单项 (例如: {'email': '...', 'message': '...'})" 
+      "form_data": {
+        "type": "object",
+        "description": "键值对，对应表单项 (例如: {'email': '...', 'message': '...'})"
       }
     }
   }
@@ -146,13 +178,16 @@ CREATE TABLE dorms (
 ## 5. 实施策略 (Implementation Strategy)
 
 ### 第一阶段：数据采集 (Scrapers)
-*   **课程 (Courses)**: 爬取 `courses.illinois.edu` 并与 `waf.cs.illinois.edu/discovery/gpa/` (GPA 数据) 合并。
-*   **宿舍 (Dorms)**: 爬取 `housing.illinois.edu` + Reddit/Discord 评论以获取 "氛围 (vibe)" 标签。
+
+- **课程 (Courses)**: 爬取 `courses.illinois.edu` 并与 `waf.cs.illinois.edu/discovery/gpa/` (GPA 数据) 合并。
+- **宿舍 (Dorms)**: 爬取 `housing.illinois.edu` + Reddit/Discord 评论以获取 "氛围 (vibe)" 标签。
 
 ### 第二阶段：后端 (Backend - Cloudflare/FastAPI)
-*   使用 SQL 查询实现 `search_courses` 和 `search_dorms` API 端点。
-*   实现 `ActionService`，用于调度 Docker 容器中的 Playwright 任务（注意：Cloudflare Workers 无法直接运行完整浏览器，可能需要外挂 VPS 服务）。
+
+- 使用 SQL 查询实现 `search_courses` 和 `search_dorms` API 端点。
+- 实现 `ActionService`，用于调度 Docker 容器中的 Playwright 任务（注意：Cloudflare Workers 无法直接运行完整浏览器，可能需要外挂 VPS 服务）。
 
 ### 第三阶段：前端 (Frontend - UI)
-*   **结构化卡片 (Structured Cards)**: 不仅仅是显示文本，而是渲染 **"课程卡片 (Course Card)"**（带有颜色编码的 GPA 徽章）和 **"宿舍卡片 (Dorm Card)"**（带有照片/设施图标）。
-*   **确认弹窗 (Confirmation Modal)**: 专用于 Action Agent 的二次确认界面。
+
+- **结构化卡片 (Structured Cards)**: 不仅仅是显示文本，而是渲染 **"课程卡片 (Course Card)"**（带有颜色编码的 GPA 徽章）和 **"宿舍卡片 (Dorm Card)"**（带有照片/设施图标）。
+- **确认弹窗 (Confirmation Modal)**: 专用于 Action Agent 的二次确认界面。

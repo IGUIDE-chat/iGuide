@@ -5,17 +5,19 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from 'react';
+import React from 'react'
 
 interface BlockIIconProps {
-    className?: string;
+  className?: string
 }
 
-export const BlockIIcon: React.FC<BlockIIconProps> = ({ className = 'text-lg' }) => (
-    <span
-        className={`select-none font-black leading-none tracking-[-0.06em] ${className}`}
-        aria-hidden="true"
-    >
-        I
-    </span>
-);
+export const BlockIIcon: React.FC<BlockIIconProps> = ({
+  className = 'text-lg',
+}) => (
+  <span
+    className={`select-none font-black leading-none tracking-[-0.06em] ${className}`}
+    aria-hidden="true"
+  >
+    I
+  </span>
+)

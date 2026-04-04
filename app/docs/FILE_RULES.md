@@ -8,18 +8,18 @@ It should stay aligned with:
 - `README.md`
 - `docs/ARCHITECTURE.md`
 
-*   **`root/`**
-    *   **`src/`**: Source code directory.
-        *   **`components/`**: React UI components (e.g., `ChatScreen.tsx`, `ArticleView.tsx`).
-        *   **`data/`**: Static data and content.
-            *   **`articles/`**: Individual article TypeScript files.
-        *   **`services/`**: API and logic services (e.g., `conversationService.ts`, `supabase.ts`).
-        *   **`contexts/`**: React Context providers (e.g., `AuthContext.tsx`).
-    *   **`functions/`**: Cloudflare Pages functions (serverless backend).
-    *   **`docs/`**: Project documentation, setup guides, and changelogs.
-    *   **`tests/`**: Test scripts (Python/JS) and test result files.
-    *   **`scripts/`**: Utility and maintenance scripts (e.g., migration or layout adjustment scripts).
-    *   **`dist/`**: Build output directory (do not edit manually).
+* **`root/`**
+  - **`src/`**: Source code directory.
+    - **`components/`**: React UI components (e.g., `ChatScreen.tsx`, `ArticleView.tsx`).
+    - **`data/`**: Static data and content.
+      - **`articles/`**: Individual article TypeScript files.
+    - **`services/`**: API and logic services (e.g., `conversationService.ts`, `supabase.ts`).
+    - **`contexts/`**: React Context providers (e.g., `AuthContext.tsx`).
+  - **`functions/`**: Cloudflare Pages functions (serverless backend).
+  - **`docs/`**: Project documentation, setup guides, and changelogs.
+  - **`tests/`**: Test scripts (Python/JS) and test result files.
+  - **`scripts/`**: Utility and maintenance scripts (e.g., migration or layout adjustment scripts).
+  - **`dist/`**: Build output directory (do not edit manually).
 
 ## 1) Root Scope
 

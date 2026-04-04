@@ -14,13 +14,13 @@ This document summarizes the minimal path changes for the Dify migration work.
 ## Import Example
 
 ```ts
-import { streamChatResponse } from '../../services/cozeService';
+import { streamChatResponse } from '../../services/cozeService'
 ```
 
 becomes:
 
 ```ts
-import { streamChatResponse } from '../../services/difyService';
+import { streamChatResponse } from '../../services/difyService'
 ```
 
 ## Validation

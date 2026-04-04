@@ -5,15 +5,15 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from 'react';
-import { ChatScreen } from '../../components/chat/ChatScreen';
-import { Language } from '../../types';
-import { useChatSession } from './useChatSession';
+import React from 'react'
+import { ChatScreen } from '../../components/chat/ChatScreen'
+import { Language } from '../../types'
+import { useChatSession } from './useChatSession'
 
 interface ChatPageProps {
-  language: Language;
-  currentConversationId: string | null;
-  onConversationCreated: (conversationId: string) => void;
+  language: Language
+  currentConversationId: string | null
+  onConversationCreated: (conversationId: string) => void
 }
 
 const ChatPage: React.FC<ChatPageProps> = ({
@@ -26,7 +26,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
       language,
       currentConversationId,
       onConversationCreated,
-    });
+    })
 
   return (
     <ChatScreen
@@ -37,13 +37,13 @@ const ChatPage: React.FC<ChatPageProps> = ({
       onInputChange={setInput}
       onSubmit={handleSubmit}
       onSuggestionClick={(text) => {
-        void sendMessage(text);
+        void sendMessage(text)
       }}
       onFollowUpClick={(text) => {
-        void sendMessage(text);
+        void sendMessage(text)
       }}
     />
-  );
-};
+  )
+}
 
-export default ChatPage;
+export default ChatPage

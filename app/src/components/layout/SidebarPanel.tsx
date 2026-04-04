@@ -5,20 +5,20 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from 'react';
-import { Language } from '../../types';
-import { ConversationSidebar } from './ConversationSidebar';
-import { LibrarySidebar } from './LibrarySidebar';
-import { DormSidebar } from './DormSidebar';
+import React from 'react'
+import { Language } from '../../types'
+import { ConversationSidebar } from './ConversationSidebar'
+import { LibrarySidebar } from './LibrarySidebar'
+import { DormSidebar } from './DormSidebar'
 
 interface SidebarPanelProps {
-  activeTab: string;
-  language: Language;
-  currentPath: string;
-  currentConversationId?: string | null;
-  onNewConversation?: () => void;
-  onSelectConversation?: (conversationId: string | null) => void;
-  favoritesIconRef: React.RefObject<SVGSVGElement | null>;
+  activeTab: string
+  language: Language
+  currentPath: string
+  currentConversationId?: string | null
+  onNewConversation?: () => void
+  onSelectConversation?: (conversationId: string | null) => void
+  favoritesIconRef: React.RefObject<SVGSVGElement | null>
 }
 
 export const SidebarPanel: React.FC<SidebarPanelProps> = ({
@@ -31,7 +31,7 @@ export const SidebarPanel: React.FC<SidebarPanelProps> = ({
   favoritesIconRef,
 }) => {
   return (
-    <div className="flex-1 overflow-hidden flex flex-col border-t border-white/10 mx-3 pt-2 min-h-0">
+    <div className="mx-3 flex min-h-0 flex-1 flex-col overflow-hidden border-t border-white/10 pt-2">
       {activeTab === 'chat' && (
         <ConversationSidebar
           currentConversationId={currentConversationId ?? null}
@@ -44,17 +44,23 @@ export const SidebarPanel: React.FC<SidebarPanelProps> = ({
         <LibrarySidebar
           language={language}
           currentArticleId={
-            currentPath.startsWith('/library/article/') ? currentPath.split('/').pop() : undefined
+            currentPath.startsWith('/library/article/')
+              ? currentPath.split('/').pop()
+              : undefined
           }
         />
       )}
       {activeTab === 'dorms' && (
         <DormSidebar
           language={language}
-          currentDormId={currentPath.startsWith('/dorms/') ? currentPath.split('/').pop() : undefined}
+          currentDormId={
+            currentPath.startsWith('/dorms/')
+              ? currentPath.split('/').pop()
+              : undefined
+          }
           favoritesIconRef={favoritesIconRef}
         />
       )}
     </div>
-  );
-};
+  )
+}

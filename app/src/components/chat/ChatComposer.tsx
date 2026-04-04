@@ -6,13 +6,13 @@
  */
 
 interface ChatComposerProps {
-  input: string;
-  isLoading: boolean;
-  placeholder: string;
-  helperText: string;
-  containerClass: string;
-  onInputChange: (value: string) => void;
-  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+  input: string
+  isLoading: boolean
+  placeholder: string
+  helperText: string
+  containerClass: string
+  onInputChange: (value: string) => void
+  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void
 }
 
 export const ChatComposer: React.FC<ChatComposerProps> = ({
@@ -25,14 +25,14 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
   onSubmit,
 }) => {
   return (
-    <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-white via-white to-transparent pt-2 pb-6">
+    <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-white via-white to-transparent pb-6 pt-2">
       <div className={containerClass}>
         <form
           onSubmit={onSubmit}
-          className="relative shadow-md rounded-[26px] border border-slate-200 bg-white focus-within:ring-1 focus-within:ring-slate-300 overflow-hidden transition-all"
+          className="relative overflow-hidden rounded-[26px] border border-slate-200 bg-white shadow-md transition-all focus-within:ring-1 focus-within:ring-slate-300"
         >
           <input
-            className="w-full py-3.5 pl-5 pr-12 text-base text-slate-900 placeholder-slate-400 focus:outline-none bg-transparent resize-none"
+            className="w-full resize-none bg-transparent py-3.5 pl-5 pr-12 text-base text-slate-900 placeholder-slate-400 focus:outline-none"
             placeholder={placeholder}
             value={input}
             onChange={(event) => onInputChange(event.target.value)}
@@ -40,14 +40,18 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
           <button
             type="submit"
             disabled={!input.trim() || isLoading}
-            className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full transition-all ${
+            className={`absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-2 transition-all ${
               !input.trim() || isLoading
-                ? 'bg-slate-100 text-slate-300 cursor-not-allowed'
+                ? 'cursor-not-allowed bg-slate-100 text-slate-300'
                 : 'bg-black text-white hover:opacity-80'
             }`}
           >
             {isLoading ? (
-              <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+              <svg
+                className="h-4 w-4 animate-spin"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
                 <circle
                   className="opacity-25"
                   cx="12"
@@ -63,7 +67,12 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                 />
               </svg>
             ) : (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -74,8 +83,10 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
             )}
           </button>
         </form>
-        <div className="hidden md:block text-center mt-3 text-xs text-slate-400">{helperText}</div>
+        <div className="mt-3 hidden text-center text-xs text-slate-400 md:block">
+          {helperText}
+        </div>
       </div>
     </div>
-  );
-};
+  )
+}

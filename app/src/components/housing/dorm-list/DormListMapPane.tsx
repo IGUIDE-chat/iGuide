@@ -5,43 +5,43 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { Suspense } from 'react';
-import { Dorm } from '../types/index';
-import { Language } from '../../../types';
-import MapCarousel from './MapCarousel';
-import { MapEmptyViewportOverlay, MapNoResultsOverlay } from './EmptyStates';
-import { DormListText } from './types';
+import React, { Suspense } from 'react'
+import { Dorm } from '../types/index'
+import { Language } from '../../../types'
+import MapCarousel from './MapCarousel'
+import { MapEmptyViewportOverlay, MapNoResultsOverlay } from './EmptyStates'
+import { DormListText } from './types'
 
 // Lazy-load DormMap to defer mapbox-gl (~700KB) until map view is actually used
-const DormMap = React.lazy(() => import('../DormMap'));
+const DormMap = React.lazy(() => import('../DormMap'))
 
 /** Skeleton placeholder while mapbox is loading */
 const MapLoadingSkeleton: React.FC = () => (
-  <div className="w-full h-full bg-gray-100 flex items-center justify-center animate-pulse">
+  <div className="flex h-full w-full animate-pulse items-center justify-center bg-gray-100">
     <div className="text-center">
-      <div className="w-10 h-10 border-3 border-illini-orange border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+      <div className="border-3 mx-auto mb-3 h-10 w-10 animate-spin rounded-full border-illini-orange border-t-transparent" />
       <p className="text-sm text-gray-400">Loading map...</p>
     </div>
   </div>
-);
+)
 
 interface DormListMapPaneProps {
-  isMapView: boolean;
-  filteredDorms: Dorm[];
-  visibleInMap: Dorm[];
-  favoritesSet: Set<string>;
-  language: Language;
-  t: DormListText;
-  hasPriceFilter: boolean;
-  highlightedDormId: string | null;
-  scrollContainerRef: React.RefObject<HTMLDivElement | null>;
-  disableScrollZoom: boolean;
-  onVisibleDormsChange: (dorms: Dorm[]) => void;
-  onToggleFavorite: (dorm: Dorm, event?: React.MouseEvent) => void;
-  onViewDetails: (dorm: Dorm) => void;
-  onHoverDorm: (id: string | null) => void;
-  onHoveringChange: (hovering: boolean) => void;
-  onMapNoResultAction: () => void;
+  isMapView: boolean
+  filteredDorms: Dorm[]
+  visibleInMap: Dorm[]
+  favoritesSet: Set<string>
+  language: Language
+  t: DormListText
+  hasPriceFilter: boolean
+  highlightedDormId: string | null
+  scrollContainerRef: React.RefObject<HTMLDivElement | null>
+  disableScrollZoom: boolean
+  onVisibleDormsChange: (dorms: Dorm[]) => void
+  onToggleFavorite: (dorm: Dorm, event?: React.MouseEvent) => void
+  onViewDetails: (dorm: Dorm) => void
+  onHoverDorm: (id: string | null) => void
+  onHoveringChange: (hovering: boolean) => void
+  onMapNoResultAction: () => void
 }
 
 export const DormListMapPane: React.FC<DormListMapPaneProps> = ({
@@ -63,22 +63,19 @@ export const DormListMapPane: React.FC<DormListMapPaneProps> = ({
   onMapNoResultAction,
 }) => {
   if (!isMapView) {
-    return null;
+    return null
   }
 
   return (
     <div
-      className={`
-        h-full transition-opacity duration-200 flex flex-col min-w-0
-        ${
-          isMapView
-            ? 'absolute inset-0 xl:static xl:flex-1 xl:min-w-0 opacity-100 z-20 xl:z-auto'
-            : 'absolute inset-0 xl:static xl:hidden opacity-0 pointer-events-none'
-        }
-      `}
+      className={`flex h-full min-w-0 flex-col transition-opacity duration-200 ${
+        isMapView
+          ? 'absolute inset-0 z-20 opacity-100 xl:static xl:z-auto xl:min-w-0 xl:flex-1'
+          : 'pointer-events-none absolute inset-0 opacity-0 xl:static xl:hidden'
+      } `}
     >
-      <div className="flex-1 min-h-0 min-w-0 relative flex flex-col">
-        <div className="flex-1 min-h-[200px] w-full bg-gray-100">
+      <div className="relative flex min-h-0 min-w-0 flex-1 flex-col">
+        <div className="min-h-[200px] w-full flex-1 bg-gray-100">
           <Suspense fallback={<MapLoadingSkeleton />}>
             <DormMap
               dorms={filteredDorms}
@@ -118,6 +115,5 @@ export const DormListMapPane: React.FC<DormListMapPaneProps> = ({
         <MapEmptyViewportOverlay t={t} />
       )}
     </div>
-  );
-};
-
+  )
+}

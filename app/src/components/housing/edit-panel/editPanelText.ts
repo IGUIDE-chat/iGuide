@@ -82,12 +82,14 @@ export const TEXT = {
       historyEmpty: 'No edit history yet.',
     },
     alerts: {
-      resetConfirm: 'Reset all overrides for this dorm? Manual edits will be deleted.',
+      resetConfirm:
+        'Reset all overrides for this dorm? Manual edits will be deleted.',
       saveFailed: 'Save failed. Please try again.',
       onlyImages: 'Only image files are supported.',
       imageTooLarge: 'Image size must be 10MB or smaller.',
       imageUploadFailed: 'Image upload failed. Please try again.',
-      restoreConfirm: 'Restore to this version? Current data will be overwritten.',
+      restoreConfirm:
+        'Restore to this version? Current data will be overwritten.',
       restoreFailed: 'Restore failed. Please try again.',
     },
   },
@@ -176,4 +178,4 @@ export const TEXT = {
       restoreFailed: '还原失败，请重试。',
     },
   },
-} as const;
+} as const

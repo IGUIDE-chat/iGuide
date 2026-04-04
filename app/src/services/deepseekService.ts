@@ -5,18 +5,18 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import type { StreamChunk, ChatHistoryItem } from './ai/types';
-import { fetchChatRAGContext } from './chatRagService';
-import { quickSearch } from './searchService';
-import { webSearch } from './webSearchService';
-import { memoryService } from './memoryService';
+import type { StreamChunk, ChatHistoryItem } from './ai/types'
+import { fetchChatRAGContext } from './chatRagService'
+import { quickSearch } from './searchService'
+import { webSearch } from './webSearchService'
+import { memoryService } from './memoryService'
 
 // ── Config ──────────────────────────────────────────────────────
 
 // Security: API key is NEVER in the frontend bundle.
 // DEV: Vite proxy /api/deepseek-raw injects Authorization header from .env.local
 // PROD: CF Pages Function /api/deepseek injects key from CF environment variables
-const IS_DEV = import.meta.env.DEV;
+const IS_DEV = import.meta.env.DEV
 
 const DEFAULT_SYSTEM_PROMPT = `# Role: UIUC 资深学长姐顾问 (Illini Spirit Advisor)
 
@@ -37,7 +37,7 @@ const DEFAULT_SYSTEM_PROMPT = `# Role: UIUC 资深学长姐顾问 (Illini Spirit
    > 1. [追问问题一]
    > 2. [追问问题二]
    > 3. [追问问题三]
-5. **记忆连贯 (No Repetitive Greetings)**：请结合对话历史（Conversation History）自然连贯地互动。**严禁**在每轮回复开头重复使用固定套话（如”UIUC顾问来啦！”或每次起手都用固定的颜文字打招呼）。当处理多轮对话的追问时，直接切入正题并给出详尽耐心的解惑，像朋友聊天一样自然。`;
+5. **记忆连贯 (No Repetitive Greetings)**：请结合对话历史（Conversation History）自然连贯地互动。**严禁**在每轮回复开头重复使用固定套话（如”UIUC顾问来啦！”或每次起手都用固定的颜文字打招呼）。当处理多轮对话的追问时，直接切入正题并给出详尽耐心的解惑，像朋友聊天一样自然。`
 
 const MEMORY_EXTRACTION_INSTRUCTIONS = `
 
@@ -49,7 +49,7 @@ Rules:
 - Only include tags when there is genuinely NEW information. Omit if nothing new.
 - user_memory format: semicolon-separated key-value pairs, e.g. \`<user_memory>Major: CS; Budget: $900/month; Preferred area: near Siebel</user_memory>\`
 - conv_memory format: brief Chinese/English summary of this turn's key points
-- These tags must appear AFTER the follow-up questions section, at the absolute end of your response.`;
+- These tags must appear AFTER the follow-up questions section, at the absolute end of your response.`
 
 // ── RAG Context Builder ──────────────────────────────────────────
 
@@ -58,17 +58,24 @@ Rules:
  */
 async function fetchQMDContext(query: string, lang: string): Promise<string[]> {
   try {
-    const { results } = await quickSearch(query, lang as 'en' | 'zh', 5);
+    const { results } = await quickSearch(query, lang as 'en' | 'zh', 5)
     return results
-      .filter(r => r.score > 0.3)
-      .map(r => {
-        const typeLabel = r.type === 'dorm' ? '🏠 Dorm' : r.type === 'article' ? '📄 Article' : '🌐 Web';
-        const url = r.id ? `/${r.type === 'dorm' ? 'housing' : 'article'}/${r.id}` : 'N/A';
-        return `[${typeLabel}] ${r.title} (relevance: ${r.score.toFixed(2)})\nURL: ${url}\n${r.snippet}`;
-      });
+      .filter((r) => r.score > 0.3)
+      .map((r) => {
+        const typeLabel =
+          r.type === 'dorm'
+            ? '🏠 Dorm'
+            : r.type === 'article'
+              ? '📄 Article'
+              : '🌐 Web'
+        const url = r.id
+          ? `/${r.type === 'dorm' ? 'housing' : 'article'}/${r.id}`
+          : 'N/A'
+        return `[${typeLabel}] ${r.title} (relevance: ${r.score.toFixed(2)})\nURL: ${url}\n${r.snippet}`
+      })
   } catch (err) {
-    console.warn('[RAG] QMD search failed:', err);
-    return [];
+    console.warn('[RAG] QMD search failed:', err)
+    return []
   }
 }
 
@@ -77,13 +84,13 @@ async function fetchQMDContext(query: string, lang: string): Promise<string[]> {
  */
 async function fetchWebContext(query: string): Promise<string[]> {
   try {
-    const results = await webSearch(query, { maxResults: 3 });
+    const results = await webSearch(query, { maxResults: 3 })
     return results.map(
-      r => `[🌐 Web] ${r.title}\nURL: ${r.url}\n${r.content.slice(0, 300)}`,
-    );
+      (r) => `[🌐 Web] ${r.title}\nURL: ${r.url}\n${r.content.slice(0, 300)}`
+    )
   } catch (err) {
-    console.warn('[RAG] Web search failed:', err);
-    return [];
+    console.warn('[RAG] Web search failed:', err)
+    return []
   }
 }
 
@@ -97,19 +104,22 @@ Rules:
 - Only include this tag when there is genuinely NEW assistant-style preference information.
 - Do not repeat existing preferences already reflected in prior soul context.
 - Format as semicolon-separated key-value pairs, e.g. \`<user_soul>Tone: casual; Verbosity: concise; Emoji: light; Focus: CS topics</user_soul>\`
-- Place the tag after the follow-up questions section, at the absolute end of your response.`;
+- Place the tag after the follow-up questions section, at the absolute end of your response.`
 
 interface RAGResult {
-  context: string;
-  hasQMD: boolean;
-  hasWeb: boolean;
+  context: string
+  hasQMD: boolean
+  hasWeb: boolean
 }
 
 /**
  * Combined RAG: QMD knowledge base + Tavily web search (parallel).
  */
-async function fetchRAGContext(query: string, lang: string): Promise<RAGResult> {
-  return fetchChatRAGContext(query, lang);
+async function fetchRAGContext(
+  query: string,
+  lang: string
+): Promise<RAGResult> {
+  return fetchChatRAGContext(query, lang)
 }
 
 // ── SSE Stream Parser ────────────────────────────────────────────
@@ -120,47 +130,47 @@ async function fetchRAGContext(query: string, lang: string): Promise<RAGResult> 
  */
 async function* parseDeepSeekSSE(
   reader: ReadableStreamDefaultReader<Uint8Array>,
-  lang: 'en' | 'zh',
+  lang: 'en' | 'zh'
 ): AsyncGenerator<StreamChunk> {
-  const decoder = new TextDecoder('utf-8');
-  let buffer = '';
-  let reasoningBuffer = '';
-  let isInReasoning = false;
+  const decoder = new TextDecoder('utf-8')
+  let buffer = ''
+  let reasoningBuffer = ''
+  let isInReasoning = false
 
   while (true) {
-    const { done, value } = await reader.read();
+    const { done, value } = await reader.read()
     if (done) {
       // Flush remaining buffer
       if (buffer.trim()) {
         for (const line of buffer.split('\n')) {
-          const chunk = parseLine(line.trim());
-          if (chunk) yield chunk;
+          const chunk = parseLine(line.trim())
+          if (chunk) yield chunk
         }
       }
-      break;
+      break
     }
 
-    buffer += decoder.decode(value, { stream: true });
-    const lines = buffer.split('\n');
-    buffer = lines.pop() || '';
+    buffer += decoder.decode(value, { stream: true })
+    const lines = buffer.split('\n')
+    buffer = lines.pop() || ''
 
     for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed || trimmed === 'data: [DONE]') continue;
-      if (!trimmed.startsWith('data: ')) continue;
+      const trimmed = line.trim()
+      if (!trimmed || trimmed === 'data: [DONE]') continue
+      if (!trimmed.startsWith('data: ')) continue
 
       try {
-        const json = JSON.parse(trimmed.slice(6));
-        const delta = json.choices?.[0]?.delta;
-        if (!delta) continue;
+        const json = JSON.parse(trimmed.slice(6))
+        const delta = json.choices?.[0]?.delta
+        if (!delta) continue
 
         // Handle reasoning_content (DeepSeek R1 / thinking)
         if (delta.reasoning_content) {
           if (!isInReasoning) {
-            isInReasoning = true;
-            reasoningBuffer = '';
+            isInReasoning = true
+            reasoningBuffer = ''
           }
-          reasoningBuffer += delta.reasoning_content;
+          reasoningBuffer += delta.reasoning_content
           yield {
             text: '',
             thinkingStep: {
@@ -168,17 +178,17 @@ async function* parseDeepSeekSSE(
               label: lang === 'zh' ? '正在思考...' : 'Thinking...',
               detail: reasoningBuffer,
             },
-          };
-          continue;
+          }
+          continue
         }
 
         // Regular content
         if (delta.content) {
           if (isInReasoning) {
-            isInReasoning = false;
-            reasoningBuffer = '';
+            isInReasoning = false
+            reasoningBuffer = ''
           }
-          yield { text: delta.content };
+          yield { text: delta.content }
         }
       } catch {
         // skip malformed lines
@@ -187,13 +197,13 @@ async function* parseDeepSeekSSE(
   }
 
   function parseLine(line: string): StreamChunk | null {
-    if (!line.startsWith('data: ') || line === 'data: [DONE]') return null;
+    if (!line.startsWith('data: ') || line === 'data: [DONE]') return null
     try {
-      const json = JSON.parse(line.slice(6));
-      const content = json.choices?.[0]?.delta?.content;
-      return content ? { text: content } : null;
+      const json = JSON.parse(line.slice(6))
+      const content = json.choices?.[0]?.delta?.content
+      return content ? { text: content } : null
     } catch {
-      return null;
+      return null
     }
   }
 }
@@ -201,36 +211,37 @@ async function* parseDeepSeekSSE(
 // ── Message Builder ─────────────────────────────────────────────
 
 interface OpenAIMessage {
-  role: 'system' | 'user' | 'assistant';
-  content: string;
+  role: 'system' | 'user' | 'assistant'
+  content: string
 }
 
 function buildOpenAIMessages(
   history: ChatHistoryItem[],
   newMessage: string,
   lang: string,
-  systemInstruction?: string,
+  systemInstruction?: string
 ): OpenAIMessage[] {
-  const messages: OpenAIMessage[] = [];
+  const messages: OpenAIMessage[] = []
 
   // System prompt with optional RAG context
-  const systemContent = systemInstruction || DEFAULT_SYSTEM_PROMPT;
-  const langHint = lang === 'zh'
-    ? '\n\nIMPORTANT: The user prefers Chinese. Reply in Chinese (简体中文) unless they write in English.'
-    : '\n\nIMPORTANT: The user has selected English mode. You MUST reply exclusively in English regardless of the language of your instructions above. Do NOT use Chinese in your response.';
-  messages.push({ role: 'system', content: systemContent + langHint });
+  const systemContent = systemInstruction || DEFAULT_SYSTEM_PROMPT
+  const langHint =
+    lang === 'zh'
+      ? '\n\nIMPORTANT: The user prefers Chinese. Reply in Chinese (简体中文) unless they write in English.'
+      : '\n\nIMPORTANT: The user has selected English mode. You MUST reply exclusively in English regardless of the language of your instructions above. Do NOT use Chinese in your response.'
+  messages.push({ role: 'system', content: systemContent + langHint })
 
   // Conversation history
   for (const h of history) {
     messages.push({
       role: h.role === 'model' ? 'assistant' : 'user',
       content: h.text,
-    });
+    })
   }
 
   // Current user message
-  messages.push({ role: 'user', content: newMessage });
-  return messages;
+  messages.push({ role: 'user', content: newMessage })
+  return messages
 }
 
 // ── Main Streaming Function ──────────────────────────────────────
@@ -248,73 +259,97 @@ export const streamDeepSeekChat = async function* (
   newMessage: string,
   lang: string = 'en',
   _conversationId?: string,
-  _userId?: string,
+  _userId?: string
 ): AsyncGenerator<StreamChunk> {
   try {
     // 1. Fetch RAG context + personalization context in parallel
-    let ragContext = '';
-    let soul = '';
-    let userMemory = '';
-    let conversationMemory = '';
+    let ragContext = ''
+    let soul = ''
+    let userMemory = ''
+    let conversationMemory = ''
 
     try {
       const [ragResult, chatCtx] = await Promise.all([
         fetchRAGContext(newMessage, lang),
         _userId
-          ? memoryService.getChatContext(_userId, _conversationId).catch(() => ({ soul: '', userMemory: '', conversationMemory: '' }))
-          : Promise.resolve({ soul: '', userMemory: '', conversationMemory: '' }),
-      ]);
-      ragContext = ragResult.context;
-      soul = chatCtx.soul;
-      userMemory = chatCtx.userMemory;
-      conversationMemory = chatCtx.conversationMemory;
+          ? memoryService
+              .getChatContext(_userId, _conversationId)
+              .catch(() => ({
+                soul: '',
+                userMemory: '',
+                conversationMemory: '',
+              }))
+          : Promise.resolve({
+              soul: '',
+              userMemory: '',
+              conversationMemory: '',
+            }),
+      ])
+      ragContext = ragResult.context
+      soul = chatCtx.soul
+      userMemory = chatCtx.userMemory
+      conversationMemory = chatCtx.conversationMemory
 
       if (ragResult.hasQMD) {
         yield {
           text: '',
-          thinkingStep: { type: 'searching', label: lang === 'zh' ? '知识库检索完成' : 'Knowledge base retrieved', detail: 'QMD knowledge base' },
-        };
+          thinkingStep: {
+            type: 'searching',
+            label:
+              lang === 'zh' ? '知识库检索完成' : 'Knowledge base retrieved',
+            detail: 'QMD knowledge base',
+          },
+        }
       }
       if (ragResult.hasWeb) {
         yield {
           text: '',
-          thinkingStep: { type: 'searching', label: lang === 'zh' ? '网络搜索完成' : 'Web search complete', detail: 'Tavily web search' },
-        };
+          thinkingStep: {
+            type: 'searching',
+            label: lang === 'zh' ? '网络搜索完成' : 'Web search complete',
+            detail: 'Tavily web search',
+          },
+        }
       }
     } catch {
       // QMD / Tavily might not be available; proceed without RAG
     }
 
     // 2. Build system instruction with personalization + RAG context
-    let basePrompt = DEFAULT_SYSTEM_PROMPT;
+    let basePrompt = DEFAULT_SYSTEM_PROMPT
 
     if (soul) {
-      basePrompt += `\n\n## 🎭 Persona Customization (用户自定义人设)\n${soul}`;
+      basePrompt += `\n\n## 🎭 Persona Customization (用户自定义人设)\n${soul}`
     }
 
     if (_userId) {
-      basePrompt += MEMORY_EXTRACTION_INSTRUCTIONS;
-      basePrompt += SOUL_EXTRACTION_INSTRUCTIONS;
+      basePrompt += MEMORY_EXTRACTION_INSTRUCTIONS
+      basePrompt += SOUL_EXTRACTION_INSTRUCTIONS
     }
 
     if (userMemory) {
-      basePrompt += `\n\n## 📋 User Profile (remembered from past conversations)\n${userMemory}`;
+      basePrompt += `\n\n## 📋 User Profile (remembered from past conversations)\n${userMemory}`
     }
 
     if (conversationMemory) {
-      basePrompt += `\n\n## 💬 This Conversation's Key Points (对话记忆)\n${conversationMemory}`;
+      basePrompt += `\n\n## 💬 This Conversation's Key Points (对话记忆)\n${conversationMemory}`
     }
 
     const systemInstruction = ragContext
       ? `${basePrompt}${ragContext}`
-      : basePrompt;
+      : basePrompt
 
     // 3. Call DeepSeek — dev calls API directly, prod uses CF Function
-    let response: Response;
+    let response: Response
 
     if (IS_DEV) {
       // DEV: build OpenAI-format messages, call via Vite proxy (proxy injects Authorization header)
-      const messages = buildOpenAIMessages(history, newMessage, lang, systemInstruction);
+      const messages = buildOpenAIMessages(
+        history,
+        newMessage,
+        lang,
+        systemInstruction
+      )
       response = await fetch('/api/deepseek-raw', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -324,7 +359,7 @@ export const streamDeepSeekChat = async function* (
           stream: true,
           temperature: 1.0,
         }),
-      });
+      })
     } else {
       // PROD: CF Function handles format translation
       response = await fetch('/api/deepseek', {
@@ -337,30 +372,33 @@ export const streamDeepSeekChat = async function* (
           stream: true,
           systemInstruction,
         }),
-      });
+      })
     }
 
     if (!response.ok) {
-      const err = await response.json().catch(() => ({}));
-      throw new Error((err as { error?: string }).error || `DeepSeek API returned ${response.status}`);
+      const err = await response.json().catch(() => ({}))
+      throw new Error(
+        (err as { error?: string }).error ||
+          `DeepSeek API returned ${response.status}`
+      )
     }
 
-    const contentType = response.headers.get('content-type') || '';
+    const contentType = response.headers.get('content-type') || ''
 
     if (contentType.includes('text/event-stream') && response.body) {
       // SSE streaming
-      const reader = response.body.getReader();
-      yield* parseDeepSeekSSE(reader, lang as 'en' | 'zh');
+      const reader = response.body.getReader()
+      yield* parseDeepSeekSSE(reader, lang as 'en' | 'zh')
     } else {
       // Fallback: non-streaming JSON response
-      const data = (await response.json()) as { reply?: string };
+      const data = (await response.json()) as { reply?: string }
       if (data.reply) {
-        yield { text: data.reply };
+        yield { text: data.reply }
       }
     }
   } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[DeepSeek] Stream error:', msg);
-    yield { text: `\n(Error: ${msg})` };
+    const msg = error instanceof Error ? error.message : 'Unknown error'
+    console.error('[DeepSeek] Stream error:', msg)
+    yield { text: `\n(Error: ${msg})` }
   }
-};
+}

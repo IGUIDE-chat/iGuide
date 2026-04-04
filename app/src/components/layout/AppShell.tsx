@@ -5,19 +5,19 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from 'react';
-import { useLayout } from '../../contexts/LayoutContext';
+import React from 'react'
+import { useLayout } from '../../contexts/LayoutContext'
 
 interface AppShellProps {
-  isSidebarOpen: boolean;
-  sidebar: React.ReactNode;
-  mobileHeader: React.ReactNode;
-  children: React.ReactNode;
-  sidebarToggleButtonRef: React.RefObject<HTMLButtonElement | null>;
-  mobileSidebarButtonRef: React.RefObject<HTMLButtonElement | null>;
-  onCloseSidebar: () => void;
-  onOpenSidebar: () => void;
-  onToggleSidebar: () => void;
+  isSidebarOpen: boolean
+  sidebar: React.ReactNode
+  mobileHeader: React.ReactNode
+  children: React.ReactNode
+  sidebarToggleButtonRef: React.RefObject<HTMLButtonElement | null>
+  mobileSidebarButtonRef: React.RefObject<HTMLButtonElement | null>
+  onCloseSidebar: () => void
+  onOpenSidebar: () => void
+  onToggleSidebar: () => void
 }
 
 export const AppShell: React.FC<AppShellProps> = ({
@@ -31,43 +31,44 @@ export const AppShell: React.FC<AppShellProps> = ({
   onOpenSidebar,
   onToggleSidebar,
 }) => {
-  const layout = useLayout();
-  const headerSlot = layout.mobileHeaderSlot;
+  const layout = useLayout()
+  const headerSlot = layout.mobileHeaderSlot
 
   return (
-    <div className="flex h-[100dvh] w-full bg-white text-slate-900 font-sans overflow-hidden">
+    <div className="flex h-[100dvh] w-full overflow-hidden bg-white font-sans text-slate-900">
       <div
-        className={`fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 md:hidden ${
+        className={`fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 md:hidden ${
           isSidebarOpen
-            ? 'opacity-100 pointer-events-auto'
-            : 'opacity-0 pointer-events-none'
+            ? 'pointer-events-auto opacity-100'
+            : 'pointer-events-none opacity-0'
         }`}
         onClick={onCloseSidebar}
       />
 
       <aside
-        className={`
-          fixed inset-y-0 left-0 z-50 bg-[#171717] text-slate-200 flex flex-col transition-all duration-300 ease-in-out
-          md:relative
-          ${
-            isSidebarOpen
-              ? 'translate-x-0 w-[180px]'
-              : '-translate-x-full w-[180px] md:w-0 md:translate-x-0 md:overflow-hidden'
-          }
-        `}
+        className={`fixed inset-y-0 left-0 z-50 flex flex-col bg-[#171717] text-slate-200 transition-all duration-300 ease-in-out md:relative ${
+          isSidebarOpen
+            ? 'w-[180px] translate-x-0'
+            : 'w-[180px] -translate-x-full md:w-0 md:translate-x-0 md:overflow-hidden'
+        } `}
       >
-        <div className="flex flex-col h-full w-[180px]">{sidebar}</div>
+        <div className="flex h-full w-[180px] flex-col">{sidebar}</div>
       </aside>
 
-      <main className="flex-1 flex flex-col relative h-full w-full bg-white min-w-0">
-        <div className="hidden md:block absolute top-3 left-3 z-40">
+      <main className="relative flex h-full w-full min-w-0 flex-1 flex-col bg-white">
+        <div className="absolute left-3 top-3 z-40 hidden md:block">
           <button
             ref={sidebarToggleButtonRef}
             onClick={onToggleSidebar}
-            className="text-slate-400 hover:text-illini-blue p-2 rounded-md hover:bg-illini-blue/5 transition-colors"
+            className="rounded-md p-2 text-slate-400 transition-colors hover:bg-illini-blue/5 hover:text-illini-blue"
             title={isSidebarOpen ? 'Close Sidebar' : 'Open Sidebar'}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -78,13 +79,18 @@ export const AppShell: React.FC<AppShellProps> = ({
           </button>
         </div>
 
-        <div className="md:hidden flex items-center gap-2 p-3 border-b border-slate-100 bg-white sticky top-0 z-20">
+        <div className="sticky top-0 z-20 flex items-center gap-2 border-b border-slate-100 bg-white p-3 md:hidden">
           <button
             ref={mobileSidebarButtonRef}
             onClick={onOpenSidebar}
-            className="h-10 w-10 shrink-0 text-slate-500 flex items-center justify-center rounded-xl bg-slate-100 border border-slate-200"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-slate-100 text-slate-500"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              className="h-6 w-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -96,8 +102,10 @@ export const AppShell: React.FC<AppShellProps> = ({
           {headerSlot ?? mobileHeader}
         </div>
 
-        <div className="flex-1 overflow-hidden relative min-w-0">{children}</div>
+        <div className="relative min-w-0 flex-1 overflow-hidden">
+          {children}
+        </div>
       </main>
     </div>
-  );
-};
+  )
+}

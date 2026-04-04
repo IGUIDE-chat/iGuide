@@ -5,20 +5,20 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { BrandMark } from '../ui/branding/BrandMark';
+import React from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { Link } from 'react-router-dom'
+import { BrandMark } from '../ui/branding/BrandMark'
 
 interface SidebarFooterProps {
-  isSidebarOpen: boolean;
-  isGuest?: boolean;
-  languageLabel: string;
-  guestLabel: string;
-  signedInLabel: string;
-  profileName: string;
-  onToggleLanguage: () => void;
-  onGuestLogin?: () => void;
+  isSidebarOpen: boolean
+  isGuest?: boolean
+  languageLabel: string
+  guestLabel: string
+  signedInLabel: string
+  profileName: string
+  onToggleLanguage: () => void
+  onGuestLogin?: () => void
 }
 
 const AnimatedText = ({ children }: { children: React.ReactNode }) => (
@@ -34,24 +34,28 @@ const AnimatedText = ({ children }: { children: React.ReactNode }) => (
       {children}
     </motion.span>
   </AnimatePresence>
-);
+)
 
 const SidebarLabel = ({
   isOpen,
   children,
 }: {
-  isOpen: boolean;
-  children: React.ReactNode;
+  isOpen: boolean
+  children: React.ReactNode
 }) => (
   <motion.span
     initial={false}
-    animate={isOpen ? { opacity: 1, x: 0, maxWidth: 220 } : { opacity: 0, x: -6, maxWidth: 0 }}
+    animate={
+      isOpen
+        ? { opacity: 1, x: 0, maxWidth: 220 }
+        : { opacity: 0, x: -6, maxWidth: 0 }
+    }
     transition={{ duration: 0.2, ease: 'easeOut' }}
     className="inline-block overflow-hidden whitespace-nowrap"
   >
     {children}
   </motion.span>
-);
+)
 
 export const SidebarFooter: React.FC<SidebarFooterProps> = ({
   isSidebarOpen,
@@ -64,13 +68,18 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
   onGuestLogin,
 }) => {
   return (
-    <div className="p-3 border-t border-white/10 space-y-2">
+    <div className="space-y-2 border-t border-white/10 p-3">
       <button
         onClick={onToggleLanguage}
-        className="w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm hover:bg-[#212121] transition-colors text-slate-300"
+        className="flex w-full items-center gap-3 rounded-md px-3 py-3 text-sm text-slate-300 transition-colors hover:bg-[#212121]"
       >
         <span>
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            className="h-5 w-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -87,10 +96,13 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
       {isGuest ? (
         <button
           onClick={onGuestLogin}
-          className="w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm hover:bg-[#212121] transition-colors text-white group"
+          className="group flex w-full items-center gap-3 rounded-md px-3 py-3 text-sm text-white transition-colors hover:bg-[#212121]"
         >
-          <div className="group-hover:scale-110 transition-transform">
-            <BrandMark className="h-5 w-5 rounded-[4px]" iconClassName="text-[10px]" />
+          <div className="transition-transform group-hover:scale-110">
+            <BrandMark
+              className="h-5 w-5 rounded-[4px]"
+              iconClassName="text-[10px]"
+            />
           </div>
           <SidebarLabel isOpen={isSidebarOpen}>
             <AnimatedText>{guestLabel}</AnimatedText>
@@ -99,22 +111,28 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
       ) : (
         <Link
           to="/profile"
-          className="flex items-center gap-3 px-3 py-2 rounded-md bg-white/5 hover:bg-white/10 cursor-pointer transition-colors block"
+          className="block flex cursor-pointer items-center gap-3 rounded-md bg-white/5 px-3 py-2 transition-colors hover:bg-white/10"
         >
-          <div className="w-8 h-8 rounded-full bg-illini-orange flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
+          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-illini-orange text-sm font-semibold text-white">
             {profileName.charAt(0).toUpperCase() || 'U'}
           </div>
           <motion.div
             initial={false}
-            animate={isSidebarOpen ? { opacity: 1, x: 0, maxWidth: 180 } : { opacity: 0, x: -6, maxWidth: 0 }}
+            animate={
+              isSidebarOpen
+                ? { opacity: 1, x: 0, maxWidth: 180 }
+                : { opacity: 0, x: -6, maxWidth: 0 }
+            }
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="flex-1 min-w-0 overflow-hidden whitespace-nowrap"
+            className="min-w-0 flex-1 overflow-hidden whitespace-nowrap"
           >
             <div className="text-[10px] text-slate-400">{signedInLabel}</div>
-            <div className="text-xs font-medium text-white truncate">{profileName}</div>
+            <div className="truncate text-xs font-medium text-white">
+              {profileName}
+            </div>
           </motion.div>
         </Link>
       )}
     </div>
-  );
-};
+  )
+}

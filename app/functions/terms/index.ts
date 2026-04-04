@@ -1,3 +1,3 @@
-import { proxyToLanding } from '../_proxy';
+import { proxyToLanding } from '../_proxy'
 
-export const onRequest: PagesFunction = (context) => proxyToLanding(context);
+export const onRequest: PagesFunction = (context) => proxyToLanding(context)

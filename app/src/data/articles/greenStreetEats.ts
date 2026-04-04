@@ -7,7 +7,7 @@
 
 // [DATA] Article content for Green Street Eats guide.
 // [数据] 绿街美食指南的文章内容。
-import { Article } from '../../types';
+import { Article } from '../../types'
 
 export const greenStreetEats: Article = {
   id: 'green-street-eats',
@@ -38,5 +38,5 @@ Green Street (绿街) 是校园餐饮的心脏。
 **提示:** 下载 'Chowbus' 或 'Snackpass' APP 可以点单自提，常有优惠。
   `,
   tags_zh: ['美食', '餐厅', '绿街', '饮食', '奶茶'],
-  lastUpdated: '2024-02-01'
-};
+  lastUpdated: '2024-02-01',
+}

@@ -5,30 +5,32 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from 'react';
-import { BathroomType, DiningType, Dorm } from '../types/index';
+import React from 'react'
+import { BathroomType, DiningType, Dorm } from '../types/index'
 import {
   BATHROOM_TYPE_OPTIONS,
   DINING_OPTIONS,
   getLocalizedLabel,
   HOUSING_TYPE_OPTIONS,
-} from '../constants/metadata';
-import { DormEditFormState } from './useDormEditForm';
-import { Field, Toggle, inputCls } from './EditPanelFields';
+} from '../constants/metadata'
+import { DormEditFormState } from './useDormEditForm'
+import { Field, Toggle, inputCls } from './EditPanelFields'
 
 interface DetailsTabProps {
-  form: DormEditFormState;
+  form: DormEditFormState
 }
 
 export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
-  const { t } = form;
+  const { t } = form
 
   return (
     <>
       <Field label={t.labels.housingType}>
         <select
           value={form.housingType}
-          onChange={(event) => form.setHousingType(event.target.value as Dorm['housingType'])}
+          onChange={(event) =>
+            form.setHousingType(event.target.value as Dorm['housingType'])
+          }
           className={inputCls}
         >
           {HOUSING_TYPE_OPTIONS.map((option) => (
@@ -57,7 +59,11 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
           placeholder={t.hints.feePlaceholder}
         />
       </Field>
-      <Toggle label={t.labels.airConditioning} checked={form.ac} onChange={form.setAc} />
+      <Toggle
+        label={t.labels.airConditioning}
+        checked={form.ac}
+        onChange={form.setAc}
+      />
       <Field label={t.labels.dining}>
         <select
           value={form.dining}
@@ -85,7 +91,9 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
       <Field label={t.labels.bathroomType}>
         <select
           value={form.bathroomType}
-          onChange={(event) => form.setBathroomType(event.target.value as BathroomType)}
+          onChange={(event) =>
+            form.setBathroomType(event.target.value as BathroomType)
+          }
           className={inputCls}
         >
           {BATHROOM_TYPE_OPTIONS.map((option) => (
@@ -122,24 +130,28 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
           placeholder="https://housing.illinois.edu/..."
         />
       </Field>
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
-        <p className="text-xs font-medium text-gray-500 mb-1.5">{t.labels.roomOptions}</p>
-        <p className="text-[11px] text-gray-400 mb-2">{t.hints.roomOptions}</p>
+      <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
+        <p className="mb-1.5 text-xs font-medium text-gray-500">
+          {t.labels.roomOptions}
+        </p>
+        <p className="mb-2 text-[11px] text-gray-400">{t.hints.roomOptions}</p>
         <div className="flex flex-wrap gap-1.5">
           {form.derivedRoomOptions.length > 0 ? (
             form.derivedRoomOptions.map((option) => (
               <span
                 key={`${option.labelCode ?? 'custom'}-${option.bedCount ?? 'na'}-${option.bathroomCount ?? 'na'}-${option.bathroomScope}`}
-                className="inline-block px-2 py-0.5 rounded-md border border-gray-300 text-gray-600 text-xs bg-white"
+                className="inline-block rounded-md border border-gray-300 bg-white px-2 py-0.5 text-xs text-gray-600"
               >
                 {form.getRoomDisplayLabel(option, form.language)}
               </span>
             ))
           ) : (
-            <span className="text-xs text-gray-400">{t.values.noFloorPlans}</span>
+            <span className="text-xs text-gray-400">
+              {t.values.noFloorPlans}
+            </span>
           )}
         </div>
       </div>
     </>
-  );
-};
+  )
+}

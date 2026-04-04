@@ -5,8 +5,8 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-export * from './dormData';
-export * from './mapData';
-export * from './pricing';
-export * from './chat';
-export * from './metadata';
+export * from './dormData'
+export * from './mapData'
+export * from './pricing'
+export * from './chat'
+export * from './metadata'

@@ -7,14 +7,15 @@
 
 // [DATA] Article content for Dorm Selection guide.
 // [数据] 宿舍选择指南的文章内容。
-import { Article } from '../../types';
+import { Article } from '../../types'
 
 export const dormSelection: Article = {
-    id: 'dorm-selection',
-    category: 'housing',
-    title: 'Freshman Dorm Selection Guide',
-    summary: 'ISR vs. Ike vs. PAR/FAR. How to choose the right residence hall for you.',
-    content: `
+  id: 'dorm-selection',
+  category: 'housing',
+  title: 'Freshman Dorm Selection Guide',
+  summary:
+    'ISR vs. Ike vs. PAR/FAR. How to choose the right residence hall for you.',
+  content: `
 ### Choosing Your Home at UIUC
 
 **ISR (Illinois Street Residence)**
@@ -29,10 +30,10 @@ Further south. Known for Late Night dining at PAR. Quieter, but very tight-knit 
 **Allen Hall**
 Known for artsy, creative vibes and Unit One LLC.
   `,
-    tags: ['housing', 'freshman', 'dorms', 'isr', 'ike', 'par', 'far'],
-    title_zh: '大一新生宿舍选择指南',
-    summary_zh: 'ISR、Ike 还是 PAR/FAR？如何选择最适合你的宿舍。',
-    content_zh: `
+  tags: ['housing', 'freshman', 'dorms', 'isr', 'ike', 'par', 'far'],
+  title_zh: '大一新生宿舍选择指南',
+  summary_zh: 'ISR、Ike 还是 PAR/FAR？如何选择最适合你的宿舍。',
+  content_zh: `
 ### 在 UIUC 选择你的家
 
 **ISR (Illinois Street Residence)**
@@ -47,6 +48,6 @@ Known for artsy, creative vibes and Unit One LLC.
 **Allen Hall**
 以艺术、创意氛围和 Unit One LLC (学习生活社区) 闻名。
   `,
-    tags_zh: ['住宿', '大一', '宿舍', 'ISR', 'Ike', 'PAR', 'FAR'],
-    lastUpdated: '2024-05-15'
-};
+  tags_zh: ['住宿', '大一', '宿舍', 'ISR', 'Ike', 'PAR', 'FAR'],
+  lastUpdated: '2024-05-15',
+}

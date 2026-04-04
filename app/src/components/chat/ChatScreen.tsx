@@ -5,25 +5,25 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import * as React from 'react';
-import { useEffect, useRef } from 'react';
-import { Language, ChatMessage } from '../../types';
-import { UI_TEXT } from '../../i18n/uiText';
-import { ChatEmptyState } from './ChatEmptyState';
-import { ChatMessageList } from './ChatMessageList';
-import { ChatComposer } from './ChatComposer';
+import * as React from 'react'
+import { useEffect, useRef } from 'react'
+import { Language, ChatMessage } from '../../types'
+import { UI_TEXT } from '../../i18n/uiText'
+import { ChatEmptyState } from './ChatEmptyState'
+import { ChatMessageList } from './ChatMessageList'
+import { ChatComposer } from './ChatComposer'
 
 interface ChatScreenProps {
-  onNavigateToLibrary?: () => void;
-  language: Language;
-  messages: ChatMessage[];
-  input: string;
-  isLoading: boolean;
-  isLoadingHistory?: boolean;
-  onInputChange: (value: string) => void;
-  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
-  onSuggestionClick: (text: string) => void;
-  onFollowUpClick: (text: string) => void;
+  onNavigateToLibrary?: () => void
+  language: Language
+  messages: ChatMessage[]
+  input: string
+  isLoading: boolean
+  isLoadingHistory?: boolean
+  onInputChange: (value: string) => void
+  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void
+  onSuggestionClick: (text: string) => void
+  onFollowUpClick: (text: string) => void
 }
 
 export const ChatScreen: React.FC<ChatScreenProps> = ({
@@ -36,22 +36,22 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
   onSuggestionClick,
   onFollowUpClick,
 }) => {
-  const t = UI_TEXT[language];
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const previousMessagesLength = useRef(0);
-  const containerClass = 'w-full max-w-3xl mx-auto px-4';
+  const t = UI_TEXT[language]
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const previousMessagesLength = useRef(0)
+  const containerClass = 'w-full max-w-3xl mx-auto px-4'
 
   useEffect(() => {
     if (messages.length > previousMessagesLength.current) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
     }
-    previousMessagesLength.current = messages.length;
-  }, [messages]);
+    previousMessagesLength.current = messages.length
+  }, [messages])
 
   return (
-    <div className="flex flex-col h-full w-full relative">
-      <div className="flex-1 overflow-y-auto w-full">
-        <div className="flex flex-col min-h-full">
+    <div className="relative flex h-full w-full flex-col">
+      <div className="w-full flex-1 overflow-y-auto">
+        <div className="flex min-h-full flex-col">
           {messages.length === 0 ? (
             <ChatEmptyState
               language={language}
@@ -85,5 +85,5 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
         onSubmit={onSubmit}
       />
     </div>
-  );
-};
+  )
+}

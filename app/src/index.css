@@ -7,7 +7,7 @@
 /* Body base style */
 body {
   font-family: 'Plus Jakarta Sans', sans-serif;
-  background-color: #F8FAFC;
+  background-color: #f8fafc;
   background-image:
     radial-gradient(at 0% 0%, rgba(19, 41, 75, 0.05) 0px, transparent 50%),
     radial-gradient(at 100% 0%, rgba(255, 95, 5, 0.05) 0px, transparent 50%);
@@ -27,19 +27,19 @@ body {
 
 /* Custom UIUC Colors extensions */
 .bg-illini-blue {
-  background-color: #13294B;
+  background-color: #13294b;
 }
 
 .text-illini-blue {
-  color: #13294B;
+  color: #13294b;
 }
 
 .bg-illini-orange {
-  background-color: #FF5F05;
+  background-color: #ff5f05;
 }
 
 .text-illini-orange {
-  color: #FF5F05;
+  color: #ff5f05;
 }
 
 /* Glassmorphism utilities */
@@ -129,11 +129,16 @@ body {
 
 /* Highlight glow effect for active map marker */
 @keyframes marker-glow {
-  0%, 100% {
-    box-shadow: 0 0 20px rgba(255, 95, 5, 0.5), 0 0 30px rgba(255, 95, 5, 0.3);
+  0%,
+  100% {
+    box-shadow:
+      0 0 20px rgba(255, 95, 5, 0.5),
+      0 0 30px rgba(255, 95, 5, 0.3);
   }
   50% {
-    box-shadow: 0 0 25px rgba(255, 95, 5, 0.6), 0 0 35px rgba(255, 95, 5, 0.4);
+    box-shadow:
+      0 0 25px rgba(255, 95, 5, 0.6),
+      0 0 35px rgba(255, 95, 5, 0.4);
   }
 }
 
@@ -180,7 +185,7 @@ body {
 }
 
 .prose a {
-  color: #FF5F05;
+  color: #ff5f05;
   text-decoration: none;
 }
 
@@ -251,10 +256,10 @@ html {
 
 /* UIUC Brand Custom Properties */
 :root {
-  --illini-blue: #13294B;
-  --illini-orange: #FF5F05;
-  --illini-blue-light: #1E3A5F;
-  --illini-orange-light: #FF7A30;
+  --illini-blue: #13294b;
+  --illini-orange: #ff5f05;
+  --illini-blue-light: #1e3a5f;
+  --illini-orange-light: #ff7a30;
 }
 
 /* Custom Scrollbar Styles - Thin & Fashionable */
@@ -330,7 +335,6 @@ html {
   scrollbar-color: rgba(107, 114, 128, 0.5) rgba(0, 0, 0, 0.05);
 }
 
-
 /* Custom Range Slider Styles - Modern & Premium */
 .slider-modern {
   z-index: 10;
@@ -348,9 +352,13 @@ html {
   height: 20px;
   border-radius: 50%;
   border: 2.5px solid #ffffff;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 3px 6px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
   cursor: grab;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+  transition:
+    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.2s ease;
 }
 
 .slider-thumb-orange::-webkit-slider-thumb:active,
@@ -365,7 +373,9 @@ html {
 }
 
 .slider-thumb-orange:hover::-webkit-slider-thumb {
-  box-shadow: 0 4px 12px rgba(255, 95, 5, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 4px 12px rgba(255, 95, 5, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.2);
   transform: scale(1.15);
 }
 
@@ -375,7 +385,9 @@ html {
 }
 
 .slider-thumb-blue:hover::-webkit-slider-thumb {
-  box-shadow: 0 4px 12px rgba(19, 41, 75, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 4px 12px rgba(19, 41, 75, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.2);
   transform: scale(1.15);
 }
 
@@ -418,7 +430,7 @@ html {
 }
 
 .rc-slider-track {
-  background: linear-gradient(90deg, #FF5F05 0%, #13294B 100%) !important;
+  background: linear-gradient(90deg, #ff5f05 0%, #13294b 100%) !important;
   height: 4px !important;
   border-radius: 2px;
 }
@@ -428,8 +440,12 @@ html {
   height: 20px !important;
   margin-top: -8px !important;
   border: 3px solid #ffffff !important;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease !important;
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+  transition:
+    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.2s ease !important;
 }
 
 .rc-slider-handle:hover,
@@ -443,19 +459,23 @@ html {
 }
 
 .rc-slider-handle-1 {
-  background-color: #FF5F05 !important;
+  background-color: #ff5f05 !important;
 }
 
 .rc-slider-handle-2 {
-  background-color: #13294B !important;
+  background-color: #13294b !important;
 }
 
 .rc-slider-handle-1:hover {
-  box-shadow: 0 4px 12px rgba(255, 95, 5, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.2) !important;
+  box-shadow:
+    0 4px 12px rgba(255, 95, 5, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.2) !important;
 }
 
 .rc-slider-handle-2:hover {
-  box-shadow: 0 4px 12px rgba(19, 41, 75, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.2) !important;
+  box-shadow:
+    0 4px 12px rgba(19, 41, 75, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.2) !important;
 }
 
 /* Modal uses a lighter slider transform profile for smoother scrolling/dragging. */

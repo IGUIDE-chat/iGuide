@@ -5,16 +5,16 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from 'react';
-import { AgentLandingPage } from '../../components/AgentLandingPage';
-import { Language } from '../../types';
+import React from 'react'
+import { AgentLandingPage } from '../../components/AgentLandingPage'
+import { Language } from '../../types'
 
 interface ResumeLandingPageProps {
-  language: Language;
+  language: Language
 }
 
 const ResumeLandingPage: React.FC<ResumeLandingPageProps> = ({ language }) => {
-  return <AgentLandingPage type="resume" language={language} />;
-};
+  return <AgentLandingPage type="resume" language={language} />
+}
 
-export default ResumeLandingPage;
+export default ResumeLandingPage

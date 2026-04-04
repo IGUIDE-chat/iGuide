@@ -5,68 +5,72 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import * as React from 'react';
-import { useEffect, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { LoginScreen } from './components/auth/LoginScreen';
-import { Layout } from './components/layout/Layout';
-import { AppRoutes } from './app/routes';
-import { useAuth } from './contexts/AuthContext';
-import { HousingProvider } from './components/housing/store/HousingContext';
-import { DormDataProvider } from './components/housing/store/DormDataContext';
-import { DormUserInteractionProvider } from './components/housing/store/DormUserInteractionContext';
-import { CompareProvider } from './components/housing/store/CompareContext';
-import { Language } from './types';
+import * as React from 'react'
+import { useEffect, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { LoginScreen } from './components/auth/LoginScreen'
+import { Layout } from './components/layout/Layout'
+import { AppRoutes } from './app/routes'
+import { useAuth } from './contexts/AuthContext'
+import { HousingProvider } from './components/housing/store/HousingContext'
+import { DormDataProvider } from './components/housing/store/DormDataContext'
+import { DormUserInteractionProvider } from './components/housing/store/DormUserInteractionContext'
+import { CompareProvider } from './components/housing/store/CompareContext'
+import { Language } from './types'
 
 export default function App() {
-  const { user, isLoading, isGuest, setIsGuest } = useAuth();
+  const { user, isLoading, isGuest, setIsGuest } = useAuth()
   const [language, setLanguage] = useState<Language>(() => {
     if (typeof navigator !== 'undefined') {
-      const browserLang = navigator.language.toLowerCase();
-      return browserLang.startsWith('zh') ? 'zh' : 'en';
+      const browserLang = navigator.language.toLowerCase()
+      return browserLang.startsWith('zh') ? 'zh' : 'en'
     }
-    return 'zh';
-  });
-  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
+    return 'zh'
+  })
+  const [currentConversationId, setCurrentConversationId] = useState<
+    string | null
+  >(null)
 
   useEffect(() => {
     if (user) {
-      setIsGuest(false);
+      setIsGuest(false)
     }
-  }, [user, setIsGuest]);
+  }, [user, setIsGuest])
 
   useEffect(() => {
-    const lastId = localStorage.getItem('lastConversationId');
+    const lastId = localStorage.getItem('lastConversationId')
     if (lastId && !isGuest) {
-      setCurrentConversationId(lastId);
+      setCurrentConversationId(lastId)
     }
-  }, [isGuest]);
+  }, [isGuest])
 
   const handleNewConversation = () => {
-    setCurrentConversationId(null);
-  };
+    setCurrentConversationId(null)
+  }
 
   const handleSelectConversation = (conversationId: string | null) => {
-    setCurrentConversationId(conversationId);
+    setCurrentConversationId(conversationId)
     if (conversationId) {
-      localStorage.setItem('lastConversationId', conversationId);
+      localStorage.setItem('lastConversationId', conversationId)
     } else {
-      localStorage.removeItem('lastConversationId');
+      localStorage.removeItem('lastConversationId')
     }
-  };
+  }
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-illini-blue/10 via-white to-illini-orange/10">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-illini-blue/10 via-white to-illini-orange/10">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-illini-orange border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-slate-600">{language === 'zh' ? '加载中...' : 'Loading...'}</p>
+          <div className="mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-4 border-illini-orange border-t-transparent" />
+          <p className="text-slate-600">
+            {language === 'zh' ? '加载中...' : 'Loading...'}
+          </p>
         </div>
       </div>
-    );
+    )
   }
 
-  const showLogin = !user && !isGuest;
+  const showLogin = !user && !isGuest
 
   return (
     <AnimatePresence mode="wait">
@@ -96,29 +100,29 @@ export default function App() {
         >
           <DormDataProvider>
             <CompareProvider>
-            <HousingProvider>
-              <DormUserInteractionProvider>
-              <Layout
-                language={language}
-                onLanguageChange={setLanguage}
-                isGuest={isGuest}
-                onExitGuest={() => setIsGuest(false)}
-                currentConversationId={currentConversationId}
-                onNewConversation={handleNewConversation}
-                onSelectConversation={handleSelectConversation}
-              >
-                <AppRoutes
-                  language={language}
-                  currentConversationId={currentConversationId}
-                  onConversationCreated={setCurrentConversationId}
-                />
-              </Layout>
-              </DormUserInteractionProvider>
-            </HousingProvider>
+              <HousingProvider>
+                <DormUserInteractionProvider>
+                  <Layout
+                    language={language}
+                    onLanguageChange={setLanguage}
+                    isGuest={isGuest}
+                    onExitGuest={() => setIsGuest(false)}
+                    currentConversationId={currentConversationId}
+                    onNewConversation={handleNewConversation}
+                    onSelectConversation={handleSelectConversation}
+                  >
+                    <AppRoutes
+                      language={language}
+                      currentConversationId={currentConversationId}
+                      onConversationCreated={setCurrentConversationId}
+                    />
+                  </Layout>
+                </DormUserInteractionProvider>
+              </HousingProvider>
             </CompareProvider>
           </DormDataProvider>
         </motion.div>
       )}
     </AnimatePresence>
-  );
+  )
 }

@@ -7,7 +7,7 @@
 
 // [DATA] Article content for MTD Bus System guide.
 // [数据] MTD 公交系统指南的文章内容。
-import { Article } from '../../types';
+import { Article } from '../../types'
 
 export const mtdGuide: Article = {
   id: 'mtd-guide',
@@ -40,5 +40,5 @@ UIUC 学生凭有效的 **iCard** 可以无限次免费乘坐香槟-厄巴纳公
 **深夜出行：** 常规公交停运后，可以使用 SafeRides 服务进行点对点接送。
   `,
   tags_zh: ['公交', '交通', 'iCard', 'MTD', '出行'],
-  lastUpdated: '2023-08-20'
-};
+  lastUpdated: '2023-08-20',
+}
