@@ -1,4 +1,4 @@
-# Agent Configuration
+# agent configuration
 .agent/
 .gemini/
 .cursor/
@@ -7,12 +7,43 @@
 .claude/
 .agents/
 
-# System Files
+# agent generated files
+.learnings
+.sisyphus
+.superpowers
+
+# system Files
 .DS_Store
 Thumbs.db
 
-# Node Modules
+# generated files
 node_modules/
 dist/
+
+# secrets
 .env
 .env.local
+.env.vars
+
+# editor specific files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# worktrees
+.worktree
+
+# logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
