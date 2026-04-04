@@ -1,0 +1,54 @@
+name: Build
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+        required: false
+        default: ${{ github.ref }}
+    secrets:
+      vite_supabase_url:
+        required: true
+      vite_supabase_anon_key:
+        required: true
+      vite_mapbox_token:
+        required: true
+      vite_coze_bot_id:
+        required: true
+
+jobs:
+  check:
+    name: Lint, TypeCheck & Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install dependencies
+        run: pnpm ci
+
+      - name: Lint
+        run: pnpm run lint
+
+      - name: TypeCheck
+        run: pnpm run typecheck
+
+      - name: Build
+        run: pnpm run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.vite_supabase_url }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.vite_supabase_anon_key }}
+          VITE_MAPBOX_TOKEN: ${{ secrets.vite_mapbox_token }}
+          VITE_COZE_BOT_ID: ${{ secrets.vite_coze_bot_id }}
