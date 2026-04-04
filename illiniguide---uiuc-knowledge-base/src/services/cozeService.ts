@@ -199,7 +199,7 @@ export const streamChatResponse = async function* (
               text: '',
               thinkingStep: {
                 type: 'reasoning',
-                label: '正在思考...',
+                label: lang === 'zh' ? '正在思考...' : 'Thinking...',
                 detail: data.content,
               },
             });
@@ -213,7 +213,7 @@ export const streamChatResponse = async function* (
                 text: '',
                 thinkingStep: {
                   type: 'tool_call',
-                  label: `调用工具: ${callInfo.name || '插件'}`,
+                  label: lang === 'zh' ? `调用工具: ${callInfo.name || '插件'}` : `Calling tool: ${callInfo.name || 'plugin'}`,
                   detail: callInfo.arguments ? JSON.stringify(callInfo.arguments).substring(0, 120) : undefined,
                 },
               });
@@ -222,7 +222,7 @@ export const streamChatResponse = async function* (
                 text: '',
                 thinkingStep: {
                   type: 'tool_call',
-                  label: '调用工具...',
+                  label: lang === 'zh' ? '调用工具...' : 'Calling tool...',
                   detail: data.content.substring(0, 120),
                 },
               });
@@ -234,7 +234,7 @@ export const streamChatResponse = async function* (
             text: '',
             thinkingStep: {
               type: 'searching',
-              label: '获取结果...',
+              label: lang === 'zh' ? '获取结果...' : 'Fetching results...',
               detail: data.content ? data.content.substring(0, 120) : undefined,
             },
           });
@@ -244,7 +244,7 @@ export const streamChatResponse = async function* (
             text: '',
             thinkingStep: {
               type: 'searching',
-              label: '处理工具结果...',
+              label: lang === 'zh' ? '处理工具结果...' : 'Processing results...',
             },
           });
         } else if (currentEvent === 'conversation.message.completed' && data.type === 'answer') {
