@@ -92,7 +92,7 @@ To initialize or update the housing data:
    ```bash
    npx tsx scripts/seed-dorms-table.ts
    ```
-   _This script merges any local static data with existing database overrides into a unified `dorms` table._
+   *This script merges any local static data with existing database overrides into a unified `dorms` table.*
 
 ## Commands
 
