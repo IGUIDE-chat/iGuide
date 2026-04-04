@@ -18,6 +18,7 @@ interface ChatMessageListProps {
   userRole: string;
   messagesEndRef: React.RefObject<HTMLDivElement | null>;
   onFollowUpClick: (text: string) => void;
+  language?: 'en' | 'zh';
 }
 
 export const ChatMessageList: React.FC<ChatMessageListProps> = ({
@@ -28,6 +29,7 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
   userRole,
   messagesEndRef,
   onFollowUpClick,
+  language = 'zh',
 }) => {
   return (
     <div className="flex-col pb-36 pt-14">
@@ -85,6 +87,7 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
                     <ThinkingProcess
                       steps={message.thinkingSteps || []}
                       isThinking={!!message.isThinking}
+                      language={language}
                     />
                   )}
                 <div className="prose prose-slate prose-sm max-w-none leading-relaxed text-slate-800">

@@ -69,6 +69,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
               userRole={t.userRole}
               messagesEndRef={messagesEndRef}
               onFollowUpClick={onFollowUpClick}
+              language={language}
             />
           )}
         </div>

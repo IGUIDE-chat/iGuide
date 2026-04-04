@@ -12,6 +12,7 @@ import { ThinkingStep } from '../../types';
 interface ThinkingProcessProps {
   steps: ThinkingStep[];
   isThinking: boolean;
+  language?: 'en' | 'zh';
 }
 
 const stepIcons: Record<ThinkingStep['type'], string> = {
@@ -34,7 +35,7 @@ const ThinkingDots = () => (
   </span>
 );
 
-export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({ steps, isThinking }) => {
+export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({ steps, isThinking, language = 'zh' }) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const wasThinking = useRef(true);
 
@@ -73,7 +74,9 @@ export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({ steps, isThink
           </svg>
         )}
         <span className="font-medium">
-          {isThinking ? '思考中' : '思考完成'}
+          {isThinking
+            ? (language === 'zh' ? '思考中' : 'Thinking')
+            : (language === 'zh' ? '思考完成' : 'Done thinking')}
         </span>
         {isThinking && latestStep && (
           <span className="text-slate-400">
