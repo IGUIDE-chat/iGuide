@@ -1,9 +1,0 @@
-Message layout tweak notes
-
-The user-message alignment changes now live in:
-
-- `src/components/chat/ChatMessageList.tsx`
-
-When adjusting the chat bubble layout, update the message row container,
-avatar block, message metadata alignment, and user bubble wrapper in that
-file instead of editing `ChatScreen.tsx`.
