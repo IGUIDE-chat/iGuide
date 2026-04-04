@@ -163,19 +163,19 @@ Do not change only the static JSON shape and assume admin or seed will keep up.
 When you change housing data or contracts, run:
 
 ```bash
-npm run validate:dorm-data
+pnpm run validate:dorm-data
 ```
 
 Run this too when media sourcing or media quality rules changed:
 
 ```bash
-npm run audit:dorm-media
+pnpm run audit:dorm-media
 ```
 
 Run this when imports, types, or UI structure changed:
 
 ```bash
-npm run build
+pnpm run build
 ```
 
 ## Safe Edit Patterns

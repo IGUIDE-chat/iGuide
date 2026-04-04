@@ -9,7 +9,7 @@ This document summarizes the minimal path changes for the Dify migration work.
 3. Add your `VITE_DIFY_API_KEY`.
 4. Update the chat service import in
    `src/components/chat/ChatScreen.tsx` if that migration is still in use.
-5. Run `npm run dev`.
+5. Run `pnpm run dev`.
 
 ## Import Example
 
@@ -25,5 +25,5 @@ import { streamChatResponse } from '../../services/difyService';
 
 ## Validation
 
-- `npm run typecheck`
-- `npm run build`
+- `pnpm run typecheck`
+- `pnpm run build`

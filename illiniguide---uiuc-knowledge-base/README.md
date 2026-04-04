@@ -97,8 +97,8 @@ To initialize or update the housing data:
 ## Commands
 
 ```bash
-npm install
-npm run dev
-npm run typecheck
-npm run build
+pnpm install
+pnpm run dev
+pnpm run typecheck
+pnpm run build
 ```

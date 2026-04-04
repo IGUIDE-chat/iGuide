@@ -29,7 +29,7 @@ api-gateway/
 ### 1. Install Dependencies
 
 ```bash
-npm install
+pnpm install
 ```
 
 ### 2. Configure Environment Variables
@@ -68,7 +68,7 @@ routes = [
 ### Run Locally
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 The Worker will be available at `http://localhost:8787`
@@ -91,19 +91,19 @@ curl -X POST http://localhost:8787/chat \
 ### Deploy to Production
 
 ```bash
-npm run deploy
+pnpm run deploy
 ```
 
 Or with environment:
 
 ```bash
-npm run deploy:production
+pnpm run deploy:production
 ```
 
 ### View Logs
 
 ```bash
-npm run tail
+pnpm run tail
 ```
 
 ## API Endpoints
@@ -146,13 +146,13 @@ Streaming SSE response from backend.
 
 ## Environment Variables
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `SUPABASE_URL` | Supabase project URL | Yes |
-| `SUPABASE_ANON_KEY` | Supabase anon key | Yes |
-| `DEEPSEEK_API_KEY` | DeepSeek API key | Yes |
-| `SILICONFLOW_API_KEY` | SiliconFlow API key | Yes |
-| `BACKEND_URL` | Backend API URL (Argo Tunnel) | Yes |
+| Variable              | Description                   | Required |
+|-----------------------|-------------------------------|----------|
+| `SUPABASE_URL`        | Supabase project URL          | Yes      |
+| `SUPABASE_ANON_KEY`   | Supabase anon key             | Yes      |
+| `DEEPSEEK_API_KEY`    | DeepSeek API key              | Yes      |
+| `SILICONFLOW_API_KEY` | SiliconFlow API key           | Yes      |
+| `BACKEND_URL`         | Backend API URL (Argo Tunnel) | Yes      |
 
 ## DNS Configuration
 

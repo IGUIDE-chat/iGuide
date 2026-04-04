@@ -267,7 +267,7 @@ If the project is being reorganized:
 A structure move is not complete until:
 
 - imports resolve
-- `npm run build` passes
+- `pnpm run build` passes
 - docs describe the same tree the runtime uses
 
 ---
@@ -276,8 +276,8 @@ A structure move is not complete until:
 
 For structure-affecting changes:
 
-1. Run `npm run typecheck`.
-2. Run `npm run build` for module moves, route changes, or renamed imports.
+1. Run `pnpm run typecheck`.
+2. Run `pnpm run build` for module moves, route changes, or renamed imports.
 3. Use targeted `rg` searches to confirm old paths or deprecated imports are
    gone after structural moves.
 

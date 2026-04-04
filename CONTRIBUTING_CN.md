@@ -14,12 +14,12 @@
     主应用程序代码位于 `illiniguide---uiuc-knowledge-base/` 目录中。
     ```bash
     cd illiniguide---uiuc-knowledge-base
-    npm install
+    pnpm install
     ```
 
 3.  **启动开发服务器：**
     ```bash
-    npm run dev
+    pnpm run dev
     ```
 
 ## 🛠️ 开发工作流

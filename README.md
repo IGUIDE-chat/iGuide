@@ -31,12 +31,12 @@ To run the application locally:
 2. **Install dependencies:**
 
    ```bash
-   npm install
+   pnpm install
    ```
 3. **Start the development server:**
 
    ```bash
-   npm run dev
+   pnpm run dev
    ```
 
    The app should now be running at `http://localhost:5173`.
@@ -128,12 +128,12 @@ Detailed documentation can be found in the `illiniguide---uiuc-knowledge-base/do
 2. **安装依赖：**
 
    ```bash
-   npm install
+   pnpm install
    ```
 3. **启动开发服务器：**
 
    ```bash
-   npm run dev
+   pnpm run dev
    ```
 
    应用现在应该运行在 `http://localhost:5173`。

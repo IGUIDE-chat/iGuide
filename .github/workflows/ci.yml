@@ -106,17 +106,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
+          cache: pnpm
           cache-dependency-path: illiniguide---uiuc-knowledge-base/package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm ci
 
       - name: TypeCheck
-        run: npm run typecheck
+        run: pnpm run typecheck
 
       - name: Build
-        run: npm run build
+        run: pnpm run build
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
@@ -141,14 +141,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
+          cache: pnpm
           cache-dependency-path: illiniguide---uiuc-knowledge-base/package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm ci
 
       - name: Build (for bundle scan)
-        run: npm run build
+        run: pnpm run build
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
