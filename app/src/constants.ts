@@ -5,7 +5,7 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-// [ROOT] Global constants and static library metadata.
+﻿// [ROOT] Global constants and static library metadata.
 import { Article, Category, Language } from './types';
 import { UI_TEXT as I18N_UI_TEXT } from './i18n/uiText';
 

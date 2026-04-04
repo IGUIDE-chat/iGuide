@@ -6,9 +6,7 @@
  */
 
 import * as React from 'react';
-// [ROOT] Main application component handling routing and global layout.
-// [根组件] 处理路由和全局布局的应用程序主组件。
-import { useState, useMemo, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { LoginScreen } from './components/auth/LoginScreen';
 import { Layout } from './components/layout/Layout';
@@ -100,21 +98,21 @@ export default function App() {
             <CompareProvider>
             <HousingProvider>
               <DormUserInteractionProvider>
-                <Layout
+              <Layout
+                language={language}
+                onLanguageChange={setLanguage}
+                isGuest={isGuest}
+                onExitGuest={() => setIsGuest(false)}
+                currentConversationId={currentConversationId}
+                onNewConversation={handleNewConversation}
+                onSelectConversation={handleSelectConversation}
+              >
+                <AppRoutes
                   language={language}
-                  onLanguageChange={setLanguage}
-                  isGuest={isGuest}
-                  onExitGuest={() => setIsGuest(false)}
                   currentConversationId={currentConversationId}
-                  onNewConversation={handleNewConversation}
-                  onSelectConversation={handleSelectConversation}
-                >
-                  <AppRoutes
-                    language={language}
-                    currentConversationId={currentConversationId}
-                    onConversationCreated={setCurrentConversationId}
-                  />
-                </Layout>
+                  onConversationCreated={setCurrentConversationId}
+                />
+              </Layout>
               </DormUserInteractionProvider>
             </HousingProvider>
             </CompareProvider>

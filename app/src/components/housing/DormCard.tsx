@@ -1,0 +1,476 @@
+/**
+ * @file ./src/components/housing/DormCard.tsx
+ * @description Housing (Dorms) Component / Module
+ * @description_zh 此文件属于 Housing 业务域（限界上下文）。请勿在此引入其他业务（如 chat, library）的代码。保持高内聚，不要把 Housing 独有的逻辑泄露到外层全局目录。
+ * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
+ */
+
+import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { Bath, BedSingle, Check, GitCompareArrows, MapPin, ThumbsUp, Utensils, Wind } from 'lucide-react';
+import { formatPrice } from './constants/pricing';
+import { Dorm } from './types/index';
+import { Language } from '../../types';
+import { deriveRoomOptions, getRoomRangeSummary } from '../../utils/roomOptions';
+import { CardTagItem, getCardTagCandidates } from '../../utils/tagLabels';
+
+interface DormCardProps {
+    dorm: Dorm;
+    onViewDetails: (dorm: Dorm) => void;
+    isFavorite?: boolean;
+    onToggleFavorite?: (dorm: Dorm, e?: React.MouseEvent) => void;
+    isCompared?: boolean;
+    onToggleCompare?: (dorm: Dorm) => void;
+    onHoverDorm?: (dormId: string | null) => void;
+    onRatingClick?: (dorm: Dorm, e: React.MouseEvent) => void;
+    language?: Language;
+    positivePercent?: number | null;
+    totalReviews?: number;
+}
+
+const CARD_TAG_GAP_PX = 6;
+const MAX_VISIBLE_CARD_TAGS = 8;
+
+const TEXT = {
+    en: {
+        ac: 'AC',
+        noAc: 'No AC',
+        diningInside: 'Dining hall',
+        diningNearby: 'Dining nearby',
+        diningNone: 'No dining',
+        roomSummaryLabel: 'Layouts',
+        unsave: 'Unsave dorm',
+        save: 'Save dorm',
+        moreTags: (count: number) => `+${count}`,
+    },
+    zh: {
+        ac: '有空调',
+        noAc: '无空调',
+        diningInside: '楼内食堂',
+        diningNearby: '附近食堂',
+        diningNone: '无食堂',
+        roomSummaryLabel: '房型',
+        unsave: '取消收藏宿舍',
+        save: '收藏宿舍',
+        moreTags: (count: number) => `+${count}`,
+    },
+};
+
+function normalizeCopy(value: string) {
+    return value.toLowerCase().replace(/\s+/g, ' ').trim();
+}
+
+function isRedundantCardCopy(copy: string, locationLabel: string, language: Language) {
+    const normalizedCopy = normalizeCopy(copy);
+    const normalizedLocation = normalizeCopy(locationLabel);
+
+    if (normalizedLocation && normalizedCopy.includes(normalizedLocation)) {
+        return true;
+    }
+
+    if (language === 'zh') {
+        return normalizedCopy.includes('位于') || normalizedCopy.includes('在 main quad') || normalizedCopy.includes('近 main quad');
+    }
+
+    return normalizedCopy.includes('located in') || normalizedCopy.includes('located on') || normalizedCopy.includes('near ');
+}
+
+function getSignalDrivenSummary(dorm: Dorm, language: Language) {
+    const tags = dorm.categorizedTags ?? { livingConditions: [], facilities: [], lifestyle: [] };
+    const llcName = tags.llcNames?.[0];
+
+    if (llcName && tags.lifestyle.includes('artsyCreative') && tags.facilities.includes('musicRooms')) {
+        return language === 'zh'
+            ? `设有 ${llcName} 社群项目，艺术氛围浓，且配有琴房。`
+            : `Home to ${llcName}, with a creative community and dedicated music rooms.`;
+    }
+
+    if (llcName) {
+        return language === 'zh'
+            ? `设有 ${llcName} 社群项目，社区活动和归属感更强。`
+            : `Home to ${llcName}, a distinct living-learning community.`;
+    }
+
+    if (tags.lifestyle.includes('artsyCreative') && tags.facilities.includes('musicRooms')) {
+        return language === 'zh'
+            ? '艺术氛围浓，适合重视创作与音乐练习的学生。'
+            : 'A creative community with dedicated music rooms.';
+    }
+
+    if (tags.livingConditions.includes('newlyRenovated')) {
+        return language === 'zh'
+            ? '居住空间较新，整体设施状态更好。'
+            : 'Recently renovated living spaces with a fresher feel.';
+    }
+
+    if (tags.lifestyle.includes('quiet')) {
+        return language === 'zh'
+            ? '整体氛围更安静，适合规律作息和专注学习。'
+            : 'Known for a quieter community atmosphere.';
+    }
+
+    if (tags.lifestyle.includes('internationalFriendly')) {
+        return language === 'zh'
+            ? '国际生社群更活跃，社区包容度较高。'
+            : 'Popular with international students and a more globally mixed community.';
+    }
+
+    if (tags.lifestyle.includes('socialParty')) {
+        return language === 'zh'
+            ? '社交氛围更活跃，更适合喜欢热闹社区的学生。'
+            : 'A more social community for students who want an active dorm scene.';
+    }
+
+    if (tags.facilities.includes('musicRooms')) {
+        return language === 'zh'
+            ? '配有琴房，对音乐练习更友好。'
+            : 'Includes dedicated music rooms for regular practice.';
+    }
+
+    if (tags.facilities.includes('convenienceStore')) {
+        return language === 'zh'
+            ? '日常补给更方便，买东西不用专门绕路。'
+            : 'Convenience-store access makes daily basics easier.';
+    }
+
+    if (tags.facilities.includes('busStop')) {
+        return language === 'zh'
+            ? '靠近公交站，日常往返校园更方便。'
+            : 'Easy bus access helps with daily campus travel.';
+    }
+
+    return null;
+}
+
+function getCardSummary(dorm: Dorm, description: string | undefined, locationLabel: string, language: Language) {
+    const signalSummary = getSignalDrivenSummary(dorm, language);
+    if (signalSummary) {
+        return signalSummary;
+    }
+
+    const localizedPros =
+        language === 'zh' && dorm.pros_zh?.length ? dorm.pros_zh : dorm.pros;
+    const fallbackPro = localizedPros.find((item) => !isRedundantCardCopy(item, locationLabel, language));
+    if (fallbackPro) {
+        return fallbackPro;
+    }
+
+    if (description && !isRedundantCardCopy(description, locationLabel, language)) {
+        return description;
+    }
+
+    return null;
+}
+
+function getDiningLabel(dorm: Dorm, language: Language) {
+    const t = TEXT[language];
+    if (dorm.dining === 'inside') {
+        return t.diningInside;
+    }
+    if (dorm.dining === 'nearby') {
+        return t.diningNearby;
+    }
+
+    return t.diningNone;
+}
+
+function getCardTagClasses(tag: CardTagItem) {
+    const toneClasses =
+        tag.tone === 'muted'
+            ? 'border-gray-200/70 bg-gray-100/70 text-gray-400'
+            : tag.tone === 'positive'
+                ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                : 'border-slate-200 bg-slate-50 text-slate-700';
+
+    return `inline-flex min-w-0 shrink-0 items-center overflow-hidden text-ellipsis whitespace-nowrap rounded-full border px-2 py-1 text-[11px] font-medium max-w-[8.5rem] ${toneClasses}`;
+}
+
+function getOverflowTagClasses() {
+    return 'inline-flex shrink-0 items-center rounded-full border border-dashed border-gray-300 px-2 py-1 text-[11px] font-medium text-gray-500';
+}
+
+function useResponsiveCardTags(allTags: CardTagItem[], moreTagsLabel: (count: number) => string) {
+    const containerRef = useRef<HTMLDivElement | null>(null);
+    const tagRefs = useRef<Record<string, HTMLSpanElement | null>>({});
+    const overflowRefs = useRef<Record<number, HTMLSpanElement | null>>({});
+    const [layout, setLayout] = useState(() => {
+        const initialVisibleCount = Math.min(allTags.length, MAX_VISIBLE_CARD_TAGS);
+
+        return {
+            visibleCount: initialVisibleCount,
+            overflowCount: Math.max(allTags.length - initialVisibleCount, 0),
+        };
+    });
+
+    const tagSignature = useMemo(() => allTags.map((tag) => tag.id).join('|'), [allTags]);
+
+    useLayoutEffect(() => {
+        const container = containerRef.current;
+        if (!container) {
+            return;
+        }
+
+        let frame = 0;
+
+        const measure = () => {
+            const availableWidth = container.clientWidth;
+            if (!availableWidth) {
+                return;
+            }
+
+            const maxVisibleCount = Math.min(allTags.length, MAX_VISIBLE_CARD_TAGS);
+            let nextVisibleCount = maxVisibleCount;
+
+            for (let count = maxVisibleCount; count >= 1; count -= 1) {
+                const overflowCount = allTags.length - count;
+                const tagWidths = allTags
+                    .slice(0, count)
+                    .reduce((total, tag) => total + (tagRefs.current[tag.id]?.offsetWidth ?? 0), 0);
+                const tagGapWidth = count > 1 ? (count - 1) * CARD_TAG_GAP_PX : 0;
+                const overflowWidth =
+                    overflowCount > 0 ? overflowRefs.current[overflowCount]?.offsetWidth ?? 0 : 0;
+                const overflowGapWidth = overflowCount > 0 && count > 0 ? CARD_TAG_GAP_PX : 0;
+
+                if (tagWidths + tagGapWidth + overflowGapWidth + overflowWidth <= availableWidth) {
+                    nextVisibleCount = count;
+                    break;
+                }
+
+                nextVisibleCount = 1;
+            }
+
+            const nextOverflowCount = Math.max(allTags.length - nextVisibleCount, 0);
+            setLayout((current) => {
+                if (
+                    current.visibleCount === nextVisibleCount &&
+                    current.overflowCount === nextOverflowCount
+                ) {
+                    return current;
+                }
+
+                return {
+                    visibleCount: nextVisibleCount,
+                    overflowCount: nextOverflowCount,
+                };
+            });
+        };
+
+        const scheduleMeasure = () => {
+            cancelAnimationFrame(frame);
+            frame = requestAnimationFrame(measure);
+        };
+
+        scheduleMeasure();
+
+        const resizeObserver = new ResizeObserver(scheduleMeasure);
+        resizeObserver.observe(container);
+
+        return () => {
+            cancelAnimationFrame(frame);
+            resizeObserver.disconnect();
+        };
+    }, [allTags, moreTagsLabel, tagSignature]);
+
+    const visibleItems = allTags.slice(0, layout.visibleCount);
+
+    return {
+        containerRef,
+        overflowCount: layout.overflowCount,
+        overflowRefs,
+        tagRefs,
+        visibleItems,
+    };
+}
+
+const DormCard: React.FC<DormCardProps> = ({
+    dorm,
+    onViewDetails,
+    isFavorite = false,
+    onToggleFavorite,
+    isCompared = false,
+    onToggleCompare,
+    onHoverDorm,
+    onRatingClick,
+    language = 'en',
+    positivePercent,
+    totalReviews,
+}) => {
+    const t = TEXT[language];
+    const dormName = language === 'zh' && dorm.name_zh ? dorm.name_zh : dorm.name;
+    const description = language === 'zh' && dorm.description_zh ? dorm.description_zh : dorm.description;
+    const locationLabel = language === 'zh' && dorm.location_zh ? dorm.location_zh : dorm.location;
+    const roomOptions = dorm.roomOptions ?? deriveRoomOptions(dorm.floorPlans, dorm.bathroomType).roomOptions;
+    const roomRangeSummary = getRoomRangeSummary(roomOptions, language);
+    const cardTagCandidates = getCardTagCandidates(
+        dorm.categorizedTags ?? { livingConditions: [], facilities: [], lifestyle: [] },
+        language
+    );
+    const cardTags = useResponsiveCardTags(cardTagCandidates, t.moreTags);
+    const cardSummary = getCardSummary(dorm, description, locationLabel, language);
+
+    return (
+        <div
+            onClick={() => onViewDetails(dorm)}
+            onMouseEnter={() => onHoverDorm?.(dorm.id)}
+            onMouseLeave={() => onHoverDorm?.(null)}
+            className="dorm-card group relative flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-shadow duration-300 hover:shadow-md"
+        >
+            <div className="relative h-48 overflow-hidden">
+                <img
+                    src={dorm.imageUrl}
+                    alt={dormName}
+                    loading="lazy"
+                    decoding="async"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                {positivePercent != null && totalReviews != null && totalReviews > 0 && (
+                    <button
+                        type="button"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onRatingClick?.(dorm, e);
+                        }}
+                        className="absolute right-3 top-3 rounded-md bg-white px-2 py-1 text-xs font-bold text-slate-800 shadow-sm transition-all duration-200 group-hover:scale-105 hover:bg-illini-orange/10 hover:border-illini-orange/30 flex items-center gap-1 border border-transparent"
+                    >
+                        <ThumbsUp size={11} className="text-slate-500" />
+                        {positivePercent}% ({totalReviews})
+                    </button>
+                )}
+
+                {onToggleCompare && (
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onToggleCompare(dorm);
+                        }}
+                        type="button"
+                        className={`absolute right-3 bottom-3 rounded-full p-1.5 shadow-sm transition-all duration-200 ${
+                            isCompared
+                                ? 'bg-illini-blue text-white scale-105'
+                                : 'bg-white/90 text-gray-400 hover:bg-white hover:text-illini-blue'
+                        }`}
+                        aria-label={isCompared ? 'Remove from compare' : 'Add to compare'}
+                    >
+                        {isCompared ? <Check className="h-4 w-4" /> : <GitCompareArrows className="h-4 w-4" />}
+                    </button>
+                )}
+
+                {onToggleFavorite && (
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onToggleFavorite(dorm, e);
+                        }}
+                        type="button"
+                        className="absolute left-3 top-3 rounded-full bg-white p-2 text-gray-400 shadow-sm transition-colors hover:bg-gray-50 hover:text-red-500"
+                        aria-label={isFavorite ? t.unsave : t.save}
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill={isFavorite ? 'currentColor' : 'none'}
+                            stroke="currentColor"
+                            className={`h-5 w-5 ${isFavorite ? 'text-red-500' : ''}`}
+                            strokeWidth="2"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+                            />
+                        </svg>
+                    </button>
+                )}
+            </div>
+
+            <div className="flex flex-grow flex-col p-4">
+                <h3 className="mb-1.5 line-clamp-2 text-xl font-bold leading-[1.15] text-gray-900 antialiased">
+                    {dormName}
+                </h3>
+
+                <div className="mb-3 grid grid-cols-[minmax(0,1.3fr)_minmax(0,0.9fr)] gap-x-6 text-[12px] text-gray-500">
+                    <div className="inline-flex min-w-0 items-center gap-1">
+                        <MapPin size={13} className="shrink-0 text-illini-orange" />
+                        <span className="line-clamp-1">{locationLabel}</span>
+                    </div>
+                    <span className="text-[12px] font-bold text-illini-blue">{formatPrice(dorm.price)}</span>
+                </div>
+
+                <div className="mb-3 grid grid-cols-[minmax(0,1.3fr)_minmax(0,0.9fr)] gap-x-6 gap-y-2 text-[13px] text-slate-700">
+                    <div className="inline-flex min-w-0 items-center gap-1.5">
+                        <BedSingle size={14} className="shrink-0 text-slate-400" />
+                        <span className="line-clamp-2 leading-5">{roomRangeSummary.occupancyLabel}</span>
+                    </div>
+                    <div className="inline-flex min-w-0 items-center gap-1.5">
+                        <Bath size={14} className="shrink-0 text-slate-400" />
+                        <span className="line-clamp-2 leading-5">{roomRangeSummary.bathroomLabel}</span>
+                    </div>
+                    <div className="inline-flex min-w-0 items-center gap-1.5">
+                        <Wind size={14} className="shrink-0 text-slate-400" />
+                        <span className="line-clamp-1 leading-5">{dorm.ac ? t.ac : t.noAc}</span>
+                    </div>
+                    <div className="inline-flex min-w-0 items-center gap-1.5">
+                        <Utensils size={14} className="shrink-0 text-slate-400" />
+                        <span className="line-clamp-1 leading-5">{getDiningLabel(dorm, language)}</span>
+                    </div>
+                </div>
+
+                {cardSummary && (
+                    <p className="mb-3 line-clamp-1 text-sm leading-6 text-gray-600 antialiased">
+                        {cardSummary}
+                    </p>
+                )}
+
+                <div ref={cardTags.containerRef} className="mt-auto flex min-w-0 items-center gap-1.5 overflow-hidden">
+                    {cardTags.visibleItems.map((tag) => (
+                        <span
+                            key={tag.id}
+                            title={tag.label}
+                            className={getCardTagClasses(tag)}
+                        >
+                            {tag.label}
+                        </span>
+                    ))}
+                    {cardTags.overflowCount > 0 && (
+                        <span className={getOverflowTagClasses()}>
+                            {t.moreTags(cardTags.overflowCount)}
+                        </span>
+                    )}
+                </div>
+
+                {cardTagCandidates.length > 0 && (
+                    <div
+                        aria-hidden="true"
+                        className="pointer-events-none absolute left-4 top-4 -z-10 h-0 overflow-hidden opacity-0"
+                    >
+                        <div className="flex items-center gap-1.5">
+                            {cardTagCandidates.map((tag) => (
+                                <span
+                                    key={`measure-${tag.id}`}
+                                    ref={(element) => {
+                                        cardTags.tagRefs.current[tag.id] = element;
+                                    }}
+                                    className={getCardTagClasses(tag)}
+                                >
+                                    {tag.label}
+                                </span>
+                            ))}
+                            {Array.from({ length: cardTagCandidates.length }, (_, index) => index + 1).map((count) => (
+                                <span
+                                    key={`measure-overflow-${count}`}
+                                    ref={(element) => {
+                                        cardTags.overflowRefs.current[count] = element;
+                                    }}
+                                    className={getOverflowTagClasses()}
+                                >
+                                    {t.moreTags(count)}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+export default DormCard;
