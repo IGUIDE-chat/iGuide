@@ -16,89 +16,77 @@ A three-layer UIUC knowledge platform split across the app, API gateway, and cra
 | `api/` | Cloudflare Worker gateway for JWT auth, geo routing, proxying, CORS, and health checks. |
 | `data_collection/` | Python crawler/ETL pipeline for harvesting, cleaning, and incrementally updating UIUC sources. |
 
-### 🚀 Main Application (`app/`)
+## Unified Setup
 
-The main application is a modern web app built with React 19, TypeScript, Vite, and Tailwind CSS. It uses Supabase for backend services and Cloudflare Pages for deployment and serverless functions.
+### App dev
 
-#### Quick Start
+```bash
+cd app
+pnpm install
+pnpm run dev
+pnpm run typecheck
+```
 
-To run the application locally:
+### Supabase dorm data
 
-1. **Navigate to the project directory:**
+Run the SQL migrations in Supabase:
 
-   ```bash
-   cd app
-   ```
-2. **Install dependencies:**
+- `scripts/migrations/create_dorms_table.sql`
+- `scripts/migrations/add_categorized_tags.sql`
 
-   ```bash
-   pnpm install
-   ```
-3. **Start the development server:**
+Then seed or resync data with:
 
-   ```bash
-   pnpm run dev
-   ```
+```bash
+npx tsx scripts/seed-dorms-table.ts
+```
 
-   The app should now be running at `http://localhost:5173`.
+Requires `SUPABASE_URL` and `SUPABASE_SERVICE_KEY`.
 
-### 🏗️ Architecture & File Organization
+### Crawler setup
 
-**Architecture Diagram**
+```bash
+cd data_collection
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+playwright install chromium
+chmod +x run_all.sh
+./run_all.sh
+```
 
-![Architecture Diagram](./app/docs/diagrams/architecture_v3.jpg)
+### API gateway basics
 
-We follow a strict file structure to keep the codebase maintainable. All source code resides in the `src/` directory.
+```bash
+cd api
+pnpm install
+pnpm run dev
+curl http://localhost:8787/health
+```
 
-| Directory                    | Description                                                                    |
-|:-----------------------------|:-------------------------------------------------------------------------------|
-| `src/`                       | **Core Application Source Code**                                               |
-| &nbsp;&nbsp;├─ `app/`        | Global app configuration and routes.                                           |
-| &nbsp;&nbsp;├─ `components/` | Reusable React UI components (e.g.,`ChatScreen.tsx`, `Sidebar.tsx`).           |
-| &nbsp;&nbsp;├─ `services/`   | API clients and business logic (e.g.,`conversationService.ts`, `supabase.ts`). |
-| &nbsp;&nbsp;├─ `contexts/`   | Global React Context providers (e.g.,`AuthContext.tsx`, `ThemeContext.tsx`).   |
-| &nbsp;&nbsp;├─ `pages/`      | Top-level page components (if applicable).                                     |
-| &nbsp;&nbsp;├─ `hooks/`      | Custom React hooks.                                                            |
-| &nbsp;&nbsp;├─ `utils/`      | Utility functions.                                                             |
-| &nbsp;&nbsp;├─ `constants/`  | Constant values and configuration.                                             |
-| &nbsp;&nbsp;├─ `i18n/`       | Internationalization resources.                                                |
-| &nbsp;&nbsp;├─ `data/`       | Static data files.                                                             |
-| &nbsp;&nbsp;└─ `types/`      | TypeScript type definitions and interfaces.                                    |
-| `functions/`                 | Cloudflare Pages Functions (Serverless backend).                               |
-| `tests/`                     | Automated tests (Python/JS).                                                   |
-| `docs/`                      | Detailed project documentation.                                                |
-| `scripts/`                   | Utility/Maintenance scripts.                                                   |
+The gateway verifies Supabase JWTs, routes by Geo-IP, proxies to the backend through Argo Tunnel, and supports SSE chat responses.
 
-### 🛠️ Guide for Developers
+## API Gateway Notes
 
-#### Making Changes
+- JWT auth via Supabase tokens.
+- Geo-IP routing for CN vs global traffic.
+- CORS handling, health check, and streaming proxy support.
+- Production env vars: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `DEEPSEEK_API_KEY`, `SILICONFLOW_API_KEY`, `BACKEND_URL`.
 
-- **UI/Components:** Look into `src/components/`. We use functional components and Tailwind CSS.
-- **Business Logic:** API calls and core logic should be in `src/services/`.
-- **Global State:** If you need to access Auth or User settings, check `src/contexts/`.
+## Placement Rules
 
-#### Rules & Best Practices
+- `src/App.tsx` is the only active app-composition entry.
+- Keep route orchestration thin in `src/pages/**`.
+- Keep feature UI in `src/components/<feature>/**`.
+- Keep shared UI in `src/components/ui/**` only.
+- Keep legacy code isolated in `src/legacy/**` and do not import from it at runtime.
+- Register new pages in `src/app/pageRegistry.ts` and route changes in `src/app/routes.tsx`.
 
-1. **Strict TypeScript:** Do not use `any`. Define interfaces for props and state.
-2. **CSS:** Use Tailwind utility classes. Avoid inline styles.
-3. **New Files:** Place new components in `src/components/` and services in `src/services/`.
+## Dify Chatflow Setup
 
-For detailed file rules, refer to `app/docs/FILE_RULES.md` (if available) or strict adherence to the folders above.
-
-### 📊 Data Collection (`data_collection/`)
-
-Scripts for populating the knowledge base.
-
-- `get_data.py`: Main script or entry point for data fetching.
-- `clean_domians.py`: Utilities for cleaning and normalizing domain data.
-- `*.json` / `*.txt`: Raw and processed data files.
-
-### 📚 Documentation
-
-Detailed documentation can be found in the `app/docs/` folder, including:
-
-- `CHATFLOW_SETUP.md`: Guide for configuring the Coze/Chat workflow.
-- `Setup Guides`: Detailed environment setup.
+1. Retrieve from the `UIUC Campus Guide` knowledge base first.
+2. If retrieval returns results, pass them into the LLM and answer directly.
+3. If retrieval is empty, call a web-search tool such as Tavily and answer from live web results.
+4. Keep the chatflow knowledge-base-first so web search is only the fallback path.
 
 ---
 
