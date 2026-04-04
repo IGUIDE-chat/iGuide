@@ -167,7 +167,7 @@ export const useChatSession = ({
               {
                 id: `step-${Date.now()}-init`,
                 type: 'processing' as const,
-                label: '理解问题...',
+                label: language === 'zh' ? '理解问题...' : 'Understanding...',
                 timestamp: Date.now(),
                 done: false,
               },
