@@ -2,18 +2,11 @@ name: CI
 
 on:
   pull_request:
-    branches: [main, production, feature/dorm-compare]
+    branches: ["**/*"]
   push:
-    branches: [main, production, feature/dorm-compare]
+    branches: ["**/*"]
 
 jobs:
-  secret-scan:
-    name: Secret Scan (Source)
-    uses: ./.github/workflows/secret-scan.yml
-    with:
-      ref: ${{ github.ref }}
-      full_repo_name: ${{ github.repository }}
-
   build:
     name: Lint, TypeCheck & Build
     needs: secret-scan
@@ -25,7 +18,12 @@ jobs:
       vite_supabase_anon_key: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
       vite_mapbox_token: ${{ secrets.VITE_MAPBOX_TOKEN }}
       vite_coze_bot_id: ${{ secrets.VITE_COZE_BOT_ID }}
-
+  secret-scan:
+    name: Secret Scan (Source)
+    uses: ./.github/workflows/secret-scan.yml
+    with:
+      ref: ${{ github.ref }}
+      full_repo_name: ${{ github.repository }}
   bundle-scan:
     name: Bundle Secret Scan (dist)
     needs: build
@@ -37,7 +35,6 @@ jobs:
       vite_supabase_anon_key: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
       vite_mapbox_token: ${{ secrets.VITE_MAPBOX_TOKEN }}
       vite_coze_bot_id: ${{ secrets.VITE_COZE_BOT_ID }}
-
   deploy:
     name: Cloudflare Deploy Status
     needs: [build, bundle-scan]
