@@ -9,7 +9,7 @@ See [docs/CHATFLOW_SETUP.md](docs/CHATFLOW_SETUP.md) for Coze configuration.
 ## File Structure
 
 ```text
-illiniguide---uiuc-knowledge-base/
+app/
 |-- docs/
 |   `-- diagrams/
 |-- functions/

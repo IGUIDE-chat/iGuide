@@ -11,9 +11,9 @@
     ```
 
 2.  **安装依赖：**
-    主应用程序代码位于 `illiniguide---uiuc-knowledge-base/` 目录中。
+    主应用程序代码位于 `app/` 目录中。
     ```bash
-    cd illiniguide---uiuc-knowledge-base
+    cd app
     pnpm install
     ```
 
@@ -34,7 +34,7 @@
     *(使用前缀，如 `fix/`, `feat/`, `docs/`, `refactor/`)*
 
 2.  **进行更改**：
-    - 遵循 `illiniguide---uiuc-knowledge-base/docs/FILE_RULES.md` 中的文件结构规则（如果有）或参考 `README.md`。
+    - 遵循 `app/docs/FILE_RULES.md` 中的文件结构规则（如果有）或参考 `README.md`。
     - 组件放入 `src/components`。
     - 服务放入 `src/services`。
 

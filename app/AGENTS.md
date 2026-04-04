@@ -1,7 +1,7 @@
 # AGENTS.md
 
 This file is the canonical short-form rule set for agents working in
-`illiniguide---uiuc-knowledge-base/`.
+`app/`.
 
 If this file and another project document disagree, follow this file first.
 
@@ -12,7 +12,7 @@ For fuller explanations, see:
 
 ## Scope
 
-- This file applies to `illiniguide---uiuc-knowledge-base/`.
+- This file applies to `app/`.
 - The active runtime entry is `src/index.tsx`.
 - The only active app-composition file is `src/App.tsx`.
 

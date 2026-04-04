@@ -1,7 +1,7 @@
 # Project File Rules
 
 This document is the practical file-placement contract for
-`illiniguide---uiuc-knowledge-base/`.
+`app/`.
 
 It should stay aligned with:
 
@@ -27,7 +27,7 @@ At repository root (`Ask/`), the business-facing directories currently are:
 
 - `api-gateway/`
 - `data_collection/`
-- `illiniguide---uiuc-knowledge-base/`
+- `app/`
 
 Do not add hidden tooling folders such as `.agent/`, `.claude/`, or `.gemini/`
 to business structure documentation.
@@ -47,7 +47,7 @@ The repository should prefer one obvious home for new code over speculative
 ## 3) Current Canonical App Structure
 
 ```text
-illiniguide---uiuc-knowledge-base/
+app/
 |-- docs/
 |-- functions/
 |   `-- api/

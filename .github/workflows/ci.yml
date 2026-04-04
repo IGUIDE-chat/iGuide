@@ -37,7 +37,7 @@ jobs:
 
           for pattern in "${PATTERNS[@]}"; do
             matches=$(grep -rn --include="*.ts" --include="*.tsx" --include="*.js" \
-              "$pattern" illiniguide---uiuc-knowledge-base/src/ 2>/dev/null || true)
+              "$pattern" app/src/ 2>/dev/null || true)
             if [ -n "$matches" ]; then
               echo "❌ Found forbidden VITE_ prefixed key: $pattern"
               echo "$matches"
@@ -71,7 +71,7 @@ jobs:
 
           for pattern in "${PATTERNS[@]}"; do
             matches=$(grep -rEn --include="*.ts" --include="*.tsx" --include="*.js" --include="*.json" \
-              "$pattern" illiniguide---uiuc-knowledge-base/src/ 2>/dev/null || true)
+              "$pattern" app/src/ 2>/dev/null || true)
             # Exclude .env files and example files
             matches=$(echo "$matches" | grep -v "\.env" | grep -v "example" || true)
             if [ -n "$matches" ]; then
@@ -98,7 +98,7 @@ jobs:
     needs: secret-scan
     defaults:
       run:
-        working-directory: illiniguide---uiuc-knowledge-base
+        working-directory: app
 
     steps:
       - uses: actions/checkout@v4
@@ -107,7 +107,7 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-          cache-dependency-path: illiniguide---uiuc-knowledge-base/package-lock.json
+          cache-dependency-path: app/package-lock.json
 
       - name: Install dependencies
         run: pnpm ci
@@ -133,7 +133,7 @@ jobs:
     needs: check
     defaults:
       run:
-        working-directory: illiniguide---uiuc-knowledge-base
+        working-directory: app
 
     steps:
       - uses: actions/checkout@v4
@@ -142,7 +142,7 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-          cache-dependency-path: illiniguide---uiuc-knowledge-base/package-lock.json
+          cache-dependency-path: app/package-lock.json
 
       - name: Install dependencies
         run: pnpm ci

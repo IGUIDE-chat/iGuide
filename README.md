@@ -12,10 +12,10 @@ Welcome to the IlliniGuide project repository. This project is a comprehensive k
 
 This repository is structured into two primary directories, separating the application code from data processing scripts.
 
-- **`illiniguide---uiuc-knowledge-base/`**: The core web application codebase. This contains the React frontend, Cloudflare Pages functions, and associated documentation.
+- **`app/`**: The core web application codebase. This contains the React frontend, Cloudflare Pages functions, and associated documentation.
 - **`data_collection/`**: Contains Python scripts and raw data files used for scraping, cleaning, and aggregating UIUC-related information for the knowledge base.
 
-### 🚀 Main Application (`illiniguide---uiuc-knowledge-base/`)
+### 🚀 Main Application (`app/`)
 
 The main application is a modern web app built with React 19, TypeScript, Vite, and Tailwind CSS. It uses Supabase for backend services and Cloudflare Pages for deployment and serverless functions.
 
@@ -26,7 +26,7 @@ To run the application locally:
 1. **Navigate to the project directory:**
 
    ```bash
-   cd illiniguide---uiuc-knowledge-base
+   cd app
    ```
 2. **Install dependencies:**
 
@@ -45,7 +45,7 @@ To run the application locally:
 
 **Architecture Diagram**
 
-![Architecture Diagram](./illiniguide---uiuc-knowledge-base/docs/diagrams/architecture_v3.jpg)
+![Architecture Diagram](./app/docs/diagrams/architecture_v3.jpg)
 
 We follow a strict file structure to keep the codebase maintainable. All source code resides in the `src/` directory.
 
@@ -82,7 +82,7 @@ We follow a strict file structure to keep the codebase maintainable. All source 
 2. **CSS:** Use Tailwind utility classes. Avoid inline styles.
 3. **New Files:** Place new components in `src/components/` and services in `src/services/`.
 
-For detailed file rules, refer to `illiniguide---uiuc-knowledge-base/docs/FILE_RULES.md` (if available) or strict adherence to the folders above.
+For detailed file rules, refer to `app/docs/FILE_RULES.md` (if available) or strict adherence to the folders above.
 
 ### 📊 Data Collection (`data_collection/`)
 
@@ -94,7 +94,7 @@ Scripts for populating the knowledge base.
 
 ### 📚 Documentation
 
-Detailed documentation can be found in the `illiniguide---uiuc-knowledge-base/docs/` folder, including:
+Detailed documentation can be found in the `app/docs/` folder, including:
 
 - `CHATFLOW_SETUP.md`: Guide for configuring the Coze/Chat workflow.
 - `Setup Guides`: Detailed environment setup.
@@ -109,10 +109,10 @@ Detailed documentation can be found in the `illiniguide---uiuc-knowledge-base/do
 
 本仓库分为两个主要目录，将应用程序代码与数据处理脚本分开。
 
-- **`illiniguide---uiuc-knowledge-base/`**: 核心 Web 应用程序代码库。包含 React 前端、Cloudflare Pages 函数以及相关文档。
+- **`app/`**: 核心 Web 应用程序代码库。包含 React 前端、Cloudflare Pages 函数以及相关文档。
 - **`data_collection/`**: 包含用于抓取、清理和汇总 UIUC 相关信息的 Python 脚本和原始数据文件，用于构建知识库。
 
-### 🚀 主应用程序 (`illiniguide---uiuc-knowledge-base/`)
+### 🚀 主应用程序 (`app/`)
 
 主应用程序是一个基于 React 19、TypeScript、Vite 和 Tailwind CSS 构建的现代 Web 应用。它使用 Supabase 作为后端服务，并使用 Cloudflare Pages 进行部署和无服务器函数支持。
 
@@ -123,7 +123,7 @@ Detailed documentation can be found in the `illiniguide---uiuc-knowledge-base/do
 1. **进入项目目录：**
 
    ```bash
-   cd illiniguide---uiuc-knowledge-base
+   cd app
    ```
 2. **安装依赖：**
 
@@ -142,7 +142,7 @@ Detailed documentation can be found in the `illiniguide---uiuc-knowledge-base/do
 
 **架构图 (Architecture Diagram)**
 
-![架构图](./illiniguide---uiuc-knowledge-base/docs/diagrams/architecture_v3.jpg)
+![架构图](./app/docs/diagrams/architecture_v3.jpg)
 
 我们遵循严格的文件结构以保持代码库的可维护性。所有源代码都位于 `src/` 目录下。
 
@@ -179,7 +179,7 @@ Detailed documentation can be found in the `illiniguide---uiuc-knowledge-base/do
 2. **CSS：** 使用 Tailwind 工具类。避免内联样式。
 3. **新文件：** 将新组件放在 `src/components/`，服务放在 `src/services/`。
 
-有关详细的文件规则，请参阅 `illiniguide---uiuc-knowledge-base/docs/FILE_RULES.md`（如果有）或严格遵守上述文件夹结构。
+有关详细的文件规则，请参阅 `app/docs/FILE_RULES.md`（如果有）或严格遵守上述文件夹结构。
 
 ### 🗄️ 数据库与数据管理 (Database & Data Management)
 
@@ -205,7 +205,7 @@ Detailed documentation can be found in the `illiniguide---uiuc-knowledge-base/do
 
 ### 📚 Documentation
 
-详细文档可以在 `illiniguide---uiuc-knowledge-base/docs/` 文件夹中找到，包括：
+详细文档可以在 `app/docs/` 文件夹中找到，包括：
 
 - `CHATFLOW_SETUP.md`: 配置 Coze/Chat 工作流的指南。
 - `Setup Guides`: 详细的环境设置指南。
