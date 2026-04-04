@@ -20,7 +20,7 @@
     "sync:qmd": "npx tsx scripts/sync-qmd-index.ts",
     "typecheck": "tsc --noEmit",
     "validate:dorm-data": "npx tsx scripts/validate-dorm-data.ts",
-    "postinstall": "pnpm run submodule:init && git config --global include.path ../.gitconfig"
+    "postinstall": "pnpm run submodule:init && git config --local include.path ../.gitconfig"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",
