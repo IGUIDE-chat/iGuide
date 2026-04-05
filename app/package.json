@@ -23,6 +23,7 @@
     "postinstall": "pnpm run submodule:init && git config --local include.path ../.gitconfig"
   },
   "dependencies": {
+    "@assistant-ui/react": "^0.12.23",
     "@headlessui/react": "^2.2.9",
     "@supabase/supabase-js": "^2.101.1",
     "framer-motion": "^12.38.0",
@@ -41,6 +42,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260405.1",
     "@eslint/js": "^9.39.4",
+    "@tailwindcss/postcss": "^4.2.2",
     "@types/node": "^25.5.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
