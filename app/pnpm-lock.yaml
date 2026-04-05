@@ -52,10 +52,10 @@ importers:
         version: 4.0.1
     devDependencies:
       '@cloudflare/workers-types':
-        specifier: ^4.20260404.1
-        version: 4.20260404.1
+        specifier: ^4.20260405.1
+        version: 4.20260405.1
       '@eslint/js':
-        specifier: ^9.38.0
+        specifier: ^9.39.4
         version: 9.39.4
       '@types/node':
         specifier: ^25.5.2
@@ -76,7 +76,7 @@ importers:
         specifier: ^17.4.0
         version: 17.4.0
       eslint:
-        specifier: ^9.39.0
+        specifier: ^9.39.4
         version: 9.39.4(jiti@2.6.1)
       eslint-config-prettier:
         specifier: ^10.1.8
@@ -106,7 +106,7 @@ importers:
         specifier: ^3.8.1
         version: 3.8.1
       prettier-plugin-tailwindcss:
-        specifier: ^0.7.1
+        specifier: ^0.7.2
         version: 0.7.2(prettier@3.8.1)
       puppeteer:
         specifier: ^24.40.0
@@ -130,7 +130,7 @@ importers:
         specifier: ~5.8.3
         version: 5.8.3
       typescript-eslint:
-        specifier: ^8.46.1
+        specifier: ^8.58.0
         version: 8.58.0(eslint@9.39.4(jiti@2.6.1))(typescript@5.8.3)
       vite:
         specifier: ^6.4.1
@@ -225,8 +225,8 @@ packages:
     resolution: {integrity: sha512-LwdZHpScM4Qz8Xw2iKSzS+cfglZzJGvofQICy7W7v4caru4EaAmyUuO6BGrbyQ2mYV11W0U8j5mBhd14dd3B0A==}
     engines: {node: '>=6.9.0'}
 
-  '@cloudflare/workers-types@4.20260404.1':
-    resolution: {integrity: sha512-jfZfktdn3D0ceA59i4lkMgPUR9p5Wd6trtNLQR1RTgF59iVt9/yegkiEZv0TQvJPXlmQOU1D0pAYz7cMztqErg==}
+  '@cloudflare/workers-types@4.20260405.1':
+    resolution: {integrity: sha512-PokTmySa+D6MY01R1UfYH48korsN462NK/fl3aw47Hg7XuLuSo/RTpjT0vtWaJhJoFY5tHGOBBIbDcIc8wltLg==}
 
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -1134,8 +1134,8 @@ packages:
     resolution: {integrity: sha512-P8BjAsXvZS+VIDUI11hHCQEv74YT67YUi5JJFNWIqL235sBmjX4+qx9Muvls5ivyNENctx46xQLQ3aTuE7ssaQ==}
     engines: {node: '>=6'}
 
-  caniuse-lite@1.0.30001784:
-    resolution: {integrity: sha512-WU346nBTklUV9YfUl60fqRbU5ZqyXlqvo1SgigE1OAXK5bFL8LL9q1K7aap3N739l4BvNqnkm3YrGHiY9sfUQw==}
+  caniuse-lite@1.0.30001785:
+    resolution: {integrity: sha512-blhOL/WNR+Km1RI/LCVAvA73xplXA7ZbjzI4YkMK9pa6T/P3F2GxjNpEkyw5repTw9IvkyrjyHpwjnhZ5FOvYQ==}
 
   ccount@2.0.1:
     resolution: {integrity: sha512-eyrF0jiFpY+3drT6383f1qhkbGsLSifNAjA61IUjZjmLCWjItY6LB9ft9YhoDgwfmclB2zhu51Lc7+95b8NRAg==}
@@ -3330,7 +3330,7 @@ snapshots:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.28.5
 
-  '@cloudflare/workers-types@4.20260404.1': {}
+  '@cloudflare/workers-types@4.20260405.1': {}
 
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
@@ -4081,7 +4081,7 @@ snapshots:
   autoprefixer@10.4.27(postcss@8.5.8):
     dependencies:
       browserslist: 4.28.2
-      caniuse-lite: 1.0.30001784
+      caniuse-lite: 1.0.30001785
       fraction.js: 5.3.4
       picocolors: 1.1.1
       postcss: 8.5.8
@@ -4151,7 +4151,7 @@ snapshots:
   browserslist@4.28.2:
     dependencies:
       baseline-browser-mapping: 2.10.14
-      caniuse-lite: 1.0.30001784
+      caniuse-lite: 1.0.30001785
       electron-to-chromium: 1.5.331
       node-releases: 2.0.37
       update-browserslist-db: 1.2.3(browserslist@4.28.2)
@@ -4186,7 +4186,7 @@ snapshots:
 
   callsites@3.1.0: {}
 
-  caniuse-lite@1.0.30001784: {}
+  caniuse-lite@1.0.30001785: {}
 
   ccount@2.0.1: {}
 
