@@ -24,10 +24,6 @@ export const TypewriterMarkdown: React.FC<TypewriterMarkdownProps> = ({
   isStreaming = false,
   components,
 }) => {
-  console.log(
-    `[Typewriter] Render: isStreaming=${isStreaming}, contentLen=${content?.length}`
-  )
-
   return (
     <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
       {content || ''}
