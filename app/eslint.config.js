@@ -3,7 +3,7 @@ import globals from 'globals'
 import react from 'eslint-plugin-react'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
-import tailwind from 'eslint-plugin-tailwindcss'
+import betterTailwindcss from 'eslint-plugin-better-tailwindcss'
 import tseslint from 'typescript-eslint'
 import eslintConfigPrettier from 'eslint-config-prettier'
 
@@ -27,20 +27,25 @@ export default tseslint.config(
       },
       ...react.configs.flat.recommended.languageOptions,
     },
-    settings: {
-      react: {
-        version: 'detect',
-      },
-    },
     plugins: {
       react,
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
-      tailwindcss: tailwind,
+      'better-tailwindcss': betterTailwindcss,
+    },
+    settings: {
+      react: {
+        version: 'detect',
+      },
+      'better-tailwindcss': {
+        tw4: true,
+        entryPoint: './src/index.css',
+      },
     },
     rules: {
       ...react.configs.flat.recommended.rules,
       ...reactHooks.configs.recommended.rules,
+      ...betterTailwindcss.configs['stylistic-warn'].rules,
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },
@@ -49,11 +54,6 @@ export default tseslint.config(
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
       'react/jsx-uses-react': 'off',
-      // Tailwind
-      'tailwindcss/classnames-order': 'warn',
-      'tailwindcss/enforces-shorthand': 'warn',
-      'tailwindcss/no-contradicting-classname': 'warn',
-      'tailwindcss/no-custom-classname': 'off',
       // TypeScript
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-vars': [
