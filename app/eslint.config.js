@@ -46,6 +46,7 @@ export default tseslint.config(
       ...react.configs.flat.recommended.rules,
       ...reactHooks.configs.recommended.rules,
       ...betterTailwindcss.configs['stylistic-warn'].rules,
+      'better-tailwindcss/enforce-consistent-line-wrapping': ['warn', { strictness: 'loose' }],
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },
