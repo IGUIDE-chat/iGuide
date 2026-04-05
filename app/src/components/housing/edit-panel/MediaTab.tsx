@@ -45,17 +45,24 @@ const ImageChip: React.FC<{
   onClick?: () => void
 }> = ({ url, onRemove, onClick }) => (
   <div
-    className="group relative h-16 w-16 shrink-0 cursor-pointer overflow-hidden rounded-lg border border-gray-200 bg-gray-50"
+    className="
+      group h-16 w-16 rounded-lg border-gray-200 bg-gray-50 relative shrink-0
+      cursor-pointer overflow-hidden border
+    "
     onClick={onClick}
   >
-    <img src={url} alt="" className="h-full w-full object-cover" />
+    <img src={url} alt="" className="size-full object-cover" />
     <button
       type="button"
       onClick={(e) => {
         e.stopPropagation()
         onRemove()
       }}
-      className="absolute -right-1 -top-1 rounded-full bg-red-500 p-0.5 text-white opacity-0 transition-opacity group-hover:opacity-100"
+      className="
+        -right-1 -top-1 bg-red-500 p-0.5 text-white absolute rounded-full
+        opacity-0 transition-opacity
+        group-hover:opacity-100
+      "
     >
       <X size={10} />
     </button>
@@ -83,7 +90,7 @@ const MultiImageField: React.FC<{
   return (
     <Field label={label}>
       {urls.length > 0 && (
-        <div className="mb-2 flex flex-wrap gap-2">
+        <div className="mb-2 gap-2 flex flex-wrap">
           {urls.map((url, i) => (
             <ImageChip
               key={i}
@@ -93,7 +100,7 @@ const MultiImageField: React.FC<{
           ))}
         </div>
       )}
-      <div className="flex gap-2">
+      <div className="gap-2 flex">
         <input
           type="text"
           value={inputValue}
@@ -107,7 +114,12 @@ const MultiImageField: React.FC<{
           className={inputCls}
           placeholder="https://..."
         />
-        <label className="flex flex-shrink-0 cursor-pointer items-center justify-center gap-1 rounded-lg border border-gray-300 bg-gray-100 px-3 text-gray-700 transition-colors hover:bg-gray-200">
+        <label className="
+          gap-1 rounded-lg border-gray-300 bg-gray-100 px-3 text-gray-700
+          hover:bg-gray-200
+          flex shrink-0 cursor-pointer items-center justify-center border
+          transition-colors
+        ">
           {form.uploadingImage ? (
             <Loader2 size={14} className="animate-spin" />
           ) : (
@@ -132,7 +144,10 @@ const MultiImageField: React.FC<{
           <button
             type="button"
             onClick={() => addUrl(inputValue)}
-            className="flex flex-shrink-0 items-center justify-center rounded-lg bg-illini-blue px-2 text-white"
+            className="
+              rounded-lg bg-illini-blue px-2 text-white flex shrink-0
+              items-center justify-center
+            "
           >
             <Plus size={14} />
           </button>
@@ -164,7 +179,7 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
   return (
     <>
       <Field label={t.labels.imageUrl}>
-        <div className="flex gap-2">
+        <div className="gap-2 flex">
           <input
             type="text"
             value={form.imageUrl || ''}
@@ -172,7 +187,12 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
             className={inputCls}
             placeholder="https://..."
           />
-          <label className="flex flex-shrink-0 cursor-pointer items-center justify-center gap-1 rounded-lg border border-gray-300 bg-gray-100 px-3 text-gray-700 transition-colors hover:bg-gray-200">
+          <label className="
+            gap-1 rounded-lg border-gray-300 bg-gray-100 px-3 text-gray-700
+            hover:bg-gray-200
+            flex shrink-0 cursor-pointer items-center justify-center border
+            transition-colors
+          ">
             {form.uploadingImage ? (
               <Loader2 size={16} className="animate-spin" />
             ) : (
@@ -243,19 +263,28 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
             return (
               <div
                 key={index}
-                className="overflow-hidden rounded-lg border border-gray-200 bg-gray-50"
+                className="
+                  rounded-lg border-gray-200 bg-gray-50 overflow-hidden border
+                "
               >
                 {/* Collapsed header — always visible */}
-                <div className="flex items-center gap-0">
+                <div className="gap-0 flex items-center">
                   {/* Reorder buttons — separate from toggle zone */}
-                  <div className="flex shrink-0 flex-col border-r border-gray-200">
+                  <div className="
+                    border-gray-200 flex shrink-0 flex-col border-r
+                  ">
                     <button
                       type="button"
                       onClick={() => {
                         if (index > 0) moveFloorPlan(index, index - 1)
                       }}
                       disabled={index === 0}
-                      className="flex h-6 w-8 items-center justify-center text-gray-400 transition-colors hover:bg-blue-50 hover:text-illini-blue disabled:cursor-not-allowed disabled:opacity-20"
+                      className="
+                        h-6 w-8 text-gray-400
+                        hover:bg-blue-50 hover:text-illini-blue
+                        flex items-center justify-center transition-colors
+                        disabled:cursor-not-allowed disabled:opacity-20
+                      "
                       title={form.language === 'zh' ? '上移' : 'Move up'}
                     >
                       <ChevronUp size={14} strokeWidth={2.5} />
@@ -267,7 +296,12 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                           moveFloorPlan(index, index + 1)
                       }}
                       disabled={index === form.normalizedFloorPlans.length - 1}
-                      className="flex h-6 w-8 items-center justify-center text-gray-400 transition-colors hover:bg-blue-50 hover:text-illini-blue disabled:cursor-not-allowed disabled:opacity-20"
+                      className="
+                        h-6 w-8 text-gray-400
+                        hover:bg-blue-50 hover:text-illini-blue
+                        flex items-center justify-center transition-colors
+                        disabled:cursor-not-allowed disabled:opacity-20
+                      "
                       title={form.language === 'zh' ? '下移' : 'Move down'}
                     >
                       <ChevronDown size={14} strokeWidth={2.5} />
@@ -275,7 +309,11 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                   </div>
                   {/* Toggle expand zone */}
                   <div
-                    className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 px-3 py-2.5 transition-colors hover:bg-gray-100"
+                    className="
+                      min-w-0 gap-2 px-3 py-2.5
+                      hover:bg-gray-100
+                      flex flex-1 cursor-pointer items-center transition-colors
+                    "
                     onClick={() => toggleExpand(index)}
                   >
                     <div className="min-w-0 flex-1">
@@ -284,16 +322,20 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                       </span>
                       <div className="mt-0.5 min-w-0">
                         {plan.officialName && (
-                          <div className="truncate text-xs font-semibold text-gray-700">
+                          <div className="
+                            text-xs font-semibold text-gray-700 truncate
+                          ">
                             {plan.officialName}
                           </div>
                         )}
-                        <span className="block truncate text-xs text-gray-400">
+                        <span className="text-xs text-gray-400 block truncate">
                           {preview}
                         </span>
                       </div>
                       {hasPublishedPrice(plan.price) && (
-                        <span className="ml-2 text-xs font-medium text-illini-blue">
+                        <span className="
+                          ml-2 text-xs font-medium text-illini-blue
+                        ">
                           ${plan.price.toLocaleString()}/yr
                         </span>
                       )}
@@ -312,23 +354,32 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                         )
                           setExpandedIndex(expandedIndex - 1)
                       }}
-                      className="shrink-0 text-red-400 hover:text-red-600"
+                      className="
+                        text-red-400
+                        hover:text-red-600
+                        shrink-0
+                      "
                     >
                       <Trash2 size={14} />
                     </button>
                     <ChevronDown
                       size={16}
-                      className={`shrink-0 text-gray-400 transition-transform duration-200 ${
+                      className={`
+                        text-gray-400 shrink-0 transition-transform duration-200
+                        ${
                         isExpanded ? 'rotate-180' : ''
-                      }`}
+                      }
+                      `}
                     />
                   </div>
                 </div>
 
                 {/* Expanded body */}
                 {isExpanded && (
-                  <div className="space-y-3 border-t border-gray-200 px-3 pb-3 pt-1">
-                    <div className="grid grid-cols-2 gap-2">
+                  <div className="
+                    space-y-3 border-gray-200 px-3 pb-3 pt-1 border-t
+                  ">
+                    <div className="gap-2 grid grid-cols-2">
                       <Field label="Official Room Name">
                         <input
                           type="text"
@@ -567,7 +618,10 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
               // Auto-expand the new plan
               setExpandedIndex(form.normalizedFloorPlans.length)
             }}
-            className="flex items-center gap-1 text-xs text-illini-blue hover:underline"
+            className="
+              gap-1 text-xs text-illini-blue flex items-center
+              hover:underline
+            "
           >
             <Plus size={12} /> {t.actions.addFloorPlan}
           </button>

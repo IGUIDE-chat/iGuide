@@ -78,9 +78,17 @@ class MapErrorBoundary extends Component<
 
     if (hasError) {
       return (
-        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
-          <div className="mx-4 max-w-md rounded-2xl bg-white p-8 text-center shadow-xl">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
+        <div className="
+          from-gray-50 to-gray-100 flex size-full items-center justify-center
+          bg-linear-to-br
+        ">
+          <div className="
+            mx-4 max-w-md rounded-2xl bg-white p-8 shadow-xl text-center
+          ">
+            <div className="
+              mb-4 h-16 w-16 bg-red-100 mx-auto flex items-center justify-center
+              rounded-full
+            ">
               <svg
                 className="h-8 w-8 text-red-500"
                 fill="none"
@@ -104,7 +112,11 @@ class MapErrorBoundary extends Component<
             <button
               onClick={() => window.location.reload()}
               type="button"
-              className="rounded-xl bg-illini-blue px-6 py-2 font-semibold text-white transition-colors hover:bg-illini-blue/90"
+              className="
+                rounded-xl bg-illini-blue px-6 py-2 font-semibold text-white
+                hover:bg-illini-blue/90
+                transition-colors
+              "
             >
               Reload page
             </button>
@@ -451,8 +463,13 @@ const DormMap: React.FC<DormMapProps> = ({
 
   if (!MAPBOX_TOKEN) {
     return (
-      <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
-        <div className="mx-4 max-w-md rounded-2xl bg-white p-8 text-center shadow-xl">
+      <div className="
+        from-gray-50 to-gray-100 flex size-full items-center justify-center
+        bg-linear-to-br
+      ">
+        <div className="
+          mx-4 max-w-md rounded-2xl bg-white p-8 shadow-xl text-center
+        ">
           <h3 className="mb-2 text-lg font-bold text-gray-900">
             {language === 'zh' ? '地图不可用' : 'Map unavailable'}
           </h3>
@@ -467,7 +484,7 @@ const DormMap: React.FC<DormMapProps> = ({
   }
 
   return (
-    <div ref={containerRef} className="relative h-full w-full bg-gray-50">
+    <div ref={containerRef} className="bg-gray-50 relative size-full">
       <Map
         ref={mapRef}
         onLoad={onMapLoad}
@@ -547,13 +564,25 @@ const DormMap: React.FC<DormMapProps> = ({
           {areMapImagesReady && <Layer {...(UNCLUSTERED_LAYER as any)} />}
         </Source>
 
-        <div className="absolute left-4 top-4 z-10 flex min-w-[140px] flex-col gap-2 rounded-lg border border-slate-200/50 bg-white/90 p-3 shadow-lg backdrop-blur-sm">
-          <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-500">
+        <div className="
+          left-4 top-4 gap-2 rounded-lg border-slate-200/50 bg-white/90 p-3
+          shadow-lg backdrop-blur-sm absolute z-10 flex min-w-[140px] flex-col
+          border
+        ">
+          <div className="
+            mb-1 text-xs font-semibold tracking-wider text-slate-500 uppercase
+          ">
             {language === 'zh' ? '地图图层' : 'Map Layers'}
           </div>
 
-          <label className="group flex cursor-pointer items-center justify-between">
-            <span className="text-sm font-medium text-slate-700 transition-colors group-hover:text-illini-blue">
+          <label className="
+            group flex cursor-pointer items-center justify-between
+          ">
+            <span className="
+              text-sm font-medium text-slate-700
+              group-hover:text-illini-blue
+              transition-colors
+            ">
               {language === 'zh' ? '区域' : 'Zones'}
             </span>
             <div className="relative inline-flex cursor-pointer items-center">
@@ -563,12 +592,29 @@ const DormMap: React.FC<DormMapProps> = ({
                 checked={showZones}
                 onChange={(e) => setShowZones(e.target.checked)}
               />
-              <div className="peer h-4 w-7 rounded-full bg-slate-300 after:absolute after:left-[2px] after:top-[2px] after:h-3 after:w-3 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-illini-orange peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none" />
+              <div className="
+                peer h-4 w-7 bg-slate-300
+                after:h-3 after:w-3 after:border-gray-300 after:bg-white
+                peer-checked:bg-illini-orange
+                peer-checked:after:border-white
+                rounded-full
+                peer-focus:outline-none
+                after:absolute after:top-[2px] after:left-[2px]
+                after:rounded-full after:border after:transition-all
+                after:content-['']
+                peer-checked:after:translate-x-full
+              " />
             </div>
           </label>
 
-          <label className="group flex cursor-pointer items-center justify-between">
-            <span className="text-sm font-medium text-slate-700 transition-colors group-hover:text-illini-blue">
+          <label className="
+            group flex cursor-pointer items-center justify-between
+          ">
+            <span className="
+              text-sm font-medium text-slate-700
+              group-hover:text-illini-blue
+              transition-colors
+            ">
               {language === 'zh' ? '地标' : 'Landmarks'}
             </span>
             <div className="relative inline-flex cursor-pointer items-center">
@@ -578,7 +624,18 @@ const DormMap: React.FC<DormMapProps> = ({
                 checked={showLandmarks}
                 onChange={(e) => setShowLandmarks(e.target.checked)}
               />
-              <div className="peer h-4 w-7 rounded-full bg-slate-300 after:absolute after:left-[2px] after:top-[2px] after:h-3 after:w-3 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-illini-orange peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none" />
+              <div className="
+                peer h-4 w-7 bg-slate-300
+                after:h-3 after:w-3 after:border-gray-300 after:bg-white
+                peer-checked:bg-illini-orange
+                peer-checked:after:border-white
+                rounded-full
+                peer-focus:outline-none
+                after:absolute after:top-[2px] after:left-[2px]
+                after:rounded-full after:border after:transition-all
+                after:content-['']
+                peer-checked:after:translate-x-full
+              " />
             </div>
           </label>
         </div>
@@ -633,7 +690,7 @@ const PopupDormPreview: React.FC<{
 
   return (
     <div
-      className="w-56 cursor-pointer [touch-action:manipulation]"
+      className="w-56 cursor-pointer touch-manipulation"
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
@@ -657,7 +714,7 @@ const PopupDormPreview: React.FC<{
         <img
           src={dorm.imageUrl}
           alt={dorm.name}
-          className="h-full w-full object-cover"
+          className="size-full object-cover"
           onError={(e) => {
             e.currentTarget.src =
               'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400'
@@ -666,32 +723,36 @@ const PopupDormPreview: React.FC<{
       </div>
       <div className="p-3">
         <div className="mb-1 flex items-center justify-between">
-          <h4 className="flex-1 truncate text-sm font-bold text-gray-900">
+          <h4 className="text-sm font-bold text-gray-900 flex-1 truncate">
             {isChinese && dorm.name_zh ? dorm.name_zh : dorm.name}
           </h4>
           {(() => {
             const housingTypeMeta = getHousingTypeMeta(dorm.housingType)
             return (
               <span
-                className={`ml-2 flex-shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${housingTypeMeta.badgeClassName}`}
+                className={`
+                  ml-2 px-1.5 py-0.5 font-semibold shrink-0 rounded-full
+                  text-[10px]
+                  ${housingTypeMeta.badgeClassName}
+                `}
               >
                 {housingTypeMeta.shortLabel}
               </span>
             )
           })()}
         </div>
-        <div className="mb-2 flex items-center gap-2 text-[11px] text-gray-500">
+        <div className="mb-2 gap-2 text-gray-500 flex items-center text-[11px]">
           {dorm.ac && <span>{popupT.ac}</span>}
           {dorm.dining === 'inside' && <span>{popupT.dining}</span>}
         </div>
         <div className="flex items-center justify-between">
           <span className="text-base font-bold text-gray-900">
             {formatPopupPrice(dorm.price)}
-            <span className="ml-0.5 text-[10px] font-normal text-gray-400">
+            <span className="ml-0.5 font-normal text-gray-400 text-[10px]">
               {popupT.perSem}
             </span>
           </span>
-          <span className="text-[11px] font-semibold text-blue-600">
+          <span className="font-semibold text-blue-600 text-[11px]">
             {popupT.viewDetails}
           </span>
         </div>

@@ -54,16 +54,23 @@ const SortDropdownMobile: React.FC<{
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className={`flex h-10 w-10 items-center justify-center rounded-full border transition-all duration-200 ${
+        className={`
+          h-10 w-10 flex items-center justify-center rounded-full border
+          transition-all duration-200
+          ${
           open
             ? 'border-illini-blue/50 bg-illini-blue/10 text-illini-blue'
             : 'border-gray-200 bg-white text-gray-700'
-        }`}
+        }
+        `}
       >
         <ArrowUpDown size={18} strokeWidth={2} />
       </button>
       {open && (
-        <div className="absolute right-0 z-50 mt-2 w-36 rounded-xl border border-gray-100 bg-white py-1 shadow-lg">
+        <div className="
+          right-0 mt-2 w-36 rounded-xl border-gray-100 bg-white py-1 shadow-lg
+          absolute z-50 border
+        ">
           {SORT_OPTIONS.map((o) => (
             <button
               key={o.value}
@@ -72,7 +79,15 @@ const SortDropdownMobile: React.FC<{
                 onSortChange(o.value)
                 setOpen(false)
               }}
-              className={`w-full px-4 py-2 text-left text-sm transition-colors ${sortBy === o.value ? 'bg-illini-blue/5 font-medium text-illini-blue' : 'text-gray-600 hover:bg-gray-50'}`}
+              className={`
+                px-4 py-2 text-sm w-full text-left transition-colors
+                ${sortBy === o.value ? `
+                  bg-illini-blue/5 font-medium text-illini-blue
+                ` : `
+                  text-gray-600
+                  hover:bg-gray-50
+                `}
+              `}
             >
               {o.label}
             </button>
@@ -280,12 +295,21 @@ export const Layout: React.FC<LayoutProps> = ({
   ]
 
   const mobileHeader = isHousingMobileHeader ? (
-    <div className="flex min-w-0 flex-1 items-center gap-2">
-      <div className="relative min-w-0 flex-1">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+    <div className="min-w-0 gap-2 flex flex-1 items-center">
+      <div className="min-w-0 relative flex-1">
+        <Search className="
+          left-3 h-4 w-4 text-gray-400 pointer-events-none absolute top-1/2
+          -translate-y-1/2
+        " />
         <input
           type="text"
-          className="block h-10 w-full rounded-full border border-gray-200 bg-gray-50/50 pl-9 pr-3 text-sm leading-5 placeholder-gray-400 shadow-sm transition-all focus:border-black/20 focus:outline-none focus:ring-2 focus:ring-black/5"
+          className="
+            h-10 border-gray-200 bg-gray-50/50 pl-9 pr-3 text-sm leading-5
+            placeholder-gray-400 shadow-sm
+            focus:border-black/20 focus:ring-black/5
+            block w-full rounded-full border transition-all
+            focus:ring-2 focus:outline-none
+          "
           placeholder={
             language === 'zh' ? '输入搜索宿舍...' : 'Type to search dorms...'
           }
@@ -298,16 +322,27 @@ export const Layout: React.FC<LayoutProps> = ({
           type="button"
           aria-label={language === 'zh' ? '筛选' : 'Filters'}
           onClick={() => setIsFilterModalOpen(true)}
-          className={`flex h-10 w-10 items-center justify-center rounded-full border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-illini-orange/20 ${
+          className={`
+            h-10 w-10
+            focus:ring-illini-orange/20
+            flex items-center justify-center rounded-full border transition-all
+            duration-200
+            focus:ring-2 focus:outline-none
+            ${
             hasActiveDormFilters
               ? 'border-illini-orange/40 bg-illini-orange/10 text-illini-orange'
               : 'border-gray-200 bg-white text-gray-700'
-          } `}
+          }
+          `}
         >
           <SlidersHorizontal size={18} strokeWidth={2} />
         </button>
         {hasActiveDormFilters && (
-          <div className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full border-2 border-white bg-illini-orange text-[10px] font-bold text-white shadow-sm">
+          <div className="
+            -right-1.5 -top-1.5 h-5 w-5 border-white bg-illini-orange font-bold
+            text-white shadow-sm absolute flex items-center justify-center
+            rounded-full border-2 text-[10px]
+          ">
             {activeDormFilterCount}
           </div>
         )}
@@ -325,7 +360,12 @@ export const Layout: React.FC<LayoutProps> = ({
               : 'List'
         }
         onClick={() => setViewMode(viewMode === 'list' ? 'map' : 'list')}
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 transition-all duration-200 active:scale-95"
+        className="
+          h-10 w-10 border-gray-200 bg-white text-gray-700 flex shrink-0
+          items-center justify-center rounded-full border transition-all
+          duration-200
+          active:scale-95
+        "
       >
         {viewMode === 'list' ? (
           <MapIcon size={18} strokeWidth={2} />

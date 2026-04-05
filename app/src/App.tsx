@@ -59,9 +59,15 @@ export default function App() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-illini-blue/10 via-white to-illini-orange/10">
+      <div className="
+        from-illini-blue/10 via-white to-illini-orange/10 flex min-h-screen
+        items-center justify-center bg-linear-to-br
+      ">
         <div className="text-center">
-          <div className="mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-4 border-illini-orange border-t-transparent" />
+          <div className="
+            mb-4 h-16 w-16 animate-spin border-illini-orange mx-auto
+            rounded-full border-4 border-t-transparent
+          " />
           <p className="text-slate-600">
             {language === 'zh' ? '加载中...' : 'Loading...'}
           </p>
@@ -81,7 +87,7 @@ export default function App() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.3 }}
-          className="h-full w-full"
+          className="size-full"
         >
           <LoginScreen
             onGuestLogin={() => setIsGuest(true)}
@@ -96,7 +102,7 @@ export default function App() {
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
           transition={{ duration: 0.4, ease: 'easeOut' }}
-          className="h-full w-full"
+          className="size-full"
         >
           <DormDataProvider>
             <CompareProvider>

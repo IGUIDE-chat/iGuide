@@ -130,17 +130,20 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
           placeholder="https://housing.illinois.edu/..."
         />
       </Field>
-      <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
+      <div className="rounded-lg border-gray-200 bg-gray-50 p-3 border">
         <p className="mb-1.5 text-xs font-medium text-gray-500">
           {t.labels.roomOptions}
         </p>
-        <p className="mb-2 text-[11px] text-gray-400">{t.hints.roomOptions}</p>
-        <div className="flex flex-wrap gap-1.5">
+        <p className="mb-2 text-gray-400 text-[11px]">{t.hints.roomOptions}</p>
+        <div className="gap-1.5 flex flex-wrap">
           {form.derivedRoomOptions.length > 0 ? (
             form.derivedRoomOptions.map((option) => (
               <span
                 key={`${option.labelCode ?? 'custom'}-${option.bedCount ?? 'na'}-${option.bathroomCount ?? 'na'}-${option.bathroomScope}`}
-                className="inline-block rounded-md border border-gray-300 bg-white px-2 py-0.5 text-xs text-gray-600"
+                className="
+                  rounded-md border-gray-300 bg-white px-2 py-0.5 text-xs
+                  text-gray-600 inline-block border
+                "
               >
                 {form.getRoomDisplayLabel(option, form.language)}
               </span>

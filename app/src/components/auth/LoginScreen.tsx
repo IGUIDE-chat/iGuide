@@ -64,13 +64,28 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
       onClick={(e) => {
         if (e.target === e.currentTarget) onGuestLogin?.()
       }}
-      className="relative flex min-h-screen cursor-default items-start justify-center overflow-y-auto bg-gradient-to-br from-illini-blue/10 via-white to-illini-orange/10 px-4 pt-16 md:pt-32"
+      className="
+        from-illini-blue/10 via-white to-illini-orange/10 px-4 pt-16
+        md:pt-32
+        relative flex min-h-screen cursor-default items-start justify-center
+        overflow-y-auto bg-linear-to-br
+      "
     >
       {/* Language Switcher - Responsive Position */}
-      <div className="absolute right-4 top-4 z-50 md:right-8 md:top-8">
+      <div className="
+        right-4 top-4
+        md:right-8 md:top-8
+        absolute z-50
+      ">
         <button
           onClick={() => onLanguageChange(language === 'en' ? 'zh' : 'en')}
-          className="flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-3 py-2 text-sm font-semibold text-slate-600 shadow-sm backdrop-blur-md transition-all hover:border-illini-blue/30 hover:text-illini-blue md:px-4 md:py-2.5"
+          className="
+            gap-2 border-slate-200 bg-white/80 px-3 py-2 text-sm font-semibold
+            text-slate-600 shadow-sm backdrop-blur-md
+            hover:border-illini-blue/30 hover:text-illini-blue
+            md:px-4 md:py-2.5
+            flex items-center rounded-full border transition-all
+          "
         >
           <span>{language === 'en' ? '🌏 中文' : '🌏 English'}</span>
         </button>
@@ -79,7 +94,11 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
       <motion.div
         layout
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-        className="w-full max-w-md rounded-3xl border border-slate-100 bg-white p-6 shadow-2xl md:p-8"
+        className="
+          max-w-md rounded-3xl border-slate-100 bg-white p-6 shadow-2xl
+          md:p-8
+          w-full border
+        "
       >
         {/* Logo */}
         <div className="mb-8 text-center">
@@ -90,19 +109,30 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
         </div>
 
         {/* Toggle */}
-        <div className="relative isolate mb-6 flex gap-2 rounded-full bg-slate-100 p-1">
+        <div className="
+          mb-6 gap-2 bg-slate-100 p-1 relative isolate flex rounded-full
+        ">
           <button
             onClick={() => setIsLogin(true)}
-            className={`relative z-10 flex-1 rounded-full px-4 py-2 font-medium transition-colors ${
+            className={`
+              px-4 py-2 font-medium relative z-10 flex-1 rounded-full
+              transition-colors
+              ${
               isLogin
                 ? 'text-illini-blue'
-                : 'text-slate-500 hover:text-slate-900'
-            }`}
+                : `
+                  text-slate-500
+                  hover:text-slate-900
+                `
+            }
+            `}
           >
             {isLogin && (
               <motion.div
                 layoutId="active-pill"
-                className="absolute inset-0 -z-10 rounded-full bg-white shadow-sm"
+                className="
+                  inset-0 bg-white shadow-sm absolute -z-10 rounded-full
+                "
                 transition={{ type: 'spring', stiffness: 500, damping: 30 }}
               />
             )}
@@ -110,16 +140,25 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
           </button>
           <button
             onClick={() => setIsLogin(false)}
-            className={`relative z-10 flex-1 rounded-full px-4 py-2 font-medium transition-colors ${
+            className={`
+              px-4 py-2 font-medium relative z-10 flex-1 rounded-full
+              transition-colors
+              ${
               !isLogin
                 ? 'text-illini-blue'
-                : 'text-slate-500 hover:text-slate-900'
-            }`}
+                : `
+                  text-slate-500
+                  hover:text-slate-900
+                `
+            }
+            `}
           >
             {!isLogin && (
               <motion.div
                 layoutId="active-pill"
-                className="absolute inset-0 -z-10 rounded-full bg-white shadow-sm"
+                className="
+                  inset-0 bg-white shadow-sm absolute -z-10 rounded-full
+                "
                 transition={{ type: 'spring', stiffness: 500, damping: 30 }}
               />
             )}
@@ -130,12 +169,20 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
         {/* Google Login */}
         <button
           onClick={() => loginWithGoogle()}
-          className="group mb-3 flex w-full items-center justify-center gap-3 rounded-xl border border-slate-200 px-4 py-3 font-medium text-slate-700 transition-all hover:border-slate-300 hover:bg-slate-50"
+          className="
+            group mb-3 gap-3 rounded-xl border-slate-200 px-4 py-3 font-medium
+            text-slate-700
+            hover:border-slate-300 hover:bg-slate-50
+            flex w-full items-center justify-center border transition-all
+          "
         >
           <img
             src="https://www.google.com/favicon.ico"
             alt="Google"
-            className="h-5 w-5 opacity-70 transition-opacity group-hover:opacity-100"
+            className="
+              h-5 w-5 opacity-70 transition-opacity
+              group-hover:opacity-100
+            "
           />
           {t.googleLogin}
         </button>
@@ -143,10 +190,18 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
         {/* Microsoft Login */}
         <button
           onClick={() => loginWithMicrosoft()}
-          className="group mb-6 flex w-full items-center justify-center gap-3 rounded-xl border border-slate-200 px-4 py-3 font-medium text-slate-700 transition-all hover:border-slate-300 hover:bg-slate-50"
+          className="
+            group mb-6 gap-3 rounded-xl border-slate-200 px-4 py-3 font-medium
+            text-slate-700
+            hover:border-slate-300 hover:bg-slate-50
+            flex w-full items-center justify-center border transition-all
+          "
         >
           <svg
-            className="h-5 w-5 opacity-70 transition-opacity group-hover:opacity-100"
+            className="
+              h-5 w-5 opacity-70 transition-opacity
+              group-hover:opacity-100
+            "
             viewBox="0 0 21 21"
             xmlns="http://www.w3.org/2000/svg"
           >
@@ -158,11 +213,11 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
           {t.microsoftLogin}
         </button>
 
-        <div className="relative mb-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-slate-100"></div>
+        <div className="mb-6 relative">
+          <div className="inset-0 absolute flex items-center">
+            <div className="border-slate-100 w-full border-t"></div>
           </div>
-          <div className="relative flex justify-center text-sm">
+          <div className="text-sm relative flex justify-center">
             <span className="bg-white px-2 text-slate-400">{t.orEmail}</span>
           </div>
         </div>
@@ -170,28 +225,40 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-2 ml-1 block text-sm font-bold text-slate-700">
+            <label className="mb-2 ml-1 text-sm font-bold text-slate-700 block">
               {t.emailLabel}
             </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-xl border-2 border-slate-200 bg-slate-50 px-4 py-3 transition-all focus:border-illini-blue focus:bg-white focus:outline-none focus:ring-4 focus:ring-illini-blue/10"
+              className="
+                rounded-xl border-slate-200 bg-slate-50 px-4 py-3
+                focus:border-illini-blue focus:bg-white
+                focus:ring-illini-blue/10
+                w-full border-2 transition-all
+                focus:ring-4 focus:outline-none
+              "
               placeholder="your@email.com"
               required
             />
           </div>
 
           <div>
-            <label className="mb-2 ml-1 block text-sm font-bold text-slate-700">
+            <label className="mb-2 ml-1 text-sm font-bold text-slate-700 block">
               {t.passwordLabel}
             </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-xl border-2 border-slate-200 bg-slate-50 px-4 py-3 transition-all focus:border-illini-blue focus:bg-white focus:outline-none focus:ring-4 focus:ring-illini-blue/10"
+              className="
+                rounded-xl border-slate-200 bg-slate-50 px-4 py-3
+                focus:border-illini-blue focus:bg-white
+                focus:ring-illini-blue/10
+                w-full border-2 transition-all
+                focus:ring-4 focus:outline-none
+              "
               placeholder="••••••••"
               required
               minLength={6}
@@ -199,7 +266,10 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
           </div>
 
           {error && (
-            <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+            <div className="
+              gap-2 rounded-xl border-red-200 bg-red-50 p-3 text-sm text-red-600
+              flex items-center border
+            ">
               <span>⚠️</span> {error}
             </div>
           )}
@@ -207,7 +277,17 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-xl bg-illini-blue py-3.5 text-lg font-bold text-white shadow-lg shadow-illini-blue/20 transition-all hover:scale-[1.02] hover:bg-illini-blue/90 hover:shadow-xl hover:shadow-illini-blue/30 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
+            className="
+              rounded-xl bg-illini-blue py-3.5 text-lg font-bold text-white
+              shadow-lg shadow-illini-blue/20
+              hover:bg-illini-blue/90 hover:shadow-xl
+              hover:shadow-illini-blue/30
+              w-full transition-all
+              hover:scale-[1.02]
+              active:scale-[0.98]
+              disabled:cursor-not-allowed disabled:opacity-50
+              disabled:hover:scale-100
+            "
           >
             {loading
               ? t.processing
@@ -217,24 +297,32 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-slate-500">
+        <div className="mt-6 text-sm text-slate-500 text-center">
           {isLogin ? t.noAccount : t.hasAccount}
           <button
             onClick={() => {
               setIsLogin(!isLogin)
               setError('')
             }}
-            className="ml-1 font-medium text-illini-blue hover:underline"
+            className="
+              ml-1 font-medium text-illini-blue
+              hover:underline
+            "
           >
             {isLogin ? t.registerNow : t.loginNow}
           </button>
         </div>
 
         {/* Guest Mode Link */}
-        <div className="mt-4 border-t border-slate-100/80 pt-4 text-center">
+        <div className="mt-4 border-slate-100/80 pt-4 border-t text-center">
           <button
             onClick={onGuestLogin}
-            className="text-xs text-slate-400 transition-colors hover:text-slate-600 hover:underline"
+            className="
+              text-xs text-slate-400
+              hover:text-slate-600
+              transition-colors
+              hover:underline
+            "
           >
             {t.guestMode}
           </button>

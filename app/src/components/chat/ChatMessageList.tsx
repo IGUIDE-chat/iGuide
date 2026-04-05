@@ -32,7 +32,7 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
   language = 'zh',
 }) => {
   return (
-    <div className="flex-col pb-36 pt-14">
+    <div className="pb-36 pt-14 flex-col">
       <AnimatePresence initial={false}>
         {messages.map((message, index) => (
           <motion.div
@@ -44,21 +44,37 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
               ease: [0.25, 0.1, 0.25, 1],
               delay: index === messages.length - 1 ? 0 : 0,
             }}
-            className="w-full border-b border-transparent py-6"
+            className="py-6 w-full border-b border-transparent"
           >
             <div
-              className={`${containerClass} flex gap-4 ${
+              className={`
+                ${containerClass}
+                gap-4 flex
+                ${
                 message.role === 'user'
                   ? 'flex-row-reverse'
-                  : 'flex-col md:flex-row'
-              }`}
+                  : `
+                    md:flex-row
+                    flex-col
+                  `
+              }
+              `}
             >
               {/* Avatar: hidden on mobile for AI, always shown on desktop */}
               <div
-                className={`relative flex flex-shrink-0 flex-col items-end ${message.role === 'model' ? 'hidden md:flex' : ''}`}
+                className={`
+                  relative flex shrink-0 flex-col items-end
+                  ${message.role === 'model' ? `
+                    md:flex
+                    hidden
+                  ` : ''}
+                `}
               >
                 {message.role === 'user' ? (
-                  <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-slate-200 text-slate-500">
+                  <div className="
+                    h-6 w-6 rounded-lg bg-slate-200 text-slate-500 flex
+                    items-center justify-center
+                  ">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
@@ -73,18 +89,31 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
                     </svg>
                   </div>
                 ) : (
-                  <div className="flex h-6 w-6 items-center justify-center rounded-sm bg-illini-orange font-serif text-xs font-bold text-white shadow-sm">
+                  <div className="
+                    h-6 w-6 rounded-sm bg-illini-orange font-serif text-xs
+                    font-bold text-white shadow-sm flex items-center
+                    justify-center
+                  ">
                     I
                   </div>
                 )}
               </div>
               <div
-                className={`relative flex-1 overflow-hidden pt-0.5 ${
+                className={`
+                  pt-0.5 relative flex-1 overflow-hidden
+                  ${
                   message.role === 'user' ? 'flex flex-col items-end' : ''
-                }`}
+                }
+                `}
               >
                 <div
-                  className={`mb-1 text-xs font-semibold text-slate-900 ${message.role === 'model' ? 'hidden md:block' : ''}`}
+                  className={`
+                    mb-1 text-xs font-semibold text-slate-900
+                    ${message.role === 'model' ? `
+                      md:block
+                      hidden
+                    ` : ''}
+                  `}
                 >
                   {message.role === 'user' ? userRole : botName}
                 </div>
@@ -96,7 +125,10 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
                       language={language}
                     />
                   )}
-                <div className="prose prose-slate prose-sm max-w-none leading-relaxed text-slate-800">
+                <div className="
+                  prose prose-slate prose-sm leading-relaxed text-slate-800
+                  max-w-none
+                ">
                   {message.role === 'user' ? (
                     <div className="whitespace-pre-wrap">{message.text}</div>
                   ) : (
@@ -107,7 +139,10 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
                         a: ({ node, ...props }) => (
                           <a
                             {...props}
-                            className="text-illini-orange hover:underline"
+                            className="
+                              text-illini-orange
+                              hover:underline
+                            "
                             target="_blank"
                             rel="noopener noreferrer"
                           />
@@ -116,14 +151,19 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
                           const isInline = !className
                           return isInline ? (
                             <code
-                              className="rounded bg-slate-100 px-1 py-0.5 text-xs"
+                              className="
+                                rounded-sm bg-slate-100 px-1 py-0.5 text-xs
+                              "
                               {...props}
                             >
                               {children}
                             </code>
                           ) : (
                             <code
-                              className="block overflow-x-auto rounded bg-slate-100 p-2 text-xs"
+                              className="
+                                rounded-sm bg-slate-100 p-2 text-xs block
+                                overflow-x-auto
+                              "
                               {...props}
                             >
                               {children}
@@ -132,23 +172,29 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
                         },
                         ul: ({ node, ...props }) => (
                           <ul
-                            className="list-inside list-disc space-y-1"
+                            className="space-y-1 list-inside list-disc"
                             {...props}
                           />
                         ),
                         ol: ({ node, ...props }) => (
                           <ol
-                            className="list-inside list-decimal space-y-1"
+                            className="space-y-1 list-inside list-decimal"
                             {...props}
                           />
                         ),
                         p: ({ node, ...props }) => (
-                          <p className="mb-2 last:mb-0" {...props} />
+                          <p className="
+                            mb-2
+                            last:mb-0
+                          " {...props} />
                         ),
                         img: ({ node, ...props }) => (
                           <img
                             {...props}
-                            className="my-2 h-auto max-w-full rounded-lg border border-slate-200 shadow-sm"
+                            className="
+                              my-2 rounded-lg border-slate-200 shadow-sm h-auto
+                              max-w-full border
+                            "
                             loading="lazy"
                           />
                         ),
@@ -183,7 +229,7 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
                 {message.role === 'model' &&
                   message.followUpQuestions &&
                   message.followUpQuestions.length > 0 && (
-                    <div className="mt-3 flex flex-wrap gap-2">
+                    <div className="mt-3 gap-2 flex flex-wrap">
                       {message.followUpQuestions
                         .slice(0, 3)
                         .map((question, idx) => {
@@ -197,7 +243,14 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
                               onClick={() => onFollowUpClick(question)}
                               disabled={isLoading}
                               title={question}
-                              className="rounded-full border border-slate-200 bg-slate-100 px-3 py-1.5 text-xs transition-colors hover:border-illini-blue hover:bg-illini-blue hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+                              className="
+                                border-slate-200 bg-slate-100 px-3 py-1.5
+                                text-xs
+                                hover:border-illini-blue hover:bg-illini-blue
+                                hover:text-white
+                                rounded-full border transition-colors
+                                disabled:cursor-not-allowed disabled:opacity-50
+                              "
                             >
                               💡 {displayText}
                             </button>

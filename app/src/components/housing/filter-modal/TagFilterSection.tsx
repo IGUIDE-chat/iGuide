@@ -28,20 +28,37 @@ const TagFilterSection: React.FC<TagFilterSectionProps> = ({
 }) => (
   <section className="mb-8">
     <h3 className="mb-6 text-xl font-bold">{title}</h3>
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div className="
+      gap-4
+      md:grid-cols-2
+      grid grid-cols-1
+    ">
       {tags.map((tag) => {
         const isSelected = selectedValues.includes(tag)
         return (
           <label
             key={tag}
-            className="group flex cursor-pointer select-none items-center gap-3 py-1"
+            className="
+              group gap-3 py-1 flex cursor-pointer items-center select-none
+            "
           >
             <div
-              className={`flex h-6 w-6 items-center justify-center rounded-[4px] border transition-all duration-200 ${
+              className={`
+                h-6 w-6 flex items-center justify-center rounded-[4px] border
+                transition-all duration-200
+                ${
                 isSelected
-                  ? 'border-illini-blue bg-illini-blue text-white active:border-[#0e2240] active:bg-[#0e2240]'
-                  : 'border-gray-300 bg-white active:border-illini-blue active:bg-blue-50/50 group-hover:border-illini-blue'
-              } `}
+                  ? `
+                    border-illini-blue bg-illini-blue text-white
+                    active:border-[#0e2240] active:bg-[#0e2240]
+                  `
+                  : `
+                    border-gray-300 bg-white
+                    active:border-illini-blue active:bg-blue-50/50
+                    group-hover:border-illini-blue
+                  `
+              }
+              `}
             >
               {isSelected && <Check size={16} strokeWidth={3} />}
               <input
@@ -51,7 +68,11 @@ const TagFilterSection: React.FC<TagFilterSectionProps> = ({
                 onChange={() => onToggle(tag)}
               />
             </div>
-            <span className="text-gray-700 transition-colors group-hover:text-illini-blue">
+            <span className="
+              text-gray-700
+              group-hover:text-illini-blue
+              transition-colors
+            ">
               {getTagDisplay(tag, language)}
             </span>
           </label>

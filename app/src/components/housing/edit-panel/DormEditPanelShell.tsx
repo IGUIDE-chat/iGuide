@@ -51,44 +51,70 @@ export const DormEditPanelShell: React.FC<DormEditPanelShellProps> = ({
   return (
     <>
       {/* No full-page backdrop — left side stays fully interactive and scrollable */}
-      <div className="fixed right-0 top-0 z-50 flex h-full w-full max-w-lg flex-col border-l border-gray-200 bg-white shadow-2xl">
-        <div className="flex flex-shrink-0 items-center justify-between bg-illini-blue px-4 py-3 text-white">
-          <span className="truncate text-base font-bold">{title}</span>
+      <div className="
+        right-0 top-0 max-w-lg border-gray-200 bg-white shadow-2xl fixed z-50
+        flex size-full flex-col border-l
+      ">
+        <div className="
+          bg-illini-blue px-4 py-3 text-white flex shrink-0 items-center
+          justify-between
+        ">
+          <span className="text-base font-bold truncate">{title}</span>
           <button
             type="button"
             onClick={onClose}
-            className="ml-2 flex-shrink-0 hover:text-gray-300"
+            className="
+              ml-2
+              hover:text-gray-300
+              shrink-0
+            "
           >
             <X size={20} />
           </button>
         </div>
-        <div className="flex flex-shrink-0 border-b border-gray-200">
+        <div className="border-gray-200 flex shrink-0 border-b">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               type="button"
               onClick={() => onTabChange(tab.id)}
-              className={`flex flex-1 items-center justify-center gap-1.5 py-2.5 text-xs font-medium transition-colors ${
+              className={`
+                gap-1.5 py-2.5 text-xs font-medium flex flex-1 items-center
+                justify-center transition-colors
+                ${
                 activeTab === tab.id
-                  ? 'border-b-2 border-illini-orange text-illini-blue'
-                  : 'text-gray-500 hover:text-illini-blue'
-              }`}
+                  ? 'border-illini-orange text-illini-blue border-b-2'
+                  : `
+                    text-gray-500
+                    hover:text-illini-blue
+                  `
+              }
+              `}
             >
               {tab.icon}
               {tab.label}
             </button>
           ))}
         </div>
-        <div className="flex-1 space-y-4 overflow-y-auto px-4 py-4 text-sm">
+        <div className="space-y-4 px-4 py-4 text-sm flex-1 overflow-y-auto">
           {children}
         </div>
-        <div className="flex flex-shrink-0 items-center gap-3 border-t border-gray-200 bg-white px-4 py-3">
+        <div className="
+          gap-3 border-gray-200 bg-white px-4 py-3 flex shrink-0 items-center
+          border-t
+        ">
           {activeTab !== 'history' && (
             <button
               type="button"
               onClick={onSave}
               disabled={saving}
-              className="flex items-center justify-center gap-2 rounded-lg bg-illini-orange px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-illini-orange-dark disabled:opacity-60"
+              className="
+                gap-2 rounded-lg bg-illini-orange px-4 py-2 text-sm font-bold
+                text-white
+                hover:bg-illini-orange-dark
+                flex items-center justify-center transition-colors
+                disabled:opacity-60
+              "
             >
               {saving ? savingLabel : saveLabel}
             </button>
@@ -106,7 +132,11 @@ export const DormEditPanelShell: React.FC<DormEditPanelShellProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="ml-auto rounded-lg border border-gray-300 px-3 py-2 text-xs text-gray-500 transition-colors hover:text-gray-700"
+            className="
+              rounded-lg border-gray-300 px-3 py-2 text-xs text-gray-500
+              hover:text-gray-700
+              ml-auto border transition-colors
+            "
           >
             {cancelLabel}
           </button>

@@ -40,11 +40,19 @@ const DormGrid: React.FC<DormGridProps> = ({
 }) => {
   return (
     <div
-      className={`grid pb-20 xl:pb-6 ${
+      className={`
+        pb-20
+        xl:pb-6
+        grid
+        ${
         isListView
-          ? 'grid-cols-[repeat(auto-fill,minmax(min(100%,320px),420px))] justify-center gap-6'
-          : 'grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))] gap-3'
-      } `}
+          ? `
+            gap-6 grid-cols-[repeat(auto-fill,minmax(min(100%,320px),420px))]
+            justify-center
+          `
+          : 'gap-3 grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))]'
+      }
+      `}
     >
       {dorms.map((dorm) => {
         const stats = commentStats?.[dorm.id]

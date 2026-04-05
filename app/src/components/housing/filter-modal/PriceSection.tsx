@@ -100,11 +100,13 @@ const PriceSection: React.FC<PriceSectionProps> = ({
       <h3 className="mb-2 text-xl font-bold">{t.priceRange}</h3>
       <p className="mb-6 text-sm text-gray-500">{t.avgPrice}</p>
 
-      <div className="mb-2 flex h-16 items-end gap-1 px-4">
+      <div className="mb-2 h-16 gap-1 px-4 flex items-end">
         {HISTOGRAM_DATA.map((height, i) => (
           <div
             key={i}
-            className="flex-1 rounded-t-sm bg-gray-200 transition-colors duration-200"
+            className="
+              rounded-t-sm bg-gray-200 flex-1 transition-colors duration-200
+            "
             style={{
               height: `${height}%`,
               backgroundColor: i > 3 && i < 10 ? '#13294B' : '#E5E7EB',
@@ -156,8 +158,14 @@ const PriceSection: React.FC<PriceSectionProps> = ({
         />
       </div>
 
-      <div className="flex items-center gap-4">
-        <div className="flex-1 rounded-xl border border-gray-300 px-3 py-2 transition-colors focus-within:border-illini-orange focus-within:ring-2 focus-within:ring-illini-orange hover:border-illini-orange">
+      <div className="gap-4 flex items-center">
+        <div className="
+          rounded-xl border-gray-300 px-3 py-2
+          focus-within:border-illini-orange focus-within:ring-illini-orange
+          hover:border-illini-orange
+          flex-1 border transition-colors
+          focus-within:ring-2
+        ">
           <div className="text-xs text-gray-500">{t.minPrice}</div>
           <div className="flex items-center">
             <span className="text-lg">$</span>
@@ -180,12 +188,18 @@ const PriceSection: React.FC<PriceSectionProps> = ({
                 commitMinInput((e.currentTarget as HTMLInputElement).value)
                 e.currentTarget.blur()
               }}
-              className="ml-1 w-full text-lg outline-none"
+              className="ml-1 text-lg w-full outline-none"
             />
           </div>
         </div>
         <div className="text-gray-400">-</div>
-        <div className="flex-1 rounded-xl border border-gray-300 px-3 py-2 transition-colors focus-within:border-illini-orange focus-within:ring-2 focus-within:ring-illini-orange hover:border-illini-orange">
+        <div className="
+          rounded-xl border-gray-300 px-3 py-2
+          focus-within:border-illini-orange focus-within:ring-illini-orange
+          hover:border-illini-orange
+          flex-1 border transition-colors
+          focus-within:ring-2
+        ">
           <div className="text-xs text-gray-500">{t.maxPrice}</div>
           <div className="flex items-center">
             <span className="text-lg">$</span>
@@ -208,7 +222,7 @@ const PriceSection: React.FC<PriceSectionProps> = ({
                 commitMaxInput((e.currentTarget as HTMLInputElement).value)
                 e.currentTarget.blur()
               }}
-              className="ml-1 w-full text-lg outline-none"
+              className="ml-1 text-lg w-full outline-none"
             />
           </div>
         </div>

@@ -48,7 +48,11 @@ const AmenitiesSection: React.FC<AmenitiesSectionProps> = ({
 }) => (
   <section className="mb-8">
     <h3 className="mb-6 text-xl font-bold">{title}</h3>
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div className="
+      gap-4
+      md:grid-cols-2
+      grid grid-cols-1
+    ">
       {DISPLAY_AMENITIES.map((amenity) => {
         const isSelected = selectedValues.includes(amenity.id)
         const Icon = amenity.icon
@@ -56,14 +60,27 @@ const AmenitiesSection: React.FC<AmenitiesSectionProps> = ({
         return (
           <label
             key={amenity.id}
-            className="group flex cursor-pointer select-none items-center gap-3 py-1"
+            className="
+              group gap-3 py-1 flex cursor-pointer items-center select-none
+            "
           >
             <div
-              className={`flex h-6 w-6 items-center justify-center rounded-[4px] border transition-all duration-200 ${
+              className={`
+                h-6 w-6 flex items-center justify-center rounded-[4px] border
+                transition-all duration-200
+                ${
                 isSelected
-                  ? 'border-illini-blue bg-illini-blue text-white active:border-[#0e2240] active:bg-[#0e2240]'
-                  : 'border-gray-300 bg-white active:border-illini-blue active:bg-blue-50/50 group-hover:border-illini-blue'
-              } `}
+                  ? `
+                    border-illini-blue bg-illini-blue text-white
+                    active:border-[#0e2240] active:bg-[#0e2240]
+                  `
+                  : `
+                    border-gray-300 bg-white
+                    active:border-illini-blue active:bg-blue-50/50
+                    group-hover:border-illini-blue
+                  `
+              }
+              `}
             >
               {isSelected && <Check size={16} strokeWidth={3} />}
               <input
@@ -73,10 +90,17 @@ const AmenitiesSection: React.FC<AmenitiesSectionProps> = ({
                 onChange={() => onToggle(amenity.id)}
               />
             </div>
-            <div className="flex items-center gap-2 text-gray-700 transition-colors group-hover:text-illini-blue">
+            <div className="
+              gap-2 text-gray-700
+              group-hover:text-illini-blue
+              flex items-center transition-colors
+            ">
               <Icon
                 size={18}
-                className="text-gray-500 group-hover:text-illini-blue"
+                className="
+                  text-gray-500
+                  group-hover:text-illini-blue
+                "
               />
               <span>{amenity.label[language] || amenity.label.en}</span>
             </div>

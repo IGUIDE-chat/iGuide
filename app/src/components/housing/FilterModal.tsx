@@ -75,7 +75,7 @@ function ToggleButtonSection<T extends string | number>({
   return (
     <section className="mb-8">
       <h3 className="mb-6 text-xl font-bold">{title}</h3>
-      <div className="flex flex-wrap gap-3">
+      <div className="gap-3 flex flex-wrap">
         {options.map(({ value, label }) => {
           const selected = selectedValues.includes(value)
           return (
@@ -83,11 +83,18 @@ function ToggleButtonSection<T extends string | number>({
               key={String(value)}
               type="button"
               onClick={() => onToggle(value)}
-              className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
+              className={`
+                px-4 py-2 text-sm font-medium rounded-full border
+                transition-colors
+                ${
                 selected
                   ? 'border-illini-blue bg-illini-blue text-white'
-                  : 'border-gray-300 text-gray-700 hover:border-illini-blue'
-              }`}
+                  : `
+                    border-gray-300 text-gray-700
+                    hover:border-illini-blue
+                  `
+              }
+              `}
             >
               {label}
             </button>
@@ -387,11 +394,13 @@ export const FilterModal: React.FC<FilterModalProps> = ({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black/45" />
+          <div className="inset-0 bg-black/45 fixed" />
         </Transition.Child>
 
-        <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4 text-center">
+        <div className="inset-0 fixed overflow-y-auto">
+          <div className="
+            p-4 flex min-h-full items-center justify-center text-center
+          ">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-200"
@@ -401,8 +410,14 @@ export const FilterModal: React.FC<FilterModalProps> = ({
               leaveFrom="opacity-100 translate-y-0"
               leaveTo="opacity-0 translate-y-2"
             >
-              <Dialog.Panel className="flex max-h-[85vh] w-full max-w-2xl transform flex-col overflow-hidden rounded-2xl bg-white text-left align-middle shadow-2xl">
-                <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+              <Dialog.Panel className="
+                max-w-2xl rounded-2xl bg-white shadow-2xl flex max-h-[85vh]
+                w-full transform flex-col overflow-hidden text-left align-middle
+              ">
+                <div className="
+                  border-gray-100 px-6 py-4 flex items-center justify-between
+                  border-b
+                ">
                   <div className="w-9" />
                   <Dialog.Title className="text-lg font-bold">
                     {t.filters}
@@ -410,7 +425,11 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                   <button
                     onClick={onClose}
                     type="button"
-                    className="-mr-2 rounded-full p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-black"
+                    className="
+                      -mr-2 p-2 text-gray-500
+                      hover:bg-gray-100 hover:text-black
+                      rounded-full transition-colors
+                    "
                   >
                     <X size={20} />
                   </button>
@@ -419,7 +438,10 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                 <div
                   ref={scrollContainerRef}
                   onScroll={handleScroll}
-                  className="scrollbar-grey modal-scroll-smooth flex-1 overflow-y-auto px-6 py-6"
+                  className="
+                    scrollbar-grey modal-scroll-smooth px-6 py-6 flex-1
+                    overflow-y-auto
+                  "
                 >
                   <ChipSection
                     title={t.location}
@@ -505,15 +527,22 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                     <h3 className="mb-6 text-xl font-bold">
                       {t.livingConditions}
                     </h3>
-                    <div className="flex flex-wrap gap-3">
+                    <div className="gap-3 flex flex-wrap">
                       <button
                         type="button"
                         onClick={() => setLocalRequireAc((prev) => !prev)}
-                        className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
+                        className={`
+                          px-4 py-2 text-sm font-medium rounded-full border
+                          transition-colors
+                          ${
                           localRequireAc
                             ? 'border-illini-blue bg-illini-blue text-white'
-                            : 'border-gray-300 text-gray-700 hover:border-illini-blue'
-                        }`}
+                            : `
+                              border-gray-300 text-gray-700
+                              hover:border-illini-blue
+                            `
+                        }
+                        `}
                       >
                         {t.airConditioning}
                       </button>
@@ -530,11 +559,18 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                                 setLocalLivingConditions
                               )
                             }
-                            className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
+                            className={`
+                              px-4 py-2 text-sm font-medium rounded-full border
+                              transition-colors
+                              ${
                               selected
                                 ? 'border-illini-blue bg-illini-blue text-white'
-                                : 'border-gray-300 text-gray-700 hover:border-illini-blue'
-                            }`}
+                                : `
+                                  border-gray-300 text-gray-700
+                                  hover:border-illini-blue
+                                `
+                            }
+                            `}
                           >
                             {getTagDisplay(tag, language)}
                           </button>
@@ -569,23 +605,37 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                 </div>
 
                 <div
-                  className={`z-10 flex items-center justify-between border-t border-gray-100 bg-white px-6 py-4 transition-shadow duration-300 ${
+                  className={`
+                    border-gray-100 bg-white px-6 py-4 z-10 flex items-center
+                    justify-between border-t transition-shadow duration-300
+                    ${
                     showFooterShadow
                       ? 'shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]'
                       : ''
-                  }`}
+                  }
+                  `}
                 >
                   <button
                     onClick={handleClear}
                     type="button"
-                    className="text-sm font-bold text-gray-900 underline transition-colors hover:text-gray-700 hover:no-underline"
+                    className="
+                      text-sm font-bold text-gray-900
+                      hover:text-gray-700
+                      underline transition-colors
+                      hover:no-underline
+                    "
                   >
                     {t.clearAll}
                   </button>
                   <button
                     onClick={handleApply}
                     type="button"
-                    className="rounded-lg bg-gray-900 px-8 py-3 font-bold text-white transition-colors hover:bg-black active:scale-[0.98]"
+                    className="
+                      rounded-lg bg-gray-900 px-8 py-3 font-bold text-white
+                      hover:bg-black
+                      transition-colors
+                      active:scale-[0.98]
+                    "
                   >
                     {t.showPlaces}
                   </button>

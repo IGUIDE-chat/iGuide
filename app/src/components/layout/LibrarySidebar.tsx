@@ -162,21 +162,27 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
 
   return (
     <div className="flex h-full flex-col bg-[#171717]">
-      <div className="mb-2 flex items-center justify-between px-3 py-2">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+      <div className="mb-2 px-3 py-2 flex items-center justify-between">
+        <h3 className="
+          text-xs font-semibold tracking-wider text-slate-400 uppercase
+        ">
           {t.title}
         </h3>
         {history.length > 0 && (
           <button
             onClick={handleClearHistory}
-            className="text-[10px] text-slate-500 transition-colors hover:text-white"
+            className="
+              text-slate-500
+              hover:text-white
+              text-[10px] transition-colors
+            "
           >
             {t.clear}
           </button>
         )}
       </div>
 
-      <div className="no-scrollbar flex-1 space-y-4 overflow-y-auto px-2">
+      <div className="no-scrollbar space-y-4 px-2 flex-1 overflow-y-auto">
         {history.length === 0 ? (
           <div className="py-8 text-center">
             <p className="text-xs text-slate-600">{t.empty}</p>
@@ -188,7 +194,9 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
 
             return (
               <div key={category}>
-                <h4 className="mb-1.5 px-2 text-[10px] font-medium text-slate-500">
+                <h4 className="
+                  mb-1.5 px-2 font-medium text-slate-500 text-[10px]
+                ">
                   {category}
                 </h4>
                 <div className="space-y-0.5">
@@ -209,15 +217,24 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
                         onClick={() =>
                           navigate(`/library/article/${item.articleId}`)
                         }
-                        className={`group relative cursor-pointer rounded-md px-3 py-2 transition-colors ${
+                        className={`
+                          group rounded-md px-3 py-2 relative cursor-pointer
+                          transition-colors
+                          ${
                           item.articleId === currentArticleId
                             ? 'bg-white/10 text-white'
-                            : 'text-slate-300 hover:bg-white/5 hover:text-white'
-                        }`}
+                            : `
+                              text-slate-300
+                              hover:bg-white/5 hover:text-white
+                            `
+                        }
+                        `}
                       >
-                        <div className="flex items-start justify-between gap-1.5">
+                        <div className="
+                          gap-1.5 flex items-start justify-between
+                        ">
                           <div className="min-w-0 flex-1">
-                            <div className="flex truncate text-xs font-medium">
+                            <div className="text-xs font-medium flex truncate">
                               <TypewriterText
                                 text={
                                   language === 'zh' && item.articleTitleZh
@@ -227,16 +244,27 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
                               />
                             </div>
                           </div>
-                          <div className="flex gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+                          <div className="
+                            gap-0.5 flex opacity-0 transition-opacity
+                            group-hover:opacity-100
+                          ">
                             <button
                               onClick={(e) =>
                                 handleTogglePin(item.id, item.isPinned, e)
                               }
-                              className="rounded p-1 hover:bg-illini-orange/20"
+                              className="
+                                rounded-sm p-1
+                                hover:bg-illini-orange/20
+                              "
                               title={item.isPinned ? t.unpin : t.pin}
                             >
                               <svg
-                                className={`h-3 w-3 ${item.isPinned ? 'text-illini-orange' : 'text-slate-400'}`}
+                                className={`
+                                  h-3 w-3
+                                  ${item.isPinned ? `text-illini-orange` : `
+                                    text-slate-400
+                                  `}
+                                `}
                                 fill={item.isPinned ? 'currentColor' : 'none'}
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -251,7 +279,10 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
                             </button>
                             <button
                               onClick={(e) => handleDeleteClick(item.id, e)}
-                              className="rounded p-1 hover:bg-red-500/20"
+                              className="
+                                rounded-sm p-1
+                                hover:bg-red-500/20
+                              "
                               title={t.delete}
                             >
                               <svg

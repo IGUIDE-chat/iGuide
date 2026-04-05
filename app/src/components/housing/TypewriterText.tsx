@@ -54,7 +54,12 @@ export const TypewriterText: React.FC<TypewriterTextProps> = ({
   }, [currentIndex, text, speed, onComplete])
 
   return (
-    <div className="prose prose-sm prose-p:leading-relaxed prose-pre:bg-gray-100 max-w-none text-gray-800">
+    <div className="
+      prose prose-sm
+      prose-p:leading-relaxed
+      prose-pre:bg-gray-100
+      text-gray-800 max-w-none
+    ">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{

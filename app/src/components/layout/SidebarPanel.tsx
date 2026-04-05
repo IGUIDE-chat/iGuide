@@ -31,7 +31,10 @@ export const SidebarPanel: React.FC<SidebarPanelProps> = ({
   favoritesIconRef,
 }) => {
   return (
-    <div className="mx-3 flex min-h-0 flex-1 flex-col overflow-hidden border-t border-white/10 pt-2">
+    <div className="
+      mx-3 min-h-0 border-white/10 pt-2 flex flex-1 flex-col overflow-hidden
+      border-t
+    ">
       {activeTab === 'chat' && (
         <ConversationSidebar
           currentConversationId={currentConversationId ?? null}

@@ -379,15 +379,23 @@ const DormCard: React.FC<DormCardProps> = ({
       onClick={() => onViewDetails(dorm)}
       onMouseEnter={() => onHoverDorm?.(dorm.id)}
       onMouseLeave={() => onHoverDorm?.(null)}
-      className="dorm-card group relative flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-shadow duration-300 hover:shadow-md"
+      className="
+        dorm-card group rounded-xl border-gray-100 bg-white shadow-sm
+        hover:shadow-md
+        relative flex size-full cursor-pointer flex-col overflow-hidden border
+        transition-shadow duration-300
+      "
     >
-      <div className="relative h-48 overflow-hidden">
+      <div className="h-48 relative overflow-hidden">
         <img
           src={dorm.imageUrl}
           alt={dormName}
           loading="lazy"
           decoding="async"
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="
+            size-full object-cover transition-transform duration-500
+            group-hover:scale-105
+          "
         />
         {positivePercent != null &&
           totalReviews != null &&
@@ -398,7 +406,14 @@ const DormCard: React.FC<DormCardProps> = ({
                 e.stopPropagation()
                 onRatingClick?.(dorm, e)
               }}
-              className="absolute right-3 top-3 flex items-center gap-1 rounded-md border border-transparent bg-white px-2 py-1 text-xs font-bold text-slate-800 shadow-sm transition-all duration-200 hover:border-illini-orange/30 hover:bg-illini-orange/10 group-hover:scale-105"
+              className="
+                right-3 top-3 gap-1 rounded-md bg-white px-2 py-1 text-xs
+                font-bold text-slate-800 shadow-sm
+                hover:border-illini-orange/30 hover:bg-illini-orange/10
+                absolute flex items-center border border-transparent
+                transition-all duration-200
+                group-hover:scale-105
+              "
             >
               <ThumbsUp size={11} className="text-slate-500" />
               {positivePercent}% ({totalReviews})
@@ -412,11 +427,18 @@ const DormCard: React.FC<DormCardProps> = ({
               onToggleCompare(dorm)
             }}
             type="button"
-            className={`absolute bottom-3 right-3 rounded-full p-1.5 shadow-sm transition-all duration-200 ${
+            className={`
+              bottom-3 right-3 p-1.5 shadow-sm absolute rounded-full
+              transition-all duration-200
+              ${
               isCompared
-                ? 'scale-105 bg-illini-blue text-white'
-                : 'bg-white/90 text-gray-400 hover:bg-white hover:text-illini-blue'
-            }`}
+                ? 'bg-illini-blue text-white scale-105'
+                : `
+                  bg-white/90 text-gray-400
+                  hover:bg-white hover:text-illini-blue
+                `
+            }
+            `}
             aria-label={isCompared ? 'Remove from compare' : 'Add to compare'}
           >
             {isCompared ? (
@@ -434,7 +456,11 @@ const DormCard: React.FC<DormCardProps> = ({
               onToggleFavorite(dorm, e)
             }}
             type="button"
-            className="absolute left-3 top-3 rounded-full bg-white p-2 text-gray-400 shadow-sm transition-colors hover:bg-gray-50 hover:text-red-500"
+            className="
+              left-3 top-3 bg-white p-2 text-gray-400 shadow-sm
+              hover:bg-gray-50 hover:text-red-500
+              absolute rounded-full transition-colors
+            "
             aria-label={isFavorite ? t.unsave : t.save}
           >
             <svg
@@ -442,7 +468,10 @@ const DormCard: React.FC<DormCardProps> = ({
               viewBox="0 0 24 24"
               fill={isFavorite ? 'currentColor' : 'none'}
               stroke="currentColor"
-              className={`h-5 w-5 ${isFavorite ? 'text-red-500' : ''}`}
+              className={`
+                h-5 w-5
+                ${isFavorite ? 'text-red-500' : ''}
+              `}
               strokeWidth="2"
             >
               <path
@@ -455,57 +484,68 @@ const DormCard: React.FC<DormCardProps> = ({
         )}
       </div>
 
-      <div className="flex flex-grow flex-col p-4">
-        <h3 className="mb-1.5 line-clamp-2 text-xl font-bold leading-[1.15] text-gray-900 antialiased">
+      <div className="p-4 flex grow flex-col">
+        <h3 className="
+          mb-1.5 text-xl font-bold text-gray-900 line-clamp-2 leading-[1.15]
+          antialiased
+        ">
           {dormName}
         </h3>
 
-        <div className="mb-3 grid grid-cols-[minmax(0,1.3fr)_minmax(0,0.9fr)] gap-x-6 text-[12px] text-gray-500">
-          <div className="inline-flex min-w-0 items-center gap-1">
-            <MapPin size={13} className="shrink-0 text-illini-orange" />
+        <div className="
+          mb-3 gap-x-6 text-gray-500 grid
+          grid-cols-[minmax(0,1.3fr)_minmax(0,0.9fr)] text-[12px]
+        ">
+          <div className="min-w-0 gap-1 inline-flex items-center">
+            <MapPin size={13} className="text-illini-orange shrink-0" />
             <span className="line-clamp-1">{locationLabel}</span>
           </div>
-          <span className="text-[12px] font-bold text-illini-blue">
+          <span className="font-bold text-illini-blue text-[12px]">
             {formatPrice(dorm.price)}
           </span>
         </div>
 
-        <div className="mb-3 grid grid-cols-[minmax(0,1.3fr)_minmax(0,0.9fr)] gap-x-6 gap-y-2 text-[13px] text-slate-700">
-          <div className="inline-flex min-w-0 items-center gap-1.5">
-            <BedSingle size={14} className="shrink-0 text-slate-400" />
-            <span className="line-clamp-2 leading-5">
+        <div className="
+          mb-3 gap-x-6 gap-y-2 text-slate-700 grid
+          grid-cols-[minmax(0,1.3fr)_minmax(0,0.9fr)] text-[13px]
+        ">
+          <div className="min-w-0 gap-1.5 inline-flex items-center">
+            <BedSingle size={14} className="text-slate-400 shrink-0" />
+            <span className="leading-5 line-clamp-2">
               {roomRangeSummary.occupancyLabel}
             </span>
           </div>
-          <div className="inline-flex min-w-0 items-center gap-1.5">
-            <Bath size={14} className="shrink-0 text-slate-400" />
-            <span className="line-clamp-2 leading-5">
+          <div className="min-w-0 gap-1.5 inline-flex items-center">
+            <Bath size={14} className="text-slate-400 shrink-0" />
+            <span className="leading-5 line-clamp-2">
               {roomRangeSummary.bathroomLabel}
             </span>
           </div>
-          <div className="inline-flex min-w-0 items-center gap-1.5">
-            <Wind size={14} className="shrink-0 text-slate-400" />
-            <span className="line-clamp-1 leading-5">
+          <div className="min-w-0 gap-1.5 inline-flex items-center">
+            <Wind size={14} className="text-slate-400 shrink-0" />
+            <span className="leading-5 line-clamp-1">
               {dorm.ac ? t.ac : t.noAc}
             </span>
           </div>
-          <div className="inline-flex min-w-0 items-center gap-1.5">
-            <Utensils size={14} className="shrink-0 text-slate-400" />
-            <span className="line-clamp-1 leading-5">
+          <div className="min-w-0 gap-1.5 inline-flex items-center">
+            <Utensils size={14} className="text-slate-400 shrink-0" />
+            <span className="leading-5 line-clamp-1">
               {getDiningLabel(dorm, language)}
             </span>
           </div>
         </div>
 
         {cardSummary && (
-          <p className="mb-3 line-clamp-1 text-sm leading-6 text-gray-600 antialiased">
+          <p className="
+            mb-3 text-sm leading-6 text-gray-600 line-clamp-1 antialiased
+          ">
             {cardSummary}
           </p>
         )}
 
         <div
           ref={cardTags.containerRef}
-          className="mt-auto flex min-w-0 items-center gap-1.5 overflow-hidden"
+          className="min-w-0 gap-1.5 mt-auto flex items-center overflow-hidden"
         >
           {cardTags.visibleItems.map((tag) => (
             <span
@@ -526,9 +566,12 @@ const DormCard: React.FC<DormCardProps> = ({
         {cardTagCandidates.length > 0 && (
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute left-4 top-4 -z-10 h-0 overflow-hidden opacity-0"
+            className="
+              left-4 top-4 h-0 pointer-events-none absolute -z-10
+              overflow-hidden opacity-0
+            "
           >
-            <div className="flex items-center gap-1.5">
+            <div className="gap-1.5 flex items-center">
               {cardTagCandidates.map((tag) => (
                 <span
                   key={`measure-${tag.id}`}

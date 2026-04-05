@@ -125,7 +125,13 @@ const InlineImageNavButton: React.FC<InlineImageNavButtonProps> = ({
       type="button"
       aria-label={label}
       onClick={onClick}
-      className={`absolute top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/35 text-white backdrop-blur-sm transition-colors hover:bg-black/55 ${className}`}
+      className={`
+        h-9 w-9 bg-black/35 text-white backdrop-blur-sm
+        hover:bg-black/55
+        absolute top-1/2 z-10 flex -translate-y-1/2 items-center justify-center
+        rounded-full transition-colors
+        ${className}
+      `}
     >
       <Icon className="h-5 w-5" />
     </button>
@@ -233,24 +239,32 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
       }
     }
     setMobileHeaderSlot(
-      <div className="flex min-w-0 flex-1 items-center justify-between">
+      <div className="min-w-0 flex flex-1 items-center justify-between">
         <button
           type="button"
           onClick={() => navigate('/dorms')}
-          className="flex shrink-0 items-center gap-1 text-slate-500 transition-colors hover:text-illini-blue"
+          className="
+            gap-1 text-slate-500
+            hover:text-illini-blue
+            flex shrink-0 items-center transition-colors
+          "
         >
           <ArrowLeft className="h-4 w-4" />
-          <span className="text-[13px] font-semibold">
+          <span className="font-semibold text-[13px]">
             {language === 'zh' ? '返回' : 'Back'}
           </span>
         </button>
         <div className="flex-1" />
-        <div className="flex shrink-0 items-center gap-1">
+        <div className="gap-1 flex shrink-0 items-center">
           {user?.isAdmin && (
             <button
               type="button"
               onClick={() => setEditOpen(true)}
-              className="rounded-full p-1.5 text-slate-400 transition-colors hover:text-illini-blue"
+              className="
+                p-1.5 text-slate-400
+                hover:text-illini-blue
+                rounded-full transition-colors
+              "
               aria-label="Edit"
             >
               <Pencil className="h-4 w-4" />
@@ -261,10 +275,17 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
             onClick={() => {
               toggleFavorite(dorm.id, dorm.name, dorm.name_zh)
             }}
-            className="rounded-full p-1.5 text-slate-400 transition-colors hover:text-illini-orange"
+            className="
+              p-1.5 text-slate-400
+              hover:text-illini-orange
+              rounded-full transition-colors
+            "
           >
             <Heart
-              className={`h-5 w-5 transition-colors duration-200 ${isFavorite(dorm.id) ? 'fill-illini-orange text-illini-orange' : ''}`}
+              className={`
+                h-5 w-5 transition-colors duration-200
+                ${isFavorite(dorm.id) ? `fill-illini-orange text-illini-orange` : ''}
+              `}
             />
           </button>
         </div>
@@ -281,7 +302,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
     toggleFavorite,
     isFavorite,
     setMobileHeaderSlot,
-  ]) // eslint-disable-line react-hooks/exhaustive-deps
+  ])  
 
   // ── Loading state ──────────────────────────────────────────────────────
   if (!dorm) {
@@ -291,7 +312,10 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
         <button
           type="button"
           onClick={() => navigate('/dorms')}
-          className="mt-4 text-illini-blue hover:underline"
+          className="
+            mt-4 text-illini-blue
+            hover:underline
+          "
         >
           {t.backToDorms}
         </button>
@@ -462,30 +486,51 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
       variants={pageVariants}
       initial="hidden"
       animate="visible"
-      className="no-scrollbar h-full w-full overflow-y-auto bg-slate-50 pb-24 font-sans text-slate-800"
+      className="
+        no-scrollbar bg-slate-50 pb-24 font-sans text-slate-800 size-full
+        overflow-y-auto
+      "
       style={{
         marginRight: editOpen ? '32rem' : 0,
         transition: 'margin-right 0.3s ease-in-out',
       }}
     >
       {/* ── Top bar (desktop: sticky bar; mobile: overlay on hero) ── */}
-      <div className="sticky top-0 z-40 hidden border-b border-white/50 bg-white/70 shadow-[0_4px_20px_rgba(0,0,0,0.02)] backdrop-blur-xl md:block">
-        <div className="mx-auto flex h-14 max-w-[1000px] items-center justify-between px-6">
+      <div className="
+        top-0 border-white/50 bg-white/70 backdrop-blur-xl
+        md:block
+        sticky z-40 hidden border-b shadow-[0_4px_20px_rgba(0,0,0,0.02)]
+      ">
+        <div className="
+          h-14 px-6 mx-auto flex max-w-[1000px] items-center justify-between
+        ">
           <button
             type="button"
             onClick={() => navigate('/dorms')}
-            className="group flex items-center gap-1.5 py-2 text-slate-500 transition-colors hover:text-illini-blue"
+            className="
+              group gap-1.5 py-2 text-slate-500
+              hover:text-illini-blue
+              flex items-center transition-colors
+            "
           >
-            <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
-            <span className="text-[14px] font-semibold">{t.backToBrowse}</span>
+            <ArrowLeft className="
+              h-4 w-4
+              group-hover:-translate-x-0.5
+              transition-transform
+            " />
+            <span className="font-semibold text-[14px]">{t.backToBrowse}</span>
           </button>
 
-          <div className="flex items-center gap-1">
+          <div className="gap-1 flex items-center">
             {user?.isAdmin && (
               <button
                 type="button"
                 onClick={() => setEditOpen(true)}
-                className="rounded-full p-2 text-slate-400 transition-colors hover:bg-slate-100/50 hover:text-illini-blue"
+                className="
+                  p-2 text-slate-400
+                  hover:bg-slate-100/50 hover:text-illini-blue
+                  rounded-full transition-colors
+                "
                 aria-label="Edit"
               >
                 <Pencil className="h-4 w-4" />
@@ -499,7 +544,11 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
               aria-label={isSaved ? t.saved : t.save}
               whileTap={{ scale: 1.35 }}
               transition={{ type: 'spring', stiffness: 400, damping: 12 }}
-              className="-mr-1 rounded-full p-2 text-slate-500 transition-colors hover:bg-slate-100/50 hover:text-illini-orange"
+              className="
+                -mr-1 p-2 text-slate-500
+                hover:bg-slate-100/50 hover:text-illini-orange
+                rounded-full transition-colors
+              "
             >
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
@@ -510,7 +559,10 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                   transition={{ duration: 0.15 }}
                 >
                   <Heart
-                    className={`h-5 w-5 transition-colors duration-200 ${isSaved ? 'fill-illini-orange text-illini-orange' : ''}`}
+                    className={`
+                      h-5 w-5 transition-colors duration-200
+                      ${isSaved ? `fill-illini-orange text-illini-orange` : ''}
+                    `}
                   />
                 </motion.div>
               </AnimatePresence>
@@ -519,18 +571,34 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
         </div>
       </div>
 
-      <main className="mx-auto mt-0 max-w-[1000px] px-4 md:mt-8 md:px-6">
+      <main className="
+        mt-0 px-4
+        md:mt-8 md:px-6
+        mx-auto max-w-[1000px]
+      ">
         <motion.div
           variants={staggerContainer}
           initial="hidden"
           animate="visible"
-          className="space-y-8 md:space-y-10"
+          className="
+            space-y-8
+            md:space-y-10
+          "
         >
           {/* ── Hero Section ── */}
-          <motion.section variants={fadeUp} className="space-y-5 md:space-y-6">
+          <motion.section variants={fadeUp} className="
+            space-y-5
+            md:space-y-6
+          ">
             {heroImage && (
               <div
-                className="relative aspect-[4/3] w-full cursor-zoom-in overflow-hidden bg-slate-100 shadow-sm sm:aspect-video md:aspect-[21/9] md:rounded-2xl md:rounded-3xl md:border md:border-white/60"
+                className="
+                  bg-slate-100 shadow-sm
+                  sm:aspect-video
+                  md:aspect-[21/9] md:rounded-2xl md:rounded-3xl md:border
+                  md:border-white/60
+                  relative aspect-4/3 w-full cursor-zoom-in overflow-hidden
+                "
                 onClick={() => {
                   const gallery = heroImages.map((src, i) => ({
                     src,
@@ -542,7 +610,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                 <motion.img
                   src={heroImage}
                   alt={dormName}
-                  className="h-full w-full object-cover"
+                  className="size-full object-cover"
                   initial={{ scale: 1.04 }}
                   animate={{ scale: 1 }}
                   transition={{ duration: 0.8, ease: 'easeOut' }}
@@ -559,10 +627,24 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                         .getElementById('reviews')
                         ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
                     }}
-                    className="absolute right-3 top-3 flex cursor-pointer items-center gap-1 rounded-full border border-white/50 bg-white/80 px-2.5 py-1 shadow-sm backdrop-blur-md transition-colors hover:bg-white/95 md:right-4 md:top-4 md:gap-1.5 md:px-3 md:py-1.5"
+                    className="
+                      right-3 top-3 gap-1 border-white/50 bg-white/80 px-2.5
+                      py-1 shadow-sm backdrop-blur-md
+                      hover:bg-white/95
+                      md:right-4 md:top-4 md:gap-1.5 md:px-3 md:py-1.5
+                      absolute flex cursor-pointer items-center rounded-full
+                      border transition-colors
+                    "
                   >
-                    <ThumbsUp className="h-3.5 w-3.5 fill-illini-orange text-illini-orange md:h-4 md:w-4" />
-                    <span className="text-[12px] font-bold text-slate-900 md:text-[13px]">
+                    <ThumbsUp className="
+                      h-3.5 w-3.5 fill-illini-orange text-illini-orange
+                      md:h-4 md:w-4
+                    " />
+                    <span className="
+                      font-bold text-slate-900
+                      md:text-[13px]
+                      text-[12px]
+                    ">
                       {positivePercent}
                       {t.positiveRating} ({totalReviews})
                     </span>
@@ -582,7 +664,10 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                             (prev - 1 + heroImages.length) % heroImages.length
                         )
                       }}
-                      className="left-3 md:left-4"
+                      className="
+                        left-3
+                        md:left-4
+                      "
                     />
                     <InlineImageNavButton
                       direction="next"
@@ -595,9 +680,17 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                           (prev) => (prev + 1) % heroImages.length
                         )
                       }}
-                      className="right-3 md:right-4"
+                      className="
+                        right-3
+                        md:right-4
+                      "
                     />
-                    <div className="absolute bottom-3 right-3 rounded-full bg-black/40 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-sm md:bottom-4 md:right-4">
+                    <div className="
+                      bottom-3 right-3 bg-black/40 px-2.5 py-1 font-semibold
+                      text-white backdrop-blur-sm
+                      md:bottom-4 md:right-4
+                      absolute rounded-full text-[11px]
+                    ">
                       {safeHeroImageIndex + 1} / {heroImages.length}
                     </div>
                   </>
@@ -606,32 +699,59 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
             )}
 
             {/* Title & Meta + Hard Facts */}
-            <div className="flex flex-col justify-between gap-6 md:flex-row md:items-start md:gap-8">
-              <div className="flex-1 space-y-3 md:space-y-4">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-full bg-slate-200/60 px-3 py-1 text-[11px] font-bold text-slate-700 md:text-[12px]">
+            <div className="
+              gap-6
+              md:flex-row md:items-start md:gap-8
+              flex flex-col justify-between
+            ">
+              <div className="
+                space-y-3
+                md:space-y-4
+                flex-1
+              ">
+                <div className="gap-2 flex flex-wrap items-center">
+                  <span className="
+                    bg-slate-200/60 px-3 py-1 font-bold text-slate-700
+                    md:text-[12px]
+                    rounded-full text-[11px]
+                  ">
                     {getLocalizedLabel(housingMeta, language)} (
                     {housingMeta.shortLabel})
                   </span>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-slate-200/60 px-3 py-1 text-[11px] font-bold text-slate-700 md:text-[12px]">
+                  <span className="
+                    gap-1 bg-slate-200/60 px-3 py-1 font-bold text-slate-700
+                    md:text-[12px]
+                    inline-flex items-center rounded-full text-[11px]
+                  ">
                     <MapPin className="h-3 w-3" />
                     {dormLocation}
                   </span>
                 </div>
 
-                <h1 className="text-3xl font-extrabold tracking-tight text-illini-blue md:text-4xl">
+                <h1 className="
+                  text-3xl font-extrabold tracking-tight text-illini-blue
+                  md:text-4xl
+                ">
                   {dormName}
                 </h1>
 
                 {dormAddress && (
-                  <div className="flex items-start gap-1.5 text-[13px] font-medium text-slate-500 md:items-center md:text-[14px]">
-                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 md:mt-0" />
+                  <div className="
+                    gap-1.5 font-medium text-slate-500
+                    md:items-center md:text-[14px]
+                    flex items-start text-[13px]
+                  ">
+                    <MapPin className="
+                      mt-0.5 h-4 w-4
+                      md:mt-0
+                      shrink-0
+                    " />
                     <span className="leading-tight">{dormAddress}</span>
                   </div>
                 )}
 
                 {positiveTags.length > 0 && (
-                  <div className="flex flex-wrap gap-2 pt-1">
+                  <div className="gap-2 pt-1 flex flex-wrap">
                     {positiveTags.flatMap((tag, i) => {
                       const Icon = TAG_REGISTRY[tag]?.icon
                       if (
@@ -645,7 +765,13 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                               initial={{ opacity: 0, scale: 0.85 }}
                               animate={{ opacity: 1, scale: 1 }}
                               transition={{ delay: 0.3 + (i + j) * 0.06 }}
-                              className="inline-flex items-center gap-1 rounded-full bg-illini-orange/10 px-3 py-1 text-[12px] font-bold text-illini-orange md:text-[13px]"
+                              className="
+                                gap-1 bg-illini-orange/10 px-3 py-1 font-bold
+                                text-illini-orange
+                                md:text-[13px]
+                                inline-flex items-center rounded-full
+                                text-[12px]
+                              "
                             >
                               {Icon && (
                                 <Icon
@@ -664,7 +790,12 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                           initial={{ opacity: 0, scale: 0.85 }}
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{ delay: 0.3 + i * 0.06 }}
-                          className="inline-flex items-center gap-1 rounded-full bg-illini-orange/10 px-3 py-1 text-[12px] font-bold text-illini-orange md:text-[13px]"
+                          className="
+                            gap-1 bg-illini-orange/10 px-3 py-1 font-bold
+                            text-illini-orange
+                            md:text-[13px]
+                            inline-flex items-center rounded-full text-[12px]
+                          "
                         >
                           {Icon && (
                             <Icon className="h-3.5 w-3.5" strokeWidth={1.5} />
@@ -682,29 +813,53 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
               </div>
 
               {/* Hard Facts cards */}
-              <div className="mt-2 flex w-full gap-2 md:mt-0 md:w-auto md:gap-3">
+              <div className="
+                mt-2 gap-2
+                md:mt-0 md:w-auto md:gap-3
+                flex w-full
+              ">
                 {/* AC */}
                 <div
-                  className={`flex h-[88px] min-w-[88px] flex-1 flex-col items-center justify-center rounded-2xl border p-2 shadow-sm md:h-[100px] md:min-w-[100px] md:flex-none md:p-3 ${
+                  className={`
+                    rounded-2xl p-2 shadow-sm
+                    md:h-[100px] md:min-w-[100px] md:flex-none md:p-3
+                    flex h-[88px] min-w-[88px] flex-1 flex-col items-center
+                    justify-center border
+                    ${
                     dorm.ac
                       ? 'border-slate-100 bg-white'
                       : 'border-amber-200 bg-amber-50'
-                  }`}
+                  }
+                  `}
                 >
                   {/* Snowflake with strikethrough when no AC */}
-                  <div className="relative mb-1.5">
+                  <div className="mb-1.5 relative">
                     <Snowflake
-                      className={`h-5 w-5 md:h-6 md:w-6 ${dorm.ac ? 'text-sky-400' : 'text-slate-300'}`}
+                      className={`
+                        h-5 w-5
+                        md:h-6 md:w-6
+                        ${dorm.ac ? `text-sky-400` : `text-slate-300`}
+                      `}
                       strokeWidth={1.5}
                     />
                     {!dorm.ac && (
-                      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                        <div className="h-[2px] w-[140%] rotate-45 rounded-full bg-red-400" />
+                      <div className="
+                        inset-0 pointer-events-none absolute flex items-center
+                        justify-center
+                      ">
+                        <div className="
+                          bg-red-400 h-[2px] w-[140%] rotate-45 rounded-full
+                        " />
                       </div>
                     )}
                   </div>
                   <span
-                    className={`text-center text-[11px] font-bold leading-tight md:text-[12px] ${dorm.ac ? 'text-slate-700' : 'text-amber-700'}`}
+                    className={`
+                      font-bold leading-tight
+                      md:text-[12px]
+                      text-center text-[11px]
+                      ${dorm.ac ? `text-slate-700` : `text-amber-700`}
+                    `}
                   >
                     {dorm.ac
                       ? language === 'zh'
@@ -715,30 +870,61 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                         : 'No A/C'}
                   </span>
                   {!dorm.ac && (
-                    <span className="mt-1 rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-semibold leading-none text-amber-500 md:text-[10px]">
+                    <span className="
+                      mt-1 bg-amber-100 px-1.5 py-0.5 font-semibold
+                      text-amber-500
+                      md:text-[10px]
+                      rounded-full text-[9px] leading-none
+                    ">
                       {language === 'zh' ? '注意' : 'Note'}
                     </span>
                   )}
                 </div>
 
                 {/* Dining */}
-                <div className="flex h-[88px] min-w-[88px] flex-1 flex-col items-center justify-center rounded-2xl border border-slate-100 bg-white p-2 shadow-sm md:h-[100px] md:min-w-[100px] md:flex-none md:p-3">
+                <div className="
+                  rounded-2xl border-slate-100 bg-white p-2 shadow-sm
+                  md:h-[100px] md:min-w-[100px] md:flex-none md:p-3
+                  flex h-[88px] min-w-[88px] flex-1 flex-col items-center
+                  justify-center border
+                ">
                   <Utensils
-                    className="mb-1.5 h-5 w-5 shrink-0 text-[#52C41A] md:h-6 md:w-6"
+                    className="
+                      mb-1.5 h-5 w-5
+                      md:h-6 md:w-6
+                      shrink-0 text-[#52C41A]
+                    "
                     strokeWidth={1.5}
                   />
-                  <span className="text-center text-[11px] font-bold leading-tight text-slate-700 md:text-[12px]">
+                  <span className="
+                    font-bold leading-tight text-slate-700
+                    md:text-[12px]
+                    text-center text-[11px]
+                  ">
                     {diningLabel}
                   </span>
                 </div>
 
                 {/* Bathroom */}
-                <div className="flex h-[88px] min-w-[88px] flex-1 flex-col items-center justify-center rounded-2xl border border-slate-100 bg-white p-2 shadow-sm md:h-[100px] md:min-w-[100px] md:flex-none md:p-3">
+                <div className="
+                  rounded-2xl border-slate-100 bg-white p-2 shadow-sm
+                  md:h-[100px] md:min-w-[100px] md:flex-none md:p-3
+                  flex h-[88px] min-w-[88px] flex-1 flex-col items-center
+                  justify-center border
+                ">
                   <Bath
-                    className="mb-1.5 h-5 w-5 shrink-0 text-[#1890FF] md:h-6 md:w-6"
+                    className="
+                      mb-1.5 h-5 w-5
+                      md:h-6 md:w-6
+                      shrink-0 text-[#1890FF]
+                    "
                     strokeWidth={1.5}
                   />
-                  <span className="text-center text-[11px] font-bold leading-tight text-slate-700 md:text-[12px]">
+                  <span className="
+                    font-bold leading-tight text-slate-700
+                    md:text-[12px]
+                    text-center text-[11px]
+                  ">
                     {bathroomLabel}
                   </span>
                 </div>
@@ -747,7 +933,11 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
 
             {/* Description + website link */}
             <div className="space-y-3 pt-2">
-              <p className="max-w-4xl text-[14px] font-medium leading-relaxed text-slate-600 md:text-[15px]">
+              <p className="
+                max-w-4xl font-medium leading-relaxed text-slate-600
+                md:text-[15px]
+                text-[14px]
+              ">
                 {dormDesc}
               </p>
               {(dorm.website || dorm.housingType === 'URH') && (
@@ -755,7 +945,13 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                   href={dorm.website || 'https://housing.illinois.edu/'}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex w-fit items-center gap-1 rounded-full bg-slate-100 px-3 py-1.5 text-[11px] font-semibold text-slate-500 transition-colors hover:bg-slate-200 md:text-[12px]"
+                  className="
+                    gap-1 bg-slate-100 px-3 py-1.5 font-semibold text-slate-500
+                    hover:bg-slate-200
+                    md:text-[12px]
+                    inline-flex w-fit items-center rounded-full text-[11px]
+                    transition-colors
+                  "
                 >
                   <span>{t.viewWebsite}</span>
                   <ExternalLink className="h-3 w-3" />
@@ -768,12 +964,23 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
           {(neutralTags.length > 0 || mutedTags.length > 0) && (
             <motion.section
               variants={fadeUp}
-              className="space-y-3 md:space-y-4"
+              className="
+                space-y-3
+                md:space-y-4
+              "
             >
-              <h3 className="text-[16px] font-bold text-slate-900 md:text-[18px]">
+              <h3 className="
+                font-bold text-slate-900
+                md:text-[18px]
+                text-[16px]
+              ">
                 {t.amenities}
               </h3>
-              <div className="flex flex-wrap gap-2 md:gap-2.5">
+              <div className="
+                gap-2
+                md:gap-2.5
+                flex flex-wrap
+              ">
                 {neutralTags.map((tag, i) => {
                   const Icon = TAG_REGISTRY[tag]?.icon
                   return (
@@ -783,15 +990,28 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: 0.05 * i }}
                       whileHover={{ y: -2, scale: 1.04 }}
-                      className="flex cursor-default items-center gap-1.5 rounded-lg border border-white/60 bg-white/80 px-2.5 py-1 shadow-[0_2px_10px_rgba(0,0,0,0.02)] backdrop-blur-md md:rounded-xl md:px-3 md:py-1.5"
+                      className="
+                        gap-1.5 rounded-lg border-white/60 bg-white/80 px-2.5
+                        py-1 backdrop-blur-md
+                        md:rounded-xl md:px-3 md:py-1.5
+                        flex cursor-default items-center border
+                        shadow-[0_2px_10px_rgba(0,0,0,0.02)]
+                      "
                     >
                       {Icon && (
                         <Icon
-                          className="h-3.5 w-3.5 text-slate-500 md:h-4 md:w-4"
+                          className="
+                            h-3.5 w-3.5 text-slate-500
+                            md:h-4 md:w-4
+                          "
                           strokeWidth={1.5}
                         />
                       )}
-                      <span className="text-[12px] font-semibold text-slate-700 md:text-[13px]">
+                      <span className="
+                        font-semibold text-slate-700
+                        md:text-[13px]
+                        text-[12px]
+                      ">
                         {getDetailTagDisplay(
                           tag,
                           dorm.categorizedTags,
@@ -810,15 +1030,27 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: 0.05 * (neutralTags.length + i) }}
                       whileHover={{ y: -2, scale: 1.04 }}
-                      className="flex cursor-default items-center gap-1.5 rounded-lg border border-slate-200/50 bg-slate-100/50 px-2.5 py-1 md:rounded-xl md:px-3 md:py-1.5"
+                      className="
+                        gap-1.5 rounded-lg border-slate-200/50 bg-slate-100/50
+                        px-2.5 py-1
+                        md:rounded-xl md:px-3 md:py-1.5
+                        flex cursor-default items-center border
+                      "
                     >
                       {Icon && (
                         <Icon
-                          className="h-3.5 w-3.5 text-slate-400 md:h-4 md:w-4"
+                          className="
+                            h-3.5 w-3.5 text-slate-400
+                            md:h-4 md:w-4
+                          "
                           strokeWidth={1.5}
                         />
                       )}
-                      <span className="text-[12px] font-semibold text-slate-500 md:text-[13px]">
+                      <span className="
+                        font-semibold text-slate-500
+                        md:text-[13px]
+                        text-[12px]
+                      ">
                         {getDetailTagDisplay(
                           tag,
                           dorm.categorizedTags,
@@ -836,16 +1068,34 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
           {sortedPlans.length > 0 && (
             <motion.section
               variants={fadeUp}
-              className="space-y-3 pt-2 md:space-y-4"
+              className="
+                space-y-3 pt-2
+                md:space-y-4
+              "
             >
-              <div className="mb-4 flex items-end justify-between md:mb-6">
-                <div className="space-y-1 md:space-y-1.5">
-                  <h3 className="text-[16px] font-bold text-slate-900 md:text-[18px]">
+              <div className="
+                mb-4
+                md:mb-6
+                flex items-end justify-between
+              ">
+                <div className="
+                  space-y-1
+                  md:space-y-1.5
+                ">
+                  <h3 className="
+                    font-bold text-slate-900
+                    md:text-[18px]
+                    text-[16px]
+                  ">
                     {language === 'zh'
                       ? '户型图与价格'
                       : 'Floor Plans & Pricing'}
                   </h3>
-                  <p className="text-[12px] font-medium text-slate-500 md:text-[13px]">
+                  <p className="
+                    font-medium text-slate-500
+                    md:text-[13px]
+                    text-[12px]
+                  ">
                     {t.floorPlansDesc}
                   </p>
                 </div>
@@ -854,13 +1104,26 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => setShowPlanCompare(!showPlanCompare)}
-                  className={`flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-[12px] font-bold shadow-[0_2px_10px_rgba(0,0,0,0.02)] backdrop-blur-md transition-all md:px-4 md:py-2 md:text-[13px] ${
+                  className={`
+                    gap-1.5 rounded-xl px-3 py-1.5 font-bold backdrop-blur-md
+                    md:px-4 md:py-2 md:text-[13px]
+                    flex items-center border text-[12px]
+                    shadow-[0_2px_10px_rgba(0,0,0,0.02)] transition-all
+                    ${
                     showPlanCompare
                       ? 'border-illini-blue bg-illini-blue text-white'
-                      : 'border-white/60 bg-white/80 text-illini-blue hover:bg-white hover:shadow-[0_4px_15px_rgba(0,0,0,0.04)]'
-                  }`}
+                      : `
+                        border-white/60 bg-white/80 text-illini-blue
+                        hover:bg-white
+                        hover:shadow-[0_4px_15px_rgba(0,0,0,0.04)]
+                      `
+                  }
+                  `}
                 >
-                  <ArrowRightLeft className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                  <ArrowRightLeft className="
+                    h-3.5 w-3.5
+                    md:h-4 md:w-4
+                  " />
                   {showPlanCompare
                     ? language === 'zh'
                       ? '退出对比'
@@ -979,12 +1242,29 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                       onClick={() =>
                         setExpandedPlanId(isExpanded ? null : planKey)
                       }
-                      className="group cursor-pointer overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm transition-[box-shadow] duration-150 hover:-translate-y-px hover:shadow-[0_6px_20px_rgba(0,0,0,0.08)] md:rounded-2xl"
+                      className="
+                        group rounded-xl border-slate-100 bg-white shadow-sm
+                        md:rounded-2xl
+                        cursor-pointer overflow-hidden border transition-shadow
+                        duration-150
+                        hover:-translate-y-px
+                        hover:shadow-[0_6px_20px_rgba(0,0,0,0.08)]
+                      "
                     >
-                      <div className="flex flex-row items-center gap-4 p-3 md:items-start md:gap-6 md:p-5">
+                      <div className="
+                        gap-4 p-3
+                        md:items-start md:gap-6 md:p-5
+                        flex flex-row items-center
+                      ">
                         {/* Thumbnail (展示图 > 户型图 > placeholder) */}
                         <div
-                          className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg border border-slate-200/60 bg-slate-50 transition-colors group-hover:border-slate-300 md:h-28 md:w-36 md:rounded-xl"
+                          className="
+                            h-20 w-20 rounded-lg border-slate-200/60 bg-slate-50
+                            group-hover:border-slate-300
+                            md:h-28 md:w-36 md:rounded-xl
+                            relative shrink-0 overflow-hidden border
+                            transition-colors
+                          "
                           onClick={(e) => {
                             if (planImages.length > 0) {
                               e.stopPropagation()
@@ -996,7 +1276,11 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                             <img
                               src={thumbSrc}
                               alt={planDisplayTitle}
-                              className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
+                              className="
+                                size-full object-cover transition-transform
+                                duration-200
+                                group-hover:scale-105
+                              "
                               onError={() =>
                                 setImageErrors((prev) => ({
                                   ...prev,
@@ -1005,7 +1289,10 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                               }
                             />
                           ) : (
-                            <div className="flex h-full w-full items-center justify-center text-slate-300">
+                            <div className="
+                              text-slate-300 flex size-full items-center
+                              justify-center
+                            ">
                               <SquareDashed
                                 className="h-8 w-8"
                                 strokeWidth={1}
@@ -1015,32 +1302,72 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                         </div>
 
                         {/* Content */}
-                        <div className="flex min-w-0 flex-1 flex-col justify-between gap-1 md:h-28 md:flex-row md:gap-0">
+                        <div className="
+                          min-w-0 gap-1
+                          md:h-28 md:flex-row md:gap-0
+                          flex flex-1 flex-col justify-between
+                        ">
                           {/* Left */}
-                          <div className="flex h-full min-w-0 flex-col justify-center gap-1.5 py-0.5 md:gap-3">
-                            <div className="flex w-full items-center justify-between gap-2 md:justify-start">
-                              <div className="flex min-w-0 flex-wrap items-center gap-1.5 md:gap-3">
-                                <h4 className="truncate text-[15px] font-extrabold text-slate-900 md:text-[18px]">
+                          <div className="
+                            min-w-0 gap-1.5 py-0.5
+                            md:gap-3
+                            flex h-full flex-col justify-center
+                          ">
+                            <div className="
+                              gap-2
+                              md:justify-start
+                              flex w-full items-center justify-between
+                            ">
+                              <div className="
+                                min-w-0 gap-1.5
+                                md:gap-3
+                                flex flex-wrap items-center
+                              ">
+                                <h4 className="
+                                  font-extrabold text-slate-900
+                                  md:text-[18px]
+                                  truncate text-[15px]
+                                ">
                                   {planDisplayTitle}
                                 </h4>
                                 {normalizedSummary && (
-                                  <span className="text-[12px] font-medium text-slate-500 md:text-[14px]">
+                                  <span className="
+                                    font-medium text-slate-500
+                                    md:text-[14px]
+                                    text-[12px]
+                                  ">
                                     {normalizedSummary}
                                   </span>
                                 )}
                                 <span
-                                  className={`flex items-center gap-0.5 whitespace-nowrap rounded-md border px-1.5 py-0.5 text-[10px] font-bold md:gap-1 md:rounded-xl md:px-2.5 md:py-1 md:text-[13px] ${
+                                  className={`
+                                    gap-0.5 rounded-md px-1.5 py-0.5 font-bold
+                                    md:gap-1 md:rounded-xl md:px-2.5 md:py-1
+                                    md:text-[13px]
+                                    flex items-center border text-[10px]
+                                    whitespace-nowrap
+                                    ${
                                     plan.available === false
                                       ? 'border-red-200 bg-red-50 text-red-600'
                                       : planPrice == null
-                                        ? 'border-amber-200 bg-amber-50 text-amber-700'
-                                        : 'border-[#D1FAE5] bg-[#ECFDF5] text-[#059669]'
-                                  }`}
+                                        ? `
+                                          border-amber-200 bg-amber-50
+                                          text-amber-700
+                                        `
+                                        : `
+                                          border-[#D1FAE5] bg-[#ECFDF5]
+                                          text-[#059669]
+                                        `
+                                  }
+                                  `}
                                 >
                                   {plan.available !== false &&
                                     planPrice != null && (
                                       <Check
-                                        className="h-2.5 w-2.5 md:h-3.5 md:w-3.5"
+                                        className="
+                                          h-2.5 w-2.5
+                                          md:h-3.5 md:w-3.5
+                                        "
                                         strokeWidth={3}
                                       />
                                     )}
@@ -1051,30 +1378,64 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                               <motion.div
                                 animate={{ rotate: isExpanded ? 180 : 0 }}
                                 transition={{ duration: 0.25 }}
-                                className="-mr-1 flex shrink-0 items-center justify-center text-slate-400 md:hidden"
+                                className="
+                                  -mr-1 text-slate-400
+                                  md:hidden
+                                  flex shrink-0 items-center justify-center
+                                "
                               >
                                 <ChevronDown className="h-5 w-5" />
                               </motion.div>
                             </div>
 
                             {/* Specs */}
-                            <div className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-slate-600 md:mt-0 md:gap-4">
+                            <div className="
+                              mt-1 gap-x-1.5 gap-y-1 text-slate-600
+                              md:mt-0 md:gap-4
+                              flex flex-wrap items-center
+                            ">
                               {plan.bedCount != null && (
                                 <>
-                                  <div className="flex items-center gap-1 md:gap-1.5">
-                                    <BedSingle className="h-3.5 w-3.5 text-slate-400 md:h-4 md:w-4" />
-                                    <span className="text-[12px] font-semibold md:text-[14px]">
+                                  <div className="
+                                    gap-1
+                                    md:gap-1.5
+                                    flex items-center
+                                  ">
+                                    <BedSingle className="
+                                      h-3.5 w-3.5 text-slate-400
+                                      md:h-4 md:w-4
+                                    " />
+                                    <span className="
+                                      font-semibold
+                                      md:text-[14px]
+                                      text-[12px]
+                                    ">
                                       {plan.bedSize
                                         ? plan.bedSize
                                         : `${plan.bedCount} ${language === 'zh' ? '张床' : plan.bedCount === 1 ? 'Bed' : 'Beds'}`}
                                     </span>
                                   </div>
-                                  <div className="h-0.5 w-0.5 rounded-full bg-slate-300 md:h-1 md:w-1" />
+                                  <div className="
+                                    h-0.5 w-0.5 bg-slate-300
+                                    md:h-1 md:w-1
+                                    rounded-full
+                                  " />
                                 </>
                               )}
-                              <div className="flex items-center gap-1 md:gap-1.5">
-                                <Bath className="h-3.5 w-3.5 text-slate-400 md:h-4 md:w-4" />
-                                <span className="text-[12px] font-semibold md:text-[14px]">
+                              <div className="
+                                gap-1
+                                md:gap-1.5
+                                flex items-center
+                              ">
+                                <Bath className="
+                                  h-3.5 w-3.5 text-slate-400
+                                  md:h-4 md:w-4
+                                " />
+                                <span className="
+                                  font-semibold
+                                  md:text-[14px]
+                                  text-[12px]
+                                ">
                                   {plan.bathroomCount != null &&
                                   plan.bathroomCount > 0
                                     ? `${plan.bathroomCount} ${language === 'zh' ? '卫' : plan.bathroomCount === 1 ? 'Bath' : 'Baths'}`
@@ -1083,16 +1444,33 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                               </div>
                               {plan.sqft && (
                                 <>
-                                  <div className="h-0.5 w-0.5 rounded-full bg-slate-300 md:h-1 md:w-1" />
-                                  <div className="flex items-center gap-1 md:gap-1.5">
-                                    <SquareDashed className="h-3.5 w-3.5 text-slate-400 md:h-4 md:w-4" />
-                                    <span className="text-[12px] font-semibold tabular-nums md:text-[14px]">
+                                  <div className="
+                                    h-0.5 w-0.5 bg-slate-300
+                                    md:h-1 md:w-1
+                                    rounded-full
+                                  " />
+                                  <div className="
+                                    gap-1
+                                    md:gap-1.5
+                                    flex items-center
+                                  ">
+                                    <SquareDashed className="
+                                      h-3.5 w-3.5 text-slate-400
+                                      md:h-4 md:w-4
+                                    " />
+                                    <span className="
+                                      font-semibold
+                                      md:text-[14px]
+                                      text-[12px] tabular-nums
+                                    ">
                                       {plan.sqft}{' '}
                                       {t.sqft ||
                                         (language === 'zh'
                                           ? '平方英尺'
                                           : 'sqft')}
-                                      <span className="ml-1 font-medium text-slate-400">
+                                      <span className="
+                                        ml-1 font-medium text-slate-400
+                                      ">
                                         (~{Math.round(plan.sqft * 0.092903)}㎡)
                                       </span>
                                     </span>
@@ -1103,21 +1481,40 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
 
                             {/* Mobile price */}
                             {planPrice != null ? (
-                              <div className="mt-0.5 flex items-baseline gap-1 md:hidden">
-                                <span className="text-[16px] font-extrabold tabular-nums tracking-tight text-slate-900">
+                              <div className="
+                                mt-0.5 gap-1
+                                md:hidden
+                                flex items-baseline
+                              ">
+                                <span className="
+                                  font-extrabold tracking-tight text-slate-900
+                                  text-[16px] tabular-nums
+                                ">
                                   {formatPrice(planPrice)}
                                 </span>
-                                <span className="text-[11px] font-medium text-slate-500">
+                                <span className="
+                                  font-medium text-slate-500 text-[11px]
+                                ">
                                   {t.yr}
                                 </span>
-                                <span className="ml-1 text-[11px] font-medium tabular-nums text-slate-400">
+                                <span className="
+                                  ml-1 font-medium text-slate-400 text-[11px]
+                                  tabular-nums
+                                ">
                                   (~{formatPrice(Math.round(planPrice / 12))}
                                   {t.mo})
                                 </span>
                               </div>
                             ) : (
                               <div
-                                className={`mt-0.5 text-[12px] font-semibold md:hidden ${plan.available === false ? 'text-red-500' : 'text-amber-600'}`}
+                                className={`
+                                  mt-0.5 font-semibold
+                                  md:hidden
+                                  text-[12px]
+                                  ${plan.available === false ? `text-red-500` : `
+                                    text-amber-600
+                                  `}
+                                `}
                               >
                                 {availabilityLabel}
                               </div>
@@ -1132,14 +1529,31 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                   e.stopPropagation()
                                   toggleCompare(planKey)
                                 }}
-                                className={`mt-1 flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[11px] font-semibold transition-colors md:hidden ${
+                                className={`
+                                  mt-1 gap-1.5 rounded-lg px-2.5 py-1
+                                  font-semibold
+                                  md:hidden
+                                  flex items-center border text-[11px]
+                                  transition-colors
+                                  ${
                                   isCompared
-                                    ? 'border-illini-blue/30 bg-illini-blue/5 text-illini-blue'
+                                    ? `
+                                      border-illini-blue/30 bg-illini-blue/5
+                                      text-illini-blue
+                                    `
                                     : 'border-slate-200 bg-white text-slate-500'
-                                }`}
+                                }
+                                `}
                               >
                                 <div
-                                  className={`flex h-3 w-3 items-center justify-center rounded-[3px] border transition-colors ${isCompared ? 'border-illini-blue bg-illini-blue text-white' : 'border-slate-300'}`}
+                                  className={`
+                                    h-3 w-3 flex items-center justify-center
+                                    rounded-[3px] border transition-colors
+                                    ${isCompared ? `
+                                      border-illini-blue bg-illini-blue
+                                      text-white
+                                    ` : `border-slate-300`}
+                                  `}
                                 >
                                   {isCompared && (
                                     <Check
@@ -1154,31 +1568,50 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                           </div>
 
                           {/* Right: desktop price + actions */}
-                          <div className="hidden h-full shrink-0 flex-col items-end justify-between gap-2 py-0.5 md:flex">
+                          <div className="
+                            gap-2 py-0.5
+                            md:flex
+                            hidden h-full shrink-0 flex-col items-end
+                            justify-between
+                          ">
                             {planPrice != null ? (
                               <div className="flex flex-col items-end">
-                                <div className="flex items-baseline gap-0.5">
-                                  <span className="text-[24px] font-extrabold tabular-nums tracking-tight text-slate-900">
+                                <div className="gap-0.5 flex items-baseline">
+                                  <span className="
+                                    font-extrabold tracking-tight text-slate-900
+                                    text-[24px] tabular-nums
+                                  ">
                                     {formatPrice(planPrice)}
                                   </span>
-                                  <span className="text-[13px] font-medium text-slate-500">
+                                  <span className="
+                                    font-medium text-slate-500 text-[13px]
+                                  ">
                                     {t.yr}
                                   </span>
                                 </div>
-                                <div className="mt-1 inline-flex items-center rounded-md bg-slate-100 px-1.5 py-0.5 text-[12px] font-medium tabular-nums text-slate-500">
+                                <div className="
+                                  mt-1 rounded-md bg-slate-100 px-1.5 py-0.5
+                                  font-medium text-slate-500 inline-flex
+                                  items-center text-[12px] tabular-nums
+                                ">
                                   ~{formatPrice(Math.round(planPrice / 12))}
                                   {t.mo}
                                 </div>
                               </div>
                             ) : (
                               <div
-                                className={`text-[13px] font-semibold ${plan.available === false ? 'text-red-500' : 'text-amber-600'}`}
+                                className={`
+                                  font-semibold text-[13px]
+                                  ${plan.available === false ? `text-red-500` : `
+                                    text-amber-600
+                                  `}
+                                `}
                               >
                                 {availabilityLabel}
                               </div>
                             )}
 
-                            <div className="flex items-center gap-3">
+                            <div className="gap-3 flex items-center">
                               {showPlanCompare && (
                                 <motion.button
                                   type="button"
@@ -1190,14 +1623,34 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                     e.stopPropagation()
                                     toggleCompare(planKey)
                                   }}
-                                  className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[12px] font-semibold transition-colors ${
+                                  className={`
+                                    gap-1.5 rounded-lg px-3 py-1.5 font-semibold
+                                    flex items-center border text-[12px]
+                                    transition-colors
+                                    ${
                                     isCompared
-                                      ? 'border-illini-blue/30 bg-illini-blue/5 text-illini-blue'
-                                      : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:text-slate-700'
-                                  }`}
+                                      ? `
+                                        border-illini-blue/30 bg-illini-blue/5
+                                        text-illini-blue
+                                      `
+                                      : `
+                                        border-slate-200 bg-white text-slate-500
+                                        hover:border-slate-300
+                                        hover:text-slate-700
+                                      `
+                                  }
+                                  `}
                                 >
                                   <div
-                                    className={`flex h-3.5 w-3.5 items-center justify-center rounded-[4px] border transition-colors ${isCompared ? 'border-illini-blue bg-illini-blue text-white' : 'border-slate-300'}`}
+                                    className={`
+                                      h-3.5 w-3.5 flex items-center
+                                      justify-center rounded-[4px] border
+                                      transition-colors
+                                      ${isCompared ? `
+                                        border-illini-blue bg-illini-blue
+                                        text-white
+                                      ` : `border-slate-300`}
+                                    `}
                                   >
                                     <AnimatePresence>
                                       {isCompared && (
@@ -1225,7 +1678,12 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                               <motion.div
                                 animate={{ rotate: isExpanded ? 180 : 0 }}
                                 transition={{ duration: 0.25 }}
-                                className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-50 transition-colors group-hover:bg-slate-100"
+                                className="
+                                  h-8 w-8 bg-slate-50
+                                  group-hover:bg-slate-100
+                                  flex items-center justify-center rounded-full
+                                  transition-colors
+                                "
                               >
                                 <ChevronDown className="h-5 w-5 text-slate-400" />
                               </motion.div>
@@ -1244,13 +1702,26 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                             transition={{ duration: 0.3, ease: 'easeInOut' }}
                             className="overflow-hidden"
                           >
-                            <div className="mx-4 mt-2 border-t border-slate-100/50 p-4 pt-0 md:mx-5 md:p-5">
+                            <div className="
+                              mx-4 mt-2 border-slate-100/50 p-4 pt-0
+                              md:mx-5 md:p-5
+                              border-t
+                            ">
                               {hasExpandedImage ? (
-                                <div className="relative mt-3 md:mt-4">
+                                <div className="
+                                  mt-3
+                                  md:mt-4
+                                  relative
+                                ">
                                   <img
                                     src={expandedSrc}
                                     alt={`${labels.primaryLabel} floor plan`}
-                                    className="h-auto w-full cursor-zoom-in rounded-xl border border-slate-200/50 bg-slate-50 transition-opacity hover:opacity-90"
+                                    className="
+                                      rounded-xl border-slate-200/50 bg-slate-50
+                                      h-auto w-full cursor-zoom-in border
+                                      transition-opacity
+                                      hover:opacity-90
+                                    "
                                     onClick={(e) => {
                                       e.stopPropagation()
                                       setLightbox({
@@ -1305,7 +1776,12 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                         }}
                                         className="right-3"
                                       />
-                                      <div className="absolute bottom-3 right-3 rounded-full bg-black/40 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
+                                      <div className="
+                                        bottom-3 right-3 bg-black/40 px-2.5 py-1
+                                        font-semibold text-white
+                                        backdrop-blur-sm absolute rounded-full
+                                        text-[11px]
+                                      ">
                                         {safeExpandedIndex + 1} /{' '}
                                         {allExpandedImages.length}
                                       </div>
@@ -1313,7 +1789,13 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                   )}
                                 </div>
                               ) : (
-                                <div className="mt-3 flex items-center justify-center rounded-xl border border-dashed border-slate-200/50 bg-slate-50/50 p-6 text-[13px] font-medium text-slate-400 md:mt-4 md:p-8 md:text-[14px]">
+                                <div className="
+                                  mt-3 rounded-xl border-slate-200/50
+                                  bg-slate-50/50 p-6 font-medium text-slate-400
+                                  md:mt-4 md:p-8 md:text-[14px]
+                                  flex items-center justify-center border
+                                  border-dashed text-[13px]
+                                ">
                                   {language === 'zh'
                                     ? '暂无户型图'
                                     : 'Floor plan image unavailable'}
@@ -1426,20 +1908,38 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                         transition={{ duration: 0.3, ease: 'easeInOut' }}
                         className="mt-4 overflow-hidden"
                       >
-                        <div className="overflow-x-auto rounded-xl border border-illini-blue/20 bg-white shadow-[0_4px_20px_rgba(19,41,75,0.06)] md:rounded-2xl">
-                          <div className="flex items-center gap-2 border-b border-slate-100 px-4 py-3 md:px-5 md:py-4">
+                        <div className="
+                          rounded-xl border-illini-blue/20 bg-white
+                          md:rounded-2xl
+                          overflow-x-auto border
+                          shadow-[0_4px_20px_rgba(19,41,75,0.06)]
+                        ">
+                          <div className="
+                            gap-2 border-slate-100 px-4 py-3
+                            md:px-5 md:py-4
+                            flex items-center border-b
+                          ">
                             <ArrowRightLeft className="h-4 w-4 text-illini-blue" />
-                            <span className="text-[14px] font-bold text-slate-900 md:text-[15px]">
+                            <span className="
+                              font-bold text-slate-900
+                              md:text-[15px]
+                              text-[14px]
+                            ">
                               {language === 'zh'
                                 ? '房型对比'
                                 : 'Plan Comparison'}
                             </span>
-                            <span className="ml-auto text-[12px] font-medium text-slate-400">
+                            <span className="
+                              font-medium text-slate-400 ml-auto text-[12px]
+                            ">
                               {compared.length}{' '}
                               {language === 'zh' ? '个房型' : 'plans'}
                             </span>
                           </div>
-                          <table className="w-full text-[12px] md:text-[13px]">
+                          <table className="
+                            md:text-[13px]
+                            w-full text-[12px]
+                          ">
                             <tbody>
                               {rows.map((row, ri) => (
                                 <tr
@@ -1448,13 +1948,24 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                     ri % 2 === 0 ? 'bg-slate-50/50' : 'bg-white'
                                   }
                                 >
-                                  <td className="w-[100px] whitespace-nowrap border-r border-slate-100 px-4 py-2.5 font-semibold text-slate-500 md:w-[120px] md:px-5 md:py-3">
+                                  <td className="
+                                    border-slate-100 px-4 py-2.5 font-semibold
+                                    text-slate-500
+                                    md:w-[120px] md:px-5 md:py-3
+                                    w-[100px] border-r whitespace-nowrap
+                                  ">
                                     {row.label}
                                   </td>
                                   {row.values.map((val, ci) => (
                                     <td
                                       key={ci}
-                                      className="min-w-[100px] border-r border-slate-100 px-3 py-2.5 text-center font-semibold text-slate-800 last:border-r-0 md:px-4 md:py-3"
+                                      className="
+                                        border-slate-100 px-3 py-2.5
+                                        font-semibold text-slate-800
+                                        md:px-4 md:py-3
+                                        min-w-[100px] border-r text-center
+                                        last:border-r-0
+                                      "
                                     >
                                       {val}
                                     </td>
@@ -1475,12 +1986,26 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.4 }}
-                  className="mt-4 flex items-center justify-between rounded-xl border border-white/50 bg-white/60 p-4 shadow-[0_4px_20px_rgba(0,0,0,0.02)] backdrop-blur-md md:rounded-2xl md:p-5"
+                  className="
+                    mt-4 rounded-xl border-white/50 bg-white/60 p-4
+                    backdrop-blur-md
+                    md:rounded-2xl md:p-5
+                    flex items-center justify-between border
+                    shadow-[0_4px_20px_rgba(0,0,0,0.02)]
+                  "
                 >
-                  <span className="text-[13px] font-semibold text-slate-600 md:text-[14px]">
+                  <span className="
+                    font-semibold text-slate-600
+                    md:text-[14px]
+                    text-[13px]
+                  ">
                     {t.priceRange}
                   </span>
-                  <span className="text-[16px] font-extrabold text-slate-900 md:text-[18px]">
+                  <span className="
+                    font-extrabold text-slate-900
+                    md:text-[18px]
+                    text-[16px]
+                  ">
                     {formatPrice(minPrice)}
                     {minPrice !== maxPrice ? ` – ${formatPrice(maxPrice)}` : ''}
                   </span>
@@ -1493,14 +2018,22 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
           <motion.section
             id="reviews"
             variants={fadeUp}
-            className="space-y-4 border-t border-slate-200/50 pb-8 pt-6"
+            className="space-y-4 border-slate-200/50 pb-8 pt-6 border-t"
           >
             <div className="mb-2 flex items-center justify-between">
-              <h3 className="text-[16px] font-bold text-slate-900 md:text-[18px]">
+              <h3 className="
+                font-bold text-slate-900
+                md:text-[18px]
+                text-[16px]
+              ">
                 {t.ratingsAndReviews}
               </h3>
               {totalReviews > 0 && (
-                <span className="text-[12px] font-medium text-slate-500 md:text-[13px]">
+                <span className="
+                  font-medium text-slate-500
+                  md:text-[13px]
+                  text-[12px]
+                ">
                   {totalReviews} {language === 'zh' ? '条评价' : 'Reviews'}
                   {positivePercent !== null &&
                     ` · ${positivePercent}${t.positiveRating}`}
@@ -1512,17 +2045,43 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
             {!user ? (
               <motion.div
                 whileHover={{ scale: 1.005 }}
-                className="flex flex-col items-center justify-between gap-4 rounded-xl border border-illini-blue/10 bg-white/60 p-5 shadow-[0_4px_20px_rgba(0,0,0,0.02)] backdrop-blur-md sm:flex-row md:rounded-2xl md:p-6"
+                className="
+                  gap-4 rounded-xl border-illini-blue/10 bg-white/60 p-5
+                  backdrop-blur-md
+                  sm:flex-row
+                  md:rounded-2xl md:p-6
+                  flex flex-col items-center justify-between border
+                  shadow-[0_4px_20px_rgba(0,0,0,0.02)]
+                "
               >
-                <div className="flex w-full items-center gap-3 sm:w-auto">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-illini-blue/5 md:h-12 md:w-12">
-                    <MessageSquare className="h-5 w-5 text-illini-blue md:h-6 md:w-6" />
+                <div className="
+                  gap-3
+                  sm:w-auto
+                  flex w-full items-center
+                ">
+                  <div className="
+                    h-10 w-10 bg-illini-blue/5
+                    md:h-12 md:w-12
+                    flex shrink-0 items-center justify-center rounded-full
+                  ">
+                    <MessageSquare className="
+                      h-5 w-5 text-illini-blue
+                      md:h-6 md:w-6
+                    " />
                   </div>
                   <div>
-                    <h4 className="text-[14px] font-bold text-slate-900 md:text-[15px]">
+                    <h4 className="
+                      font-bold text-slate-900
+                      md:text-[15px]
+                      text-[14px]
+                    ">
                       {t.shareExp}
                     </h4>
-                    <p className="mt-0.5 text-[12px] font-medium text-slate-500 md:text-[13px]">
+                    <p className="
+                      mt-0.5 font-medium text-slate-500
+                      md:text-[13px]
+                      text-[12px]
+                    ">
                       {t.loginPrompt}
                     </p>
                   </div>
@@ -1532,17 +2091,32 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => requestLogin()}
-                  className="w-full rounded-xl bg-illini-blue px-5 py-2.5 text-[13px] font-bold text-white shadow-sm transition-colors hover:bg-illini-blue/90 sm:w-auto md:text-[14px]"
+                  className="
+                    rounded-xl bg-illini-blue px-5 py-2.5 font-bold text-white
+                    shadow-sm
+                    hover:bg-illini-blue/90
+                    sm:w-auto
+                    md:text-[14px]
+                    w-full text-[13px] transition-colors
+                  "
                 >
                   {t.loginBtn}
                 </motion.button>
               </motion.div>
             ) : (
-              <div className="rounded-xl border border-white/60 bg-white/80 p-4 shadow-[0_4px_20px_rgba(0,0,0,0.02)] backdrop-blur-md md:rounded-2xl md:p-5">
-                <h4 className="mb-3 text-[14px] font-bold text-slate-900 md:text-[15px]">
+              <div className="
+                rounded-xl border-white/60 bg-white/80 p-4 backdrop-blur-md
+                md:rounded-2xl md:p-5
+                border shadow-[0_4px_20px_rgba(0,0,0,0.02)]
+              ">
+                <h4 className="
+                  mb-3 font-bold text-slate-900
+                  md:text-[15px]
+                  text-[14px]
+                ">
                   {t.shareExp}
                 </h4>
-                <div className="mb-3 flex gap-2">
+                <div className="mb-3 gap-2 flex">
                   {([1, -1] as const).map((vote) => (
                     <motion.button
                       key={vote}
@@ -1552,16 +2126,32 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                       onClick={() =>
                         setCommentVote(commentVote === vote ? null : vote)
                       }
-                      className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[12px] font-semibold transition-colors ${
+                      className={`
+                        gap-1.5 rounded-lg px-3 py-1.5 font-semibold flex
+                        items-center border text-[12px] transition-colors
+                        ${
                         commentVote === vote && vote === 1
-                          ? 'border-illini-orange/30 bg-illini-orange/10 text-illini-orange'
+                          ? `
+                            border-illini-orange/30 bg-illini-orange/10
+                            text-illini-orange
+                          `
                           : commentVote === vote && vote === -1
                             ? 'border-red-200 bg-red-50 text-red-600'
-                            : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300'
-                      }`}
+                            : `
+                              border-slate-200 bg-white text-slate-500
+                              hover:border-slate-300
+                            `
+                      }
+                      `}
                     >
                       <ThumbsUp
-                        className={`h-3.5 w-3.5 ${vote === -1 ? 'rotate-180' : ''} ${commentVote === vote && vote === 1 ? 'fill-illini-orange/20' : ''}`}
+                        className={`
+                          h-3.5 w-3.5
+                          ${vote === -1 ? 'rotate-180' : ''}
+                          ${commentVote === vote && vote === 1 ? `
+                            fill-illini-orange/20
+                          ` : ''}
+                        `}
                       />
                       {vote === 1 ? t.thumbsUpDorm : t.thumbsDownDorm}
                     </motion.button>
@@ -1572,7 +2162,14 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                   onChange={(e) => setCommentContent(e.target.value)}
                   placeholder={t.leaveComment}
                   rows={3}
-                  className="w-full resize-none rounded-xl border border-slate-200 bg-white/50 px-3 py-2.5 text-[13px] font-medium placeholder-slate-400 transition-colors focus:border-illini-blue/40 focus:outline-none md:text-[14px]"
+                  className="
+                    rounded-xl border-slate-200 bg-white/50 px-3 py-2.5
+                    font-medium placeholder-slate-400
+                    focus:border-illini-blue/40
+                    md:text-[14px]
+                    w-full resize-none border text-[13px] transition-colors
+                    focus:outline-none
+                  "
                 />
                 <div className="mt-2.5 flex justify-end">
                   <motion.button
@@ -1581,7 +2178,13 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                     onClick={handleSubmit}
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
-                    className="rounded-xl bg-illini-blue px-5 py-2 text-[13px] font-bold text-white transition-colors hover:bg-illini-blue/90 disabled:opacity-40 md:text-[14px]"
+                    className="
+                      rounded-xl bg-illini-blue px-5 py-2 font-bold text-white
+                      hover:bg-illini-blue/90
+                      md:text-[14px]
+                      text-[13px] transition-colors
+                      disabled:opacity-40
+                    "
                   >
                     {submitting ? '...' : t.submitComment}
                   </motion.button>
@@ -1591,11 +2194,11 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
 
             {/* Comment list */}
             {commentsLoading ? (
-              <div className="py-6 text-center text-[13px] text-slate-400">
+              <div className="py-6 text-slate-400 text-center text-[13px]">
                 {language === 'zh' ? '加载中...' : 'Loading...'}
               </div>
             ) : comments.length === 0 ? (
-              <p className="py-6 text-center text-[13px] text-slate-400">
+              <p className="py-6 text-slate-400 text-center text-[13px]">
                 {t.noComments}
               </p>
             ) : (
@@ -1609,18 +2212,34 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -8 }}
                         transition={{ delay: i * 0.05, duration: 0.3 }}
-                        className="rounded-xl border border-white/60 bg-white/80 p-4 shadow-[0_4px_20px_rgba(0,0,0,0.02)] backdrop-blur-md md:rounded-2xl md:p-5"
+                        className="
+                          rounded-xl border-white/60 bg-white/80 p-4
+                          backdrop-blur-md
+                          md:rounded-2xl md:p-5
+                          border shadow-[0_4px_20px_rgba(0,0,0,0.02)]
+                        "
                       >
                         <div className="mb-3 flex items-start justify-between">
-                          <div className="flex items-center gap-2.5">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-slate-100">
+                          <div className="gap-2.5 flex items-center">
+                            <div className="
+                              h-8 w-8 border-slate-200 bg-slate-100 flex
+                              items-center justify-center rounded-full border
+                            ">
                               <User className="h-4 w-4 text-slate-400" />
                             </div>
                             <div>
-                              <div className="text-[13px] font-bold leading-tight text-slate-900 md:text-[14px]">
+                              <div className="
+                                font-bold leading-tight text-slate-900
+                                md:text-[14px]
+                                text-[13px]
+                              ">
                                 {comment.display_name}
                               </div>
-                              <div className="mt-0.5 text-[11px] font-medium text-slate-500 md:text-[12px]">
+                              <div className="
+                                mt-0.5 font-medium text-slate-500
+                                md:text-[12px]
+                                text-[11px]
+                              ">
                                 {new Date(
                                   comment.created_at
                                 ).toLocaleDateString(
@@ -1630,11 +2249,18 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                               </div>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="gap-2 flex items-center">
                             {comment.dorm_vote === 1 && (
-                              <div className="flex items-center gap-1 rounded-lg bg-illini-orange/10 px-2 py-1">
-                                <ThumbsUp className="h-3 w-3 fill-illini-orange text-illini-orange" />
-                                <span className="text-[11px] font-bold text-illini-orange">
+                              <div className="
+                                gap-1 rounded-lg bg-illini-orange/10 px-2 py-1
+                                flex items-center
+                              ">
+                                <ThumbsUp className="
+                                  h-3 w-3 fill-illini-orange text-illini-orange
+                                " />
+                                <span className="
+                                  font-bold text-illini-orange text-[11px]
+                                ">
                                   {t.recommended}
                                 </span>
                               </div>
@@ -1644,7 +2270,11 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                 type="button"
                                 whileTap={{ scale: 0.9 }}
                                 onClick={() => handleDeleteComment(comment.id)}
-                                className="p-1 text-slate-300 transition-colors hover:text-red-400"
+                                className="
+                                  p-1 text-slate-300
+                                  hover:text-red-400
+                                  transition-colors
+                                "
                                 aria-label={t.deleteComment}
                               >
                                 <X className="h-3.5 w-3.5" />
@@ -1654,26 +2284,40 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                         </div>
                         {translations[comment.id] ? (
                           <>
-                            <p className="text-[13px] font-medium leading-relaxed text-slate-600 md:text-[14px]">
+                            <p className="
+                              font-medium leading-relaxed text-slate-600
+                              md:text-[14px]
+                              text-[13px]
+                            ">
                               {translations[comment.id]}
                             </p>
-                            <p className="mt-1.5 border-l-2 border-slate-200 pl-3 text-[12px] leading-relaxed text-slate-400">
+                            <p className="
+                              mt-1.5 border-slate-200 pl-3 leading-relaxed
+                              text-slate-400 border-l-2 text-[12px]
+                            ">
                               {comment.content}
                             </p>
                           </>
                         ) : (
-                          <p className="text-[13px] font-medium leading-relaxed text-slate-600 md:text-[14px]">
+                          <p className="
+                            font-medium leading-relaxed text-slate-600
+                            md:text-[14px]
+                            text-[13px]
+                          ">
                             {comment.content}
                           </p>
                         )}
                         {translateErrors[comment.id] && (
-                          <p className="mt-1 text-[12px] text-red-400">
+                          <p className="mt-1 text-red-400 text-[12px]">
                             {language === 'zh'
                               ? '翻译失败，点击重试'
                               : 'Translation failed, click to retry'}
                           </p>
                         )}
-                        <div className="mt-4 flex items-center gap-4 border-t border-slate-100/50 pt-3">
+                        <div className="
+                          mt-4 gap-4 border-slate-100/50 pt-3 flex items-center
+                          border-t
+                        ">
                           <motion.button
                             type="button"
                             whileTap={{ scale: 0.88 }}
@@ -1683,16 +2327,27 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                 comment.myVote === 1 ? null : 1
                               )
                             }
-                            className={`group flex items-center gap-1.5 transition-colors ${
+                            className={`
+                              group gap-1.5 flex items-center transition-colors
+                              ${
                               comment.myVote === 1
                                 ? 'text-illini-orange'
-                                : 'text-slate-400 hover:text-illini-orange'
-                            }`}
+                                : `
+                                  text-slate-400
+                                  hover:text-illini-orange
+                                `
+                            }
+                            `}
                           >
                             <ThumbsUp
-                              className={`h-3.5 w-3.5 ${comment.myVote === 1 ? 'fill-illini-orange/20' : 'group-hover:fill-illini-orange/20'}`}
+                              className={`
+                                h-3.5 w-3.5
+                                ${comment.myVote === 1 ? `fill-illini-orange/20` : `
+                                  group-hover:fill-illini-orange/20
+                                `}
+                              `}
                             />
-                            <span className="text-[12px] font-semibold">
+                            <span className="font-semibold text-[12px]">
                               {t.helpful}
                               {comment.upvotes > 0
                                 ? ` (${comment.upvotes})`
@@ -1706,7 +2361,12 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                                 handleTranslate(comment.id, comment.content)
                               }
                               disabled={translating[comment.id]}
-                              className="flex items-center gap-1 text-[12px] font-semibold text-slate-400 transition-colors hover:text-illini-blue disabled:opacity-50"
+                              className="
+                                gap-1 font-semibold text-slate-400
+                                hover:text-illini-blue
+                                flex items-center text-[12px] transition-colors
+                                disabled:opacity-50
+                              "
                             >
                               <Globe className="h-3.5 w-3.5" />
                               {translating[comment.id]
@@ -1734,7 +2394,13 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setShowAllReviews(!showAllReviews)}
-                    className="w-full rounded-xl border border-white/50 bg-white/40 py-3 text-[13px] font-semibold text-slate-500 backdrop-blur-md transition-colors hover:bg-white/60 hover:text-slate-800 md:text-[14px]"
+                    className="
+                      rounded-xl border-white/50 bg-white/40 py-3 font-semibold
+                      text-slate-500 backdrop-blur-md
+                      hover:bg-white/60 hover:text-slate-800
+                      md:text-[14px]
+                      w-full border text-[13px] transition-colors
+                    "
                   >
                     {showAllReviews
                       ? language === 'zh'
@@ -1781,7 +2447,13 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = 'en' }) => {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setEditOpen(true)}
-          className="fixed bottom-20 right-6 z-50 flex items-center gap-2 rounded-full bg-illini-blue px-4 py-2.5 text-[13px] font-bold text-white shadow-lg transition-colors hover:bg-illini-blue/90"
+          className="
+            bottom-20 right-6 gap-2 bg-illini-blue px-4 py-2.5 font-bold
+            text-white shadow-lg
+            hover:bg-illini-blue/90
+            fixed z-50 flex items-center rounded-full text-[13px]
+            transition-colors
+          "
         >
           <Pencil className="h-3.5 w-3.5" />
           {language === 'zh' ? '编辑' : 'Edit'}

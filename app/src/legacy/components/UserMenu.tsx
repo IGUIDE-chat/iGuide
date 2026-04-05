@@ -20,12 +20,24 @@ export const UserMenu: React.FC = () => {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 rounded-full px-3 py-2 transition-colors hover:bg-slate-100"
+        className="
+          gap-2 px-3 py-2
+          hover:bg-slate-100
+          flex items-center rounded-full transition-colors
+        "
       >
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-illini-blue to-illini-orange text-sm font-semibold text-white">
+        <div className="
+          h-8 w-8 from-illini-blue to-illini-orange text-sm font-semibold
+          text-white flex items-center justify-center rounded-full
+          bg-linear-to-br
+        ">
           {user.name.charAt(0).toUpperCase()}
         </div>
-        <span className="hidden text-sm font-medium text-slate-700 sm:block">
+        <span className="
+          text-sm font-medium text-slate-700
+          sm:block
+          hidden
+        ">
           {user.name}
         </span>
       </button>
@@ -34,15 +46,18 @@ export const UserMenu: React.FC = () => {
         <>
           {/* Backdrop */}
           <div
-            className="fixed inset-0 z-10"
+            className="inset-0 fixed z-10"
             onClick={() => setIsOpen(false)}
           />
 
           {/* Menu */}
-          <div className="absolute right-0 z-20 mt-2 w-56 overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-xl">
-            <div className="border-b border-slate-100 p-4">
+          <div className="
+            right-0 mt-2 w-56 rounded-2xl border-slate-100 bg-white shadow-xl
+            absolute z-20 overflow-hidden border
+          ">
+            <div className="border-slate-100 p-4 border-b">
               <p className="font-semibold text-slate-900">{user.name}</p>
-              <p className="truncate text-sm text-slate-500">{user.email}</p>
+              <p className="text-sm text-slate-500 truncate">{user.email}</p>
             </div>
 
             <div className="p-2">
@@ -51,7 +66,11 @@ export const UserMenu: React.FC = () => {
                   logout()
                   setIsOpen(false)
                 }}
-                className="w-full rounded-xl px-4 py-2 text-left text-sm text-red-600 transition-colors hover:bg-red-50"
+                className="
+                  rounded-xl px-4 py-2 text-sm text-red-600
+                  hover:bg-red-50
+                  w-full text-left transition-colors
+                "
               >
                 登出
               </button>

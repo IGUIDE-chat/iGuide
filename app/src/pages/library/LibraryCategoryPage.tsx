@@ -37,7 +37,7 @@ const LibraryCategoryPage: React.FC<LibraryCategoryPageProps> = ({
 
   if (!category) {
     return (
-      <div className="p-8 text-center text-slate-500">Category not found</div>
+      <div className="p-8 text-slate-500 text-center">Category not found</div>
     )
   }
 
@@ -47,14 +47,25 @@ const LibraryCategoryPage: React.FC<LibraryCategoryPageProps> = ({
   const categoryText = getCategoryText(category, language)
 
   return (
-    <div className="animate-fade-in-up no-scrollbar h-full w-full min-w-0 overflow-y-auto">
-      <div className="mx-auto min-w-0 max-w-3xl px-4 py-8 pb-24">
+    <div className="
+      animate-fade-in-up no-scrollbar min-w-0 size-full overflow-y-auto
+    ">
+      <div className="min-w-0 max-w-3xl px-4 py-8 pb-24 mx-auto">
         <button
           type="button"
           onClick={() => navigate('/library')}
-          className="group mb-8 flex items-center gap-2 text-sm font-semibold text-slate-500 transition-colors hover:text-illini-blue"
+          className="
+            group mb-8 gap-2 text-sm font-semibold text-slate-500
+            hover:text-illini-blue
+            flex items-center transition-colors
+          "
         >
-          <span className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white transition-all group-hover:border-illini-blue group-hover:bg-illini-blue group-hover:text-white">
+          <span className="
+            h-8 w-8 border-slate-200 bg-white
+            group-hover:border-illini-blue group-hover:bg-illini-blue
+            group-hover:text-white
+            flex items-center justify-center rounded-full border transition-all
+          ">
             <svg
               className="h-4 w-4"
               fill="none"
@@ -72,10 +83,20 @@ const LibraryCategoryPage: React.FC<LibraryCategoryPageProps> = ({
           {t.backToCategories}
         </button>
 
-        <div className="glass-card relative mb-10 flex flex-col items-start gap-6 overflow-hidden rounded-2xl p-8 sm:flex-row sm:items-center">
-          <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-gradient-to-br from-illini-orange/20 to-illini-blue/20 blur-3xl" />
+        <div className="
+          glass-card mb-10 gap-6 rounded-2xl p-8
+          sm:flex-row sm:items-center
+          relative flex flex-col items-start overflow-hidden
+        ">
+          <div className="
+            -right-10 -top-10 h-40 w-40 from-illini-orange/20 to-illini-blue/20
+            blur-3xl pointer-events-none absolute rounded-full bg-linear-to-br
+          " />
 
-          <div className="z-10 flex h-16 w-16 items-center justify-center rounded-2xl bg-white text-3xl shadow-md">
+          <div className="
+            h-16 w-16 rounded-2xl bg-white text-3xl shadow-md z-10 flex
+            items-center justify-center
+          ">
             {category.icon}
           </div>
           <div className="z-10">
@@ -88,26 +109,44 @@ const LibraryCategoryPage: React.FC<LibraryCategoryPageProps> = ({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+        <div className="
+          gap-5
+          md:grid-cols-2
+          grid grid-cols-1
+        ">
           {categoryArticles.map((article) => (
             <div
               key={article.id}
               onClick={() => navigate(`/library/article/${article.id}`)}
-              className="group cursor-pointer rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-illini-orange/30 hover:shadow-md hover:shadow-slate-200/50"
+              className="
+                group rounded-2xl border-slate-100 bg-white p-6 shadow-sm
+                hover:-translate-y-1 hover:border-illini-orange/30
+                hover:shadow-md hover:shadow-slate-200/50
+                cursor-pointer border transition-all duration-300
+              "
             >
-              <h3 className="mb-3 text-lg font-bold text-slate-800 transition-colors group-hover:text-illini-orange">
+              <h3 className="
+                mb-3 text-lg font-bold text-slate-800
+                group-hover:text-illini-orange
+                transition-colors
+              ">
                 {article.title}
               </h3>
               <p className="text-sm leading-relaxed text-slate-500">
                 {article.summary}
               </p>
-              <div className="mt-4 flex translate-y-2 transform items-center text-sm font-semibold text-illini-blue opacity-0 transition-opacity group-hover:translate-y-0 group-hover:opacity-100">
+              <div className="
+                mt-4 translate-y-2 text-sm font-semibold text-illini-blue
+                group-hover:translate-y-0
+                flex transform items-center opacity-0 transition-opacity
+                group-hover:opacity-100
+              ">
                 {t.readGuide}
               </div>
             </div>
           ))}
           {categoryArticles.length === 0 && (
-            <p className="italic text-slate-500">{t.emptyCategory}</p>
+            <p className="text-slate-500 italic">{t.emptyCategory}</p>
           )}
         </div>
       </div>

@@ -180,12 +180,15 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
 
   return (
     <>
-      <div className="flex h-full min-h-0 flex-col px-3">
+      <div className="min-h-0 px-3 flex h-full flex-col">
         {/* Conversations List */}
         <div className="no-scrollbar flex-1 overflow-y-auto">
           {isLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-illini-orange border-t-transparent"></div>
+            <div className="py-8 flex items-center justify-center">
+              <div className="
+                h-5 w-5 animate-spin border-illini-orange rounded-full border-2
+                border-t-transparent
+              "></div>
             </div>
           ) : conversations.length === 0 ? (
             <div className="px-2 py-6 text-center">
@@ -199,7 +202,10 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
 
                 return (
                   <div key={category}>
-                    <h4 className="mb-1.5 px-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                    <h4 className="
+                      mb-1.5 px-2 font-semibold tracking-wider text-slate-500
+                      text-[10px] uppercase
+                    ">
                       {category}
                     </h4>
                     <div className="space-y-0.5">
@@ -218,26 +224,41 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                               opacity: { duration: 0.2 },
                             }}
                             onClick={() => onSelectConversation(conv.id)}
-                            className={`group relative cursor-pointer rounded-lg px-2 py-2 transition-all ${
+                            className={`
+                              group rounded-lg px-2 py-2 relative cursor-pointer
+                              transition-all
+                              ${
                               conv.id === currentConversationId
                                 ? 'bg-white/20 text-white'
-                                : 'text-slate-300 hover:bg-white/10'
-                            }`}
+                                : `
+                                  text-slate-300
+                                  hover:bg-white/10
+                                `
+                            }
+                            `}
                           >
                             <div className="relative overflow-hidden">
                               <div className="pr-1">
                                 <div
-                                  className={`truncate text-xs font-medium ${
+                                  className={`
+                                    text-xs font-medium truncate
+                                    ${
                                     conv.id === currentConversationId
                                       ? 'text-white'
-                                      : 'text-slate-300 group-hover:text-white'
-                                  }`}
+                                      : `
+                                        text-slate-300
+                                        group-hover:text-white
+                                      `
+                                  }
+                                  `}
                                 >
                                   <TypewriterText text={conv.title} />
                                 </div>
                                 {conv.messageCount !== undefined &&
                                   conv.messageCount > 0 && (
-                                    <p className="mt-0.5 text-[10px] text-slate-500">
+                                    <p className="
+                                      mt-0.5 text-slate-500 text-[10px]
+                                    ">
                                       {conv.messageCount}{' '}
                                       {language === 'zh' ? '条' : 'msgs'}
                                     </p>
@@ -245,21 +266,37 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                               </div>
 
                               <div
-                                className={`absolute bottom-0 right-0 top-0 flex w-24 items-center justify-end gap-0.5 bg-gradient-to-l to-transparent px-2 opacity-0 transition-all duration-200 group-hover:opacity-100 ${
+                                className={`
+                                  bottom-0 right-0 top-0 w-24 gap-0.5 px-2
+                                  absolute flex items-center justify-end
+                                  bg-linear-to-l to-transparent opacity-0
+                                  transition-all duration-200
+                                  group-hover:opacity-100
+                                  ${
                                   conv.id === currentConversationId
                                     ? 'from-[#454545] via-[#454545]'
                                     : 'from-[#2E2E2E] via-[#2E2E2E]'
-                                }`}
+                                }
+                                `}
                               >
                                 <button
                                   onClick={(e) =>
                                     handleTogglePin(conv.id, conv.isPinned, e)
                                   }
-                                  className="rounded-md p-1 transition-colors hover:bg-white/10"
+                                  className="
+                                    rounded-md p-1
+                                    hover:bg-white/10
+                                    transition-colors
+                                  "
                                   title={conv.isPinned ? t.unpin : t.pin}
                                 >
                                   <svg
-                                    className={`h-3.5 w-3.5 ${conv.isPinned ? 'text-illini-orange' : 'text-slate-400'}`}
+                                    className={`
+                                      h-3.5 w-3.5
+                                      ${conv.isPinned ? `text-illini-orange` : `
+                                        text-slate-400
+                                      `}
+                                    `}
                                     fill={
                                       conv.isPinned ? 'currentColor' : 'none'
                                     }
@@ -276,7 +313,11 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                                 </button>
                                 <button
                                   onClick={(e) => handleDeleteClick(conv.id, e)}
-                                  className="rounded-md p-1 transition-colors hover:bg-red-500/20"
+                                  className="
+                                    rounded-md p-1
+                                    hover:bg-red-500/20
+                                    transition-colors
+                                  "
                                   title={t.delete}
                                 >
                                   <svg
@@ -309,10 +350,19 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-          <div className="animate-scale-in w-full max-w-sm overflow-hidden rounded-xl border border-white/10 bg-[#1E1E1E] shadow-2xl">
+        <div className="
+          inset-0 bg-black/50 p-4 backdrop-blur-sm fixed z-50 flex items-center
+          justify-center
+        ">
+          <div className="
+            animate-scale-in max-w-sm rounded-xl border-white/10 shadow-2xl
+            w-full overflow-hidden border bg-[#1E1E1E]
+          ">
             <div className="p-5 text-center">
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-500/10">
+              <div className="
+                mb-4 h-12 w-12 bg-red-500/10 mx-auto flex items-center
+                justify-center rounded-full
+              ">
                 <svg
                   className="h-6 w-6 text-red-500"
                   fill="none"
@@ -335,16 +385,26 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                   ? '此操作无法撤销。'
                   : 'This action cannot be undone.'}
               </p>
-              <div className="flex gap-3">
+              <div className="gap-3 flex">
                 <button
                   onClick={() => setShowDeleteConfirm(null)}
-                  className="flex-1 rounded-lg bg-white/5 px-4 py-2 text-sm font-medium text-slate-300 transition-colors hover:bg-white/10"
+                  className="
+                    rounded-lg bg-white/5 px-4 py-2 text-sm font-medium
+                    text-slate-300
+                    hover:bg-white/10
+                    flex-1 transition-colors
+                  "
                 >
                   {language === 'zh' ? '取消' : 'Cancel'}
                 </button>
                 <button
                   onClick={confirmDelete}
-                  className="flex-1 rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-600"
+                  className="
+                    rounded-lg bg-red-500 px-4 py-2 text-sm font-medium
+                    text-white
+                    hover:bg-red-600
+                    flex-1 transition-colors
+                  "
                 >
                   {language === 'zh' ? '删除' : 'Delete'}
                 </button>

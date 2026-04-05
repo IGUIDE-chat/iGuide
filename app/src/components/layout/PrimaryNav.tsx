@@ -56,7 +56,10 @@ const SidebarLabel = ({
         : { opacity: 0, x: -6, maxWidth: 0 }
     }
     transition={{ duration: 0.2, ease: 'easeOut' }}
-    className={`inline-block overflow-hidden whitespace-nowrap ${className}`}
+    className={`
+      inline-block overflow-hidden whitespace-nowrap
+      ${className}
+    `}
   >
     {children}
   </motion.span>
@@ -71,22 +74,30 @@ export const PrimaryNav: React.FC<PrimaryNavProps> = ({
 }) => {
   return (
     <>
-      <div className="mb-2 flex items-center justify-between p-3">
-        <div className="flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-2 transition-colors hover:bg-white/5">
+      <div className="mb-2 p-3 flex items-center justify-between">
+        <div className="
+          gap-2 rounded-md px-2 py-2
+          hover:bg-white/5
+          flex w-full cursor-pointer items-center transition-colors
+        ">
           <BrandMark
-            className="h-[26px] w-[26px] rounded-md"
+            className="rounded-md h-[26px] w-[26px]"
             iconClassName="text-[10px]"
           />
           <SidebarLabel
             isOpen={isSidebarOpen}
-            className="text-[15px] font-bold tracking-tight text-white"
+            className="font-bold tracking-tight text-white text-[15px]"
           >
             <AnimatedText>{appTitle}</AnimatedText>
           </SidebarLabel>
         </div>
         <button
           onClick={onCloseSidebar}
-          className="p-2 text-slate-400 hover:text-white md:hidden"
+          className="
+            p-2 text-slate-400
+            hover:text-white
+            md:hidden
+          "
         >
           ×
         </button>
@@ -97,11 +108,18 @@ export const PrimaryNav: React.FC<PrimaryNavProps> = ({
           <button
             key={item.key}
             onClick={item.onClick}
-            className={`flex w-full items-center gap-3 rounded-md px-3 py-3 text-sm transition-colors ${
+            className={`
+              gap-3 rounded-md px-3 py-3 text-sm flex w-full items-center
+              transition-colors
+              ${
               activeTab === item.key
-                ? 'bg-[#212121] text-white'
-                : 'text-slate-300 hover:bg-[#212121]'
-            }`}
+                ? 'text-white bg-[#212121]'
+                : `
+                  text-slate-300
+                  hover:bg-[#212121]
+                `
+            }
+            `}
           >
             <span>{item.icon}</span>
             <SidebarLabel isOpen={isSidebarOpen}>

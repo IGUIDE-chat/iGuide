@@ -132,8 +132,11 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
   ) => {
     if (isLoading) {
       return (
-        <div className="flex items-center justify-center py-6">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-illini-orange border-t-transparent" />
+        <div className="py-6 flex items-center justify-center">
+          <div className="
+            h-4 w-4 animate-spin border-illini-orange rounded-full border-2
+            border-t-transparent
+          " />
         </div>
       )
     }
@@ -141,7 +144,7 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
     if (items.length === 0) {
       return (
         <div className="px-2 py-3">
-          <p className="text-[11px] text-slate-600">{emptyText}</p>
+          <p className="text-slate-600 text-[11px]">{emptyText}</p>
         </div>
       )
     }
@@ -163,32 +166,46 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
                 opacity: { duration: 0.2 },
               }}
               onClick={() => openDorm(item.id)}
-              className={`group cursor-pointer rounded-lg px-2 py-2 transition-all ${
+              className={`
+                group rounded-lg px-2 py-2 cursor-pointer transition-all
+                ${
                 item.id === currentDormId
                   ? 'bg-white/20 text-white'
-                  : 'text-slate-300 hover:bg-white/10'
-              }`}
+                  : `
+                    text-slate-300
+                    hover:bg-white/10
+                  `
+              }
+              `}
             >
               <div className="relative overflow-hidden">
-                <div className="flex items-center gap-2 pr-7">
-                  <div className="h-7 w-7 flex-shrink-0 overflow-hidden rounded bg-white/10">
+                <div className="gap-2 pr-7 flex items-center">
+                  <div className="
+                    h-7 w-7 rounded-sm bg-white/10 shrink-0 overflow-hidden
+                  ">
                     {item.imageUrl ? (
                       <img
                         src={item.imageUrl}
                         alt={item.name}
-                        className="h-full w-full object-cover"
+                        className="size-full object-cover"
                       />
                     ) : (
-                      <div className="h-full w-full bg-white/5" />
+                      <div className="bg-white/5 size-full" />
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
                     <div
-                      className={`truncate text-xs font-medium ${
+                      className={`
+                        text-xs font-medium truncate
+                        ${
                         item.id === currentDormId
                           ? 'text-white'
-                          : 'text-slate-300 group-hover:text-white'
-                      }`}
+                          : `
+                            text-slate-300
+                            group-hover:text-white
+                          `
+                      }
+                      `}
                     >
                       <TypewriterText
                         text={
@@ -201,13 +218,22 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
                   </div>
                 </div>
 
-                <div className="absolute bottom-0 right-0 top-0 flex items-center bg-gradient-to-l from-[#2E2E2E] to-transparent px-1 opacity-0 transition-all duration-200 group-hover:opacity-100">
+                <div className="
+                  bottom-0 right-0 top-0 px-1 absolute flex items-center
+                  bg-linear-to-l from-[#2E2E2E] to-transparent opacity-0
+                  transition-all duration-200
+                  group-hover:opacity-100
+                ">
                   <button
                     onClick={(event) => {
                       event.stopPropagation()
                       onRemove(item.id)
                     }}
-                    className="rounded-md p-1 transition-colors hover:bg-red-500/20"
+                    className="
+                      rounded-md p-1
+                      hover:bg-red-500/20
+                      transition-colors
+                    "
                     title="Remove"
                     type="button"
                   >
@@ -223,24 +249,28 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
   }
 
   return (
-    <div className="flex h-full min-h-0 flex-col px-3">
-      <div className="no-scrollbar flex-1 space-y-4 overflow-y-auto pt-2">
+    <div className="min-h-0 px-3 flex h-full flex-col">
+      <div className="no-scrollbar space-y-4 pt-2 flex-1 overflow-y-auto">
         <section>
-          <div className="mb-1.5 flex items-center justify-between px-1">
-            <div className="flex items-center gap-1.5 text-slate-400">
+          <div className="mb-1.5 px-1 flex items-center justify-between">
+            <div className="gap-1.5 text-slate-400 flex items-center">
               <Heart
                 ref={favoritesIconRef}
                 size={12}
-                className="shrink-0 fill-red-500 text-red-500"
+                className="fill-red-500 text-red-500 shrink-0"
               />
-              <h3 className="text-[10px] font-semibold uppercase tracking-wider">
+              <h3 className="font-semibold tracking-wider text-[10px] uppercase">
                 {t.favorites}
               </h3>
             </div>
             {favoriteItems.length > 0 && (
               <button
                 onClick={handleClearFavorites}
-                className="text-[10px] text-slate-500 transition-colors hover:text-white"
+                className="
+                  text-slate-500
+                  hover:text-white
+                  text-[10px] transition-colors
+                "
                 type="button"
               >
                 {t.clear}
@@ -253,17 +283,21 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
         </section>
 
         <section>
-          <div className="mb-1.5 flex items-center justify-between px-1">
-            <div className="flex items-center gap-1.5 text-slate-400">
+          <div className="mb-1.5 px-1 flex items-center justify-between">
+            <div className="gap-1.5 text-slate-400 flex items-center">
               <Clock size={12} />
-              <h3 className="text-[10px] font-semibold uppercase tracking-wider">
+              <h3 className="font-semibold tracking-wider text-[10px] uppercase">
                 {t.history}
               </h3>
             </div>
             {historyItems.length > 0 && (
               <button
                 onClick={handleClearHistory}
-                className="text-[10px] text-slate-500 transition-colors hover:text-white"
+                className="
+                  text-slate-500
+                  hover:text-white
+                  text-[10px] transition-colors
+                "
                 type="button"
               >
                 {t.clear}

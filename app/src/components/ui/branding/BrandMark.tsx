@@ -18,7 +18,10 @@ export const BrandMark: React.FC<BrandMarkProps> = ({
   iconClassName = 'text-lg',
 }) => (
   <div
-    className={`flex items-center justify-center bg-illini-orange text-white shadow-sm ${className}`}
+    className={`
+      bg-illini-orange text-white shadow-sm flex items-center justify-center
+      ${className}
+    `}
     aria-hidden="true"
   >
     <BlockIIcon className={iconClassName} />

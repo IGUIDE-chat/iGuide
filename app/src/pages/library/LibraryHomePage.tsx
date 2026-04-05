@@ -43,20 +43,30 @@ const LibraryHomePage: React.FC<LibraryHomePageProps> = ({ language }) => {
   }, [localQuery, localizedArticles])
 
   return (
-    <div className="animate-fade-in-up no-scrollbar h-full w-full min-w-0 overflow-y-auto">
-      <div className="mx-auto min-w-0 max-w-3xl px-4 py-8 pb-24">
+    <div className="
+      animate-fade-in-up no-scrollbar min-w-0 size-full overflow-y-auto
+    ">
+      <div className="min-w-0 max-w-3xl px-4 py-8 pb-24 mx-auto">
         <div className="py-10 text-center">
           <h2 className="mb-3 text-3xl font-bold tracking-tight text-slate-900">
             {t.knowledgeBaseTitle}
           </h2>
-          <p className="mx-auto mb-8 max-w-2xl text-base text-slate-500">
+          <p className="mb-8 max-w-2xl text-base text-slate-500 mx-auto">
             {t.knowledgeBaseSubtitle}
           </p>
 
-          <div className="relative mx-auto mb-16 max-w-xl">
+          <div className="mb-16 max-w-xl relative mx-auto">
             <input
               type="text"
-              className="block w-full rounded-full border border-slate-200 bg-white py-3.5 pl-5 pr-5 text-base text-slate-900 placeholder-slate-400 shadow-sm shadow-slate-200/50 transition-all hover:shadow-md focus:border-slate-300 focus:outline-none focus:ring-2 focus:ring-illini-blue/10"
+              className="
+                border-slate-200 bg-white py-3.5 pl-5 pr-5 text-base
+                text-slate-900 placeholder-slate-400 shadow-sm
+                shadow-slate-200/50
+                hover:shadow-md
+                focus:border-slate-300 focus:ring-illini-blue/10
+                block w-full rounded-full border transition-all
+                focus:ring-2 focus:outline-none
+              "
               placeholder={t.searchPlaceholder}
               value={localQuery}
               onChange={(e) => setLocalQuery(e.target.value)}
@@ -74,17 +84,24 @@ const LibraryHomePage: React.FC<LibraryHomePageProps> = ({ language }) => {
               <button
                 type="button"
                 onClick={() => setLocalQuery('')}
-                className="rounded-full px-3 py-1 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-100 hover:text-illini-blue"
+                className="
+                  px-3 py-1 text-xs font-medium text-slate-500
+                  hover:bg-slate-100 hover:text-illini-blue
+                  rounded-full transition-colors
+                "
               >
                 {t.clear}
               </button>
             </div>
             {filteredArticles.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-slate-200 bg-white/50 py-16 text-center">
+              <div className="
+                rounded-2xl border-slate-200 bg-white/50 py-16 border
+                border-dashed text-center
+              ">
                 <p className="text-base text-slate-500">{t.noResults}</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-4">
+              <div className="gap-4 grid grid-cols-1">
                 {filteredArticles.map((article) => {
                   const category = CATEGORIES.find(
                     (item) => item.id === article.category
@@ -96,15 +113,34 @@ const LibraryHomePage: React.FC<LibraryHomePageProps> = ({ language }) => {
                     <div
                       key={article.id}
                       onClick={() => navigate(`/library/article/${article.id}`)}
-                      className="group cursor-pointer rounded-3xl border border-slate-100 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-illini-blue/20 hover:shadow-xl hover:shadow-slate-200/50"
+                      className="
+                        group rounded-3xl border-slate-100 bg-white p-6
+                        shadow-sm
+                        hover:-translate-y-1 hover:border-illini-blue/20
+                        hover:shadow-xl hover:shadow-slate-200/50
+                        cursor-pointer border transition-all duration-300
+                      "
                     >
-                      <span className="mb-4 inline-block rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-500 transition-colors group-hover:bg-illini-blue/10 group-hover:text-illini-blue">
+                      <span className="
+                        mb-4 bg-slate-100 px-3 py-1 font-bold tracking-wider
+                        text-slate-500
+                        group-hover:bg-illini-blue/10
+                        group-hover:text-illini-blue
+                        inline-block rounded-full text-[10px] uppercase
+                        transition-colors
+                      ">
                         {categoryText?.label}
                       </span>
-                      <h3 className="mb-3 text-lg font-bold leading-tight text-slate-900 transition-colors group-hover:text-illini-blue">
+                      <h3 className="
+                        mb-3 text-lg font-bold leading-tight text-slate-900
+                        group-hover:text-illini-blue
+                        transition-colors
+                      ">
                         {article.title}
                       </h3>
-                      <p className="line-clamp-3 text-sm leading-relaxed text-slate-500">
+                      <p className="
+                        text-sm leading-relaxed text-slate-500 line-clamp-3
+                      ">
                         {article.summary}
                       </p>
                     </div>
@@ -114,19 +150,37 @@ const LibraryHomePage: React.FC<LibraryHomePageProps> = ({ language }) => {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <div className="
+            gap-5
+            sm:grid-cols-2
+            grid grid-cols-1
+          ">
             {CATEGORIES.map((category) => {
               const categoryText = getCategoryText(category, language)
               return (
                 <div
                   key={category.id}
                   onClick={() => navigate(`/library/category/${category.id}`)}
-                  className="group cursor-pointer rounded-2xl border border-slate-100 bg-white p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:shadow-slate-200/50"
+                  className="
+                    group rounded-2xl border-slate-100 bg-white p-7 shadow-sm
+                    hover:-translate-y-1 hover:shadow-md
+                    hover:shadow-slate-200/50
+                    cursor-pointer border transition-all duration-300
+                  "
                 >
-                  <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-50 text-3xl shadow-inner transition-colors duration-300 group-hover:bg-illini-blue group-hover:text-white">
+                  <div className="
+                    mb-6 h-14 w-14 rounded-2xl bg-slate-50 text-3xl shadow-inner
+                    group-hover:bg-illini-blue group-hover:text-white
+                    flex items-center justify-center transition-colors
+                    duration-300
+                  ">
                     {category.icon}
                   </div>
-                  <h3 className="mb-3 text-xl font-bold text-slate-900 transition-colors group-hover:text-illini-blue">
+                  <h3 className="
+                    mb-3 text-xl font-bold text-slate-900
+                    group-hover:text-illini-blue
+                    transition-colors
+                  ">
                     {categoryText.label}
                   </h3>
                   <p className="text-sm leading-relaxed text-slate-500">

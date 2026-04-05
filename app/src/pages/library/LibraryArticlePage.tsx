@@ -32,13 +32,13 @@ const LibraryArticlePage: React.FC<LibraryArticlePageProps> = ({
 
   if (!article) {
     return (
-      <div className="p-8 text-center text-slate-500">Article not found</div>
+      <div className="p-8 text-slate-500 text-center">Article not found</div>
     )
   }
 
   return (
-    <div className="no-scrollbar h-full w-full overflow-y-auto">
-      <div className="mx-auto max-w-3xl px-4 py-8 pb-24">
+    <div className="no-scrollbar size-full overflow-y-auto">
+      <div className="max-w-3xl px-4 py-8 pb-24 mx-auto">
         <ArticleView
           article={article}
           onBack={() => navigate('/library')}

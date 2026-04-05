@@ -20,7 +20,7 @@ export function Field({
 }) {
   return (
     <div className="space-y-1">
-      <label className="block font-medium text-gray-700">{label}</label>
+      <label className="font-medium text-gray-700 block">{label}</label>
       {children}
     </div>
   )
@@ -38,9 +38,14 @@ export function EditableList({
   return (
     <div className="space-y-2">
       {items.map((item, index) => (
-        <div key={index} className="flex items-center gap-2">
+        <div key={index} className="gap-2 flex items-center">
           <input
-            className="flex-1 rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-illini-blue"
+            className="
+              rounded-lg border-gray-300 px-3 py-1.5 text-sm
+              focus:ring-illini-blue
+              flex-1 border
+              focus:ring-2 focus:outline-none
+            "
             value={item}
             onChange={(event) => {
               const next = [...items]
@@ -55,7 +60,10 @@ export function EditableList({
                 items.filter((_, currentIndex) => currentIndex !== index)
               )
             }
-            className="text-red-400 hover:text-red-600"
+            className="
+              text-red-400
+              hover:text-red-600
+            "
           >
             <Trash2 size={14} />
           </button>
@@ -64,7 +72,10 @@ export function EditableList({
       <button
         type="button"
         onClick={() => onChange([...items, ''])}
-        className="flex items-center gap-1 text-xs text-illini-blue hover:underline"
+        className="
+          gap-1 text-xs text-illini-blue flex items-center
+          hover:underline
+        "
       >
         <Plus size={12} /> {placeholder}
       </button>
@@ -82,17 +93,23 @@ export function Toggle({
   onChange: (value: boolean) => void
 }) {
   return (
-    <label className="flex cursor-pointer select-none items-center gap-2">
+    <label className="gap-2 flex cursor-pointer items-center select-none">
       <div
         onClick={() => onChange(!checked)}
-        className={`flex h-5 w-9 items-center rounded-full px-0.5 transition-colors ${
+        className={`
+          h-5 w-9 px-0.5 flex items-center rounded-full transition-colors
+          ${
           checked ? 'bg-illini-orange' : 'bg-gray-300'
-        }`}
+        }
+        `}
       >
         <div
-          className={`h-4 w-4 rounded-full bg-white shadow transition-transform ${
+          className={`
+            h-4 w-4 bg-white shadow-sm rounded-full transition-transform
+            ${
             checked ? 'translate-x-4' : 'translate-x-0'
-          }`}
+          }
+          `}
         />
       </div>
       <span className="text-gray-700">{label}</span>

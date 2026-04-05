@@ -29,7 +29,7 @@ export const FavoriteFlyEffect: React.FC<FavoriteFlyEffectProps> = ({
   onComplete,
 }) => (
   <motion.div
-    className="pointer-events-none fixed left-0 top-0 z-[100] origin-center"
+    className="left-0 top-0 pointer-events-none fixed z-100 origin-center"
     initial={{ x: startX, y: startY, scale: 1 }}
     animate={{
       x: targetX,
@@ -40,7 +40,7 @@ export const FavoriteFlyEffect: React.FC<FavoriteFlyEffectProps> = ({
     onAnimationComplete={onComplete}
     style={{ willChange: 'transform' }}
   >
-    <div className="-translate-x-1/2 -translate-y-1/2">
+    <div className="-translate-1/2">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"

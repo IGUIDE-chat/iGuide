@@ -68,7 +68,7 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
   )
 
   return (
-    <div className="flex h-full flex-col bg-gray-50">
+    <div className="bg-gray-50 flex h-full flex-col">
       <DormListHeader
         t={controller.t}
         searchTerm={controller.searchTerm}
@@ -82,13 +82,30 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
         setViewMode={controller.setViewMode}
       />
 
-      <div className="relative z-0 flex min-w-0 flex-1 flex-row overflow-hidden bg-gray-50/50">
+      <div className="
+        min-w-0 bg-gray-50/50 relative z-0 flex flex-1 flex-row overflow-hidden
+      ">
         <div
-          className={`scrollbar-thin h-full min-w-0 overflow-y-auto transition-opacity duration-200 ${
+          className={`
+            scrollbar-thin min-w-0 h-full overflow-y-auto transition-opacity
+            duration-200
+            ${
             controller.isListView
-              ? 'z-10 w-full p-4 opacity-100 xl:p-6'
-              : 'pointer-events-none absolute inset-0 p-3 opacity-0 xl:pointer-events-auto xl:static xl:z-auto xl:w-[360px] xl:min-w-0 xl:shrink-0 xl:border-r xl:border-gray-200 xl:p-3 xl:opacity-100 2xl:w-[40%] 2xl:p-4'
-          } `}
+              ? `
+                p-4
+                xl:p-6
+                z-10 w-full opacity-100
+              `
+              : `
+                inset-0 p-3
+                xl:pointer-events-auto xl:static xl:z-auto xl:w-[360px]
+                xl:min-w-0 xl:shrink-0 xl:border-r xl:border-gray-200 xl:p-3
+                xl:opacity-100
+                2xl:w-[40%] 2xl:p-4
+                pointer-events-none absolute opacity-0
+              `
+          }
+          `}
         >
           {controller.filteredDorms.length > 0 ? (
             <DormGrid
@@ -156,22 +173,37 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 80, opacity: 0 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed bottom-6 left-4 right-4 z-50 mx-auto flex w-fit max-w-[calc(100vw-2rem)] items-center gap-2 rounded-full bg-illini-blue px-3 py-2.5 text-white shadow-xl md:gap-3 md:px-5 md:py-3"
+            className="
+              bottom-6 left-4 right-4 gap-2 bg-illini-blue px-3 py-2.5
+              text-white shadow-xl
+              md:gap-3 md:px-5 md:py-3
+              fixed z-50 mx-auto flex w-fit max-w-[calc(100vw-2rem)]
+              items-center rounded-full
+            "
           >
             <GitCompareArrows className="h-4 w-4 shrink-0" />
-            <span className="whitespace-nowrap text-sm font-medium">
+            <span className="text-sm font-medium whitespace-nowrap">
               {ct.compareBar(compareIds.length)}
             </span>
             <button
               onClick={openCompare}
               disabled={compareIds.length < 2}
-              className="rounded-full bg-white/20 px-4 py-1.5 text-sm font-semibold transition-colors hover:bg-white/30 disabled:cursor-not-allowed disabled:opacity-40"
+              className="
+                bg-white/20 px-4 py-1.5 text-sm font-semibold
+                hover:bg-white/30
+                rounded-full transition-colors
+                disabled:cursor-not-allowed disabled:opacity-40
+              "
             >
               {ct.compare}
             </button>
             <button
               onClick={clearCompare}
-              className="rounded-full p-1.5 transition-colors hover:bg-white/20"
+              className="
+                p-1.5
+                hover:bg-white/20
+                rounded-full transition-colors
+              "
               aria-label={ct.clear}
             >
               <X className="h-3.5 w-3.5" />

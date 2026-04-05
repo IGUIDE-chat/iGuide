@@ -127,10 +127,18 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
   }
 
   return (
-    <div className="flex h-full w-full items-center justify-center overflow-auto bg-white p-4 md:p-8">
-      <div className="relative w-full max-w-md text-center">
+    <div className="
+      bg-white p-4
+      md:p-8
+      flex size-full items-center justify-center overflow-auto
+    ">
+      <div className="max-w-md relative w-full text-center">
         {/* Icon - static, doesn't change with language */}
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-slate-100 bg-slate-50 shadow-sm md:mb-6 md:h-20 md:w-20">
+        <div className="
+          mb-4 h-16 w-16 rounded-2xl border-slate-100 bg-slate-50 shadow-sm
+          md:mb-6 md:h-20 md:w-20
+          mx-auto flex items-center justify-center border
+        ">
           {config.icon}
         </div>
 
@@ -144,19 +152,27 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
             transition={{ duration: 0.2, ease: 'easeOut' }}
           >
             {/* Title */}
-            <h1 className="mb-3 text-2xl font-bold tracking-tight text-slate-900">
+            <h1 className="
+              mb-3 text-2xl font-bold tracking-tight text-slate-900
+            ">
               {title}
             </h1>
 
             {/* Coming Soon Badge */}
             <div className="mb-5">
-              <span className="inline-block rounded-full bg-illini-orange px-3 py-1 text-xs font-semibold text-white">
+              <span className="
+                bg-illini-orange px-3 py-1 text-xs font-semibold text-white
+                inline-block rounded-full
+              ">
                 {t.comingSoon}
               </span>
             </div>
 
             {/* Description */}
-            <p className="mx-auto mb-8 min-h-[3rem] max-w-sm text-sm leading-relaxed text-slate-500">
+            <p className="
+              mb-8 max-w-sm text-sm leading-relaxed text-slate-500 mx-auto
+              min-h-[3rem]
+            ">
               {desc}
             </p>
           </motion.div>
@@ -164,14 +180,20 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
 
         {/* Email Form - partially animated */}
         {!submitted ? (
-          <form onSubmit={handleSubmit} className="mx-auto max-w-xs space-y-3">
+          <form onSubmit={handleSubmit} className="max-w-xs space-y-3 mx-auto">
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder={t.emailPlaceholder}
               required
-              className="w-full rounded-full border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 shadow-sm transition-all focus:border-slate-300 focus:outline-none focus:ring-2 focus:ring-illini-blue/10"
+              className="
+                border-slate-200 bg-white px-4 py-3 text-sm text-slate-900
+                placeholder-slate-400 shadow-sm
+                focus:border-slate-300 focus:ring-illini-blue/10
+                w-full rounded-full border transition-all
+                focus:ring-2 focus:outline-none
+              "
             />
             <AnimatePresence mode="wait">
               <motion.button
@@ -182,7 +204,14 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.15 }}
-                className="w-full rounded-full bg-illini-orange py-3 text-sm font-semibold text-white shadow-md transition-colors hover:bg-illini-orange/90 active:scale-[0.98] disabled:opacity-60"
+                className="
+                  bg-illini-orange py-3 text-sm font-semibold text-white
+                  shadow-md
+                  hover:bg-illini-orange/90
+                  w-full rounded-full transition-colors
+                  active:scale-[0.98]
+                  disabled:opacity-60
+                "
               >
                 {submitting
                   ? language === 'zh'
@@ -192,12 +221,14 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
               </motion.button>
             </AnimatePresence>
             {error && (
-              <p className="text-center text-xs text-red-500">{error}</p>
+              <p className="text-xs text-red-500 text-center">{error}</p>
             )}
           </form>
         ) : (
-          <div className="mx-auto max-w-xs rounded-2xl border border-slate-100 bg-slate-50 p-5">
-            <span className="mb-2 block text-2xl">✅</span>
+          <div className="
+            max-w-xs rounded-2xl border-slate-100 bg-slate-50 p-5 mx-auto border
+          ">
+            <span className="mb-2 text-2xl block">✅</span>
             <p className="text-sm font-medium text-slate-600">
               {t.emailSuccess}
             </p>

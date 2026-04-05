@@ -25,14 +25,26 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
   onSubmit,
 }) => {
   return (
-    <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-white via-white to-transparent pb-6 pt-2">
+    <div className="
+      bottom-0 left-0 from-white via-white pb-6 pt-2 absolute w-full
+      bg-linear-to-t to-transparent
+    ">
       <div className={containerClass}>
         <form
           onSubmit={onSubmit}
-          className="relative overflow-hidden rounded-[26px] border border-slate-200 bg-white shadow-md transition-all focus-within:ring-1 focus-within:ring-slate-300"
+          className="
+            border-slate-200 bg-white shadow-md
+            focus-within:ring-slate-300
+            relative overflow-hidden rounded-[26px] border transition-all
+            focus-within:ring-1
+          "
         >
           <input
-            className="w-full resize-none bg-transparent py-3.5 pl-5 pr-12 text-base text-slate-900 placeholder-slate-400 focus:outline-none"
+            className="
+              py-3.5 pl-5 pr-12 text-base text-slate-900 placeholder-slate-400
+              w-full resize-none bg-transparent
+              focus:outline-none
+            "
             placeholder={placeholder}
             value={input}
             onChange={(event) => onInputChange(event.target.value)}
@@ -40,11 +52,18 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
           <button
             type="submit"
             disabled={!input.trim() || isLoading}
-            className={`absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-2 transition-all ${
+            className={`
+              right-2 p-2 absolute top-1/2 -translate-y-1/2 rounded-full
+              transition-all
+              ${
               !input.trim() || isLoading
-                ? 'cursor-not-allowed bg-slate-100 text-slate-300'
-                : 'bg-black text-white hover:opacity-80'
-            }`}
+                ? 'bg-slate-100 text-slate-300 cursor-not-allowed'
+                : `
+                  bg-black text-white
+                  hover:opacity-80
+                `
+            }
+            `}
           >
             {isLoading ? (
               <svg
@@ -83,7 +102,11 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
             )}
           </button>
         </form>
-        <div className="mt-3 hidden text-center text-xs text-slate-400 md:block">
+        <div className="
+          mt-3 text-xs text-slate-400
+          md:block
+          hidden text-center
+        ">
           {helperText}
         </div>
       </div>

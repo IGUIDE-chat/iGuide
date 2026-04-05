@@ -72,9 +72,14 @@ const MapCarouselCard: React.FC<MapCarouselCardProps> = ({
       }}
       onMouseEnter={() => onHoverDorm(dorm.id)}
       onMouseLeave={() => onHoverDorm(null)}
-      className="w-[210px] flex-shrink-0 cursor-pointer snap-start [touch-action:manipulation]"
+      className="
+        w-[210px] shrink-0 cursor-pointer touch-manipulation snap-start
+      "
     >
-      <div className="flex h-[72px] flex-row overflow-hidden rounded-xl border border-gray-100/80 bg-white/95 shadow-[0_4px_14px_rgba(0,0,0,0.14)] backdrop-blur-md">
+      <div className="
+        rounded-xl border-gray-100/80 bg-white/95 backdrop-blur-md flex h-[72px]
+        flex-row overflow-hidden border shadow-[0_4px_14px_rgba(0,0,0,0.14)]
+      ">
         {/* Thumbnail */}
         <div className="relative w-[72px] shrink-0">
           <img
@@ -82,7 +87,7 @@ const MapCarouselCard: React.FC<MapCarouselCardProps> = ({
             alt={dormName}
             loading="lazy"
             decoding="async"
-            className="pointer-events-none h-full w-full object-cover"
+            className="pointer-events-none size-full object-cover"
             onError={(e) => {
               e.currentTarget.src =
                 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400'
@@ -91,7 +96,13 @@ const MapCarouselCard: React.FC<MapCarouselCardProps> = ({
           {/* Housing type badge */}
           {(dorm.housingType === 'URH' || dorm.housingType === 'PCH') && (
             <div
-              className={`absolute left-1 top-1 rounded px-1 py-0.5 text-[8px] font-bold uppercase tracking-wider text-white ${dorm.housingType === 'URH' ? 'bg-illini-orange/90' : 'bg-illini-blue/90'}`}
+              className={`
+                left-1 top-1 rounded-sm px-1 py-0.5 font-bold tracking-wider
+                text-white absolute text-[8px] uppercase
+                ${dorm.housingType === 'URH' ? `bg-illini-orange/90` : `
+                  bg-illini-blue/90
+                `}
+              `}
             >
               {dorm.housingType}
             </div>
@@ -99,21 +110,25 @@ const MapCarouselCard: React.FC<MapCarouselCardProps> = ({
         </div>
 
         {/* Content */}
-        <div className="flex min-w-0 flex-1 flex-col justify-between px-2.5 py-2">
+        <div className="
+          min-w-0 px-2.5 py-2 flex flex-1 flex-col justify-between
+        ">
           <div className="min-w-0">
-            <h3 className="truncate text-sm font-bold leading-tight text-gray-900">
+            <h3 className="
+              text-sm font-bold leading-tight text-gray-900 truncate
+            ">
               {dormName}
             </h3>
-            <p className="mt-0.5 truncate text-[10px] text-gray-500">
+            <p className="mt-0.5 text-gray-500 truncate text-[10px]">
               {locationLabel} {t.campus}
             </p>
           </div>
           <div className="mt-auto flex items-center justify-between">
-            <div className="flex items-baseline gap-0.5">
+            <div className="gap-0.5 flex items-baseline">
               <span className="text-xs font-bold text-gray-900">
                 {formatPrice(dorm.price)}
               </span>
-              <span className="text-[9px] text-gray-400">{t.perYear}</span>
+              <span className="text-gray-400 text-[9px]">{t.perYear}</span>
             </div>
             <button
               onPointerDown={(e) => e.stopPropagation()}
@@ -123,10 +138,13 @@ const MapCarouselCard: React.FC<MapCarouselCardProps> = ({
                 onToggleFavorite(dorm, e)
               }}
               type="button"
-              className="-mr-0.5 rounded-full p-1"
+              className="-mr-0.5 p-1 rounded-full"
             >
               <Heart
-                className={`h-3.5 w-3.5 transition-colors ${isFav ? 'fill-red-500 text-red-500' : 'text-gray-300'}`}
+                className={`
+                  h-3.5 w-3.5 transition-colors
+                  ${isFav ? `fill-red-500 text-red-500` : `text-gray-300`}
+                `}
                 strokeWidth={2}
               />
             </button>
@@ -164,10 +182,17 @@ const MapCarousel: React.FC<MapCarouselProps> = ({
       : { campus: 'Campus', perYear: '/ yr' }
 
   return (
-    <div className="absolute bottom-4 left-0 right-0 z-20 px-3 xl:hidden">
+    <div className="
+      bottom-4 left-0 right-0 px-3
+      xl:hidden
+      absolute z-20
+    ">
       <div
         ref={scrollContainerRef}
-        className="scrollbar-hide flex snap-x snap-mandatory gap-2.5 overflow-x-auto overscroll-x-contain pb-1 pr-10"
+        className="
+          scrollbar-hide gap-2.5 pb-1 pr-10 flex snap-x snap-mandatory
+          overflow-x-auto overscroll-x-contain
+        "
         style={{
           scrollBehavior: 'smooth',
           scrollPaddingInlineStart: '4px',

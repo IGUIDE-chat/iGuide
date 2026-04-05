@@ -49,7 +49,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
   }, [messages])
 
   return (
-    <div className="relative flex h-full w-full flex-col">
+    <div className="relative flex size-full flex-col">
       <div className="w-full flex-1 overflow-y-auto">
         <div className="flex min-h-full flex-col">
           {messages.length === 0 ? (

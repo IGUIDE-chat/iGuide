@@ -28,7 +28,11 @@ const HousingTypeSection: React.FC<HousingTypeSectionProps> = ({
 }) => (
   <section className="mb-8">
     <h3 className="mb-6 text-xl font-bold">{title}</h3>
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div className="
+      gap-4
+      md:grid-cols-2
+      grid grid-cols-1
+    ">
       {HOUSING_TYPE_OPTIONS.map((option) => {
         const meta = getHousingTypeMeta(option.value)
         const selected = value === option.value
@@ -46,11 +50,18 @@ const HousingTypeSection: React.FC<HousingTypeSectionProps> = ({
         return (
           <label
             key={option.value}
-            className={`flex cursor-pointer items-center gap-4 rounded-xl border-2 p-4 transition-colors duration-200 ${selected ? accentClass : hoverClass} `}
+            className={`
+              gap-4 rounded-xl p-4 flex cursor-pointer items-center border-2
+              transition-colors duration-200
+              ${selected ? accentClass : hoverClass}
+            `}
           >
             <input
               type="checkbox"
-              className={`h-5 w-5 rounded-md ${checkboxClass}`}
+              className={`
+                h-5 w-5 rounded-md
+                ${checkboxClass}
+              `}
               checked={selected}
               onChange={() => onChange(selected ? 'ALL' : option.value)}
             />

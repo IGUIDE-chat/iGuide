@@ -59,18 +59,35 @@ const SortingDropdown: React.FC<SortingDropdownProps> = memo(
         <button
           onClick={() => setIsOpen(!isOpen)}
           type="button"
-          className={`flex h-10 w-10 items-center justify-center rounded-full border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-illini-blue/20 ${
+          className={`
+            h-10 w-10
+            focus:ring-illini-blue/20
+            flex items-center justify-center rounded-full border transition-all
+            duration-200
+            focus:ring-2 focus:outline-none
+            ${
             isOpen
               ? 'border-illini-blue/50 bg-illini-blue/10 text-illini-blue'
-              : 'border-gray-200 bg-white text-gray-700 hover:border-illini-blue/40 hover:bg-illini-blue/5 hover:text-illini-blue/80 active:border-illini-blue/50 active:bg-illini-blue/10 active:text-illini-blue'
-          }`}
+              : `
+                border-gray-200 bg-white text-gray-700
+                hover:border-illini-blue/40 hover:bg-illini-blue/5
+                hover:text-illini-blue/80
+                active:border-illini-blue/50 active:bg-illini-blue/10
+                active:text-illini-blue
+              `
+          }
+          `}
           title={`Sort by: ${currentLabel}`}
         >
           <ArrowUpDown size={18} strokeWidth={2} />
         </button>
 
         {isOpen && (
-          <div className="animate-in fade-in zoom-in-95 absolute right-0 z-50 mt-2 w-48 origin-top-right rounded-xl border border-gray-100 bg-white py-1 shadow-lg duration-100">
+          <div className="
+            animate-in fade-in zoom-in-95 right-0 mt-2 w-48 rounded-xl
+            border-gray-100 bg-white py-1 shadow-lg absolute z-50
+            origin-top-right border duration-100
+          ">
             {SORT_OPTIONS.map((option) => (
               <button
                 key={option.value}
@@ -79,13 +96,23 @@ const SortingDropdown: React.FC<SortingDropdownProps> = memo(
                   setIsOpen(false)
                 }}
                 type="button"
-                className="group flex w-full items-center justify-between px-4 py-2 text-left text-sm transition-colors first:rounded-t-lg last:rounded-b-lg hover:bg-illini-blue/5"
+                className="
+                  group px-4 py-2 text-sm
+                  first:rounded-t-lg
+                  last:rounded-b-lg
+                  hover:bg-illini-blue/5
+                  flex w-full items-center justify-between text-left
+                  transition-colors
+                "
               >
                 <span
                   className={
                     sortBy === option.value
                       ? 'font-medium text-illini-blue'
-                      : 'text-gray-600 group-hover:text-illini-blue/80'
+                      : `
+                        text-gray-600
+                        group-hover:text-illini-blue/80
+                      `
                   }
                 >
                   {option.label}

@@ -26,10 +26,12 @@ export const TagsTab: React.FC<TagsTabProps> = ({ form }) => {
       {(['livingConditions', 'facilities', 'lifestyle'] as const).map(
         (category) => (
           <div key={category}>
-            <p className="mb-2 text-xs font-bold uppercase tracking-wider text-gray-500">
+            <p className="
+              mb-2 text-xs font-bold tracking-wider text-gray-500 uppercase
+            ">
               {CATEGORY_LABELS[category][form.language]}
             </p>
-            <div className="flex flex-wrap gap-2">
+            <div className="gap-2 flex flex-wrap">
               {TAGS_BY_CATEGORY[category].map((tagId) => {
                 const checked = form.categorizedTags[category].includes(
                   tagId as never
@@ -46,11 +48,20 @@ export const TagsTab: React.FC<TagsTabProps> = ({ form }) => {
                           : [...prev[category], tagId],
                       }))
                     }
-                    className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition-all ${
+                    className={`
+                      rounded-lg px-3 py-1.5 text-sm font-medium border
+                      transition-all
+                      ${
                       checked
-                        ? 'border-illini-blue bg-illini-blue text-white shadow-sm'
-                        : 'border-gray-300 bg-white text-gray-600 hover:border-illini-blue hover:text-illini-blue'
-                    }`}
+                        ? `
+                          border-illini-blue bg-illini-blue text-white shadow-sm
+                        `
+                        : `
+                          border-gray-300 bg-white text-gray-600
+                          hover:border-illini-blue hover:text-illini-blue
+                        `
+                    }
+                    `}
                   >
                     {getTagDisplay(tagId, form.language)}
                   </button>
@@ -62,18 +73,26 @@ export const TagsTab: React.FC<TagsTabProps> = ({ form }) => {
       )}
 
       <div>
-        <p className="mb-2 text-xs font-bold uppercase tracking-wider text-gray-500">
+        <p className="
+          mb-2 text-xs font-bold tracking-wider text-gray-500 uppercase
+        ">
           {form.language === 'zh' ? '社区' : 'Community'}
         </p>
-        <div className="flex flex-wrap gap-2">
+        <div className="gap-2 flex flex-wrap">
           <button
             type="button"
             onClick={() => form.setPetFriendly(!form.petFriendly)}
-            className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition-all ${
+            className={`
+              rounded-lg px-3 py-1.5 text-sm font-medium border transition-all
+              ${
               form.petFriendly
                 ? 'border-illini-blue bg-illini-blue text-white shadow-sm'
-                : 'border-gray-300 bg-white text-gray-600 hover:border-illini-blue hover:text-illini-blue'
-            }`}
+                : `
+                  border-gray-300 bg-white text-gray-600
+                  hover:border-illini-blue hover:text-illini-blue
+                `
+            }
+            `}
           >
             {form.language === 'zh' ? '允许宠物' : 'Pet-Friendly'}
           </button>
@@ -81,10 +100,12 @@ export const TagsTab: React.FC<TagsTabProps> = ({ form }) => {
       </div>
 
       <div>
-        <p className="mb-2 text-xs font-bold uppercase tracking-wider text-gray-500">
+        <p className="
+          mb-2 text-xs font-bold tracking-wider text-gray-500 uppercase
+        ">
           {t.labels.llc}
         </p>
-        <div className="flex flex-wrap gap-2">
+        <div className="gap-2 flex flex-wrap">
           {LLC_OPTIONS.map((llc) => {
             const selected =
               form.categorizedTags.llcNames?.includes(llc) ?? false
@@ -108,11 +129,18 @@ export const TagsTab: React.FC<TagsTabProps> = ({ form }) => {
                     }
                   })
                 }
-                className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition-all ${
+                className={`
+                  rounded-lg px-3 py-1.5 text-sm font-medium border
+                  transition-all
+                  ${
                   selected
                     ? 'border-illini-blue bg-illini-blue text-white shadow-sm'
-                    : 'border-gray-300 bg-white text-gray-600 hover:border-illini-blue hover:text-illini-blue'
-                }`}
+                    : `
+                      border-gray-300 bg-white text-gray-600
+                      hover:border-illini-blue hover:text-illini-blue
+                    `
+                }
+                `}
               >
                 {llc}
               </button>
