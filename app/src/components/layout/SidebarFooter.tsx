@@ -106,10 +106,12 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
             hover:bg-[#212121]
           "
         >
-          <div className="
-            transition-transform
-            group-hover:scale-110
-          ">
+          <div
+            className="
+              transition-transform
+              group-hover:scale-110
+            "
+          >
             <BrandMark
               className="h-5 w-5 rounded-[4px]"
               iconClassName="text-[10px]"
@@ -128,10 +130,12 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
             block flex cursor-pointer items-center transition-colors
           "
         >
-          <div className="
-            h-8 w-8 bg-illini-orange text-sm font-semibold text-white flex
-            shrink-0 items-center justify-center rounded-full
-          ">
+          <div
+            className="
+              h-8 w-8 bg-illini-orange text-sm font-semibold text-white flex
+              shrink-0 items-center justify-center rounded-full
+            "
+          >
             {profileName.charAt(0).toUpperCase() || 'U'}
           </div>
           <motion.div

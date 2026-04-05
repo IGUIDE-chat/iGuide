@@ -25,10 +25,12 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
   onSubmit,
 }) => {
   return (
-    <div className="
-      bottom-0 left-0 from-white via-white pb-6 pt-2 absolute w-full
-      bg-linear-to-t to-transparent
-    ">
+    <div
+      className="
+        bottom-0 left-0 from-white via-white pb-6 pt-2 absolute w-full
+        bg-linear-to-t to-transparent
+      "
+    >
       <div className={containerClass}>
         <form
           onSubmit={onSubmit}
@@ -56,13 +58,13 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
               right-2 p-2 absolute top-1/2 -translate-y-1/2 rounded-full
               transition-all
               ${
-              !input.trim() || isLoading
-                ? 'bg-slate-100 text-slate-300 cursor-not-allowed'
-                : `
-                  bg-black text-white
-                  hover:opacity-80
-                `
-            }
+                !input.trim() || isLoading
+                  ? 'bg-slate-100 text-slate-300 cursor-not-allowed'
+                  : `
+                    bg-black text-white
+                    hover:opacity-80
+                  `
+              }
             `}
           >
             {isLoading ? (
@@ -102,11 +104,13 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
             )}
           </button>
         </form>
-        <div className="
-          mt-3 text-xs text-slate-400
-          md:block
-          hidden text-center
-        ">
+        <div
+          className="
+            mt-3 text-xs text-slate-400
+            md:block
+            hidden text-center
+          "
+        >
           {helperText}
         </div>
       </div>

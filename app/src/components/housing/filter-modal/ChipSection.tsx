@@ -42,13 +42,13 @@ const ChipSection: React.FC<ChipSectionProps> = ({
                 px-4 py-2 text-sm font-medium rounded-full border transition-all
                 duration-200
                 ${
-                isSelected
-                  ? `
-                    border-illini-blue bg-illini-blue text-white
-                    active:border-[#0e2240] active:bg-[#0e2240]
-                  `
-                  : unselectedClass
-              }
+                  isSelected
+                    ? `
+                      border-illini-blue bg-illini-blue text-white
+                      active:border-[#0e2240] active:bg-[#0e2240]
+                    `
+                    : unselectedClass
+                }
               `}
             >
               {value.label}

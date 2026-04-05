@@ -55,20 +55,26 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
   }
 
   return (
-    <div className="
-      from-illini-blue via-slate-800 to-illini-orange/20 p-4 flex min-h-screen
-      items-center justify-center bg-linear-to-br
-    ">
+    <div
+      className="
+        from-illini-blue via-slate-800 to-illini-orange/20 p-4 flex min-h-screen
+        items-center justify-center bg-linear-to-br
+      "
+    >
       {/* Background decoration */}
       <div className="inset-0 pointer-events-none absolute overflow-hidden">
-        <div className="
-          -left-20 h-96 w-96 bg-illini-orange/10 blur-3xl absolute top-1/4
-          rounded-full
-        "></div>
-        <div className="
-          -right-20 h-96 w-96 bg-illini-blue/10 blur-3xl absolute bottom-1/4
-          rounded-full
-        "></div>
+        <div
+          className="
+            -left-20 h-96 w-96 bg-illini-orange/10 blur-3xl absolute top-1/4
+            rounded-full
+          "
+        ></div>
+        <div
+          className="
+            -right-20 h-96 w-96 bg-illini-blue/10 blur-3xl absolute bottom-1/4
+            rounded-full
+          "
+        ></div>
       </div>
 
       <div className="max-w-md relative w-full">
@@ -79,10 +85,12 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
         </div>
 
         {/* Register Card */}
-        <div className="
-          rounded-2xl border-white/20 bg-white/95 p-8 shadow-2xl
-          backdrop-blur-sm border
-        ">
+        <div
+          className="
+            rounded-2xl border-white/20 bg-white/95 p-8 shadow-2xl
+            backdrop-blur-sm border
+          "
+        >
           <h2 className="mb-6 text-2xl font-bold text-slate-900">
             Create Account
           </h2>
@@ -200,17 +208,21 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
               />
               <label htmlFor="terms" className="ml-2 text-sm text-slate-600">
                 I agree to the{' '}
-                <span className="
-                  text-illini-blue cursor-pointer
-                  hover:underline
-                ">
+                <span
+                  className="
+                    text-illini-blue cursor-pointer
+                    hover:underline
+                  "
+                >
                   Terms of Service
                 </span>{' '}
                 and{' '}
-                <span className="
-                  text-illini-blue cursor-pointer
-                  hover:underline
-                ">
+                <span
+                  className="
+                    text-illini-blue cursor-pointer
+                    hover:underline
+                  "
+                >
                   Privacy Policy
                 </span>
               </label>
@@ -218,10 +230,12 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
 
             {/* Error Message */}
             {error && (
-              <div className="
-                rounded-lg border-red-200 bg-red-50 px-4 py-3 text-sm
-                text-red-700 border
-              ">
+              <div
+                className="
+                  rounded-lg border-red-200 bg-red-50 px-4 py-3 text-sm
+                  text-red-700 border
+                "
+              >
                 {error}
               </div>
             )}

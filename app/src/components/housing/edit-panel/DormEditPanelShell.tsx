@@ -51,14 +51,18 @@ export const DormEditPanelShell: React.FC<DormEditPanelShellProps> = ({
   return (
     <>
       {/* No full-page backdrop — left side stays fully interactive and scrollable */}
-      <div className="
-        right-0 top-0 max-w-lg border-gray-200 bg-white shadow-2xl fixed z-50
-        flex size-full flex-col border-l
-      ">
-        <div className="
-          bg-illini-blue px-4 py-3 text-white flex shrink-0 items-center
-          justify-between
-        ">
+      <div
+        className="
+          right-0 top-0 max-w-lg border-gray-200 bg-white shadow-2xl fixed z-50
+          flex size-full flex-col border-l
+        "
+      >
+        <div
+          className="
+            bg-illini-blue px-4 py-3 text-white flex shrink-0 items-center
+            justify-between
+          "
+        >
           <span className="text-base font-bold truncate">{title}</span>
           <button
             type="button"
@@ -82,13 +86,13 @@ export const DormEditPanelShell: React.FC<DormEditPanelShellProps> = ({
                 gap-1.5 py-2.5 text-xs font-medium flex flex-1 items-center
                 justify-center transition-colors
                 ${
-                activeTab === tab.id
-                  ? 'border-illini-orange text-illini-blue border-b-2'
-                  : `
-                    text-gray-500
-                    hover:text-illini-blue
-                  `
-              }
+                  activeTab === tab.id
+                    ? 'border-illini-orange text-illini-blue border-b-2'
+                    : `
+                      text-gray-500
+                      hover:text-illini-blue
+                    `
+                }
               `}
             >
               {tab.icon}
@@ -99,10 +103,12 @@ export const DormEditPanelShell: React.FC<DormEditPanelShellProps> = ({
         <div className="space-y-4 px-4 py-4 text-sm flex-1 overflow-y-auto">
           {children}
         </div>
-        <div className="
-          gap-3 border-gray-200 bg-white px-4 py-3 flex shrink-0 items-center
-          border-t
-        ">
+        <div
+          className="
+            gap-3 border-gray-200 bg-white px-4 py-3 flex shrink-0 items-center
+            border-t
+          "
+        >
           {activeTab !== 'history' && (
             <button
               type="button"

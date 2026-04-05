@@ -68,10 +68,12 @@ const ImageLightbox: React.FC<ImageLightboxProps> = ({
       onClick={onClose}
     >
       {/* Top bar */}
-      <div className="
-        left-0 right-0 top-0 px-4 py-3 absolute z-10 flex items-center
-        justify-between
-      ">
+      <div
+        className="
+          left-0 right-0 top-0 px-4 py-3 absolute z-10 flex items-center
+          justify-between
+        "
+      >
         <div className="text-sm font-medium text-white/70">
           {current?.label && <span>{current.label}</span>}
           {hasMultiple && (

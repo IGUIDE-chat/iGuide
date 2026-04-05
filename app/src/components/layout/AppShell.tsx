@@ -35,19 +35,21 @@ export const AppShell: React.FC<AppShellProps> = ({
   const headerSlot = layout.mobileHeaderSlot
 
   return (
-    <div className="
-      bg-white font-sans text-slate-900 flex h-dvh w-full overflow-hidden
-    ">
+    <div
+      className="
+        bg-white font-sans text-slate-900 flex h-dvh w-full overflow-hidden
+      "
+    >
       <div
         className={`
           inset-0 bg-black/50
           md:hidden
           fixed z-40 transition-opacity duration-300
           ${
-          isSidebarOpen
-            ? 'pointer-events-auto opacity-100'
-            : 'pointer-events-none opacity-0'
-        }
+            isSidebarOpen
+              ? 'pointer-events-auto opacity-100'
+              : 'pointer-events-none opacity-0'
+          }
         `}
         onClick={onCloseSidebar}
       />
@@ -58,24 +60,26 @@ export const AppShell: React.FC<AppShellProps> = ({
           md:relative
           fixed z-50 flex flex-col bg-[#171717] transition-all duration-300
           ${
-          isSidebarOpen
-            ? 'translate-x-0 w-[180px]'
-            : `
-              md:w-0 md:translate-x-0 md:overflow-hidden
-              w-[180px] -translate-x-full
-            `
-        }
+            isSidebarOpen
+              ? 'translate-x-0 w-[180px]'
+              : `
+                md:w-0 md:translate-x-0 md:overflow-hidden
+                w-[180px] -translate-x-full
+              `
+          }
         `}
       >
         <div className="flex h-full w-[180px] flex-col">{sidebar}</div>
       </aside>
 
       <main className="min-w-0 bg-white relative flex size-full flex-1 flex-col">
-        <div className="
-          left-3 top-3
-          md:block
-          absolute z-40 hidden
-        ">
+        <div
+          className="
+            left-3 top-3
+            md:block
+            absolute z-40 hidden
+          "
+        >
           <button
             ref={sidebarToggleButtonRef}
             onClick={onToggleSidebar}
@@ -102,11 +106,13 @@ export const AppShell: React.FC<AppShellProps> = ({
           </button>
         </div>
 
-        <div className="
-          top-0 gap-2 border-slate-100 bg-white p-3
-          md:hidden
-          sticky z-20 flex items-center border-b
-        ">
+        <div
+          className="
+            top-0 gap-2 border-slate-100 bg-white p-3
+            md:hidden
+            sticky z-20 flex items-center border-b
+          "
+        >
           <button
             ref={mobileSidebarButtonRef}
             onClick={onOpenSidebar}

@@ -133,10 +133,12 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
     if (isLoading) {
       return (
         <div className="py-6 flex items-center justify-center">
-          <div className="
-            h-4 w-4 animate-spin border-illini-orange rounded-full border-2
-            border-t-transparent
-          " />
+          <div
+            className="
+              h-4 w-4 animate-spin border-illini-orange rounded-full border-2
+              border-t-transparent
+            "
+          />
         </div>
       )
     }
@@ -169,20 +171,22 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
               className={`
                 group rounded-lg px-2 py-2 cursor-pointer transition-all
                 ${
-                item.id === currentDormId
-                  ? 'bg-white/20 text-white'
-                  : `
-                    text-slate-300
-                    hover:bg-white/10
-                  `
-              }
+                  item.id === currentDormId
+                    ? 'bg-white/20 text-white'
+                    : `
+                      text-slate-300
+                      hover:bg-white/10
+                    `
+                }
               `}
             >
               <div className="relative overflow-hidden">
                 <div className="gap-2 pr-7 flex items-center">
-                  <div className="
-                    h-7 w-7 rounded-sm bg-white/10 shrink-0 overflow-hidden
-                  ">
+                  <div
+                    className="
+                      h-7 w-7 rounded-sm bg-white/10 shrink-0 overflow-hidden
+                    "
+                  >
                     {item.imageUrl ? (
                       <img
                         src={item.imageUrl}
@@ -198,13 +202,13 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
                       className={`
                         text-xs font-medium truncate
                         ${
-                        item.id === currentDormId
-                          ? 'text-white'
-                          : `
-                            text-slate-300
-                            group-hover:text-white
-                          `
-                      }
+                          item.id === currentDormId
+                            ? 'text-white'
+                            : `
+                              text-slate-300
+                              group-hover:text-white
+                            `
+                        }
                       `}
                     >
                       <TypewriterText
@@ -218,12 +222,14 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
                   </div>
                 </div>
 
-                <div className="
-                  bottom-0 right-0 top-0 px-1 absolute flex items-center
-                  bg-linear-to-l from-[#2E2E2E] to-transparent opacity-0
-                  transition-all duration-200
-                  group-hover:opacity-100
-                ">
+                <div
+                  className="
+                    bottom-0 right-0 top-0 px-1 absolute flex items-center
+                    bg-linear-to-l from-[#2E2E2E] to-transparent opacity-0
+                    transition-all duration-200
+                    group-hover:opacity-100
+                  "
+                >
                   <button
                     onClick={(event) => {
                       event.stopPropagation()

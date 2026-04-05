@@ -29,13 +29,13 @@ export const ContentTab: React.FC<ContentTabProps> = ({ form }) => {
             className={`
               rounded-md px-3 py-1 text-xs font-medium transition-colors
               ${
-              form.contentLang === lang
-                ? 'bg-white text-illini-blue shadow-sm'
-                : `
-                  text-gray-500
-                  hover:text-gray-700
-                `
-            }
+                form.contentLang === lang
+                  ? 'bg-white text-illini-blue shadow-sm'
+                  : `
+                    text-gray-500
+                    hover:text-gray-700
+                  `
+              }
             `}
           >
             {lang === 'en' ? 'English' : '中文'}
@@ -76,15 +76,16 @@ export const ContentTab: React.FC<ContentTabProps> = ({ form }) => {
                       rounded-lg px-3 py-1.5 text-xs font-medium border
                       transition-all
                       ${
-                      form.location === preset.value
-                        ? `
-                          border-illini-blue bg-illini-blue text-white shadow-sm
-                        `
-                        : `
-                          border-gray-300 bg-white text-gray-600
-                          hover:border-illini-blue hover:text-illini-blue
-                        `
-                    }
+                        form.location === preset.value
+                          ? `
+                            border-illini-blue bg-illini-blue text-white
+                            shadow-sm
+                          `
+                          : `
+                            border-gray-300 bg-white text-gray-600
+                            hover:border-illini-blue hover:text-illini-blue
+                          `
+                      }
                     `}
                   >
                     {preset.en}
@@ -148,15 +149,16 @@ export const ContentTab: React.FC<ContentTabProps> = ({ form }) => {
                       rounded-lg px-3 py-1.5 text-xs font-medium border
                       transition-all
                       ${
-                      form.locationZh === preset.zh
-                        ? `
-                          border-illini-blue bg-illini-blue text-white shadow-sm
-                        `
-                        : `
-                          border-gray-300 bg-white text-gray-600
-                          hover:border-illini-blue hover:text-illini-blue
-                        `
-                    }
+                        form.locationZh === preset.zh
+                          ? `
+                            border-illini-blue bg-illini-blue text-white
+                            shadow-sm
+                          `
+                          : `
+                            border-gray-300 bg-white text-gray-600
+                            hover:border-illini-blue hover:text-illini-blue
+                          `
+                      }
                     `}
                   >
                     {preset.zh}

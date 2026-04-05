@@ -98,17 +98,13 @@ export function Toggle({
         onClick={() => onChange(!checked)}
         className={`
           h-5 w-9 px-0.5 flex items-center rounded-full transition-colors
-          ${
-          checked ? 'bg-illini-orange' : 'bg-gray-300'
-        }
+          ${checked ? 'bg-illini-orange' : 'bg-gray-300'}
         `}
       >
         <div
           className={`
             h-4 w-4 bg-white shadow-sm rounded-full transition-transform
-            ${
-            checked ? 'translate-x-4' : 'translate-x-0'
-          }
+            ${checked ? 'translate-x-4' : 'translate-x-0'}
           `}
         />
       </div>

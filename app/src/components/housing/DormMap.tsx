@@ -78,17 +78,23 @@ class MapErrorBoundary extends Component<
 
     if (hasError) {
       return (
-        <div className="
-          from-gray-50 to-gray-100 flex size-full items-center justify-center
-          bg-linear-to-br
-        ">
-          <div className="
-            mx-4 max-w-md rounded-2xl bg-white p-8 shadow-xl text-center
-          ">
-            <div className="
-              mb-4 h-16 w-16 bg-red-100 mx-auto flex items-center justify-center
-              rounded-full
-            ">
+        <div
+          className="
+            from-gray-50 to-gray-100 flex size-full items-center justify-center
+            bg-linear-to-br
+          "
+        >
+          <div
+            className="
+              mx-4 max-w-md rounded-2xl bg-white p-8 shadow-xl text-center
+            "
+          >
+            <div
+              className="
+                mb-4 h-16 w-16 bg-red-100 mx-auto flex items-center
+                justify-center rounded-full
+              "
+            >
               <svg
                 className="h-8 w-8 text-red-500"
                 fill="none"
@@ -463,13 +469,17 @@ const DormMap: React.FC<DormMapProps> = ({
 
   if (!MAPBOX_TOKEN) {
     return (
-      <div className="
-        from-gray-50 to-gray-100 flex size-full items-center justify-center
-        bg-linear-to-br
-      ">
-        <div className="
-          mx-4 max-w-md rounded-2xl bg-white p-8 shadow-xl text-center
-        ">
+      <div
+        className="
+          from-gray-50 to-gray-100 flex size-full items-center justify-center
+          bg-linear-to-br
+        "
+      >
+        <div
+          className="
+            mx-4 max-w-md rounded-2xl bg-white p-8 shadow-xl text-center
+          "
+        >
           <h3 className="mb-2 text-lg font-bold text-gray-900">
             {language === 'zh' ? '地图不可用' : 'Map unavailable'}
           </h3>
@@ -564,25 +574,29 @@ const DormMap: React.FC<DormMapProps> = ({
           {areMapImagesReady && <Layer {...(UNCLUSTERED_LAYER as any)} />}
         </Source>
 
-        <div className="
-          left-4 top-4 gap-2 rounded-lg border-slate-200/50 bg-white/90 p-3
-          shadow-lg backdrop-blur-sm absolute z-10 flex min-w-[140px] flex-col
-          border
-        ">
-          <div className="
-            mb-1 text-xs font-semibold tracking-wider text-slate-500 uppercase
-          ">
+        <div
+          className="
+            left-4 top-4 gap-2 rounded-lg border-slate-200/50 bg-white/90 p-3
+            shadow-lg backdrop-blur-sm absolute z-10 flex min-w-[140px] flex-col
+            border
+          "
+        >
+          <div
+            className="
+              mb-1 text-xs font-semibold tracking-wider text-slate-500 uppercase
+            "
+          >
             {language === 'zh' ? '地图图层' : 'Map Layers'}
           </div>
 
-          <label className="
-            group flex cursor-pointer items-center justify-between
-          ">
-            <span className="
-              text-sm font-medium text-slate-700
-              group-hover:text-illini-blue
-              transition-colors
-            ">
+          <label className="group flex cursor-pointer items-center justify-between">
+            <span
+              className="
+                text-sm font-medium text-slate-700
+                group-hover:text-illini-blue
+                transition-colors
+              "
+            >
               {language === 'zh' ? '区域' : 'Zones'}
             </span>
             <div className="relative inline-flex cursor-pointer items-center">
@@ -592,29 +606,31 @@ const DormMap: React.FC<DormMapProps> = ({
                 checked={showZones}
                 onChange={(e) => setShowZones(e.target.checked)}
               />
-              <div className="
-                peer h-4 w-7 bg-slate-300
-                after:h-3 after:w-3 after:border-gray-300 after:bg-white
-                peer-checked:bg-illini-orange
-                peer-checked:after:border-white
-                rounded-full
-                peer-focus:outline-none
-                after:absolute after:top-[2px] after:left-[2px]
-                after:rounded-full after:border after:transition-all
-                after:content-['']
-                peer-checked:after:translate-x-full
-              " />
+              <div
+                className="
+                  peer h-4 w-7 bg-slate-300
+                  after:h-3 after:w-3 after:border-gray-300 after:bg-white
+                  peer-checked:bg-illini-orange
+                  peer-checked:after:border-white
+                  rounded-full
+                  peer-focus:outline-none
+                  after:absolute after:top-[2px] after:left-[2px]
+                  after:rounded-full after:border after:transition-all
+                  after:content-['']
+                  peer-checked:after:translate-x-full
+                "
+              />
             </div>
           </label>
 
-          <label className="
-            group flex cursor-pointer items-center justify-between
-          ">
-            <span className="
-              text-sm font-medium text-slate-700
-              group-hover:text-illini-blue
-              transition-colors
-            ">
+          <label className="group flex cursor-pointer items-center justify-between">
+            <span
+              className="
+                text-sm font-medium text-slate-700
+                group-hover:text-illini-blue
+                transition-colors
+              "
+            >
               {language === 'zh' ? '地标' : 'Landmarks'}
             </span>
             <div className="relative inline-flex cursor-pointer items-center">
@@ -624,18 +640,20 @@ const DormMap: React.FC<DormMapProps> = ({
                 checked={showLandmarks}
                 onChange={(e) => setShowLandmarks(e.target.checked)}
               />
-              <div className="
-                peer h-4 w-7 bg-slate-300
-                after:h-3 after:w-3 after:border-gray-300 after:bg-white
-                peer-checked:bg-illini-orange
-                peer-checked:after:border-white
-                rounded-full
-                peer-focus:outline-none
-                after:absolute after:top-[2px] after:left-[2px]
-                after:rounded-full after:border after:transition-all
-                after:content-['']
-                peer-checked:after:translate-x-full
-              " />
+              <div
+                className="
+                  peer h-4 w-7 bg-slate-300
+                  after:h-3 after:w-3 after:border-gray-300 after:bg-white
+                  peer-checked:bg-illini-orange
+                  peer-checked:after:border-white
+                  rounded-full
+                  peer-focus:outline-none
+                  after:absolute after:top-[2px] after:left-[2px]
+                  after:rounded-full after:border after:transition-all
+                  after:content-['']
+                  peer-checked:after:translate-x-full
+                "
+              />
             </div>
           </label>
         </div>

@@ -82,29 +82,32 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
         setViewMode={controller.setViewMode}
       />
 
-      <div className="
-        min-w-0 bg-gray-50/50 relative z-0 flex flex-1 flex-row overflow-hidden
-      ">
+      <div
+        className="
+          min-w-0 bg-gray-50/50 relative z-0 flex flex-1 flex-row
+          overflow-hidden
+        "
+      >
         <div
           className={`
             scrollbar-thin min-w-0 h-full overflow-y-auto transition-opacity
             duration-200
             ${
-            controller.isListView
-              ? `
-                p-4
-                xl:p-6
-                z-10 w-full opacity-100
-              `
-              : `
-                inset-0 p-3
-                xl:pointer-events-auto xl:static xl:z-auto xl:w-[360px]
-                xl:min-w-0 xl:shrink-0 xl:border-r xl:border-gray-200 xl:p-3
-                xl:opacity-100
-                2xl:w-[40%] 2xl:p-4
-                pointer-events-none absolute opacity-0
-              `
-          }
+              controller.isListView
+                ? `
+                  p-4
+                  xl:p-6
+                  z-10 w-full opacity-100
+                `
+                : `
+                  inset-0 p-3
+                  xl:pointer-events-auto xl:static xl:z-auto xl:w-[360px]
+                  xl:min-w-0 xl:shrink-0 xl:border-r xl:border-gray-200 xl:p-3
+                  xl:opacity-100
+                  2xl:w-[40%] 2xl:p-4
+                  pointer-events-none absolute opacity-0
+                `
+            }
           `}
         >
           {controller.filteredDorms.length > 0 ? (

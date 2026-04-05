@@ -57,7 +57,6 @@
     "markdownlint-cli2": "^0.22.0",
     "postcss": "^8.5.8",
     "prettier": "^3.8.1",
-
     "puppeteer": "^24.40.0",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",

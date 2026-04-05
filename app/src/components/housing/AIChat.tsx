@@ -152,13 +152,13 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
           bottom-6 right-6 p-4 shadow-2xl fixed z-50 rounded-full transition-all
           duration-300
           ${
-          isOpen
-            ? 'bg-gray-800 scale-75 rotate-90'
-            : `
-              bg-illini-orange
-              hover:bg-illini-orange-dark hover:scale-110
-            `
-        }
+            isOpen
+              ? 'bg-gray-800 scale-75 rotate-90'
+              : `
+                bg-illini-orange
+                hover:bg-illini-orange-dark hover:scale-110
+              `
+          }
         `}
       >
         {isOpen ? (
@@ -174,19 +174,21 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
           fixed z-40 flex max-w-[calc(100vw-3rem)] origin-bottom-right flex-col
           overflow-hidden border transition-all duration-300
           ${
-          isOpen
-            ? 'translate-y-0 scale-100 opacity-100'
-            : 'translate-y-10 pointer-events-none scale-95 opacity-0'
-        }
+            isOpen
+              ? 'translate-y-0 scale-100 opacity-100'
+              : 'translate-y-10 pointer-events-none scale-95 opacity-0'
+          }
         `}
         style={{ height: '70vh', maxHeight: '85vh' }}
       >
         <div className="bg-illini-blue p-4 flex items-center justify-between">
           <div className="gap-3 flex items-center">
-            <div className="
-              h-10 w-10 bg-white/10 flex items-center justify-center
-              rounded-full
-            ">
+            <div
+              className="
+                h-10 w-10 bg-white/10 flex items-center justify-center
+                rounded-full
+              "
+            >
               <Sparkles className="h-5 w-5 text-illini-orange" />
             </div>
             <div>
@@ -196,9 +198,11 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
           </div>
         </div>
 
-        <div className="
-          space-y-4 bg-gray-50/50 p-4 grow overflow-x-hidden overflow-y-auto
-        ">
+        <div
+          className="
+            space-y-4 bg-gray-50/50 p-4 grow overflow-x-hidden overflow-y-auto
+          "
+        >
           <AnimatePresence initial={false}>
             {messages.map((msg, index) => {
               const isRecent =
@@ -222,34 +226,34 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                       rounded-2xl px-5 py-4 text-sm leading-relaxed shadow-sm
                       overflow-hidden
                       ${
-                      msg.role === 'user'
-                        ? `
-                          bg-illini-blue font-medium text-white max-w-[85%]
-                          rounded-br-none
-                        `
-                        : `
-                          border-gray-100 bg-white text-gray-800 max-w-full
-                          rounded-bl-none border
-                        `
-                    }
+                        msg.role === 'user'
+                          ? `
+                            bg-illini-blue font-medium text-white max-w-[85%]
+                            rounded-br-none
+                          `
+                          : `
+                            border-gray-100 bg-white text-gray-800 max-w-full
+                            rounded-bl-none border
+                          `
+                      }
                     `}
                   >
                     {msg.role === 'model' && isRecent ? (
                       <TypewriterText text={msg.text} />
                     ) : msg.role === 'user' ? (
-                      <span className="
-                        font-medium text-white whitespace-pre-wrap
-                      ">
+                      <span className="font-medium text-white whitespace-pre-wrap">
                         {msg.text}
                       </span>
                     ) : (
-                      <div className="
-                        prose prose-sm
-                        prose-p:leading-relaxed
-                        prose-pre:bg-gray-100 prose-pre:overflow-x-auto
-                        overflow-wrap-anywhere text-gray-800 max-w-none
-                        wrap-break-word
-                      ">
+                      <div
+                        className="
+                          prose prose-sm
+                          prose-p:leading-relaxed
+                          prose-pre:bg-gray-100 prose-pre:overflow-x-auto
+                          overflow-wrap-anywhere text-gray-800 max-w-none
+                          wrap-break-word
+                        "
+                      >
                         <ReactMarkdown
                           remarkPlugins={[remarkGfm]}
                           components={{
@@ -297,10 +301,12 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                                 text-left transition-all
                               "
                             >
-                              <div className="
-                                h-16 w-16 rounded-lg bg-gray-100 shrink-0
-                                overflow-hidden
-                              ">
+                              <div
+                                className="
+                                  h-16 w-16 rounded-lg bg-gray-100 shrink-0
+                                  overflow-hidden
+                                "
+                              >
                                 <img
                                   src={dorm.imageUrl}
                                   alt={dormName}
@@ -312,14 +318,14 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                                 />
                               </div>
                               <div className="min-w-0 grow">
-                                <div className="
-                                  flex items-start justify-between
-                                ">
-                                  <h4 className="
-                                    text-base font-bold text-gray-900
-                                    group-hover:text-illini-orange
-                                    truncate transition-colors
-                                  ">
+                                <div className="flex items-start justify-between">
+                                  <h4
+                                    className="
+                                      text-base font-bold text-gray-900
+                                      group-hover:text-illini-orange
+                                      truncate transition-colors
+                                    "
+                                  >
                                     {dormName}
                                   </h4>
                                 </div>
@@ -353,10 +359,12 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
           </AnimatePresence>
           {isLoading && (
             <div className="flex justify-start">
-              <div className="
-                gap-2 rounded-2xl border-gray-100 bg-white px-4 py-3 shadow-sm
-                flex items-center rounded-bl-none border
-              ">
+              <div
+                className="
+                  gap-2 rounded-2xl border-gray-100 bg-white px-4 py-3 shadow-sm
+                  flex items-center rounded-bl-none border
+                "
+              >
                 <Loader2 className="h-4 w-4 animate-spin text-illini-orange" />
                 <span className="text-xs text-gray-500">{t.thinking}</span>
               </div>

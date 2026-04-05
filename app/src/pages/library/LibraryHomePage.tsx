@@ -43,9 +43,11 @@ const LibraryHomePage: React.FC<LibraryHomePageProps> = ({ language }) => {
   }, [localQuery, localizedArticles])
 
   return (
-    <div className="
-      animate-fade-in-up no-scrollbar min-w-0 size-full overflow-y-auto
-    ">
+    <div
+      className="
+        animate-fade-in-up no-scrollbar min-w-0 size-full overflow-y-auto
+      "
+    >
       <div className="min-w-0 max-w-3xl px-4 py-8 pb-24 mx-auto">
         <div className="py-10 text-center">
           <h2 className="mb-3 text-3xl font-bold tracking-tight text-slate-900">
@@ -94,10 +96,12 @@ const LibraryHomePage: React.FC<LibraryHomePageProps> = ({ language }) => {
               </button>
             </div>
             {filteredArticles.length === 0 ? (
-              <div className="
-                rounded-2xl border-slate-200 bg-white/50 py-16 border
-                border-dashed text-center
-              ">
+              <div
+                className="
+                  rounded-2xl border-slate-200 bg-white/50 py-16 border
+                  border-dashed text-center
+                "
+              >
                 <p className="text-base text-slate-500">{t.noResults}</p>
               </div>
             ) : (
@@ -121,26 +125,32 @@ const LibraryHomePage: React.FC<LibraryHomePageProps> = ({ language }) => {
                         cursor-pointer border transition-all duration-300
                       "
                     >
-                      <span className="
-                        mb-4 bg-slate-100 px-3 py-1 font-bold tracking-wider
-                        text-slate-500
-                        group-hover:bg-illini-blue/10
-                        group-hover:text-illini-blue
-                        inline-block rounded-full text-[10px] uppercase
-                        transition-colors
-                      ">
+                      <span
+                        className="
+                          mb-4 bg-slate-100 px-3 py-1 font-bold tracking-wider
+                          text-slate-500
+                          group-hover:bg-illini-blue/10
+                          group-hover:text-illini-blue
+                          inline-block rounded-full text-[10px] uppercase
+                          transition-colors
+                        "
+                      >
                         {categoryText?.label}
                       </span>
-                      <h3 className="
-                        mb-3 text-lg font-bold leading-tight text-slate-900
-                        group-hover:text-illini-blue
-                        transition-colors
-                      ">
+                      <h3
+                        className="
+                          mb-3 text-lg font-bold leading-tight text-slate-900
+                          group-hover:text-illini-blue
+                          transition-colors
+                        "
+                      >
                         {article.title}
                       </h3>
-                      <p className="
-                        text-sm leading-relaxed text-slate-500 line-clamp-3
-                      ">
+                      <p
+                        className="
+                          text-sm leading-relaxed text-slate-500 line-clamp-3
+                        "
+                      >
                         {article.summary}
                       </p>
                     </div>
@@ -150,11 +160,13 @@ const LibraryHomePage: React.FC<LibraryHomePageProps> = ({ language }) => {
             )}
           </div>
         ) : (
-          <div className="
-            gap-5
-            sm:grid-cols-2
-            grid grid-cols-1
-          ">
+          <div
+            className="
+              gap-5
+              sm:grid-cols-2
+              grid grid-cols-1
+            "
+          >
             {CATEGORIES.map((category) => {
               const categoryText = getCategoryText(category, language)
               return (
@@ -168,19 +180,24 @@ const LibraryHomePage: React.FC<LibraryHomePageProps> = ({ language }) => {
                     cursor-pointer border transition-all duration-300
                   "
                 >
-                  <div className="
-                    mb-6 h-14 w-14 rounded-2xl bg-slate-50 text-3xl shadow-inner
-                    group-hover:bg-illini-blue group-hover:text-white
-                    flex items-center justify-center transition-colors
-                    duration-300
-                  ">
+                  <div
+                    className="
+                      mb-6 h-14 w-14 rounded-2xl bg-slate-50 text-3xl
+                      shadow-inner
+                      group-hover:bg-illini-blue group-hover:text-white
+                      flex items-center justify-center transition-colors
+                      duration-300
+                    "
+                  >
                     {category.icon}
                   </div>
-                  <h3 className="
-                    mb-3 text-xl font-bold text-slate-900
-                    group-hover:text-illini-blue
-                    transition-colors
-                  ">
+                  <h3
+                    className="
+                      mb-3 text-xl font-bold text-slate-900
+                      group-hover:text-illini-blue
+                      transition-colors
+                    "
+                  >
                     {categoryText.label}
                   </h3>
                   <p className="text-sm leading-relaxed text-slate-500">

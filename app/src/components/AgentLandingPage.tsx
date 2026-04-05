@@ -127,18 +127,22 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
   }
 
   return (
-    <div className="
-      bg-white p-4
-      md:p-8
-      flex size-full items-center justify-center overflow-auto
-    ">
+    <div
+      className="
+        bg-white p-4
+        md:p-8
+        flex size-full items-center justify-center overflow-auto
+      "
+    >
       <div className="max-w-md relative w-full text-center">
         {/* Icon - static, doesn't change with language */}
-        <div className="
-          mb-4 h-16 w-16 rounded-2xl border-slate-100 bg-slate-50 shadow-sm
-          md:mb-6 md:h-20 md:w-20
-          mx-auto flex items-center justify-center border
-        ">
+        <div
+          className="
+            mb-4 h-16 w-16 rounded-2xl border-slate-100 bg-slate-50 shadow-sm
+            md:mb-6 md:h-20 md:w-20
+            mx-auto flex items-center justify-center border
+          "
+        >
           {config.icon}
         </div>
 
@@ -152,27 +156,29 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
             transition={{ duration: 0.2, ease: 'easeOut' }}
           >
             {/* Title */}
-            <h1 className="
-              mb-3 text-2xl font-bold tracking-tight text-slate-900
-            ">
+            <h1 className="mb-3 text-2xl font-bold tracking-tight text-slate-900">
               {title}
             </h1>
 
             {/* Coming Soon Badge */}
             <div className="mb-5">
-              <span className="
-                bg-illini-orange px-3 py-1 text-xs font-semibold text-white
-                inline-block rounded-full
-              ">
+              <span
+                className="
+                  bg-illini-orange px-3 py-1 text-xs font-semibold text-white
+                  inline-block rounded-full
+                "
+              >
                 {t.comingSoon}
               </span>
             </div>
 
             {/* Description */}
-            <p className="
-              mb-8 max-w-sm text-sm leading-relaxed text-slate-500 mx-auto
-              min-h-[3rem]
-            ">
+            <p
+              className="
+                mb-8 max-w-sm text-sm leading-relaxed text-slate-500 mx-auto
+                min-h-[3rem]
+              "
+            >
               {desc}
             </p>
           </motion.div>
@@ -225,9 +231,12 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
             )}
           </form>
         ) : (
-          <div className="
-            max-w-xs rounded-2xl border-slate-100 bg-slate-50 p-5 mx-auto border
-          ">
+          <div
+            className="
+              max-w-xs rounded-2xl border-slate-100 bg-slate-50 p-5 mx-auto
+              border
+            "
+          >
             <span className="mb-2 text-2xl block">✅</span>
             <p className="text-sm font-medium text-slate-600">
               {t.emailSuccess}

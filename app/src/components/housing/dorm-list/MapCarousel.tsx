@@ -76,10 +76,13 @@ const MapCarouselCard: React.FC<MapCarouselCardProps> = ({
         w-[210px] shrink-0 cursor-pointer touch-manipulation snap-start
       "
     >
-      <div className="
-        rounded-xl border-gray-100/80 bg-white/95 backdrop-blur-md flex h-[72px]
-        flex-row overflow-hidden border shadow-[0_4px_14px_rgba(0,0,0,0.14)]
-      ">
+      <div
+        className="
+          rounded-xl border-gray-100/80 bg-white/95 backdrop-blur-md flex
+          h-[72px] flex-row overflow-hidden border
+          shadow-[0_4px_14px_rgba(0,0,0,0.14)]
+        "
+      >
         {/* Thumbnail */}
         <div className="relative w-[72px] shrink-0">
           <img
@@ -99,9 +102,11 @@ const MapCarouselCard: React.FC<MapCarouselCardProps> = ({
               className={`
                 left-1 top-1 rounded-sm px-1 py-0.5 font-bold tracking-wider
                 text-white absolute text-[8px] uppercase
-                ${dorm.housingType === 'URH' ? `bg-illini-orange/90` : `
-                  bg-illini-blue/90
-                `}
+                ${
+                  dorm.housingType === 'URH'
+                    ? `bg-illini-orange/90`
+                    : `bg-illini-blue/90`
+                }
               `}
             >
               {dorm.housingType}
@@ -110,13 +115,9 @@ const MapCarouselCard: React.FC<MapCarouselCardProps> = ({
         </div>
 
         {/* Content */}
-        <div className="
-          min-w-0 px-2.5 py-2 flex flex-1 flex-col justify-between
-        ">
+        <div className="min-w-0 px-2.5 py-2 flex flex-1 flex-col justify-between">
           <div className="min-w-0">
-            <h3 className="
-              text-sm font-bold leading-tight text-gray-900 truncate
-            ">
+            <h3 className="text-sm font-bold leading-tight text-gray-900 truncate">
               {dormName}
             </h3>
             <p className="mt-0.5 text-gray-500 truncate text-[10px]">
@@ -182,11 +183,13 @@ const MapCarousel: React.FC<MapCarouselProps> = ({
       : { campus: 'Campus', perYear: '/ yr' }
 
   return (
-    <div className="
-      bottom-4 left-0 right-0 px-3
-      xl:hidden
-      absolute z-20
-    ">
+    <div
+      className="
+        bottom-4 left-0 right-0 px-3
+        xl:hidden
+        absolute z-20
+      "
+    >
       <div
         ref={scrollContainerRef}
         className="

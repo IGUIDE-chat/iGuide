@@ -17,14 +17,18 @@ const DormMap = React.lazy(() => import('../DormMap'))
 
 /** Skeleton placeholder while mapbox is loading */
 const MapLoadingSkeleton: React.FC = () => (
-  <div className="
-    animate-pulse bg-gray-100 flex size-full items-center justify-center
-  ">
+  <div
+    className="
+      animate-pulse bg-gray-100 flex size-full items-center justify-center
+    "
+  >
     <div className="text-center">
-      <div className="
-        mb-3 h-10 w-10 animate-spin border-illini-orange mx-auto rounded-full
-        border-3 border-t-transparent
-      " />
+      <div
+        className="
+          mb-3 h-10 w-10 animate-spin border-illini-orange mx-auto rounded-full
+          border-3 border-t-transparent
+        "
+      />
       <p className="text-sm text-gray-400">Loading map...</p>
     </div>
   </div>
@@ -76,18 +80,18 @@ export const DormListMapPane: React.FC<DormListMapPaneProps> = ({
       className={`
         min-w-0 flex h-full flex-col transition-opacity duration-200
         ${
-        isMapView
-          ? `
-            inset-0
-            xl:static xl:z-auto xl:min-w-0 xl:flex-1
-            absolute z-20 opacity-100
-          `
-          : `
-            inset-0
-            xl:static xl:hidden
-            pointer-events-none absolute opacity-0
-          `
-      }
+          isMapView
+            ? `
+              inset-0
+              xl:static xl:z-auto xl:min-w-0 xl:flex-1
+              absolute z-20 opacity-100
+            `
+            : `
+              inset-0
+              xl:static xl:hidden
+              pointer-events-none absolute opacity-0
+            `
+        }
       `}
     >
       <div className="min-h-0 min-w-0 relative flex flex-1 flex-col">

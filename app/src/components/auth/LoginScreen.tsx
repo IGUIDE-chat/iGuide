@@ -72,11 +72,13 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
       "
     >
       {/* Language Switcher - Responsive Position */}
-      <div className="
-        right-4 top-4
-        md:right-8 md:top-8
-        absolute z-50
-      ">
+      <div
+        className="
+          right-4 top-4
+          md:right-8 md:top-8
+          absolute z-50
+        "
+      >
         <button
           onClick={() => onLanguageChange(language === 'en' ? 'zh' : 'en')}
           className="
@@ -109,22 +111,24 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
         </div>
 
         {/* Toggle */}
-        <div className="
-          mb-6 gap-2 bg-slate-100 p-1 relative isolate flex rounded-full
-        ">
+        <div
+          className="
+            mb-6 gap-2 bg-slate-100 p-1 relative isolate flex rounded-full
+          "
+        >
           <button
             onClick={() => setIsLogin(true)}
             className={`
               px-4 py-2 font-medium relative z-10 flex-1 rounded-full
               transition-colors
               ${
-              isLogin
-                ? 'text-illini-blue'
-                : `
-                  text-slate-500
-                  hover:text-slate-900
-                `
-            }
+                isLogin
+                  ? 'text-illini-blue'
+                  : `
+                    text-slate-500
+                    hover:text-slate-900
+                  `
+              }
             `}
           >
             {isLogin && (
@@ -144,13 +148,13 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
               px-4 py-2 font-medium relative z-10 flex-1 rounded-full
               transition-colors
               ${
-              !isLogin
-                ? 'text-illini-blue'
-                : `
-                  text-slate-500
-                  hover:text-slate-900
-                `
-            }
+                !isLogin
+                  ? 'text-illini-blue'
+                  : `
+                    text-slate-500
+                    hover:text-slate-900
+                  `
+              }
             `}
           >
             {!isLogin && (
@@ -266,10 +270,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
           </div>
 
           {error && (
-            <div className="
-              gap-2 rounded-xl border-red-200 bg-red-50 p-3 text-sm text-red-600
-              flex items-center border
-            ">
+            <div
+              className="
+                gap-2 rounded-xl border-red-200 bg-red-50 p-3 text-sm
+                text-red-600 flex items-center border
+              "
+            >
               <span>⚠️</span> {error}
             </div>
           )}

@@ -178,15 +178,19 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         </div>
 
         {/* Profile Card */}
-        <div className="
-          mb-6 rounded-2xl border-slate-200 bg-white p-6 shadow-sm border
-        ">
+        <div
+          className="
+            mb-6 rounded-2xl border-slate-200 bg-white p-6 shadow-sm border
+          "
+        >
           <div className="flex flex-col items-center">
-            <div className="
-              mb-4 h-24 w-24 bg-illini-orange text-4xl font-bold text-white
-              shadow-lg shadow-illini-orange/20 flex items-center justify-center
-              rounded-full
-            ">
+            <div
+              className="
+                mb-4 h-24 w-24 bg-illini-orange text-4xl font-bold text-white
+                shadow-lg shadow-illini-orange/20 flex items-center
+                justify-center rounded-full
+              "
+            >
               {user.name?.charAt(0).toUpperCase() || 'U'}
             </div>
 
@@ -205,9 +209,11 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 />
               </div>
             ) : (
-              <h2 className="
-                mb-1 gap-2 text-xl font-bold text-slate-900 flex items-center
-              ">
+              <h2
+                className="
+                  mb-1 gap-2 text-xl font-bold text-slate-900 flex items-center
+                "
+              >
                 {user.name || 'User'}
                 <button
                   onClick={() => {
@@ -268,15 +274,19 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
           <div className="mt-8 space-y-4">
             <div className="space-y-1">
-              <label className="
-                text-xs font-semibold tracking-wider text-slate-400 uppercase
-              ">
+              <label
+                className="
+                  text-xs font-semibold tracking-wider text-slate-400 uppercase
+                "
+              >
                 {t.email}
               </label>
-              <div className="
-                rounded-lg border-slate-100 bg-slate-50 p-3 text-sm font-medium
-                text-slate-700 border
-              ">
+              <div
+                className="
+                  rounded-lg border-slate-100 bg-slate-50 p-3 text-sm
+                  font-medium text-slate-700 border
+                "
+              >
                 {user.email}
               </div>
             </div>
@@ -284,14 +294,18 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         </div>
 
         {/* Soul Editor */}
-        <div className="
-          mb-6 rounded-2xl border-slate-200 bg-white p-6 shadow-sm border
-        ">
+        <div
+          className="
+            mb-6 rounded-2xl border-slate-200 bg-white p-6 shadow-sm border
+          "
+        >
           <div className="mb-3 flex items-center justify-between">
             <div>
-              <h3 className="
-                gap-2 text-base font-bold text-slate-900 flex items-center
-              ">
+              <h3
+                className="
+                  gap-2 text-base font-bold text-slate-900 flex items-center
+                "
+              >
                 <span>🎭</span> {t.soulTitle}
               </h3>
               <p className="mt-0.5 text-xs text-slate-400">{t.soulDesc}</p>
@@ -356,10 +370,12 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               </div>
             </>
           ) : (
-            <div className="
-              rounded-lg border-slate-100 bg-slate-50 p-3 text-sm text-slate-600
-              min-h-[60px] border
-            ">
+            <div
+              className="
+                rounded-lg border-slate-100 bg-slate-50 p-3 text-sm
+                text-slate-600 min-h-[60px] border
+              "
+            >
               {soul || (
                 <span className="text-slate-400 italic">
                   {t.soulPlaceholder}
@@ -370,14 +386,18 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         </div>
 
         {/* User Memory */}
-        <div className="
-          mb-6 rounded-2xl border-slate-200 bg-white p-6 shadow-sm border
-        ">
+        <div
+          className="
+            mb-6 rounded-2xl border-slate-200 bg-white p-6 shadow-sm border
+          "
+        >
           <div className="mb-3 flex items-center justify-between">
             <div>
-              <h3 className="
-                gap-2 text-base font-bold text-slate-900 flex items-center
-              ">
+              <h3
+                className="
+                  gap-2 text-base font-bold text-slate-900 flex items-center
+                "
+              >
                 <span>🧠</span> {t.memoryTitle}
               </h3>
               <p className="mt-0.5 text-xs text-slate-400">{t.memoryDesc}</p>
@@ -456,10 +476,12 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               </div>
             </>
           ) : (
-            <div className="
-              rounded-lg border-slate-100 bg-slate-50 p-3 text-sm text-slate-600
-              min-h-[60px] border whitespace-pre-wrap
-            ">
+            <div
+              className="
+                rounded-lg border-slate-100 bg-slate-50 p-3 text-sm
+                text-slate-600 min-h-[60px] border whitespace-pre-wrap
+              "
+            >
               {userMemory || (
                 <span className="text-slate-400 italic">
                   {t.memoryPlaceholder}

@@ -26,9 +26,11 @@ export const TagsTab: React.FC<TagsTabProps> = ({ form }) => {
       {(['livingConditions', 'facilities', 'lifestyle'] as const).map(
         (category) => (
           <div key={category}>
-            <p className="
-              mb-2 text-xs font-bold tracking-wider text-gray-500 uppercase
-            ">
+            <p
+              className="
+                mb-2 text-xs font-bold tracking-wider text-gray-500 uppercase
+              "
+            >
               {CATEGORY_LABELS[category][form.language]}
             </p>
             <div className="gap-2 flex flex-wrap">
@@ -52,15 +54,16 @@ export const TagsTab: React.FC<TagsTabProps> = ({ form }) => {
                       rounded-lg px-3 py-1.5 text-sm font-medium border
                       transition-all
                       ${
-                      checked
-                        ? `
-                          border-illini-blue bg-illini-blue text-white shadow-sm
-                        `
-                        : `
-                          border-gray-300 bg-white text-gray-600
-                          hover:border-illini-blue hover:text-illini-blue
-                        `
-                    }
+                        checked
+                          ? `
+                            border-illini-blue bg-illini-blue text-white
+                            shadow-sm
+                          `
+                          : `
+                            border-gray-300 bg-white text-gray-600
+                            hover:border-illini-blue hover:text-illini-blue
+                          `
+                      }
                     `}
                   >
                     {getTagDisplay(tagId, form.language)}
@@ -73,9 +76,11 @@ export const TagsTab: React.FC<TagsTabProps> = ({ form }) => {
       )}
 
       <div>
-        <p className="
-          mb-2 text-xs font-bold tracking-wider text-gray-500 uppercase
-        ">
+        <p
+          className="
+            mb-2 text-xs font-bold tracking-wider text-gray-500 uppercase
+          "
+        >
           {form.language === 'zh' ? '社区' : 'Community'}
         </p>
         <div className="gap-2 flex flex-wrap">
@@ -85,13 +90,13 @@ export const TagsTab: React.FC<TagsTabProps> = ({ form }) => {
             className={`
               rounded-lg px-3 py-1.5 text-sm font-medium border transition-all
               ${
-              form.petFriendly
-                ? 'border-illini-blue bg-illini-blue text-white shadow-sm'
-                : `
-                  border-gray-300 bg-white text-gray-600
-                  hover:border-illini-blue hover:text-illini-blue
-                `
-            }
+                form.petFriendly
+                  ? 'border-illini-blue bg-illini-blue text-white shadow-sm'
+                  : `
+                    border-gray-300 bg-white text-gray-600
+                    hover:border-illini-blue hover:text-illini-blue
+                  `
+              }
             `}
           >
             {form.language === 'zh' ? '允许宠物' : 'Pet-Friendly'}
@@ -100,9 +105,11 @@ export const TagsTab: React.FC<TagsTabProps> = ({ form }) => {
       </div>
 
       <div>
-        <p className="
-          mb-2 text-xs font-bold tracking-wider text-gray-500 uppercase
-        ">
+        <p
+          className="
+            mb-2 text-xs font-bold tracking-wider text-gray-500 uppercase
+          "
+        >
           {t.labels.llc}
         </p>
         <div className="gap-2 flex flex-wrap">
@@ -133,13 +140,13 @@ export const TagsTab: React.FC<TagsTabProps> = ({ form }) => {
                   rounded-lg px-3 py-1.5 text-sm font-medium border
                   transition-all
                   ${
-                  selected
-                    ? 'border-illini-blue bg-illini-blue text-white shadow-sm'
-                    : `
-                      border-gray-300 bg-white text-gray-600
-                      hover:border-illini-blue hover:text-illini-blue
-                    `
-                }
+                    selected
+                      ? 'border-illini-blue bg-illini-blue text-white shadow-sm'
+                      : `
+                        border-gray-300 bg-white text-gray-600
+                        hover:border-illini-blue hover:text-illini-blue
+                      `
+                  }
                 `}
               >
                 {llc}

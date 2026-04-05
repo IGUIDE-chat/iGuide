@@ -389,10 +389,10 @@ const DormComparison: React.FC<DormComparisonProps> = ({
                   gap-1.5 px-3 py-1.5 text-xs font-medium flex shrink-0
                   items-center rounded-full whitespace-nowrap transition-colors
                   ${
-                  i === mobileActiveIdx
-                    ? 'bg-illini-blue text-white'
-                    : 'bg-gray-100 text-gray-600'
-                }
+                    i === mobileActiveIdx
+                      ? 'bg-illini-blue text-white'
+                      : 'bg-gray-100 text-gray-600'
+                  }
                 `}
               >
                 <img
@@ -447,9 +447,11 @@ const DormComparison: React.FC<DormComparisonProps> = ({
             "
           >
             {/* Dorm header */}
-            <div className="
-              gap-3 border-gray-200 bg-gray-50 p-4 flex items-center border-b
-            ">
+            <div
+              className="
+                gap-3 border-gray-200 bg-gray-50 p-4 flex items-center border-b
+              "
+            >
               <img
                 src={activeDorm.imageUrl}
                 alt={dormName(activeDorm)}
@@ -500,9 +502,7 @@ const DormComparison: React.FC<DormComparisonProps> = ({
 
                 return (
                   <div className="border-gray-100 border-t-4">
-                    <div className="
-                      border-gray-200 bg-gray-50 px-4 py-3 border-b
-                    ">
+                    <div className="border-gray-200 bg-gray-50 px-4 py-3 border-b">
                       <h4 className="text-sm font-bold text-gray-900">
                         {language === 'zh' ? '房型详情' : 'Floor Plan'}
                       </h4>
@@ -547,10 +547,12 @@ const DormComparison: React.FC<DormComparisonProps> = ({
                             )
                           })}
                         </select>
-                        <ChevronDown className="
-                          right-2.5 h-4 w-4 text-gray-400 pointer-events-none
-                          absolute top-1/2 -translate-y-1/2
-                        " />
+                        <ChevronDown
+                          className="
+                            right-2.5 h-4 w-4 text-gray-400 pointer-events-none
+                            absolute top-1/2 -translate-y-1/2
+                          "
+                        />
                       </div>
                     </div>
                     <div className="divide-gray-100 divide-y">
@@ -571,21 +573,25 @@ const DormComparison: React.FC<DormComparisonProps> = ({
                               ${isCheapest ? `bg-emerald-50/60` : ''}
                             `}
                           >
-                            <div className="
-                              gap-1.5 text-sm text-gray-600 flex shrink-0
-                              items-center
-                            ">
+                            <div
+                              className="
+                                gap-1.5 text-sm text-gray-600 flex shrink-0
+                                items-center
+                              "
+                            >
                               {row.icon}
                               <span>{row.label}</span>
                             </div>
                             <div className="text-sm text-right">
                               {row.values[di]}
                               {isCheapest && (
-                                <span className="
-                                  ml-1.5 bg-emerald-100 px-1.5 py-0.5
-                                  font-medium text-emerald-700 rounded-full
-                                  text-[10px]
-                                ">
+                                <span
+                                  className="
+                                    ml-1.5 bg-emerald-100 px-1.5 py-0.5
+                                    font-medium text-emerald-700 rounded-full
+                                    text-[10px]
+                                  "
+                                >
                                   {language === 'zh' ? '最低' : 'Lowest'}
                                 </span>
                               )}
@@ -612,11 +618,13 @@ const DormComparison: React.FC<DormComparisonProps> = ({
         <table className="w-full min-w-[760px] border-collapse">
           <thead>
             <tr className="bg-gray-50">
-              <th className="
-                left-0 border-gray-200 bg-gray-50 px-4 py-3 text-sm
-                font-semibold text-gray-700 sticky z-10 border-r border-b
-                text-left
-              ">
+              <th
+                className="
+                  left-0 border-gray-200 bg-gray-50 px-4 py-3 text-sm
+                  font-semibold text-gray-700 sticky z-10 border-r border-b
+                  text-left
+                "
+              >
                 {t.feature}
               </th>
               {dorms.map((dorm) => {
@@ -649,17 +657,21 @@ const DormComparison: React.FC<DormComparisonProps> = ({
                 key={row.label}
                 className={rowIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'}
               >
-                <td className="
-                  left-0 border-gray-200 px-4 py-4 text-sm font-medium
-                  text-gray-700 sticky z-10 border-r border-b bg-inherit
-                ">
+                <td
+                  className="
+                    left-0 border-gray-200 px-4 py-4 text-sm font-medium
+                    text-gray-700 sticky z-10 border-r border-b bg-inherit
+                  "
+                >
                   <div className="gap-2 flex items-center">
                     <span>{row.label}</span>
                     {row.highlightBest && (
-                      <span className="
-                        bg-emerald-100 px-1.5 py-0.5 text-emerald-700
-                        rounded-full text-[10px]
-                      ">
+                      <span
+                        className="
+                          bg-emerald-100 px-1.5 py-0.5 text-emerald-700
+                          rounded-full text-[10px]
+                        "
+                      >
                         {t.bestOption}
                       </span>
                     )}
@@ -672,9 +684,7 @@ const DormComparison: React.FC<DormComparisonProps> = ({
                       key={`${row.label}-${dorm.id}`}
                       className={`
                         border-gray-200 px-4 py-4 text-sm border-b align-top
-                        ${
-                        isBest ? 'bg-emerald-50/60' : ''
-                      }
+                        ${isBest ? 'bg-emerald-50/60' : ''}
                       `}
                     >
                       {row.getValue(dorm)}
@@ -689,23 +699,29 @@ const DormComparison: React.FC<DormComparisonProps> = ({
         {/* ── Cross-dorm floor plan comparison ── */}
         {dorms.some((d) => (dormPlans[d.id]?.length ?? 0) > 0) && (
           <div className="border-gray-100 border-t-4">
-            <div className="
-              border-gray-200 bg-gray-50 px-4 py-4
-              md:px-6
-              border-b
-            ">
-              <h3 className="
-                font-bold text-gray-900
-                md:text-base
-                text-[15px]
-              ">
+            <div
+              className="
+                border-gray-200 bg-gray-50 px-4 py-4
+                md:px-6
+                border-b
+              "
+            >
+              <h3
+                className="
+                  font-bold text-gray-900
+                  md:text-base
+                  text-[15px]
+                "
+              >
                 {language === 'zh' ? '房型对比' : 'Floor Plan Comparison'}
               </h3>
-              <p className="
-                mt-0.5 text-gray-500
-                md:text-[13px]
-                text-[12px]
-              ">
+              <p
+                className="
+                  mt-0.5 text-gray-500
+                  md:text-[13px]
+                  text-[12px]
+                "
+              >
                 {language === 'zh'
                   ? '选择每个宿舍的房型进行对比'
                   : 'Select a floor plan from each dorm to compare'}
@@ -719,10 +735,12 @@ const DormComparison: React.FC<DormComparisonProps> = ({
                 gridTemplateColumns: `140px repeat(${dorms.length}, 1fr)`,
               }}
             >
-              <div className="
-                border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium
-                text-gray-500 flex items-center border-r
-              ">
+              <div
+                className="
+                  border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium
+                  text-gray-500 flex items-center border-r
+                "
+              >
                 {language === 'zh' ? '选择房型' : 'Select Plan'}
               </div>
               {dorms.map((dorm) => {
@@ -790,10 +808,12 @@ const DormComparison: React.FC<DormComparisonProps> = ({
                           )
                         })}
                       </select>
-                      <ChevronDown className="
-                        right-2.5 h-4 w-4 text-gray-400 pointer-events-none
-                        absolute top-1/2 -translate-y-1/2
-                      " />
+                      <ChevronDown
+                        className="
+                          right-2.5 h-4 w-4 text-gray-400 pointer-events-none
+                          absolute top-1/2 -translate-y-1/2
+                        "
+                      />
                     </div>
                   </div>
                 )
@@ -808,11 +828,13 @@ const DormComparison: React.FC<DormComparisonProps> = ({
                     key={ri}
                     className={ri % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
                   >
-                    <td className="
-                      left-0 border-gray-200 px-4 py-3 text-sm font-medium
-                      text-gray-600 sticky z-10 w-[140px] border-r border-b
-                      bg-inherit
-                    ">
+                    <td
+                      className="
+                        left-0 border-gray-200 px-4 py-3 text-sm font-medium
+                        text-gray-600 sticky z-10 w-[140px] border-r border-b
+                        bg-inherit
+                      "
+                    >
                       <div className="gap-1.5 flex items-center">
                         {row.icon}
                         <span>{row.label}</span>
@@ -837,10 +859,12 @@ const DormComparison: React.FC<DormComparisonProps> = ({
                         >
                           {val}
                           {isCheapest && (
-                            <span className="
-                              ml-1.5 bg-emerald-100 px-1.5 py-0.5 font-medium
-                              text-emerald-700 rounded-full text-[10px]
-                            ">
+                            <span
+                              className="
+                                ml-1.5 bg-emerald-100 px-1.5 py-0.5 font-medium
+                                text-emerald-700 rounded-full text-[10px]
+                              "
+                            >
                               {language === 'zh' ? '最低' : 'Lowest'}
                             </span>
                           )}
@@ -886,15 +910,19 @@ const DormComparison: React.FC<DormComparisonProps> = ({
           "
           style={{ pointerEvents: 'auto' }}
         >
-          <div className="
-            top-0 border-gray-200 bg-white px-4 py-3
-            md:px-6 md:py-4
-            sticky z-10 flex items-center justify-between border-b
-          ">
-            <h2 className="
-              text-base font-bold text-gray-900
-              md:text-lg
-            ">
+          <div
+            className="
+              top-0 border-gray-200 bg-white px-4 py-3
+              md:px-6 md:py-4
+              sticky z-10 flex items-center justify-between border-b
+            "
+          >
+            <h2
+              className="
+                text-base font-bold text-gray-900
+                md:text-lg
+              "
+            >
               {t.title}
             </h2>
             <button

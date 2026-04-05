@@ -163,9 +163,11 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
   return (
     <div className="flex h-full flex-col bg-[#171717]">
       <div className="mb-2 px-3 py-2 flex items-center justify-between">
-        <h3 className="
-          text-xs font-semibold tracking-wider text-slate-400 uppercase
-        ">
+        <h3
+          className="
+            text-xs font-semibold tracking-wider text-slate-400 uppercase
+          "
+        >
           {t.title}
         </h3>
         {history.length > 0 && (
@@ -194,9 +196,7 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
 
             return (
               <div key={category}>
-                <h4 className="
-                  mb-1.5 px-2 font-medium text-slate-500 text-[10px]
-                ">
+                <h4 className="mb-1.5 px-2 font-medium text-slate-500 text-[10px]">
                   {category}
                 </h4>
                 <div className="space-y-0.5">
@@ -221,18 +221,16 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
                           group rounded-md px-3 py-2 relative cursor-pointer
                           transition-colors
                           ${
-                          item.articleId === currentArticleId
-                            ? 'bg-white/10 text-white'
-                            : `
-                              text-slate-300
-                              hover:bg-white/5 hover:text-white
-                            `
-                        }
+                            item.articleId === currentArticleId
+                              ? 'bg-white/10 text-white'
+                              : `
+                                text-slate-300
+                                hover:bg-white/5 hover:text-white
+                              `
+                          }
                         `}
                       >
-                        <div className="
-                          gap-1.5 flex items-start justify-between
-                        ">
+                        <div className="gap-1.5 flex items-start justify-between">
                           <div className="min-w-0 flex-1">
                             <div className="text-xs font-medium flex truncate">
                               <TypewriterText
@@ -244,10 +242,12 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
                               />
                             </div>
                           </div>
-                          <div className="
-                            gap-0.5 flex opacity-0 transition-opacity
-                            group-hover:opacity-100
-                          ">
+                          <div
+                            className="
+                              gap-0.5 flex opacity-0 transition-opacity
+                              group-hover:opacity-100
+                            "
+                          >
                             <button
                               onClick={(e) =>
                                 handleTogglePin(item.id, item.isPinned, e)
@@ -261,9 +261,11 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
                               <svg
                                 className={`
                                   h-3 w-3
-                                  ${item.isPinned ? `text-illini-orange` : `
-                                    text-slate-400
-                                  `}
+                                  ${
+                                    item.isPinned
+                                      ? `text-illini-orange`
+                                      : `text-slate-400`
+                                  }
                                 `}
                                 fill={item.isPinned ? 'currentColor' : 'none'}
                                 stroke="currentColor"

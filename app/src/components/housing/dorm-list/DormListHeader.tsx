@@ -41,26 +41,34 @@ const DormListHeader: React.FC<DormListHeaderProps> = ({
   const activePillLeft = isListView ? '4px' : 'calc(50% - 2px)'
 
   return (
-    <div className="
-      top-0 border-gray-200 bg-white shadow-sm
-      md:block
-      sticky z-30 hidden border-b transition-all
-    ">
-      <div className="
-        min-w-0 gap-4 px-6 py-4
-        md:pl-16
-        flex items-center
-      ">
-        <div className="
-          min-w-0 max-w-4xl gap-2
-          sm:gap-3
-          mx-auto flex w-full flex-1 items-center justify-center
-        ">
+    <div
+      className="
+        top-0 border-gray-200 bg-white shadow-sm
+        md:block
+        sticky z-30 hidden border-b transition-all
+      "
+    >
+      <div
+        className="
+          min-w-0 gap-4 px-6 py-4
+          md:pl-16
+          flex items-center
+        "
+      >
+        <div
+          className="
+            min-w-0 max-w-4xl gap-2
+            sm:gap-3
+            mx-auto flex w-full flex-1 items-center justify-center
+          "
+        >
           <div className="min-w-0 relative w-full">
-            <div className="
-              inset-y-0 left-0 pl-3 pointer-events-none absolute flex
-              items-center
-            ">
+            <div
+              className="
+                inset-y-0 left-0 pl-3 pointer-events-none absolute flex
+                items-center
+              "
+            >
               <Search className="h-4 w-4 text-gray-400" />
             </div>
             <input
@@ -93,42 +101,46 @@ const DormListHeader: React.FC<DormListHeaderProps> = ({
                 transition-all duration-200
                 focus:ring-2 focus:outline-none
                 ${
-                hasActiveFilters
-                  ? `
-                    border-illini-orange/40 bg-illini-orange/10
-                    text-illini-orange
-                    hover:border-illini-orange/60 hover:bg-illini-orange/15
-                    hover:text-illini-orange
-                    active:border-illini-orange/70 active:bg-illini-orange/20
-                    active:text-illini-orange
-                  `
-                  : `
-                    border-gray-200 bg-white text-gray-700
-                    hover:border-illini-orange/40 hover:bg-illini-orange/10
-                    hover:text-illini-orange/90
-                    active:border-illini-orange/50 active:bg-illini-orange/10
-                    active:text-illini-orange
-                  `
-              }
+                  hasActiveFilters
+                    ? `
+                      border-illini-orange/40 bg-illini-orange/10
+                      text-illini-orange
+                      hover:border-illini-orange/60 hover:bg-illini-orange/15
+                      hover:text-illini-orange
+                      active:border-illini-orange/70 active:bg-illini-orange/20
+                      active:text-illini-orange
+                    `
+                    : `
+                      border-gray-200 bg-white text-gray-700
+                      hover:border-illini-orange/40 hover:bg-illini-orange/10
+                      hover:text-illini-orange/90
+                      active:border-illini-orange/50 active:bg-illini-orange/10
+                      active:text-illini-orange
+                    `
+                }
               `}
             >
               <SlidersHorizontal size={18} strokeWidth={2} />
             </button>
             {hasActiveFilters && (
-              <div className="
-                -right-1.5 -top-1.5 h-5 w-5 border-white bg-illini-orange
-                font-bold text-white shadow-sm absolute flex items-center
-                justify-center rounded-full border-2 text-[10px]
-              ">
+              <div
+                className="
+                  -right-1.5 -top-1.5 h-5 w-5 border-white bg-illini-orange
+                  font-bold text-white shadow-sm absolute flex items-center
+                  justify-center rounded-full border-2 text-[10px]
+                "
+              >
                 {activeFilterCount}
               </div>
             )}
           </div>
 
-          <div className="
-            sm:block
-            hidden shrink-0
-          ">
+          <div
+            className="
+              sm:block
+              hidden shrink-0
+            "
+          >
             <SortingDropdown
               sortBy={sortBy}
               onSortChange={setSortBy}
@@ -137,16 +149,20 @@ const DormListHeader: React.FC<DormListHeaderProps> = ({
           </div>
         </div>
 
-        <div className="
-          gap-3
-          xl:w-fit
-          flex w-auto shrink-0 items-center justify-end
-        ">
-          <div className="
-            rounded-lg bg-gray-100 p-1
-            sm:flex
-            relative hidden
-          ">
+        <div
+          className="
+            gap-3
+            xl:w-fit
+            flex w-auto shrink-0 items-center justify-end
+          "
+        >
+          <div
+            className="
+              rounded-lg bg-gray-100 p-1
+              sm:flex
+              relative hidden
+            "
+          >
             <motion.div
               className="
                 rounded-md border-gray-200/50 bg-white shadow-sm absolute border
@@ -172,20 +188,26 @@ const DormListHeader: React.FC<DormListHeaderProps> = ({
                 gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium relative z-10
                 flex items-center transition-colors duration-200
                 ${
-                isListView ? 'text-black' : `
-                  text-gray-500
-                  hover:text-gray-700
-                `
-              }
+                  isListView
+                    ? 'text-black'
+                    : `
+                      text-gray-500
+                      hover:text-gray-700
+                    `
+                }
               `}
               title={t.viewList}
               type="button"
             >
               <List size={16} />
-              <span className="
-                lg:inline
-                hidden
-              ">{t.viewList}</span>
+              <span
+                className="
+                  lg:inline
+                  hidden
+                "
+              >
+                {t.viewList}
+              </span>
             </button>
             <button
               onClick={(e) => {
@@ -197,20 +219,26 @@ const DormListHeader: React.FC<DormListHeaderProps> = ({
                 gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium relative z-10
                 flex items-center transition-colors duration-200
                 ${
-                isMapView ? 'text-black' : `
-                  text-gray-500
-                  hover:text-gray-700
-                `
-              }
+                  isMapView
+                    ? 'text-black'
+                    : `
+                      text-gray-500
+                      hover:text-gray-700
+                    `
+                }
               `}
               title={t.viewMap}
               type="button"
             >
               <MapIcon size={16} />
-              <span className="
-                lg:inline
-                hidden
-              ">{t.viewMap}</span>
+              <span
+                className="
+                  lg:inline
+                  hidden
+                "
+              >
+                {t.viewMap}
+              </span>
             </button>
           </div>
         </div>

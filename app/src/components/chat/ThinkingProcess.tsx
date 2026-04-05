@@ -130,9 +130,7 @@ export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="
-              ml-1 mt-2 space-y-1.5 border-slate-200 pl-3 border-l-2
-            ">
+            <div className="ml-1 mt-2 space-y-1.5 border-slate-200 pl-3 border-l-2">
               {steps.map((step, index) => (
                 <motion.div
                   key={step.id}
@@ -141,9 +139,7 @@ export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({
                   transition={{ duration: 0.2, delay: index * 0.05 }}
                   className="gap-1.5 text-xs text-slate-500 flex items-start"
                 >
-                  <span className="mt-px shrink-0">
-                    {stepIcons[step.type]}
-                  </span>
+                  <span className="mt-px shrink-0">{stepIcons[step.type]}</span>
                   <div className="min-w-0">
                     <span
                       className={

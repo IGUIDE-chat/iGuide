@@ -66,16 +66,16 @@ const SortingDropdown: React.FC<SortingDropdownProps> = memo(
             duration-200
             focus:ring-2 focus:outline-none
             ${
-            isOpen
-              ? 'border-illini-blue/50 bg-illini-blue/10 text-illini-blue'
-              : `
-                border-gray-200 bg-white text-gray-700
-                hover:border-illini-blue/40 hover:bg-illini-blue/5
-                hover:text-illini-blue/80
-                active:border-illini-blue/50 active:bg-illini-blue/10
-                active:text-illini-blue
-              `
-          }
+              isOpen
+                ? 'border-illini-blue/50 bg-illini-blue/10 text-illini-blue'
+                : `
+                  border-gray-200 bg-white text-gray-700
+                  hover:border-illini-blue/40 hover:bg-illini-blue/5
+                  hover:text-illini-blue/80
+                  active:border-illini-blue/50 active:bg-illini-blue/10
+                  active:text-illini-blue
+                `
+            }
           `}
           title={`Sort by: ${currentLabel}`}
         >
@@ -83,11 +83,13 @@ const SortingDropdown: React.FC<SortingDropdownProps> = memo(
         </button>
 
         {isOpen && (
-          <div className="
-            animate-in fade-in zoom-in-95 right-0 mt-2 w-48 rounded-xl
-            border-gray-100 bg-white py-1 shadow-lg absolute z-50
-            origin-top-right border duration-100
-          ">
+          <div
+            className="
+              animate-in fade-in zoom-in-95 right-0 mt-2 w-48 rounded-xl
+              border-gray-100 bg-white py-1 shadow-lg absolute z-50
+              origin-top-right border duration-100
+            "
+          >
             {SORT_OPTIONS.map((option) => (
               <button
                 key={option.value}

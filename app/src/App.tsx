@@ -59,15 +59,19 @@ export default function App() {
 
   if (isLoading) {
     return (
-      <div className="
-        from-illini-blue/10 via-white to-illini-orange/10 flex min-h-screen
-        items-center justify-center bg-linear-to-br
-      ">
+      <div
+        className="
+          from-illini-blue/10 via-white to-illini-orange/10 flex min-h-screen
+          items-center justify-center bg-linear-to-br
+        "
+      >
         <div className="text-center">
-          <div className="
-            mb-4 h-16 w-16 animate-spin border-illini-orange mx-auto
-            rounded-full border-4 border-t-transparent
-          " />
+          <div
+            className="
+              mb-4 h-16 w-16 animate-spin border-illini-orange mx-auto
+              rounded-full border-4 border-t-transparent
+            "
+          />
           <p className="text-slate-600">
             {language === 'zh' ? '加载中...' : 'Loading...'}
           </p>

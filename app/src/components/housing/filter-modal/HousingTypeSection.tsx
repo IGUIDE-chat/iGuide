@@ -28,11 +28,13 @@ const HousingTypeSection: React.FC<HousingTypeSectionProps> = ({
 }) => (
   <section className="mb-8">
     <h3 className="mb-6 text-xl font-bold">{title}</h3>
-    <div className="
-      gap-4
-      md:grid-cols-2
-      grid grid-cols-1
-    ">
+    <div
+      className="
+        gap-4
+        md:grid-cols-2
+        grid grid-cols-1
+      "
+    >
       {HOUSING_TYPE_OPTIONS.map((option) => {
         const meta = getHousingTypeMeta(option.value)
         const selected = value === option.value

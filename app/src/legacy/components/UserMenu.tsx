@@ -26,18 +26,22 @@ export const UserMenu: React.FC = () => {
           flex items-center rounded-full transition-colors
         "
       >
-        <div className="
-          h-8 w-8 from-illini-blue to-illini-orange text-sm font-semibold
-          text-white flex items-center justify-center rounded-full
-          bg-linear-to-br
-        ">
+        <div
+          className="
+            h-8 w-8 from-illini-blue to-illini-orange text-sm font-semibold
+            text-white flex items-center justify-center rounded-full
+            bg-linear-to-br
+          "
+        >
           {user.name.charAt(0).toUpperCase()}
         </div>
-        <span className="
-          text-sm font-medium text-slate-700
-          sm:block
-          hidden
-        ">
+        <span
+          className="
+            text-sm font-medium text-slate-700
+            sm:block
+            hidden
+          "
+        >
           {user.name}
         </span>
       </button>
@@ -51,10 +55,12 @@ export const UserMenu: React.FC = () => {
           />
 
           {/* Menu */}
-          <div className="
-            right-0 mt-2 w-56 rounded-2xl border-slate-100 bg-white shadow-xl
-            absolute z-20 overflow-hidden border
-          ">
+          <div
+            className="
+              right-0 mt-2 w-56 rounded-2xl border-slate-100 bg-white shadow-xl
+              absolute z-20 overflow-hidden border
+            "
+          >
             <div className="border-slate-100 p-4 border-b">
               <p className="font-semibold text-slate-900">{user.name}</p>
               <p className="text-sm text-slate-500 truncate">{user.email}</p>

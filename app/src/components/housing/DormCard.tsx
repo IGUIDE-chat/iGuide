@@ -431,13 +431,13 @@ const DormCard: React.FC<DormCardProps> = ({
               bottom-3 right-3 p-1.5 shadow-sm absolute rounded-full
               transition-all duration-200
               ${
-              isCompared
-                ? 'bg-illini-blue text-white scale-105'
-                : `
-                  bg-white/90 text-gray-400
-                  hover:bg-white hover:text-illini-blue
-                `
-            }
+                isCompared
+                  ? 'bg-illini-blue text-white scale-105'
+                  : `
+                    bg-white/90 text-gray-400
+                    hover:bg-white hover:text-illini-blue
+                  `
+              }
             `}
             aria-label={isCompared ? 'Remove from compare' : 'Add to compare'}
           >
@@ -485,17 +485,21 @@ const DormCard: React.FC<DormCardProps> = ({
       </div>
 
       <div className="p-4 flex grow flex-col">
-        <h3 className="
-          mb-1.5 text-xl font-bold text-gray-900 line-clamp-2 leading-[1.15]
-          antialiased
-        ">
+        <h3
+          className="
+            mb-1.5 text-xl font-bold text-gray-900 line-clamp-2 leading-[1.15]
+            antialiased
+          "
+        >
           {dormName}
         </h3>
 
-        <div className="
-          mb-3 gap-x-6 text-gray-500 grid
-          grid-cols-[minmax(0,1.3fr)_minmax(0,0.9fr)] text-[12px]
-        ">
+        <div
+          className="
+            mb-3 gap-x-6 text-gray-500 grid
+            grid-cols-[minmax(0,1.3fr)_minmax(0,0.9fr)] text-[12px]
+          "
+        >
           <div className="min-w-0 gap-1 inline-flex items-center">
             <MapPin size={13} className="text-illini-orange shrink-0" />
             <span className="line-clamp-1">{locationLabel}</span>
@@ -505,10 +509,12 @@ const DormCard: React.FC<DormCardProps> = ({
           </span>
         </div>
 
-        <div className="
-          mb-3 gap-x-6 gap-y-2 text-slate-700 grid
-          grid-cols-[minmax(0,1.3fr)_minmax(0,0.9fr)] text-[13px]
-        ">
+        <div
+          className="
+            mb-3 gap-x-6 gap-y-2 text-slate-700 grid
+            grid-cols-[minmax(0,1.3fr)_minmax(0,0.9fr)] text-[13px]
+          "
+        >
           <div className="min-w-0 gap-1.5 inline-flex items-center">
             <BedSingle size={14} className="text-slate-400 shrink-0" />
             <span className="leading-5 line-clamp-2">
@@ -536,9 +542,11 @@ const DormCard: React.FC<DormCardProps> = ({
         </div>
 
         {cardSummary && (
-          <p className="
-            mb-3 text-sm leading-6 text-gray-600 line-clamp-1 antialiased
-          ">
+          <p
+            className="
+              mb-3 text-sm leading-6 text-gray-600 line-clamp-1 antialiased
+            "
+          >
             {cardSummary}
           </p>
         )}

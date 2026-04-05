@@ -51,30 +51,36 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
                 ${containerClass}
                 gap-4 flex
                 ${
-                message.role === 'user'
-                  ? 'flex-row-reverse'
-                  : `
-                    md:flex-row
-                    flex-col
-                  `
-              }
+                  message.role === 'user'
+                    ? 'flex-row-reverse'
+                    : `
+                      md:flex-row
+                      flex-col
+                    `
+                }
               `}
             >
               {/* Avatar: hidden on mobile for AI, always shown on desktop */}
               <div
                 className={`
                   relative flex shrink-0 flex-col items-end
-                  ${message.role === 'model' ? `
-                    md:flex
-                    hidden
-                  ` : ''}
+                  ${
+                    message.role === 'model'
+                      ? `
+                        md:flex
+                        hidden
+                      `
+                      : ''
+                  }
                 `}
               >
                 {message.role === 'user' ? (
-                  <div className="
-                    h-6 w-6 rounded-lg bg-slate-200 text-slate-500 flex
-                    items-center justify-center
-                  ">
+                  <div
+                    className="
+                      h-6 w-6 rounded-lg bg-slate-200 text-slate-500 flex
+                      items-center justify-center
+                    "
+                  >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
@@ -89,11 +95,13 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
                     </svg>
                   </div>
                 ) : (
-                  <div className="
-                    h-6 w-6 rounded-sm bg-illini-orange font-serif text-xs
-                    font-bold text-white shadow-sm flex items-center
-                    justify-center
-                  ">
+                  <div
+                    className="
+                      h-6 w-6 rounded-sm bg-illini-orange font-serif text-xs
+                      font-bold text-white shadow-sm flex items-center
+                      justify-center
+                    "
+                  >
                     I
                   </div>
                 )}
@@ -101,18 +109,20 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
               <div
                 className={`
                   pt-0.5 relative flex-1 overflow-hidden
-                  ${
-                  message.role === 'user' ? 'flex flex-col items-end' : ''
-                }
+                  ${message.role === 'user' ? 'flex flex-col items-end' : ''}
                 `}
               >
                 <div
                   className={`
                     mb-1 text-xs font-semibold text-slate-900
-                    ${message.role === 'model' ? `
-                      md:block
-                      hidden
-                    ` : ''}
+                    ${
+                      message.role === 'model'
+                        ? `
+                          md:block
+                          hidden
+                        `
+                        : ''
+                    }
                   `}
                 >
                   {message.role === 'user' ? userRole : botName}
@@ -125,10 +135,12 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
                       language={language}
                     />
                   )}
-                <div className="
-                  prose prose-slate prose-sm leading-relaxed text-slate-800
-                  max-w-none
-                ">
+                <div
+                  className="
+                    prose prose-slate prose-sm leading-relaxed text-slate-800
+                    max-w-none
+                  "
+                >
                   {message.role === 'user' ? (
                     <div className="whitespace-pre-wrap">{message.text}</div>
                   ) : (
@@ -183,10 +195,13 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
                           />
                         ),
                         p: ({ node, ...props }) => (
-                          <p className="
-                            mb-2
-                            last:mb-0
-                          " {...props} />
+                          <p
+                            className="
+                              mb-2
+                              last:mb-0
+                            "
+                            {...props}
+                          />
                         ),
                         img: ({ node, ...props }) => (
                           <img

@@ -87,13 +87,13 @@ function ToggleButtonSection<T extends string | number>({
                 px-4 py-2 text-sm font-medium rounded-full border
                 transition-colors
                 ${
-                selected
-                  ? 'border-illini-blue bg-illini-blue text-white'
-                  : `
-                    border-gray-300 text-gray-700
-                    hover:border-illini-blue
-                  `
-              }
+                  selected
+                    ? 'border-illini-blue bg-illini-blue text-white'
+                    : `
+                      border-gray-300 text-gray-700
+                      hover:border-illini-blue
+                    `
+                }
               `}
             >
               {label}
@@ -398,9 +398,11 @@ export const FilterModal: React.FC<FilterModalProps> = ({
         </Transition.Child>
 
         <div className="inset-0 fixed overflow-y-auto">
-          <div className="
-            p-4 flex min-h-full items-center justify-center text-center
-          ">
+          <div
+            className="
+              p-4 flex min-h-full items-center justify-center text-center
+            "
+          >
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-200"
@@ -410,14 +412,19 @@ export const FilterModal: React.FC<FilterModalProps> = ({
               leaveFrom="opacity-100 translate-y-0"
               leaveTo="opacity-0 translate-y-2"
             >
-              <Dialog.Panel className="
-                max-w-2xl rounded-2xl bg-white shadow-2xl flex max-h-[85vh]
-                w-full transform flex-col overflow-hidden text-left align-middle
-              ">
-                <div className="
-                  border-gray-100 px-6 py-4 flex items-center justify-between
-                  border-b
-                ">
+              <Dialog.Panel
+                className="
+                  max-w-2xl rounded-2xl bg-white shadow-2xl flex max-h-[85vh]
+                  w-full transform flex-col overflow-hidden text-left
+                  align-middle
+                "
+              >
+                <div
+                  className="
+                    border-gray-100 px-6 py-4 flex items-center justify-between
+                    border-b
+                  "
+                >
                   <div className="w-9" />
                   <Dialog.Title className="text-lg font-bold">
                     {t.filters}
@@ -535,13 +542,13 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                           px-4 py-2 text-sm font-medium rounded-full border
                           transition-colors
                           ${
-                          localRequireAc
-                            ? 'border-illini-blue bg-illini-blue text-white'
-                            : `
-                              border-gray-300 text-gray-700
-                              hover:border-illini-blue
-                            `
-                        }
+                            localRequireAc
+                              ? 'border-illini-blue bg-illini-blue text-white'
+                              : `
+                                border-gray-300 text-gray-700
+                                hover:border-illini-blue
+                              `
+                          }
                         `}
                       >
                         {t.airConditioning}
@@ -563,13 +570,15 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                               px-4 py-2 text-sm font-medium rounded-full border
                               transition-colors
                               ${
-                              selected
-                                ? 'border-illini-blue bg-illini-blue text-white'
-                                : `
-                                  border-gray-300 text-gray-700
-                                  hover:border-illini-blue
-                                `
-                            }
+                                selected
+                                  ? `
+                                    border-illini-blue bg-illini-blue text-white
+                                  `
+                                  : `
+                                    border-gray-300 text-gray-700
+                                    hover:border-illini-blue
+                                  `
+                              }
                             `}
                           >
                             {getTagDisplay(tag, language)}
@@ -609,10 +618,10 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                     border-gray-100 bg-white px-6 py-4 z-10 flex items-center
                     justify-between border-t transition-shadow duration-300
                     ${
-                    showFooterShadow
-                      ? 'shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]'
-                      : ''
-                  }
+                      showFooterShadow
+                        ? 'shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]'
+                        : ''
+                    }
                   `}
                 >
                   <button

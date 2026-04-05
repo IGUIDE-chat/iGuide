@@ -185,10 +185,12 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
         <div className="no-scrollbar flex-1 overflow-y-auto">
           {isLoading ? (
             <div className="py-8 flex items-center justify-center">
-              <div className="
-                h-5 w-5 animate-spin border-illini-orange rounded-full border-2
-                border-t-transparent
-              "></div>
+              <div
+                className="
+                  h-5 w-5 animate-spin border-illini-orange rounded-full
+                  border-2 border-t-transparent
+                "
+              ></div>
             </div>
           ) : conversations.length === 0 ? (
             <div className="px-2 py-6 text-center">
@@ -202,10 +204,12 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
 
                 return (
                   <div key={category}>
-                    <h4 className="
-                      mb-1.5 px-2 font-semibold tracking-wider text-slate-500
-                      text-[10px] uppercase
-                    ">
+                    <h4
+                      className="
+                        mb-1.5 px-2 font-semibold tracking-wider text-slate-500
+                        text-[10px] uppercase
+                      "
+                    >
                       {category}
                     </h4>
                     <div className="space-y-0.5">
@@ -228,13 +232,13 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                               group rounded-lg px-2 py-2 relative cursor-pointer
                               transition-all
                               ${
-                              conv.id === currentConversationId
-                                ? 'bg-white/20 text-white'
-                                : `
-                                  text-slate-300
-                                  hover:bg-white/10
-                                `
-                            }
+                                conv.id === currentConversationId
+                                  ? 'bg-white/20 text-white'
+                                  : `
+                                    text-slate-300
+                                    hover:bg-white/10
+                                  `
+                              }
                             `}
                           >
                             <div className="relative overflow-hidden">
@@ -243,22 +247,24 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                                   className={`
                                     text-xs font-medium truncate
                                     ${
-                                    conv.id === currentConversationId
-                                      ? 'text-white'
-                                      : `
-                                        text-slate-300
-                                        group-hover:text-white
-                                      `
-                                  }
+                                      conv.id === currentConversationId
+                                        ? 'text-white'
+                                        : `
+                                          text-slate-300
+                                          group-hover:text-white
+                                        `
+                                    }
                                   `}
                                 >
                                   <TypewriterText text={conv.title} />
                                 </div>
                                 {conv.messageCount !== undefined &&
                                   conv.messageCount > 0 && (
-                                    <p className="
-                                      mt-0.5 text-slate-500 text-[10px]
-                                    ">
+                                    <p
+                                      className="
+                                        mt-0.5 text-slate-500 text-[10px]
+                                      "
+                                    >
                                       {conv.messageCount}{' '}
                                       {language === 'zh' ? '条' : 'msgs'}
                                     </p>
@@ -273,10 +279,10 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                                   transition-all duration-200
                                   group-hover:opacity-100
                                   ${
-                                  conv.id === currentConversationId
-                                    ? 'from-[#454545] via-[#454545]'
-                                    : 'from-[#2E2E2E] via-[#2E2E2E]'
-                                }
+                                    conv.id === currentConversationId
+                                      ? 'from-[#454545] via-[#454545]'
+                                      : 'from-[#2E2E2E] via-[#2E2E2E]'
+                                  }
                                 `}
                               >
                                 <button
@@ -293,9 +299,11 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                                   <svg
                                     className={`
                                       h-3.5 w-3.5
-                                      ${conv.isPinned ? `text-illini-orange` : `
-                                        text-slate-400
-                                      `}
+                                      ${
+                                        conv.isPinned
+                                          ? `text-illini-orange`
+                                          : `text-slate-400`
+                                      }
                                     `}
                                     fill={
                                       conv.isPinned ? 'currentColor' : 'none'
@@ -350,19 +358,25 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="
-          inset-0 bg-black/50 p-4 backdrop-blur-sm fixed z-50 flex items-center
-          justify-center
-        ">
-          <div className="
-            animate-scale-in max-w-sm rounded-xl border-white/10 shadow-2xl
-            w-full overflow-hidden border bg-[#1E1E1E]
-          ">
+        <div
+          className="
+            inset-0 bg-black/50 p-4 backdrop-blur-sm fixed z-50 flex
+            items-center justify-center
+          "
+        >
+          <div
+            className="
+              animate-scale-in max-w-sm rounded-xl border-white/10 shadow-2xl
+              w-full overflow-hidden border bg-[#1E1E1E]
+            "
+          >
             <div className="p-5 text-center">
-              <div className="
-                mb-4 h-12 w-12 bg-red-500/10 mx-auto flex items-center
-                justify-center rounded-full
-              ">
+              <div
+                className="
+                  mb-4 h-12 w-12 bg-red-500/10 mx-auto flex items-center
+                  justify-center rounded-full
+                "
+              >
                 <svg
                   className="h-6 w-6 text-red-500"
                   fill="none"

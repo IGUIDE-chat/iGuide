@@ -45,19 +45,23 @@ export const ChatEmptyState: React.FC<ChatEmptyStateProps> = ({
               className="h-10 w-10 rounded-xl"
               iconClassName="text-[1.4rem]"
             />
-            <h2 className="
-              text-2xl font-semibold tracking-tight text-slate-800 text-center
-            ">
+            <h2
+              className="
+                text-2xl font-semibold tracking-tight text-slate-800 text-center
+              "
+            >
               {title}
             </h2>
           </div>
 
           <div className={containerClass}>
-            <div className="
-              gap-2.5
-              sm:grid-cols-2
-              grid grid-cols-1
-            ">
+            <div
+              className="
+                gap-2.5
+                sm:grid-cols-2
+                grid grid-cols-1
+              "
+            >
               {suggestions.map((suggestion, index) => (
                 <button
                   key={`${suggestion.text}-${index}`}

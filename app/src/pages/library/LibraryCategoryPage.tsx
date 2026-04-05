@@ -47,9 +47,11 @@ const LibraryCategoryPage: React.FC<LibraryCategoryPageProps> = ({
   const categoryText = getCategoryText(category, language)
 
   return (
-    <div className="
-      animate-fade-in-up no-scrollbar min-w-0 size-full overflow-y-auto
-    ">
+    <div
+      className="
+        animate-fade-in-up no-scrollbar min-w-0 size-full overflow-y-auto
+      "
+    >
       <div className="min-w-0 max-w-3xl px-4 py-8 pb-24 mx-auto">
         <button
           type="button"
@@ -60,12 +62,15 @@ const LibraryCategoryPage: React.FC<LibraryCategoryPageProps> = ({
             flex items-center transition-colors
           "
         >
-          <span className="
-            h-8 w-8 border-slate-200 bg-white
-            group-hover:border-illini-blue group-hover:bg-illini-blue
-            group-hover:text-white
-            flex items-center justify-center rounded-full border transition-all
-          ">
+          <span
+            className="
+              h-8 w-8 border-slate-200 bg-white
+              group-hover:border-illini-blue group-hover:bg-illini-blue
+              group-hover:text-white
+              flex items-center justify-center rounded-full border
+              transition-all
+            "
+          >
             <svg
               className="h-4 w-4"
               fill="none"
@@ -83,20 +88,27 @@ const LibraryCategoryPage: React.FC<LibraryCategoryPageProps> = ({
           {t.backToCategories}
         </button>
 
-        <div className="
-          glass-card mb-10 gap-6 rounded-2xl p-8
-          sm:flex-row sm:items-center
-          relative flex flex-col items-start overflow-hidden
-        ">
-          <div className="
-            -right-10 -top-10 h-40 w-40 from-illini-orange/20 to-illini-blue/20
-            blur-3xl pointer-events-none absolute rounded-full bg-linear-to-br
-          " />
+        <div
+          className="
+            glass-card mb-10 gap-6 rounded-2xl p-8
+            sm:flex-row sm:items-center
+            relative flex flex-col items-start overflow-hidden
+          "
+        >
+          <div
+            className="
+              -right-10 -top-10 h-40 w-40 from-illini-orange/20
+              to-illini-blue/20 blur-3xl pointer-events-none absolute
+              rounded-full bg-linear-to-br
+            "
+          />
 
-          <div className="
-            h-16 w-16 rounded-2xl bg-white text-3xl shadow-md z-10 flex
-            items-center justify-center
-          ">
+          <div
+            className="
+              h-16 w-16 rounded-2xl bg-white text-3xl shadow-md z-10 flex
+              items-center justify-center
+            "
+          >
             {category.icon}
           </div>
           <div className="z-10">
@@ -109,11 +121,13 @@ const LibraryCategoryPage: React.FC<LibraryCategoryPageProps> = ({
           </div>
         </div>
 
-        <div className="
-          gap-5
-          md:grid-cols-2
-          grid grid-cols-1
-        ">
+        <div
+          className="
+            gap-5
+            md:grid-cols-2
+            grid grid-cols-1
+          "
+        >
           {categoryArticles.map((article) => (
             <div
               key={article.id}
@@ -125,22 +139,26 @@ const LibraryCategoryPage: React.FC<LibraryCategoryPageProps> = ({
                 cursor-pointer border transition-all duration-300
               "
             >
-              <h3 className="
-                mb-3 text-lg font-bold text-slate-800
-                group-hover:text-illini-orange
-                transition-colors
-              ">
+              <h3
+                className="
+                  mb-3 text-lg font-bold text-slate-800
+                  group-hover:text-illini-orange
+                  transition-colors
+                "
+              >
                 {article.title}
               </h3>
               <p className="text-sm leading-relaxed text-slate-500">
                 {article.summary}
               </p>
-              <div className="
-                mt-4 translate-y-2 text-sm font-semibold text-illini-blue
-                group-hover:translate-y-0
-                flex transform items-center opacity-0 transition-opacity
-                group-hover:opacity-100
-              ">
+              <div
+                className="
+                  mt-4 translate-y-2 text-sm font-semibold text-illini-blue
+                  group-hover:translate-y-0
+                  flex transform items-center opacity-0 transition-opacity
+                  group-hover:opacity-100
+                "
+              >
                 {t.readGuide}
               </div>
             </div>

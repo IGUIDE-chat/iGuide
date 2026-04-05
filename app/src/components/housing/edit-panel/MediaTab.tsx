@@ -114,12 +114,14 @@ const MultiImageField: React.FC<{
           className={inputCls}
           placeholder="https://..."
         />
-        <label className="
-          gap-1 rounded-lg border-gray-300 bg-gray-100 px-3 text-gray-700
-          hover:bg-gray-200
-          flex shrink-0 cursor-pointer items-center justify-center border
-          transition-colors
-        ">
+        <label
+          className="
+            gap-1 rounded-lg border-gray-300 bg-gray-100 px-3 text-gray-700
+            hover:bg-gray-200
+            flex shrink-0 cursor-pointer items-center justify-center border
+            transition-colors
+          "
+        >
           {form.uploadingImage ? (
             <Loader2 size={14} className="animate-spin" />
           ) : (
@@ -187,12 +189,14 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
             className={inputCls}
             placeholder="https://..."
           />
-          <label className="
-            gap-1 rounded-lg border-gray-300 bg-gray-100 px-3 text-gray-700
-            hover:bg-gray-200
-            flex shrink-0 cursor-pointer items-center justify-center border
-            transition-colors
-          ">
+          <label
+            className="
+              gap-1 rounded-lg border-gray-300 bg-gray-100 px-3 text-gray-700
+              hover:bg-gray-200
+              flex shrink-0 cursor-pointer items-center justify-center border
+              transition-colors
+            "
+          >
             {form.uploadingImage ? (
               <Loader2 size={16} className="animate-spin" />
             ) : (
@@ -270,9 +274,7 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                 {/* Collapsed header — always visible */}
                 <div className="gap-0 flex items-center">
                   {/* Reorder buttons — separate from toggle zone */}
-                  <div className="
-                    border-gray-200 flex shrink-0 flex-col border-r
-                  ">
+                  <div className="border-gray-200 flex shrink-0 flex-col border-r">
                     <button
                       type="button"
                       onClick={() => {
@@ -322,9 +324,11 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                       </span>
                       <div className="mt-0.5 min-w-0">
                         {plan.officialName && (
-                          <div className="
-                            text-xs font-semibold text-gray-700 truncate
-                          ">
+                          <div
+                            className="
+                              text-xs font-semibold text-gray-700 truncate
+                            "
+                          >
                             {plan.officialName}
                           </div>
                         )}
@@ -333,9 +337,7 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                         </span>
                       </div>
                       {hasPublishedPrice(plan.price) && (
-                        <span className="
-                          ml-2 text-xs font-medium text-illini-blue
-                        ">
+                        <span className="ml-2 text-xs font-medium text-illini-blue">
                           ${plan.price.toLocaleString()}/yr
                         </span>
                       )}
@@ -366,9 +368,7 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                       size={16}
                       className={`
                         text-gray-400 shrink-0 transition-transform duration-200
-                        ${
-                        isExpanded ? 'rotate-180' : ''
-                      }
+                        ${isExpanded ? 'rotate-180' : ''}
                       `}
                     />
                   </div>
@@ -376,9 +376,11 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
 
                 {/* Expanded body */}
                 {isExpanded && (
-                  <div className="
-                    space-y-3 border-gray-200 px-3 pb-3 pt-1 border-t
-                  ">
+                  <div
+                    className="
+                      space-y-3 border-gray-200 px-3 pb-3 pt-1 border-t
+                    "
+                  >
                     <div className="gap-2 grid grid-cols-2">
                       <Field label="Official Room Name">
                         <input
