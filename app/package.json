@@ -28,7 +28,7 @@
     "framer-motion": "^12.38.0",
     "lucide-react": "^0.563.0",
     "mapbox-gl": "^3.21.0",
-    "node": "^24.14.1",
+    "node": "^25.9.0",
     "pnpm": "^10.33.0",
     "rc-slider": "^11.1.9",
     "react": "^19.2.4",
@@ -41,7 +41,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260404.1",
     "@eslint/js": "^9.38.0",
-    "@types/node": "^22.19.17",
+    "@types/node": "^25.5.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.2.0",
