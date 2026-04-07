@@ -1,108 +1,165 @@
-## 中文版本 (Chinese Version)
+# IlliniGuide 代码仓库
 
-欢迎来到 IlliniGuide 项目仓库。这是一个专为 UIUC 学生设计的综合知识库和对话式 AI 助手。
+[English](./README.md) | 中文
 
-### 📂 仓库结构 (Repository Structure)
+---
 
-本仓库分为两个主要目录，将应用程序代码与数据处理脚本分开。
+## 中文版本
 
-- **`app/`**: 核心 Web 应用程序代码库。包含 React 前端、Cloudflare Pages 函数以及相关文档。
-- **`data_collection/`**: 包含用于抓取、清理和汇总 UIUC 相关信息的 Python 脚本和原始数据文件，用于构建知识库。
+一个三层架构的 UIUC 知识平台，前端、API 网关和爬虫/ETL 流水线各司其职。
 
-### 🚀 主应用程序 (`app/`)
+## 仓库结构
 
-主应用程序是一个基于 React 19、TypeScript、Vite 和 Tailwind CSS 构建的现代 Web 应用。它使用 Supabase 作为后端服务，并使用 Cloudflare Pages 进行部署和无服务器函数支持。
+| 路径 | 作用 |
+|:-----|:-----|
+| `app/` | React 应用、Cloudflare Pages 函数、文档、数据迁移，以及主要 UI 运行时。 |
+| `api/` | Cloudflare Worker 网关，负责 JWT 鉴权、地理路由、代理转发、CORS 和健康检查。 |
+| `data_collection/` | Python 爬虫/ETL 流水线，用于抓取、清洗和增量更新 UIUC 数据源。 |
 
-#### 快速开始 (Quick Start)
+## 快速开始
 
-在本地运行应用程序：
+### 前端开发
 
-1. **进入项目目录：**
+```bash
+cd app
+pnpm install
+pnpm run dev
+pnpm run typecheck
+```
 
-   ```bash
-   cd app
-   ```
-2. **安装依赖：**
+### Supabase 宿舍数据
 
-   ```bash
-   pnpm install
-   ```
-3. **启动开发服务器：**
+在 Supabase 中执行 SQL 迁移文件：
 
-   ```bash
-   pnpm run dev
-   ```
+- `scripts/migrations/create_dorms_table.sql`
+- `scripts/migrations/add_categorized_tags.sql`
 
-   应用现在应该运行在 `http://localhost:5173`。
+然后初始化或重新同步数据：
 
-### 🏗️ 架构与文件组织 (Architecture & File Organization)
+```bash
+npx tsx scripts/seed-dorms-table.ts
+```
 
-**架构图 (Architecture Diagram)**
+需要配置 `SUPABASE_URL` 和 `SUPABASE_SERVICE_KEY`。
 
-![架构图](./app/docs/diagrams/architecture_v3.jpg)
+### 爬虫配置
 
-我们遵循严格的文件结构以保持代码库的可维护性。所有源代码都位于 `src/` 目录下。
+```bash
+cd data_collection
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+playwright install chromium
+chmod +x run_all.sh
+./run_all.sh
+```
 
-| 目录                         | 描述                                                                     |
-|:-----------------------------|:-------------------------------------------------------------------------|
-| `src/`                       | **核心应用程序源代码**                                                   |
-| &nbsp;&nbsp;├─ `app/`        | 全局应用配置和路由。                                                     |
-| &nbsp;&nbsp;├─ `components/` | 可复用的 React UI 组件 (例如 `ChatScreen.tsx`, `Sidebar.tsx`)。          |
-| &nbsp;&nbsp;├─ `services/`   | API 客户端和业务逻辑 (例如 `conversationService.ts`, `supabase.ts`)。    |
-| &nbsp;&nbsp;├─ `contexts/`   | 全局 React Context 提供者 (例如 `AuthContext.tsx`, `ThemeContext.tsx`)。 |
-| &nbsp;&nbsp;├─ `pages/`      | 顶级页面组件 (如果在项目中使用)。                                        |
-| &nbsp;&nbsp;├─ `hooks/`      | 自定义 React Hooks。                                                     |
-| &nbsp;&nbsp;├─ `utils/`      | 工具函数。                                                               |
-| &nbsp;&nbsp;├─ `constants/`  | 常量值和配置。                                                           |
-| &nbsp;&nbsp;├─ `i18n/`       | 国际化资源。                                                             |
-| &nbsp;&nbsp;├─ `data/`       | 静态数据文件。                                                           |
-| &nbsp;&nbsp;└─ `types/`      | TypeScript 类型定义和接口。                                              |
-| `functions/`                 | Cloudflare Pages Functions (无服务器后端)。                              |
-| `tests/`                     | 自动化测试 (Python/JS)。                                                 |
-| `docs/`                      | 详细的项目文档。                                                         |
-| `scripts/`                   | 实用程序/维护脚本。                                                      |
+### API 网关基础
 
-### 🛠️ 开发者指南 (Guide for Developers)
+```bash
+cd api
+pnpm install
+pnpm run dev
+curl http://localhost:8787/health
+```
 
-#### 如何进行更改
+网关会校验 Supabase JWT、根据 IP 地理位置路由、通过 Argo Tunnel 代理到后端，并支持 SSE 聊天流式响应。
 
-- **UI/组件：** 请查看 `src/components/`。我们使用函数式组件和 Tailwind CSS。
-- **业务逻辑：** API 调用和核心逻辑应位于 `src/services/`。
-- **全局状态：** 如果你需要访问 Auth 或用户设置，请检查 `src/contexts/`。
+## API 网关说明
 
-#### 规则与最佳实践
+- 通过 Supabase tokens 进行 JWT 鉴权。
+- 基于 Geo-IP 区分中国大陆和全球流量进行路由。
+- 处理 CORS、健康检查和流式代理。
+- 生产环境变量：`SUPABASE_URL`、`SUPABASE_ANON_KEY`、`DEEPSEEK_API_KEY`、`SILICONFLOW_API_KEY`、`BACKEND_URL`。
 
-1. **严格的 TypeScript：** 不要使用 `any`。为 props 和 state 定义接口。
-2. **CSS：** 使用 Tailwind 工具类。避免内联样式。
-3. **新文件：** 将新组件放在 `src/components/`，服务放在 `src/services/`。
+## 代码组织规则
 
-有关详细的文件规则，请参阅 `app/docs/FILE_RULES.md`（如果有）或严格遵守上述文件夹结构。
+- `src/App.tsx` 是唯一活跃的应用组合入口。
+- `src/pages/**` 中只保留轻量的路由编排逻辑。
+- 功能组件放在 `src/components/<feature>/**`。
+- 通用 UI 组件只放在 `src/components/ui/**`。
+- 旧代码隔离在 `src/legacy/**`，运行时请勿从中导入。
+- 新页面在 `src/app/pageRegistry.ts` 注册，路由修改在 `src/app/routes.tsx`。
 
-### 🗄️ 数据库与数据管理 (Database & Data Management)
+## Dify 工作流配置
 
-该应用程序使用 Supabase 进行数据库和存储。
-要初始化或更新宿舍数据：
+1. 先从 `UIUC Campus Guide` 知识库中检索。
+2. 如果检索有结果，直接传给 LLM 并作答。
+3. 如果检索为空，调用 Tavily 等网络搜索工具，基于实时结果作答。
+4. 保持知识库优先的策略，网络搜索仅作为备选方案。
 
-1. 在 Supabase SQL Editor 中创建 `dorms` 总表并运行必要的迁移：`scripts/migrations/create_dorms_table.sql`
-2. 使用提供的脚本填充数据库（需要配置 `SUPABASE_URL` 和 `SUPABASE_SERVICE_KEY` 环境变量）：
+---
 
-   ```bash
-   npx tsx scripts/seed-dorms-table.ts
-   ```
+## 架构概览
 
-   *注意：此脚本会将所有本地静态数据与数据库中现有的管理员修改记录智能合并，并推送到统一的 `dorms` 总表中。*
+### 一句话概括
 
-### 📊 数据收集 (`data_collection/`)
+Cloudflare 边缘层、Supabase 用户数据层和芝加哥 VPS 智能层协同工作，组成面向 UIUC 内容的低延迟 RAG 系统。
 
-用于填充知识库的脚本。
+### 三层架构
 
-- `get_data.py`: 数据获取的主脚本或入口点。
-- `clean_domians.py`: 用于清理和标准化域名数据的工具。
-- `*.json` / `*.txt`: 原始和处理后的数据文件。
+#### 第一层 — 边缘层
 
-### 📚 Documentation
+- Cloudflare Workers 处理公网入口。
+- 鉴权代理在转发流量前校验 Supabase JWT。
+- Geo-IP 路由将中国大陆流量导向 SiliconFlow，全球流量导向 DeepSeek US。
+- Argo Tunnel 保护芝加哥 VPS 的私密性，并稳定边缘到核心的请求链路。
 
-详细文档可以在 `app/docs/` 文件夹中找到，包括：
+#### 第二层 — 用户数据层
 
-- `CHATFLOW_SETUP.md`: 配置 Coze/Chat 工作流的指南。
-- `Setup Guides`: 详细的环境设置指南。
+- Supabase Auth 负责注册、登录、OAuth 和密码找回。
+- PostgreSQL 存储聊天记录。
+- RLS（行级安全）确保每个用户只能访问自己的数据。
+- 异步日志在主响应完成后写入对话记录。
+
+#### 第三层 — 核心智能层
+
+- 位于芝加哥的 VPS 运行 Python 核心服务，推荐使用 FastAPI。
+- 核心层靠近 UIUC 数据源，便于低延迟抓取和本地处理。
+
+### 混合检索流程
+
+#### 抽取
+
+- 用 `httpx` 获取 HTML。
+- 用 MD5 计算内容哈希，跳过未变更的页面。
+- 文档状态记录在 `knowledge.db` 中。
+
+#### 转换
+
+- 用 Trafilatura 清洗页面内容。
+- 按 Markdown 标题拆分内容，而非按原始字符数切割。
+- 向每个片段注入源数据，保留课程和页面上下文。
+
+#### 加载
+
+- 知识库存储在 SQLite 中。
+- 用 FTS5 实现精确关键词匹配。
+- 用 sqlite-vec 结合 ONNX embedding 实现语义检索。
+
+#### 查询
+
+- FTS5 和向量检索并行执行。
+- 用 `bge-reranker-v2-m3` 重排候选结果。
+- 当最高得分过低时回退到 Tavily。
+
+### 为什么芝加哥 VPS 很重要
+
+- 地理位置靠近 UIUC 数据源，抓取速度快。
+- 数据清洗、分块、向量化等 CPU 密集型任务留在本地，避免调用昂贵的 API。
+- SQLite 让检索和原文查找在同一进程内完成。
+
+### 运维简洁性
+
+- `knowledge.db` 易于备份和迁移。
+- FTS5 + 向量检索与源文本共存，无需额外基础设施。
+
+### 技术栈汇总
+
+- **Supabase：** 鉴权、Postgres、RLS。
+- **Cloudflare Workers / Argo Tunnel：** 边缘网关、路由、安全回传。
+- **Python FastAPI：** 核心后端服务。
+- **SQLite 3 + FTS5 + sqlite-vec：** 本地知识库存储和检索索引。
+- **ONNX Runtime：** 本地 embedding 和重排推理。
+- **httpx + Trafilatura：** 抓取和清洗。
+- **Tavily API：** 网络搜索备选。
