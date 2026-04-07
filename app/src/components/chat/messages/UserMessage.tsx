@@ -16,9 +16,9 @@ export function UserMessage({ userRole = 'You' }: UserMessageProps) {
         <div className="relative flex shrink-0 flex-col items-end">
           <div
             className="
-       flex size-6 items-center justify-center rounded-lg bg-slate-200
-       text-slate-500
-     "
+              flex size-6 items-center justify-center rounded-lg bg-slate-200
+              text-slate-500
+            "
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -42,9 +42,9 @@ export function UserMessage({ userRole = 'You' }: UserMessageProps) {
           </div>
           <div
             className="
-       prose prose-slate prose-sm max-w-none leading-relaxed whitespace-pre-wrap
-       text-slate-800
-     "
+              prose prose-slate prose-sm max-w-none leading-relaxed
+              whitespace-pre-wrap text-slate-800
+            "
           >
             <MessagePrimitive.Parts />
           </div>

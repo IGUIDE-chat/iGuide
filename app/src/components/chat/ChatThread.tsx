@@ -67,16 +67,16 @@ export const ChatThread = ({ language }: ChatThreadProps) => {
       <ThreadPrimitive.ViewportFooter className="absolute bottom-0 left-0 w-full">
         <div
           className="
-          bg-linear-to-t from-white via-white to-transparent pt-2 pb-6
-        "
+            bg-linear-to-t from-white via-white to-transparent pt-2 pb-6
+          "
         >
           <div className={containerClass}>
             <ComposerPrimitive.Root
               className="
-              relative overflow-hidden rounded-[26px] border border-slate-200
-              bg-white shadow-md transition-all
-              focus-within:ring-1 focus-within:ring-slate-300
-            "
+                relative overflow-hidden rounded-[26px] border border-slate-200
+                bg-white shadow-md transition-all
+                focus-within:ring-1 focus-within:ring-slate-300
+              "
             >
               <ComposerPrimitive.Input
                 placeholder={t.inputPlaceholder}
@@ -89,12 +89,12 @@ export const ChatThread = ({ language }: ChatThreadProps) => {
               />
               <ComposerPrimitive.Send
                 className="
-                absolute top-1/2 right-2 -translate-y-1/2 rounded-full bg-black
-                p-2 text-white transition-all
-                hover:opacity-80
-                disabled:cursor-not-allowed disabled:bg-slate-100
-                disabled:text-slate-300
-              "
+                  absolute top-1/2 right-2 -translate-y-1/2 rounded-full
+                  bg-black p-2 text-white transition-all
+                  hover:opacity-80
+                  disabled:cursor-not-allowed disabled:bg-slate-100
+                  disabled:text-slate-300
+                "
               >
                 <svg
                   className="size-4"
@@ -114,9 +114,9 @@ export const ChatThread = ({ language }: ChatThreadProps) => {
             </ComposerPrimitive.Root>
             <div
               className="
-              mt-3 hidden text-center text-xs text-slate-400
-              md:block
-            "
+                mt-3 hidden text-center text-xs text-slate-400
+                md:block
+              "
             >
               {t.aiError}
             </div>
