@@ -30,9 +30,8 @@ const HousingTypeSection: React.FC<HousingTypeSectionProps> = ({
     <h3 className="mb-6 text-xl font-bold">{title}</h3>
     <div
       className="
-        gap-4
+        grid grid-cols-1 gap-4
         md:grid-cols-2
-        grid grid-cols-1
       "
     >
       {HOUSING_TYPE_OPTIONS.map((option) => {
@@ -53,7 +52,7 @@ const HousingTypeSection: React.FC<HousingTypeSectionProps> = ({
           <label
             key={option.value}
             className={`
-              gap-4 rounded-xl p-4 flex cursor-pointer items-center border-2
+              flex cursor-pointer items-center gap-4 rounded-xl border-2 p-4
               transition-colors duration-200
               ${selected ? accentClass : hoverClass}
             `}
@@ -61,7 +60,7 @@ const HousingTypeSection: React.FC<HousingTypeSectionProps> = ({
             <input
               type="checkbox"
               className={`
-                h-5 w-5 rounded-md
+                size-5 rounded-md
                 ${checkboxClass}
               `}
               checked={selected}

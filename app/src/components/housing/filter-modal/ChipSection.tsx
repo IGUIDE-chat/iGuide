@@ -30,7 +30,7 @@ const ChipSection: React.FC<ChipSectionProps> = ({
   return (
     <section className="mb-8">
       <h3 className="mb-4 text-xl font-bold">{title}</h3>
-      <div className="gap-2 flex flex-wrap">
+      <div className="flex flex-wrap gap-2">
         {options.map((value) => {
           const isSelected = selectedValues.includes(value.value)
           return (
@@ -39,7 +39,7 @@ const ChipSection: React.FC<ChipSectionProps> = ({
               onClick={() => onToggle(value.value)}
               type="button"
               className={`
-                px-4 py-2 text-sm font-medium rounded-full border transition-all
+                rounded-full border px-4 py-2 text-sm font-medium transition-all
                 duration-200
                 ${
                   isSelected

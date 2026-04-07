@@ -43,45 +43,43 @@ const DormListHeader: React.FC<DormListHeaderProps> = ({
   return (
     <div
       className="
-        top-0 border-gray-200 bg-white shadow-sm
+        sticky top-0 z-30 hidden border-b border-gray-200 bg-white shadow-sm
+        transition-all
         md:block
-        sticky z-30 hidden border-b transition-all
       "
     >
       <div
         className="
-          min-w-0 gap-4 px-6 py-4
+          flex min-w-0 items-center gap-4 px-6 py-4
           md:pl-16
-          flex items-center
         "
       >
         <div
           className="
-            min-w-0 max-w-4xl gap-2
+            mx-auto flex w-full max-w-4xl min-w-0 flex-1 items-center
+            justify-center gap-2
             sm:gap-3
-            mx-auto flex w-full flex-1 items-center justify-center
           "
         >
-          <div className="min-w-0 relative w-full">
+          <div className="relative w-full min-w-0">
             <div
               className="
-                inset-y-0 left-0 pl-3 pointer-events-none absolute flex
-                items-center
+                pointer-events-none absolute inset-y-0 left-0 flex items-center
+                pl-3
               "
             >
-              <Search className="h-4 w-4 text-gray-400" />
+              <Search className="size-4 text-gray-400" />
             </div>
             <input
               type="text"
               className="
-                border-gray-200 bg-gray-50/50 py-2 pl-9 pr-3 leading-5
-                placeholder-gray-400 shadow-sm
+                block w-full rounded-full border border-gray-200 bg-gray-50/50
+                py-2 pr-3 pl-9 leading-5 placeholder-gray-400 shadow-sm
+                transition-all
                 hover:bg-white hover:shadow-md
                 focus:border-black/20 focus:bg-white focus:shadow-md
-                focus:ring-black/5
+                focus:ring-2 focus:ring-black/5 focus:outline-none
                 sm:text-sm
-                block w-full rounded-full border transition-all
-                focus:ring-2 focus:outline-none
               "
               placeholder={t.searchPlaceholder}
               value={searchTerm}
@@ -95,11 +93,9 @@ const DormListHeader: React.FC<DormListHeaderProps> = ({
               type="button"
               aria-label={t.filters}
               className={`
-                h-10 w-10
-                focus:ring-illini-orange/20
-                flex items-center justify-center rounded-full border
+                flex size-10 items-center justify-center rounded-full border
                 transition-all duration-200
-                focus:ring-2 focus:outline-none
+                focus:ring-2 focus:ring-illini-orange/20 focus:outline-none
                 ${
                   hasActiveFilters
                     ? `
@@ -125,9 +121,9 @@ const DormListHeader: React.FC<DormListHeaderProps> = ({
             {hasActiveFilters && (
               <div
                 className="
-                  -right-1.5 -top-1.5 h-5 w-5 border-white bg-illini-orange
-                  font-bold text-white shadow-sm absolute flex items-center
-                  justify-center rounded-full border-2 text-[10px]
+                  absolute -top-1.5 -right-1.5 flex size-5 items-center
+                  justify-center rounded-full border-2 border-white
+                  bg-illini-orange text-[10px] font-bold text-white shadow-sm
                 "
               >
                 {activeFilterCount}
@@ -137,8 +133,8 @@ const DormListHeader: React.FC<DormListHeaderProps> = ({
 
           <div
             className="
-              sm:block
               hidden shrink-0
+              sm:block
             "
           >
             <SortingDropdown
@@ -151,21 +147,19 @@ const DormListHeader: React.FC<DormListHeaderProps> = ({
 
         <div
           className="
-            gap-3
+            flex w-auto shrink-0 items-center justify-end gap-3
             xl:w-fit
-            flex w-auto shrink-0 items-center justify-end
           "
         >
           <div
             className="
-              rounded-lg bg-gray-100 p-1
+              relative hidden rounded-lg bg-gray-100 p-1
               sm:flex
-              relative hidden
             "
           >
             <motion.div
               className="
-                rounded-md border-gray-200/50 bg-white shadow-sm absolute border
+                absolute rounded-md border border-gray-200/50 bg-white shadow-sm
               "
               initial={{ left: activePillLeft, scaleX: 0.6, opacity: 0 }}
               animate={{ left: activePillLeft, scaleX: 1, opacity: 1 }}
@@ -185,8 +179,8 @@ const DormListHeader: React.FC<DormListHeaderProps> = ({
                 setViewMode('list')
               }}
               className={`
-                gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium relative z-10
-                flex items-center transition-colors duration-200
+                relative z-10 flex items-center gap-1.5 rounded-md px-3 py-1.5
+                text-sm font-medium transition-colors duration-200
                 ${
                   isListView
                     ? 'text-black'
@@ -202,8 +196,8 @@ const DormListHeader: React.FC<DormListHeaderProps> = ({
               <List size={16} />
               <span
                 className="
-                  lg:inline
                   hidden
+                  lg:inline
                 "
               >
                 {t.viewList}
@@ -216,8 +210,8 @@ const DormListHeader: React.FC<DormListHeaderProps> = ({
                 setViewMode('map')
               }}
               className={`
-                gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium relative z-10
-                flex items-center transition-colors duration-200
+                relative z-10 flex items-center gap-1.5 rounded-md px-3 py-1.5
+                text-sm font-medium transition-colors duration-200
                 ${
                   isMapView
                     ? 'text-black'
@@ -233,8 +227,8 @@ const DormListHeader: React.FC<DormListHeaderProps> = ({
               <MapIcon size={16} />
               <span
                 className="
-                  lg:inline
                   hidden
+                  lg:inline
                 "
               >
                 {t.viewMap}

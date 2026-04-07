@@ -37,14 +37,13 @@ export const AppShell: React.FC<AppShellProps> = ({
   return (
     <div
       className="
-        bg-white font-sans text-slate-900 flex h-dvh w-full overflow-hidden
+        flex h-dvh w-full overflow-hidden bg-white font-sans text-slate-900
       "
     >
       <div
         className={`
-          inset-0 bg-black/50
+          fixed inset-0 z-40 bg-black/50 transition-opacity duration-300
           md:hidden
-          fixed z-40 transition-opacity duration-300
           ${
             isSidebarOpen
               ? 'pointer-events-auto opacity-100'
@@ -56,15 +55,15 @@ export const AppShell: React.FC<AppShellProps> = ({
 
       <aside
         className={`
-          inset-y-0 left-0 text-slate-200 ease-in-out
+          fixed inset-y-0 left-0 z-50 flex flex-col bg-[#171717] text-slate-200
+          transition-all duration-300 ease-in-out
           md:relative
-          fixed z-50 flex flex-col bg-[#171717] transition-all duration-300
           ${
             isSidebarOpen
-              ? 'translate-x-0 w-[180px]'
+              ? 'w-[180px] translate-x-0'
               : `
-                md:w-0 md:translate-x-0 md:overflow-hidden
                 w-[180px] -translate-x-full
+                md:w-0 md:translate-x-0 md:overflow-hidden
               `
           }
         `}
@@ -72,26 +71,24 @@ export const AppShell: React.FC<AppShellProps> = ({
         <div className="flex h-full w-[180px] flex-col">{sidebar}</div>
       </aside>
 
-      <main className="min-w-0 bg-white relative flex size-full flex-1 flex-col">
+      <main className="relative flex size-full min-w-0 flex-1 flex-col bg-white">
         <div
           className="
-            left-3 top-3
+            absolute top-3 left-3 z-40 hidden
             md:block
-            absolute z-40 hidden
           "
         >
           <button
             ref={sidebarToggleButtonRef}
             onClick={onToggleSidebar}
             className="
-              rounded-md p-2 text-slate-400
+              rounded-md p-2 text-slate-400 transition-colors
               hover:bg-illini-blue/5 hover:text-illini-blue
-              transition-colors
             "
             title={isSidebarOpen ? 'Close Sidebar' : 'Open Sidebar'}
           >
             <svg
-              className="h-5 w-5"
+              className="size-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -108,21 +105,21 @@ export const AppShell: React.FC<AppShellProps> = ({
 
         <div
           className="
-            top-0 gap-2 border-slate-100 bg-white p-3
+            sticky top-0 z-20 flex items-center gap-2 border-b border-slate-100
+            bg-white p-3
             md:hidden
-            sticky z-20 flex items-center border-b
           "
         >
           <button
             ref={mobileSidebarButtonRef}
             onClick={onOpenSidebar}
             className="
-              h-10 w-10 rounded-xl border-slate-200 bg-slate-100 text-slate-500
-              flex shrink-0 items-center justify-center border
+              flex size-10 shrink-0 items-center justify-center rounded-xl
+              border border-slate-200 bg-slate-100 text-slate-500
             "
           >
             <svg
-              className="h-6 w-6"
+              className="size-6"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -138,7 +135,7 @@ export const AppShell: React.FC<AppShellProps> = ({
           {headerSlot ?? mobileHeader}
         </div>
 
-        <div className="min-w-0 relative flex-1 overflow-hidden">
+        <div className="relative min-w-0 flex-1 overflow-hidden">
           {children}
         </div>
       </main>

@@ -20,7 +20,7 @@ export const ContentTab: React.FC<ContentTabProps> = ({ form }) => {
 
   return (
     <>
-      <div className="gap-1 rounded-lg bg-gray-100 p-1 flex w-fit">
+      <div className="flex w-fit gap-1 rounded-lg bg-gray-100 p-1">
         {(['en', 'zh'] as const).map((lang) => (
           <button
             key={lang}
@@ -63,7 +63,7 @@ export const ContentTab: React.FC<ContentTabProps> = ({ form }) => {
           </Field>
           <Field label={t.labels.location}>
             <div className="space-y-2">
-              <div className="gap-2 flex flex-wrap">
+              <div className="flex flex-wrap gap-2">
                 {LOCATION_PRESETS.map((preset) => (
                   <button
                     key={preset.value}
@@ -73,7 +73,7 @@ export const ContentTab: React.FC<ContentTabProps> = ({ form }) => {
                       form.setLocationZh(preset.zh)
                     }}
                     className={`
-                      rounded-lg px-3 py-1.5 text-xs font-medium border
+                      rounded-lg border px-3 py-1.5 text-xs font-medium
                       transition-all
                       ${
                         form.location === preset.value
@@ -136,7 +136,7 @@ export const ContentTab: React.FC<ContentTabProps> = ({ form }) => {
           </Field>
           <Field label={t.labels.location}>
             <div className="space-y-2">
-              <div className="gap-2 flex flex-wrap">
+              <div className="flex flex-wrap gap-2">
                 {LOCATION_PRESETS.map((preset) => (
                   <button
                     key={preset.value}
@@ -146,7 +146,7 @@ export const ContentTab: React.FC<ContentTabProps> = ({ form }) => {
                       form.setLocationZh(preset.zh)
                     }}
                     className={`
-                      rounded-lg px-3 py-1.5 text-xs font-medium border
+                      rounded-lg border px-3 py-1.5 text-xs font-medium
                       transition-all
                       ${
                         form.locationZh === preset.zh
@@ -197,9 +197,8 @@ export const ContentTab: React.FC<ContentTabProps> = ({ form }) => {
         onClick={form.reset}
         disabled={form.resetting}
         className="
-          gap-1.5 text-xs text-red-500
+          flex items-center gap-1.5 text-xs text-red-500 transition-colors
           hover:text-red-700
-          flex items-center transition-colors
           disabled:opacity-50
         "
       >

@@ -74,21 +74,21 @@ export const PrimaryNav: React.FC<PrimaryNavProps> = ({
 }) => {
   return (
     <>
-      <div className="mb-2 p-3 flex items-center justify-between">
+      <div className="mb-2 flex items-center justify-between p-3">
         <div
           className="
-            gap-2 rounded-md px-2 py-2
+            flex w-full cursor-pointer items-center gap-2 rounded-md p-2
+            transition-colors
             hover:bg-white/5
-            flex w-full cursor-pointer items-center transition-colors
           "
         >
           <BrandMark
-            className="rounded-md h-[26px] w-[26px]"
+            className="h-[26px] w-[26px] rounded-md"
             iconClassName="text-[10px]"
           />
           <SidebarLabel
             isOpen={isSidebarOpen}
-            className="font-bold tracking-tight text-white text-[15px]"
+            className="text-[15px] font-bold tracking-tight text-white"
           >
             <AnimatedText>{appTitle}</AnimatedText>
           </SidebarLabel>
@@ -111,11 +111,11 @@ export const PrimaryNav: React.FC<PrimaryNavProps> = ({
             key={item.key}
             onClick={item.onClick}
             className={`
-              gap-3 rounded-md px-3 py-3 text-sm flex w-full items-center
+              flex w-full items-center gap-3 rounded-md p-3 text-sm
               transition-colors
               ${
                 activeTab === item.key
-                  ? 'text-white bg-[#212121]'
+                  ? 'bg-[#212121] text-white'
                   : `
                     text-slate-300
                     hover:bg-[#212121]

@@ -59,7 +59,7 @@ export const TypewriterText: React.FC<TypewriterTextProps> = ({
         prose prose-sm
         prose-p:leading-relaxed
         prose-pre:bg-gray-100
-        text-gray-800 max-w-none
+        max-w-none text-gray-800
       "
     >
       <ReactMarkdown

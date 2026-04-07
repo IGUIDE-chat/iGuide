@@ -30,7 +30,7 @@ export const ChatEmptyState: React.FC<ChatEmptyStateProps> = ({
   onSuggestionClick,
 }) => {
   return (
-    <div className="p-4 flex flex-1 flex-col items-center justify-center">
+    <div className="flex flex-1 flex-col items-center justify-center p-4">
       <AnimatePresence mode="wait">
         <motion.div
           key={language}
@@ -40,14 +40,14 @@ export const ChatEmptyState: React.FC<ChatEmptyStateProps> = ({
           transition={{ duration: 0.2, ease: 'easeOut' }}
           className="flex w-full flex-col items-center"
         >
-          <div className="mb-8 gap-3 flex items-center">
+          <div className="mb-8 flex items-center gap-3">
             <BrandMark
-              className="h-10 w-10 rounded-xl"
+              className="size-10 rounded-xl"
               iconClassName="text-[1.4rem]"
             />
             <h2
               className="
-                text-2xl font-semibold tracking-tight text-slate-800 text-center
+                text-center text-2xl font-semibold tracking-tight text-slate-800
               "
             >
               {title}
@@ -57,9 +57,8 @@ export const ChatEmptyState: React.FC<ChatEmptyStateProps> = ({
           <div className={containerClass}>
             <div
               className="
-                gap-2.5
+                grid grid-cols-1 gap-2.5
                 sm:grid-cols-2
-                grid grid-cols-1
               "
             >
               {suggestions.map((suggestion, index) => (
@@ -67,10 +66,9 @@ export const ChatEmptyState: React.FC<ChatEmptyStateProps> = ({
                   key={`${suggestion.text}-${index}`}
                   onClick={() => onSuggestionClick(suggestion.text)}
                   className="
-                    rounded-2xl border-slate-200 p-3 text-sm text-slate-600
-                    shadow-sm
+                    rounded-2xl border border-slate-200 p-3 text-left text-sm
+                    text-slate-600 shadow-sm transition-colors
                     hover:bg-slate-50 hover:shadow-md
-                    border text-left transition-colors
                   "
                 >
                   <span className="mr-2.5 text-base">{suggestion.icon}</span>

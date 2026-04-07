@@ -180,15 +180,15 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
 
   return (
     <>
-      <div className="min-h-0 px-3 flex h-full flex-col">
+      <div className="flex h-full min-h-0 flex-col px-3">
         {/* Conversations List */}
         <div className="no-scrollbar flex-1 overflow-y-auto">
           {isLoading ? (
-            <div className="py-8 flex items-center justify-center">
+            <div className="flex items-center justify-center py-8">
               <div
                 className="
-                  h-5 w-5 animate-spin border-illini-orange rounded-full
-                  border-2 border-t-transparent
+                  size-5 animate-spin rounded-full border-2 border-illini-orange
+                  border-t-transparent
                 "
               ></div>
             </div>
@@ -206,8 +206,8 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                   <div key={category}>
                     <h4
                       className="
-                        mb-1.5 px-2 font-semibold tracking-wider text-slate-500
-                        text-[10px] uppercase
+                        mb-1.5 px-2 text-[10px] font-semibold tracking-wider
+                        text-slate-500 uppercase
                       "
                     >
                       {category}
@@ -229,7 +229,7 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                             }}
                             onClick={() => onSelectConversation(conv.id)}
                             className={`
-                              group rounded-lg px-2 py-2 relative cursor-pointer
+                              group relative cursor-pointer rounded-lg p-2
                               transition-all
                               ${
                                 conv.id === currentConversationId
@@ -245,7 +245,7 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                               <div className="pr-1">
                                 <div
                                   className={`
-                                    text-xs font-medium truncate
+                                    truncate text-xs font-medium
                                     ${
                                       conv.id === currentConversationId
                                         ? 'text-white'
@@ -262,7 +262,7 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                                   conv.messageCount > 0 && (
                                     <p
                                       className="
-                                        mt-0.5 text-slate-500 text-[10px]
+                                        mt-0.5 text-[10px] text-slate-500
                                       "
                                     >
                                       {conv.messageCount}{' '}
@@ -273,9 +273,9 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
 
                               <div
                                 className={`
-                                  bottom-0 right-0 top-0 w-24 gap-0.5 px-2
-                                  absolute flex items-center justify-end
-                                  bg-linear-to-l to-transparent opacity-0
+                                  absolute inset-y-0 right-0 flex w-24
+                                  items-center justify-end gap-0.5
+                                  bg-linear-to-l to-transparent px-2 opacity-0
                                   transition-all duration-200
                                   group-hover:opacity-100
                                   ${
@@ -290,15 +290,14 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                                     handleTogglePin(conv.id, conv.isPinned, e)
                                   }
                                   className="
-                                    rounded-md p-1
+                                    rounded-md p-1 transition-colors
                                     hover:bg-white/10
-                                    transition-colors
                                   "
                                   title={conv.isPinned ? t.unpin : t.pin}
                                 >
                                   <svg
                                     className={`
-                                      h-3.5 w-3.5
+                                      size-3.5
                                       ${
                                         conv.isPinned
                                           ? `text-illini-orange`
@@ -322,14 +321,13 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                                 <button
                                   onClick={(e) => handleDeleteClick(conv.id, e)}
                                   className="
-                                    rounded-md p-1
+                                    rounded-md p-1 transition-colors
                                     hover:bg-red-500/20
-                                    transition-colors
                                   "
                                   title={t.delete}
                                 >
                                   <svg
-                                    className="h-3.5 w-3.5 text-red-400"
+                                    className="size-3.5 text-red-400"
                                     fill="none"
                                     stroke="currentColor"
                                     viewBox="0 0 24 24"
@@ -360,25 +358,25 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
       {showDeleteConfirm && (
         <div
           className="
-            inset-0 bg-black/50 p-4 backdrop-blur-sm fixed z-50 flex
-            items-center justify-center
+            fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4
+            backdrop-blur-sm
           "
         >
           <div
             className="
-              animate-scale-in max-w-sm rounded-xl border-white/10 shadow-2xl
-              w-full overflow-hidden border bg-[#1E1E1E]
+              animate-scale-in w-full max-w-sm overflow-hidden rounded-xl border
+              border-white/10 bg-[#1E1E1E] shadow-2xl
             "
           >
             <div className="p-5 text-center">
               <div
                 className="
-                  mb-4 h-12 w-12 bg-red-500/10 mx-auto flex items-center
-                  justify-center rounded-full
+                  mx-auto mb-4 flex size-12 items-center justify-center
+                  rounded-full bg-red-500/10
                 "
               >
                 <svg
-                  className="h-6 w-6 text-red-500"
+                  className="size-6 text-red-500"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -399,14 +397,13 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                   ? '此操作无法撤销。'
                   : 'This action cannot be undone.'}
               </p>
-              <div className="gap-3 flex">
+              <div className="flex gap-3">
                 <button
                   onClick={() => setShowDeleteConfirm(null)}
                   className="
-                    rounded-lg bg-white/5 px-4 py-2 text-sm font-medium
-                    text-slate-300
+                    flex-1 rounded-lg bg-white/5 px-4 py-2 text-sm font-medium
+                    text-slate-300 transition-colors
                     hover:bg-white/10
-                    flex-1 transition-colors
                   "
                 >
                   {language === 'zh' ? '取消' : 'Cancel'}
@@ -414,10 +411,9 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                 <button
                   onClick={confirmDelete}
                   className="
-                    rounded-lg bg-red-500 px-4 py-2 text-sm font-medium
-                    text-white
+                    flex-1 rounded-lg bg-red-500 px-4 py-2 text-sm font-medium
+                    text-white transition-colors
                     hover:bg-red-600
-                    flex-1 transition-colors
                   "
                 >
                   {language === 'zh' ? '删除' : 'Delete'}

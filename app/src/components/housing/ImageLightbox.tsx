@@ -62,16 +62,16 @@ const ImageLightbox: React.FC<ImageLightboxProps> = ({
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
       className="
-        inset-0 bg-black/80 backdrop-blur-sm fixed z-100 flex items-center
-        justify-center
+        fixed inset-0 z-100 flex items-center justify-center bg-black/80
+        backdrop-blur-sm
       "
       onClick={onClose}
     >
       {/* Top bar */}
       <div
         className="
-          left-0 right-0 top-0 px-4 py-3 absolute z-10 flex items-center
-          justify-between
+          absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4
+          py-3
         "
       >
         <div className="text-sm font-medium text-white/70">
@@ -82,7 +82,7 @@ const ImageLightbox: React.FC<ImageLightboxProps> = ({
             </span>
           )}
         </div>
-        <div className="gap-2 flex items-center">
+        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={(e) => {
@@ -90,27 +90,25 @@ const ImageLightbox: React.FC<ImageLightboxProps> = ({
               toggleZoom()
             }}
             className="
-              bg-white/10 p-2 text-white
+              rounded-full bg-white/10 p-2 text-white transition-colors
               hover:bg-white/20
-              rounded-full transition-colors
             "
           >
             {scale > 1 ? (
-              <ZoomOut className="h-5 w-5" />
+              <ZoomOut className="size-5" />
             ) : (
-              <ZoomIn className="h-5 w-5" />
+              <ZoomIn className="size-5" />
             )}
           </button>
           <button
             type="button"
             onClick={onClose}
             className="
-              bg-white/10 p-2 text-white
+              rounded-full bg-white/10 p-2 text-white transition-colors
               hover:bg-white/20
-              rounded-full transition-colors
             "
           >
-            <X className="h-5 w-5" />
+            <X className="size-5" />
           </button>
         </div>
       </div>
@@ -127,7 +125,7 @@ const ImageLightbox: React.FC<ImageLightboxProps> = ({
           transition={{ duration: 0.2 }}
           onClick={(e) => e.stopPropagation()}
           className="
-            rounded-lg max-h-[85vh] max-w-[90vw] cursor-zoom-in object-contain
+            max-h-[85vh] max-w-[90vw] cursor-zoom-in rounded-lg object-contain
             transition-transform duration-200 select-none
           "
           style={{ transform: `scale(${scale})` }}
@@ -144,12 +142,12 @@ const ImageLightbox: React.FC<ImageLightboxProps> = ({
               goPrev()
             }}
             className="
-              left-3 bg-white/10 p-2.5 text-white
+              absolute top-1/2 left-3 -translate-y-1/2 rounded-full bg-white/10
+              p-2.5 text-white transition-colors
               hover:bg-white/25
-              absolute top-1/2 -translate-y-1/2 rounded-full transition-colors
             "
           >
-            <ChevronLeft className="h-6 w-6" />
+            <ChevronLeft className="size-6" />
           </button>
           <button
             type="button"
@@ -158,12 +156,12 @@ const ImageLightbox: React.FC<ImageLightboxProps> = ({
               goNext()
             }}
             className="
-              right-3 bg-white/10 p-2.5 text-white
+              absolute top-1/2 right-3 -translate-y-1/2 rounded-full bg-white/10
+              p-2.5 text-white transition-colors
               hover:bg-white/25
-              absolute top-1/2 -translate-y-1/2 rounded-full transition-colors
             "
           >
-            <ChevronRight className="h-6 w-6" />
+            <ChevronRight className="size-6" />
           </button>
         </>
       )}

@@ -148,20 +148,19 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   if (!user) return null
 
   return (
-    <div className="bg-white size-full overflow-y-auto">
-      <div className="max-w-md px-4 py-8 mx-auto">
+    <div className="size-full overflow-y-auto bg-white">
+      <div className="mx-auto max-w-md px-4 py-8">
         {/* Header */}
-        <div className="mb-8 gap-4 flex items-center">
+        <div className="mb-8 flex items-center gap-4">
           <button
             onClick={onBack}
             className="
-              -ml-2 p-2 text-slate-500
+              -ml-2 rounded-full p-2 text-slate-500 transition-colors
               hover:bg-slate-100
-              rounded-full transition-colors
             "
           >
             <svg
-              className="h-6 w-6"
+              className="size-6"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -180,29 +179,29 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         {/* Profile Card */}
         <div
           className="
-            mb-6 rounded-2xl border-slate-200 bg-white p-6 shadow-sm border
+            mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm
           "
         >
           <div className="flex flex-col items-center">
             <div
               className="
-                mb-4 h-24 w-24 bg-illini-orange text-4xl font-bold text-white
-                shadow-lg shadow-illini-orange/20 flex items-center
-                justify-center rounded-full
+                mb-4 flex size-24 items-center justify-center rounded-full
+                bg-illini-orange text-4xl font-bold text-white shadow-lg
+                shadow-illini-orange/20
               "
             >
               {user.name?.charAt(0).toUpperCase() || 'U'}
             </div>
 
             {isEditing ? (
-              <div className="mb-2 gap-2 flex w-full max-w-[200px] items-center">
+              <div className="mb-2 flex w-full max-w-[200px] items-center gap-2">
                 <input
                   type="text"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                   className="
-                    border-illini-orange px-3 py-1 font-bold text-slate-900
-                    w-full border-b-2 bg-transparent text-center
+                    w-full border-b-2 border-illini-orange bg-transparent px-3
+                    py-1 text-center font-bold text-slate-900
                     focus:outline-none
                   "
                   autoFocus
@@ -211,7 +210,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             ) : (
               <h2
                 className="
-                  mb-1 gap-2 text-xl font-bold text-slate-900 flex items-center
+                  mb-1 flex items-center gap-2 text-xl font-bold text-slate-900
                 "
               >
                 {user.name || 'User'}
@@ -226,7 +225,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   "
                 >
                   <svg
-                    className="h-4 w-4"
+                    className="size-4"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -245,13 +244,13 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             <p className="text-sm text-slate-500">{user.email}</p>
 
             {isEditing && (
-              <div className="mt-4 gap-2 flex">
+              <div className="mt-4 flex gap-2">
                 <button
                   onClick={() => setIsEditing(false)}
                   className="
-                    bg-slate-100 px-4 py-1.5 text-xs font-medium text-slate-500
+                    rounded-full bg-slate-100 px-4 py-1.5 text-xs font-medium
+                    text-slate-500 transition-colors
                     hover:bg-slate-200
-                    rounded-full transition-colors
                   "
                 >
                   {t.cancel}
@@ -260,9 +259,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   onClick={handleUpdateName}
                   disabled={isLoading}
                   className="
-                    bg-illini-orange px-4 py-1.5 text-xs font-medium text-white
+                    rounded-full bg-illini-orange px-4 py-1.5 text-xs
+                    font-medium text-white transition-colors
                     hover:bg-illini-blue
-                    rounded-full transition-colors
                     disabled:opacity-50
                   "
                 >
@@ -283,8 +282,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               </label>
               <div
                 className="
-                  rounded-lg border-slate-100 bg-slate-50 p-3 text-sm
-                  font-medium text-slate-700 border
+                  rounded-lg border border-slate-100 bg-slate-50 p-3 text-sm
+                  font-medium text-slate-700
                 "
               >
                 {user.email}
@@ -296,14 +295,14 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         {/* Soul Editor */}
         <div
           className="
-            mb-6 rounded-2xl border-slate-200 bg-white p-6 shadow-sm border
+            mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm
           "
         >
           <div className="mb-3 flex items-center justify-between">
             <div>
               <h3
                 className="
-                  gap-2 text-base font-bold text-slate-900 flex items-center
+                  flex items-center gap-2 text-base font-bold text-slate-900
                 "
               >
                 <span>🎭</span> {t.soulTitle}
@@ -314,9 +313,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               <button
                 onClick={() => setIsSoulEditing(true)}
                 className="
-                  text-xs font-medium text-illini-orange
+                  text-xs font-medium text-illini-orange transition-colors
                   hover:text-illini-blue
-                  transition-colors
                 "
               >
                 {t.edit}
@@ -332,24 +330,23 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 rows={4}
                 placeholder={t.soulPlaceholder}
                 className="
-                  rounded-lg border-slate-200 bg-slate-50 p-3 text-sm
-                  text-slate-700
-                  focus:border-illini-orange focus:ring-illini-orange/30
-                  w-full resize-none border
-                  focus:ring-2 focus:outline-none
+                  w-full resize-none rounded-lg border border-slate-200
+                  bg-slate-50 p-3 text-sm text-slate-700
+                  focus:border-illini-orange focus:ring-2
+                  focus:ring-illini-orange/30 focus:outline-none
                 "
               />
               <div className="mt-2 flex items-center justify-between">
                 <span className="text-xs text-slate-400">
                   {soul.length}/500 {t.charCount}
                 </span>
-                <div className="gap-2 flex">
+                <div className="flex gap-2">
                   <button
                     onClick={() => setIsSoulEditing(false)}
                     className="
-                      bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500
+                      rounded-full bg-slate-100 px-3 py-1 text-xs font-medium
+                      text-slate-500 transition-colors
                       hover:bg-slate-200
-                      rounded-full transition-colors
                     "
                   >
                     {t.cancel}
@@ -358,9 +355,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                     onClick={handleSaveSoul}
                     disabled={isSoulSaving}
                     className="
-                      bg-illini-orange px-3 py-1 text-xs font-medium text-white
+                      rounded-full bg-illini-orange px-3 py-1 text-xs
+                      font-medium text-white transition-colors
                       hover:bg-illini-blue
-                      rounded-full transition-colors
                       disabled:opacity-50
                     "
                   >
@@ -372,8 +369,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           ) : (
             <div
               className="
-                rounded-lg border-slate-100 bg-slate-50 p-3 text-sm
-                text-slate-600 min-h-[60px] border
+                min-h-[60px] rounded-lg border border-slate-100 bg-slate-50 p-3
+                text-sm text-slate-600
               "
             >
               {soul || (
@@ -388,28 +385,27 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         {/* User Memory */}
         <div
           className="
-            mb-6 rounded-2xl border-slate-200 bg-white p-6 shadow-sm border
+            mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm
           "
         >
           <div className="mb-3 flex items-center justify-between">
             <div>
               <h3
                 className="
-                  gap-2 text-base font-bold text-slate-900 flex items-center
+                  flex items-center gap-2 text-base font-bold text-slate-900
                 "
               >
                 <span>🧠</span> {t.memoryTitle}
               </h3>
               <p className="mt-0.5 text-xs text-slate-400">{t.memoryDesc}</p>
             </div>
-            <div className="gap-2 flex">
+            <div className="flex gap-2">
               {!isMemoryEditing && userMemory && (
                 <button
                   onClick={handleClearMemory}
                   className="
-                    text-xs font-medium text-red-400
+                    text-xs font-medium text-red-400 transition-colors
                     hover:text-red-600
-                    transition-colors
                   "
                 >
                   {t.clearMemory}
@@ -419,9 +415,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 <button
                   onClick={() => setIsMemoryEditing(true)}
                   className="
-                    text-xs font-medium text-illini-orange
+                    text-xs font-medium text-illini-orange transition-colors
                     hover:text-illini-blue
-                    transition-colors
                   "
                 >
                   {t.edit}
@@ -438,24 +433,23 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 rows={6}
                 placeholder={t.memoryPlaceholder}
                 className="
-                  rounded-lg border-slate-200 bg-slate-50 p-3 text-sm
-                  text-slate-700
-                  focus:border-illini-orange focus:ring-illini-orange/30
-                  w-full resize-none border
-                  focus:ring-2 focus:outline-none
+                  w-full resize-none rounded-lg border border-slate-200
+                  bg-slate-50 p-3 text-sm text-slate-700
+                  focus:border-illini-orange focus:ring-2
+                  focus:ring-illini-orange/30 focus:outline-none
                 "
               />
               <div className="mt-2 flex items-center justify-between">
                 <span className="text-xs text-slate-400">
                   {userMemory.length}/1500 {t.charCount}
                 </span>
-                <div className="gap-2 flex">
+                <div className="flex gap-2">
                   <button
                     onClick={() => setIsMemoryEditing(false)}
                     className="
-                      bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500
+                      rounded-full bg-slate-100 px-3 py-1 text-xs font-medium
+                      text-slate-500 transition-colors
                       hover:bg-slate-200
-                      rounded-full transition-colors
                     "
                   >
                     {t.cancel}
@@ -464,9 +458,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                     onClick={handleSaveMemory}
                     disabled={isMemorySaving}
                     className="
-                      bg-illini-orange px-3 py-1 text-xs font-medium text-white
+                      rounded-full bg-illini-orange px-3 py-1 text-xs
+                      font-medium text-white transition-colors
                       hover:bg-illini-blue
-                      rounded-full transition-colors
                       disabled:opacity-50
                     "
                   >
@@ -478,8 +472,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           ) : (
             <div
               className="
-                rounded-lg border-slate-100 bg-slate-50 p-3 text-sm
-                text-slate-600 min-h-[60px] border whitespace-pre-wrap
+                min-h-[60px] rounded-lg border border-slate-100 bg-slate-50 p-3
+                text-sm whitespace-pre-wrap text-slate-600
               "
             >
               {userMemory || (
@@ -495,14 +489,14 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         <button
           onClick={handleSignOut}
           className="
-            group gap-2 rounded-xl bg-red-50 py-3.5 font-semibold text-red-600
+            group flex w-full items-center justify-center gap-2 rounded-xl
+            bg-red-50 py-3.5 font-semibold text-red-600 transition-colors
             hover:bg-red-100
-            flex w-full items-center justify-center transition-colors
           "
         >
           <svg
             className="
-              h-5 w-5 transition-transform
+              size-5 transition-transform
               group-hover:scale-110
             "
             fill="none"

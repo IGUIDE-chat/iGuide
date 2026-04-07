@@ -31,7 +31,7 @@ export const ChatThread = ({ language }: ChatThreadProps) => {
   }
 
   return (
-    <ThreadPrimitive.Root className="relative flex h-full w-full flex-col">
+    <ThreadPrimitive.Root className="relative flex size-full flex-col">
       <ThreadPrimitive.Viewport className="w-full flex-1 overflow-y-auto">
         <div className="flex min-h-full flex-col">
           {/* Empty state — shown when no messages */}
@@ -46,7 +46,7 @@ export const ChatThread = ({ language }: ChatThreadProps) => {
           </ThreadPrimitive.Empty>
 
           {/* Message list */}
-          <div className="pb-36 pt-14 flex-col">
+          <div className="flex-col pt-14 pb-36">
             <ThreadPrimitive.Messages
               components={{
                 UserMessage: () => <UserMessage userRole={t.userRole} />,
@@ -65,21 +65,59 @@ export const ChatThread = ({ language }: ChatThreadProps) => {
 
       {/* Composer — fixed to bottom */}
       <ThreadPrimitive.ViewportFooter className="absolute bottom-0 left-0 w-full">
-        <div className="bg-gradient-to-t from-white via-white to-transparent pb-6 pt-2">
+        <div
+          className="
+          bg-linear-to-t from-white via-white to-transparent pt-2 pb-6
+        "
+        >
           <div className={containerClass}>
-            <ComposerPrimitive.Root className="relative overflow-hidden rounded-[26px] border border-slate-200 bg-white shadow-md transition-all focus-within:ring-1 focus-within:ring-slate-300">
+            <ComposerPrimitive.Root
+              className="
+              relative overflow-hidden rounded-[26px] border border-slate-200
+              bg-white shadow-md transition-all
+              focus-within:ring-1 focus-within:ring-slate-300
+            "
+            >
               <ComposerPrimitive.Input
                 placeholder={t.inputPlaceholder}
-                className="w-full resize-none bg-transparent py-3.5 pl-5 pr-12 text-base text-slate-900 placeholder-slate-400 focus:outline-none"
+                className="
+                  w-full resize-none bg-transparent py-3.5 pr-12 pl-5 text-base
+                  text-slate-900 placeholder-slate-400
+                  focus:outline-none
+                "
                 rows={1}
               />
-              <ComposerPrimitive.Send className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-2 transition-all bg-black text-white hover:opacity-80 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-300">
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Send">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+              <ComposerPrimitive.Send
+                className="
+                absolute top-1/2 right-2 -translate-y-1/2 rounded-full bg-black
+                p-2 text-white transition-all
+                hover:opacity-80
+                disabled:cursor-not-allowed disabled:bg-slate-100
+                disabled:text-slate-300
+              "
+              >
+                <svg
+                  className="size-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-label="Send"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 10l7-7m0 0l7 7m-7-7v18"
+                  />
                 </svg>
               </ComposerPrimitive.Send>
             </ComposerPrimitive.Root>
-            <div className="mt-3 hidden text-center text-xs text-slate-400 md:block">
+            <div
+              className="
+              mt-3 hidden text-center text-xs text-slate-400
+              md:block
+            "
+            >
               {t.aiError}
             </div>
           </div>

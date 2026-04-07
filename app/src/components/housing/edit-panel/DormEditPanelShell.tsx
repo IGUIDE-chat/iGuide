@@ -53,41 +53,40 @@ export const DormEditPanelShell: React.FC<DormEditPanelShellProps> = ({
       {/* No full-page backdrop — left side stays fully interactive and scrollable */}
       <div
         className="
-          right-0 top-0 max-w-lg border-gray-200 bg-white shadow-2xl fixed z-50
-          flex size-full flex-col border-l
+          fixed top-0 right-0 z-50 flex size-full max-w-lg flex-col border-l
+          border-gray-200 bg-white shadow-2xl
         "
       >
         <div
           className="
-            bg-illini-blue px-4 py-3 text-white flex shrink-0 items-center
-            justify-between
+            flex shrink-0 items-center justify-between bg-illini-blue px-4 py-3
+            text-white
           "
         >
-          <span className="text-base font-bold truncate">{title}</span>
+          <span className="truncate text-base font-bold">{title}</span>
           <button
             type="button"
             onClick={onClose}
             className="
-              ml-2
+              ml-2 shrink-0
               hover:text-gray-300
-              shrink-0
             "
           >
             <X size={20} />
           </button>
         </div>
-        <div className="border-gray-200 flex shrink-0 border-b">
+        <div className="flex shrink-0 border-b border-gray-200">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               type="button"
               onClick={() => onTabChange(tab.id)}
               className={`
-                gap-1.5 py-2.5 text-xs font-medium flex flex-1 items-center
-                justify-center transition-colors
+                flex flex-1 items-center justify-center gap-1.5 py-2.5 text-xs
+                font-medium transition-colors
                 ${
                   activeTab === tab.id
-                    ? 'border-illini-orange text-illini-blue border-b-2'
+                    ? 'border-b-2 border-illini-orange text-illini-blue'
                     : `
                       text-gray-500
                       hover:text-illini-blue
@@ -100,13 +99,13 @@ export const DormEditPanelShell: React.FC<DormEditPanelShellProps> = ({
             </button>
           ))}
         </div>
-        <div className="space-y-4 px-4 py-4 text-sm flex-1 overflow-y-auto">
+        <div className="flex-1 space-y-4 overflow-y-auto p-4 text-sm">
           {children}
         </div>
         <div
           className="
-            gap-3 border-gray-200 bg-white px-4 py-3 flex shrink-0 items-center
-            border-t
+            flex shrink-0 items-center gap-3 border-t border-gray-200 bg-white
+            px-4 py-3
           "
         >
           {activeTab !== 'history' && (
@@ -115,10 +114,10 @@ export const DormEditPanelShell: React.FC<DormEditPanelShellProps> = ({
               onClick={onSave}
               disabled={saving}
               className="
-                gap-2 rounded-lg bg-illini-orange px-4 py-2 text-sm font-bold
-                text-white
+                flex items-center justify-center gap-2 rounded-lg
+                bg-illini-orange px-4 py-2 text-sm font-bold text-white
+                transition-colors
                 hover:bg-illini-orange-dark
-                flex items-center justify-center transition-colors
                 disabled:opacity-60
               "
             >
@@ -139,9 +138,9 @@ export const DormEditPanelShell: React.FC<DormEditPanelShellProps> = ({
             type="button"
             onClick={onClose}
             className="
-              rounded-lg border-gray-300 px-3 py-2 text-xs text-gray-500
+              ml-auto rounded-lg border border-gray-300 px-3 py-2 text-xs
+              text-gray-500 transition-colors
               hover:text-gray-700
-              ml-auto border transition-colors
             "
           >
             {cancelLabel}

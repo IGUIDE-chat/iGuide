@@ -149,14 +149,14 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
         onClick={() => setIsOpen(!isOpen)}
         type="button"
         className={`
-          bottom-6 right-6 p-4 shadow-2xl fixed z-50 rounded-full transition-all
+          fixed right-6 bottom-6 z-50 rounded-full p-4 shadow-2xl transition-all
           duration-300
           ${
             isOpen
-              ? 'bg-gray-800 scale-75 rotate-90'
+              ? 'scale-75 rotate-90 bg-gray-800'
               : `
                 bg-illini-orange
-                hover:bg-illini-orange-dark hover:scale-110
+                hover:scale-110 hover:bg-illini-orange-dark
               `
           }
         `}
@@ -164,32 +164,32 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
         {isOpen ? (
           <X className="text-white" />
         ) : (
-          <MessageCircle className="h-8 w-8 text-white" />
+          <MessageCircle className="size-8 text-white" />
         )}
       </button>
 
       <div
         className={`
-          bottom-24 right-6 w-96 rounded-2xl border-gray-100 bg-white shadow-2xl
-          fixed z-40 flex max-w-[calc(100vw-3rem)] origin-bottom-right flex-col
-          overflow-hidden border transition-all duration-300
+          fixed right-6 bottom-24 z-40 flex w-96 max-w-[calc(100vw-3rem)]
+          origin-bottom-right flex-col overflow-hidden rounded-2xl border
+          border-gray-100 bg-white shadow-2xl transition-all duration-300
           ${
             isOpen
               ? 'translate-y-0 scale-100 opacity-100'
-              : 'translate-y-10 pointer-events-none scale-95 opacity-0'
+              : 'pointer-events-none translate-y-10 scale-95 opacity-0'
           }
         `}
         style={{ height: '70vh', maxHeight: '85vh' }}
       >
-        <div className="bg-illini-blue p-4 flex items-center justify-between">
-          <div className="gap-3 flex items-center">
+        <div className="flex items-center justify-between bg-illini-blue p-4">
+          <div className="flex items-center gap-3">
             <div
               className="
-                h-10 w-10 bg-white/10 flex items-center justify-center
-                rounded-full
+                flex size-10 items-center justify-center rounded-full
+                bg-white/10
               "
             >
-              <Sparkles className="h-5 w-5 text-illini-orange" />
+              <Sparkles className="size-5 text-illini-orange" />
             </div>
             <div>
               <h3 className="font-bold text-white">{t.title}</h3>
@@ -200,7 +200,7 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
 
         <div
           className="
-            space-y-4 bg-gray-50/50 p-4 grow overflow-x-hidden overflow-y-auto
+            grow space-y-4 overflow-x-hidden overflow-y-auto bg-gray-50/50 p-4
           "
         >
           <AnimatePresence initial={false}>
@@ -223,17 +223,17 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                 >
                   <div
                     className={`
-                      rounded-2xl px-5 py-4 text-sm leading-relaxed shadow-sm
-                      overflow-hidden
+                      overflow-hidden rounded-2xl px-5 py-4 text-sm/relaxed
+                      shadow-sm
                       ${
                         msg.role === 'user'
                           ? `
-                            bg-illini-blue font-medium text-white max-w-[85%]
-                            rounded-br-none
+                            max-w-[85%] rounded-br-none bg-illini-blue
+                            font-medium text-white
                           `
                           : `
-                            border-gray-100 bg-white text-gray-800 max-w-full
-                            rounded-bl-none border
+                            max-w-full rounded-bl-none border border-gray-100
+                            bg-white text-gray-800
                           `
                       }
                     `}
@@ -241,7 +241,7 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                     {msg.role === 'model' && isRecent ? (
                       <TypewriterText text={msg.text} />
                     ) : msg.role === 'user' ? (
-                      <span className="font-medium text-white whitespace-pre-wrap">
+                      <span className="font-medium whitespace-pre-wrap text-white">
                         {msg.text}
                       </span>
                     ) : (
@@ -250,8 +250,8 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                           prose prose-sm
                           prose-p:leading-relaxed
                           prose-pre:bg-gray-100 prose-pre:overflow-x-auto
-                          overflow-wrap-anywhere text-gray-800 max-w-none
-                          wrap-break-word
+                          overflow-wrap-anywhere max-w-none wrap-break-word
+                          text-gray-800
                         "
                       >
                         <ReactMarkdown
@@ -280,7 +280,7 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                   </div>
 
                   {msg.role === 'model' && mentionedDorms.length > 0 && (
-                    <div className="ml-2 mt-3 gap-3 flex w-full flex-col">
+                    <div className="mt-3 ml-2 flex w-full flex-col gap-3">
                       {mentionedDorms.map((dorm) =>
                         (() => {
                           const dormName =
@@ -293,18 +293,17 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                               onClick={() => navigate(`/dorms/${dorm.id}`)}
                               type="button"
                               className="
-                                group gap-3 rounded-xl border-gray-100/80
-                                from-white/95 to-gray-50/95 p-3 shadow-sm
-                                backdrop-blur-md
+                                group flex w-full items-center gap-3 rounded-xl
+                                border border-gray-100/80 bg-linear-to-br
+                                from-white/95 to-gray-50/95 p-3 text-left
+                                shadow-sm backdrop-blur-md transition-all
                                 hover:border-illini-orange/30 hover:shadow-md
-                                flex w-full items-center border bg-linear-to-br
-                                text-left transition-all
                               "
                             >
                               <div
                                 className="
-                                  h-16 w-16 rounded-lg bg-gray-100 shrink-0
-                                  overflow-hidden
+                                  size-16 shrink-0 overflow-hidden rounded-lg
+                                  bg-gray-100
                                 "
                               >
                                 <img
@@ -321,25 +320,25 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                                 <div className="flex items-start justify-between">
                                   <h4
                                     className="
-                                      text-base font-bold text-gray-900
+                                      truncate text-base font-bold text-gray-900
+                                      transition-colors
                                       group-hover:text-illini-orange
-                                      truncate transition-colors
                                     "
                                   >
                                     {dormName}
                                   </h4>
                                 </div>
-                                <div className="mt-1.5 gap-1 flex flex-wrap">
+                                <div className="mt-1.5 flex flex-wrap gap-1">
                                   {dorm.tags.slice(0, 2).map((tag) => (
                                     <span
                                       key={tag}
                                       className="
-                                        rounded-md border-gray-100 bg-gray-50
-                                        px-1.5 py-0.5 text-gray-500
+                                        rounded-md border border-gray-100
+                                        bg-gray-50 px-1.5 py-0.5 text-[10px]
+                                        text-gray-500 transition-colors
+                                        duration-150
                                         hover:border-gray-200 hover:bg-gray-100
                                         hover:text-gray-700
-                                        border text-[10px] transition-colors
-                                        duration-150
                                       "
                                     >
                                       {tag}
@@ -361,11 +360,11 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
             <div className="flex justify-start">
               <div
                 className="
-                  gap-2 rounded-2xl border-gray-100 bg-white px-4 py-3 shadow-sm
-                  flex items-center rounded-bl-none border
+                  flex items-center gap-2 rounded-2xl rounded-bl-none border
+                  border-gray-100 bg-white px-4 py-3 shadow-sm
                 "
               >
-                <Loader2 className="h-4 w-4 animate-spin text-illini-orange" />
+                <Loader2 className="size-4 animate-spin text-illini-orange" />
                 <span className="text-xs text-gray-500">{t.thinking}</span>
               </div>
             </div>
@@ -373,7 +372,7 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
           <div ref={messagesEndRef} />
         </div>
 
-        <div className="border-gray-100 bg-white p-4 border-t">
+        <div className="border-t border-gray-100 bg-white p-4">
           <div className="relative">
             <textarea
               value={inputText}
@@ -381,10 +380,10 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
               onKeyDown={handleKeyDown}
               placeholder={t.placeholder}
               className="
-                rounded-xl border-gray-200 bg-gray-50 py-3 pl-4 pr-12 text-sm
-                focus:border-illini-blue focus:ring-illini-blue/20
-                w-full resize-none border
-                focus:ring-2 focus:outline-none
+                w-full resize-none rounded-xl border border-gray-200 bg-gray-50
+                py-3 pr-12 pl-4 text-sm
+                focus:border-illini-blue focus:ring-2 focus:ring-illini-blue/20
+                focus:outline-none
               "
               rows={2}
             />
@@ -393,9 +392,9 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
               type="button"
               disabled={isLoading || !inputText.trim()}
               className="
-                bottom-2 right-2 rounded-lg bg-illini-orange p-2 text-white
+                absolute right-2 bottom-2 rounded-lg bg-illini-orange p-2
+                text-white transition-colors
                 hover:bg-illini-orange-dark
-                absolute transition-colors
                 disabled:cursor-not-allowed disabled:opacity-50
               "
             >

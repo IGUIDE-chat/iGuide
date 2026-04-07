@@ -19,7 +19,7 @@ export const BrandMark: React.FC<BrandMarkProps> = ({
 }) => (
   <div
     className={`
-      bg-illini-orange text-white shadow-sm flex items-center justify-center
+      flex items-center justify-center bg-illini-orange text-white shadow-sm
       ${className}
     `}
     aria-hidden="true"

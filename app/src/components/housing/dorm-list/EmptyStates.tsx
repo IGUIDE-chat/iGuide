@@ -21,24 +21,24 @@ export const ListEmptyState: React.FC<ListEmptyStateProps> = ({
   return (
     <div
       className="
-        p-8 flex h-full flex-col items-center justify-center text-center
+        flex h-full flex-col items-center justify-center p-8 text-center
       "
     >
       <div
         className="
-          mb-4 h-16 w-16 bg-gray-100 text-gray-400 flex items-center
-          justify-center rounded-full
+          mb-4 flex size-16 items-center justify-center rounded-full bg-gray-100
+          text-gray-400
         "
       >
         <Search size={32} />
       </div>
       <h3 className="mb-2 text-lg font-medium text-gray-900">{t.noResults}</h3>
-      <p className="mb-6 max-w-md text-gray-500 mx-auto">{t.noResultsDesc}</p>
+      <p className="mx-auto mb-6 max-w-md text-gray-500">{t.noResultsDesc}</p>
       <button
         onClick={onClearFilters}
         type="button"
         className="
-          bg-blue-50 px-6 py-2 font-medium text-illini-blue rounded-full
+          rounded-full bg-blue-50 px-6 py-2 font-medium text-illini-blue
           transition-colors
           hover:underline
         "
@@ -63,14 +63,14 @@ export const MapNoResultsOverlay: React.FC<MapNoResultsOverlayProps> = ({
   return (
     <div
       className="
-        inset-x-0 top-4 px-4 pointer-events-none absolute z-1100 flex
-        justify-center
+        pointer-events-none absolute inset-x-0 top-4 z-1100 flex justify-center
+        px-4
       "
     >
       <div
         className="
-          max-w-sm rounded-2xl border-gray-200 bg-white/95 p-5 shadow-xl
-          pointer-events-auto w-full border text-center
+          pointer-events-auto w-full max-w-sm rounded-2xl border border-gray-200
+          bg-white/95 p-5 text-center shadow-xl
         "
       >
         <p className="mb-4 text-sm font-medium text-gray-800">
@@ -81,8 +81,8 @@ export const MapNoResultsOverlay: React.FC<MapNoResultsOverlayProps> = ({
           type="button"
           className="
             rounded-lg bg-illini-blue px-4 py-2 text-sm font-semibold text-white
-            hover:bg-illini-blue/90
             transition-colors
+            hover:bg-illini-blue/90
           "
         >
           {hasPriceFilter ? t.clearPrice : t.clearFilters}
@@ -102,15 +102,14 @@ export const MapEmptyViewportOverlay: React.FC<
   return (
     <div
       className="
-        bottom-6 left-0 right-0 px-6
+        absolute inset-x-0 bottom-6 z-10 px-6
         xl:hidden
-        absolute z-10
       "
     >
       <div
         className="
-          max-w-md rounded-2xl border-gray-200 bg-white/95 p-4 shadow-xl
-          backdrop-blur-sm mx-auto border text-center
+          mx-auto max-w-md rounded-2xl border border-gray-200 bg-white/95 p-4
+          text-center shadow-xl backdrop-blur-sm
         "
       >
         <p className="mb-0.5 text-sm font-medium text-gray-800">

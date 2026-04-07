@@ -50,7 +50,7 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({
   return (
     <Suspense
       fallback={
-        <div className="p-6 text-slate-600 text-center">{loadingText}</div>
+        <div className="p-6 text-center text-slate-600">{loadingText}</div>
       }
     >
       <Routes>

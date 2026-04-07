@@ -80,23 +80,23 @@ class MapErrorBoundary extends Component<
       return (
         <div
           className="
-            from-gray-50 to-gray-100 flex size-full items-center justify-center
-            bg-linear-to-br
+            flex size-full items-center justify-center bg-linear-to-br
+            from-gray-50 to-gray-100
           "
         >
           <div
             className="
-              mx-4 max-w-md rounded-2xl bg-white p-8 shadow-xl text-center
+              mx-4 max-w-md rounded-2xl bg-white p-8 text-center shadow-xl
             "
           >
             <div
               className="
-                mb-4 h-16 w-16 bg-red-100 mx-auto flex items-center
-                justify-center rounded-full
+                mx-auto mb-4 flex size-16 items-center justify-center
+                rounded-full bg-red-100
               "
             >
               <svg
-                className="h-8 w-8 text-red-500"
+                className="size-8 text-red-500"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -120,8 +120,8 @@ class MapErrorBoundary extends Component<
               type="button"
               className="
                 rounded-xl bg-illini-blue px-6 py-2 font-semibold text-white
-                hover:bg-illini-blue/90
                 transition-colors
+                hover:bg-illini-blue/90
               "
             >
               Reload page
@@ -471,13 +471,13 @@ const DormMap: React.FC<DormMapProps> = ({
     return (
       <div
         className="
-          from-gray-50 to-gray-100 flex size-full items-center justify-center
-          bg-linear-to-br
+          flex size-full items-center justify-center bg-linear-to-br
+          from-gray-50 to-gray-100
         "
       >
         <div
           className="
-            mx-4 max-w-md rounded-2xl bg-white p-8 shadow-xl text-center
+            mx-4 max-w-md rounded-2xl bg-white p-8 text-center shadow-xl
           "
         >
           <h3 className="mb-2 text-lg font-bold text-gray-900">
@@ -494,7 +494,7 @@ const DormMap: React.FC<DormMapProps> = ({
   }
 
   return (
-    <div ref={containerRef} className="bg-gray-50 relative size-full">
+    <div ref={containerRef} className="relative size-full bg-gray-50">
       <Map
         ref={mapRef}
         onLoad={onMapLoad}
@@ -576,9 +576,9 @@ const DormMap: React.FC<DormMapProps> = ({
 
         <div
           className="
-            left-4 top-4 gap-2 rounded-lg border-slate-200/50 bg-white/90 p-3
-            shadow-lg backdrop-blur-sm absolute z-10 flex min-w-[140px] flex-col
-            border
+            absolute top-4 left-4 z-10 flex min-w-[140px] flex-col gap-2
+            rounded-lg border border-slate-200/50 bg-white/90 p-3 shadow-lg
+            backdrop-blur-sm
           "
         >
           <div
@@ -592,9 +592,8 @@ const DormMap: React.FC<DormMapProps> = ({
           <label className="group flex cursor-pointer items-center justify-between">
             <span
               className="
-                text-sm font-medium text-slate-700
+                text-sm font-medium text-slate-700 transition-colors
                 group-hover:text-illini-blue
-                transition-colors
               "
             >
               {language === 'zh' ? '区域' : 'Zones'}
@@ -608,16 +607,14 @@ const DormMap: React.FC<DormMapProps> = ({
               />
               <div
                 className="
-                  peer h-4 w-7 bg-slate-300
-                  after:h-3 after:w-3 after:border-gray-300 after:bg-white
+                  peer h-4 w-7 rounded-full bg-slate-300
                   peer-checked:bg-illini-orange
-                  peer-checked:after:border-white
-                  rounded-full
                   peer-focus:outline-none
-                  after:absolute after:top-[2px] after:left-[2px]
-                  after:rounded-full after:border after:transition-all
-                  after:content-['']
+                  after:absolute after:top-[2px] after:left-[2px] after:size-3
+                  after:rounded-full after:border after:border-gray-300
+                  after:bg-white after:transition-all after:content-['']
                   peer-checked:after:translate-x-full
+                  peer-checked:after:border-white
                 "
               />
             </div>
@@ -626,9 +623,8 @@ const DormMap: React.FC<DormMapProps> = ({
           <label className="group flex cursor-pointer items-center justify-between">
             <span
               className="
-                text-sm font-medium text-slate-700
+                text-sm font-medium text-slate-700 transition-colors
                 group-hover:text-illini-blue
-                transition-colors
               "
             >
               {language === 'zh' ? '地标' : 'Landmarks'}
@@ -642,16 +638,14 @@ const DormMap: React.FC<DormMapProps> = ({
               />
               <div
                 className="
-                  peer h-4 w-7 bg-slate-300
-                  after:h-3 after:w-3 after:border-gray-300 after:bg-white
+                  peer h-4 w-7 rounded-full bg-slate-300
                   peer-checked:bg-illini-orange
-                  peer-checked:after:border-white
-                  rounded-full
                   peer-focus:outline-none
-                  after:absolute after:top-[2px] after:left-[2px]
-                  after:rounded-full after:border after:transition-all
-                  after:content-['']
+                  after:absolute after:top-[2px] after:left-[2px] after:size-3
+                  after:rounded-full after:border after:border-gray-300
+                  after:bg-white after:transition-all after:content-['']
                   peer-checked:after:translate-x-full
+                  peer-checked:after:border-white
                 "
               />
             </div>
@@ -741,7 +735,7 @@ const PopupDormPreview: React.FC<{
       </div>
       <div className="p-3">
         <div className="mb-1 flex items-center justify-between">
-          <h4 className="text-sm font-bold text-gray-900 flex-1 truncate">
+          <h4 className="flex-1 truncate text-sm font-bold text-gray-900">
             {isChinese && dorm.name_zh ? dorm.name_zh : dorm.name}
           </h4>
           {(() => {
@@ -749,8 +743,8 @@ const PopupDormPreview: React.FC<{
             return (
               <span
                 className={`
-                  ml-2 px-1.5 py-0.5 font-semibold shrink-0 rounded-full
-                  text-[10px]
+                  ml-2 shrink-0 rounded-full px-1.5 py-0.5 text-[10px]
+                  font-semibold
                   ${housingTypeMeta.badgeClassName}
                 `}
               >
@@ -759,18 +753,18 @@ const PopupDormPreview: React.FC<{
             )
           })()}
         </div>
-        <div className="mb-2 gap-2 text-gray-500 flex items-center text-[11px]">
+        <div className="mb-2 flex items-center gap-2 text-[11px] text-gray-500">
           {dorm.ac && <span>{popupT.ac}</span>}
           {dorm.dining === 'inside' && <span>{popupT.dining}</span>}
         </div>
         <div className="flex items-center justify-between">
           <span className="text-base font-bold text-gray-900">
             {formatPopupPrice(dorm.price)}
-            <span className="ml-0.5 font-normal text-gray-400 text-[10px]">
+            <span className="ml-0.5 text-[10px] font-normal text-gray-400">
               {popupT.perSem}
             </span>
           </span>
-          <span className="font-semibold text-blue-600 text-[11px]">
+          <span className="text-[11px] font-semibold text-blue-600">
             {popupT.viewDetails}
           </span>
         </div>

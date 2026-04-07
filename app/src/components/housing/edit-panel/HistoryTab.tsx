@@ -18,7 +18,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ form }) => {
 
   if (historyLoading) {
     return (
-      <div className="py-12 text-gray-400 flex items-center justify-center">
+      <div className="flex items-center justify-center py-12 text-gray-400">
         <Loader2 size={20} className="mr-2 animate-spin" />
         <span className="text-sm">{t.actions.loading}</span>
       </div>
@@ -27,8 +27,8 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ form }) => {
 
   if (historyEntries.length === 0) {
     return (
-      <div className="py-12 text-gray-400 text-center">
-        <History size={32} className="mb-3 mx-auto opacity-40" />
+      <div className="py-12 text-center text-gray-400">
+        <History size={32} className="mx-auto mb-3 opacity-40" />
         <p className="text-sm">{t.hints.historyEmpty}</p>
       </div>
     )
@@ -39,9 +39,9 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ form }) => {
       {historyEntries.map((entry) => (
         <li
           key={entry.id}
-          className="rounded-lg border-gray-200 bg-gray-50 p-3 border"
+          className="rounded-lg border border-gray-200 bg-gray-50 p-3"
         >
-          <div className="gap-2 flex items-start justify-between">
+          <div className="flex items-start justify-between gap-2">
             <div className="min-w-0 flex-1">
               <p className="text-xs font-medium text-gray-800">
                 {new Date(entry.changed_at).toLocaleString(
@@ -55,10 +55,10 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ form }) => {
                   }
                 )}
               </p>
-              <p className="mt-0.5 text-xs text-gray-500 truncate">
+              <p className="mt-0.5 truncate text-xs text-gray-500">
                 {entry.changed_by}
               </p>
-              <p className="mt-1 text-xs text-illini-blue wrap-break-word">
+              <p className="mt-1 text-xs wrap-break-word text-illini-blue">
                 {entry.summary}
               </p>
             </div>
@@ -67,11 +67,10 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ form }) => {
               onClick={() => handleRestore(entry)}
               disabled={restoringId !== null}
               className="
-                rounded-md border-gray-300 bg-white px-2.5 py-1.5 text-xs
-                text-gray-700
-                hover:border-illini-blue hover:text-illini-blue
-                flex shrink-0 items-center justify-center border
+                flex shrink-0 items-center justify-center rounded-md border
+                border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-700
                 transition-colors
+                hover:border-illini-blue hover:text-illini-blue
                 disabled:opacity-40
               "
             >

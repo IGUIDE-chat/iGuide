@@ -132,10 +132,10 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
   ) => {
     if (isLoading) {
       return (
-        <div className="py-6 flex items-center justify-center">
+        <div className="flex items-center justify-center py-6">
           <div
             className="
-              h-4 w-4 animate-spin border-illini-orange rounded-full border-2
+              size-4 animate-spin rounded-full border-2 border-illini-orange
               border-t-transparent
             "
           />
@@ -146,7 +146,7 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
     if (items.length === 0) {
       return (
         <div className="px-2 py-3">
-          <p className="text-slate-600 text-[11px]">{emptyText}</p>
+          <p className="text-[11px] text-slate-600">{emptyText}</p>
         </div>
       )
     }
@@ -169,7 +169,7 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
               }}
               onClick={() => openDorm(item.id)}
               className={`
-                group rounded-lg px-2 py-2 cursor-pointer transition-all
+                group cursor-pointer rounded-lg p-2 transition-all
                 ${
                   item.id === currentDormId
                     ? 'bg-white/20 text-white'
@@ -181,10 +181,10 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
               `}
             >
               <div className="relative overflow-hidden">
-                <div className="gap-2 pr-7 flex items-center">
+                <div className="flex items-center gap-2 pr-7">
                   <div
                     className="
-                      h-7 w-7 rounded-sm bg-white/10 shrink-0 overflow-hidden
+                      size-7 shrink-0 overflow-hidden rounded-sm bg-white/10
                     "
                   >
                     {item.imageUrl ? (
@@ -194,13 +194,13 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
                         className="size-full object-cover"
                       />
                     ) : (
-                      <div className="bg-white/5 size-full" />
+                      <div className="size-full bg-white/5" />
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
                     <div
                       className={`
-                        text-xs font-medium truncate
+                        truncate text-xs font-medium
                         ${
                           item.id === currentDormId
                             ? 'text-white'
@@ -224,9 +224,9 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
 
                 <div
                   className="
-                    bottom-0 right-0 top-0 px-1 absolute flex items-center
-                    bg-linear-to-l from-[#2E2E2E] to-transparent opacity-0
-                    transition-all duration-200
+                    absolute inset-y-0 right-0 flex items-center bg-linear-to-l
+                    from-[#2E2E2E] to-transparent px-1 opacity-0 transition-all
+                    duration-200
                     group-hover:opacity-100
                   "
                 >
@@ -236,9 +236,8 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
                       onRemove(item.id)
                     }}
                     className="
-                      rounded-md p-1
+                      rounded-md p-1 transition-colors
                       hover:bg-red-500/20
-                      transition-colors
                     "
                     title="Remove"
                     type="button"
@@ -255,17 +254,17 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
   }
 
   return (
-    <div className="min-h-0 px-3 flex h-full flex-col">
-      <div className="no-scrollbar space-y-4 pt-2 flex-1 overflow-y-auto">
+    <div className="flex h-full min-h-0 flex-col px-3">
+      <div className="no-scrollbar flex-1 space-y-4 overflow-y-auto pt-2">
         <section>
-          <div className="mb-1.5 px-1 flex items-center justify-between">
-            <div className="gap-1.5 text-slate-400 flex items-center">
+          <div className="mb-1.5 flex items-center justify-between px-1">
+            <div className="flex items-center gap-1.5 text-slate-400">
               <Heart
                 ref={favoritesIconRef}
                 size={12}
-                className="fill-red-500 text-red-500 shrink-0"
+                className="shrink-0 fill-red-500 text-red-500"
               />
-              <h3 className="font-semibold tracking-wider text-[10px] uppercase">
+              <h3 className="text-[10px] font-semibold tracking-wider uppercase">
                 {t.favorites}
               </h3>
             </div>
@@ -273,9 +272,8 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
               <button
                 onClick={handleClearFavorites}
                 className="
-                  text-slate-500
+                  text-[10px] text-slate-500 transition-colors
                   hover:text-white
-                  text-[10px] transition-colors
                 "
                 type="button"
               >
@@ -289,10 +287,10 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
         </section>
 
         <section>
-          <div className="mb-1.5 px-1 flex items-center justify-between">
-            <div className="gap-1.5 text-slate-400 flex items-center">
+          <div className="mb-1.5 flex items-center justify-between px-1">
+            <div className="flex items-center gap-1.5 text-slate-400">
               <Clock size={12} />
-              <h3 className="font-semibold tracking-wider text-[10px] uppercase">
+              <h3 className="text-[10px] font-semibold tracking-wider uppercase">
                 {t.history}
               </h3>
             </div>
@@ -300,9 +298,8 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
               <button
                 onClick={handleClearHistory}
                 className="
-                  text-slate-500
+                  text-[10px] text-slate-500 transition-colors
                   hover:text-white
-                  text-[10px] transition-colors
                 "
                 type="button"
               >

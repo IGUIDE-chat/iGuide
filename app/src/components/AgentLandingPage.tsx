@@ -26,7 +26,7 @@ const AGENT_CONFIG = {
   courses: {
     icon: (
       <svg
-        className="h-10 w-10 text-illini-blue"
+        className="size-10 text-illini-blue"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -44,7 +44,7 @@ const AGENT_CONFIG = {
   dorms: {
     icon: (
       <svg
-        className="h-10 w-10 text-illini-orange"
+        className="size-10 text-illini-orange"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -62,7 +62,7 @@ const AGENT_CONFIG = {
   resume: {
     icon: (
       <svg
-        className="h-10 w-10 text-emerald-600"
+        className="size-10 text-emerald-600"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -129,18 +129,17 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
   return (
     <div
       className="
-        bg-white p-4
+        flex size-full items-center justify-center overflow-auto bg-white p-4
         md:p-8
-        flex size-full items-center justify-center overflow-auto
       "
     >
-      <div className="max-w-md relative w-full text-center">
+      <div className="relative w-full max-w-md text-center">
         {/* Icon - static, doesn't change with language */}
         <div
           className="
-            mb-4 h-16 w-16 rounded-2xl border-slate-100 bg-slate-50 shadow-sm
-            md:mb-6 md:h-20 md:w-20
-            mx-auto flex items-center justify-center border
+            mx-auto mb-4 flex size-16 items-center justify-center rounded-2xl
+            border border-slate-100 bg-slate-50 shadow-sm
+            md:mb-6 md:size-20
           "
         >
           {config.icon}
@@ -164,8 +163,8 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
             <div className="mb-5">
               <span
                 className="
-                  bg-illini-orange px-3 py-1 text-xs font-semibold text-white
-                  inline-block rounded-full
+                  inline-block rounded-full bg-illini-orange px-3 py-1 text-xs
+                  font-semibold text-white
                 "
               >
                 {t.comingSoon}
@@ -175,8 +174,7 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
             {/* Description */}
             <p
               className="
-                mb-8 max-w-sm text-sm leading-relaxed text-slate-500 mx-auto
-                min-h-[3rem]
+                mx-auto mb-8 min-h-12 max-w-sm text-sm/relaxed text-slate-500
               "
             >
               {desc}
@@ -186,7 +184,7 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
 
         {/* Email Form - partially animated */}
         {!submitted ? (
-          <form onSubmit={handleSubmit} className="max-w-xs space-y-3 mx-auto">
+          <form onSubmit={handleSubmit} className="mx-auto max-w-xs space-y-3">
             <input
               type="email"
               value={email}
@@ -194,11 +192,11 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
               placeholder={t.emailPlaceholder}
               required
               className="
-                border-slate-200 bg-white px-4 py-3 text-sm text-slate-900
-                placeholder-slate-400 shadow-sm
-                focus:border-slate-300 focus:ring-illini-blue/10
-                w-full rounded-full border transition-all
-                focus:ring-2 focus:outline-none
+                w-full rounded-full border border-slate-200 bg-white px-4 py-3
+                text-sm text-slate-900 placeholder-slate-400 shadow-sm
+                transition-all
+                focus:border-slate-300 focus:ring-2 focus:ring-illini-blue/10
+                focus:outline-none
               "
             />
             <AnimatePresence mode="wait">
@@ -211,10 +209,9 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.15 }}
                 className="
-                  bg-illini-orange py-3 text-sm font-semibold text-white
-                  shadow-md
+                  w-full rounded-full bg-illini-orange py-3 text-sm
+                  font-semibold text-white shadow-md transition-colors
                   hover:bg-illini-orange/90
-                  w-full rounded-full transition-colors
                   active:scale-[0.98]
                   disabled:opacity-60
                 "
@@ -227,17 +224,17 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
               </motion.button>
             </AnimatePresence>
             {error && (
-              <p className="text-xs text-red-500 text-center">{error}</p>
+              <p className="text-center text-xs text-red-500">{error}</p>
             )}
           </form>
         ) : (
           <div
             className="
-              max-w-xs rounded-2xl border-slate-100 bg-slate-50 p-5 mx-auto
-              border
+              mx-auto max-w-xs rounded-2xl border border-slate-100 bg-slate-50
+              p-5
             "
           >
-            <span className="mb-2 text-2xl block">✅</span>
+            <span className="mb-2 block text-2xl">✅</span>
             <p className="text-sm font-medium text-slate-600">
               {t.emailSuccess}
             </p>

@@ -68,18 +68,18 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
   onGuestLogin,
 }) => {
   return (
-    <div className="space-y-2 border-white/10 p-3 border-t">
+    <div className="space-y-2 border-t border-white/10 p-3">
       <button
         onClick={onToggleLanguage}
         className="
-          gap-3 rounded-md px-3 py-3 text-sm text-slate-300 flex w-full
-          items-center transition-colors
+          flex w-full items-center gap-3 rounded-md p-3 text-sm text-slate-300
+          transition-colors
           hover:bg-[#212121]
         "
       >
         <span>
           <svg
-            className="h-5 w-5"
+            className="size-5"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -101,8 +101,8 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
         <button
           onClick={onGuestLogin}
           className="
-            group gap-3 rounded-md px-3 py-3 text-sm text-white flex w-full
-            items-center transition-colors
+            group flex w-full items-center gap-3 rounded-md p-3 text-sm
+            text-white transition-colors
             hover:bg-[#212121]
           "
         >
@@ -113,7 +113,7 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
             "
           >
             <BrandMark
-              className="h-5 w-5 rounded-[4px]"
+              className="size-5 rounded-[4px]"
               iconClassName="text-[10px]"
             />
           </div>
@@ -125,15 +125,15 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
         <Link
           to="/profile"
           className="
-            gap-3 rounded-md bg-white/5 px-3 py-2
+            block flex cursor-pointer items-center gap-3 rounded-md bg-white/5
+            px-3 py-2 transition-colors
             hover:bg-white/10
-            block flex cursor-pointer items-center transition-colors
           "
         >
           <div
             className="
-              h-8 w-8 bg-illini-orange text-sm font-semibold text-white flex
-              shrink-0 items-center justify-center rounded-full
+              flex size-8 shrink-0 items-center justify-center rounded-full
+              bg-illini-orange text-sm font-semibold text-white
             "
           >
             {profileName.charAt(0).toUpperCase() || 'U'}
@@ -148,8 +148,8 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
             transition={{ duration: 0.2, ease: 'easeOut' }}
             className="min-w-0 flex-1 overflow-hidden whitespace-nowrap"
           >
-            <div className="text-slate-400 text-[10px]">{signedInLabel}</div>
-            <div className="text-xs font-medium text-white truncate">
+            <div className="text-[10px] text-slate-400">{signedInLabel}</div>
+            <div className="truncate text-xs font-medium text-white">
               {profileName}
             </div>
           </motion.div>

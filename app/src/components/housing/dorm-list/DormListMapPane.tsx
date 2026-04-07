@@ -19,14 +19,14 @@ const DormMap = React.lazy(() => import('../DormMap'))
 const MapLoadingSkeleton: React.FC = () => (
   <div
     className="
-      animate-pulse bg-gray-100 flex size-full items-center justify-center
+      flex size-full animate-pulse items-center justify-center bg-gray-100
     "
   >
     <div className="text-center">
       <div
         className="
-          mb-3 h-10 w-10 animate-spin border-illini-orange mx-auto rounded-full
-          border-3 border-t-transparent
+          mx-auto mb-3 size-10 animate-spin rounded-full border-3
+          border-illini-orange border-t-transparent
         "
       />
       <p className="text-sm text-gray-400">Loading map...</p>
@@ -78,24 +78,22 @@ export const DormListMapPane: React.FC<DormListMapPaneProps> = ({
   return (
     <div
       className={`
-        min-w-0 flex h-full flex-col transition-opacity duration-200
+        flex h-full min-w-0 flex-col transition-opacity duration-200
         ${
           isMapView
             ? `
-              inset-0
+              absolute inset-0 z-20 opacity-100
               xl:static xl:z-auto xl:min-w-0 xl:flex-1
-              absolute z-20 opacity-100
             `
             : `
-              inset-0
+              pointer-events-none absolute inset-0 opacity-0
               xl:static xl:hidden
-              pointer-events-none absolute opacity-0
             `
         }
       `}
     >
-      <div className="min-h-0 min-w-0 relative flex flex-1 flex-col">
-        <div className="bg-gray-100 min-h-[200px] w-full flex-1">
+      <div className="relative flex min-h-0 min-w-0 flex-1 flex-col">
+        <div className="min-h-[200px] w-full flex-1 bg-gray-100">
           <Suspense fallback={<MapLoadingSkeleton />}>
             <DormMap
               dorms={filteredDorms}

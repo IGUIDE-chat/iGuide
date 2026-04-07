@@ -75,7 +75,7 @@ function ToggleButtonSection<T extends string | number>({
   return (
     <section className="mb-8">
       <h3 className="mb-6 text-xl font-bold">{title}</h3>
-      <div className="gap-3 flex flex-wrap">
+      <div className="flex flex-wrap gap-3">
         {options.map(({ value, label }) => {
           const selected = selectedValues.includes(value)
           return (
@@ -84,7 +84,7 @@ function ToggleButtonSection<T extends string | number>({
               type="button"
               onClick={() => onToggle(value)}
               className={`
-                px-4 py-2 text-sm font-medium rounded-full border
+                rounded-full border px-4 py-2 text-sm font-medium
                 transition-colors
                 ${
                   selected
@@ -394,13 +394,13 @@ export const FilterModal: React.FC<FilterModalProps> = ({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="inset-0 bg-black/45 fixed" />
+          <div className="fixed inset-0 bg-black/45" />
         </Transition.Child>
 
-        <div className="inset-0 fixed overflow-y-auto">
+        <div className="fixed inset-0 overflow-y-auto">
           <div
             className="
-              p-4 flex min-h-full items-center justify-center text-center
+              flex min-h-full items-center justify-center p-4 text-center
             "
           >
             <Transition.Child
@@ -414,15 +414,15 @@ export const FilterModal: React.FC<FilterModalProps> = ({
             >
               <Dialog.Panel
                 className="
-                  max-w-2xl rounded-2xl bg-white shadow-2xl flex max-h-[85vh]
-                  w-full transform flex-col overflow-hidden text-left
-                  align-middle
+                  flex max-h-[85vh] w-full max-w-2xl transform flex-col
+                  overflow-hidden rounded-2xl bg-white text-left align-middle
+                  shadow-2xl
                 "
               >
                 <div
                   className="
-                    border-gray-100 px-6 py-4 flex items-center justify-between
-                    border-b
+                    flex items-center justify-between border-b border-gray-100
+                    px-6 py-4
                   "
                 >
                   <div className="w-9" />
@@ -433,9 +433,8 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                     onClick={onClose}
                     type="button"
                     className="
-                      -mr-2 p-2 text-gray-500
+                      -mr-2 rounded-full p-2 text-gray-500 transition-colors
                       hover:bg-gray-100 hover:text-black
-                      rounded-full transition-colors
                     "
                   >
                     <X size={20} />
@@ -446,8 +445,8 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                   ref={scrollContainerRef}
                   onScroll={handleScroll}
                   className="
-                    scrollbar-grey modal-scroll-smooth px-6 py-6 flex-1
-                    overflow-y-auto
+                    scrollbar-grey modal-scroll-smooth flex-1 overflow-y-auto
+                    p-6
                   "
                 >
                   <ChipSection
@@ -534,12 +533,12 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                     <h3 className="mb-6 text-xl font-bold">
                       {t.livingConditions}
                     </h3>
-                    <div className="gap-3 flex flex-wrap">
+                    <div className="flex flex-wrap gap-3">
                       <button
                         type="button"
                         onClick={() => setLocalRequireAc((prev) => !prev)}
                         className={`
-                          px-4 py-2 text-sm font-medium rounded-full border
+                          rounded-full border px-4 py-2 text-sm font-medium
                           transition-colors
                           ${
                             localRequireAc
@@ -567,7 +566,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                               )
                             }
                             className={`
-                              px-4 py-2 text-sm font-medium rounded-full border
+                              rounded-full border px-4 py-2 text-sm font-medium
                               transition-colors
                               ${
                                 selected
@@ -615,8 +614,9 @@ export const FilterModal: React.FC<FilterModalProps> = ({
 
                 <div
                   className={`
-                    border-gray-100 bg-white px-6 py-4 z-10 flex items-center
-                    justify-between border-t transition-shadow duration-300
+                    z-10 flex items-center justify-between border-t
+                    border-gray-100 bg-white px-6 py-4 transition-shadow
+                    duration-300
                     ${
                       showFooterShadow
                         ? 'shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]'
@@ -628,10 +628,9 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                     onClick={handleClear}
                     type="button"
                     className="
-                      text-sm font-bold text-gray-900
-                      hover:text-gray-700
-                      underline transition-colors
-                      hover:no-underline
+                      text-sm font-bold text-gray-900 underline
+                      transition-colors
+                      hover:text-gray-700 hover:no-underline
                     "
                   >
                     {t.clearAll}
@@ -641,8 +640,8 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                     type="button"
                     className="
                       rounded-lg bg-gray-900 px-8 py-3 font-bold text-white
-                      hover:bg-black
                       transition-colors
+                      hover:bg-black
                       active:scale-[0.98]
                     "
                   >

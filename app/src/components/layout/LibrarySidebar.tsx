@@ -162,7 +162,7 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
 
   return (
     <div className="flex h-full flex-col bg-[#171717]">
-      <div className="mb-2 px-3 py-2 flex items-center justify-between">
+      <div className="mb-2 flex items-center justify-between px-3 py-2">
         <h3
           className="
             text-xs font-semibold tracking-wider text-slate-400 uppercase
@@ -174,9 +174,8 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
           <button
             onClick={handleClearHistory}
             className="
-              text-slate-500
+              text-[10px] text-slate-500 transition-colors
               hover:text-white
-              text-[10px] transition-colors
             "
           >
             {t.clear}
@@ -184,7 +183,7 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
         )}
       </div>
 
-      <div className="no-scrollbar space-y-4 px-2 flex-1 overflow-y-auto">
+      <div className="no-scrollbar flex-1 space-y-4 overflow-y-auto px-2">
         {history.length === 0 ? (
           <div className="py-8 text-center">
             <p className="text-xs text-slate-600">{t.empty}</p>
@@ -196,7 +195,7 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
 
             return (
               <div key={category}>
-                <h4 className="mb-1.5 px-2 font-medium text-slate-500 text-[10px]">
+                <h4 className="mb-1.5 px-2 text-[10px] font-medium text-slate-500">
                   {category}
                 </h4>
                 <div className="space-y-0.5">
@@ -218,7 +217,7 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
                           navigate(`/library/article/${item.articleId}`)
                         }
                         className={`
-                          group rounded-md px-3 py-2 relative cursor-pointer
+                          group relative cursor-pointer rounded-md px-3 py-2
                           transition-colors
                           ${
                             item.articleId === currentArticleId
@@ -230,9 +229,9 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
                           }
                         `}
                       >
-                        <div className="gap-1.5 flex items-start justify-between">
+                        <div className="flex items-start justify-between gap-1.5">
                           <div className="min-w-0 flex-1">
-                            <div className="text-xs font-medium flex truncate">
+                            <div className="flex truncate text-xs font-medium">
                               <TypewriterText
                                 text={
                                   language === 'zh' && item.articleTitleZh
@@ -244,7 +243,7 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
                           </div>
                           <div
                             className="
-                              gap-0.5 flex opacity-0 transition-opacity
+                              flex gap-0.5 opacity-0 transition-opacity
                               group-hover:opacity-100
                             "
                           >
@@ -260,7 +259,7 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
                             >
                               <svg
                                 className={`
-                                  h-3 w-3
+                                  size-3
                                   ${
                                     item.isPinned
                                       ? `text-illini-orange`
@@ -288,7 +287,7 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
                               title={t.delete}
                             >
                               <svg
-                                className="h-3 w-3 text-red-400"
+                                className="size-3 text-red-400"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"

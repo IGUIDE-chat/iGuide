@@ -16,7 +16,7 @@ export const BlockIIcon: React.FC<BlockIIconProps> = ({
 }) => (
   <span
     className={`
-      font-black leading-none tracking-[-0.06em] select-none
+      leading-none font-black tracking-[-0.06em] select-none
       ${className}
     `}
     aria-hidden="true"

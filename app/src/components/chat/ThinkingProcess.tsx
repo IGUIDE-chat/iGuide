@@ -23,11 +23,11 @@ const stepIcons: Record<ThinkingStep['type'], string> = {
 }
 
 const ThinkingDots = () => (
-  <span className="ml-1 gap-0.5 inline-flex items-center">
+  <span className="ml-1 inline-flex items-center gap-0.5">
     {[0, 1, 2].map((i) => (
       <motion.span
         key={i}
-        className="h-1 w-1 bg-illini-orange rounded-full"
+        className="size-1 rounded-full bg-illini-orange"
         animate={{ opacity: [0.3, 1, 0.3] }}
         transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }}
       />
@@ -61,15 +61,15 @@ export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className="
-          group gap-1.5 text-xs text-slate-500
+          group flex items-center gap-1.5 text-xs text-slate-500
+          transition-colors
           hover:text-slate-700
-          flex items-center transition-colors
         "
       >
         {isThinking ? (
           <motion.div
             className="
-              h-3.5 w-3.5 border-illini-orange rounded-full border-2
+              size-3.5 rounded-full border-2 border-illini-orange
               border-t-transparent
             "
             animate={{ rotate: 360 }}
@@ -77,7 +77,7 @@ export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({
           />
         ) : (
           <svg
-            className="h-3.5 w-3.5 text-green-500"
+            className="size-3.5 text-green-500"
             fill="currentColor"
             viewBox="0 0 20 20"
           >
@@ -105,7 +105,7 @@ export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({
         )}
         <svg
           className={`
-            h-3 w-3 transition-transform
+            size-3 transition-transform
             ${isExpanded ? 'rotate-180' : ''}
           `}
           fill="none"
@@ -130,14 +130,14 @@ export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="ml-1 mt-2 space-y-1.5 border-slate-200 pl-3 border-l-2">
+            <div className="mt-2 ml-1 space-y-1.5 border-l-2 border-slate-200 pl-3">
               {steps.map((step, index) => (
                 <motion.div
                   key={step.id}
                   initial={{ opacity: 0, x: -8 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.2, delay: index * 0.05 }}
-                  className="gap-1.5 text-xs text-slate-500 flex items-start"
+                  className="flex items-start gap-1.5 text-xs text-slate-500"
                 >
                   <span className="mt-px shrink-0">{stepIcons[step.type]}</span>
                   <div className="min-w-0">
@@ -149,7 +149,7 @@ export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({
                       {step.label}
                     </span>
                     {step.detail && (
-                      <p className="mt-0.5 max-w-md text-slate-400 truncate">
+                      <p className="mt-0.5 max-w-md truncate text-slate-400">
                         {step.detail}
                       </p>
                     )}

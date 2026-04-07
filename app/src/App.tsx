@@ -61,15 +61,15 @@ export default function App() {
     return (
       <div
         className="
-          from-illini-blue/10 via-white to-illini-orange/10 flex min-h-screen
-          items-center justify-center bg-linear-to-br
+          flex min-h-screen items-center justify-center bg-linear-to-br
+          from-illini-blue/10 via-white to-illini-orange/10
         "
       >
         <div className="text-center">
           <div
             className="
-              mb-4 h-16 w-16 animate-spin border-illini-orange mx-auto
-              rounded-full border-4 border-t-transparent
+              mx-auto mb-4 size-16 animate-spin rounded-full border-4
+              border-illini-orange border-t-transparent
             "
           />
           <p className="text-slate-600">

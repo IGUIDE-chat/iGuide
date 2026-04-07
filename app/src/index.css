@@ -1,6 +1,6 @@
 /* [ROOT] Global styles and Tailwind CSS directives. */
 /* [根组件] 全局样式和 Tailwind CSS 指令。 */
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   --color-illini-blue: #13294b;

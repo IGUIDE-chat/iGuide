@@ -33,7 +33,7 @@ export const TagsTab: React.FC<TagsTabProps> = ({ form }) => {
             >
               {CATEGORY_LABELS[category][form.language]}
             </p>
-            <div className="gap-2 flex flex-wrap">
+            <div className="flex flex-wrap gap-2">
               {TAGS_BY_CATEGORY[category].map((tagId) => {
                 const checked = form.categorizedTags[category].includes(
                   tagId as never
@@ -51,7 +51,7 @@ export const TagsTab: React.FC<TagsTabProps> = ({ form }) => {
                       }))
                     }
                     className={`
-                      rounded-lg px-3 py-1.5 text-sm font-medium border
+                      rounded-lg border px-3 py-1.5 text-sm font-medium
                       transition-all
                       ${
                         checked
@@ -83,12 +83,12 @@ export const TagsTab: React.FC<TagsTabProps> = ({ form }) => {
         >
           {form.language === 'zh' ? '社区' : 'Community'}
         </p>
-        <div className="gap-2 flex flex-wrap">
+        <div className="flex flex-wrap gap-2">
           <button
             type="button"
             onClick={() => form.setPetFriendly(!form.petFriendly)}
             className={`
-              rounded-lg px-3 py-1.5 text-sm font-medium border transition-all
+              rounded-lg border px-3 py-1.5 text-sm font-medium transition-all
               ${
                 form.petFriendly
                   ? 'border-illini-blue bg-illini-blue text-white shadow-sm'
@@ -112,7 +112,7 @@ export const TagsTab: React.FC<TagsTabProps> = ({ form }) => {
         >
           {t.labels.llc}
         </p>
-        <div className="gap-2 flex flex-wrap">
+        <div className="flex flex-wrap gap-2">
           {LLC_OPTIONS.map((llc) => {
             const selected =
               form.categorizedTags.llcNames?.includes(llc) ?? false
@@ -137,7 +137,7 @@ export const TagsTab: React.FC<TagsTabProps> = ({ form }) => {
                   })
                 }
                 className={`
-                  rounded-lg px-3 py-1.5 text-sm font-medium border
+                  rounded-lg border px-3 py-1.5 text-sm font-medium
                   transition-all
                   ${
                     selected

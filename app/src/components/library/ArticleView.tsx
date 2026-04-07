@@ -39,30 +39,28 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
       <button
         onClick={onBack}
         className="
-          mb-6 gap-1 text-sm text-slate-500
+          mb-6 flex items-center gap-1 text-sm text-slate-500 transition-colors
           hover:text-slate-900
-          flex items-center transition-colors
         "
       >
         ← {t.backToBrowse}
       </button>
 
-      <article className="rounded-2xl border-slate-200 bg-white overflow-hidden border">
+      <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
         {/* Header Section */}
         <div
           className="
-            border-slate-100 bg-white p-6
+            border-b border-slate-100 bg-white p-6
             sm:p-8
-            border-b
           "
         >
-          <div className="mb-4 gap-3 flex items-center">
+          <div className="mb-4 flex items-center gap-3">
             {category && categoryText && (
               <span
                 className="
-                  gap-1 rounded-sm border-slate-200 bg-slate-100 px-2 py-0.5
-                  font-bold tracking-wider text-slate-500 inline-flex
-                  items-center border text-[10px] uppercase
+                  inline-flex items-center gap-1 rounded-sm border
+                  border-slate-200 bg-slate-100 px-2 py-0.5 text-[10px]
+                  font-bold tracking-wider text-slate-500 uppercase
                 "
               >
                 {category.icon} {categoryText.label}
@@ -70,7 +68,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
             )}
             <span
               className="
-                font-medium tracking-wider text-slate-400 text-[10px] uppercase
+                text-[10px] font-medium tracking-wider text-slate-400 uppercase
               "
             >
               {t.updated} {article.lastUpdated}
@@ -79,7 +77,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
 
           <h1
             className="
-              mb-4 text-2xl font-bold leading-tight text-slate-900
+              mb-4 text-2xl/tight font-bold text-slate-900
               sm:text-3xl
             "
           >
@@ -88,8 +86,8 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
 
           <p
             className="
-              rounded-r-md border-illini-orange bg-slate-50 py-2 pl-4 text-base
-              leading-relaxed text-slate-600 border-l-2 italic
+              rounded-r-md border-l-2 border-illini-orange bg-slate-50 py-2 pl-4
+              text-base/relaxed text-slate-600 italic
             "
           >
             {articleText.summary}
@@ -105,9 +103,8 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
             prose-a:text-illini-blue prose-a:no-underline
             hover:prose-a:underline
             prose-img:rounded-xl
-            p-6
+            max-w-none p-6 whitespace-pre-wrap
             sm:p-8
-            max-w-none whitespace-pre-wrap
           "
         >
           <ReactMarkdown
@@ -126,13 +123,13 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
               ),
               ul: ({ node, ...props }) => (
                 <ul
-                  className="my-2 space-y-1 list-inside list-disc"
+                  className="my-2 list-inside list-disc space-y-1"
                   {...props}
                 />
               ),
               ol: ({ node, ...props }) => (
                 <ol
-                  className="my-2 space-y-1 list-inside list-decimal"
+                  className="my-2 list-inside list-decimal space-y-1"
                   {...props}
                 />
               ),
@@ -150,27 +147,27 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
               ),
               h1: ({ node, ...props }) => (
                 <h1
-                  className="mb-3 mt-6 text-2xl font-bold text-slate-900"
+                  className="mt-6 mb-3 text-2xl font-bold text-slate-900"
                   {...props}
                 />
               ),
               h2: ({ node, ...props }) => (
                 <h2
-                  className="mb-2 mt-5 text-xl font-bold text-slate-800"
+                  className="mt-5 mb-2 text-xl font-bold text-slate-800"
                   {...props}
                 />
               ),
               h3: ({ node, ...props }) => (
                 <h3
-                  className="mb-2 mt-4 text-lg font-bold text-slate-800"
+                  className="mt-4 mb-2 text-lg font-bold text-slate-800"
                   {...props}
                 />
               ),
               blockquote: ({ node, ...props }) => (
                 <blockquote
                   className="
-                    my-4 rounded-r border-illini-blue bg-slate-50 py-2 pl-4
-                    border-l-4 italic
+                    my-4 rounded-r border-l-4 border-illini-blue bg-slate-50
+                    py-2 pl-4 italic
                   "
                   {...props}
                 />
@@ -190,8 +187,8 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
                 ) : (
                   <code
                     className="
-                      my-3 rounded-lg border-slate-200 bg-slate-100 p-3
-                      font-mono text-xs block overflow-x-auto border
+                      my-3 block overflow-x-auto rounded-lg border
+                      border-slate-200 bg-slate-100 p-3 font-mono text-xs
                     "
                     {...props}
                   >
@@ -203,8 +200,8 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
                 <img
                   {...props}
                   className="
-                    my-4 rounded-xl border-slate-200 shadow-sm h-auto max-w-full
-                    border
+                    my-4 h-auto max-w-full rounded-xl border border-slate-200
+                    shadow-sm
                   "
                   loading="lazy"
                 />
@@ -218,28 +215,26 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
         {/* Footer Tags */}
         <div
           className="
-            gap-3 border-slate-100 bg-slate-50 px-6 py-4
+            flex items-center gap-3 border-t border-slate-100 bg-slate-50 px-6
+            py-4
             sm:px-8
-            flex items-center border-t
           "
         >
           <span
             className="
-              font-bold tracking-widest text-slate-400 text-[10px] uppercase
+              text-[10px] font-bold tracking-widest text-slate-400 uppercase
             "
           >
             {t.relatedTopics}:
           </span>
-          <div className="gap-2 flex flex-wrap">
+          <div className="flex flex-wrap gap-2">
             {articleText.tags.map((tag) => (
               <button
                 key={tag}
                 onClick={() => onSearch(tag)}
                 className="
-                  text-xs text-slate-500
-                  hover:text-illini-blue
-                  cursor-pointer transition-colors
-                  hover:underline
+                  cursor-pointer text-xs text-slate-500 transition-colors
+                  hover:text-illini-blue hover:underline
                 "
               >
                 #{tag}

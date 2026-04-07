@@ -40,27 +40,27 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
   return (
     <div
       className="
-        from-illini-blue via-slate-800 to-illini-orange/20 p-4 flex min-h-screen
-        items-center justify-center bg-linear-to-br
+        flex min-h-screen items-center justify-center bg-linear-to-br
+        from-illini-blue via-slate-800 to-illini-orange/20 p-4
       "
     >
       {/* Background decoration */}
-      <div className="inset-0 pointer-events-none absolute overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div
           className="
-            -left-20 h-96 w-96 bg-illini-orange/10 blur-3xl absolute top-1/4
-            rounded-full
+            absolute top-1/4 -left-20 size-96 rounded-full bg-illini-orange/10
+            blur-3xl
           "
         ></div>
         <div
           className="
-            -right-20 h-96 w-96 bg-illini-blue/10 blur-3xl absolute bottom-1/4
-            rounded-full
+            absolute -right-20 bottom-1/4 size-96 rounded-full bg-illini-blue/10
+            blur-3xl
           "
         ></div>
       </div>
 
-      <div className="max-w-md relative w-full">
+      <div className="relative w-full max-w-md">
         {/* Logo/Header */}
         <div className="mb-8 text-center">
           <h1 className="mb-2 text-4xl font-bold text-white">IlliniGuide</h1>
@@ -70,8 +70,8 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
         {/* Login Card */}
         <div
           className="
-            rounded-2xl border-white/20 bg-white/95 p-8 shadow-2xl
-            backdrop-blur-sm border
+            rounded-2xl border border-white/20 bg-white/95 p-8 shadow-2xl
+            backdrop-blur-sm
           "
         >
           <h2 className="mb-6 text-2xl font-bold text-slate-900">
@@ -83,7 +83,7 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
             <div>
               <label
                 htmlFor="email"
-                className="mb-2 text-sm font-medium text-slate-700 block"
+                className="mb-2 block text-sm font-medium text-slate-700"
               >
                 Email Address
               </label>
@@ -93,11 +93,10 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="
-                  rounded-lg border-slate-200 bg-slate-50 px-4 py-3
-                  text-slate-900 placeholder-slate-400
-                  focus:border-illini-blue focus:ring-illini-blue/50
-                  w-full border transition-all
-                  focus:ring-2 focus:outline-none
+                  w-full rounded-lg border border-slate-200 bg-slate-50 px-4
+                  py-3 text-slate-900 placeholder-slate-400 transition-all
+                  focus:border-illini-blue focus:ring-2
+                  focus:ring-illini-blue/50 focus:outline-none
                 "
                 placeholder="your.email@illinois.edu"
                 autoFocus
@@ -108,7 +107,7 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
             <div>
               <label
                 htmlFor="password"
-                className="mb-2 text-sm font-medium text-slate-700 block"
+                className="mb-2 block text-sm font-medium text-slate-700"
               >
                 Password
               </label>
@@ -118,11 +117,10 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="
-                  rounded-lg border-slate-200 bg-slate-50 px-4 py-3
-                  text-slate-900 placeholder-slate-400
-                  focus:border-illini-blue focus:ring-illini-blue/50
-                  w-full border transition-all
-                  focus:ring-2 focus:outline-none
+                  w-full rounded-lg border border-slate-200 bg-slate-50 px-4
+                  py-3 text-slate-900 placeholder-slate-400 transition-all
+                  focus:border-illini-blue focus:ring-2
+                  focus:ring-illini-blue/50 focus:outline-none
                 "
                 placeholder="••••••••"
               />
@@ -136,7 +134,7 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
                 className="
-                  h-4 w-4 rounded-sm border-slate-300 bg-slate-50
+                  size-4 rounded-sm border-slate-300 bg-slate-50
                   text-illini-blue
                   focus:ring-illini-blue/50
                 "
@@ -150,8 +148,8 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
             {error && (
               <div
                 className="
-                  rounded-lg border-red-200 bg-red-50 px-4 py-3 text-sm
-                  text-red-700 border
+                  rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm
+                  text-red-700
                 "
               >
                 {error}
@@ -163,16 +161,15 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
               type="submit"
               disabled={isLoading}
               className="
-                rounded-lg bg-illini-blue px-4 py-3 font-semibold text-white
-                shadow-lg
+                w-full rounded-lg bg-illini-blue px-4 py-3 font-semibold
+                text-white shadow-lg transition-all duration-200
                 hover:bg-illini-blue/90 hover:shadow-xl
-                w-full transition-all duration-200
                 disabled:cursor-not-allowed disabled:opacity-50
               "
             >
               {isLoading ? (
-                <span className="gap-2 flex items-center justify-center">
-                  <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24">
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="size-5 animate-spin" viewBox="0 0 24 24">
                     <circle
                       className="opacity-25"
                       cx="12"
@@ -203,9 +200,8 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
               <button
                 onClick={onSwitchToRegister}
                 className="
-                  font-semibold text-illini-orange
+                  font-semibold text-illini-orange transition-colors
                   hover:text-illini-orange/80
-                  transition-colors
                 "
               >
                 Create Account

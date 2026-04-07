@@ -30,9 +30,8 @@ const TagFilterSection: React.FC<TagFilterSectionProps> = ({
     <h3 className="mb-6 text-xl font-bold">{title}</h3>
     <div
       className="
-        gap-4
+        grid grid-cols-1 gap-4
         md:grid-cols-2
-        grid grid-cols-1
       "
     >
       {tags.map((tag) => {
@@ -41,12 +40,12 @@ const TagFilterSection: React.FC<TagFilterSectionProps> = ({
           <label
             key={tag}
             className="
-              group gap-3 py-1 flex cursor-pointer items-center select-none
+              group flex cursor-pointer items-center gap-3 py-1 select-none
             "
           >
             <div
               className={`
-                h-6 w-6 flex items-center justify-center rounded-[4px] border
+                flex size-6 items-center justify-center rounded-[4px] border
                 transition-all duration-200
                 ${
                   isSelected
@@ -56,8 +55,8 @@ const TagFilterSection: React.FC<TagFilterSectionProps> = ({
                     `
                     : `
                       border-gray-300 bg-white
-                      active:border-illini-blue active:bg-blue-50/50
                       group-hover:border-illini-blue
+                      active:border-illini-blue active:bg-blue-50/50
                     `
                 }
               `}
@@ -72,9 +71,8 @@ const TagFilterSection: React.FC<TagFilterSectionProps> = ({
             </div>
             <span
               className="
-                text-gray-700
+                text-gray-700 transition-colors
                 group-hover:text-illini-blue
-                transition-colors
               "
             >
               {getTagDisplay(tag, language)}

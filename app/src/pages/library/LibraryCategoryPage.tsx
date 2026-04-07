@@ -37,7 +37,7 @@ const LibraryCategoryPage: React.FC<LibraryCategoryPageProps> = ({
 
   if (!category) {
     return (
-      <div className="p-8 text-slate-500 text-center">Category not found</div>
+      <div className="p-8 text-center text-slate-500">Category not found</div>
     )
   }
 
@@ -49,30 +49,29 @@ const LibraryCategoryPage: React.FC<LibraryCategoryPageProps> = ({
   return (
     <div
       className="
-        animate-fade-in-up no-scrollbar min-w-0 size-full overflow-y-auto
+        animate-fade-in-up no-scrollbar size-full min-w-0 overflow-y-auto
       "
     >
-      <div className="min-w-0 max-w-3xl px-4 py-8 pb-24 mx-auto">
+      <div className="mx-auto max-w-3xl min-w-0 px-4 py-8 pb-24">
         <button
           type="button"
           onClick={() => navigate('/library')}
           className="
-            group mb-8 gap-2 text-sm font-semibold text-slate-500
+            group mb-8 flex items-center gap-2 text-sm font-semibold
+            text-slate-500 transition-colors
             hover:text-illini-blue
-            flex items-center transition-colors
           "
         >
           <span
             className="
-              h-8 w-8 border-slate-200 bg-white
+              flex size-8 items-center justify-center rounded-full border
+              border-slate-200 bg-white transition-all
               group-hover:border-illini-blue group-hover:bg-illini-blue
               group-hover:text-white
-              flex items-center justify-center rounded-full border
-              transition-all
             "
           >
             <svg
-              className="h-4 w-4"
+              className="size-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -90,23 +89,23 @@ const LibraryCategoryPage: React.FC<LibraryCategoryPageProps> = ({
 
         <div
           className="
-            glass-card mb-10 gap-6 rounded-2xl p-8
+            glass-card relative mb-10 flex flex-col items-start gap-6
+            overflow-hidden rounded-2xl p-8
             sm:flex-row sm:items-center
-            relative flex flex-col items-start overflow-hidden
           "
         >
           <div
             className="
-              -right-10 -top-10 h-40 w-40 from-illini-orange/20
-              to-illini-blue/20 blur-3xl pointer-events-none absolute
-              rounded-full bg-linear-to-br
+              pointer-events-none absolute -top-10 -right-10 size-40
+              rounded-full bg-linear-to-br from-illini-orange/20
+              to-illini-blue/20 blur-3xl
             "
           />
 
           <div
             className="
-              h-16 w-16 rounded-2xl bg-white text-3xl shadow-md z-10 flex
-              items-center justify-center
+              z-10 flex size-16 items-center justify-center rounded-2xl bg-white
+              text-3xl shadow-md
             "
           >
             {category.icon}
@@ -115,7 +114,7 @@ const LibraryCategoryPage: React.FC<LibraryCategoryPageProps> = ({
             <h2 className="mb-2 text-2xl font-bold text-slate-900">
               {categoryText.label}
             </h2>
-            <p className="max-w-2xl text-base leading-relaxed text-slate-600">
+            <p className="max-w-2xl text-base/relaxed text-slate-600">
               {categoryText.description}
             </p>
           </div>
@@ -123,9 +122,8 @@ const LibraryCategoryPage: React.FC<LibraryCategoryPageProps> = ({
 
         <div
           className="
-            gap-5
+            grid grid-cols-1 gap-5
             md:grid-cols-2
-            grid grid-cols-1
           "
         >
           {categoryArticles.map((article) => (
@@ -133,30 +131,28 @@ const LibraryCategoryPage: React.FC<LibraryCategoryPageProps> = ({
               key={article.id}
               onClick={() => navigate(`/library/article/${article.id}`)}
               className="
-                group rounded-2xl border-slate-100 bg-white p-6 shadow-sm
+                group cursor-pointer rounded-2xl border border-slate-100
+                bg-white p-6 shadow-sm transition-all duration-300
                 hover:-translate-y-1 hover:border-illini-orange/30
                 hover:shadow-md hover:shadow-slate-200/50
-                cursor-pointer border transition-all duration-300
               "
             >
               <h3
                 className="
-                  mb-3 text-lg font-bold text-slate-800
+                  mb-3 text-lg font-bold text-slate-800 transition-colors
                   group-hover:text-illini-orange
-                  transition-colors
                 "
               >
                 {article.title}
               </h3>
-              <p className="text-sm leading-relaxed text-slate-500">
+              <p className="text-sm/relaxed text-slate-500">
                 {article.summary}
               </p>
               <div
                 className="
-                  mt-4 translate-y-2 text-sm font-semibold text-illini-blue
-                  group-hover:translate-y-0
-                  flex transform items-center opacity-0 transition-opacity
-                  group-hover:opacity-100
+                  mt-4 flex translate-y-2 transform items-center text-sm
+                  font-semibold text-illini-blue opacity-0 transition-opacity
+                  group-hover:translate-y-0 group-hover:opacity-100
                 "
               >
                 {t.readGuide}

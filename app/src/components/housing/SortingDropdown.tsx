@@ -60,11 +60,9 @@ const SortingDropdown: React.FC<SortingDropdownProps> = memo(
           onClick={() => setIsOpen(!isOpen)}
           type="button"
           className={`
-            h-10 w-10
-            focus:ring-illini-blue/20
-            flex items-center justify-center rounded-full border transition-all
-            duration-200
-            focus:ring-2 focus:outline-none
+            flex size-10 items-center justify-center rounded-full border
+            transition-all duration-200
+            focus:ring-2 focus:ring-illini-blue/20 focus:outline-none
             ${
               isOpen
                 ? 'border-illini-blue/50 bg-illini-blue/10 text-illini-blue'
@@ -85,9 +83,9 @@ const SortingDropdown: React.FC<SortingDropdownProps> = memo(
         {isOpen && (
           <div
             className="
-              animate-in fade-in zoom-in-95 right-0 mt-2 w-48 rounded-xl
-              border-gray-100 bg-white py-1 shadow-lg absolute z-50
-              origin-top-right border duration-100
+              animate-in fade-in zoom-in-95 absolute right-0 z-50 mt-2 w-48
+              origin-top-right rounded-xl border border-gray-100 bg-white py-1
+              shadow-lg duration-100
             "
           >
             {SORT_OPTIONS.map((option) => (
@@ -99,12 +97,11 @@ const SortingDropdown: React.FC<SortingDropdownProps> = memo(
                 }}
                 type="button"
                 className="
-                  group px-4 py-2 text-sm
+                  group flex w-full items-center justify-between px-4 py-2
+                  text-left text-sm transition-colors
                   first:rounded-t-lg
                   last:rounded-b-lg
                   hover:bg-illini-blue/5
-                  flex w-full items-center justify-between text-left
-                  transition-colors
                 "
               >
                 <span

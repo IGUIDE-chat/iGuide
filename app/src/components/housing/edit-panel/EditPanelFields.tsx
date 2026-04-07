@@ -20,7 +20,7 @@ export function Field({
 }) {
   return (
     <div className="space-y-1">
-      <label className="font-medium text-gray-700 block">{label}</label>
+      <label className="block font-medium text-gray-700">{label}</label>
       {children}
     </div>
   )
@@ -38,13 +38,11 @@ export function EditableList({
   return (
     <div className="space-y-2">
       {items.map((item, index) => (
-        <div key={index} className="gap-2 flex items-center">
+        <div key={index} className="flex items-center gap-2">
           <input
             className="
-              rounded-lg border-gray-300 px-3 py-1.5 text-sm
-              focus:ring-illini-blue
-              flex-1 border
-              focus:ring-2 focus:outline-none
+              flex-1 rounded-lg border border-gray-300 px-3 py-1.5 text-sm
+              focus:ring-2 focus:ring-illini-blue focus:outline-none
             "
             value={item}
             onChange={(event) => {
@@ -73,7 +71,7 @@ export function EditableList({
         type="button"
         onClick={() => onChange([...items, ''])}
         className="
-          gap-1 text-xs text-illini-blue flex items-center
+          flex items-center gap-1 text-xs text-illini-blue
           hover:underline
         "
       >
@@ -93,17 +91,17 @@ export function Toggle({
   onChange: (value: boolean) => void
 }) {
   return (
-    <label className="gap-2 flex cursor-pointer items-center select-none">
+    <label className="flex cursor-pointer items-center gap-2 select-none">
       <div
         onClick={() => onChange(!checked)}
         className={`
-          h-5 w-9 px-0.5 flex items-center rounded-full transition-colors
+          flex h-5 w-9 items-center rounded-full px-0.5 transition-colors
           ${checked ? 'bg-illini-orange' : 'bg-gray-300'}
         `}
       >
         <div
           className={`
-            h-4 w-4 bg-white shadow-sm rounded-full transition-transform
+            size-4 rounded-full bg-white shadow-sm transition-transform
             ${checked ? 'translate-x-4' : 'translate-x-0'}
           `}
         />
