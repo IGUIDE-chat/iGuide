@@ -191,15 +191,21 @@ export const memoryService = {
     return data?.memory_text || ''
   },
 
+  /**
+   * Append new context to existing conversation memory instead of overwriting.
+   */
   async updateConversationMemory(
     conversationId: string,
     memoryText: string
   ): Promise<void> {
-    const trimmed = memoryText.slice(0, CONV_MEMORY_MAX_LENGTH)
+    const existing = await this.getConversationMemory(conversationId)
+    const merged = existing
+      ? `${existing}\n${memoryText}`.slice(-CONV_MEMORY_MAX_LENGTH)
+      : memoryText.slice(0, CONV_MEMORY_MAX_LENGTH)
     const { error } = await supabase.from('conversation_memories').upsert(
       {
         conversation_id: conversationId,
-        memory_text: trimmed,
+        memory_text: merged,
         updated_at: new Date().toISOString(),
       },
       { onConflict: 'conversation_id' }
