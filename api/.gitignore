@@ -1,3 +1,6 @@
 # Wrangler
 .wrangler/
 wrangler.toml.backup
+
+# local env files
+.dev.vars
