@@ -28,18 +28,18 @@ export const ChatSessionContext =
   React.createContext<ChatSessionContextValue | null>(null)
 
 const convertMessage = (msg: ChatMessage): ThreadMessageLike => {
-  const metadata = {
-    thinkingSteps: msg.thinkingSteps,
-    isThinking: msg.isThinking,
-    followUpQuestions: msg.followUpQuestions,
-    isStreaming: msg.isStreaming,
-  } as ThreadMessageLike['metadata']
-
   return {
     id: msg.id,
     role: msg.role === 'model' ? 'assistant' : 'user',
     content: [{ type: 'text', text: msg.text }],
-    metadata,
+    metadata: {
+      custom: {
+        thinkingSteps: msg.thinkingSteps,
+        isThinking: msg.isThinking,
+        followUpQuestions: msg.followUpQuestions,
+        isStreaming: msg.isStreaming,
+      },
+    },
   }
 }
 

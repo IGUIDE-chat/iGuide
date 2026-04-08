@@ -27,7 +27,7 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
 	onFollowUpClick,
 }) => {
 	const message = useMessage();
-	const meta = message.metadata as AssistantMessageMeta | undefined;
+	const meta = (message.metadata?.custom ?? undefined) as AssistantMessageMeta | undefined;
 
 	const textPart = message.content.find((p) => p.type === "text");
 	const text = textPart && textPart.type === "text" ? textPart.text : "";
