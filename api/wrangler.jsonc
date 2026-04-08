@@ -1,0 +1,17 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "api-gateway",
+	"main": "src/index.ts",
+	"compatibility_date": "2026-04-08",
+	"compatibility_flags": ["nodejs_compat"],
+	"observability": {
+		"enabled": true
+	},
+	"build": {
+		"watch_dir": "src"
+	},
+	"env": {
+		"production": {},
+		"development": {}
+	}
+}
