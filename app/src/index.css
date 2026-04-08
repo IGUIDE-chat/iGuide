@@ -3,493 +3,493 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-illini-blue: #13294b;
-  --color-illini-orange: #ff5f05;
-  --color-illini-orange-light: #ff7a30;
-  --color-illini-orange-dark: #e05504;
+	--color-illini-blue: #13294b;
+	--color-illini-orange: #ff5f05;
+	--color-illini-orange-light: #ff7a30;
+	--color-illini-orange-dark: #e05504;
 }
 
 /* Body base style */
 body {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  background-color: #f8fafc;
-  background-image:
-    radial-gradient(at 0% 0%, rgba(19, 41, 75, 0.05) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(255, 95, 5, 0.05) 0px, transparent 50%);
-  background-attachment: fixed;
+	font-family: "Plus Jakarta Sans", sans-serif;
+	background-color: #f8fafc;
+	background-image:
+		radial-gradient(at 0% 0%, rgba(19, 41, 75, 0.05) 0px, transparent 50%),
+		radial-gradient(at 100% 0%, rgba(255, 95, 5, 0.05) 0px, transparent 50%);
+	background-attachment: fixed;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
 .no-scrollbar::-webkit-scrollbar {
-  display: none;
+	display: none;
 }
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+	-ms-overflow-style: none;
+	scrollbar-width: none;
 }
 
 /* Glassmorphism utilities */
 .glass {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+	background: rgba(255, 255, 255, 0.7);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+	background: rgba(255, 255, 255, 0.85);
+	backdrop-filter: blur(8px);
+	border: 1px solid rgba(255, 255, 255, 0.6);
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
 }
 
 /* Fade-in-up animation */
 @keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
 
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 
 .animate-fade-in-up {
-  animation: fade-in-up 0.3s ease-out;
+	animation: fade-in-up 0.3s ease-out;
 }
 
 /* Fade-in animation */
 @keyframes fade-in {
-  from {
-    opacity: 0;
-  }
+	from {
+		opacity: 0;
+	}
 
-  to {
-    opacity: 1;
-  }
+	to {
+		opacity: 1;
+	}
 }
 
 .animate-fade-in {
-  animation: fade-in 0.2s ease-out;
+	animation: fade-in 0.2s ease-out;
 }
 
 /* Scale-in animation */
 @keyframes scale-in {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
+	from {
+		opacity: 0;
+		transform: scale(0.95);
+	}
 
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
 }
 
 .animate-scale-in {
-  animation: scale-in 0.2s ease-out;
+	animation: scale-in 0.2s ease-out;
 }
 
 /* Slide-in animation for sidebars */
 @keyframes slide-in {
-  from {
-    transform: translateX(100%);
-  }
+	from {
+		transform: translateX(100%);
+	}
 
-  to {
-    transform: translateX(0);
-  }
+	to {
+		transform: translateX(0);
+	}
 }
 
 .animate-slide-in {
-  animation: slide-in 0.3s ease-out;
+	animation: slide-in 0.3s ease-out;
 }
 
 /* Reduce paint/render cost while scrolling long dorm lists. */
 .dorm-card {
-  content-visibility: auto;
-  contain-intrinsic-size: 420px;
+	content-visibility: auto;
+	contain-intrinsic-size: 420px;
 }
 
 /* Highlight glow effect for active map marker */
 @keyframes marker-glow {
-  0%,
-  100% {
-    box-shadow:
-      0 0 20px rgba(255, 95, 5, 0.5),
-      0 0 30px rgba(255, 95, 5, 0.3);
-  }
-  50% {
-    box-shadow:
-      0 0 25px rgba(255, 95, 5, 0.6),
-      0 0 35px rgba(255, 95, 5, 0.4);
-  }
+	0%,
+	100% {
+		box-shadow:
+			0 0 20px rgba(255, 95, 5, 0.5),
+			0 0 30px rgba(255, 95, 5, 0.3);
+	}
+	50% {
+		box-shadow:
+			0 0 25px rgba(255, 95, 5, 0.6),
+			0 0 35px rgba(255, 95, 5, 0.4);
+	}
 }
 
 .marker-glow {
-  animation: marker-glow 2s ease-in-out infinite;
+	animation: marker-glow 2s ease-in-out infinite;
 }
 
 /* Streaming text fade-in (Gemini-style) */
 @keyframes stream-in {
-  from {
-    opacity: 0;
-    filter: blur(2px);
-    transform: translateY(2px);
-  }
-  to {
-    opacity: 1;
-    filter: blur(0);
-    transform: translateY(0);
-  }
+	from {
+		opacity: 0;
+		filter: blur(2px);
+		transform: translateY(2px);
+	}
+	to {
+		opacity: 1;
+		filter: blur(0);
+		transform: translateY(0);
+	}
 }
 
-.aui-streaming-tail > * {
-  animation: stream-in 0.3s ease-out both;
+.aui-streaming-tail {
+	animation: stream-in 0.3s ease-out both;
 }
 
 /* Prose styles for markdown content */
 .prose {
-  line-height: 1.6;
+	line-height: 1.6;
 }
 
 .prose p {
-  margin-bottom: 0.75rem;
+	margin-bottom: 0.75rem;
 }
 
 .prose p:last-child {
-  margin-bottom: 0;
+	margin-bottom: 0;
 }
 
 .prose ul,
 .prose ol {
-  margin: 0.5rem 0;
-  padding-left: 1.5rem;
+	margin: 0.5rem 0;
+	padding-left: 1.5rem;
 }
 
 .prose li {
-  margin: 0.25rem 0;
+	margin: 0.25rem 0;
 }
 
 .prose code {
-  background-color: #f1f5f9;
-  padding: 0.125rem 0.25rem;
-  border-radius: 0.25rem;
-  font-size: 0.875em;
+	background-color: #f1f5f9;
+	padding: 0.125rem 0.25rem;
+	border-radius: 0.25rem;
+	font-size: 0.875em;
 }
 
 .prose pre {
-  background-color: #f1f5f9;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  overflow-x: auto;
-  margin: 0.75rem 0;
+	background-color: #f1f5f9;
+	padding: 0.75rem 1rem;
+	border-radius: 0.5rem;
+	overflow-x: auto;
+	margin: 0.75rem 0;
 }
 
 .prose a {
-  color: #ff5f05;
-  text-decoration: none;
+	color: #ff5f05;
+	text-decoration: none;
 }
 
 .prose a:hover {
-  text-decoration: underline;
+	text-decoration: underline;
 }
 
 .prose blockquote {
-  border-left: 3px solid #e2e8f0;
-  padding-left: 1rem;
-  margin: 0.75rem 0;
-  color: #64748b;
+	border-left: 3px solid #e2e8f0;
+	padding-left: 1rem;
+	margin: 0.75rem 0;
+	color: #64748b;
 }
 
 .prose h1,
 .prose h2,
 .prose h3,
 .prose h4 {
-  font-weight: 600;
-  margin-top: 1.25rem;
-  margin-bottom: 0.5rem;
+	font-weight: 600;
+	margin-top: 1.25rem;
+	margin-bottom: 0.5rem;
 }
 
 .prose h1 {
-  font-size: 1.5rem;
+	font-size: 1.5rem;
 }
 
 .prose h2 {
-  font-size: 1.25rem;
+	font-size: 1.25rem;
 }
 
 .prose h3 {
-  font-size: 1.125rem;
+	font-size: 1.125rem;
 }
 
 .prose h4 {
-  font-size: 1rem;
+	font-size: 1rem;
 }
 
 .prose table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 0.75rem 0;
+	width: 100%;
+	border-collapse: collapse;
+	margin: 0.75rem 0;
 }
 
 .prose th,
 .prose td {
-  border: 1px solid #e2e8f0;
-  padding: 0.5rem 0.75rem;
-  text-align: left;
+	border: 1px solid #e2e8f0;
+	padding: 0.5rem 0.75rem;
+	text-align: left;
 }
 
 .prose th {
-  background-color: #f8fafc;
-  font-weight: 600;
+	background-color: #f8fafc;
+	font-weight: 600;
 }
 
 /* Smooth scrolling */
 html {
-  scroll-behavior: smooth;
+	scroll-behavior: smooth;
 }
 
 /* Selection colors */
 ::selection {
-  background-color: #fed7aa;
-  color: #7c2d12;
+	background-color: #fed7aa;
+	color: #7c2d12;
 }
 
 /* UIUC Brand Custom Properties */
 :root {
-  --illini-blue: #13294b;
-  --illini-orange: #ff5f05;
-  --illini-blue-light: #1e3a5f;
-  --illini-orange-light: #ff7a30;
+	--illini-blue: #13294b;
+	--illini-orange: #ff5f05;
+	--illini-blue-light: #1e3a5f;
+	--illini-orange-light: #ff7a30;
 }
 
 /* Custom Scrollbar Styles - Thin & Fashionable */
 /* For Webkit browsers (Chrome, Safari, Edge) */
 .scrollbar-thin::-webkit-scrollbar {
-  width: 6px;
+	width: 6px;
 }
 
 .scrollbar-thin::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 3px;
+	background: rgba(255, 255, 255, 0.05);
+	border-radius: 3px;
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(255, 95, 5, 0.4);
-  border-radius: 3px;
-  transition: background 0.2s ease;
+	background: rgba(255, 95, 5, 0.4);
+	border-radius: 3px;
+	transition: background 0.2s ease;
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 95, 5, 0.6);
+	background: rgba(255, 95, 5, 0.6);
 }
 
 /* For Firefox */
 .scrollbar-thin {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 95, 5, 0.4) rgba(255, 255, 255, 0.05);
+	scrollbar-width: thin;
+	scrollbar-color: rgba(255, 95, 5, 0.4) rgba(255, 255, 255, 0.05);
 }
 
 /* Hide Scrollbar Utility */
 .scrollbar-hide::-webkit-scrollbar {
-  display: none;
+	display: none;
 }
 
 .scrollbar-hide {
-  -ms-overflow-style: none;
-  /* IE and Edge */
-  scrollbar-width: none;
-  /* Firefox */
+	-ms-overflow-style: none;
+	/* IE and Edge */
+	scrollbar-width: none;
+	/* Firefox */
 }
 
 /* Lightweight modal scroll behavior */
 .modal-scroll-smooth {
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
+	overscroll-behavior: contain;
+	-webkit-overflow-scrolling: touch;
 }
 
 /* Grey Scrollbar Utility */
 .scrollbar-grey::-webkit-scrollbar {
-  width: 6px;
+	width: 6px;
 }
 
 .scrollbar-grey::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 3px;
+	background: rgba(0, 0, 0, 0.05);
+	border-radius: 3px;
 }
 
 .scrollbar-grey::-webkit-scrollbar-thumb {
-  background: rgba(107, 114, 128, 0.5);
-  /* gray-500/50 */
-  border-radius: 3px;
-  transition: background 0.2s ease;
+	background: rgba(107, 114, 128, 0.5);
+	/* gray-500/50 */
+	border-radius: 3px;
+	transition: background 0.2s ease;
 }
 
 .scrollbar-grey::-webkit-scrollbar-thumb:hover {
-  background: rgba(107, 114, 128, 0.7);
-  /* gray-500/70 */
+	background: rgba(107, 114, 128, 0.7);
+	/* gray-500/70 */
 }
 
 /* For Firefox */
 .scrollbar-grey {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(107, 114, 128, 0.5) rgba(0, 0, 0, 0.05);
+	scrollbar-width: thin;
+	scrollbar-color: rgba(107, 114, 128, 0.5) rgba(0, 0, 0, 0.05);
 }
 
 /* Custom Range Slider Styles - Modern & Premium */
 .slider-modern {
-  z-index: 10;
-  touch-action: pan-x;
-  -webkit-user-select: none;
-  user-select: none;
+	z-index: 10;
+	touch-action: pan-x;
+	-webkit-user-select: none;
+	user-select: none;
 }
 
 /* Base thumb style for common properties */
 .slider-thumb-orange::-webkit-slider-thumb,
 .slider-thumb-blue::-webkit-slider-thumb {
-  appearance: none;
-  pointer-events: auto;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  border: 2.5px solid #ffffff;
-  box-shadow:
-    0 3px 6px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(255, 255, 255, 0.1);
-  cursor: grab;
-  transition:
-    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow 0.2s ease;
+	appearance: none;
+	pointer-events: auto;
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	border: 2.5px solid #ffffff;
+	box-shadow:
+		0 3px 6px rgba(0, 0, 0, 0.3),
+		0 0 0 1px rgba(255, 255, 255, 0.1);
+	cursor: grab;
+	transition:
+		transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+		box-shadow 0.2s ease;
 }
 
 .slider-thumb-orange::-webkit-slider-thumb:active,
 .slider-thumb-blue::-webkit-slider-thumb:active {
-  cursor: grabbing;
-  transform: scale(1.25);
+	cursor: grabbing;
+	transform: scale(1.25);
 }
 
 /* Orange thumb (Min Price) */
 .slider-thumb-orange::-webkit-slider-thumb {
-  background: var(--illini-orange);
+	background: var(--illini-orange);
 }
 
 .slider-thumb-orange:hover::-webkit-slider-thumb {
-  box-shadow:
-    0 4px 12px rgba(255, 95, 5, 0.4),
-    0 0 0 1px rgba(255, 255, 255, 0.2);
-  transform: scale(1.15);
+	box-shadow:
+		0 4px 12px rgba(255, 95, 5, 0.4),
+		0 0 0 1px rgba(255, 255, 255, 0.2);
+	transform: scale(1.15);
 }
 
 /* Blue thumb (Max Price) */
 .slider-thumb-blue::-webkit-slider-thumb {
-  background: var(--illini-blue);
+	background: var(--illini-blue);
 }
 
 .slider-thumb-blue:hover::-webkit-slider-thumb {
-  box-shadow:
-    0 4px 12px rgba(19, 41, 75, 0.4),
-    0 0 0 1px rgba(255, 255, 255, 0.2);
-  transform: scale(1.15);
+	box-shadow:
+		0 4px 12px rgba(19, 41, 75, 0.4),
+		0 0 0 1px rgba(255, 255, 255, 0.2);
+	transform: scale(1.15);
 }
 
 /* Firefox compatibility */
 .slider-thumb-orange::-moz-range-thumb,
 .slider-thumb-blue::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 2.5px solid #ffffff;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
-  cursor: grab;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	border: 2.5px solid #ffffff;
+	box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+	cursor: grab;
+	transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .slider-thumb-orange::-moz-range-thumb {
-  background: var(--illini-orange);
+	background: var(--illini-orange);
 }
 
 .slider-thumb-blue::-moz-range-thumb {
-  background: var(--illini-blue);
+	background: var(--illini-blue);
 }
 
 .slider-thumb-orange:active::-moz-range-thumb,
 .slider-thumb-blue:active::-moz-range-thumb {
-  transform: scale(1.2);
+	transform: scale(1.2);
 }
 
 /* rc-slider Customization - Illini Theme */
 .rc-slider {
-  position: relative;
-  height: 14px;
-  padding: 5px 0;
+	position: relative;
+	height: 14px;
+	padding: 5px 0;
 }
 
 .rc-slider-rail {
-  background-color: rgba(255, 255, 255, 0.1) !important;
-  height: 4px !important;
-  border-radius: 2px;
+	background-color: rgba(255, 255, 255, 0.1) !important;
+	height: 4px !important;
+	border-radius: 2px;
 }
 
 .rc-slider-track {
-  background: linear-gradient(90deg, #ff5f05 0%, #13294b 100%) !important;
-  height: 4px !important;
-  border-radius: 2px;
+	background: linear-gradient(90deg, #ff5f05 0%, #13294b 100%) !important;
+	height: 4px !important;
+	border-radius: 2px;
 }
 
 .rc-slider-handle {
-  width: 20px !important;
-  height: 20px !important;
-  margin-top: -8px !important;
-  border: 3px solid #ffffff !important;
-  box-shadow:
-    0 3px 8px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(255, 255, 255, 0.1) !important;
-  transition:
-    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow 0.2s ease !important;
+	width: 20px !important;
+	height: 20px !important;
+	margin-top: -8px !important;
+	border: 3px solid #ffffff !important;
+	box-shadow:
+		0 3px 8px rgba(0, 0, 0, 0.3),
+		0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+	transition:
+		transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+		box-shadow 0.2s ease !important;
 }
 
 .rc-slider-handle:hover,
 .rc-slider-handle:focus {
-  transform: scale(1.08) !important;
+	transform: scale(1.08) !important;
 }
 
 .rc-slider-handle:active {
-  transform: scale(1.12) !important;
-  cursor: grabbing !important;
+	transform: scale(1.12) !important;
+	cursor: grabbing !important;
 }
 
 .rc-slider-handle-1 {
-  background-color: #ff5f05 !important;
+	background-color: #ff5f05 !important;
 }
 
 .rc-slider-handle-2 {
-  background-color: #13294b !important;
+	background-color: #13294b !important;
 }
 
 .rc-slider-handle-1:hover {
-  box-shadow:
-    0 4px 12px rgba(255, 95, 5, 0.5),
-    0 0 0 1px rgba(255, 255, 255, 0.2) !important;
+	box-shadow:
+		0 4px 12px rgba(255, 95, 5, 0.5),
+		0 0 0 1px rgba(255, 255, 255, 0.2) !important;
 }
 
 .rc-slider-handle-2:hover {
-  box-shadow:
-    0 4px 12px rgba(19, 41, 75, 0.5),
-    0 0 0 1px rgba(255, 255, 255, 0.2) !important;
+	box-shadow:
+		0 4px 12px rgba(19, 41, 75, 0.5),
+		0 0 0 1px rgba(255, 255, 255, 0.2) !important;
 }
 
 /* Modal uses a lighter slider transform profile for smoother scrolling/dragging. */
 .modal-scroll-smooth .rc-slider-handle:hover,
 .modal-scroll-smooth .rc-slider-handle:focus {
-  transform: scale(1.03) !important;
+	transform: scale(1.03) !important;
 }
 
 .modal-scroll-smooth .rc-slider-handle:active {
-  transform: scale(1.05) !important;
+	transform: scale(1.05) !important;
 }

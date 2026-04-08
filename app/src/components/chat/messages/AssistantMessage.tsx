@@ -3,6 +3,7 @@
  * @description Chat (AI) Component / Module
  */
 
+import * as React from "react";
 import { MessagePrimitive, useMessage } from "@assistant-ui/react";
 import { ThinkingProcess } from "../ThinkingProcess";
 import { TypewriterMarkdown } from "../TypewriterMarkdown";
@@ -21,13 +22,61 @@ interface AssistantMessageProps {
 	onFollowUpClick?: (text: string) => void;
 }
 
-export const AssistantMessage: React.FC<AssistantMessageProps> = ({
+const AssistantMessageInner: React.FC<AssistantMessageProps> = ({
 	language = "zh",
 	botName = "iGuide",
 	onFollowUpClick,
 }) => {
 	const message = useMessage();
-	const meta = (message.metadata?.custom ?? undefined) as AssistantMessageMeta | undefined;
+	const meta = (message.metadata?.custom ?? undefined) as
+		| AssistantMessageMeta
+		| undefined;
+	const markdownComponents = React.useMemo(
+		() => ({
+			a: ({ node, ...props }) => (
+				<a
+					{...props}
+					className="text-illini-orange hover:underline"
+					target="_blank"
+					rel="noopener noreferrer"
+				/>
+			),
+			code: ({ node, className, children, ...props }) => {
+				const isInline = !className;
+				return isInline ? (
+					<code
+						className="rounded-sm bg-slate-100 px-1 py-0.5 text-xs"
+						{...props}
+					>
+						{children}
+					</code>
+				) : (
+					<code
+						className="rounded-sm bg-slate-100 p-2 text-xs block overflow-x-auto"
+						{...props}
+					>
+						{children}
+					</code>
+				);
+			},
+			ul: ({ node, ...props }) => (
+				<ul className="space-y-1 list-inside list-disc" {...props} />
+			),
+			ol: ({ node, ...props }) => (
+				<ol className="space-y-1 list-inside list-decimal" {...props} />
+			),
+			p: ({ node, ...props }) => <p className="mb-2 last:mb-0" {...props} />,
+			img: ({ node, alt, ...props }) => (
+				<img
+					{...props}
+					alt={alt ?? ""}
+					className="my-2 rounded-lg border-slate-200 shadow-sm h-auto max-w-full border"
+					loading="lazy"
+				/>
+			),
+		}),
+		[],
+	);
 
 	const textPart = message.content.find((p) => p.type === "text");
 	const text = textPart && textPart.type === "text" ? textPart.text : "";
@@ -81,65 +130,8 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
 					>
 						<TypewriterMarkdown
 							content={text}
-							components={{
-								a: ({ node: _node, ...props }) => (
-									<a
-										{...props}
-										className="
-            text-illini-orange
-            hover:underline
-          "
-										target="_blank"
-										rel="noopener noreferrer"
-									/>
-								),
-								code: ({ node: _node, className, children, ...props }) => {
-									const isInline = !className;
-									return isInline ? (
-										<code
-											className="rounded-sm bg-slate-100 px-1 py-0.5 text-xs"
-											{...props}
-										>
-											{children}
-										</code>
-									) : (
-										<code
-											className="block overflow-x-auto rounded-sm bg-slate-100 p-2 text-xs"
-											{...props}
-										>
-											{children}
-										</code>
-									);
-								},
-								ul: ({ node: _node, ...props }) => (
-									<ul className="list-inside list-disc space-y-1" {...props} />
-								),
-								ol: ({ node: _node, ...props }) => (
-									<ol
-										className="list-inside list-decimal space-y-1"
-										{...props}
-									/>
-								),
-								p: ({ node: _node, ...props }) => (
-									<p
-										className="
-            mb-2
-            last:mb-0
-          "
-										{...props}
-									/>
-								),
-								img: ({ node: _node, alt, ...props }) => (
-									<img
-										{...props}
-										alt={alt ?? ""}
-										className="
-            my-2 h-auto max-w-full rounded-lg border border-slate-200 shadow-sm
-          "
-										loading="lazy"
-									/>
-								),
-							}}
+							isStreaming={meta?.isStreaming}
+							components={markdownComponents}
 						/>
 
 						{/* Streaming spinner */}
@@ -203,3 +195,6 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
 		</MessagePrimitive.Root>
 	);
 };
+
+export const AssistantMessage = React.memo(AssistantMessageInner);
+AssistantMessage.displayName = "AssistantMessage";

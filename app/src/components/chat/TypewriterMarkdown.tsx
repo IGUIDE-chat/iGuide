@@ -5,36 +5,31 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import * as React from 'react'
-import ReactMarkdown, { Components } from 'react-markdown'
-import remarkGfm from 'remark-gfm'
+import * as React from "react";
+import ReactMarkdown, { Components } from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface TypewriterMarkdownProps {
   content: string;
+  isStreaming?: boolean;
   speed?: number;
   components?: Components;
 }
 
-const remarkPlugins = [remarkGfm]
+const remarkPlugins = [remarkGfm];
 
 /**
  * Memoised block for content that has already been fully streamed.
  * Only re-renders when `content` string actually changes.
  */
 const StableMarkdown = React.memo(
-  ({
-    content,
-    components,
-  }: {
-    content: string
-    components?: Components
-  }) => (
+  ({ content, components }: { content: string; components?: Components }) => (
     <ReactMarkdown remarkPlugins={remarkPlugins} components={components}>
       {content}
     </ReactMarkdown>
-  )
-)
-StableMarkdown.displayName = 'StableMarkdown'
+  ),
+);
+StableMarkdown.displayName = "StableMarkdown";
 
 /**
  * Find the last "safe split" point — the end of a complete markdown paragraph
@@ -42,26 +37,31 @@ StableMarkdown.displayName = 'StableMarkdown'
  */
 function splitAtLastParagraph(text: string): [string, string] {
   // Need at least some content in both halves to be worth splitting
-  if (text.length < 120) return ['', text]
+  if (text.length < 120) return ["", text];
 
-  const lastBreak = text.lastIndexOf('\n\n')
-  if (lastBreak <= 0) return ['', text]
+  const lastBreak = text.lastIndexOf("\n\n");
+  if (lastBreak <= 0) return ["", text];
 
-  return [text.slice(0, lastBreak), text.slice(lastBreak)]
+  return [text.slice(0, lastBreak), text.slice(lastBreak)];
 }
 
+<<<<<<< HEAD
 export const TypewriterMarkdown: React.FC<TypewriterMarkdownProps> = ({
   content,
   components,
+=======
+const TypewriterMarkdownInner: React.FC<TypewriterMarkdownProps> = ({
+	content,
+	isStreaming = false,
+	components,
+>>>>>>> 920ae80 (fix(chat): eliminate per-frame re-render jitter during streaming)
 }) => {
   if (!isStreaming) {
-    return (
-      <StableMarkdown content={content || ''} components={components} />
-    )
+    return <StableMarkdown content={content || ""} components={components} />;
   }
 
   // During streaming: split into stable prefix (memoised) + active tail
-  const [stableContent, tailContent] = splitAtLastParagraph(content || '')
+  const [stableContent, tailContent] = splitAtLastParagraph(content || "");
 
   return (
     <>
@@ -74,5 +74,8 @@ export const TypewriterMarkdown: React.FC<TypewriterMarkdownProps> = ({
         </ReactMarkdown>
       </div>
     </>
-  )
-}
+  );
+};
+
+export const TypewriterMarkdown = React.memo(TypewriterMarkdownInner);
+TypewriterMarkdown.displayName = "TypewriterMarkdown";
