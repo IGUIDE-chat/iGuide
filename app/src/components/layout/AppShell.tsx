@@ -42,12 +42,11 @@ export const AppShell: React.FC<AppShellProps> = ({
     >
       <div
         className={`
-          fixed inset-0 z-40 bg-black/50 transition-opacity duration-300
+          fixed inset-0 z-40 w-64 bg-black/50 transition-opacity duration-300
           md:hidden
-          ${
-            isSidebarOpen
-              ? 'pointer-events-auto opacity-100'
-              : 'pointer-events-none opacity-0'
+          ${isSidebarOpen
+            ? 'pointer-events-auto opacity-100'
+            : 'pointer-events-none opacity-0'
           }
         `}
         onClick={onCloseSidebar}
@@ -58,17 +57,16 @@ export const AppShell: React.FC<AppShellProps> = ({
           fixed inset-y-0 left-0 z-50 flex flex-col bg-[#171717] text-slate-200
           transition-all duration-300 ease-in-out
           md:relative
-          ${
-            isSidebarOpen
-              ? 'w-[180px] translate-x-0'
-              : `
-                w-[180px] -translate-x-full
-                md:w-0 md:translate-x-0 md:overflow-hidden
-              `
+          ${isSidebarOpen
+            ? 'translate-x-0'
+            : `
+              -translate-x-full
+              md:w-0 md:translate-x-0 md:overflow-hidden
+            `
           }
         `}
       >
-        <div className="flex h-full w-[180px] flex-col">{sidebar}</div>
+        <div className="flex h-full w-64 flex-col">{sidebar}</div>
       </aside>
 
       <main className="relative flex size-full min-w-0 flex-1 flex-col bg-white">
