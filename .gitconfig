@@ -2,7 +2,7 @@
 	ff = only
 
 [pull]
-	ff = only
+	ff = false
 	rebase = true
 
 [rebase]
