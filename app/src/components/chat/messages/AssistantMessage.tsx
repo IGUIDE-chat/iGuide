@@ -118,6 +118,7 @@ const AssistantMessageInner: React.FC<AssistantMessageProps> = ({
 						<ThinkingProcess
 							steps={meta?.thinkingSteps ?? []}
 							isThinking={!!meta?.isThinking}
+							isStreaming={!!meta?.isStreaming}
 							language={language}
 						/>
 					)}
@@ -138,7 +139,7 @@ const AssistantMessageInner: React.FC<AssistantMessageProps> = ({
 						{meta?.isStreaming && (
 							<span className="ml-1 inline-flex items-center align-middle">
 								<svg
-									className="size-3.5 animate-spin text-illini-orange"
+									className="size-3.5 text-illini-orange opacity-70"
 									xmlns="http://www.w3.org/2000/svg"
 									fill="none"
 									viewBox="0 0 24 24"

@@ -10,10 +10,10 @@ import ReactMarkdown, { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 interface TypewriterMarkdownProps {
-  content: string;
-  isStreaming?: boolean;
-  speed?: number;
-  components?: Components;
+	content: string;
+	isStreaming?: boolean;
+	speed?: number;
+	components?: Components;
 }
 
 const remarkPlugins = [remarkGfm];
@@ -23,11 +23,11 @@ const remarkPlugins = [remarkGfm];
  * Only re-renders when `content` string actually changes.
  */
 const StableMarkdown = React.memo(
-  ({ content, components }: { content: string; components?: Components }) => (
-    <ReactMarkdown remarkPlugins={remarkPlugins} components={components}>
-      {content}
-    </ReactMarkdown>
-  ),
+	({ content, components }: { content: string; components?: Components }) => (
+		<ReactMarkdown remarkPlugins={remarkPlugins} components={components}>
+			{content}
+		</ReactMarkdown>
+	),
 );
 StableMarkdown.displayName = "StableMarkdown";
 
@@ -36,45 +36,41 @@ StableMarkdown.displayName = "StableMarkdown";
  * (double newline) so the stable prefix is always valid markdown.
  */
 function splitAtLastParagraph(text: string): [string, string] {
-  // Need at least some content in both halves to be worth splitting
-  if (text.length < 120) return ["", text];
+	// Need at least some content in both halves to be worth splitting
+	if (text.length < 120) return ["", text];
 
-  const lastBreak = text.lastIndexOf("\n\n");
-  if (lastBreak <= 0) return ["", text];
+	const lastBreak = text.lastIndexOf("\n\n");
+	if (lastBreak <= 0) return ["", text];
 
-  return [text.slice(0, lastBreak), text.slice(lastBreak)];
+	return [text.slice(0, lastBreak), text.slice(lastBreak)];
 }
 
-<<<<<<< HEAD
-export const TypewriterMarkdown: React.FC<TypewriterMarkdownProps> = ({
-  content,
-  components,
-=======
 const TypewriterMarkdownInner: React.FC<TypewriterMarkdownProps> = ({
 	content,
 	isStreaming = false,
 	components,
->>>>>>> 920ae80 (fix(chat): eliminate per-frame re-render jitter during streaming)
 }) => {
-  if (!isStreaming) {
-    return <StableMarkdown content={content || ""} components={components} />;
-  }
+	if (!isStreaming) {
+		return <StableMarkdown content={content || ""} components={components} />;
+	}
 
-  // During streaming: split into stable prefix (memoised) + active tail
-  const [stableContent, tailContent] = splitAtLastParagraph(content || "");
+	// During streaming: split into stable prefix (memoised) + active tail
+	const [stableContent, tailContent] = splitAtLastParagraph(content || "");
 
-  return (
-    <>
-      {stableContent && (
-        <StableMarkdown content={stableContent} components={components} />
-      )}
-      <div className="aui-streaming-tail">
-        <ReactMarkdown remarkPlugins={remarkPlugins} components={components}>
-          {tailContent}
-        </ReactMarkdown>
-      </div>
-    </>
-  );
+	return (
+		<>
+			{/* Always render StableMarkdown so aui-streaming-tail stays at
+			    position 1 in the fragment — prevents unmount/remount when
+			    stableContent first becomes non-empty, which would re-trigger
+			    the stream-in CSS animation. */}
+			<StableMarkdown content={stableContent || ""} components={components} />
+			<div className="aui-streaming-tail">
+				<ReactMarkdown remarkPlugins={remarkPlugins} components={components}>
+					{tailContent}
+				</ReactMarkdown>
+			</div>
+		</>
+	);
 };
 
 export const TypewriterMarkdown = React.memo(TypewriterMarkdownInner);

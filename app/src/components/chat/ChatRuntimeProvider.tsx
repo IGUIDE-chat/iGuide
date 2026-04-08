@@ -97,17 +97,22 @@ export const ChatRuntimeProvider = ({
 		[],
 	);
 
-	const runtime = useExternalStoreRuntime({
-		messages,
-		convertMessage: stableConvertMessage,
-		isRunning: isLoading,
-		onNew: async (message: AppendMessage) => {
+	const onNew = React.useCallback(
+		async (message: AppendMessage) => {
 			const text = getTextFromAppendMessage(message);
 
 			if (text) {
 				await sendMessage(text);
 			}
 		},
+		[sendMessage],
+	);
+
+	const runtime = useExternalStoreRuntime({
+		messages,
+		convertMessage: stableConvertMessage,
+		isRunning: isLoading,
+		onNew,
 	});
 
 	return (

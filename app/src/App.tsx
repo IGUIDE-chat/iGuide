@@ -37,17 +37,13 @@ export default function App() {
 
 	// Each visit starts with a fresh chat; sidebar lets users resume old ones
 	useEffect(() => {
-		localStorage.removeItem('lastConversationId')
-	}, [])
+		localStorage.removeItem("lastConversationId");
+	}, []);
 
 	const clearConversation = useCallback(() => {
 		setCurrentConversationId(null);
 		localStorage.removeItem("lastConversationId");
 	}, []);
-
-	const handleSelectConversation = (conversationId: string | null) => {
-		setCurrentConversationId(conversationId)
-	}
 
 	useEffect(() => {
 		if (user) {

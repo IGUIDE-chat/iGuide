@@ -146,13 +146,16 @@ export const useChatSession = ({
 
 			if (conversationId) {
 				try {
-					const service = user ? conversationService : localConversationService
-					const { error: saveError } = await service.saveMessage(conversationId, userMsg)
+					const service = user ? conversationService : localConversationService;
+					const { error: saveError } = await service.saveMessage(
+						conversationId,
+						userMsg,
+					);
 					if (saveError) {
-						console.error('Failed to save user message:', saveError)
+						console.error("Failed to save user message:", saveError);
 					}
 				} catch (error) {
-					console.error('Failed to save user message:', error)
+					console.error("Failed to save user message:", error);
 				}
 			}
 
@@ -189,42 +192,42 @@ export const useChatSession = ({
 					user?.id,
 				);
 
-				let fullText = ''
-				let followUpQuestions: string[] | undefined
-				const thinkingSteps: ThinkingStep[] = []
-				let rafId = 0
-				let dirty = false
+				let fullText = "";
+				let followUpQuestions: string[] | undefined;
+				const thinkingSteps: ThinkingStep[] = [];
+				let rafId = 0;
+				let dirty = false;
 
 				const flushUpdate = () => {
-					rafId = 0
-					if (!dirty) return
-					dirty = false
+					rafId = 0;
+					if (!dirty) return;
+					dirty = false;
 					setMessages((prev) =>
 						prev.map((message) =>
 							message.id === aiMsgId
 								? {
-									...message,
-									text: fullText,
-									isThinking: thinkingSteps.some((s) => !s.done),
-									thinkingSteps: [...thinkingSteps],
-									followUpQuestions,
-								}
-								: message
-						)
-					)
-				}
+										...message,
+										text: fullText,
+										isThinking: thinkingSteps.some((s) => !s.done),
+										thinkingSteps: [...thinkingSteps],
+										followUpQuestions,
+									}
+								: message,
+						),
+					);
+				};
 
 				const scheduleFlush = () => {
-					dirty = true
+					dirty = true;
 					if (!rafId) {
-						rafId = requestAnimationFrame(flushUpdate)
+						rafId = requestAnimationFrame(flushUpdate);
 					}
-				}
+				};
 
 				for await (const chunk of stream) {
 					if (chunk.thinkingStep) {
 						if (thinkingSteps.length > 0) {
-							thinkingSteps[thinkingSteps.length - 1].done = true
+							thinkingSteps[thinkingSteps.length - 1].done = true;
 						}
 						thinkingSteps.push({
 							id: `step-${Date.now()}-${thinkingSteps.length}`,
@@ -233,45 +236,47 @@ export const useChatSession = ({
 							detail: chunk.thinkingStep.detail,
 							timestamp: Date.now(),
 							done: false,
-						})
-						scheduleFlush()
+						});
+						scheduleFlush();
 					}
 
 					if (chunk.text) {
 						if (!fullText && thinkingSteps.length > 0) {
-							thinkingSteps.forEach((s) => { s.done = true })
+							thinkingSteps.forEach((s) => {
+								s.done = true;
+							});
 						}
-						fullText += chunk.text
-						scheduleFlush()
+						fullText += chunk.text;
+						scheduleFlush();
 					}
 
 					if (chunk.followUpQuestions) {
-						followUpQuestions = chunk.followUpQuestions
-						scheduleFlush()
+						followUpQuestions = chunk.followUpQuestions;
+						scheduleFlush();
 					}
 				}
 
 				// Final sync flush — cancel any pending rAF
-				if (rafId) cancelAnimationFrame(rafId)
-				dirty = true
-				flushUpdate()
+				if (rafId) cancelAnimationFrame(rafId);
+				dirty = true;
+				flushUpdate();
 
 				if (!fullText.trim()) {
-					fullText = INVALID_RESPONSE[language]
+					fullText = INVALID_RESPONSE[language];
 				}
 
 				// Extract "💡 你可能还想了解：" / "💡 You might also want to know:" section
 				const followUpHeaderMatch = fullText.match(
-					/\n+.*💡.*(?:[你您]可能还想|[Yy]ou (?:might|may) (?:also )?want).*[:：\n]/
-				)
+					/\n+.*💡.*(?:[你您]可能还想|[Yy]ou (?:might|may) (?:also )?want).*[:：\n]/,
+				);
 				if (
 					followUpHeaderMatch &&
 					(!followUpQuestions || followUpQuestions.length === 0)
 				) {
-					const splitIndex = followUpHeaderMatch.index!
+					const splitIndex = followUpHeaderMatch.index!;
 					const followUpText = fullText.substring(
-						splitIndex + followUpHeaderMatch[0].length
-					)
+						splitIndex + followUpHeaderMatch[0].length,
+					);
 
 					const questions = followUpText
 						.split("\n")
@@ -346,13 +351,16 @@ export const useChatSession = ({
 					try {
 						const service = user
 							? conversationService
-							: localConversationService
-						const { error: saveError } = await service.saveMessage(conversationId, aiMsg)
+							: localConversationService;
+						const { error: saveError } = await service.saveMessage(
+							conversationId,
+							aiMsg,
+						);
 						if (saveError) {
-							console.error('Failed to save AI message:', saveError)
+							console.error("Failed to save AI message:", saveError);
 						}
 					} catch (error) {
-						console.error('Failed to save AI message:', error)
+						console.error("Failed to save AI message:", error);
 					}
 				}
 			} catch (error) {
@@ -360,12 +368,12 @@ export const useChatSession = ({
 					...prev,
 					{
 						id: Date.now().toString(),
-						role: 'model',
+						role: "model",
 						text: CONNECTION_ERROR[language],
 					},
-				])
+				]);
 			} finally {
-				setIsLoading(false)
+				setIsLoading(false);
 			}
 		},
 		[
@@ -375,8 +383,8 @@ export const useChatSession = ({
 			messages,
 			onConversationCreated,
 			user,
-		]
-	)
+		],
+	);
 
 	const handleSubmit = useCallback(
 		(event: React.FormEvent<HTMLFormElement>) => {
