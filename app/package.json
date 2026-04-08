@@ -40,7 +40,7 @@
     "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260405.1",
+    "@cloudflare/workers-types": "^4.20260408.1",
     "@eslint/js": "^9.39.4",
     "@tailwindcss/postcss": "^4.2.2",
     "@types/node": "^25.5.2",
@@ -48,7 +48,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.2.0",
     "autoprefixer": "^10.4.27",
-    "dotenv": "^17.4.0",
+    "dotenv": "^17.4.1",
     "eslint": "^9.39.4",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-better-tailwindcss": "^4.3.2",
@@ -57,7 +57,7 @@
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.4.0",
     "markdownlint-cli2": "^0.22.0",
-    "postcss": "^8.5.8",
+    "postcss": "^8.5.9",
     "prettier": "^3.8.1",
     "puppeteer": "^24.40.0",
     "puppeteer-extra": "^3.3.6",
