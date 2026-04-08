@@ -35,23 +35,19 @@ export default function App() {
 		return null;
 	});
 
-	// Sync to localStorage when conversation changes
+	// Each visit starts with a fresh chat; sidebar lets users resume old ones
 	useEffect(() => {
-		if (currentConversationId && !isGuest) {
-			localStorage.setItem("lastConversationId", currentConversationId);
-		}
-	}, [currentConversationId, isGuest]);
+		localStorage.removeItem('lastConversationId')
+	}, [])
 
 	const clearConversation = useCallback(() => {
 		setCurrentConversationId(null);
 		localStorage.removeItem("lastConversationId");
 	}, []);
 
-	useEffect(() => {
-		if (isGuest) {
-			queueMicrotask(() => clearConversation());
-		}
-	}, [isGuest, clearConversation]);
+	const handleSelectConversation = (conversationId: string | null) => {
+		setCurrentConversationId(conversationId)
+	}
 
 	useEffect(() => {
 		if (user) {
