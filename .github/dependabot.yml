@@ -6,6 +6,21 @@ updates:
       interval: "cron"
       cronjob: "30 11 * * 3,6"
     open-pull-requests-limit: 10
+    groups:
+      production-minor-patch:
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+      development-minor-patch:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+      production-major:
+        dependency-type: "production"
+        update-types:
+          - "major"
 
   - package-ecosystem: "npm"
     directory: "/api"
@@ -13,6 +28,21 @@ updates:
       interval: "cron"
       cronjob: "30 11 * * 3,6"
     open-pull-requests-limit: 10
+    groups:
+      production-minor-patch:
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+      development-minor-patch:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+      production-major:
+        dependency-type: "production"
+        update-types:
+          - "major"
 
   - package-ecosystem: "pip"
     directory: "/data_collection"
@@ -20,6 +50,21 @@ updates:
       interval: "cron"
       cronjob: "30 11 * * 3,6"
     open-pull-requests-limit: 10
+    groups:
+      production-minor-patch:
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+      development-minor-patch:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+      production-major:
+        dependency-type: "production"
+        update-types:
+          - "major"
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -27,3 +72,8 @@ updates:
       interval: "cron"
       cronjob: "30 11 * * 3,6"
     open-pull-requests-limit: 5
+    groups:
+      actions-updates:
+        update-types:
+          - "minor"
+          - "patch"
