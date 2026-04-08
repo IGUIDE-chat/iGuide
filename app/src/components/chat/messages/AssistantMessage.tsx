@@ -67,6 +67,7 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
 					{/* Thinking process */}
 					{(meta?.thinkingSteps?.length || meta?.isThinking) && (
 						<ThinkingProcess
+							key={message.id}
 							steps={meta?.thinkingSteps ?? []}
 							isThinking={!!meta?.isThinking}
 							language={language}
