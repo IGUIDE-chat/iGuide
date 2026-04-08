@@ -5,26 +5,74 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-// [COMPONENT] Markdown renderer with typewriter animation effect.
-// [组件] 带有打字机动画效果的 Markdown 渲染组件。
-import * as React from "react";
-import ReactMarkdown, { Components } from "react-markdown";
-import remarkGfm from "remark-gfm";
+import * as React from 'react'
+import ReactMarkdown, { Components } from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 interface TypewriterMarkdownProps {
-	content: string;
-	speed?: number;
-	components?: Components;
+  content: string;
+  speed?: number;
+  components?: Components;
 }
 
-// SIMPLIFIED: No typewriter effect, just direct render
+const remarkPlugins = [remarkGfm]
+
+/**
+ * Memoised block for content that has already been fully streamed.
+ * Only re-renders when `content` string actually changes.
+ */
+const StableMarkdown = React.memo(
+  ({
+    content,
+    components,
+  }: {
+    content: string
+    components?: Components
+  }) => (
+    <ReactMarkdown remarkPlugins={remarkPlugins} components={components}>
+      {content}
+    </ReactMarkdown>
+  )
+)
+StableMarkdown.displayName = 'StableMarkdown'
+
+/**
+ * Find the last "safe split" point — the end of a complete markdown paragraph
+ * (double newline) so the stable prefix is always valid markdown.
+ */
+function splitAtLastParagraph(text: string): [string, string] {
+  // Need at least some content in both halves to be worth splitting
+  if (text.length < 120) return ['', text]
+
+  const lastBreak = text.lastIndexOf('\n\n')
+  if (lastBreak <= 0) return ['', text]
+
+  return [text.slice(0, lastBreak), text.slice(lastBreak)]
+}
+
 export const TypewriterMarkdown: React.FC<TypewriterMarkdownProps> = ({
-	content,
-	components,
+  content,
+  components,
 }) => {
-	return (
-		<ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
-			{content || ""}
-		</ReactMarkdown>
-	);
-};
+  if (!isStreaming) {
+    return (
+      <StableMarkdown content={content || ''} components={components} />
+    )
+  }
+
+  // During streaming: split into stable prefix (memoised) + active tail
+  const [stableContent, tailContent] = splitAtLastParagraph(content || '')
+
+  return (
+    <>
+      {stableContent && (
+        <StableMarkdown content={stableContent} components={components} />
+      )}
+      <div className="aui-streaming-tail">
+        <ReactMarkdown remarkPlugins={remarkPlugins} components={components}>
+          {tailContent}
+        </ReactMarkdown>
+      </div>
+    </>
+  )
+}

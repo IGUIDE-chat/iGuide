@@ -134,6 +134,24 @@ body {
   animation: marker-glow 2s ease-in-out infinite;
 }
 
+/* Streaming text fade-in (Gemini-style) */
+@keyframes stream-in {
+  from {
+    opacity: 0;
+    filter: blur(2px);
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+.aui-streaming-tail > * {
+  animation: stream-in 0.3s ease-out both;
+}
+
 /* Prose styles for markdown content */
 .prose {
   line-height: 1.6;
