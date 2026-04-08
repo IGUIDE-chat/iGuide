@@ -8,6 +8,7 @@
 import React, {
 	memo,
 	useCallback,
+	useEffect,
 	useLayoutEffect,
 	useRef,
 	useState,
