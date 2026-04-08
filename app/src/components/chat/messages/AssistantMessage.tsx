@@ -4,14 +4,16 @@
  */
 
 import * as React from "react";
-import { MessagePrimitive, useMessage } from "@assistant-ui/react";
-import { ThinkingProcess } from "../ThinkingProcess";
+import {
+	AuiIf,
+	ChainOfThoughtPrimitive,
+	MessagePrimitive,
+	useMessage,
+} from "@assistant-ui/react";
 import { TypewriterMarkdown } from "../TypewriterMarkdown";
-import { ThinkingStep } from "../../../types";
+import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
 
 interface AssistantMessageMeta {
-	thinkingSteps?: ThinkingStep[];
-	isThinking?: boolean;
 	followUpQuestions?: string[];
 	isStreaming?: boolean;
 }
@@ -21,6 +23,65 @@ interface AssistantMessageProps {
 	botName?: string;
 	onFollowUpClick?: (text: string) => void;
 }
+
+const Reasoning: React.FC<{ text: string }> = ({ text }) => {
+	return (
+		<p className="whitespace-pre-wrap px-4 py-2 text-sm italic text-muted-foreground">
+			{text}
+		</p>
+	);
+};
+
+const ToolFallback: React.FC<{
+	toolCallId: string;
+	name: string;
+	args: string;
+}> = ({ name, args }) => {
+	return (
+		<div className="px-4 py-2 text-sm">
+			<span className="font-medium text-muted-foreground">Tool: </span>
+			<span className="text-muted-foreground">{name}</span>
+			<pre className="mt-1 overflow-x-auto text-xs text-muted-foreground">
+				{args}
+			</pre>
+		</div>
+	);
+};
+
+const ChainOfThought: React.FC = () => {
+	return (
+		<ChainOfThoughtPrimitive.Root className="my-2 rounded-lg border">
+			<ChainOfThoughtPrimitive.AccordionTrigger className="flex w-full cursor-pointer items-center gap-2 px-4 py-2 text-sm font-medium hover:bg-muted/50">
+				<AuiIf condition={(s) => s.chainOfThought.collapsed}>
+					<ChevronRightIcon className="size-4 shrink-0" />
+				</AuiIf>
+				<AuiIf condition={(s) => !s.chainOfThought.collapsed}>
+					<ChevronDownIcon className="size-4 shrink-0" />
+				</AuiIf>
+				Thinking
+			</ChainOfThoughtPrimitive.AccordionTrigger>
+			<AuiIf condition={(s) => !s.chainOfThought.collapsed}>
+				<ChainOfThoughtPrimitive.Parts>
+					{({ part }) => {
+						if (part.type === "reasoning") {
+							return <Reasoning text={part.text ?? ""} />;
+						}
+						if (part.type === "tool-call") {
+							return (
+								<ToolFallback
+									toolCallId={part.toolCall?.toolCallId ?? ""}
+									name={part.toolCall?.name ?? "tool"}
+									args={part.toolCall?.args ?? "{}"}
+								/>
+							);
+						}
+						return null;
+					}}
+				</ChainOfThoughtPrimitive.Parts>
+			</AuiIf>
+		</ChainOfThoughtPrimitive.Root>
+	);
+};
 
 const AssistantMessageInner: React.FC<AssistantMessageProps> = ({
 	language = "zh",
@@ -81,21 +142,25 @@ const AssistantMessageInner: React.FC<AssistantMessageProps> = ({
 	const textPart = message.content.find((p) => p.type === "text");
 	const text = textPart && textPart.type === "text" ? textPart.text : "";
 
+	const hasThinkingParts = message.content.some(
+		(p) => p.type === "reasoning" || p.type === "tool-call",
+	);
+
 	return (
 		<MessagePrimitive.Root className="flex w-full border-b border-transparent py-6">
 			<div className="mx-auto flex w-full max-w-3xl flex-col gap-4 px-4 md:flex-row">
 				{/* Avatar — hidden on mobile */}
 				<div
 					className="
-       relative flex hidden shrink-0 flex-col items-end
-       md:flex
-     "
+        relative flex hidden shrink-0 flex-col items-end
+        md:flex
+      "
 				>
 					<div
 						className="
-        flex size-6 items-center justify-center rounded-sm bg-illini-orange
-        font-serif text-xs font-bold text-white shadow-sm
-      "
+          flex size-6 items-center justify-center rounded-sm bg-illini-orange
+          font-serif text-xs font-bold text-white shadow-sm
+        "
 					>
 						I
 					</div>
@@ -106,28 +171,21 @@ const AssistantMessageInner: React.FC<AssistantMessageProps> = ({
 					{/* Bot name label */}
 					<div
 						className="
-        mb-1 hidden text-xs font-semibold text-slate-900
-        md:block
-      "
+          mb-1 hidden text-xs font-semibold text-slate-900
+          md:block
+        "
 					>
 						{botName}
 					</div>
 
-					{/* Thinking process */}
-					{(meta?.thinkingSteps?.length || meta?.isThinking) && (
-						<ThinkingProcess
-							steps={meta?.thinkingSteps ?? []}
-							isThinking={!!meta?.isThinking}
-							isStreaming={!!meta?.isStreaming}
-							language={language}
-						/>
-					)}
+					{/* Chain of Thought (native) */}
+					{hasThinkingParts && <ChainOfThought />}
 
 					{/* Prose / markdown body */}
 					<div
 						className="
-        prose prose-slate prose-sm max-w-none leading-relaxed text-slate-800
-      "
+          prose prose-slate prose-sm max-w-none leading-relaxed text-slate-800
+        "
 					>
 						<TypewriterMarkdown
 							content={text}
@@ -179,11 +237,11 @@ const AssistantMessageInner: React.FC<AssistantMessageProps> = ({
 										onClick={() => onFollowUpClick?.(question)}
 										title={question}
 										className="
-            rounded-full border border-slate-200 bg-slate-100 px-3 py-1.5
-            text-xs transition-colors
-            hover:border-illini-blue hover:bg-illini-blue hover:text-white
-            disabled:cursor-not-allowed disabled:opacity-50
-          "
+                    rounded-full border border-slate-200 bg-slate-100 px-3 py-1.5
+                    text-xs transition-colors
+                    hover:border-illini-blue hover:bg-illini-blue hover:text-white
+                    disabled:cursor-not-allowed disabled:opacity-50
+                  "
 									>
 										💡 {displayText}
 									</button>

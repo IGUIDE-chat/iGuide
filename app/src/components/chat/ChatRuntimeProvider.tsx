@@ -25,8 +25,6 @@ interface ChatSessionContextValue {
 }
 
 interface AssistantMessageCustom {
-	thinkingSteps: ChatMessage["thinkingSteps"];
-	isThinking: ChatMessage["isThinking"];
 	followUpQuestions: ChatMessage["followUpQuestions"];
 	isStreaming: ChatMessage["isStreaming"];
 	[key: string]: unknown;
@@ -50,6 +48,33 @@ const getTextFromAppendMessage = (message: AppendMessage): string | null => {
 	return null;
 };
 
+const convertContentPart = (
+	part: ChatMessage["content"],
+): ThreadMessageLike["content"] => {
+	if (!part || part.length === 0) return [];
+
+	const content: ThreadMessageLike["content"] = [];
+
+	for (const p of part) {
+		if (p.type === "text") {
+			content.push({ type: "text", text: p.text || "" });
+		} else if (p.type === "reasoning") {
+			content.push({ type: "reasoning", text: p.reasoning || "" });
+		} else if (p.type === "tool-call" && p.toolCall) {
+			content.push({
+				type: "tool-call",
+				toolCall: {
+					toolCallId: `tool-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+					name: p.toolCall.name,
+					args: p.toolCall.arguments,
+				},
+			});
+		}
+	}
+
+	return content;
+};
+
 export const ChatRuntimeProvider = ({
 	language,
 	currentConversationId,
@@ -68,17 +93,14 @@ export const ChatRuntimeProvider = ({
 
 	const stableConvertMessage = React.useCallback(
 		(msg: ChatMessage): ThreadMessageLike => {
-			// Only cache metadata fields — text is always fresh in content array
-			const cacheKey = `${msg.thinkingSteps?.length ?? 0}-${msg.followUpQuestions?.length ?? 0}-${msg.isThinking}-${msg.isStreaming}`;
+			const cacheKey = `${msg.followUpQuestions?.length ?? 0}-${msg.isStreaming}`;
 			const cachedEntry = metadataCacheRef.current.get(msg.id);
 
 			let custom: AssistantMessageCustom;
 			if (cachedEntry && cachedEntry.cacheKey === cacheKey) {
-				custom = cachedEntry.custom; // reuse stable reference
+				custom = cachedEntry.custom;
 			} else {
 				custom = {
-					thinkingSteps: msg.thinkingSteps,
-					isThinking: msg.isThinking,
 					followUpQuestions: msg.followUpQuestions,
 					isStreaming: msg.isStreaming,
 				};
@@ -88,9 +110,12 @@ export const ChatRuntimeProvider = ({
 			return {
 				id: msg.id,
 				role: msg.role === "model" ? "assistant" : "user",
-				content: [{ type: "text", text: msg.text }], // always fresh text
+				content: [
+					{ type: "text", text: msg.text },
+					...convertContentPart(msg.content),
+				],
 				metadata: {
-					custom, // stable custom reference when metadata unchanged
+					custom,
 				},
 			};
 		},

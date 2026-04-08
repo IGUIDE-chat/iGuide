@@ -6,7 +6,7 @@
  */
 
 import { useCallback, useEffect, useState } from "react";
-import { Language, ChatMessage, ThinkingStep } from "../../types";
+import { Language, ChatMessage, ChatMessageContentPart } from "../../types";
 import { streamChatResponse } from "../../services/ai";
 import { conversationService } from "../../services/conversationService";
 import { localConversationService } from "../../services/localConversationService";
@@ -168,16 +168,7 @@ export const useChatSession = ({
 						role: "model",
 						text: "",
 						isStreaming: true,
-						isThinking: true,
-						thinkingSteps: [
-							{
-								id: `step-${Date.now()}-init`,
-								type: "processing" as const,
-								label: language === "zh" ? "理解问题..." : "Understanding...",
-								timestamp: Date.now(),
-								done: false,
-							},
-						],
+						content: [],
 					},
 				]);
 
@@ -194,7 +185,7 @@ export const useChatSession = ({
 
 				let fullText = "";
 				let followUpQuestions: string[] | undefined;
-				const thinkingSteps: ThinkingStep[] = [];
+				const contentParts: ChatMessageContentPart[] = [];
 				let rafId = 0;
 				let dirty = false;
 
@@ -208,8 +199,7 @@ export const useChatSession = ({
 								? {
 										...message,
 										text: fullText,
-										isThinking: thinkingSteps.some((s) => !s.done),
-										thinkingSteps: [...thinkingSteps],
+										content: [...contentParts],
 										followUpQuestions,
 									}
 								: message,
@@ -225,27 +215,31 @@ export const useChatSession = ({
 				};
 
 				for await (const chunk of stream) {
-					if (chunk.thinkingStep) {
-						if (thinkingSteps.length > 0) {
-							thinkingSteps[thinkingSteps.length - 1].done = true;
-						}
-						thinkingSteps.push({
-							id: `step-${Date.now()}-${thinkingSteps.length}`,
-							type: chunk.thinkingStep.type,
-							label: chunk.thinkingStep.label,
-							detail: chunk.thinkingStep.detail,
-							timestamp: Date.now(),
-							done: false,
+					if (chunk.reasoning) {
+						contentParts.push({
+							type: "reasoning",
+							reasoning: chunk.reasoning,
+						});
+						scheduleFlush();
+					}
+
+					if (chunk.toolCall) {
+						contentParts.push({
+							type: "tool-call",
+							toolCall: chunk.toolCall,
+						});
+						scheduleFlush();
+					}
+
+					if (chunk.toolResult) {
+						contentParts.push({
+							type: "tool-call",
+							toolCall: { name: "result", arguments: chunk.toolResult },
 						});
 						scheduleFlush();
 					}
 
 					if (chunk.text) {
-						if (!fullText && thinkingSteps.length > 0) {
-							thinkingSteps.forEach((s) => {
-								s.done = true;
-							});
-						}
 						fullText += chunk.text;
 						scheduleFlush();
 					}
@@ -328,19 +322,13 @@ export const useChatSession = ({
 					}
 				}
 
-				// Mark all steps done
-				thinkingSteps.forEach((s) => {
-					s.done = true;
-				});
-
 				const aiMsg: ChatMessage = {
 					id: aiMsgId,
 					role: "model",
 					text: fullText,
 					isStreaming: false,
-					isThinking: false,
 					followUpQuestions,
-					thinkingSteps: thinkingSteps.length > 0 ? thinkingSteps : undefined,
+					content: contentParts.length > 0 ? contentParts : undefined,
 				};
 
 				setMessages((prev) =>
