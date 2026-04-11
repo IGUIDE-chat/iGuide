@@ -7,7 +7,12 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { DEFAULT_FAVORITES_TARGET } from "./favoriteConstants";
+import {
+  DEFAULT_FAVORITES_TARGET,
+  DEFAULT_TOGGLE_TARGET,
+} from "./favoriteConstants";
+
+export { DEFAULT_FAVORITES_TARGET, DEFAULT_TOGGLE_TARGET };
 
 const FAVORITES_HEART_SCALE = 12 / 24;
 
