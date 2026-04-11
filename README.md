@@ -63,14 +63,15 @@ pnpm run dev
 curl http://localhost:8787/health
 ```
 
-The gateway verifies Supabase JWTs, routes by Geo-IP, proxies to the backend through Argo Tunnel, and supports SSE chat responses.
+The gateway verifies Supabase JWTs, routes by Geo-IP, hosts the server-side tool-use runtime, and supports SSE chat responses.
 
 ## API Gateway Notes
 
 - JWT auth via Supabase tokens.
 - Geo-IP routing for CN vs global traffic.
-- CORS handling, health check, and streaming proxy support.
-- Production env vars: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `DEEPSEEK_API_KEY`, `SILICONFLOW_API_KEY`, `BACKEND_URL`.
+- CORS handling, health check, and streaming tool-use responses.
+- Core production env vars now include: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `DEEPSEEK_API_KEY`, `TAVILY_API_KEY`, `USE_TOOL_USE_RAG`, `EMBEDDING_API_BASE_URL`, `EMBEDDING_API_KEY`, `EMBEDDING_MODEL`, `EMBEDDING_DIMENSIONS`.
+- `EMBEDDING_FALLBACK_URL` is optional and should only be configured when you explicitly want a self-hosted fallback path.
 
 ## Placement Rules
 
@@ -81,40 +82,47 @@ The gateway verifies Supabase JWTs, routes by Geo-IP, proxies to the backend thr
 - Keep legacy code isolated in `src/legacy/**` and do not import from it at runtime.
 - Register new pages in `src/app/pageRegistry.ts` and route changes in `src/app/routes.tsx`.
 
-## Dify Chatflow Setup
+## Retrieval and Tool-Use Policy
 
-1. Retrieve from the `UIUC Campus Guide` knowledge base first.
-2. If retrieval returns results, pass them into the LLM and answer directly.
-3. If retrieval is empty, call a web-search tool such as Tavily and answer from live web results.
-4. Keep the chatflow knowledge-base-first so web search is only the fallback path.
+1. The browser sends the user message to the Cloudflare Worker.
+2. The Worker runs the server-side DeepSeek agent loop.
+3. The agent chooses tools dynamically:
+   - `search_knowledge_base` for Supabase hybrid retrieval
+   - `web_search` for Tavily-backed live web search
+   - `grep_docs` for exact text lookup
+   - `custom_skills` for curated higher-level campus tasks
+4. Knowledge-base retrieval stays the default path. Web search is fallback or augmentation when local knowledge is insufficient.
+5. Frontend prompt-stuffing and browser-side retrieval orchestration are legacy behavior behind a feature flag only.
 
 ---
 
 ## Architecture Overview
 
 ### One-liner
-A Cloudflare edge layer, Supabase user-data layer, and Chicago VPS intelligence layer work together as a low-latency RAG system for UIUC content.
+A serverless-first stack uses Cloudflare Worker as the agent runtime, Supabase as the unified knowledge and user-data layer, and managed APIs for model inference, web search, and embeddings.
 
-### 3-Layer Split
+### Runtime Split
 
 #### Layer 1 — Edge Layer
 
-- Cloudflare Workers handle the public entrypoint.
-- The auth proxy verifies Supabase JWTs before proxying traffic.
-- Geo-IP routing sends CN traffic to SiliconFlow and global traffic to DeepSeek US.
-- Argo Tunnel keeps the Chicago VPS private and stabilizes edge-to-core requests.
+- Cloudflare Worker is the public entrypoint and the primary control plane.
+- It verifies Supabase JWTs, applies rate limits, exposes SSE chat responses, and runs the tool-use agent loop.
+- It also hosts the MCP-style tool registry used by the model.
 
 #### Layer 2 — User Data Layer
 
 - Supabase Auth handles sign-up, login, OAuth, and password recovery.
 - PostgreSQL stores chat history.
+- Supabase pgvector + full-text search power the knowledge base.
 - RLS keeps each user scoped to their own records.
 - Async logging writes conversations after the main response path completes.
 
-#### Layer 3 — Core Intelligence Layer
+#### Layer 3 — External Intelligence Services
 
-- A Chicago-based VPS runs the Python core services, ideally behind FastAPI.
-- The core layer stays close to UIUC sources for low-latency crawling and local processing.
+- DeepSeek provides hosted model inference.
+- Tavily provides hosted live web search.
+- A managed embedding API is the default path for query/document vector generation.
+- An optional self-hosted embedding fallback can be configured, but it is not part of the default production path.
 
 ### Hybrid Retrieval Pipeline
 
@@ -122,7 +130,7 @@ A Cloudflare edge layer, Supabase user-data layer, and Chicago VPS intelligence 
 
 - Fetch HTML with `httpx`.
 - Hash content with MD5 and skip unchanged pages.
-- Track document state in `knowledge.db`.
+- Track crawler state in the crawler pipeline.
 
 #### Transform
 
@@ -132,33 +140,119 @@ A Cloudflare edge layer, Supabase user-data layer, and Chicago VPS intelligence 
 
 #### Load
 
-- Store the knowledge base in SQLite.
-- Use FTS5 for exact keyword matches.
-- Use sqlite-vec plus ONNX embeddings for semantic retrieval.
+- Store the knowledge base in Supabase PostgreSQL.
+- Use pgvector for semantic retrieval.
+- Use PostgreSQL full-text search for exact and keyword matches.
+- Keep embeddings at a fixed dimension configured by `EMBEDDING_DIMENSIONS`.
 
 #### Query
 
-- Run FTS5 and vector search in parallel.
-- Rerank candidates with `bge-reranker-v2-m3`.
-- Fall back to Tavily when the top score is too low.
+- Generate the query embedding through the configured embedding provider.
+- Run vector search and full-text search in parallel through Supabase RPC functions.
+- Fuse results with RRF.
+- Let the model decide whether to call web search, grep, or custom skills after retrieval.
 
-### Why Chicago VPS Matters
+### Why Serverless-First Matters
 
-- It is physically close to UIUC sources, so crawling is fast.
-- CPU-heavy cleaning, chunking, and vectorization stay local instead of using expensive APIs.
-- SQLite keeps retrieval and raw-text lookup in one process.
+- The default production path does not require a dedicated VPS.
+- Cloudflare Worker + Supabase keep the control plane and data plane managed.
+- Managed embedding APIs reduce ops burden while preserving retrieval quality.
+- A fallback self-hosted embedding endpoint remains optional for cost or availability reasons.
 
 ### Operational Simplicity
 
-- `knowledge.db` stays easy to back up and move.
-- FTS5 + vector search live beside the source text, so the system avoids extra infra.
+- Cloudflare Pages hosts the frontend.
+- Cloudflare Worker hosts the API gateway, MCP-style tool registry, and agent loop.
+- Supabase hosts auth, structured memory, conversations, pgvector, and full-text retrieval.
+- Hosted APIs keep model inference, web search, and embeddings off self-managed infrastructure.
+
+## Deployment and Configuration Quick Reference
+
+### Default Production Topology
+
+```text
+Browser / Cloudflare Pages
+  -> Cloudflare Worker
+    -> Supabase
+    -> DeepSeek API
+    -> Tavily API
+    -> Managed Embedding API
+```
+
+Optional only:
+
+```text
+Cloudflare Worker
+  -> EMBEDDING_FALLBACK_URL (self-hosted embedding endpoint)
+```
+
+### Required Configuration
+
+#### Frontend / App
+
+- Configure the app to call the Cloudflare Worker chat endpoint.
+- Treat browser-side RAG orchestration as legacy behavior behind `USE_TOOL_USE_RAG=false` only.
+
+#### Cloudflare Worker
+
+Required secrets / vars:
+
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `DEEPSEEK_API_KEY`
+- `TAVILY_API_KEY`
+- `USE_TOOL_USE_RAG`
+- `EMBEDDING_API_BASE_URL`
+- `EMBEDDING_API_KEY`
+- `EMBEDDING_MODEL`
+- `EMBEDDING_DIMENSIONS`
+
+Optional:
+
+- `EMBEDDING_FALLBACK_URL`
+
+#### Supabase
+
+- Enable `pgvector`.
+- Run the retrieval-related migrations.
+- Validate the documents/chunks tables and RPC functions before enabling the new path.
+
+### Minimal Deployment Flow
+
+1. Deploy Supabase schema and RPC functions.
+2. Configure and validate the managed embedding provider.
+3. Deploy the Cloudflare Worker with `USE_TOOL_USE_RAG=false` first.
+4. Load data into Supabase and validate hybrid retrieval.
+5. Enable tool-use in staging with `USE_TOOL_USE_RAG=true`.
+6. Verify SSE responses, tool calls, fallback behavior, and benchmark quality.
+7. Promote to production.
+
+### Rollback Rule
+
+If the new tool-use path regresses, disable it by switching `USE_TOOL_USE_RAG=false`. The default rollback target is the legacy frontend-driven path. Do not require a VPS to restore service.
+
+### Validation Examples
+
+```bash
+# Worker health
+curl http://localhost:8787/health
+
+# App typecheck
+cd app && pnpm run typecheck
+
+# Worker local dev
+cd api && pnpm run dev
+```
 
 ### Tech Stack Summary
 
 - **Supabase:** Auth, Postgres, and RLS.
-- **Cloudflare Workers / Argo Tunnel:** Edge gateway, routing, and secure backhaul.
-- **Python FastAPI:** Core backend services.
-- **SQLite 3 + FTS5 + sqlite-vec:** Local knowledge store and retrieval indexes.
-- **ONNX Runtime:** Local embedding and reranking inference.
+- **Supabase pgvector + PostgreSQL FTS:** Unified knowledge retrieval.
+- **Cloudflare Workers:** Edge gateway, tool registry, agent loop, and SSE runtime.
+- **Cloudflare Pages:** Frontend hosting.
+- **DeepSeek API:** Hosted model inference.
+- **Managed Embedding API:** Default embedding generation path.
+- **Optional self-hosted embedding endpoint:** Explicit fallback only.
 - **httpx + Trafilatura:** Crawling and cleaning.
 - **Tavily API:** Web fallback.
