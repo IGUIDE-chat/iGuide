@@ -4,8 +4,6 @@ This document provides step-by-step instructions for deploying the IlliniGuide s
 
 **IMPORTANT:** The default production path does NOT depend on a dedicated VPS. All core services run on serverless infrastructure.
 
----
-
 ## Table of Contents
 
 1. [Architecture Overview](#architecture-overview)
@@ -21,13 +19,11 @@ This document provides step-by-step instructions for deploying the IlliniGuide s
 11. [Verification Commands](#verification-commands)
 12. [Troubleshooting](#troubleshooting)
 
----
-
 ## Architecture Overview
 
 The serverless RAG architecture consists of the following components:
 
-```
+```plaintext
 User Request
     |
     v
@@ -57,17 +53,15 @@ Managed Embedding Provider (OpenAI-compatible API)
 
 ### Component Responsibilities
 
-| Component | Purpose |
-|-----------|---------|
-| **Cloudflare Pages** | Static frontend hosting with edge caching |
-| **Cloudflare Worker** | API gateway, auth, routing, RAG orchestration |
-| **Supabase** | Document storage, vector search, user auth |
-| **DeepSeek** | LLM for global traffic |
-| **SiliconFlow** | LLM for China traffic |
-| **Tavily** | Web search fallback |
+| Component                      | Purpose                                       |
+|--------------------------------|-----------------------------------------------|
+| **Cloudflare Pages**           | Static frontend hosting with edge caching     |
+| **Cloudflare Worker**          | API gateway, auth, routing, RAG orchestration |
+| **Supabase**                   | Document storage, vector search, user auth    |
+| **DeepSeek**                   | LLM for global traffic                        |
+| **SiliconFlow**                | LLM for China traffic                         |
+| **Tavily**                     | Web search fallback                           |
 | **Managed Embedding Provider** | Text-to-vector embeddings (OpenAI-compatible) |
-
----
 
 ## Prerequisites
 
@@ -75,21 +69,21 @@ Managed Embedding Provider (OpenAI-compatible API)
 
 Create accounts on the following platforms:
 
-1. **Cloudflare** (https://dash.cloudflare.com)
+1. **Cloudflare** (<https://dash.cloudflare.com>)
    - Domain added to Cloudflare (e.g., `iguide.chat`)
    - Workers/Pages plan enabled
 
-2. **Supabase** (https://supabase.com)
+2. **Supabase** (<https://supabase.com>)
    - New project created
    - Note the project URL and API keys
 
-3. **DeepSeek** (https://platform.deepseek.com)
+3. **DeepSeek** (<https://platform.deepseek.com>)
    - API key for LLM access
 
-4. **SiliconFlow** (https://siliconflow.cn)
+4. **SiliconFlow** (<https://siliconflow.cn>)
    - API key for China-region LLM
 
-5. **Tavily** (https://tavily.com)
+5. **Tavily** (<https://tavily.com>)
    - API key for web search fallback
 
 6. **Managed Embedding Provider**
@@ -120,12 +114,10 @@ node --version       # Should be 18.x or higher
 
 Configure DNS records in Cloudflare:
 
-| Type | Name | Content | Proxy Status |
-|------|------|---------|--------------|
+| Type  | Name  | Content                    | Proxy Status           |
+|-------|-------|----------------------------|------------------------|
 | CNAME | `www` | `<pages-domain>.pages.dev` | Proxied (orange cloud) |
-| AAAA | `api` | `100::` | Proxied (orange cloud) |
-
----
+| AAAA  | `api` | `100::`                    | Proxied (orange cloud) |
 
 ## Environment Variables
 
@@ -133,61 +125,59 @@ Complete list of all environment variables required for the serverless RAG deplo
 
 ### Cloudflare Worker Secrets (set via `wrangler secret put`)
 
-| Variable | Description | Required | Example Value |
-|----------|-------------|----------|---------------|
-| `SUPABASE_URL` | Supabase project URL | Yes | `https://abc123.supabase.co` |
-| `SUPABASE_ANON_KEY` | Supabase anonymous key | Yes | `eyJhbGci...` |
-| `SUPABASE_SERVICE_KEY` | Supabase service role key | Yes | `eyJhbGci...` |
-| `DEEPSEEK_API_KEY` | DeepSeek API key | Yes | `sk-abc123...` |
-| `SILICONFLOW_API_KEY` | SiliconFlow API key | Yes | `sk-def456...` |
-| `TAVILY_API_KEY` | Tavily search API key | Yes | `tvly-ghi789...` |
-| `BACKEND_URL` | VPS backend URL (legacy) | Yes | `https://backend.iguide.chat` |
-| `QMD_CN_URL` | China QMD service URL | Yes | `https://qmd-cn.example.com` |
-| `QMD_US_URL` | US QMD service URL | Yes | `https://qmd-us.example.com` |
-| `QMD_API_KEY` | QMD service auth key | Yes | `Bearer qmd-key-123` |
-| `EMBEDDING_API_BASE_URL` | Embedding provider base URL | Yes | `https://api.openai.com` |
-| `EMBEDDING_API_KEY` | Embedding provider API key | Yes | `sk-embedding-key-123` |
-| `EMBEDDING_FALLBACK_URL` | Fallback embedding URL (optional) | No | `https://fallback.example.com` |
+| Variable                 | Description                       | Required | Example Value                  |
+|--------------------------|-----------------------------------|----------|--------------------------------|
+| `SUPABASE_URL`           | Supabase project URL              | Yes      | `https://abc123.supabase.co`   |
+| `SUPABASE_ANON_KEY`      | Supabase anonymous key            | Yes      | `eyJhbGci...`                  |
+| `SUPABASE_SERVICE_KEY`   | Supabase service role key         | Yes      | `eyJhbGci...`                  |
+| `DEEPSEEK_API_KEY`       | DeepSeek API key                  | Yes      | `sk-abc123...`                 |
+| `SILICONFLOW_API_KEY`    | SiliconFlow API key               | Yes      | `sk-def456...`                 |
+| `TAVILY_API_KEY`         | Tavily search API key             | Yes      | `tvly-ghi789...`               |
+| `BACKEND_URL`            | VPS backend URL (legacy)          | Yes      | `https://backend.iguide.chat`  |
+| `QMD_CN_URL`             | China QMD service URL             | Yes      | `https://qmd-cn.example.com`   |
+| `QMD_US_URL`             | US QMD service URL                | Yes      | `https://qmd-us.example.com`   |
+| `QMD_API_KEY`            | QMD service auth key              | Yes      | `Bearer qmd-key-123`           |
+| `EMBEDDING_API_BASE_URL` | Embedding provider base URL       | Yes      | `https://api.openai.com`       |
+| `EMBEDDING_API_KEY`      | Embedding provider API key        | Yes      | `sk-embedding-key-123`         |
+| `EMBEDDING_FALLBACK_URL` | Fallback embedding URL (optional) | No       | `https://fallback.example.com` |
 
 ### Cloudflare Worker Vars (set in wrangler.jsonc)
 
-| Variable | Description | Required | Default Value |
-|----------|-------------|----------|---------------|
-| `EMBEDDING_MODEL` | Embedding model name | Yes | `multilingual-e5-small` |
-| `EMBEDDING_DIMENSIONS` | Embedding vector dimensions | Yes | `384` |
-| `USE_TOOL_USE_RAG` | Feature flag for serverless RAG | Yes | `false` |
+| Variable               | Description                     | Required | Default Value           |
+|------------------------|---------------------------------|----------|-------------------------|
+| `EMBEDDING_MODEL`      | Embedding model name            | Yes      | `multilingual-e5-small` |
+| `EMBEDDING_DIMENSIONS` | Embedding vector dimensions     | Yes      | `384`                   |
+| `USE_TOOL_USE_RAG`     | Feature flag for serverless RAG | Yes      | `false`                 |
 
 ### Frontend Environment Variables (app/.env.local)
 
-| Variable | Description | Required | Example Value |
-|----------|-------------|----------|---------------|
-| `VITE_SUPABASE_URL` | Public Supabase URL | Yes | `https://abc123.supabase.co` |
-| `VITE_SUPABASE_ANON_KEY` | Public Supabase anon key | Yes | `eyJhbGci...` |
-| `VITE_MAPBOX_TOKEN` | Mapbox public token | Yes | `pk.abc123...` |
-| `VITE_COZE_BOT_ID` | Coze bot ID | Yes | `123456789` |
-| `VITE_USE_TOOL_USE_RAG` | Frontend RAG toggle | Yes | `false` |
-| `VITE_API_GATEWAY_URL` | API Gateway URL | Yes | `https://api.iguide.chat` |
+| Variable                 | Description              | Required | Example Value                |
+|--------------------------|--------------------------|----------|------------------------------|
+| `VITE_SUPABASE_URL`      | Public Supabase URL      | Yes      | `https://abc123.supabase.co` |
+| `VITE_SUPABASE_ANON_KEY` | Public Supabase anon key | Yes      | `eyJhbGci...`                |
+| `VITE_MAPBOX_TOKEN`      | Mapbox public token      | Yes      | `pk.abc123...`               |
+| `VITE_COZE_BOT_ID`       | Coze bot ID              | Yes      | `123456789`                  |
+| `VITE_USE_TOOL_USE_RAG`  | Frontend RAG toggle      | Yes      | `false`                      |
+| `VITE_API_GATEWAY_URL`   | API Gateway URL          | Yes      | `https://api.iguide.chat`    |
 
 ### Server-side Variables (app/.env.local, NOT VITE_ prefixed)
 
-| Variable | Description | Required | Example Value |
-|----------|-------------|----------|---------------|
-| `COZE_API_TOKEN` | Coze API token (dev proxy) | No | `pat-abc123...` |
-| `DEEPSEEK_API_KEY` | DeepSeek API (dev proxy) | No | `sk-abc123...` |
-| `TAVILY_API_KEY` | Tavily API (dev proxy) | No | `tvly-ghi789...` |
+| Variable           | Description                | Required | Example Value    |
+|--------------------|----------------------------|----------|------------------|
+| `COZE_API_TOKEN`   | Coze API token (dev proxy) | No       | `pat-abc123...`  |
+| `DEEPSEEK_API_KEY` | DeepSeek API (dev proxy)   | No       | `sk-abc123...`   |
+| `TAVILY_API_KEY`   | Tavily API (dev proxy)     | No       | `tvly-ghi789...` |
 
 ### Data Import Variables (scripts/import-to-supabase.ts)
 
-| Variable | Description | Required | Example Value |
-|----------|-------------|----------|---------------|
-| `SUPABASE_URL` | Supabase project URL | Yes | `https://abc123.supabase.co` |
-| `SUPABASE_SERVICE_KEY` | Supabase service role key | Yes | `eyJhbGci...` |
-| `EMBEDDING_API_BASE_URL` | Embedding provider URL | Yes | `https://api.openai.com` |
-| `EMBEDDING_API_KEY` | Embedding provider key | Yes | `sk-embedding-key-123` |
-| `EMBEDDING_MODEL` | Model name | No | `multilingual-e5-small` |
-| `EMBEDDING_DIMENSIONS` | Vector dimensions | No | `384` |
-
----
+| Variable                 | Description               | Required | Example Value                |
+|--------------------------|---------------------------|----------|------------------------------|
+| `SUPABASE_URL`           | Supabase project URL      | Yes      | `https://abc123.supabase.co` |
+| `SUPABASE_SERVICE_KEY`   | Supabase service role key | Yes      | `eyJhbGci...`                |
+| `EMBEDDING_API_BASE_URL` | Embedding provider URL    | Yes      | `https://api.openai.com`     |
+| `EMBEDDING_API_KEY`      | Embedding provider key    | Yes      | `sk-embedding-key-123`       |
+| `EMBEDDING_MODEL`        | Model name                | No       | `multilingual-e5-small`      |
+| `EMBEDDING_DIMENSIONS`   | Vector dimensions         | No       | `384`                        |
 
 ## Cloudflare Worker Deployment
 
@@ -303,8 +293,6 @@ curl https://api.iguide.chat/health
 # }
 ```
 
----
-
 ## Supabase Configuration
 
 ### Step 1: Enable pgvector Extension
@@ -371,8 +359,6 @@ WHERE proname IN ('hybrid_search', 'hybrid_search_chunks', 'keyword_search');
 -- Expected output: 3 rows with the function names
 ```
 
----
-
 ## Data Import
 
 ### Step 1: Prepare Data Source
@@ -430,29 +416,31 @@ SELECT * FROM public.document_stats;
 -- 100             | 500          | 500                   | 5
 ```
 
----
-
 ## Embedding Provider Configuration
 
 ### Step 1: Choose a Provider
 
 Select an OpenAI-compatible embedding provider:
 
-**Option A: OpenAI API**
+Option A: OpenAI API
+
 - URL: `https://api.openai.com`
 - Model: `text-embedding-3-small` (1536 dim) or `text-embedding-ada-002` (1536 dim)
 - Note: Must update `EMBEDDING_DIMENSIONS` to match
 
-**Option B: Azure OpenAI**
+Option B: Azure OpenAI
+
 - URL: `https://your-resource.openai.azure.com/openai/deployments/your-deployment`
 - Model: Your deployment name
 
-**Option C: Self-hosted (optional VPS)**
+Option C: Self-hosted (optional VPS)
+
 - Deploy a local embedding service
 - URL: `https://your-vps.example.com`
 - Model: `multilingual-e5-small`
 
-**Recommended for 384-dim compatibility:**
+Recommended for 384-dim compatibility:
+
 - Use `multilingual-e5-small` with 384 dimensions
 - Update `wrangler.jsonc` if using different dimensions
 
@@ -491,8 +479,6 @@ If using a VPS as fallback:
 wrangler secret put EMBEDDING_FALLBACK_URL
 # Enter: https://your-vps-embedding.com
 ```
-
----
 
 ## Frontend Deployment
 
@@ -542,8 +528,6 @@ In Cloudflare Dashboard:
 2. Click "Custom domains" tab
 3. Add `www.iguide.chat`
 4. Verify DNS record is proxied (orange cloud)
-
----
 
 ## Cutover Flow
 
@@ -613,8 +597,6 @@ curl -X POST https://api.iguide.chat/chat \
   -d '{"message": "Tell me about dorms"}'
 ```
 
----
-
 ## Rollback
 
 ### 30-Second Rollback via Feature Flag
@@ -657,8 +639,6 @@ wrangler pages deploy dist --project-name=iguide-app
 
 **Rollback reverts to VPS backend proxy within 30 seconds.**
 
----
-
 ## Verification Commands
 
 ### 1. Health Check
@@ -668,6 +648,7 @@ curl https://api.iguide.chat/health
 ```
 
 **Expected Output:**
+
 ```json
 {
   "status": "ok",
@@ -687,7 +668,8 @@ supabase db query "SELECT * FROM public.document_stats;"
 ```
 
 **Expected Output:**
-```
+
+```plaintext
  total_documents | total_chunks | chunks_with_embedding | categories
 -----------------+--------------+----------------------+------------
              100 |          500 |                  500 |          5
@@ -758,8 +740,6 @@ curl -X POST https://api.iguide.chat/chat \
 
 **Expected Output:** SSE stream with response tokens
 
----
-
 ## Troubleshooting
 
 ### Issue: Embedding Provider Unavailable
@@ -767,6 +747,7 @@ curl -X POST https://api.iguide.chat/chat \
 **Symptoms:** Import fails with "Embedding API returned 5xx"
 
 **Solution:**
+
 ```bash
 # Check embedding provider health
 curl -I https://your-embedding-provider.com/v1/embeddings
@@ -785,6 +766,7 @@ wrangler secret put EMBEDDING_FALLBACK_URL
 **Symptoms:** Search returns empty or errors
 
 **Solution:**
+
 ```sql
 -- Verify functions exist
 SELECT * FROM pg_proc WHERE proname LIKE '%search%';
@@ -804,6 +786,7 @@ SELECT * FROM pg_policies WHERE tablename = 'documents';
 **Symptoms:** 524 errors or timeouts
 
 **Solution:**
+
 ```bash
 # Check Worker logs
 wrangler tail
@@ -820,6 +803,7 @@ curl -I $BACKEND_URL
 **Symptoms:** Chat responses not streaming
 
 **Solution:**
+
 ```bash
 # Verify response headers include:
 # Content-Type: text/event-stream
@@ -837,6 +821,7 @@ curl -N https://api.iguide.chat/chat \
 **Symptoms:** Tavily web search used instead of knowledge base
 
 **Solution:**
+
 ```bash
 # Check if documents have embeddings
 supabase db query "SELECT COUNT(*) FROM documents WHERE embedding IS NOT NULL;"
@@ -853,6 +838,7 @@ npx tsx scripts/import-to-supabase.ts --source ./data/raw_crawl.jsonl
 **Symptoms:** 401 Unauthorized responses
 
 **Solution:**
+
 ```bash
 # Verify Supabase credentials
 wrangler secret get SUPABASE_URL
@@ -863,8 +849,6 @@ curl $SUPABASE_URL/auth/v1/user \
   -H "Authorization: Bearer $JWT_TOKEN" \
   -H "apikey: $SUPABASE_ANON_KEY"
 ```
-
----
 
 ## Summary
 
