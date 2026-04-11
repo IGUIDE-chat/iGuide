@@ -6,7 +6,8 @@
  */
 
 import type { StreamChunk, ChatHistoryItem } from "./ai/types";
-import { fetchChatRAGContext } from "./chatRagService";
+import { fetchChatRAGContext, isToolUseRagEnabled } from "./chatRagService";
+import { parseDeepSeekSSEStream } from "./deepseekSse";
 import { quickSearch } from "./searchService";
 import { webSearch } from "./webSearchService";
 import { memoryService } from "./memoryService";
@@ -16,7 +17,15 @@ import { memoryService } from "./memoryService";
 // Security: API key is NEVER in the frontend bundle.
 // DEV: Vite proxy /api/deepseek-raw injects Authorization header from .env.local
 // PROD: CF Pages Function /api/deepseek injects key from CF environment variables
-const IS_DEV = import.meta.env.DEV;
+const viteEnv = (
+	import.meta as ImportMeta & {
+		env?: Record<string, string | boolean | undefined>;
+	}
+).env;
+const IS_DEV = Boolean(viteEnv?.DEV);
+const CHAT_ENDPOINT = IS_DEV
+	? "/api/chat"
+	: `${viteEnv?.VITE_API_GATEWAY_URL || "https://api.iguide.chat"}/chat`;
 
 const DEFAULT_SYSTEM_PROMPT = `# Role: UIUC 资深学长姐顾问 (Illini Spirit Advisor)
 
@@ -125,92 +134,6 @@ async function fetchRAGContext(
 	return fetchChatRAGContext(query, lang);
 }
 
-// ── SSE Stream Parser ────────────────────────────────────────────
-
-/**
- * Parse DeepSeek SSE stream (OpenAI-compatible format).
- * Each SSE line: data: {"choices":[{"delta":{"content":"..."}}]}
- */
-async function* parseDeepSeekSSE(
-	reader: ReadableStreamDefaultReader<Uint8Array>,
-	lang: "en" | "zh",
-): AsyncGenerator<StreamChunk> {
-	const decoder = new TextDecoder("utf-8");
-	let buffer = "";
-	let reasoningBuffer = "";
-	let isInReasoning = false;
-
-	while (true) {
-		const { done, value } = await reader.read();
-		if (done) {
-			// Flush remaining buffer
-			if (buffer.trim()) {
-				for (const line of buffer.split("\n")) {
-					const chunk = parseLine(line.trim());
-					if (chunk) yield chunk;
-				}
-			}
-			break;
-		}
-
-		buffer += decoder.decode(value, { stream: true });
-		const lines = buffer.split("\n");
-		buffer = lines.pop() || "";
-
-		for (const line of lines) {
-			const trimmed = line.trim();
-			if (!trimmed || trimmed === "data: [DONE]") continue;
-			if (!trimmed.startsWith("data: ")) continue;
-
-			try {
-				const json = JSON.parse(trimmed.slice(6));
-				const delta = json.choices?.[0]?.delta;
-				if (!delta) continue;
-
-				// Handle reasoning_content (DeepSeek R1 / thinking)
-				if (delta.reasoning_content) {
-					if (!isInReasoning) {
-						isInReasoning = true;
-						reasoningBuffer = "";
-					}
-					reasoningBuffer += delta.reasoning_content;
-					yield {
-						text: "",
-						thinkingStep: {
-							type: "reasoning",
-							label: lang === "zh" ? "正在思考..." : "Thinking...",
-							detail: reasoningBuffer,
-						},
-					};
-					continue;
-				}
-
-				// Regular content
-				if (delta.content) {
-					if (isInReasoning) {
-						isInReasoning = false;
-						reasoningBuffer = "";
-					}
-					yield { text: delta.content };
-				}
-			} catch {
-				// skip malformed lines
-			}
-		}
-	}
-
-	function parseLine(line: string): StreamChunk | null {
-		if (!line.startsWith("data: ") || line === "data: [DONE]") return null;
-		try {
-			const json = JSON.parse(line.slice(6));
-			const content = json.choices?.[0]?.delta?.content;
-			return content ? { text: content } : null;
-		} catch {
-			return null;
-		}
-	}
-}
-
 // ── Message Builder ─────────────────────────────────────────────
 
 interface OpenAIMessage {
@@ -265,6 +188,44 @@ export const streamDeepSeekChat = async function* (
 	_userId?: string,
 ): AsyncGenerator<StreamChunk> {
 	try {
+		const useToolUseRag = isToolUseRagEnabled();
+
+		if (useToolUseRag) {
+			const response = await fetch(CHAT_ENDPOINT, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					message: newMessage,
+					history,
+					conversationId: _conversationId,
+					userId: _userId,
+					lang,
+				}),
+			});
+
+			if (!response.ok) {
+				const err = await response.json().catch(() => ({}));
+				throw new Error(
+					(err as { error?: string }).error ||
+						`Chat API returned ${response.status}`,
+				);
+			}
+
+			const contentType = response.headers.get("content-type") || "";
+
+			if (contentType.includes("text/event-stream") && response.body) {
+				const reader = response.body.getReader();
+				yield* parseDeepSeekSSEStream(reader, lang as "en" | "zh");
+				return;
+			}
+
+			const data = (await response.json()) as { reply?: string; text?: string };
+			if (data.reply || data.text) {
+				yield { text: data.reply || data.text || "" };
+			}
+			return;
+		}
+
 		// 1. Fetch RAG context + personalization context in parallel
 		let ragContext = "";
 		let soul = "";
@@ -391,7 +352,7 @@ export const streamDeepSeekChat = async function* (
 		if (contentType.includes("text/event-stream") && response.body) {
 			// SSE streaming
 			const reader = response.body.getReader();
-			yield* parseDeepSeekSSE(reader, lang as "en" | "zh");
+			yield* parseDeepSeekSSEStream(reader, lang as "en" | "zh");
 		} else {
 			// Fallback: non-streaming JSON response
 			const data = (await response.json()) as { reply?: string };
