@@ -1,25 +1,25 @@
 {
-	"compilerOptions": {
-		"target": "ES2022",
-		"experimentalDecorators": true,
-		"useDefineForClassFields": false,
-		"module": "ESNext",
-		"lib": ["ES2022", "DOM", "DOM.Iterable"],
-		"skipLibCheck": true,
-		"moduleResolution": "bundler",
-		"isolatedModules": true,
-		"moduleDetection": "force",
-		"allowJs": true,
-		"esModuleInterop": true,
-		"jsx": "react-jsx",
-		"baseUrl": ".",
-		"paths": {
-			"@/*": ["./src/*"],
-			"@supabase/supabase-js": ["node_modules/@supabase/supabase-js"]
-		},
-		"allowImportingTsExtensions": true,
-		"ignoreDeprecations": "6.0",
-		"noEmit": true,
-		"types": ["vite/client", "@cloudflare/workers-types"]
-	}
+  "compilerOptions": {
+    "target": "ES2022",
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
+    "module": "ESNext",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "allowJs": true,
+    "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@supabase/supabase-js": ["node_modules/@supabase/supabase-js"]
+    },
+    "allowImportingTsExtensions": true,
+    "ignoreDeprecations": "6.0",
+    "noEmit": true,
+    "types": ["vite/client", "@cloudflare/workers-types"]
+  }
 }

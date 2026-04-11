@@ -5,21 +5,21 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { AnimatePresence, motion } from 'framer-motion'
-import { Language } from '../../types'
-import { BrandMark } from '../ui/branding/BrandMark'
+import { AnimatePresence, motion } from "framer-motion";
+import { Language } from "../../types";
+import { BrandMark } from "../ui/branding/BrandMark";
 
 interface Suggestion {
-  icon: string
-  text: string
+  icon: string;
+  text: string;
 }
 
 interface ChatEmptyStateProps {
-  language: Language
-  title: string
-  suggestions: Suggestion[]
-  containerClass: string
-  onSuggestionClick: (text: string) => void
+  language: Language;
+  title: string;
+  suggestions: Suggestion[];
+  containerClass: string;
+  onSuggestionClick: (text: string) => void;
 }
 
 export const ChatEmptyState: React.FC<ChatEmptyStateProps> = ({
@@ -37,7 +37,7 @@ export const ChatEmptyState: React.FC<ChatEmptyStateProps> = ({
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.2, ease: 'easeOut' }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
           className="flex w-full flex-col items-center"
         >
           <div className="mb-8 flex items-center gap-3">
@@ -80,5 +80,5 @@ export const ChatEmptyState: React.FC<ChatEmptyStateProps> = ({
         </motion.div>
       </AnimatePresence>
     </div>
-  )
-}
+  );
+};

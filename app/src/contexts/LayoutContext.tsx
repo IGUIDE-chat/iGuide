@@ -12,29 +12,29 @@ import React, {
   RefObject,
   useState,
   useCallback,
-} from 'react'
+} from "react";
 
 interface LayoutContextType {
-  isSidebarOpen: boolean
+  isSidebarOpen: boolean;
   /** Ref for the sidebar favorites heart icon SVG (flying-heart target when sidebar open) */
-  favoritesIconRef: RefObject<SVGSVGElement | null>
+  favoritesIconRef: RefObject<SVGSVGElement | null>;
   /** Ref for the desktop sidebar toggle button (flying-heart target when sidebar closed, md+) */
-  sidebarToggleButtonRef: RefObject<HTMLButtonElement | null>
+  sidebarToggleButtonRef: RefObject<HTMLButtonElement | null>;
   /** Ref for the mobile sidebar toggle button (flying-heart target when sidebar closed, &lt;md) */
-  mobileSidebarButtonRef: RefObject<HTMLButtonElement | null>
+  mobileSidebarButtonRef: RefObject<HTMLButtonElement | null>;
   /** Custom mobile header slot — when set, replaces the default mobileHeader content */
-  mobileHeaderSlot: ReactNode | null
-  setMobileHeaderSlot: (node: ReactNode | null) => void
+  mobileHeaderSlot: ReactNode | null;
+  setMobileHeaderSlot: (node: ReactNode | null) => void;
 }
 
-const LayoutContext = createContext<LayoutContextType | null>(null)
+const LayoutContext = createContext<LayoutContextType | null>(null);
 
 export const LayoutProvider: React.FC<{
-  children: ReactNode
-  isSidebarOpen: boolean
-  favoritesIconRef: RefObject<SVGSVGElement | null>
-  sidebarToggleButtonRef: RefObject<HTMLButtonElement | null>
-  mobileSidebarButtonRef: RefObject<HTMLButtonElement | null>
+  children: ReactNode;
+  isSidebarOpen: boolean;
+  favoritesIconRef: RefObject<SVGSVGElement | null>;
+  sidebarToggleButtonRef: RefObject<HTMLButtonElement | null>;
+  mobileSidebarButtonRef: RefObject<HTMLButtonElement | null>;
 }> = ({
   children,
   isSidebarOpen,
@@ -43,11 +43,11 @@ export const LayoutProvider: React.FC<{
   mobileSidebarButtonRef,
 }) => {
   const [mobileHeaderSlot, setMobileHeaderSlotState] =
-    useState<ReactNode | null>(null)
+    useState<ReactNode | null>(null);
   const setMobileHeaderSlot = useCallback(
     (node: ReactNode | null) => setMobileHeaderSlotState(node),
     []
-  )
+  );
   return (
     <LayoutContext.Provider
       value={{
@@ -61,11 +61,11 @@ export const LayoutProvider: React.FC<{
     >
       {children}
     </LayoutContext.Provider>
-  )
-}
+  );
+};
 
 export const useLayout = (): LayoutContextType => {
-  const ctx = useContext(LayoutContext)
+  const ctx = useContext(LayoutContext);
   if (!ctx) {
     return {
       isSidebarOpen: true,
@@ -80,7 +80,7 @@ export const useLayout = (): LayoutContextType => {
       } as React.RefObject<HTMLButtonElement | null>,
       mobileHeaderSlot: null,
       setMobileHeaderSlot: () => {},
-    }
+    };
   }
-  return ctx
-}
+  return ctx;
+};

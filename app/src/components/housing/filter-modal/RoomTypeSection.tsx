@@ -5,17 +5,17 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { memo } from 'react'
-import { Check } from 'lucide-react'
-import { RoomType } from '../types/index'
-import { ROOM_TYPES } from '../constants/filters'
-import { FilterLanguage } from './modalText'
+import React, { memo } from "react";
+import { Check } from "lucide-react";
+import { RoomType } from "../types/index";
+import { ROOM_TYPES } from "../constants/filters";
+import { FilterLanguage } from "./modalText";
 
 interface RoomTypeSectionProps {
-  title: string
-  language: FilterLanguage
-  selectedValues: RoomType[]
-  onToggle: (value: RoomType) => void
+  title: string;
+  language: FilterLanguage;
+  selectedValues: RoomType[];
+  onToggle: (value: RoomType) => void;
 }
 
 const RoomTypeSection: React.FC<RoomTypeSectionProps> = ({
@@ -33,7 +33,7 @@ const RoomTypeSection: React.FC<RoomTypeSectionProps> = ({
       "
     >
       {ROOM_TYPES.map((type) => {
-        const isSelected = selectedValues.includes(type.id)
+        const isSelected = selectedValues.includes(type.id);
         return (
           <label
             key={type.id}
@@ -76,10 +76,10 @@ const RoomTypeSection: React.FC<RoomTypeSectionProps> = ({
               {type.label[language] || type.label.en}
             </span>
           </label>
-        )
+        );
       })}
     </div>
   </section>
-)
+);
 
-export default memo(RoomTypeSection)
+export default memo(RoomTypeSection);

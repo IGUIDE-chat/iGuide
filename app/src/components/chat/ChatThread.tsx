@@ -3,32 +3,32 @@
  * @description Chat (AI) Component / Module
  */
 
-import * as React from 'react'
-import { ThreadPrimitive, ComposerPrimitive } from '@assistant-ui/react'
-import { Language } from '../../types'
-import { UI_TEXT } from '../../i18n/uiText'
-import { ChatEmptyState } from './ChatEmptyState'
-import { UserMessage } from './messages/UserMessage'
-import { AssistantMessage } from './messages/AssistantMessage'
-import { ChatSessionContext } from './ChatRuntimeProvider'
+import * as React from "react";
+import { ThreadPrimitive, ComposerPrimitive } from "@assistant-ui/react";
+import { Language } from "../../types";
+import { UI_TEXT } from "../../i18n/uiText";
+import { ChatEmptyState } from "./ChatEmptyState";
+import { UserMessage } from "./messages/UserMessage";
+import { AssistantMessage } from "./messages/AssistantMessage";
+import { ChatSessionContext } from "./ChatRuntimeProvider";
 
 interface ChatThreadProps {
-  language: Language
+  language: Language;
 }
 
-const containerClass = 'w-full max-w-3xl mx-auto px-4'
+const containerClass = "w-full max-w-3xl mx-auto px-4";
 
 export const ChatThread = ({ language }: ChatThreadProps) => {
-  const t = UI_TEXT[language]
-  const ctx = React.useContext(ChatSessionContext)
+  const t = UI_TEXT[language];
+  const ctx = React.useContext(ChatSessionContext);
 
   const handleSuggestionClick = (text: string) => {
-    void ctx?.sendMessage(text)
-  }
+    void ctx?.sendMessage(text);
+  };
 
   const handleFollowUpClick = (text: string) => {
-    void ctx?.sendMessage(text)
-  }
+    void ctx?.sendMessage(text);
+  };
 
   return (
     <ThreadPrimitive.Root className="relative flex size-full flex-col">
@@ -124,5 +124,5 @@ export const ChatThread = ({ language }: ChatThreadProps) => {
         </div>
       </ThreadPrimitive.ViewportFooter>
     </ThreadPrimitive.Root>
-  )
-}
+  );
+};

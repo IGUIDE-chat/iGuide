@@ -7,18 +7,18 @@
 
 // [COMPONENT] Renders a single knowledge base article with Markdown support.
 // [组件] 支持 Markdown 的知识库文章渲染组件。
-import * as React from 'react'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
-import { Article, Language } from '../../types'
-import { CATEGORIES, getArticleText, getCategoryText } from '../../constants'
-import { UI_TEXT } from '../../i18n/uiText'
+import * as React from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { Article, Language } from "../../types";
+import { CATEGORIES, getArticleText, getCategoryText } from "../../constants";
+import { UI_TEXT } from "../../i18n/uiText";
 
 interface ArticleViewProps {
-  article: Article
-  onBack: () => void
-  onSearch: (query: string) => void
-  language: Language
+  article: Article;
+  onBack: () => void;
+  onSearch: (query: string) => void;
+  language: Language;
 }
 
 export const ArticleView: React.FC<ArticleViewProps> = ({
@@ -27,12 +27,12 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
   onSearch,
   language,
 }) => {
-  const category = CATEGORIES.find((c) => c.id === article.category)
-  const t = UI_TEXT[language]
+  const category = CATEGORIES.find((c) => c.id === article.category);
+  const t = UI_TEXT[language];
 
   // Get localized content
-  const articleText = getArticleText(article, language)
-  const categoryText = category ? getCategoryText(category, language) : null
+  const articleText = getArticleText(article, language);
+  const categoryText = category ? getCategoryText(category, language) : null;
 
   return (
     <div className="animate-fade-in-up">
@@ -110,7 +110,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{
-              a: ({ node, ...props }) => (
+              a: ({ ...props }) => (
                 <a
                   {...props}
                   className="
@@ -121,22 +121,22 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
                   rel="noopener noreferrer"
                 />
               ),
-              ul: ({ node, ...props }) => (
+              ul: ({ ...props }) => (
                 <ul
                   className="my-2 list-inside list-disc space-y-1"
                   {...props}
                 />
               ),
-              ol: ({ node, ...props }) => (
+              ol: ({ ...props }) => (
                 <ol
                   className="my-2 list-inside list-decimal space-y-1"
                   {...props}
                 />
               ),
-              li: ({ node, ...props }) => (
+              li: ({ ...props }) => (
                 <li className="marker:text-slate-400" {...props} />
               ),
-              p: ({ node, ...props }) => (
+              p: ({ ...props }) => (
                 <p
                   className="
                     mb-4 leading-relaxed
@@ -145,25 +145,25 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
                   {...props}
                 />
               ),
-              h1: ({ node, ...props }) => (
+              h1: ({ ...props }) => (
                 <h1
                   className="mt-6 mb-3 text-2xl font-bold text-slate-900"
                   {...props}
                 />
               ),
-              h2: ({ node, ...props }) => (
+              h2: ({ ...props }) => (
                 <h2
                   className="mt-5 mb-2 text-xl font-bold text-slate-800"
                   {...props}
                 />
               ),
-              h3: ({ node, ...props }) => (
+              h3: ({ ...props }) => (
                 <h3
                   className="mt-4 mb-2 text-lg font-bold text-slate-800"
                   {...props}
                 />
               ),
-              blockquote: ({ node, ...props }) => (
+              blockquote: ({ ...props }) => (
                 <blockquote
                   className="
                     my-4 rounded-r border-l-4 border-illini-blue bg-slate-50
@@ -172,8 +172,8 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
                   {...props}
                 />
               ),
-              code: ({ node, className, children, ...props }) => {
-                const isInline = !className
+              code: ({ className, children, ...props }) => {
+                const isInline = !className;
                 return isInline ? (
                   <code
                     className="
@@ -194,9 +194,9 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
                   >
                     {children}
                   </code>
-                )
+                );
               },
-              img: ({ node, ...props }) => (
+              img: ({ ...props }) => (
                 <img
                   {...props}
                   className="
@@ -244,5 +244,5 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
         </div>
       </article>
     </div>
-  )
-}
+  );
+};

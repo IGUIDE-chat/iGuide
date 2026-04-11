@@ -5,25 +5,25 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from 'react'
-import { Plus, Trash2 } from 'lucide-react'
+import React from "react";
+import { Plus, Trash2 } from "lucide-react";
 
 export const inputCls =
-  'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-illini-blue'
+  "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-illini-blue";
 
 export function Field({
   label,
   children,
 }: {
-  label: string
-  children: React.ReactNode
+  label: string;
+  children: React.ReactNode;
 }) {
   return (
     <div className="space-y-1">
       <label className="block font-medium text-gray-700">{label}</label>
       {children}
     </div>
-  )
+  );
 }
 
 export function EditableList({
@@ -31,9 +31,9 @@ export function EditableList({
   onChange,
   placeholder,
 }: {
-  items: string[]
-  onChange: (next: string[]) => void
-  placeholder: string
+  items: string[];
+  onChange: (next: string[]) => void;
+  placeholder: string;
 }) {
   return (
     <div className="space-y-2">
@@ -46,9 +46,9 @@ export function EditableList({
             "
             value={item}
             onChange={(event) => {
-              const next = [...items]
-              next[index] = event.target.value
-              onChange(next)
+              const next = [...items];
+              next[index] = event.target.value;
+              onChange(next);
             }}
           />
           <button
@@ -69,7 +69,7 @@ export function EditableList({
       ))}
       <button
         type="button"
-        onClick={() => onChange([...items, ''])}
+        onClick={() => onChange([...items, ""])}
         className="
           flex items-center gap-1 text-xs text-illini-blue
           hover:underline
@@ -78,7 +78,7 @@ export function EditableList({
         <Plus size={12} /> {placeholder}
       </button>
     </div>
-  )
+  );
 }
 
 export function Toggle({
@@ -86,9 +86,9 @@ export function Toggle({
   checked,
   onChange,
 }: {
-  label: string
-  checked: boolean
-  onChange: (value: boolean) => void
+  label: string;
+  checked: boolean;
+  onChange: (value: boolean) => void;
 }) {
   return (
     <label className="flex cursor-pointer items-center gap-2 select-none">
@@ -96,17 +96,17 @@ export function Toggle({
         onClick={() => onChange(!checked)}
         className={`
           flex h-5 w-9 items-center rounded-full px-0.5 transition-colors
-          ${checked ? 'bg-illini-orange' : 'bg-gray-300'}
+          ${checked ? "bg-illini-orange" : "bg-gray-300"}
         `}
       >
         <div
           className={`
             size-4 rounded-full bg-white shadow-sm transition-transform
-            ${checked ? 'translate-x-4' : 'translate-x-0'}
+            ${checked ? "translate-x-4" : "translate-x-0"}
           `}
         />
       </div>
       <span className="text-gray-700">{label}</span>
     </label>
-  )
+  );
 }

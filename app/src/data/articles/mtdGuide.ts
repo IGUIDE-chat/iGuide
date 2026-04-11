@@ -7,13 +7,13 @@
 
 // [DATA] Article content for MTD Bus System guide.
 // [数据] MTD 公交系统指南的文章内容。
-import { Article } from '../../types'
+import { Article } from "../../types";
 
 export const mtdGuide: Article = {
-  id: 'mtd-guide',
-  category: 'transport',
-  title: 'Mastering the CUMTD Bus System',
-  summary: 'How to use your iCard for free rides and apps you need.',
+  id: "mtd-guide",
+  category: "transport",
+  title: "Mastering the CUMTD Bus System",
+  summary: "How to use your iCard for free rides and apps you need.",
   content: `
 ### Riding the Bus
 
@@ -25,9 +25,9 @@ UIUC students have unlimited access to the Champaign-Urbana Mass Transit Distric
 
 **Late Night:** The SafeRides service operates after regular bus hours for on-demand safe transport.
   `,
-  tags: ['bus', 'transport', 'icard', 'mtd', 'getting around'],
-  title_zh: '玩转 CUMTD 公交系统',
-  summary_zh: '如何用 iCard 免费乘车以及必备的公交 APP。',
+  tags: ["bus", "transport", "icard", "mtd", "getting around"],
+  title_zh: "玩转 CUMTD 公交系统",
+  summary_zh: "如何用 iCard 免费乘车以及必备的公交 APP。",
   content_zh: `
 ### 乘坐公交车
 
@@ -39,6 +39,6 @@ UIUC 学生凭有效的 **iCard** 可以无限次免费乘坐香槟-厄巴纳公
 
 **深夜出行：** 常规公交停运后，可以使用 SafeRides 服务进行点对点接送。
   `,
-  tags_zh: ['公交', '交通', 'iCard', 'MTD', '出行'],
-  lastUpdated: '2023-08-20',
-}
+  tags_zh: ["公交", "交通", "iCard", "MTD", "出行"],
+  lastUpdated: "2023-08-20",
+};

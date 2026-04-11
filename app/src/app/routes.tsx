@@ -5,47 +5,49 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { Suspense } from 'react'
-import { Navigate, Route, Routes, useParams } from 'react-router-dom'
-import { Language } from '../types'
+import React, { Suspense } from "react";
+import { Navigate, Route, Routes, useParams } from "react-router-dom";
+import { Language } from "../types";
 
-const ChatPage = React.lazy(() => import('../pages/chat/ChatPage'))
+const ChatPage = React.lazy(() => import("../pages/chat/ChatPage"));
 const LibraryHomePage = React.lazy(
-  () => import('../pages/library/LibraryHomePage')
-)
+  () => import("../pages/library/LibraryHomePage")
+);
 const LibraryCategoryPage = React.lazy(
-  () => import('../pages/library/LibraryCategoryPage')
-)
+  () => import("../pages/library/LibraryCategoryPage")
+);
 const LibraryArticlePage = React.lazy(
-  () => import('../pages/library/LibraryArticlePage')
-)
-const ProfilePage = React.lazy(() => import('../pages/profile/ProfilePage'))
+  () => import("../pages/library/LibraryArticlePage")
+);
+const ProfilePage = React.lazy(() => import("../pages/profile/ProfilePage"));
 const CoursesLandingPage = React.lazy(
-  () => import('../pages/courses/CoursesLandingPage')
-)
+  () => import("../pages/courses/CoursesLandingPage")
+);
 const ResumeLandingPage = React.lazy(
-  () => import('../pages/resume/ResumeLandingPage')
-)
-const DormListPage = React.lazy(() => import('../pages/dorms/DormListPage'))
-const DormDetailPage = React.lazy(() => import('../pages/dorms/DormDetailPage'))
+  () => import("../pages/resume/ResumeLandingPage")
+);
+const DormListPage = React.lazy(() => import("../pages/dorms/DormListPage"));
+const DormDetailPage = React.lazy(
+  () => import("../pages/dorms/DormDetailPage")
+);
 
 export interface AppRoutesProps {
-  language: Language
-  currentConversationId: string | null
-  onConversationCreated: (conversationId: string) => void
+  language: Language;
+  currentConversationId: string | null;
+  onConversationCreated: (conversationId: string) => void;
 }
 
 const LegacyDormRedirect: React.FC = () => {
-  const { id } = useParams<{ id: string }>()
-  return <Navigate to={id ? `/dorms/${id}` : '/dorms'} replace />
-}
+  const { id } = useParams<{ id: string }>();
+  return <Navigate to={id ? `/dorms/${id}` : "/dorms"} replace />;
+};
 
 export const AppRoutes: React.FC<AppRoutesProps> = ({
   language,
   currentConversationId,
   onConversationCreated,
 }) => {
-  const loadingText = language === 'zh' ? '页面加载中...' : 'Loading page...'
+  const loadingText = language === "zh" ? "页面加载中..." : "Loading page...";
 
   return (
     <Suspense
@@ -94,5 +96,5 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({
         <Route path="/dorm/:id" element={<LegacyDormRedirect />} />
       </Routes>
     </Suspense>
-  )
-}
+  );
+};

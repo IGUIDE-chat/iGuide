@@ -5,15 +5,15 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { Suspense } from 'react'
-import { Dorm } from '../types/index'
-import { Language } from '../../../types'
-import MapCarousel from './MapCarousel'
-import { MapEmptyViewportOverlay, MapNoResultsOverlay } from './EmptyStates'
-import { DormListText } from './types'
+import React, { Suspense } from "react";
+import { Dorm } from "../types/index";
+import { Language } from "../../../types";
+import MapCarousel from "./MapCarousel";
+import { MapEmptyViewportOverlay, MapNoResultsOverlay } from "./EmptyStates";
+import { DormListText } from "./types";
 
 // Lazy-load DormMap to defer mapbox-gl (~700KB) until map view is actually used
-const DormMap = React.lazy(() => import('../DormMap'))
+const DormMap = React.lazy(() => import("../DormMap"));
 
 /** Skeleton placeholder while mapbox is loading */
 const MapLoadingSkeleton: React.FC = () => (
@@ -32,25 +32,25 @@ const MapLoadingSkeleton: React.FC = () => (
       <p className="text-sm text-gray-400">Loading map...</p>
     </div>
   </div>
-)
+);
 
 interface DormListMapPaneProps {
-  isMapView: boolean
-  filteredDorms: Dorm[]
-  visibleInMap: Dorm[]
-  favoritesSet: Set<string>
-  language: Language
-  t: DormListText
-  hasPriceFilter: boolean
-  highlightedDormId: string | null
-  scrollContainerRef: React.RefObject<HTMLDivElement | null>
-  disableScrollZoom: boolean
-  onVisibleDormsChange: (dorms: Dorm[]) => void
-  onToggleFavorite: (dorm: Dorm, event?: React.MouseEvent) => void
-  onViewDetails: (dorm: Dorm) => void
-  onHoverDorm: (id: string | null) => void
-  onHoveringChange: (hovering: boolean) => void
-  onMapNoResultAction: () => void
+  isMapView: boolean;
+  filteredDorms: Dorm[];
+  visibleInMap: Dorm[];
+  favoritesSet: Set<string>;
+  language: Language;
+  t: DormListText;
+  hasPriceFilter: boolean;
+  highlightedDormId: string | null;
+  scrollContainerRef: React.RefObject<HTMLDivElement | null>;
+  disableScrollZoom: boolean;
+  onVisibleDormsChange: (dorms: Dorm[]) => void;
+  onToggleFavorite: (dorm: Dorm, event?: React.MouseEvent) => void;
+  onViewDetails: (dorm: Dorm) => void;
+  onHoverDorm: (id: string | null) => void;
+  onHoveringChange: (hovering: boolean) => void;
+  onMapNoResultAction: () => void;
 }
 
 export const DormListMapPane: React.FC<DormListMapPaneProps> = ({
@@ -72,7 +72,7 @@ export const DormListMapPane: React.FC<DormListMapPaneProps> = ({
   onMapNoResultAction,
 }) => {
   if (!isMapView) {
-    return null
+    return null;
   }
 
   return (
@@ -133,5 +133,5 @@ export const DormListMapPane: React.FC<DormListMapPaneProps> = ({
         <MapEmptyViewportOverlay t={t} />
       )}
     </div>
-  )
-}
+  );
+};

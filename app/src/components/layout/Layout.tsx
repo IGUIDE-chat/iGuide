@@ -5,49 +5,50 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import * as React from 'react'
-import { useEffect, useRef, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import * as React from "react";
+import { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Search,
   SlidersHorizontal,
   Map as MapIcon,
   List,
   ArrowUpDown,
-} from 'lucide-react'
-import { Language } from '../../types'
-import { UI_TEXT } from '../../i18n/uiText'
-import { useAuth } from '../../contexts/AuthContext'
-import { useHousingFilters } from '../housing/store/HousingContext'
-import { LayoutProvider } from '../../contexts/LayoutContext'
-import { useDormFilterBadge } from '../housing/hooks/useDormFilterBadge'
-import { AppShell } from './AppShell'
-import { PrimaryNav } from './PrimaryNav'
-import { SidebarPanel } from './SidebarPanel'
-import { SidebarFooter } from './SidebarFooter'
+} from "lucide-react";
+import { Language } from "../../types";
+import { UI_TEXT } from "../../i18n/uiText";
+import { useAuth } from "../../contexts/AuthContext";
+import { useHousingFilters } from "../housing/store/HousingContext";
+import { LayoutProvider } from "../../contexts/LayoutContext";
+import { useDormFilterBadge } from "../housing/hooks/useDormFilterBadge";
+import { AppShell } from "./AppShell";
+import { PrimaryNav } from "./PrimaryNav";
+import { SidebarPanel } from "./SidebarPanel";
+import { SidebarFooter } from "./SidebarFooter";
 
 // ── Lightweight mobile sort dropdown (avoids cross-domain import) ─────────
 const SORT_OPTIONS = [
-  { value: 'name-asc', label: 'A-Z' },
-  { value: 'name-desc', label: 'Z-A' },
-  { value: 'price-asc', label: 'Price ↑' },
-  { value: 'price-desc', label: 'Price ↓' },
-] as const
+  { value: "name-asc", label: "A-Z" },
+  { value: "name-desc", label: "Z-A" },
+  { value: "price-asc", label: "Price ↑" },
+  { value: "price-desc", label: "Price ↓" },
+] as const;
 
 const SortDropdownMobile: React.FC<{
-  sortBy: string
-  onSortChange: (v: string) => void
+  sortBy: string;
+  onSortChange: (v: string) => void;
 }> = ({ sortBy, onSortChange }) => {
-  const [open, setOpen] = React.useState(false)
-  const ref = React.useRef<HTMLDivElement>(null)
+  const [open, setOpen] = React.useState(false);
+  const ref = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
-    }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [])
+      if (ref.current && !ref.current.contains(e.target as Node))
+        setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   return (
     <div className="relative shrink-0" ref={ref}>
@@ -59,8 +60,8 @@ const SortDropdownMobile: React.FC<{
           transition-all duration-200
           ${
             open
-              ? 'border-illini-blue/50 bg-illini-blue/10 text-illini-blue'
-              : 'border-gray-200 bg-white text-gray-700'
+              ? "border-illini-blue/50 bg-illini-blue/10 text-illini-blue"
+              : "border-gray-200 bg-white text-gray-700"
           }
         `}
       >
@@ -78,8 +79,8 @@ const SortDropdownMobile: React.FC<{
               key={o.value}
               type="button"
               onClick={() => {
-                onSortChange(o.value)
-                setOpen(false)
+                onSortChange(o.value);
+                setOpen(false);
               }}
               className={`
                 w-full px-4 py-2 text-left text-sm transition-colors
@@ -99,20 +100,20 @@ const SortDropdownMobile: React.FC<{
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
 interface LayoutProps {
-  children: React.ReactNode
-  language: Language
-  onLanguageChange: (lang: Language) => void
-  isGuest?: boolean
-  onExitGuest?: () => void
-  currentConversationId?: string | null
-  onNewConversation?: () => void
-  onSelectConversation?: (conversationId: string | null) => void
-  activeTab?: string
-  onTabChange?: (tab: any) => void
+  children: React.ReactNode;
+  language: Language;
+  onLanguageChange: (lang: Language) => void;
+  isGuest?: boolean;
+  onExitGuest?: () => void;
+  currentConversationId?: string | null;
+  onNewConversation?: () => void;
+  onSelectConversation?: (conversationId: string | null) => void;
+  activeTab?: string;
+  onTabChange?: (tab: any) => void;
 }
 
 export const Layout: React.FC<LayoutProps> = ({
@@ -126,8 +127,8 @@ export const Layout: React.FC<LayoutProps> = ({
   onSelectConversation,
   activeTab: propActiveTab,
 }) => {
-  const t = UI_TEXT[language]
-  const { user } = useAuth()
+  const t = UI_TEXT[language];
+  const { user } = useAuth();
   const {
     searchTerm,
     setSearchTerm,
@@ -136,52 +137,52 @@ export const Layout: React.FC<LayoutProps> = ({
     setViewMode,
     sortBy,
     setSortBy,
-  } = useHousingFilters()
-  const { hasActiveDormFilters, activeDormFilterCount } = useDormFilterBadge()
-  const navigate = useNavigate()
-  const location = useLocation()
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
-  const favoritesIconRef = useRef<SVGSVGElement | null>(null)
-  const sidebarToggleButtonRef = useRef<HTMLButtonElement | null>(null)
-  const mobileSidebarButtonRef = useRef<HTMLButtonElement | null>(null)
+  } = useHousingFilters();
+  const { hasActiveDormFilters, activeDormFilterCount } = useDormFilterBadge();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const favoritesIconRef = useRef<SVGSVGElement | null>(null);
+  const sidebarToggleButtonRef = useRef<HTMLButtonElement | null>(null);
+  const mobileSidebarButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const activeTab = React.useMemo(() => {
     if (propActiveTab) {
-      return propActiveTab
+      return propActiveTab;
     }
-    if (location.pathname.startsWith('/library')) return 'library'
-    if (location.pathname.startsWith('/courses')) return 'courses'
-    if (location.pathname.startsWith('/dorms')) return 'dorms'
-    if (location.pathname.startsWith('/resume')) return 'resume'
-    return 'chat'
-  }, [location.pathname, propActiveTab])
+    if (location.pathname.startsWith("/library")) return "library";
+    if (location.pathname.startsWith("/courses")) return "courses";
+    if (location.pathname.startsWith("/dorms")) return "dorms";
+    if (location.pathname.startsWith("/resume")) return "resume";
+    return "chat";
+  }, [location.pathname, propActiveTab]);
 
-  const isDormListPage = location.pathname === '/dorms'
-  const isHousingMobileHeader = activeTab === 'dorms' && isDormListPage
+  const isDormListPage = location.pathname === "/dorms";
+  const isHousingMobileHeader = activeTab === "dorms" && isDormListPage;
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(min-width: 768px)')
+    const mediaQuery = window.matchMedia("(min-width: 768px)");
     const handleMediaChange = (event: MediaQueryListEvent | MediaQueryList) => {
-      setIsSidebarOpen(event.matches)
-    }
+      setIsSidebarOpen(event.matches);
+    };
 
-    handleMediaChange(mediaQuery)
-    mediaQuery.addEventListener('change', handleMediaChange)
+    handleMediaChange(mediaQuery);
+    mediaQuery.addEventListener("change", handleMediaChange);
 
     return () => {
-      mediaQuery.removeEventListener('change', handleMediaChange)
-    }
-  }, [])
+      mediaQuery.removeEventListener("change", handleMediaChange);
+    };
+  }, []);
 
   const closeSidebarOnMobile = () => {
     if (window.innerWidth < 768) {
-      setIsSidebarOpen(false)
+      setIsSidebarOpen(false);
     }
-  }
+  };
 
   const navItems = [
     {
-      key: 'chat',
+      key: "chat",
       label: t.chatTab,
       icon: (
         <svg
@@ -199,13 +200,13 @@ export const Layout: React.FC<LayoutProps> = ({
         </svg>
       ),
       onClick: () => {
-        onNewConversation?.()
-        navigate('/chat')
-        closeSidebarOnMobile()
+        onNewConversation?.();
+        navigate("/chat");
+        closeSidebarOnMobile();
       },
     },
     {
-      key: 'library',
+      key: "library",
       label: t.libraryTab,
       icon: (
         <svg
@@ -223,12 +224,12 @@ export const Layout: React.FC<LayoutProps> = ({
         </svg>
       ),
       onClick: () => {
-        navigate('/library')
-        closeSidebarOnMobile()
+        navigate("/library");
+        closeSidebarOnMobile();
       },
     },
     {
-      key: 'courses',
+      key: "courses",
       label: t.coursesTab,
       icon: (
         <svg
@@ -246,12 +247,12 @@ export const Layout: React.FC<LayoutProps> = ({
         </svg>
       ),
       onClick: () => {
-        navigate('/courses')
-        closeSidebarOnMobile()
+        navigate("/courses");
+        closeSidebarOnMobile();
       },
     },
     {
-      key: 'dorms',
+      key: "dorms",
       label: t.dormsTab,
       icon: (
         <svg
@@ -269,12 +270,12 @@ export const Layout: React.FC<LayoutProps> = ({
         </svg>
       ),
       onClick: () => {
-        navigate('/dorms')
-        closeSidebarOnMobile()
+        navigate("/dorms");
+        closeSidebarOnMobile();
       },
     },
     {
-      key: 'resume',
+      key: "resume",
       label: t.resumeTab,
       icon: (
         <svg
@@ -292,11 +293,11 @@ export const Layout: React.FC<LayoutProps> = ({
         </svg>
       ),
       onClick: () => {
-        navigate('/resume')
-        closeSidebarOnMobile()
+        navigate("/resume");
+        closeSidebarOnMobile();
       },
     },
-  ]
+  ];
 
   const mobileHeader = isHousingMobileHeader ? (
     <div className="flex min-w-0 flex-1 items-center gap-2">
@@ -316,7 +317,7 @@ export const Layout: React.FC<LayoutProps> = ({
             focus:outline-none
           "
           placeholder={
-            language === 'zh' ? '输入搜索宿舍...' : 'Type to search dorms...'
+            language === "zh" ? "输入搜索宿舍..." : "Type to search dorms..."
           }
           value={searchTerm}
           onChange={(event) => setSearchTerm(event.target.value)}
@@ -325,7 +326,7 @@ export const Layout: React.FC<LayoutProps> = ({
       <div className="relative shrink-0">
         <button
           type="button"
-          aria-label={language === 'zh' ? '筛选' : 'Filters'}
+          aria-label={language === "zh" ? "筛选" : "Filters"}
           onClick={() => setIsFilterModalOpen(true)}
           className={`
             flex size-10 items-center justify-center rounded-full border
@@ -336,7 +337,7 @@ export const Layout: React.FC<LayoutProps> = ({
                 ? `
                   border-illini-orange/40 bg-illini-orange/10 text-illini-orange
                 `
-                : 'border-gray-200 bg-white text-gray-700'
+                : "border-gray-200 bg-white text-gray-700"
             }
           `}
         >
@@ -358,22 +359,22 @@ export const Layout: React.FC<LayoutProps> = ({
       <button
         type="button"
         aria-label={
-          viewMode === 'list'
-            ? language === 'zh'
-              ? '地图'
-              : 'Map'
-            : language === 'zh'
-              ? '列表'
-              : 'List'
+          viewMode === "list"
+            ? language === "zh"
+              ? "地图"
+              : "Map"
+            : language === "zh"
+              ? "列表"
+              : "List"
         }
-        onClick={() => setViewMode(viewMode === 'list' ? 'map' : 'list')}
+        onClick={() => setViewMode(viewMode === "list" ? "map" : "list")}
         className="
           flex size-10 shrink-0 items-center justify-center rounded-full border
           border-gray-200 bg-white text-gray-700 transition-all duration-200
           active:scale-95
         "
       >
-        {viewMode === 'list' ? (
+        {viewMode === "list" ? (
           <MapIcon size={18} strokeWidth={2} />
         ) : (
           <List size={18} strokeWidth={2} />
@@ -382,21 +383,21 @@ export const Layout: React.FC<LayoutProps> = ({
     </div>
   ) : (
     <span className="text-sm font-semibold text-slate-700">
-      {activeTab === 'chat'
+      {activeTab === "chat"
         ? t.chatTab
-        : activeTab === 'library'
+        : activeTab === "library"
           ? t.libraryTab
-          : activeTab === 'courses'
+          : activeTab === "courses"
             ? t.coursesTab
-            : activeTab === 'dorms'
+            : activeTab === "dorms"
               ? t.dormsTab
-              : activeTab === 'resume'
+              : activeTab === "resume"
                 ? t.resumeTab
                 : t.chatTab}
     </span>
-  )
+  );
 
-  const profileName = user?.name || user?.email || 'User'
+  const profileName = user?.name || user?.email || "User";
 
   return (
     <LayoutProvider
@@ -432,12 +433,12 @@ export const Layout: React.FC<LayoutProps> = ({
             <SidebarFooter
               isSidebarOpen={isSidebarOpen}
               isGuest={isGuest}
-              languageLabel={language === 'zh' ? '中文' : 'English'}
-              guestLabel={language === 'zh' ? '登录' : 'Login'}
-              signedInLabel={language === 'zh' ? '当前账号' : 'Signed in as'}
+              languageLabel={language === "zh" ? "中文" : "English"}
+              guestLabel={language === "zh" ? "登录" : "Login"}
+              signedInLabel={language === "zh" ? "当前账号" : "Signed in as"}
               profileName={profileName}
               onToggleLanguage={() =>
-                onLanguageChange(language === 'zh' ? 'en' : 'zh')
+                onLanguageChange(language === "zh" ? "en" : "zh")
               }
               onGuestLogin={onExitGuest}
             />
@@ -447,5 +448,5 @@ export const Layout: React.FC<LayoutProps> = ({
         {children}
       </AppShell>
     </LayoutProvider>
-  )
-}
+  );
+};

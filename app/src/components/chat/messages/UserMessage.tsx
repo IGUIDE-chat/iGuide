@@ -3,13 +3,13 @@
  * @description Chat (AI) Component / Module
  */
 
-import { MessagePrimitive } from '@assistant-ui/react'
+import { MessagePrimitive } from "@assistant-ui/react";
 
 interface UserMessageProps {
-  userRole?: string
+  userRole?: string;
 }
 
-export function UserMessage({ userRole = 'You' }: UserMessageProps) {
+export function UserMessage({ userRole = "You" }: UserMessageProps) {
   return (
     <MessagePrimitive.Root className="flex w-full border-b border-transparent py-6">
       <div className="mx-auto flex w-full max-w-3xl flex-row-reverse gap-4 px-4">
@@ -51,5 +51,5 @@ export function UserMessage({ userRole = 'You' }: UserMessageProps) {
         </div>
       </div>
     </MessagePrimitive.Root>
-  )
+  );
 }

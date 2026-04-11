@@ -7,19 +7,19 @@
 
 // [PAGE] Landing page template for specific agents (Courses, Dorms, Resume).
 // [页面] 用于特定智能体（课程、宿舍、简历）的着陆页模板。
-import * as React from 'react'
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Language } from '../types'
-import { UI_TEXT } from '../i18n/uiText'
+import * as React from "react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Language } from "../types";
+import { UI_TEXT } from "../i18n/uiText";
 import {
   mailingListService,
   MailingListTopic,
-} from '../services/mailingListService'
+} from "../services/mailingListService";
 
 interface AgentLandingPageProps {
-  type: 'courses' | 'dorms' | 'resume'
-  language: Language
+  type: "courses" | "dorms" | "resume";
+  language: Language;
 }
 
 const AGENT_CONFIG = {
@@ -39,7 +39,7 @@ const AGENT_CONFIG = {
         />
       </svg>
     ),
-    gradient: 'from-illini-blue to-blue-600',
+    gradient: "from-illini-blue to-blue-600",
   },
   dorms: {
     icon: (
@@ -57,7 +57,7 @@ const AGENT_CONFIG = {
         />
       </svg>
     ),
-    gradient: 'from-illini-orange to-orange-500',
+    gradient: "from-illini-orange to-orange-500",
   },
   resume: {
     icon: (
@@ -75,56 +75,56 @@ const AGENT_CONFIG = {
         />
       </svg>
     ),
-    gradient: 'from-emerald-500 to-teal-600',
+    gradient: "from-emerald-500 to-teal-600",
   },
-}
+};
 
 export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
   type,
   language,
 }) => {
-  const t = UI_TEXT[language]
-  const [email, setEmail] = useState('')
-  const [submitted, setSubmitted] = useState(false)
-  const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const config = AGENT_CONFIG[type]
+  const t = UI_TEXT[language];
+  const [email, setEmail] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const config = AGENT_CONFIG[type];
 
   const title =
-    type === 'courses'
+    type === "courses"
       ? t.coursesTitle
-      : type === 'dorms'
+      : type === "dorms"
         ? t.dormsTitle
-        : t.resumeTitle
+        : t.resumeTitle;
   const desc =
-    type === 'courses'
+    type === "courses"
       ? t.coursesDesc
-      : type === 'dorms'
+      : type === "dorms"
         ? t.dormsDesc
-        : t.resumeDesc
+        : t.resumeDesc;
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!email) return
-    setSubmitting(true)
-    setError(null)
+    e.preventDefault();
+    if (!email) return;
+    setSubmitting(true);
+    setError(null);
 
     const result = await mailingListService.subscribe(
       email,
       type as MailingListTopic
-    )
-    setSubmitting(false)
+    );
+    setSubmitting(false);
 
     if (result.success) {
-      setSubmitted(true)
+      setSubmitted(true);
     } else {
       setError(
-        language === 'zh'
-          ? '提交失败，请重试。'
-          : 'Failed to submit. Please try again.'
-      )
+        language === "zh"
+          ? "提交失败，请重试。"
+          : "Failed to submit. Please try again."
+      );
     }
-  }
+  };
 
   return (
     <div
@@ -152,7 +152,7 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
           >
             {/* Title */}
             <h1 className="mb-3 text-2xl font-bold tracking-tight text-slate-900">
@@ -201,7 +201,7 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
             />
             <AnimatePresence mode="wait">
               <motion.button
-                key={language + '-btn'}
+                key={language + "-btn"}
                 type="submit"
                 disabled={submitting}
                 initial={{ opacity: 0 }}
@@ -217,9 +217,9 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
                 "
               >
                 {submitting
-                  ? language === 'zh'
-                    ? '提交中…'
-                    : 'Submitting…'
+                  ? language === "zh"
+                    ? "提交中…"
+                    : "Submitting…"
                   : t.notifyMe}
               </motion.button>
             </AnimatePresence>
@@ -242,5 +242,5 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
         )}
       </div>
     </div>
-  )
-}
+  );
+};

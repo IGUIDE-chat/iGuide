@@ -5,17 +5,17 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from 'react'
-import { BlockIIcon } from './BlockIIcon'
+import React from "react";
+import { BlockIIcon } from "./BlockIIcon";
 
 interface BrandMarkProps {
-  className?: string
-  iconClassName?: string
+  className?: string;
+  iconClassName?: string;
 }
 
 export const BrandMark: React.FC<BrandMarkProps> = ({
-  className = 'h-10 w-10 rounded-xl',
-  iconClassName = 'text-lg',
+  className = "h-10 w-10 rounded-xl",
+  iconClassName = "text-lg",
 }) => (
   <div
     className={`
@@ -26,4 +26,4 @@ export const BrandMark: React.FC<BrandMarkProps> = ({
   >
     <BlockIIcon className={iconClassName} />
   </div>
-)
+);

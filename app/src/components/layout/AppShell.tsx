@@ -5,17 +5,19 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from 'react'
-import { useLayout } from '../../contexts/LayoutContext'
+import React from "react";
+import { useLayout } from "../../contexts/LayoutContext";
 
 interface AppShellProps {
-  isSidebarOpen: boolean
-  sidebar: React.ReactNode
-  mobileHeader: React.ReactNode
-  children: React.ReactNode
-  sidebarToggleButtonRef: React.RefObject<HTMLButtonElement | null>
-  mobileSidebarButtonRef: React.RefObject<HTMLButtonElement | null>
-  onToggleSidebar: () => void
+  isSidebarOpen: boolean;
+  sidebar: React.ReactNode;
+  mobileHeader: React.ReactNode;
+  children: React.ReactNode;
+  sidebarToggleButtonRef: React.RefObject<HTMLButtonElement | null>;
+  mobileSidebarButtonRef: React.RefObject<HTMLButtonElement | null>;
+  onCloseSidebar: () => void;
+  onOpenSidebar: () => void;
+  onToggleSidebar: () => void;
 }
 
 export const AppShell: React.FC<AppShellProps> = ({
@@ -27,8 +29,8 @@ export const AppShell: React.FC<AppShellProps> = ({
   mobileSidebarButtonRef,
   onToggleSidebar,
 }) => {
-  const layout = useLayout()
-  const headerSlot = layout?.mobileHeaderSlot ?? mobileHeader
+  const layout = useLayout();
+  const headerSlot = layout.mobileHeaderSlot;
 
   return (
     <div
@@ -41,8 +43,8 @@ export const AppShell: React.FC<AppShellProps> = ({
           fixed inset-0 z-40 w-64 bg-black/50 transition-opacity duration-300
           md:hidden
           ${isSidebarOpen
-            ? 'pointer-events-auto opacity-100'
-            : 'pointer-events-none opacity-0'
+            ? "pointer-events-auto opacity-100"
+            : "pointer-events-none opacity-0"
           }
         `}
         role="button"
@@ -65,11 +67,11 @@ export const AppShell: React.FC<AppShellProps> = ({
           transition-all duration-300 ease-in-out
           md:relative
           ${isSidebarOpen
-            ? 'translate-x-0'
+            ? "translate-x-0"
             : `
-              -translate-x-full
-              md:w-0 md:translate-x-0 md:overflow-hidden
-            `
+                -translate-x-full
+                md:w-0 md:translate-x-0 md:overflow-hidden
+              `
           }
         `}
       >
@@ -90,7 +92,7 @@ export const AppShell: React.FC<AppShellProps> = ({
               rounded-md p-2 text-slate-400 transition-colors
               hover:bg-illini-blue/5 hover:text-illini-blue
             "
-            title={isSidebarOpen ? 'Close Sidebar' : 'Open Sidebar'}
+            title={isSidebarOpen ? "Close Sidebar" : "Open Sidebar"}
           >
             <svg
               className="size-5"
@@ -146,5 +148,5 @@ export const AppShell: React.FC<AppShellProps> = ({
         </div>
       </main>
     </div>
-  )
-}
+  );
+};

@@ -5,9 +5,9 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { useMemo } from 'react'
-import { useHousingFilters } from '../store/HousingContext'
-import { getPriceRangeFromData } from '../constants/pricing'
+import { useMemo } from "react";
+import { useHousingFilters } from "../store/HousingContext";
+import { getPriceRangeFromData } from "../constants/pricing";
 
 export const useDormFilterBadge = () => {
   const {
@@ -18,36 +18,36 @@ export const useDormFilterBadge = () => {
     bathroomCountFilters,
     bathroomTypeFilters,
     housingTypeDetails,
-  } = useHousingFilters()
+  } = useHousingFilters();
 
-  const defaultPriceRange = getPriceRangeFromData()
+  const defaultPriceRange = getPriceRangeFromData();
   const hasPriceFilter =
     priceRange[0] !== defaultPriceRange[0] ||
-    priceRange[1] !== defaultPriceRange[1]
+    priceRange[1] !== defaultPriceRange[1];
 
   return useMemo(() => {
     const hasActiveDormFilters =
       activeFilters.length > 0 ||
       hasPriceFilter ||
-      housingTypeDetails !== 'ALL' ||
+      housingTypeDetails !== "ALL" ||
       locationFilters.length > 0 ||
       bedCountFilters.length > 0 ||
       bathroomCountFilters.length > 0 ||
-      bathroomTypeFilters.length > 0
+      bathroomTypeFilters.length > 0;
 
     const activeDormFilterCount =
       (hasPriceFilter ? 1 : 0) +
-      (housingTypeDetails !== 'ALL' ? 1 : 0) +
+      (housingTypeDetails !== "ALL" ? 1 : 0) +
       locationFilters.length +
       bedCountFilters.length +
       bathroomCountFilters.length +
       bathroomTypeFilters.length +
-      activeFilters.length
+      activeFilters.length;
 
     return {
       hasActiveDormFilters,
       activeDormFilterCount,
-    }
+    };
   }, [
     activeFilters.length,
     bathroomCountFilters.length,
@@ -56,5 +56,5 @@ export const useDormFilterBadge = () => {
     hasPriceFilter,
     housingTypeDetails,
     locationFilters.length,
-  ])
-}
+  ]);
+};

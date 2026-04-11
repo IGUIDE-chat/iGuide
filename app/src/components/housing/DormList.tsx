@@ -5,44 +5,44 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { Suspense, useCallback } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
-import { GitCompareArrows, X } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
-import { Language } from '../../types'
-import { useAuth } from '../../contexts/AuthContext'
-import { FilterModal } from './FilterModal'
-import DormListHeader from './dorm-list/DormListHeader'
-import DormGrid from './dorm-list/DormGrid'
-import { FavoriteFlyEffect } from './dorm-list/FavoriteFlyEffect'
-import { ListEmptyState } from './dorm-list/EmptyStates'
-import { DormListMapPane } from './dorm-list/DormListMapPane'
-import { useDormListController } from './dorm-list/useDormListController'
-import { useDormCommentStats } from './hooks/useDormCommentStats'
-import { useCompare } from './store/CompareContext'
+import React, { Suspense, useCallback } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { GitCompareArrows, X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Language } from "../../types";
+import { useAuth } from "../../contexts/AuthContext";
+import { FilterModal } from "./FilterModal";
+import DormListHeader from "./dorm-list/DormListHeader";
+import DormGrid from "./dorm-list/DormGrid";
+import { FavoriteFlyEffect } from "./dorm-list/FavoriteFlyEffect";
+import { ListEmptyState } from "./dorm-list/EmptyStates";
+import { DormListMapPane } from "./dorm-list/DormListMapPane";
+import { useDormListController } from "./dorm-list/useDormListController";
+import { useDormCommentStats } from "./hooks/useDormCommentStats";
+import { useCompare } from "./store/CompareContext";
 
-const DormComparison = React.lazy(() => import('./DormComparison'))
+const DormComparison = React.lazy(() => import("./DormComparison"));
 
 const COMPARE_TEXT = {
   en: {
-    compareBar: (n: number) => `${n} dorm${n > 1 ? 's' : ''} selected`,
-    compare: 'Compare',
-    clear: 'Clear',
+    compareBar: (n: number) => `${n} dorm${n > 1 ? "s" : ""} selected`,
+    compare: "Compare",
+    clear: "Clear",
   },
   zh: {
     compareBar: (n: number) => `已选 ${n} 个宿舍`,
-    compare: '对比',
-    clear: '清除',
+    compare: "对比",
+    clear: "清除",
   },
-}
+};
 
 interface DormListProps {
-  language: Language
+  language: Language;
 }
 
 const DormList: React.FC<DormListProps> = ({ language }) => {
-  const controller = useDormListController(language)
-  const commentStats = useDormCommentStats()
+  const controller = useDormListController(language);
+  const commentStats = useDormCommentStats();
   const {
     compareIds,
     compareDorms,
@@ -51,21 +51,21 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
     clearCompare,
     openCompare,
     closeCompare,
-  } = useCompare()
-  const { user, requestLogin } = useAuth()
-  const navigate = useNavigate()
-  const ct = COMPARE_TEXT[language]
+  } = useCompare();
+  const { user, requestLogin } = useAuth();
+  const navigate = useNavigate();
+  const ct = COMPARE_TEXT[language];
 
   const handleRatingClick = useCallback(
     (dorm: { id: string }) => {
       if (!user) {
-        requestLogin()
+        requestLogin();
       } else {
-        navigate(`/dorms/${dorm.id}#reviews`)
+        navigate(`/dorms/${dorm.id}#reviews`);
       }
     },
     [user, requestLogin, navigate]
-  )
+  );
 
   return (
     <div className="flex h-full flex-col bg-gray-50">
@@ -153,7 +153,7 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
       <FilterModal
         isOpen={controller.isFilterModalOpen}
         onClose={() => controller.setIsFilterModalOpen(false)}
-        language={language === 'zh' ? 'zh' : 'en'}
+        language={language === "zh" ? "zh" : "en"}
       />
 
       {controller.flyingHeart && (
@@ -173,7 +173,7 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
             initial={{ y: 80, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 80, opacity: 0 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
             className="
               fixed inset-x-4 bottom-6 z-50 mx-auto flex w-fit
               max-w-[calc(100vw-2rem)] items-center gap-2 rounded-full
@@ -222,7 +222,7 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
         </Suspense>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default DormList
+export default DormList;

@@ -5,16 +5,17 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from 'react'
-import { History, Loader2 } from 'lucide-react'
-import { DormEditFormState } from './useDormEditForm'
+import React from "react";
+import { History, Loader2 } from "lucide-react";
+import { DormEditFormState } from "./useDormEditForm";
 
 interface HistoryTabProps {
-  form: DormEditFormState
+  form: DormEditFormState;
 }
 
 export const HistoryTab: React.FC<HistoryTabProps> = ({ form }) => {
-  const { t, historyEntries, historyLoading, restoringId, handleRestore } = form
+  const { t, historyEntries, historyLoading, restoringId, handleRestore } =
+    form;
 
   if (historyLoading) {
     return (
@@ -22,7 +23,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ form }) => {
         <Loader2 size={20} className="mr-2 animate-spin" />
         <span className="text-sm">{t.actions.loading}</span>
       </div>
-    )
+    );
   }
 
   if (historyEntries.length === 0) {
@@ -31,7 +32,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ form }) => {
         <History size={32} className="mx-auto mb-3 opacity-40" />
         <p className="text-sm">{t.hints.historyEmpty}</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -45,13 +46,13 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ form }) => {
             <div className="min-w-0 flex-1">
               <p className="text-xs font-medium text-gray-800">
                 {new Date(entry.changed_at).toLocaleString(
-                  form.language === 'zh' ? 'zh-CN' : 'en-US',
+                  form.language === "zh" ? "zh-CN" : "en-US",
                   {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit',
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
                   }
                 )}
               </p>
@@ -84,5 +85,5 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ form }) => {
         </li>
       ))}
     </ul>
-  )
-}
+  );
+};

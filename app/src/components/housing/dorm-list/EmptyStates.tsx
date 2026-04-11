@@ -5,13 +5,13 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from 'react'
-import { Search } from 'lucide-react'
-import { DormListText } from './types'
+import React from "react";
+import { Search } from "lucide-react";
+import { DormListText } from "./types";
 
 interface ListEmptyStateProps {
-  t: DormListText
-  onClearFilters: () => void
+  t: DormListText;
+  onClearFilters: () => void;
 }
 
 export const ListEmptyState: React.FC<ListEmptyStateProps> = ({
@@ -46,13 +46,13 @@ export const ListEmptyState: React.FC<ListEmptyStateProps> = ({
         {t.clearFilters}
       </button>
     </div>
-  )
-}
+  );
+};
 
 interface MapNoResultsOverlayProps {
-  t: DormListText
-  hasPriceFilter: boolean
-  onAction: () => void
+  t: DormListText;
+  hasPriceFilter: boolean;
+  onAction: () => void;
 }
 
 export const MapNoResultsOverlay: React.FC<MapNoResultsOverlayProps> = ({
@@ -89,11 +89,11 @@ export const MapNoResultsOverlay: React.FC<MapNoResultsOverlayProps> = ({
         </button>
       </div>
     </div>
-  )
-}
+  );
+};
 
 interface MapEmptyViewportOverlayProps {
-  t: DormListText
+  t: DormListText;
 }
 
 export const MapEmptyViewportOverlay: React.FC<
@@ -118,5 +118,5 @@ export const MapEmptyViewportOverlay: React.FC<
         <p className="text-xs text-gray-500">{t.panToSeeDorms}</p>
       </div>
     </div>
-  )
-}
+  );
+};

@@ -7,52 +7,52 @@
 
 // [LEGACY/UNUSED] Old register component. Replaced by LoginScreen.tsx.
 // [遗留/未使用] 旧的注册组件。已被 LoginScreen.tsx 取代。
-import React, { useState } from 'react'
-import { useAuth } from './AuthContext'
+import React, { useState } from "react";
+import { useAuth } from "./AuthContext";
 
 interface RegisterProps {
-  onSwitchToLogin: () => void
+  onSwitchToLogin: () => void;
 }
 
 export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
-  const { register, isLoading } = useAuth()
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [acceptTerms, setAcceptTerms] = useState(false)
-  const [error, setError] = useState('')
+  const { register, isLoading } = useAuth();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
+    e.preventDefault();
+    setError("");
 
     // Validation
     if (!name || !email || !password || !confirmPassword) {
-      setError('Please fill in all fields')
-      return
+      setError("Please fill in all fields");
+      return;
     }
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match')
-      return
+      setError("Passwords do not match");
+      return;
     }
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters')
-      return
+      setError("Password must be at least 6 characters");
+      return;
     }
 
     if (!acceptTerms) {
-      setError('Please accept the terms of service')
-      return
+      setError("Please accept the terms of service");
+      return;
     }
 
-    const success = await register(name, email, password)
+    const success = await register(name, email, password);
     if (!success) {
-      setError('Email already registered')
+      setError("Email already registered");
     }
-  }
+  };
 
   return (
     <div
@@ -203,7 +203,7 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
                 "
               />
               <label htmlFor="terms" className="ml-2 text-sm text-slate-600">
-                I agree to the{' '}
+                I agree to the{" "}
                 <span
                   className="
                     cursor-pointer text-illini-blue
@@ -211,8 +211,8 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
                   "
                 >
                   Terms of Service
-                </span>{' '}
-                and{' '}
+                </span>{" "}
+                and{" "}
                 <span
                   className="
                     cursor-pointer text-illini-blue
@@ -268,7 +268,7 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
                   Creating account...
                 </span>
               ) : (
-                'Create Account'
+                "Create Account"
               )}
             </button>
           </form>
@@ -276,7 +276,7 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
           {/* Login Link */}
           <div className="mt-6 text-center">
             <p className="text-sm text-slate-600">
-              Already have an account?{' '}
+              Already have an account?{" "}
               <button
                 onClick={onSwitchToLogin}
                 className="
@@ -298,5 +298,5 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

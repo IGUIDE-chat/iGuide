@@ -5,14 +5,14 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from 'react'
+import React from "react";
 
 interface BlockIIconProps {
-  className?: string
+  className?: string;
 }
 
 export const BlockIIcon: React.FC<BlockIIconProps> = ({
-  className = 'text-lg',
+  className = "text-lg",
 }) => (
   <span
     className={`
@@ -23,4 +23,4 @@ export const BlockIIcon: React.FC<BlockIIconProps> = ({
   >
     I
   </span>
-)
+);

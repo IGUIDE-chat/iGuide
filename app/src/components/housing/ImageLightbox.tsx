@@ -5,20 +5,20 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { useCallback, useEffect, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { X, ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from 'lucide-react'
+import React, { useCallback, useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { X, ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from "lucide-react";
 
 interface LightboxImage {
-  src: string
-  alt?: string
-  label?: string
+  src: string;
+  alt?: string;
+  label?: string;
 }
 
 interface ImageLightboxProps {
-  images: LightboxImage[]
-  initialIndex?: number
-  onClose: () => void
+  images: LightboxImage[];
+  initialIndex?: number;
+  onClose: () => void;
 }
 
 const ImageLightbox: React.FC<ImageLightboxProps> = ({
@@ -26,34 +26,34 @@ const ImageLightbox: React.FC<ImageLightboxProps> = ({
   initialIndex = 0,
   onClose,
 }) => {
-  const [currentIndex, setCurrentIndex] = useState(initialIndex)
-  const [scale, setScale] = useState(1)
-  const hasMultiple = images.length > 1
-  const current = images[currentIndex]
+  const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const [scale, setScale] = useState(1);
+  const hasMultiple = images.length > 1;
+  const current = images[currentIndex];
 
   const goNext = useCallback(() => {
-    setScale(1)
-    setCurrentIndex((i) => (i + 1) % images.length)
-  }, [images.length])
+    setScale(1);
+    setCurrentIndex((i) => (i + 1) % images.length);
+  }, [images.length]);
 
   const goPrev = useCallback(() => {
-    setScale(1)
-    setCurrentIndex((i) => (i - 1 + images.length) % images.length)
-  }, [images.length])
+    setScale(1);
+    setCurrentIndex((i) => (i - 1 + images.length) % images.length);
+  }, [images.length]);
 
   const toggleZoom = useCallback(() => {
-    setScale((s) => (s > 1 ? 1 : 2))
-  }, [])
+    setScale((s) => (s > 1 ? 1 : 2));
+  }, []);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-      if (e.key === 'ArrowRight' && hasMultiple) goNext()
-      if (e.key === 'ArrowLeft' && hasMultiple) goPrev()
-    }
-    window.addEventListener('keydown', handleKey)
-    return () => window.removeEventListener('keydown', handleKey)
-  }, [onClose, goNext, goPrev, hasMultiple])
+      if (e.key === "Escape") onClose();
+      if (e.key === "ArrowRight" && hasMultiple) goNext();
+      if (e.key === "ArrowLeft" && hasMultiple) goPrev();
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [onClose, goNext, goPrev, hasMultiple]);
 
   return (
     <motion.div
@@ -86,8 +86,8 @@ const ImageLightbox: React.FC<ImageLightboxProps> = ({
           <button
             type="button"
             onClick={(e) => {
-              e.stopPropagation()
-              toggleZoom()
+              e.stopPropagation();
+              toggleZoom();
             }}
             className="
               rounded-full bg-white/10 p-2 text-white transition-colors
@@ -118,7 +118,7 @@ const ImageLightbox: React.FC<ImageLightboxProps> = ({
         <motion.img
           key={currentIndex}
           src={current?.src}
-          alt={current?.alt ?? ''}
+          alt={current?.alt ?? ""}
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
@@ -138,8 +138,8 @@ const ImageLightbox: React.FC<ImageLightboxProps> = ({
           <button
             type="button"
             onClick={(e) => {
-              e.stopPropagation()
-              goPrev()
+              e.stopPropagation();
+              goPrev();
             }}
             className="
               absolute top-1/2 left-3 -translate-y-1/2 rounded-full bg-white/10
@@ -152,8 +152,8 @@ const ImageLightbox: React.FC<ImageLightboxProps> = ({
           <button
             type="button"
             onClick={(e) => {
-              e.stopPropagation()
-              goNext()
+              e.stopPropagation();
+              goNext();
             }}
             className="
               absolute top-1/2 right-3 -translate-y-1/2 rounded-full bg-white/10
@@ -166,7 +166,7 @@ const ImageLightbox: React.FC<ImageLightboxProps> = ({
         </>
       )}
     </motion.div>
-  )
-}
+  );
+};
 
-export default ImageLightbox
+export default ImageLightbox;

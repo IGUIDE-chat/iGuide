@@ -7,14 +7,14 @@
 
 // [DATA] Article content for Quad Day guide.
 // [数据] 迎新日（Quad Day）指南的文章内容。
-import { Article } from '../../types'
+import { Article } from "../../types";
 
 export const quadDay: Article = {
-  id: 'quad-day',
-  category: 'social',
-  title: 'Quad Day: The RSO Fair',
+  id: "quad-day",
+  category: "social",
+  title: "Quad Day: The RSO Fair",
   summary:
-    'The most chaotic and fun Sunday of the year. Join one of 1000+ clubs.',
+    "The most chaotic and fun Sunday of the year. Join one of 1000+ clubs.",
   content: `
 ### What is Quad Day?
 
@@ -27,9 +27,9 @@ Held on the Sunday before classes start, Quad Day is where hundreds of Registere
 
 **Missed it?** Check out the connection portal online to find clubs year-round.
   `,
-  tags: ['social', 'clubs', 'rso', 'events', 'quad day', 'involvement'],
-  title_zh: 'Quad Day：社团招新日',
-  summary_zh: '一年中最混乱也最有趣的周日。加入 1000+ 个社团之一。',
+  tags: ["social", "clubs", "rso", "events", "quad day", "involvement"],
+  title_zh: "Quad Day：社团招新日",
+  summary_zh: "一年中最混乱也最有趣的周日。加入 1000+ 个社团之一。",
   content_zh: `
 ### 什么是 Quad Day?
 
@@ -42,6 +42,6 @@ Held on the Sunday before classes start, Quad Day is where hundreds of Registere
 
 **错过了?** 全年都可以在学校官网的 connection portal 查找社团。
   `,
-  tags_zh: ['社交', '社团', 'RSO', '活动', 'Quad Day'],
-  lastUpdated: '2024-08-15',
-}
+  tags_zh: ["社交", "社团", "RSO", "活动", "Quad Day"],
+  lastUpdated: "2024-08-15",
+};

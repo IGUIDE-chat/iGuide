@@ -7,13 +7,13 @@
 
 // [DATA] Article content for VeoRide guide.
 // [数据] VeoRide 共享单车指南的文章内容。
-import { Article } from '../../types'
+import { Article } from "../../types";
 
 export const veoRide: Article = {
-  id: 'veoride-rules',
-  category: 'transport',
-  title: 'E-Scooters & Bikes (VeoRide)',
-  summary: 'How to use campus scooters without getting fined.',
+  id: "veoride-rules",
+  category: "transport",
+  title: "E-Scooters & Bikes (VeoRide)",
+  summary: "How to use campus scooters without getting fined.",
   content: `
 ### Using VeoRide
 
@@ -24,9 +24,9 @@ You will see teal e-scooters and bikes everywhere.
 3.  **Parking:** **Crucial!** You must park in designated bike racks. If you leave it in the middle of a sidewalk, you might get fined or banned.
 4.  **Riding:** Do NOT ride on the sidewalks on Green Street. Use the bike lanes.
   `,
-  tags: ['scooter', 'bike', 'veo', 'transport', 'fines'],
-  title_zh: '共享单车与滑板车 (VeoRide)',
-  summary_zh: '如何使用校园滑板车并不被罚款。',
+  tags: ["scooter", "bike", "veo", "transport", "fines"],
+  title_zh: "共享单车与滑板车 (VeoRide)",
+  summary_zh: "如何使用校园滑板车并不被罚款。",
   content_zh: `
 ### 使用 VeoRide
 
@@ -37,6 +37,6 @@ You will see teal e-scooters and bikes everywhere.
 3.  **停车:** **关键！** 必须停在指定的自行车架区域。如果你把它扔在人行道中间，可能会被罚款或封号。
 4.  **骑行:** 严禁在 Green Street 的人行道上骑行。请使用自行车道。
   `,
-  tags_zh: ['滑板车', '自行车', 'Veo', '交通', '罚款'],
-  lastUpdated: '2023-09-01',
-}
+  tags_zh: ["滑板车", "自行车", "Veo", "交通", "罚款"],
+  lastUpdated: "2023-09-01",
+};

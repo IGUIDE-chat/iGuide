@@ -5,20 +5,20 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
-import { BrandMark } from '../ui/branding/BrandMark'
+import React from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import { BrandMark } from "../ui/branding/BrandMark";
 
 interface SidebarFooterProps {
-  isSidebarOpen: boolean
-  isGuest?: boolean
-  languageLabel: string
-  guestLabel: string
-  signedInLabel: string
-  profileName: string
-  onToggleLanguage: () => void
-  onGuestLogin?: () => void
+  isSidebarOpen: boolean;
+  isGuest?: boolean;
+  languageLabel: string;
+  guestLabel: string;
+  signedInLabel: string;
+  profileName: string;
+  onToggleLanguage: () => void;
+  onGuestLogin?: () => void;
 }
 
 const AnimatedText = ({ children }: { children: React.ReactNode }) => (
@@ -29,19 +29,19 @@ const AnimatedText = ({ children }: { children: React.ReactNode }) => (
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -2 }}
       transition={{ duration: 0.15 }}
-      style={{ display: 'inline-block' }}
+      style={{ display: "inline-block" }}
     >
       {children}
     </motion.span>
   </AnimatePresence>
-)
+);
 
 const SidebarLabel = ({
   isOpen,
   children,
 }: {
-  isOpen: boolean
-  children: React.ReactNode
+  isOpen: boolean;
+  children: React.ReactNode;
 }) => (
   <motion.span
     initial={false}
@@ -50,12 +50,12 @@ const SidebarLabel = ({
         ? { opacity: 1, x: 0, maxWidth: 220 }
         : { opacity: 0, x: -6, maxWidth: 0 }
     }
-    transition={{ duration: 0.2, ease: 'easeOut' }}
+    transition={{ duration: 0.2, ease: "easeOut" }}
     className="inline-block overflow-hidden whitespace-nowrap"
   >
     {children}
   </motion.span>
-)
+);
 
 export const SidebarFooter: React.FC<SidebarFooterProps> = ({
   isSidebarOpen,
@@ -136,7 +136,7 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
               bg-illini-orange text-sm font-semibold text-white
             "
           >
-            {profileName.charAt(0).toUpperCase() || 'U'}
+            {profileName.charAt(0).toUpperCase() || "U"}
           </div>
           <motion.div
             initial={false}
@@ -145,7 +145,7 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
                 ? { opacity: 1, x: 0, maxWidth: 180 }
                 : { opacity: 0, x: -6, maxWidth: 0 }
             }
-            transition={{ duration: 0.2, ease: 'easeOut' }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
             className="min-w-0 flex-1 overflow-hidden whitespace-nowrap"
           >
             <div className="text-[10px] text-slate-400">{signedInLabel}</div>
@@ -156,5 +156,5 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
         </Link>
       )}
     </div>
-  )
-}
+  );
+};

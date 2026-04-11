@@ -5,39 +5,45 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { memo } from 'react'
-import { Check, GraduationCap, MapPin, Snowflake, Utensils } from 'lucide-react'
-import { FilterOption } from '../types/index'
-import { FilterLanguage } from './modalText'
+import React, { memo } from "react";
+import {
+  Check,
+  GraduationCap,
+  MapPin,
+  Snowflake,
+  Utensils,
+} from "lucide-react";
+import { FilterOption } from "../types/index";
+import { FilterLanguage } from "./modalText";
 
 const DISPLAY_AMENITIES = [
   {
     id: FilterOption.AC,
-    label: { en: 'Air Conditioning', zh: '空调' },
+    label: { en: "Air Conditioning", zh: "空调" },
     icon: Snowflake,
   },
   {
     id: FilterOption.DINING_IN_BUILDING,
-    label: { en: 'Dining Hall', zh: '食堂' },
+    label: { en: "Dining Hall", zh: "食堂" },
     icon: Utensils,
   },
   {
     id: FilterOption.NEAR_ENGINEERING,
-    label: { en: 'Near Engineering', zh: '靠近工程学院' },
+    label: { en: "Near Engineering", zh: "靠近工程学院" },
     icon: GraduationCap,
   },
   {
     id: FilterOption.NEAR_MAIN_QUAD,
-    label: { en: 'Near Main Quad', zh: '靠近主广场' },
+    label: { en: "Near Main Quad", zh: "靠近主广场" },
     icon: MapPin,
   },
-] as const
+] as const;
 
 interface AmenitiesSectionProps {
-  title: string
-  language: FilterLanguage
-  selectedValues: FilterOption[]
-  onToggle: (value: FilterOption) => void
+  title: string;
+  language: FilterLanguage;
+  selectedValues: FilterOption[];
+  onToggle: (value: FilterOption) => void;
 }
 
 const AmenitiesSection: React.FC<AmenitiesSectionProps> = ({
@@ -55,8 +61,8 @@ const AmenitiesSection: React.FC<AmenitiesSectionProps> = ({
       "
     >
       {DISPLAY_AMENITIES.map((amenity) => {
-        const isSelected = selectedValues.includes(amenity.id)
-        const Icon = amenity.icon
+        const isSelected = selectedValues.includes(amenity.id);
+        const Icon = amenity.icon;
 
         return (
           <label
@@ -107,10 +113,10 @@ const AmenitiesSection: React.FC<AmenitiesSectionProps> = ({
               <span>{amenity.label[language] || amenity.label.en}</span>
             </div>
           </label>
-        )
+        );
       })}
     </div>
   </section>
-)
+);
 
-export default memo(AmenitiesSection)
+export default memo(AmenitiesSection);

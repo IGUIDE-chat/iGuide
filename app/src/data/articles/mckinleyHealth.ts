@@ -7,13 +7,13 @@
 
 // [DATA] Article content for McKinley Health Center guide.
 // [数据] 麦金利校医院指南的文章内容。
-import { Article } from '../../types'
+import { Article } from "../../types";
 
 export const mckinleyHealth: Article = {
-  id: 'mckinley-health',
-  category: 'safety',
-  title: 'McKinley Health Center: Free Services',
-  summary: 'Did you know you already paid for healthcare? How to use McKinley.',
+  id: "mckinley-health",
+  category: "safety",
+  title: "McKinley Health Center: Free Services",
+  summary: "Did you know you already paid for healthcare? How to use McKinley.",
   content: `
 ### McKinley Health Center
 
@@ -26,9 +26,9 @@ Your student fees cover most services here!
 
 **Location:** Lincoln Avenue, near the Ike and FAR/PAR.
   `,
-  tags: ['health', 'doctor', 'medicine', 'mckinley', 'safety', 'free'],
-  title_zh: 'McKinley 校医院：免费服务',
-  summary_zh: '你知道你已经付过医疗费了吗？如何使用 McKinley。',
+  tags: ["health", "doctor", "medicine", "mckinley", "safety", "free"],
+  title_zh: "McKinley 校医院：免费服务",
+  summary_zh: "你知道你已经付过医疗费了吗？如何使用 McKinley。",
   content_zh: `
 ### McKinley 校医院
 
@@ -41,6 +41,6 @@ Your student fees cover most services here!
 
 **位置:** Lincoln Avenue，靠近 Ike 和 FAR/PAR。
   `,
-  tags_zh: ['健康', '医生', '药', 'McKinley', '安全', '免费'],
-  lastUpdated: '2024-08-01',
-}
+  tags_zh: ["健康", "医生", "药", "McKinley", "安全", "免费"],
+  lastUpdated: "2024-08-01",
+};

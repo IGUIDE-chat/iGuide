@@ -5,20 +5,20 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from 'react'
-import { Language } from '../../types'
-import { ConversationSidebar } from './ConversationSidebar'
-import { LibrarySidebar } from './LibrarySidebar'
-import { DormSidebar } from './DormSidebar'
+import React from "react";
+import { Language } from "../../types";
+import { ConversationSidebar } from "./ConversationSidebar";
+import { LibrarySidebar } from "./LibrarySidebar";
+import { DormSidebar } from "./DormSidebar";
 
 interface SidebarPanelProps {
-  activeTab: string
-  language: Language
-  currentPath: string
-  currentConversationId?: string | null
-  onNewConversation?: () => void
-  onSelectConversation?: (conversationId: string | null) => void
-  favoritesIconRef: React.RefObject<SVGSVGElement | null>
+  activeTab: string;
+  language: Language;
+  currentPath: string;
+  currentConversationId?: string | null;
+  onNewConversation?: () => void;
+  onSelectConversation?: (conversationId: string | null) => void;
+  favoritesIconRef: React.RefObject<SVGSVGElement | null>;
 }
 
 export const SidebarPanel: React.FC<SidebarPanelProps> = ({
@@ -37,7 +37,7 @@ export const SidebarPanel: React.FC<SidebarPanelProps> = ({
         border-white/10 pt-2
       "
     >
-      {activeTab === 'chat' && (
+      {activeTab === "chat" && (
         <ConversationSidebar
           currentConversationId={currentConversationId ?? null}
           onSelectConversation={onSelectConversation ?? (() => {})}
@@ -45,27 +45,27 @@ export const SidebarPanel: React.FC<SidebarPanelProps> = ({
           language={language}
         />
       )}
-      {activeTab === 'library' && (
+      {activeTab === "library" && (
         <LibrarySidebar
           language={language}
           currentArticleId={
-            currentPath.startsWith('/library/article/')
-              ? currentPath.split('/').pop()
+            currentPath.startsWith("/library/article/")
+              ? currentPath.split("/").pop()
               : undefined
           }
         />
       )}
-      {activeTab === 'dorms' && (
+      {activeTab === "dorms" && (
         <DormSidebar
           language={language}
           currentDormId={
-            currentPath.startsWith('/dorms/')
-              ? currentPath.split('/').pop()
+            currentPath.startsWith("/dorms/")
+              ? currentPath.split("/").pop()
               : undefined
           }
           favoritesIconRef={favoritesIconRef}
         />
       )}
     </div>
-  )
-}
+  );
+};

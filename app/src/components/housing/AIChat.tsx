@@ -5,108 +5,108 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { useState, useRef, useEffect } from 'react'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
-import { motion, AnimatePresence } from 'framer-motion'
-import { MessageCircle, X, Send, Sparkles, Loader2 } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
-import { ChatMessage } from './types/index'
-import { streamChatResponse } from '../../services/ai'
-import { isDormMention, findMentionedDorms } from '../../utils/housingUtils'
-import { TypewriterText } from './TypewriterText'
-import { Language } from '../../types'
-import { aiChatTexts } from './i18n/dormTexts'
+import React, { useState, useRef, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { motion, AnimatePresence } from "framer-motion";
+import { MessageCircle, X, Send, Sparkles, Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { ChatMessage } from "./types/index";
+import { streamChatResponse } from "../../services/ai";
+import { isDormMention, findMentionedDorms } from "../../utils/housingUtils";
+import { TypewriterText } from "./TypewriterText";
+import { Language } from "../../types";
+import { aiChatTexts } from "./i18n/dormTexts";
 
 interface AIChatProps {
-  language: Language
+  language: Language;
 }
 
 const AIChat: React.FC<AIChatProps> = ({ language }) => {
-  const navigate = useNavigate()
-  const [isOpen, setIsOpen] = useState(false)
-  const [messages, setMessages] = useState<ChatMessage[]>([])
-  const [inputText, setInputText] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const t = aiChatTexts[language]
+  const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [inputText, setInputText] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const t = aiChatTexts[language];
 
   useEffect(() => {
     setMessages([
       {
-        id: 'welcome',
-        role: 'model',
+        id: "welcome",
+        role: "model",
         text: t.initialMessage,
         timestamp: new Date(),
       },
-    ])
-  }, [t.initialMessage])
+    ]);
+  }, [t.initialMessage]);
 
   useEffect(() => {
-    if (!isOpen) return
-    messagesEndRef.current?.scrollIntoView({ behavior: 'auto' })
-  }, [isOpen])
+    if (!isOpen) return;
+    messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
+  }, [isOpen]);
 
   const handleSend = async () => {
-    if (!inputText.trim() || isLoading) return
+    if (!inputText.trim() || isLoading) return;
 
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
-      role: 'user',
+      role: "user",
       text: inputText,
       timestamp: new Date(),
-    }
+    };
 
-    setMessages((prev) => [...prev, userMessage])
-    setInputText('')
-    setIsLoading(true)
+    setMessages((prev) => [...prev, userMessage]);
+    setInputText("");
+    setIsLoading(true);
 
     try {
-      const botMessageId = (Date.now() + 1).toString()
+      const botMessageId = (Date.now() + 1).toString();
       const historyForCoze = messages
-        .filter((message) => message.id !== 'welcome')
+        .filter((message) => message.id !== "welcome")
         .map((message) => ({
           role: message.role,
           text: message.text,
-        }))
+        }));
 
       const stream = streamChatResponse(
         historyForCoze,
         userMessage.text,
         language
-      )
-      let responseText = ''
-      let hasRenderedBotMessage = false
+      );
+      let responseText = "";
+      let hasRenderedBotMessage = false;
 
       for await (const chunk of stream) {
         if (!chunk.text) {
-          continue
+          continue;
         }
 
         if (!hasRenderedBotMessage) {
-          responseText = chunk.text
-          hasRenderedBotMessage = true
+          responseText = chunk.text;
+          hasRenderedBotMessage = true;
           setMessages((prev) => [
             ...prev,
             {
               id: botMessageId,
-              role: 'model',
+              role: "model",
               text: responseText,
               timestamp: new Date(),
             },
-          ])
-          continue
+          ]);
+          continue;
         }
 
-        responseText += chunk.text
-        const currentText = responseText
+        responseText += chunk.text;
+        const currentText = responseText;
         setMessages((prev) =>
           prev.map((message) =>
             message.id === botMessageId
               ? { ...message, text: currentText }
               : message
           )
-        )
+        );
       }
 
       if (!responseText.trim()) {
@@ -114,34 +114,34 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
           ...prev,
           {
             id: botMessageId,
-            role: 'model',
-            text: 'No response received. Please try again.',
+            role: "model",
+            text: "No response received. Please try again.",
             timestamp: new Date(),
           },
-        ])
+        ]);
       }
     } catch (error) {
-      console.error(error)
+      console.error(error);
       setMessages((prev) => [
         ...prev,
         {
           id: (Date.now() + 2).toString(),
-          role: 'model',
-          text: 'Connection failed. Please try again.',
+          role: "model",
+          text: "Connection failed. Please try again.",
           timestamp: new Date(),
         },
-      ])
+      ]);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSend()
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
     }
-  }
+  };
 
   return (
     <>
@@ -153,7 +153,7 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
           duration-300
           ${
             isOpen
-              ? 'scale-75 rotate-90 bg-gray-800'
+              ? "scale-75 rotate-90 bg-gray-800"
               : `
                 bg-illini-orange
                 hover:scale-110 hover:bg-illini-orange-dark
@@ -175,11 +175,11 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
           border-gray-100 bg-white shadow-2xl transition-all duration-300
           ${
             isOpen
-              ? 'translate-y-0 scale-100 opacity-100'
-              : 'pointer-events-none translate-y-10 scale-95 opacity-0'
+              ? "translate-y-0 scale-100 opacity-100"
+              : "pointer-events-none translate-y-10 scale-95 opacity-0"
           }
         `}
-        style={{ height: '70vh', maxHeight: '85vh' }}
+        style={{ height: "70vh", maxHeight: "85vh" }}
       >
         <div className="flex items-center justify-between bg-illini-blue p-4">
           <div className="flex items-center gap-3">
@@ -206,19 +206,19 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
           <AnimatePresence initial={false}>
             {messages.map((msg, index) => {
               const isRecent =
-                index === messages.length - 1 && msg.role === 'model'
+                index === messages.length - 1 && msg.role === "model";
               const mentionedDorms =
-                msg.role === 'model' ? findMentionedDorms(msg.text) : []
+                msg.role === "model" ? findMentionedDorms(msg.text) : [];
 
               return (
                 <motion.div
                   key={msg.id}
                   initial={{ opacity: 0, y: 20, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ duration: 0.3, ease: 'easeOut' }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
                   className={`
                     flex flex-col
-                    ${msg.role === 'user' ? 'items-end' : `items-start`}
+                    ${msg.role === "user" ? "items-end" : `items-start`}
                   `}
                 >
                   <div
@@ -226,7 +226,7 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                       overflow-hidden rounded-2xl px-5 py-4 text-sm/relaxed
                       shadow-sm
                       ${
-                        msg.role === 'user'
+                        msg.role === "user"
                           ? `
                             max-w-[85%] rounded-br-none bg-illini-blue
                             font-medium text-white
@@ -238,9 +238,9 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                       }
                     `}
                   >
-                    {msg.role === 'model' && isRecent ? (
+                    {msg.role === "model" && isRecent ? (
                       <TypewriterText text={msg.text} />
-                    ) : msg.role === 'user' ? (
+                    ) : msg.role === "user" ? (
                       <span className="font-medium whitespace-pre-wrap text-white">
                         {msg.text}
                       </span>
@@ -258,18 +258,18 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                           remarkPlugins={[remarkGfm]}
                           components={{
                             strong: ({ ...props }) => {
-                              const content = String(props.children)
-                              const isDorm = isDormMention(content)
+                              const content = String(props.children);
+                              const isDorm = isDormMention(content);
                               return (
                                 <span
                                   className={
                                     isDorm
-                                      ? 'font-extrabold text-illini-orange'
-                                      : 'font-bold text-gray-900'
+                                      ? "font-extrabold text-illini-orange"
+                                      : "font-bold text-gray-900"
                                   }
                                   {...props}
                                 />
-                              )
+                              );
                             },
                           }}
                         >
@@ -279,14 +279,14 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                     )}
                   </div>
 
-                  {msg.role === 'model' && mentionedDorms.length > 0 && (
+                  {msg.role === "model" && mentionedDorms.length > 0 && (
                     <div className="mt-3 ml-2 flex w-full flex-col gap-3">
                       {mentionedDorms.map((dorm) =>
                         (() => {
                           const dormName =
-                            language === 'zh' && dorm.name_zh
+                            language === "zh" && dorm.name_zh
                               ? dorm.name_zh
-                              : dorm.name
+                              : dorm.name;
                           return (
                             <button
                               key={dorm.id}
@@ -347,13 +347,13 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                                 </div>
                               </div>
                             </button>
-                          )
+                          );
                         })()
                       )}
                     </div>
                   )}
                 </motion.div>
-              )
+              );
             })}
           </AnimatePresence>
           {isLoading && (
@@ -404,7 +404,7 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default AIChat
+export default AIChat;

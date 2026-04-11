@@ -14,62 +14,6 @@ type ProxyMutableRequest = IncomingMessage & {
 
 export default defineConfig(({ mode }) => {
 	const env = loadEnv(mode, ".", "");
-	const preProxyBodyPlugin: Plugin = {
-		name: "pre-proxy-body-transform",
-		configureServer(server) {
-			server.middlewares.use((req, _res, next) => {
-				const mutableReq = req as ProxyMutableRequest;
-				const requestPath = req.url?.split("?")[0];
-				if (
-					req.method !== "POST" ||
-					(requestPath !== "/api/gemini" && requestPath !== "/api/tavily")
-				) {
-					next();
-					return;
-				}
-
-				let body = "";
-				req.on("data", (chunk: Buffer) => {
-					body += chunk.toString();
-				});
-				req.on("end", () => {
-					try {
-						const parsed = JSON.parse(body);
-						if (requestPath === "/api/gemini") {
-							const apiKey = env.GOOGLE_API_KEY;
-							if (!apiKey) {
-								next();
-								return;
-							}
-							const model = parsed.model || "gemini-1.5-flash";
-							delete parsed.model;
-							mutableReq._geminiProxyPath =
-								`/v1beta/models/${model}:generateContent?key=${apiKey}`;
-							mutableReq._geminiProxyBody = JSON.stringify(parsed);
-						} else if (requestPath === "/api/tavily") {
-							if (!parsed.api_key && env.TAVILY_API_KEY) {
-								parsed.api_key = env.TAVILY_API_KEY;
-							}
-							mutableReq._tavilyProxyBody = JSON.stringify(parsed);
-						}
-					} catch {
-						if (requestPath === "/api/gemini") {
-							const apiKey = env.GOOGLE_API_KEY;
-							if (apiKey) {
-								mutableReq._geminiProxyPath =
-									`/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-								mutableReq._geminiProxyBody = body;
-							}
-						} else if (requestPath === "/api/tavily") {
-							mutableReq._tavilyProxyBody = body;
-						}
-					}
-					next();
-				});
-				req.on("error", () => next());
-			});
-		},
-	};
 	return {
 		server: {
 			port: 3000,
@@ -101,18 +45,28 @@ export default defineConfig(({ mode }) => {
 					changeOrigin: true,
 					configure: (proxy) => {
 						proxy.on("proxyReq", (proxyReq, req) => {
-							const mutableReq = req as ProxyMutableRequest;
-							if (mutableReq._geminiProxyPath) {
-								proxyReq.path = mutableReq._geminiProxyPath;
-							}
-							if (mutableReq._geminiProxyBody) {
-								proxyReq.setHeader("Content-Type", "application/json");
-								proxyReq.setHeader(
-									"Content-Length",
-									Buffer.byteLength(mutableReq._geminiProxyBody),
-								);
-								proxyReq.write(mutableReq._geminiProxyBody);
-							}
+							const apiKey = env.GOOGLE_API_KEY;
+							if (!apiKey) return;
+							let body = "";
+							req.on("data", (chunk: Buffer) => {
+								body += chunk.toString();
+							});
+							req.on("end", () => {
+								try {
+									const parsed = JSON.parse(body);
+									const model = parsed.model || "gemini-1.5-flash";
+									delete parsed.model;
+									const newBody = JSON.stringify(parsed);
+									proxyReq.path = `/v1beta/models/${model}:generateContent?key=${apiKey}`;
+									proxyReq.setHeader(
+										"Content-Length",
+										Buffer.byteLength(newBody)
+									);
+									proxyReq.write(newBody);
+								} catch {
+									/* pass through as-is */
+								}
+							});
 						});
 					},
 				},
@@ -123,32 +77,44 @@ export default defineConfig(({ mode }) => {
 					rewrite: () => "/search",
 					configure: (proxy) => {
 						proxy.on("proxyReq", (proxyReq, req) => {
-							const mutableReq = req as ProxyMutableRequest;
-							if (mutableReq._tavilyProxyBody) {
-								proxyReq.setHeader("Content-Type", "application/json");
-								proxyReq.setHeader(
-									"Content-Length",
-									Buffer.byteLength(mutableReq._tavilyProxyBody),
-								);
-								proxyReq.write(mutableReq._tavilyProxyBody);
-							}
+							// Inject API key into the forwarded request body
+							const apiKey = env.TAVILY_API_KEY;
+							if (!apiKey) return;
+							let body = "";
+							req.on("data", (chunk: Buffer) => {
+								body += chunk.toString();
+							});
+							req.on("end", () => {
+								try {
+									const parsed = JSON.parse(body);
+									if (!parsed.api_key) parsed.api_key = apiKey;
+									const newBody = JSON.stringify(parsed);
+									proxyReq.setHeader(
+										"Content-Length",
+										Buffer.byteLength(newBody)
+									);
+									proxyReq.write(newBody);
+								} catch {
+									/* pass through as-is */
+								}
+							});
 						});
 					},
 				},
 			},
 		},
-		plugins: [preProxyBodyPlugin, qmdSearchPlugin(), react()],
+		plugins: [qmdSearchPlugin(), react()],
 		define: {
 			// Only inject public keys that are safe for frontend
 			// NEVER inject sensitive API keys here
 			"import.meta.env.VITE_SUPABASE_URL": JSON.stringify(
-				env.VITE_SUPABASE_URL,
+				env.VITE_SUPABASE_URL
 			),
 			"import.meta.env.VITE_SUPABASE_ANON_KEY": JSON.stringify(
-				env.VITE_SUPABASE_ANON_KEY,
+				env.VITE_SUPABASE_ANON_KEY
 			),
 			"import.meta.env.VITE_MAPBOX_TOKEN": JSON.stringify(
-				env.VITE_MAPBOX_TOKEN || "",
+				env.VITE_MAPBOX_TOKEN || ""
 			),
 		},
 		build: {

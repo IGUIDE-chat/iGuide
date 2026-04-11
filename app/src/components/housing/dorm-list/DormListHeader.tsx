@@ -5,23 +5,23 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from 'react'
-import { Search, Map as MapIcon, List, SlidersHorizontal } from 'lucide-react'
-import { motion } from 'framer-motion'
-import SortingDropdown from '../SortingDropdown'
-import { DormListText } from './types'
+import React from "react";
+import { Search, Map as MapIcon, List, SlidersHorizontal } from "lucide-react";
+import { motion } from "framer-motion";
+import SortingDropdown from "../SortingDropdown";
+import { DormListText } from "./types";
 
 interface DormListHeaderProps {
-  t: DormListText
-  searchTerm: string
-  setSearchTerm: (term: string) => void
-  hasActiveFilters: boolean
-  activeFilterCount: number
-  onOpenFilters: () => void
-  sortBy: string
-  setSortBy: (sortBy: string) => void
-  viewMode: 'list' | 'map'
-  setViewMode: (mode: 'list' | 'map') => void
+  t: DormListText;
+  searchTerm: string;
+  setSearchTerm: (term: string) => void;
+  hasActiveFilters: boolean;
+  activeFilterCount: number;
+  onOpenFilters: () => void;
+  sortBy: string;
+  setSortBy: (sortBy: string) => void;
+  viewMode: "list" | "map";
+  setViewMode: (mode: "list" | "map") => void;
 }
 
 const DormListHeader: React.FC<DormListHeaderProps> = ({
@@ -36,9 +36,9 @@ const DormListHeader: React.FC<DormListHeaderProps> = ({
   viewMode,
   setViewMode,
 }) => {
-  const isMapView = viewMode === 'map'
-  const isListView = !isMapView
-  const activePillLeft = isListView ? '4px' : 'calc(50% - 2px)'
+  const isMapView = viewMode === "map";
+  const isListView = !isMapView;
+  const activePillLeft = isListView ? "4px" : "calc(50% - 2px)";
 
   return (
     <div
@@ -163,27 +163,27 @@ const DormListHeader: React.FC<DormListHeaderProps> = ({
               "
               initial={{ left: activePillLeft, scaleX: 0.6, opacity: 0 }}
               animate={{ left: activePillLeft, scaleX: 1, opacity: 1 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              transition={{ type: "spring", stiffness: 400, damping: 30 }}
               style={{
-                width: 'calc(50% - 6px)',
-                height: 'calc(100% - 8px)',
-                top: '4px',
-                transformOrigin: 'center',
+                width: "calc(50% - 6px)",
+                height: "calc(100% - 8px)",
+                top: "4px",
+                transformOrigin: "center",
               }}
             />
 
             <button
               onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                setViewMode('list')
+                e.preventDefault();
+                e.stopPropagation();
+                setViewMode("list");
               }}
               className={`
                 relative z-10 flex items-center gap-1.5 rounded-md px-3 py-1.5
                 text-sm font-medium transition-colors duration-200
                 ${
                   isListView
-                    ? 'text-black'
+                    ? "text-black"
                     : `
                       text-gray-500
                       hover:text-gray-700
@@ -205,16 +205,16 @@ const DormListHeader: React.FC<DormListHeaderProps> = ({
             </button>
             <button
               onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                setViewMode('map')
+                e.preventDefault();
+                e.stopPropagation();
+                setViewMode("map");
               }}
               className={`
                 relative z-10 flex items-center gap-1.5 rounded-md px-3 py-1.5
                 text-sm font-medium transition-colors duration-200
                 ${
                   isMapView
-                    ? 'text-black'
+                    ? "text-black"
                     : `
                       text-gray-500
                       hover:text-gray-700
@@ -238,7 +238,7 @@ const DormListHeader: React.FC<DormListHeaderProps> = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default DormListHeader
+export default DormListHeader;

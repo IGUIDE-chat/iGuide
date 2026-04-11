@@ -1,15 +1,15 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       colors: {
-        'illini-blue': '#13294B',
-        'illini-orange': '#FF5F05',
-        'illini-orange-light': '#FF7A30',
-        'illini-orange-dark': '#E05504',
+        "illini-blue": "#13294B",
+        "illini-orange": "#FF5F05",
+        "illini-orange-light": "#FF7A30",
+        "illini-orange-dark": "#E05504",
       },
     },
   },
   plugins: [],
-}
+};

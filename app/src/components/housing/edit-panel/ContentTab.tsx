@@ -5,23 +5,23 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from 'react'
-import { RotateCcw } from 'lucide-react'
-import { LOCATION_PRESETS } from '../constants/metadata'
-import { DormEditFormState } from './useDormEditForm'
-import { EditableList, Field, inputCls } from './EditPanelFields'
+import React from "react";
+import { RotateCcw } from "lucide-react";
+import { LOCATION_PRESETS } from "../constants/metadata";
+import { DormEditFormState } from "./useDormEditForm";
+import { EditableList, Field, inputCls } from "./EditPanelFields";
 
 interface ContentTabProps {
-  form: DormEditFormState
+  form: DormEditFormState;
 }
 
 export const ContentTab: React.FC<ContentTabProps> = ({ form }) => {
-  const { t } = form
+  const { t } = form;
 
   return (
     <>
       <div className="flex w-fit gap-1 rounded-lg bg-gray-100 p-1">
-        {(['en', 'zh'] as const).map((lang) => (
+        {(["en", "zh"] as const).map((lang) => (
           <button
             key={lang}
             type="button"
@@ -30,7 +30,7 @@ export const ContentTab: React.FC<ContentTabProps> = ({ form }) => {
               rounded-md px-3 py-1 text-xs font-medium transition-colors
               ${
                 form.contentLang === lang
-                  ? 'bg-white text-illini-blue shadow-sm'
+                  ? "bg-white text-illini-blue shadow-sm"
                   : `
                     text-gray-500
                     hover:text-gray-700
@@ -38,12 +38,12 @@ export const ContentTab: React.FC<ContentTabProps> = ({ form }) => {
               }
             `}
           >
-            {lang === 'en' ? 'English' : '中文'}
+            {lang === "en" ? "English" : "中文"}
           </button>
         ))}
       </div>
 
-      {form.contentLang === 'en' ? (
+      {form.contentLang === "en" ? (
         <>
           <Field label={t.labels.name}>
             <input
@@ -69,8 +69,8 @@ export const ContentTab: React.FC<ContentTabProps> = ({ form }) => {
                     key={preset.value}
                     type="button"
                     onClick={() => {
-                      form.setLocation(preset.value)
-                      form.setLocationZh(preset.zh)
+                      form.setLocation(preset.value);
+                      form.setLocationZh(preset.zh);
                     }}
                     className={`
                       rounded-lg border px-3 py-1.5 text-xs font-medium
@@ -142,8 +142,8 @@ export const ContentTab: React.FC<ContentTabProps> = ({ form }) => {
                     key={preset.value}
                     type="button"
                     onClick={() => {
-                      form.setLocation(preset.value)
-                      form.setLocationZh(preset.zh)
+                      form.setLocation(preset.value);
+                      form.setLocationZh(preset.zh);
                     }}
                     className={`
                       rounded-lg border px-3 py-1.5 text-xs font-medium
@@ -206,5 +206,5 @@ export const ContentTab: React.FC<ContentTabProps> = ({ form }) => {
         {form.resetting ? t.actions.resetting : t.actions.reset}
       </button>
     </>
-  )
-}
+  );
+};

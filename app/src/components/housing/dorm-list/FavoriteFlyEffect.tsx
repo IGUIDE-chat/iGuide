@@ -5,20 +5,20 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from 'react'
-import { motion } from 'framer-motion'
+import React from "react";
+import { motion } from "framer-motion";
 
-export const DEFAULT_FAVORITES_TARGET = { x: 90, y: 360 }
-export const DEFAULT_TOGGLE_TARGET = { x: 30, y: 30 }
+export const DEFAULT_FAVORITES_TARGET = { x: 90, y: 360 };
+export const DEFAULT_TOGGLE_TARGET = { x: 30, y: 30 };
 
-const FAVORITES_HEART_SCALE = 12 / 24
+const FAVORITES_HEART_SCALE = 12 / 24;
 
 interface FavoriteFlyEffectProps {
-  startX: number
-  startY: number
-  targetX: number
-  targetY: number
-  onComplete: () => void
+  startX: number;
+  startY: number;
+  targetX: number;
+  targetY: number;
+  onComplete: () => void;
 }
 
 export const FavoriteFlyEffect: React.FC<FavoriteFlyEffectProps> = ({
@@ -38,7 +38,7 @@ export const FavoriteFlyEffect: React.FC<FavoriteFlyEffectProps> = ({
     }}
     transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
     onAnimationComplete={onComplete}
-    style={{ willChange: 'transform' }}
+    style={{ willChange: "transform" }}
   >
     <div className="-translate-1/2">
       <svg
@@ -51,4 +51,4 @@ export const FavoriteFlyEffect: React.FC<FavoriteFlyEffectProps> = ({
       </svg>
     </div>
   </motion.div>
-)
+);

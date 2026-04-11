@@ -5,23 +5,23 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from 'react'
-import { BathroomType, DiningType, Dorm } from '../types/index'
+import React from "react";
+import { BathroomType, DiningType, Dorm } from "../types/index";
 import {
   BATHROOM_TYPE_OPTIONS,
   DINING_OPTIONS,
   getLocalizedLabel,
   HOUSING_TYPE_OPTIONS,
-} from '../constants/metadata'
-import { DormEditFormState } from './useDormEditForm'
-import { Field, Toggle, inputCls } from './EditPanelFields'
+} from "../constants/metadata";
+import { DormEditFormState } from "./useDormEditForm";
+import { Field, Toggle, inputCls } from "./EditPanelFields";
 
 interface DetailsTabProps {
-  form: DormEditFormState
+  form: DormEditFormState;
 }
 
 export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
-  const { t } = form
+  const { t } = form;
 
   return (
     <>
@@ -29,7 +29,7 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
         <select
           value={form.housingType}
           onChange={(event) =>
-            form.setHousingType(event.target.value as Dorm['housingType'])
+            form.setHousingType(event.target.value as Dorm["housingType"])
           }
           className={inputCls}
         >
@@ -77,7 +77,7 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
           ))}
         </select>
       </Field>
-      {form.dining === 'nearby' && (
+      {form.dining === "nearby" && (
         <Field label={t.labels.dining}>
           <input
             type="text"
@@ -139,7 +139,7 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
           {form.derivedRoomOptions.length > 0 ? (
             form.derivedRoomOptions.map((option) => (
               <span
-                key={`${option.labelCode ?? 'custom'}-${option.bedCount ?? 'na'}-${option.bathroomCount ?? 'na'}-${option.bathroomScope}`}
+                key={`${option.labelCode ?? "custom"}-${option.bedCount ?? "na"}-${option.bathroomCount ?? "na"}-${option.bathroomScope}`}
                 className="
                   inline-block rounded-md border border-gray-300 bg-white px-2
                   py-0.5 text-xs text-gray-600
@@ -156,5 +156,5 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
         </div>
       </div>
     </>
-  )
-}
+  );
+};

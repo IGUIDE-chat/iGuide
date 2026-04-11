@@ -7,14 +7,14 @@
 
 // [COMPONENT] Dropdown menu for user profile actions.
 // [组件] 用户个人资料操作的下拉菜单。
-import React, { useState, useRef, useEffect } from 'react'
-import { useAuth } from '../../contexts/AuthContext'
+import React, { useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
 
 export const UserMenu: React.FC = () => {
-  const { user, logout } = useAuth()
-  const [isOpen, setIsOpen] = useState(false)
+  const { user, logout } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
 
-  if (!user) return null
+  if (!user) return null;
 
   return (
     <div className="relative">
@@ -66,8 +66,8 @@ export const UserMenu: React.FC = () => {
             <div className="p-2">
               <button
                 onClick={() => {
-                  logout()
-                  setIsOpen(false)
+                  logout();
+                  setIsOpen(false);
                 }}
                 className="
                   w-full rounded-xl px-4 py-2 text-left text-sm text-red-600
@@ -82,5 +82,5 @@ export const UserMenu: React.FC = () => {
         </>
       )}
     </div>
-  )
-}
+  );
+};

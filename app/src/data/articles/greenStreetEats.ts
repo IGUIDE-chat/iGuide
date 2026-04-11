@@ -7,13 +7,13 @@
 
 // [DATA] Article content for Green Street Eats guide.
 // [数据] 绿街美食指南的文章内容。
-import { Article } from '../../types'
+import { Article } from "../../types";
 
 export const greenStreetEats: Article = {
-  id: 'green-street-eats',
-  category: 'dining',
-  title: 'Green Street Food Guide',
-  summary: 'The best spots for bubble tea, late-night cravings, and lunch.',
+  id: "green-street-eats",
+  category: "dining",
+  title: "Green Street Food Guide",
+  summary: "The best spots for bubble tea, late-night cravings, and lunch.",
   content: `
 Green Street is the heart of campus dining.
 
@@ -24,9 +24,9 @@ Green Street is the heart of campus dining.
 
 **Tip:** Download the 'Chowbus' or 'Snackpass' apps for pickup deals.
   `,
-  tags: ['food', 'restaurants', 'green street', 'dining', 'boba'],
-  title_zh: 'Green Street 美食指南',
-  summary_zh: '奶茶、夜宵和午餐的最佳去处。',
+  tags: ["food", "restaurants", "green street", "dining", "boba"],
+  title_zh: "Green Street 美食指南",
+  summary_zh: "奶茶、夜宵和午餐的最佳去处。",
   content_zh: `
 Green Street (绿街) 是校园餐饮的心脏。
 
@@ -37,6 +37,6 @@ Green Street (绿街) 是校园餐饮的心脏。
 
 **提示:** 下载 'Chowbus' 或 'Snackpass' APP 可以点单自提，常有优惠。
   `,
-  tags_zh: ['美食', '餐厅', '绿街', '饮食', '奶茶'],
-  lastUpdated: '2024-02-01',
-}
+  tags_zh: ["美食", "餐厅", "绿街", "饮食", "奶茶"],
+  lastUpdated: "2024-02-01",
+};

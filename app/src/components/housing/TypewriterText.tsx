@@ -11,77 +11,77 @@ import remarkGfm from "remark-gfm";
 import { isDormMention } from "../../utils/housingUtils";
 
 interface TypewriterTextProps {
-	text: string;
-	speed?: number;
-	onComplete?: () => void;
+  text: string;
+  speed?: number;
+  onComplete?: () => void;
 }
 
 export const TypewriterText: React.FC<TypewriterTextProps> = ({
-	text,
-	speed = 5,
-	onComplete,
+  text,
+  speed = 5,
+  onComplete,
 }) => {
-	const [displayedText, setDisplayedText] = useState("");
-	const [currentIndex, setCurrentIndex] = useState(0);
+  const [displayedText, setDisplayedText] = useState("");
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-	useEffect(() => {
-		if (text.length > 0 && currentIndex === 0) {
-			queueMicrotask(() => setDisplayedText(""));
-		}
-	}, [text, currentIndex]);
+  useEffect(() => {
+    if (text.length > 0 && currentIndex === 0) {
+      queueMicrotask(() => setDisplayedText(""));
+    }
+  }, [text, currentIndex]);
 
-	useEffect(() => {
-		if (currentIndex < text.length) {
-			// Adaptive speed: faster if text is long or we are far behind
-			// standard speed 5ms, but if text > 200 chars, go faster (2ms)
-			// also render chunks of characters to prevent React render bottleneck
-			const isLong = text.length > 150;
-			const chunkSize = isLong ? 3 : 1;
-			const renderSpeed = isLong ? 2 : speed;
+  useEffect(() => {
+    if (currentIndex < text.length) {
+      // Adaptive speed: faster if text is long or we are far behind
+      // standard speed 5ms, but if text > 200 chars, go faster (2ms)
+      // also render chunks of characters to prevent React render bottleneck
+      const isLong = text.length > 150;
+      const chunkSize = isLong ? 3 : 1;
+      const renderSpeed = isLong ? 2 : speed;
 
-			const timeout = setTimeout(() => {
-				const nextIndex = Math.min(currentIndex + chunkSize, text.length);
-				setDisplayedText(text.slice(0, nextIndex));
-				setCurrentIndex(nextIndex);
-			}, renderSpeed);
+      const timeout = setTimeout(() => {
+        const nextIndex = Math.min(currentIndex + chunkSize, text.length);
+        setDisplayedText(text.slice(0, nextIndex));
+        setCurrentIndex(nextIndex);
+      }, renderSpeed);
 
-			return () => clearTimeout(timeout);
-		} else if (currentIndex >= text.length && onComplete) {
-			// Ensure we only call onComplete once when actually done
-			onComplete();
-		}
-	}, [currentIndex, text, speed, onComplete]);
+      return () => clearTimeout(timeout);
+    } else if (currentIndex >= text.length && onComplete) {
+      // Ensure we only call onComplete once when actually done
+      onComplete();
+    }
+  }, [currentIndex, text, speed, onComplete]);
 
-	return (
-		<div
-			className="
-     prose prose-sm
-     prose-p:leading-relaxed
-     prose-pre:bg-gray-100
-     max-w-none text-gray-800
-   "
-		>
-			<ReactMarkdown
-				remarkPlugins={[remarkGfm]}
-				components={{
-					strong: ({ node: _node, ...props }) => {
-						const content = String(props.children);
-						const isDorm = isDormMention(content);
-						return (
-							<span
-								className={
-									isDorm
-										? "font-extrabold text-illini-orange"
-										: "font-bold text-gray-900"
-								}
-								{...props}
-							/>
-						);
-					},
-				}}
-			>
-				{displayedText}
-			</ReactMarkdown>
-		</div>
-	);
+  return (
+    <div
+      className="
+        prose prose-sm
+        prose-p:leading-relaxed
+        prose-pre:bg-gray-100
+        max-w-none text-gray-800
+      "
+    >
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          strong: ({ node: _node, ...props }) => {
+            const content = String(props.children);
+            const isDorm = isDormMention(content);
+            return (
+              <span
+                className={
+                  isDorm
+                    ? "font-extrabold text-illini-orange"
+                    : "font-bold text-gray-900"
+                }
+                {...props}
+              />
+            );
+          },
+        }}
+      >
+        {displayedText}
+      </ReactMarkdown>
+    </div>
+  );
 };

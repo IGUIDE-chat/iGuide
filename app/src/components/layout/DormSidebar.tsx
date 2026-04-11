@@ -5,28 +5,28 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { useMemo } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
-import { Clock, Heart, Trash2 } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
-import { useSharedDormInteraction } from '../housing/store/DormUserInteractionContext'
-import { useDormData } from '../housing/store/DormDataContext'
-import { Language } from '../../types'
-import { Dorm } from '../housing/types/index'
-import { TypewriterText } from '../ui/TypewriterText'
+import React, { useMemo } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Clock, Heart, Trash2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useSharedDormInteraction } from "../housing/store/DormUserInteractionContext";
+import { useDormData } from "../housing/store/DormDataContext";
+import { Language } from "../../types";
+import { Dorm } from "../housing/types/index";
+import { TypewriterText } from "../ui/TypewriterText";
 
 interface DormSidebarProps {
-  language: Language
-  currentDormId?: string | null
+  language: Language;
+  currentDormId?: string | null;
   /** Ref for the favorites section heart icon SVG (flying-heart target) */
-  favoritesIconRef?: React.RefObject<SVGSVGElement | null>
+  favoritesIconRef?: React.RefObject<SVGSVGElement | null>;
 }
 
 interface SidebarDormItem {
-  id: string
-  name: string
-  nameZh: string
-  imageUrl: string
+  id: string;
+  name: string;
+  nameZh: string;
+  imageUrl: string;
 }
 
 export const DormSidebar: React.FC<DormSidebarProps> = ({
@@ -34,12 +34,12 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
   currentDormId,
   favoritesIconRef,
 }) => {
-  const navigate = useNavigate()
-  const { dorms } = useDormData()
+  const navigate = useNavigate();
+  const { dorms } = useDormData();
   const dormById = useMemo(
     () => new Map(dorms.map((dorm) => [dorm.id, dorm])),
     [dorms]
-  )
+  );
   const {
     favorites,
     cloudFavorites,
@@ -49,81 +49,81 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
     removeFromHistory,
     clearHistory,
     isLoading,
-  } = useSharedDormInteraction()
+  } = useSharedDormInteraction();
 
   const t = {
     en: {
-      favorites: 'Favorites',
-      history: 'History',
-      clear: 'Clear',
-      noFavorites: 'No favorite dorms yet',
-      noHistory: 'No viewing history yet',
-      clearFavoritesConfirm: 'Clear all dorm favorites?',
-      clearHistoryConfirm: 'Clear all dorm history?',
+      favorites: "Favorites",
+      history: "History",
+      clear: "Clear",
+      noFavorites: "No favorite dorms yet",
+      noHistory: "No viewing history yet",
+      clearFavoritesConfirm: "Clear all dorm favorites?",
+      clearHistoryConfirm: "Clear all dorm history?",
     },
     zh: {
-      favorites: '收藏',
-      history: '历史记录',
-      clear: '清空',
-      noFavorites: '暂无收藏宿舍',
-      noHistory: '暂无浏览记录',
-      clearFavoritesConfirm: '确认清空全部宿舍收藏吗？',
-      clearHistoryConfirm: '确认清空全部宿舍浏览记录吗？',
+      favorites: "收藏",
+      history: "历史记录",
+      clear: "清空",
+      noFavorites: "暂无收藏宿舍",
+      noHistory: "暂无浏览记录",
+      clearFavoritesConfirm: "确认清空全部宿舍收藏吗？",
+      clearHistoryConfirm: "确认清空全部宿舍浏览记录吗？",
     },
-  }[language]
+  }[language];
 
   const favoriteItems = useMemo<SidebarDormItem[]>(() => {
     return favorites
       .map((favoriteId) => {
-        const dorm = dormById.get(favoriteId)
+        const dorm = dormById.get(favoriteId);
         if (dorm) {
           return {
             id: dorm.id,
             name: dorm.name,
-            nameZh: dorm.name_zh ?? '',
-            imageUrl: dorm.imageUrl ?? '',
-          }
+            nameZh: dorm.name_zh ?? "",
+            imageUrl: dorm.imageUrl ?? "",
+          };
         }
 
         const cloudFavorite = cloudFavorites.find(
           (favorite) => favorite.dorm_id === favoriteId
-        )
-        if (!cloudFavorite) return null
+        );
+        if (!cloudFavorite) return null;
 
         return {
           id: cloudFavorite.dorm_id,
           name: cloudFavorite.dorm_name,
-          nameZh: cloudFavorite.dorm_name_zh ?? '',
-          imageUrl: '',
-        }
+          nameZh: cloudFavorite.dorm_name_zh ?? "",
+          imageUrl: "",
+        };
       })
-      .filter((item): item is SidebarDormItem => item !== null)
-  }, [favorites, cloudFavorites, dormById])
+      .filter((item): item is SidebarDormItem => item !== null);
+  }, [favorites, cloudFavorites, dormById]);
 
   const historyItems = useMemo<SidebarDormItem[]>(() => {
     return recentlyViewed.map((dorm: Dorm) => ({
       id: dorm.id,
       name: dorm.name,
-      nameZh: dorm.name_zh ?? '',
-      imageUrl: dorm.imageUrl ?? '',
-    }))
-  }, [recentlyViewed])
+      nameZh: dorm.name_zh ?? "",
+      imageUrl: dorm.imageUrl ?? "",
+    }));
+  }, [recentlyViewed]);
 
   const openDorm = (dormId: string) => {
-    navigate(`/dorms/${dormId}`)
-  }
+    navigate(`/dorms/${dormId}`);
+  };
 
   const handleClearFavorites = () => {
     if (window.confirm(t.clearFavoritesConfirm)) {
-      void clearFavorites()
+      void clearFavorites();
     }
-  }
+  };
 
   const handleClearHistory = () => {
     if (window.confirm(t.clearHistoryConfirm)) {
-      void clearHistory()
+      void clearHistory();
     }
-  }
+  };
 
   const renderDormList = (
     items: SidebarDormItem[],
@@ -140,7 +140,7 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
             "
           />
         </div>
-      )
+      );
     }
 
     if (items.length === 0) {
@@ -148,7 +148,7 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
         <div className="px-2 py-3">
           <p className="text-[11px] text-slate-600">{emptyText}</p>
         </div>
-      )
+      );
     }
 
     return (
@@ -159,10 +159,10 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
               key={item.id}
               layout
               initial={{ opacity: 0, x: -16, height: 0 }}
-              animate={{ opacity: 1, x: 0, height: 'auto' }}
+              animate={{ opacity: 1, x: 0, height: "auto" }}
               exit={{ opacity: 0, x: 12, height: 0 }}
               transition={{
-                type: 'spring',
+                type: "spring",
                 stiffness: 500,
                 damping: 30,
                 opacity: { duration: 0.2 },
@@ -172,7 +172,7 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
                 group cursor-pointer rounded-lg p-2 transition-all
                 ${
                   item.id === currentDormId
-                    ? 'bg-white/20 text-white'
+                    ? "bg-white/20 text-white"
                     : `
                       text-slate-300
                       hover:bg-white/10
@@ -203,7 +203,7 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
                         truncate text-xs font-medium
                         ${
                           item.id === currentDormId
-                            ? 'text-white'
+                            ? "text-white"
                             : `
                               text-slate-300
                               group-hover:text-white
@@ -213,7 +213,7 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
                     >
                       <TypewriterText
                         text={
-                          language === 'zh' && item.nameZh
+                          language === "zh" && item.nameZh
                             ? item.nameZh
                             : item.name
                         }
@@ -232,8 +232,8 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
                 >
                   <button
                     onClick={(event) => {
-                      event.stopPropagation()
-                      onRemove(item.id)
+                      event.stopPropagation();
+                      onRemove(item.id);
                     }}
                     className="
                       rounded-md p-1 transition-colors
@@ -250,8 +250,8 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
           ))}
         </AnimatePresence>
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <div className="flex h-full min-h-0 flex-col px-3">
@@ -282,7 +282,7 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
             )}
           </div>
           {renderDormList(favoriteItems, t.noFavorites, (dormId: string) => {
-            void removeFavorite(dormId)
+            void removeFavorite(dormId);
           })}
         </section>
 
@@ -308,10 +308,10 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
             )}
           </div>
           {renderDormList(historyItems, t.noHistory, (dormId: string) => {
-            void removeFromHistory(dormId)
+            void removeFromHistory(dormId);
           })}
         </section>
       </div>
     </div>
-  )
-}
+  );
+};

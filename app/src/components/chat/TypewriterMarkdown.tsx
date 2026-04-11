@@ -12,19 +12,19 @@ import ReactMarkdown, { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 interface TypewriterMarkdownProps {
-	content: string;
-	speed?: number;
-	components?: Components;
+  content: string;
+  speed?: number;
+  components?: Components;
 }
 
 // SIMPLIFIED: No typewriter effect, just direct render
 export const TypewriterMarkdown: React.FC<TypewriterMarkdownProps> = ({
-	content,
-	components,
+  content,
+  components,
 }) => {
-	return (
-		<ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
-			{content || ""}
-		</ReactMarkdown>
-	);
+  return (
+    <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+      {content || ""}
+    </ReactMarkdown>
+  );
 };

@@ -16,77 +16,77 @@ import React, {
   useCallback,
   useMemo,
   ReactNode,
-} from 'react'
-import { Dorm } from '../types/index'
-import { dormService } from '../../../services/dormService'
+} from "react";
+import { Dorm } from "../types/index";
+import { dormService } from "../../../services/dormService";
 
 interface DormDataContextType {
-  dorms: Dorm[]
-  isLoading: boolean
-  refreshDorms: () => Promise<void>
-  getDormById: (id: string) => Dorm | undefined
+  dorms: Dorm[];
+  isLoading: boolean;
+  refreshDorms: () => Promise<void>;
+  getDormById: (id: string) => Dorm | undefined;
 }
 
 const DormDataContext = createContext<DormDataContextType | undefined>(
   undefined
-)
+);
 
 export const DormDataProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [dorms, setDorms] = useState<Dorm[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [dorms, setDorms] = useState<Dorm[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const loadDorms = useCallback(async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const dbDorms = await dormService.getAllDorms()
-      setDorms(dbDorms)
+      const dbDorms = await dormService.getAllDorms();
+      setDorms(dbDorms);
     } catch (err) {
       console.error(
-        '[DormDataContext] Failed to load from DB, loading static fallback:',
+        "[DormDataContext] Failed to load from DB, loading static fallback:",
         err
-      )
+      );
       // Lazy-load static data only as a fallback
       try {
-        const { UIUC_DORMS } = await import('../constants/dormData')
-        setDorms(UIUC_DORMS)
+        const { UIUC_DORMS } = await import("../constants/dormData");
+        setDorms(UIUC_DORMS);
       } catch (importErr) {
         console.error(
-          '[DormDataContext] Failed to load static fallback:',
+          "[DormDataContext] Failed to load static fallback:",
           importErr
-        )
+        );
       }
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
-    void loadDorms()
-  }, [loadDorms])
+    void loadDorms();
+  }, [loadDorms]);
 
   const getDormById = useCallback(
     (id: string): Dorm | undefined => dorms.find((d) => d.id === id),
     [dorms]
-  )
+  );
 
   const value = useMemo<DormDataContextType>(
     () => ({ dorms, isLoading, refreshDorms: loadDorms, getDormById }),
     [dorms, isLoading, loadDorms, getDormById]
-  )
+  );
 
   return (
     <DormDataContext.Provider value={value}>
       {children}
     </DormDataContext.Provider>
-  )
-}
+  );
+};
 
 export const useDormData = (): DormDataContextType => {
-  const ctx = useContext(DormDataContext)
+  const ctx = useContext(DormDataContext);
   if (!ctx) {
-    throw new Error('useDormData must be used within a DormDataProvider')
+    throw new Error("useDormData must be used within a DormDataProvider");
   }
-  return ctx
-}
+  return ctx;
+};

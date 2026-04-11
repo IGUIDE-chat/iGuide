@@ -5,24 +5,24 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from 'react'
-import { Dorm } from '../types/index'
-import { Language } from '../../../types'
-import { DormCommentStats } from '../../../services/dormCommentsService'
-import DormCard from '../DormCard'
+import React from "react";
+import { Dorm } from "../types/index";
+import { Language } from "../../../types";
+import { DormCommentStats } from "../../../services/dormCommentsService";
+import DormCard from "../DormCard";
 
 interface DormGridProps {
-  dorms: Dorm[]
-  isListView: boolean
-  favoritesSet: Set<string>
-  onToggleFavorite: (dorm: Dorm, e?: React.MouseEvent) => void
-  onViewDetails: (dorm: Dorm) => void
-  onHoverDorm?: (dormId: string | null) => void
-  onRatingClick?: (dorm: Dorm, e: React.MouseEvent) => void
-  compareIds?: string[]
-  onToggleCompare?: (dorm: Dorm) => void
-  language: Language
-  commentStats?: Record<string, DormCommentStats>
+  dorms: Dorm[];
+  isListView: boolean;
+  favoritesSet: Set<string>;
+  onToggleFavorite: (dorm: Dorm, e?: React.MouseEvent) => void;
+  onViewDetails: (dorm: Dorm) => void;
+  onHoverDorm?: (dormId: string | null) => void;
+  onRatingClick?: (dorm: Dorm, e: React.MouseEvent) => void;
+  compareIds?: string[];
+  onToggleCompare?: (dorm: Dorm) => void;
+  language: Language;
+  commentStats?: Record<string, DormCommentStats>;
 }
 
 const DormGrid: React.FC<DormGridProps> = ({
@@ -49,12 +49,12 @@ const DormGrid: React.FC<DormGridProps> = ({
               grid-cols-[repeat(auto-fill,minmax(min(100%,320px),420px))]
               justify-center gap-6
             `
-            : 'grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))] gap-3'
+            : "grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))] gap-3"
         }
       `}
     >
       {dorms.map((dorm) => {
-        const stats = commentStats?.[dorm.id]
+        const stats = commentStats?.[dorm.id];
         return (
           <DormCard
             key={dorm.id}
@@ -70,10 +70,10 @@ const DormGrid: React.FC<DormGridProps> = ({
             positivePercent={stats?.positivePercent}
             totalReviews={stats?.totalComments}
           />
-        )
+        );
       })}
     </div>
-  )
-}
+  );
+};
 
-export default DormGrid
+export default DormGrid;

@@ -5,46 +5,46 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { useMemo } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import React, { useMemo } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   ARTICLES,
   CATEGORIES,
   getArticleText,
   getCategoryText,
-} from '../../constants'
-import { UI_TEXT } from '../../i18n/uiText'
-import { Language } from '../../types'
+} from "../../constants";
+import { UI_TEXT } from "../../i18n/uiText";
+import { Language } from "../../types";
 
 interface LibraryCategoryPageProps {
-  language: Language
+  language: Language;
 }
 
 const LibraryCategoryPage: React.FC<LibraryCategoryPageProps> = ({
   language,
 }) => {
-  const { categoryId } = useParams<{ categoryId: string }>()
-  const navigate = useNavigate()
-  const t = UI_TEXT[language]
+  const { categoryId } = useParams<{ categoryId: string }>();
+  const navigate = useNavigate();
+  const t = UI_TEXT[language];
 
-  const category = CATEGORIES.find((item) => item.id === categoryId)
+  const category = CATEGORIES.find((item) => item.id === categoryId);
   const localizedArticles = useMemo(() => {
     return ARTICLES.map((article) => ({
       ...article,
       ...getArticleText(article, language),
-    }))
-  }, [language])
+    }));
+  }, [language]);
 
   if (!category) {
     return (
       <div className="p-8 text-center text-slate-500">Category not found</div>
-    )
+    );
   }
 
   const categoryArticles = localizedArticles.filter(
     (item) => item.category === categoryId
-  )
-  const categoryText = getCategoryText(category, language)
+  );
+  const categoryText = getCategoryText(category, language);
 
   return (
     <div
@@ -55,7 +55,7 @@ const LibraryCategoryPage: React.FC<LibraryCategoryPageProps> = ({
       <div className="mx-auto max-w-3xl min-w-0 px-4 py-8 pb-24">
         <button
           type="button"
-          onClick={() => navigate('/library')}
+          onClick={() => navigate("/library")}
           className="
             group mb-8 flex items-center gap-2 text-sm font-semibold
             text-slate-500 transition-colors
@@ -165,7 +165,7 @@ const LibraryCategoryPage: React.FC<LibraryCategoryPageProps> = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default LibraryCategoryPage
+export default LibraryCategoryPage;

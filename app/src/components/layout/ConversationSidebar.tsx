@@ -5,22 +5,22 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import * as React from 'react'
+import * as React from "react";
 // [LAYOUT] Sidebar component displaying chat history and conversation management.
 // [布局] 显示对话历史和管理的侧边栏组件。
-import { useEffect, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { TypewriterText } from '../ui/TypewriterText'
-import { ConversationSummary } from '../../types'
-import { conversationService } from '../../services/conversationService'
-import { localConversationService } from '../../services/localConversationService'
-import { useAuth } from '../../contexts/AuthContext'
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { TypewriterText } from "../ui/TypewriterText";
+import { ConversationSummary } from "../../types";
+import { conversationService } from "../../services/conversationService";
+import { localConversationService } from "../../services/localConversationService";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface ConversationSidebarProps {
-  currentConversationId: string | null
-  onSelectConversation: (conversationId: string | null) => void
-  onNewConversation: () => void
-  language: 'en' | 'zh'
+  currentConversationId: string | null;
+  onSelectConversation: (conversationId: string | null) => void;
+  onNewConversation: () => void;
+  language: "en" | "zh";
 }
 
 export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
@@ -29,54 +29,55 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
   onNewConversation,
   language,
 }) => {
-  const { user } = useAuth()
-  const [conversations, setConversations] = useState<ConversationSummary[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const { user } = useAuth();
+  const [conversations, setConversations] = useState<ConversationSummary[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const t = {
     en: {
-      newChat: 'New Chat',
-      noConversations: 'No conversations yet',
-      delete: 'Delete',
-      pin: 'Pin',
-      unpin: 'Unpin',
-      pinned: 'Pinned',
-      today: 'Today',
-      yesterday: 'Yesterday',
-      thisWeek: 'This Week',
-      older: 'Older',
+      newChat: "New Chat",
+      noConversations: "No conversations yet",
+      delete: "Delete",
+      pin: "Pin",
+      unpin: "Unpin",
+      pinned: "Pinned",
+      today: "Today",
+      yesterday: "Yesterday",
+      thisWeek: "This Week",
+      older: "Older",
     },
     zh: {
-      newChat: '新对话',
-      noConversations: '暂无对话记录',
-      delete: '删除',
-      pin: '置顶',
-      unpin: '取消置顶',
-      pinned: '置顶对话',
-      today: '今天',
-      yesterday: '昨天',
-      thisWeek: '本周',
-      older: '更早',
+      newChat: "新对话",
+      noConversations: "暂无对话记录",
+      delete: "删除",
+      pin: "置顶",
+      unpin: "取消置顶",
+      pinned: "置顶对话",
+      today: "今天",
+      yesterday: "昨天",
+      thisWeek: "本周",
+      older: "更早",
     },
-  }[language]
+  }[language];
 
   // ... (keep usage of hooks)
 
   // Reload conversations when user changes OR when a new conversation is created/selected
   useEffect(() => {
-    loadConversations()
-  }, [user, currentConversationId])
+    loadConversations();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, currentConversationId]);
 
   // ... (keep loadConversations and other handlers)
 
   const loadConversations = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       // Use local service if not logged in
-      const service = user ? conversationService : localConversationService
-      const { data, error } = await service.getUserConversations()
+      const service = user ? conversationService : localConversationService;
+      const { data, error } = await service.getUserConversations();
 
-      if (error) throw error
+      if (error) throw error;
 
       if (data) {
         const summaries: ConversationSummary[] = data.map((conv) => ({
@@ -85,95 +86,95 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
           updatedAt: conv.updated_at,
           isPinned: conv.is_pinned,
           messageCount: conv.messages?.length || 0,
-        }))
-        setConversations(summaries)
+        }));
+        setConversations(summaries);
       }
     } catch (error) {
-      console.error('Failed to load conversations:', error)
+      console.error("Failed to load conversations:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleTogglePin = async (
     conversationId: string,
     isPinned: boolean,
     e: React.MouseEvent
   ) => {
-    e.stopPropagation()
+    e.stopPropagation();
 
     try {
-      const service = user ? conversationService : localConversationService
+      const service = user ? conversationService : localConversationService;
       const { error } = await service.togglePinConversation(
         conversationId,
         !isPinned
-      )
-      if (error) throw error
+      );
+      if (error) throw error;
 
       // Reload conversations
-      loadConversations()
+      loadConversations();
     } catch (error) {
-      console.error('Failed to toggle pin:', error)
+      console.error("Failed to toggle pin:", error);
     }
-  }
+  };
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(
     null
-  )
+  );
 
   const handleDeleteClick = (conversationId: string, e: React.MouseEvent) => {
-    e.stopPropagation()
-    setShowDeleteConfirm(conversationId)
-  }
+    e.stopPropagation();
+    setShowDeleteConfirm(conversationId);
+  };
 
   const confirmDelete = async () => {
-    if (!showDeleteConfirm) return
+    if (!showDeleteConfirm) return;
 
     try {
-      const service = user ? conversationService : localConversationService
-      const { error } = await service.deleteConversation(showDeleteConfirm)
-      if (error) throw error
+      const service = user ? conversationService : localConversationService;
+      const { error } = await service.deleteConversation(showDeleteConfirm);
+      if (error) throw error;
 
       if (showDeleteConfirm === currentConversationId) {
-        onNewConversation()
+        onNewConversation();
       }
 
-      loadConversations()
+      loadConversations();
     } catch (error) {
-      console.error('Failed to delete conversation:', error)
+      console.error("Failed to delete conversation:", error);
     } finally {
-      setShowDeleteConfirm(null)
+      setShowDeleteConfirm(null);
     }
-  }
+  };
 
   const getTimeCategory = (dateStr: string) => {
-    const date = new Date(dateStr)
-    const now = new Date()
-    const diffMs = now.getTime() - date.getTime()
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 0) return t.today
-    if (diffDays === 1) return t.yesterday
-    if (diffDays <= 7) return t.thisWeek
-    return t.older
-  }
+    if (diffDays === 0) return t.today;
+    if (diffDays === 1) return t.yesterday;
+    if (diffDays <= 7) return t.thisWeek;
+    return t.older;
+  };
 
   const groupedConversations = conversations.reduce(
     (groups, conv) => {
       if (conv.isPinned) {
-        if (!groups[t.pinned]) groups[t.pinned] = []
-        groups[t.pinned].push(conv)
+        if (!groups[t.pinned]) groups[t.pinned] = [];
+        groups[t.pinned].push(conv);
       } else {
-        const category = getTimeCategory(conv.updatedAt)
-        if (!groups[category]) groups[category] = []
-        groups[category].push(conv)
+        const category = getTimeCategory(conv.updatedAt);
+        if (!groups[category]) groups[category] = [];
+        groups[category].push(conv);
       }
-      return groups
+      return groups;
     },
     {} as Record<string, ConversationSummary[]>
-  )
+  );
 
-  const categoryOrder = [t.pinned, t.today, t.yesterday, t.thisWeek, t.older]
+  const categoryOrder = [t.pinned, t.today, t.yesterday, t.thisWeek, t.older];
 
   // Removed early return for !user to allow guest mode
   // if (!user) return null;
@@ -199,8 +200,8 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
           ) : (
             <div className="space-y-3">
               {categoryOrder.map((category) => {
-                const convs = groupedConversations[category]
-                if (!convs || convs.length === 0) return null
+                const convs = groupedConversations[category];
+                if (!convs || convs.length === 0) return null;
 
                 return (
                   <div key={category}>
@@ -219,10 +220,10 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                             key={conv.id}
                             layout
                             initial={{ opacity: 0, x: -20, height: 0 }}
-                            animate={{ opacity: 1, x: 0, height: 'auto' }}
+                            animate={{ opacity: 1, x: 0, height: "auto" }}
                             exit={{ opacity: 0, height: 0 }}
                             transition={{
-                              type: 'spring',
+                              type: "spring",
                               stiffness: 500,
                               damping: 30,
                               opacity: { duration: 0.2 },
@@ -233,7 +234,7 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                               transition-all
                               ${
                                 conv.id === currentConversationId
-                                  ? 'bg-white/20 text-white'
+                                  ? "bg-white/20 text-white"
                                   : `
                                     text-slate-300
                                     hover:bg-white/10
@@ -248,7 +249,7 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                                     truncate text-xs font-medium
                                     ${
                                       conv.id === currentConversationId
-                                        ? 'text-white'
+                                        ? "text-white"
                                         : `
                                           text-slate-300
                                           group-hover:text-white
@@ -265,8 +266,8 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                                         mt-0.5 text-[10px] text-slate-500
                                       "
                                     >
-                                      {conv.messageCount}{' '}
-                                      {language === 'zh' ? '条' : 'msgs'}
+                                      {conv.messageCount}{" "}
+                                      {language === "zh" ? "条" : "msgs"}
                                     </p>
                                   )}
                               </div>
@@ -280,8 +281,8 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                                   group-hover:opacity-100
                                   ${
                                     conv.id === currentConversationId
-                                      ? 'from-[#454545] via-[#454545]'
-                                      : 'from-[#2E2E2E] via-[#2E2E2E]'
+                                      ? "from-[#454545] via-[#454545]"
+                                      : "from-[#2E2E2E] via-[#2E2E2E]"
                                   }
                                 `}
                               >
@@ -305,7 +306,7 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                                       }
                                     `}
                                     fill={
-                                      conv.isPinned ? 'currentColor' : 'none'
+                                      conv.isPinned ? "currentColor" : "none"
                                     }
                                     stroke="currentColor"
                                     viewBox="0 0 24 24"
@@ -347,7 +348,7 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                       </AnimatePresence>
                     </div>
                   </div>
-                )
+                );
               })}
             </div>
           )}
@@ -390,12 +391,12 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                 </svg>
               </div>
               <h3 className="mb-2 text-lg font-semibold text-white">
-                {language === 'zh' ? '删除对话?' : 'Delete Conversation?'}
+                {language === "zh" ? "删除对话?" : "Delete Conversation?"}
               </h3>
               <p className="mb-6 text-sm text-slate-400">
-                {language === 'zh'
-                  ? '此操作无法撤销。'
-                  : 'This action cannot be undone.'}
+                {language === "zh"
+                  ? "此操作无法撤销。"
+                  : "This action cannot be undone."}
               </p>
               <div className="flex gap-3">
                 <button
@@ -406,7 +407,7 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                     hover:bg-white/10
                   "
                 >
-                  {language === 'zh' ? '取消' : 'Cancel'}
+                  {language === "zh" ? "取消" : "Cancel"}
                 </button>
                 <button
                   onClick={confirmDelete}
@@ -416,7 +417,7 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                     hover:bg-red-600
                   "
                 >
-                  {language === 'zh' ? '删除' : 'Delete'}
+                  {language === "zh" ? "删除" : "Delete"}
                 </button>
               </div>
             </div>
@@ -424,5 +425,5 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
         </div>
       )}
     </>
-  )
-}
+  );
+};

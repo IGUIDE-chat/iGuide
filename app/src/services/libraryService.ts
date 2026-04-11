@@ -7,28 +7,28 @@
 
 // [SERVICE] Manages reading history, pinned articles, and library interactions.
 // [服务] 管理阅读历史、置顶文章以及知识库交互功能。
-import { Article, LibraryHistoryItem } from '../types'
-import { supabase } from './supabase'
-import { authService } from './authService'
+import { Article, LibraryHistoryItem } from "../types";
+import { supabase } from "./supabase";
+import { authService } from "./authService";
 
 export const libraryService = {
   /**
    * Get reading history from Supabase
    */
   async getHistory(): Promise<LibraryHistoryItem[]> {
-    const user = await authService.getCurrentUser()
-    if (!user) return []
+    const user = await authService.getCurrentUser();
+    if (!user) return [];
 
     const { data, error } = await supabase
-      .from('reading_history')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('is_pinned', { ascending: false }) // Pinned first
-      .order('last_viewed_at', { ascending: false })
+      .from("reading_history")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("is_pinned", { ascending: false }) // Pinned first
+      .order("last_viewed_at", { ascending: false });
 
     if (error) {
-      console.error('Error fetching history:', error)
-      return []
+      console.error("Error fetching history:", error);
+      return [];
     }
 
     return data.map((item) => ({
@@ -38,25 +38,25 @@ export const libraryService = {
       articleTitleZh: item.article_title_zh,
       isPinned: item.is_pinned || false,
       viewedAt: item.last_viewed_at,
-    }))
+    }));
   },
 
   /**
    * Toggle pin status of a history item
    */
   async togglePin(id: string, isPinned: boolean) {
-    const user = await authService.getCurrentUser()
-    if (!user) return
+    const user = await authService.getCurrentUser();
+    if (!user) return;
 
     const { error } = await supabase
-      .from('reading_history')
+      .from("reading_history")
       .update({ is_pinned: !isPinned })
-      .eq('id', id)
-      .eq('user_id', user.id)
+      .eq("id", id)
+      .eq("user_id", user.id);
 
     if (error) {
-      console.error('Error toggling pin:', error)
-      throw error
+      console.error("Error toggling pin:", error);
+      throw error;
     }
   },
 
@@ -64,18 +64,18 @@ export const libraryService = {
    * Remove item from history
    */
   async removeFromHistory(id: string) {
-    const user = await authService.getCurrentUser()
-    if (!user) return
+    const user = await authService.getCurrentUser();
+    if (!user) return;
 
     const { error } = await supabase
-      .from('reading_history')
+      .from("reading_history")
       .delete()
-      .eq('id', id)
-      .eq('user_id', user.id)
+      .eq("id", id)
+      .eq("user_id", user.id);
 
     if (error) {
-      console.error('Error removing from history:', error)
-      throw error
+      console.error("Error removing from history:", error);
+      throw error;
     }
   },
 
@@ -83,14 +83,14 @@ export const libraryService = {
    * Add article to reading history
    */
   async addToHistory(article: Article) {
-    const user = await authService.getCurrentUser()
-    if (!user) return
+    const user = await authService.getCurrentUser();
+    if (!user) return;
 
     // Upsert logic: insert or update timestamps if exists
     // Since we have a UNIQUE constraint on (user_id, article_id),
     // we can use upsert to update the timestamp if it exists.
 
-    const { error } = await supabase.from('reading_history').upsert(
+    const { error } = await supabase.from("reading_history").upsert(
       {
         user_id: user.id,
         article_id: article.id,
@@ -99,12 +99,12 @@ export const libraryService = {
         last_viewed_at: new Date().toISOString(),
       },
       {
-        onConflict: 'user_id, article_id',
+        onConflict: "user_id, article_id",
       }
-    )
+    );
 
     if (error) {
-      console.error('Error adding to history:', error)
+      console.error("Error adding to history:", error);
     }
   },
 
@@ -112,16 +112,16 @@ export const libraryService = {
    * Clear all reading history
    */
   async clearHistory() {
-    const user = await authService.getCurrentUser()
-    if (!user) return
+    const user = await authService.getCurrentUser();
+    if (!user) return;
 
     const { error } = await supabase
-      .from('reading_history')
+      .from("reading_history")
       .delete()
-      .eq('user_id', user.id)
+      .eq("user_id", user.id);
 
     if (error) {
-      console.error('Error clearing history:', error)
+      console.error("Error clearing history:", error);
     }
   },
-}
+};

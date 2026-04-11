@@ -5,31 +5,31 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from 'react'
-import { X } from 'lucide-react'
-import { ActiveTab } from './useDormEditForm'
+import React from "react";
+import { X } from "lucide-react";
+import { ActiveTab } from "./useDormEditForm";
 
 interface TabConfig {
-  id: ActiveTab
-  icon: React.ReactNode
-  label: string
+  id: ActiveTab;
+  icon: React.ReactNode;
+  label: string;
 }
 
 interface DormEditPanelShellProps {
-  title: string
-  activeTab: ActiveTab
-  tabs: TabConfig[]
-  saving: boolean
-  saveSuccess: boolean
-  saveError: string | null
-  saveLabel: string
-  savingLabel: string
-  savedLabel: string
-  cancelLabel: string
-  onClose: () => void
-  onSave: () => void
-  onTabChange: (tab: ActiveTab) => void
-  children: React.ReactNode
+  title: string;
+  activeTab: ActiveTab;
+  tabs: TabConfig[];
+  saving: boolean;
+  saveSuccess: boolean;
+  saveError: string | null;
+  saveLabel: string;
+  savingLabel: string;
+  savedLabel: string;
+  cancelLabel: string;
+  onClose: () => void;
+  onSave: () => void;
+  onTabChange: (tab: ActiveTab) => void;
+  children: React.ReactNode;
 }
 
 export const DormEditPanelShell: React.FC<DormEditPanelShellProps> = ({
@@ -86,7 +86,7 @@ export const DormEditPanelShell: React.FC<DormEditPanelShellProps> = ({
                 font-medium transition-colors
                 ${
                   activeTab === tab.id
-                    ? 'border-b-2 border-illini-orange text-illini-blue'
+                    ? "border-b-2 border-illini-orange text-illini-blue"
                     : `
                       text-gray-500
                       hover:text-illini-blue
@@ -108,7 +108,7 @@ export const DormEditPanelShell: React.FC<DormEditPanelShellProps> = ({
             px-4 py-3
           "
         >
-          {activeTab !== 'history' && (
+          {activeTab !== "history" && (
             <button
               type="button"
               onClick={onSave}
@@ -148,5 +148,5 @@ export const DormEditPanelShell: React.FC<DormEditPanelShellProps> = ({
         </div>
       </div>
     </>
-  )
-}
+  );
+};

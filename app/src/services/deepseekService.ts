@@ -18,14 +18,14 @@ import { memoryService } from "./memoryService";
 // DEV: Vite proxy /api/deepseek-raw injects Authorization header from .env.local
 // PROD: CF Pages Function /api/deepseek injects key from CF environment variables
 const viteEnv = (
-	import.meta as ImportMeta & {
-		env?: Record<string, string | boolean | undefined>;
-	}
+  import.meta as ImportMeta & {
+    env?: Record<string, string | boolean | undefined>;
+  }
 ).env;
 const IS_DEV = Boolean(viteEnv?.DEV);
 const CHAT_ENDPOINT = IS_DEV
-	? "/api/chat"
-	: `${viteEnv?.VITE_API_GATEWAY_URL || "https://api.iguide.chat"}/chat`;
+  ? "/api/chat"
+  : `${viteEnv?.VITE_API_GATEWAY_URL || "https://api.iguide.chat"}/chat`;
 
 const DEFAULT_SYSTEM_PROMPT = `# Role: UIUC 资深学长姐顾问 (Illini Spirit Advisor)
 
@@ -66,44 +66,44 @@ Rules:
  * Query QMD for relevant knowledge base chunks.
  */
 async function _fetchQMDContext(
-	query: string,
-	lang: string,
+  query: string,
+  lang: string
 ): Promise<string[]> {
-	try {
-		const { results } = await quickSearch(query, lang as "en" | "zh", 5);
-		return results
-			.filter((r) => r.score > 0.3)
-			.map((r) => {
-				const typeLabel =
-					r.type === "dorm"
-						? "🏠 Dorm"
-						: r.type === "article"
-							? "📄 Article"
-							: "🌐 Web";
-				const url = r.id
-					? `/${r.type === "dorm" ? "housing" : "article"}/${r.id}`
-					: "N/A";
-				return `[${typeLabel}] ${r.title} (relevance: ${r.score.toFixed(2)})\nURL: ${url}\n${r.snippet}`;
-			});
-	} catch (err) {
-		console.warn("[RAG] QMD search failed:", err);
-		return [];
-	}
+  try {
+    const { results } = await quickSearch(query, lang as "en" | "zh", 5);
+    return results
+      .filter((r) => r.score > 0.3)
+      .map((r) => {
+        const typeLabel =
+          r.type === "dorm"
+            ? "🏠 Dorm"
+            : r.type === "article"
+              ? "📄 Article"
+              : "🌐 Web";
+        const url = r.id
+          ? `/${r.type === "dorm" ? "housing" : "article"}/${r.id}`
+          : "N/A";
+        return `[${typeLabel}] ${r.title} (relevance: ${r.score.toFixed(2)})\nURL: ${url}\n${r.snippet}`;
+      });
+  } catch (err) {
+    console.warn("[RAG] QMD search failed:", err);
+    return [];
+  }
 }
 
 /**
  * Query Tavily for web search results.
  */
 async function _fetchWebContext(query: string): Promise<string[]> {
-	try {
-		const results = await webSearch(query, { maxResults: 3 });
-		return results.map(
-			(r) => `[🌐 Web] ${r.title}\nURL: ${r.url}\n${r.content.slice(0, 300)}`,
-		);
-	} catch (err) {
-		console.warn("[RAG] Web search failed:", err);
-		return [];
-	}
+  try {
+    const results = await webSearch(query, { maxResults: 3 });
+    return results.map(
+      (r) => `[🌐 Web] ${r.title}\nURL: ${r.url}\n${r.content.slice(0, 300)}`
+    );
+  } catch (err) {
+    console.warn("[RAG] Web search failed:", err);
+    return [];
+  }
 }
 
 const SOUL_EXTRACTION_INSTRUCTIONS = `
@@ -119,55 +119,55 @@ Rules:
 - Place the tag after the follow-up questions section, at the absolute end of your response.`;
 
 interface RAGResult {
-	context: string;
-	hasQMD: boolean;
-	hasWeb: boolean;
+  context: string;
+  hasQMD: boolean;
+  hasWeb: boolean;
 }
 
 /**
  * Combined RAG: QMD knowledge base + Tavily web search (parallel).
  */
 async function fetchRAGContext(
-	query: string,
-	lang: string,
+  query: string,
+  lang: string
 ): Promise<RAGResult> {
-	return fetchChatRAGContext(query, lang);
+  return fetchChatRAGContext(query, lang);
 }
 
 // ── Message Builder ─────────────────────────────────────────────
 
 interface OpenAIMessage {
-	role: "system" | "user" | "assistant";
-	content: string;
+  role: "system" | "user" | "assistant";
+  content: string;
 }
 
 function buildOpenAIMessages(
-	history: ChatHistoryItem[],
-	newMessage: string,
-	lang: string,
-	systemInstruction?: string,
+  history: ChatHistoryItem[],
+  newMessage: string,
+  lang: string,
+  systemInstruction?: string
 ): OpenAIMessage[] {
-	const messages: OpenAIMessage[] = [];
+  const messages: OpenAIMessage[] = [];
 
-	// System prompt with optional RAG context
-	const systemContent = systemInstruction || DEFAULT_SYSTEM_PROMPT;
-	const langHint =
-		lang === "zh"
-			? "\n\nIMPORTANT: The user prefers Chinese. Reply in Chinese (简体中文) unless they write in English."
-			: "\n\nIMPORTANT: The user has selected English mode. You MUST reply exclusively in English regardless of the language of your instructions above. Do NOT use Chinese in your response.";
-	messages.push({ role: "system", content: systemContent + langHint });
+  // System prompt with optional RAG context
+  const systemContent = systemInstruction || DEFAULT_SYSTEM_PROMPT;
+  const langHint =
+    lang === "zh"
+      ? "\n\nIMPORTANT: The user prefers Chinese. Reply in Chinese (简体中文) unless they write in English."
+      : "\n\nIMPORTANT: The user has selected English mode. You MUST reply exclusively in English regardless of the language of your instructions above. Do NOT use Chinese in your response.";
+  messages.push({ role: "system", content: systemContent + langHint });
 
-	// Conversation history
-	for (const h of history) {
-		messages.push({
-			role: h.role === "model" ? "assistant" : "user",
-			content: h.text,
-		});
-	}
+  // Conversation history
+  for (const h of history) {
+    messages.push({
+      role: h.role === "model" ? "assistant" : "user",
+      content: h.text,
+    });
+  }
 
-	// Current user message
-	messages.push({ role: "user", content: newMessage });
-	return messages;
+  // Current user message
+  messages.push({ role: "user", content: newMessage });
+  return messages;
 }
 
 // ── Main Streaming Function ──────────────────────────────────────
@@ -181,188 +181,188 @@ function buildOpenAIMessages(
  * Flow: User message → QMD search → inject context → DeepSeek streaming
  */
 export const streamDeepSeekChat = async function* (
-	history: ChatHistoryItem[],
-	newMessage: string,
-	lang: string = "en",
-	_conversationId?: string,
-	_userId?: string,
+  history: ChatHistoryItem[],
+  newMessage: string,
+  lang: string = "en",
+  _conversationId?: string,
+  _userId?: string
 ): AsyncGenerator<StreamChunk> {
-	try {
-		const useToolUseRag = isToolUseRagEnabled();
+  try {
+    const useToolUseRag = isToolUseRagEnabled();
 
-		if (useToolUseRag) {
-			const response = await fetch(CHAT_ENDPOINT, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					message: newMessage,
-					history,
-					conversationId: _conversationId,
-					userId: _userId,
-					lang,
-				}),
-			});
+    if (useToolUseRag) {
+      const response = await fetch(CHAT_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: newMessage,
+          history,
+          conversationId: _conversationId,
+          userId: _userId,
+          lang,
+        }),
+      });
 
-			if (!response.ok) {
-				const err = await response.json().catch(() => ({}));
-				throw new Error(
-					(err as { error?: string }).error ||
-						`Chat API returned ${response.status}`,
-				);
-			}
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(
+          (err as { error?: string }).error ||
+            `Chat API returned ${response.status}`
+        );
+      }
 
-			const contentType = response.headers.get("content-type") || "";
+      const contentType = response.headers.get("content-type") || "";
 
-			if (contentType.includes("text/event-stream") && response.body) {
-				const reader = response.body.getReader();
-				yield* parseDeepSeekSSEStream(reader, lang as "en" | "zh");
-				return;
-			}
+      if (contentType.includes("text/event-stream") && response.body) {
+        const reader = response.body.getReader();
+        yield* parseDeepSeekSSEStream(reader, lang as "en" | "zh");
+        return;
+      }
 
-			const data = (await response.json()) as { reply?: string; text?: string };
-			if (data.reply || data.text) {
-				yield { text: data.reply || data.text || "" };
-			}
-			return;
-		}
+      const data = (await response.json()) as { reply?: string; text?: string };
+      if (data.reply || data.text) {
+        yield { text: data.reply || data.text || "" };
+      }
+      return;
+    }
 
-		// 1. Fetch RAG context + personalization context in parallel
-		let ragContext = "";
-		let soul = "";
-		let userMemory = "";
-		let conversationMemory = "";
+    // 1. Fetch RAG context + personalization context in parallel
+    let ragContext = "";
+    let soul = "";
+    let userMemory = "";
+    let conversationMemory = "";
 
-		try {
-			const [ragResult, chatCtx] = await Promise.all([
-				fetchRAGContext(newMessage, lang),
-				_userId
-					? memoryService
-							.getChatContext(_userId, _conversationId)
-							.catch(() => ({
-								soul: "",
-								userMemory: "",
-								conversationMemory: "",
-							}))
-					: Promise.resolve({
-							soul: "",
-							userMemory: "",
-							conversationMemory: "",
-						}),
-			]);
-			ragContext = ragResult.context;
-			soul = chatCtx.soul;
-			userMemory = chatCtx.userMemory;
-			conversationMemory = chatCtx.conversationMemory;
+    try {
+      const [ragResult, chatCtx] = await Promise.all([
+        fetchRAGContext(newMessage, lang),
+        _userId
+          ? memoryService
+              .getChatContext(_userId, _conversationId)
+              .catch(() => ({
+                soul: "",
+                userMemory: "",
+                conversationMemory: "",
+              }))
+          : Promise.resolve({
+              soul: "",
+              userMemory: "",
+              conversationMemory: "",
+            }),
+      ]);
+      ragContext = ragResult.context;
+      soul = chatCtx.soul;
+      userMemory = chatCtx.userMemory;
+      conversationMemory = chatCtx.conversationMemory;
 
-			if (ragResult.hasQMD) {
-				yield {
-					text: "",
-					thinkingStep: {
-						type: "searching",
-						label:
-							lang === "zh" ? "知识库检索完成" : "Knowledge base retrieved",
-						detail: "QMD knowledge base",
-					},
-				};
-			}
-			if (ragResult.hasWeb) {
-				yield {
-					text: "",
-					thinkingStep: {
-						type: "searching",
-						label: lang === "zh" ? "网络搜索完成" : "Web search complete",
-						detail: "Tavily web search",
-					},
-				};
-			}
-		} catch {
-			// QMD / Tavily might not be available; proceed without RAG
-		}
+      if (ragResult.hasQMD) {
+        yield {
+          text: "",
+          thinkingStep: {
+            type: "searching",
+            label:
+              lang === "zh" ? "知识库检索完成" : "Knowledge base retrieved",
+            detail: "QMD knowledge base",
+          },
+        };
+      }
+      if (ragResult.hasWeb) {
+        yield {
+          text: "",
+          thinkingStep: {
+            type: "searching",
+            label: lang === "zh" ? "网络搜索完成" : "Web search complete",
+            detail: "Tavily web search",
+          },
+        };
+      }
+    } catch {
+      // QMD / Tavily might not be available; proceed without RAG
+    }
 
-		// 2. Build system instruction with personalization + RAG context
-		let basePrompt = DEFAULT_SYSTEM_PROMPT;
+    // 2. Build system instruction with personalization + RAG context
+    let basePrompt = DEFAULT_SYSTEM_PROMPT;
 
-		if (soul) {
-			basePrompt += `\n\n## 🎭 Persona Customization (用户自定义人设)\n${soul}`;
-		}
+    if (soul) {
+      basePrompt += `\n\n## 🎭 Persona Customization (用户自定义人设)\n${soul}`;
+    }
 
-		if (_userId) {
-			basePrompt += MEMORY_EXTRACTION_INSTRUCTIONS;
-			basePrompt += SOUL_EXTRACTION_INSTRUCTIONS;
-		}
+    if (_userId) {
+      basePrompt += MEMORY_EXTRACTION_INSTRUCTIONS;
+      basePrompt += SOUL_EXTRACTION_INSTRUCTIONS;
+    }
 
-		if (userMemory) {
-			basePrompt += `\n\n## 📋 User Profile (remembered from past conversations)\n${userMemory}`;
-		}
+    if (userMemory) {
+      basePrompt += `\n\n## 📋 User Profile (remembered from past conversations)\n${userMemory}`;
+    }
 
-		if (conversationMemory) {
-			basePrompt += `\n\n## 💬 This Conversation's Key Points (对话记忆)\n${conversationMemory}`;
-		}
+    if (conversationMemory) {
+      basePrompt += `\n\n## 💬 This Conversation's Key Points (对话记忆)\n${conversationMemory}`;
+    }
 
-		const systemInstruction = ragContext
-			? `${basePrompt}${ragContext}`
-			: basePrompt;
+    const systemInstruction = ragContext
+      ? `${basePrompt}${ragContext}`
+      : basePrompt;
 
-		// 3. Call DeepSeek — dev calls API directly, prod uses CF Function
-		let response: Response;
+    // 3. Call DeepSeek — dev calls API directly, prod uses CF Function
+    let response: Response;
 
-		if (IS_DEV) {
-			// DEV: build OpenAI-format messages, call via Vite proxy (proxy injects Authorization header)
-			const messages = buildOpenAIMessages(
-				history,
-				newMessage,
-				lang,
-				systemInstruction,
-			);
-			response = await fetch("/api/deepseek-raw", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					model: "deepseek-chat",
-					messages,
-					stream: true,
-					temperature: 1.0,
-				}),
-			});
-		} else {
-			// PROD: CF Function handles format translation
-			response = await fetch("/api/deepseek", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					history,
-					newMessage,
-					lang,
-					stream: true,
-					systemInstruction,
-				}),
-			});
-		}
+    if (IS_DEV) {
+      // DEV: build OpenAI-format messages, call via Vite proxy (proxy injects Authorization header)
+      const messages = buildOpenAIMessages(
+        history,
+        newMessage,
+        lang,
+        systemInstruction
+      );
+      response = await fetch("/api/deepseek-raw", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "deepseek-chat",
+          messages,
+          stream: true,
+          temperature: 1.0,
+        }),
+      });
+    } else {
+      // PROD: CF Function handles format translation
+      response = await fetch("/api/deepseek", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          history,
+          newMessage,
+          lang,
+          stream: true,
+          systemInstruction,
+        }),
+      });
+    }
 
-		if (!response.ok) {
-			const err = await response.json().catch(() => ({}));
-			throw new Error(
-				(err as { error?: string }).error ||
-					`DeepSeek API returned ${response.status}`,
-			);
-		}
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(
+        (err as { error?: string }).error ||
+          `DeepSeek API returned ${response.status}`
+      );
+    }
 
-		const contentType = response.headers.get("content-type") || "";
+    const contentType = response.headers.get("content-type") || "";
 
-		if (contentType.includes("text/event-stream") && response.body) {
-			// SSE streaming
-			const reader = response.body.getReader();
-			yield* parseDeepSeekSSEStream(reader, lang as "en" | "zh");
-		} else {
-			// Fallback: non-streaming JSON response
-			const data = (await response.json()) as { reply?: string };
-			if (data.reply) {
-				yield { text: data.reply };
-			}
-		}
-	} catch (error: unknown) {
-		const msg = error instanceof Error ? error.message : "Unknown error";
-		console.error("[DeepSeek] Stream error:", msg);
-		yield { text: `\n(Error: ${msg})` };
-	}
+    if (contentType.includes("text/event-stream") && response.body) {
+      // SSE streaming
+      const reader = response.body.getReader();
+      yield* parseDeepSeekSSEStream(reader, lang as "en" | "zh");
+    } else {
+      // Fallback: non-streaming JSON response
+      const data = (await response.json()) as { reply?: string };
+      if (data.reply) {
+        yield { text: data.reply };
+      }
+    }
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : "Unknown error";
+    console.error("[DeepSeek] Stream error:", msg);
+    yield { text: `\n(Error: ${msg})` };
+  }
 };

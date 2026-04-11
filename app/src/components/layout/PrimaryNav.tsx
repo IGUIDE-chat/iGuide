@@ -5,23 +5,23 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
-import { BrandMark } from '../ui/branding/BrandMark'
+import React from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { BrandMark } from "../ui/branding/BrandMark";
 
 interface NavItem {
-  key: string
-  label: string
-  icon: React.ReactNode
-  onClick: () => void
+  key: string;
+  label: string;
+  icon: React.ReactNode;
+  onClick: () => void;
 }
 
 interface PrimaryNavProps {
-  appTitle: string
-  activeTab: string
-  isSidebarOpen: boolean
-  navItems: NavItem[]
-  onCloseSidebar: () => void
+  appTitle: string;
+  activeTab: string;
+  isSidebarOpen: boolean;
+  navItems: NavItem[];
+  onCloseSidebar: () => void;
 }
 
 const AnimatedText = ({ children }: { children: React.ReactNode }) => (
@@ -32,21 +32,21 @@ const AnimatedText = ({ children }: { children: React.ReactNode }) => (
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -2 }}
       transition={{ duration: 0.15 }}
-      style={{ display: 'inline-block' }}
+      style={{ display: "inline-block" }}
     >
       {children}
     </motion.span>
   </AnimatePresence>
-)
+);
 
 const SidebarLabel = ({
   isOpen,
   children,
-  className = '',
+  className = "",
 }: {
-  isOpen: boolean
-  children: React.ReactNode
-  className?: string
+  isOpen: boolean;
+  children: React.ReactNode;
+  className?: string;
 }) => (
   <motion.span
     initial={false}
@@ -55,7 +55,7 @@ const SidebarLabel = ({
         ? { opacity: 1, x: 0, maxWidth: 220 }
         : { opacity: 0, x: -6, maxWidth: 0 }
     }
-    transition={{ duration: 0.2, ease: 'easeOut' }}
+    transition={{ duration: 0.2, ease: "easeOut" }}
     className={`
       inline-block overflow-hidden whitespace-nowrap
       ${className}
@@ -63,7 +63,7 @@ const SidebarLabel = ({
   >
     {children}
   </motion.span>
-)
+);
 
 export const PrimaryNav: React.FC<PrimaryNavProps> = ({
   appTitle,
@@ -115,7 +115,7 @@ export const PrimaryNav: React.FC<PrimaryNavProps> = ({
               transition-colors
               ${
                 activeTab === item.key
-                  ? 'bg-[#212121] text-white'
+                  ? "bg-[#212121] text-white"
                   : `
                     text-slate-300
                     hover:bg-[#212121]
@@ -131,5 +131,5 @@ export const PrimaryNav: React.FC<PrimaryNavProps> = ({
         ))}
       </nav>
     </>
-  )
-}
+  );
+};

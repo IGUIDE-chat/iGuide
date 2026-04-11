@@ -7,20 +7,20 @@
 
 // [SERVICE] Manages dorm viewing history with Supabase.
 // [服务] 管理宿舍浏览历史（Supabase）。
-import { supabase } from './supabase'
-import { authService } from './authService'
+import { supabase } from "./supabase";
+import { authService } from "./authService";
 
 export interface DormViewingHistory {
-  id: string
-  user_id: string
-  dorm_id: string
-  dorm_name: string
-  dorm_name_zh?: string
-  view_count: number
-  last_viewed_at: string
+  id: string;
+  user_id: string;
+  dorm_id: string;
+  dorm_name: string;
+  dorm_name_zh?: string;
+  view_count: number;
+  last_viewed_at: string;
 }
 
-const TABLE_NAME = 'dorm_viewing_history'
+const TABLE_NAME = "dorm_viewing_history";
 
 export const dormViewingService = {
   /**
@@ -31,8 +31,8 @@ export const dormViewingService = {
     dormName: string,
     dormNameZh?: string
   ): Promise<void> {
-    const user = await authService.getCurrentUser()
-    if (!user) return
+    const user = await authService.getCurrentUser();
+    if (!user) return;
 
     const { error } = await supabase.from(TABLE_NAME).upsert(
       {
@@ -42,12 +42,12 @@ export const dormViewingService = {
         dorm_name_zh: dormNameZh || null,
         last_viewed_at: new Date().toISOString(),
       },
-      { onConflict: 'user_id,dorm_id' }
-    )
+      { onConflict: "user_id,dorm_id" }
+    );
 
     if (error) {
-      console.error('Error adding viewing history:', error)
-      throw error
+      console.error("Error adding viewing history:", error);
+      throw error;
     }
   },
 
@@ -55,40 +55,40 @@ export const dormViewingService = {
    * Get viewing history for current user
    */
   async getHistory(limit: number = 20): Promise<DormViewingHistory[]> {
-    const user = await authService.getCurrentUser()
-    if (!user) return []
+    const user = await authService.getCurrentUser();
+    if (!user) return [];
 
     const { data, error } = await supabase
       .from(TABLE_NAME)
-      .select('*')
-      .eq('user_id', user.id)
-      .order('last_viewed_at', { ascending: false })
-      .limit(limit)
+      .select("*")
+      .eq("user_id", user.id)
+      .order("last_viewed_at", { ascending: false })
+      .limit(limit);
 
     if (error) {
-      console.error('Error fetching viewing history:', error)
-      return []
+      console.error("Error fetching viewing history:", error);
+      return [];
     }
 
-    return data || []
+    return data || [];
   },
 
   /**
    * Remove a specific item from viewing history
    */
   async removeFromHistory(id: string): Promise<void> {
-    const user = await authService.getCurrentUser()
-    if (!user) return
+    const user = await authService.getCurrentUser();
+    if (!user) return;
 
     const { error } = await supabase
       .from(TABLE_NAME)
       .delete()
-      .eq('id', id)
-      .eq('user_id', user.id)
+      .eq("id", id)
+      .eq("user_id", user.id);
 
     if (error) {
-      console.error('Error removing from history:', error)
-      throw error
+      console.error("Error removing from history:", error);
+      throw error;
     }
   },
 
@@ -96,18 +96,18 @@ export const dormViewingService = {
    * Remove viewing history by dorm id for current user
    */
   async removeFromHistoryByDormId(dormId: string): Promise<void> {
-    const user = await authService.getCurrentUser()
-    if (!user) return
+    const user = await authService.getCurrentUser();
+    if (!user) return;
 
     const { error } = await supabase
       .from(TABLE_NAME)
       .delete()
-      .eq('user_id', user.id)
-      .eq('dorm_id', dormId)
+      .eq("user_id", user.id)
+      .eq("dorm_id", dormId);
 
     if (error) {
-      console.error('Error removing from history by dorm id:', error)
-      throw error
+      console.error("Error removing from history by dorm id:", error);
+      throw error;
     }
   },
 
@@ -115,17 +115,17 @@ export const dormViewingService = {
    * Clear all viewing history for current user
    */
   async clearHistory(): Promise<void> {
-    const user = await authService.getCurrentUser()
-    if (!user) return
+    const user = await authService.getCurrentUser();
+    if (!user) return;
 
     const { error } = await supabase
       .from(TABLE_NAME)
       .delete()
-      .eq('user_id', user.id)
+      .eq("user_id", user.id);
 
     if (error) {
-      console.error('Error clearing history:', error)
-      throw error
+      console.error("Error clearing history:", error);
+      throw error;
     }
   },
-}
+};

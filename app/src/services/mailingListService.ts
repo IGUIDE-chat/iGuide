@@ -7,16 +7,16 @@
 
 // [SERVICE] Mailing list subscriptions — stores signups in Supabase `mailing_list` table.
 // [服务] 邮件列表订阅——将注册信息存储在 Supabase `mailing_list` 表中。
-import { supabase } from './supabase'
+import { supabase } from "./supabase";
 
-const TABLE = 'mailing_list'
+const TABLE = "mailing_list";
 
-export type MailingListTopic = 'courses' | 'resume' | 'dorms'
+export type MailingListTopic = "courses" | "resume" | "dorms";
 
 interface SubscribeResult {
-  success: boolean
-  alreadySubscribed?: boolean
-  errorMessage?: string
+  success: boolean;
+  alreadySubscribed?: boolean;
+  errorMessage?: string;
 }
 
 /**
@@ -30,26 +30,26 @@ export async function subscribe(
   // Check for existing subscription
   const { data: existing } = await supabase
     .from(TABLE)
-    .select('id')
-    .eq('email', email.toLowerCase().trim())
-    .eq('topic', topic)
-    .maybeSingle()
+    .select("id")
+    .eq("email", email.toLowerCase().trim())
+    .eq("topic", topic)
+    .maybeSingle();
 
   if (existing) {
-    return { success: true, alreadySubscribed: true }
+    return { success: true, alreadySubscribed: true };
   }
 
   const { error } = await supabase.from(TABLE).insert({
     email: email.toLowerCase().trim(),
     topic,
-  })
+  });
 
   if (error) {
-    console.error('[mailingListService] subscribe error:', error)
-    return { success: false, errorMessage: error.message }
+    console.error("[mailingListService] subscribe error:", error);
+    return { success: false, errorMessage: error.message };
   }
 
-  return { success: true }
+  return { success: true };
 }
 
-export const mailingListService = { subscribe }
+export const mailingListService = { subscribe };

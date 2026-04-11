@@ -7,13 +7,13 @@
 
 // [DATA] Article content for ARC vs CRCE guide.
 // [数据] ARC 与 CRCE 指南的文章内容。
-import { Article } from '../../types'
+import { Article } from "../../types";
 
 export const arcVsCrce: Article = {
-  id: 'arc-vs-crce',
-  category: 'social',
-  title: 'Gym Wars: ARC vs. CRCE',
-  summary: 'Which campus recreation center fits your workout style?',
+  id: "arc-vs-crce",
+  category: "social",
+  title: "Gym Wars: ARC vs. CRCE",
+  summary: "Which campus recreation center fits your workout style?",
   content: `
 ### ARC (Activities and Recreation Center)
 *   **Vibe:** Massive, energetic, crowded.
@@ -27,9 +27,9 @@ export const arcVsCrce: Article = {
 
 **Access:** Both are free with your iCard!
   `,
-  tags: ['gym', 'workout', 'sports', 'arc', 'crce', 'health'],
-  title_zh: '健身房之战：ARC vs. CRCE',
-  summary_zh: '哪个校园健身中心适合你？',
+  tags: ["gym", "workout", "sports", "arc", "crce", "health"],
+  title_zh: "健身房之战：ARC vs. CRCE",
+  summary_zh: "哪个校园健身中心适合你？",
   content_zh: `
 ### ARC (Activities and Recreation Center)
 *   **氛围:** 巨大、活力四射、拥挤。
@@ -43,6 +43,6 @@ export const arcVsCrce: Article = {
 
 **权限:** 凭 iCard 均可免费进入！
   `,
-  tags_zh: ['健身房', '运动', '体育', 'ARC', 'CRCE', '健康'],
-  lastUpdated: '2024-01-20',
-}
+  tags_zh: ["健身房", "运动", "体育", "ARC", "CRCE", "健康"],
+  lastUpdated: "2024-01-20",
+};

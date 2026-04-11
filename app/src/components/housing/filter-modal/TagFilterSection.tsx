@@ -5,18 +5,18 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { memo } from 'react'
-import { Check } from 'lucide-react'
-import { DormTag } from '../types/index'
-import { getTagDisplay } from '../constants/metadata'
-import { FilterLanguage } from './modalText'
+import React, { memo } from "react";
+import { Check } from "lucide-react";
+import { DormTag } from "../types/index";
+import { getTagDisplay } from "../constants/metadata";
+import { FilterLanguage } from "./modalText";
 
 interface TagFilterSectionProps {
-  title: string
-  language: FilterLanguage
-  tags: DormTag[]
-  selectedValues: DormTag[]
-  onToggle: (tag: DormTag) => void
+  title: string;
+  language: FilterLanguage;
+  tags: DormTag[];
+  selectedValues: DormTag[];
+  onToggle: (tag: DormTag) => void;
 }
 
 const TagFilterSection: React.FC<TagFilterSectionProps> = ({
@@ -35,7 +35,7 @@ const TagFilterSection: React.FC<TagFilterSectionProps> = ({
       "
     >
       {tags.map((tag) => {
-        const isSelected = selectedValues.includes(tag)
+        const isSelected = selectedValues.includes(tag);
         return (
           <label
             key={tag}
@@ -78,10 +78,10 @@ const TagFilterSection: React.FC<TagFilterSectionProps> = ({
               {getTagDisplay(tag, language)}
             </span>
           </label>
-        )
+        );
       })}
     </div>
   </section>
-)
+);
 
-export default memo(TagFilterSection)
+export default memo(TagFilterSection);

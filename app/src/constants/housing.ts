@@ -5,4 +5,4 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-export * from '../components/housing/constants/index'
+export * from "../components/housing/constants/index";
