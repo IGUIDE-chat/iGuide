@@ -7,9 +7,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-
-export const DEFAULT_FAVORITES_TARGET = { x: 90, y: 360 };
-export const DEFAULT_TOGGLE_TARGET = { x: 30, y: 30 };
+import { DEFAULT_FAVORITES_TARGET } from "./favoriteConstants";
 
 const FAVORITES_HEART_SCALE = 12 / 24;
 
@@ -32,8 +30,8 @@ export const FavoriteFlyEffect: React.FC<FavoriteFlyEffectProps> = ({
     className="pointer-events-none fixed top-0 left-0 z-100 origin-center"
     initial={{ x: startX, y: startY, scale: 1 }}
     animate={{
-      x: targetX,
-      y: targetY,
+      x: targetX ?? DEFAULT_FAVORITES_TARGET.x,
+      y: targetY ?? DEFAULT_FAVORITES_TARGET.y,
       scale: FAVORITES_HEART_SCALE,
     }}
     transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}

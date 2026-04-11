@@ -85,9 +85,11 @@ class MapErrorBoundary extends Component<
             from-gray-50 to-gray-100
           "
         >
-          <div className="
-            mx-4 max-w-md rounded-2xl bg-white p-8 text-center shadow-xl
-          ">
+          <div
+            className="
+              mx-4 max-w-md rounded-2xl bg-white p-8 text-center shadow-xl
+            "
+          >
             <div
               className="
                 mx-auto mb-4 flex size-16 items-center justify-center
@@ -491,9 +493,11 @@ const DormMap: React.FC<DormMapProps> = ({
           from-gray-50 to-gray-100
         "
       >
-        <div className="
-          mx-4 max-w-md rounded-2xl bg-white p-8 text-center shadow-xl
-        ">
+        <div
+          className="
+            mx-4 max-w-md rounded-2xl bg-white p-8 text-center shadow-xl
+          "
+        >
           <h3 className="mb-2 text-lg font-bold text-gray-900">
             {language === "zh" ? "地图不可用" : "Map unavailable"}
           </h3>

@@ -19,6 +19,7 @@ import { User, AuthContextType } from "../../types";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+/* eslint-disable react-refresh/only-export-components */
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

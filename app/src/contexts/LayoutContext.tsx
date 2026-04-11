@@ -64,6 +64,7 @@ export const LayoutProvider: React.FC<{
   );
 };
 
+/* eslint-disable react-refresh/only-export-components */
 export const useLayout = (): LayoutContextType => {
   const ctx = useContext(LayoutContext);
   if (!ctx) {

@@ -43,6 +43,7 @@ export const DormUserInteractionProvider: React.FC<{ children: ReactNode }> = ({
   );
 };
 
+/* eslint-disable react-refresh/only-export-components */
 export const useSharedDormInteraction = (): DormUserInteractionContextType => {
   const ctx = useContext(DormUserInteractionContext);
   if (!ctx) {

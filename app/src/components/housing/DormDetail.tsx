@@ -845,10 +845,10 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
                     justify-center rounded-2xl border p-2 shadow-sm
                     md:h-[100px] md:min-w-[100px] md:flex-none md:p-3
                     ${
-             dorm.ac
-               ? "border-slate-100 bg-white"
-               : "border-amber-200 bg-amber-50"
-           }
+                      dorm.ac
+                        ? "border-slate-100 bg-white"
+                        : "border-amber-200 bg-amber-50"
+                    }
                   `}
                 >
                   {/* Snowflake with strikethrough when no AC */}
@@ -868,9 +868,11 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
                           justify-center
                         "
                       >
-                        <div className="
-                          h-[2px] w-[140%] rotate-45 rounded-full bg-red-400
-                        " />
+                        <div
+                          className="
+                            h-[2px] w-[140%] rotate-45 rounded-full bg-red-400
+                          "
+                        />
                       </div>
                     )}
                   </div>
@@ -1146,13 +1148,14 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
                     backdrop-blur-md transition-all
                     md:px-4 md:py-2 md:text-[13px]
                     ${
-             showPlanCompare
-               ? "border-illini-blue bg-illini-blue text-white"
-               : `
-                 border-white/60 bg-white/80 text-illini-blue
-                 hover:bg-white hover:shadow-[0_4px_15px_rgba(0,0,0,0.04)]
-               `
-           }
+                      showPlanCompare
+                        ? "border-illini-blue bg-illini-blue text-white"
+                        : `
+                          border-white/60 bg-white/80 text-illini-blue
+                          hover:bg-white
+                          hover:shadow-[0_4px_15px_rgba(0,0,0,0.04)]
+                        `
+                    }
                   `}
                 >
                   <ArrowRightLeft
@@ -1384,12 +1387,20 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
                                     md:gap-1 md:rounded-xl md:px-2.5 md:py-1
                                     md:text-[13px]
                                     ${
-                     plan.available === false
-                       ? `border-red-200 bg-red-50 text-red-600`
-                       : planPrice == null
-                         ? `border-amber-200 bg-amber-50 text-amber-700`
-                         : `border-[#D1FAE5] bg-[#ECFDF5] text-[#059669]`
-                   }
+                                      plan.available === false
+                                        ? `
+                                          border-red-200 bg-red-50 text-red-600
+                                        `
+                                        : planPrice == null
+                                          ? `
+                                            border-amber-200 bg-amber-50
+                                            text-amber-700
+                                          `
+                                          : `
+                                            border-[#D1FAE5] bg-[#ECFDF5]
+                                            text-[#059669]
+                                          `
+                                    }
                                   `}
                                 >
                                   {plan.available !== false &&
@@ -1515,9 +1526,11 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
                                         (language === "zh"
                                           ? "平方英尺"
                                           : "sqft")}
-                                      <span className="
-                                        ml-1 font-medium text-slate-400
-                                      ">
+                                      <span
+                                        className="
+                                          ml-1 font-medium text-slate-400
+                                        "
+                                      >
                                         (~{Math.round(plan.sqft * 0.092903)}㎡)
                                       </span>
                                     </span>
@@ -1542,9 +1555,11 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
                                 >
                                   {formatPrice(planPrice)}
                                 </span>
-                                <span className="
-                                  text-[11px] font-medium text-slate-500
-                                ">
+                                <span
+                                  className="
+                                    text-[11px] font-medium text-slate-500
+                                  "
+                                >
                                   {t.yr}
                                 </span>
                                 <span
@@ -1563,8 +1578,10 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
                                   mt-0.5 text-[12px] font-semibold
                                   md:hidden
                                   ${
-                    plan.available === false ? `text-red-500` : `text-amber-600`
-                  }
+                                    plan.available === false
+                                      ? `text-red-500`
+                                      : `text-amber-600`
+                                  }
                                 `}
                               >
                                 {availabilityLabel}
@@ -1586,12 +1603,15 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
                                   transition-colors
                                   md:hidden
                                   ${
-                    isCompared
-                      ? `
-                        border-illini-blue/30 bg-illini-blue/5 text-illini-blue
-                      `
-                      : `border-slate-200 bg-white text-slate-500`
-                  }
+                                    isCompared
+                                      ? `
+                                        border-illini-blue/30 bg-illini-blue/5
+                                        text-illini-blue
+                                      `
+                                      : `
+                                        border-slate-200 bg-white text-slate-500
+                                      `
+                                  }
                                 `}
                               >
                                 <div
@@ -1599,10 +1619,13 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
                                     flex size-3 items-center justify-center
                                     rounded-[3px] border transition-colors
                                     ${
-                     isCompared
-                       ? `border-illini-blue bg-illini-blue text-white`
-                       : `border-slate-300`
-                   }
+                                      isCompared
+                                        ? `
+                                          border-illini-blue bg-illini-blue
+                                          text-white
+                                        `
+                                        : `border-slate-300`
+                                    }
                                   `}
                                 >
                                   {isCompared && (
@@ -1633,9 +1656,11 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
                                   >
                                     {formatPrice(planPrice)}
                                   </span>
-                                  <span className="
-                                    text-[13px] font-medium text-slate-500
-                                  ">
+                                  <span
+                                    className="
+                                      text-[13px] font-medium text-slate-500
+                                    "
+                                  >
                                     {t.yr}
                                   </span>
                                 </div>
@@ -1655,8 +1680,10 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
                                 className={`
                                   text-[13px] font-semibold
                                   ${
-                    plan.available === false ? `text-red-500` : `text-amber-600`
-                  }
+                                    plan.available === false
+                                      ? `text-red-500`
+                                      : `text-amber-600`
+                                  }
                                 `}
                               >
                                 {availabilityLabel}
@@ -1680,15 +1707,18 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
                                     px-3 py-1.5 text-[12px] font-semibold
                                     transition-colors
                                     ${
-                     isCompared
-                       ? `
-                         border-illini-blue/30 bg-illini-blue/5 text-illini-blue
-                       `
-                       : `
-                         border-slate-200 bg-white text-slate-500
-                         hover:border-slate-300 hover:text-slate-700
-                       `
-                   }
+                                      isCompared
+                                        ? `
+                                          border-illini-blue/30 bg-illini-blue/5
+                                          text-illini-blue
+                                        `
+                                        : `
+                                          border-slate-200 bg-white
+                                          text-slate-500
+                                          hover:border-slate-300
+                                          hover:text-slate-700
+                                        `
+                                    }
                                   `}
                                 >
                                   <div
@@ -1696,10 +1726,13 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
                                       flex size-3.5 items-center justify-center
                                       rounded-[4px] border transition-colors
                                       ${
-                      isCompared
-                        ? `border-illini-blue bg-illini-blue text-white`
-                        : `border-slate-300`
-                    }
+                                        isCompared
+                                          ? `
+                                            border-illini-blue bg-illini-blue
+                                            text-white
+                                          `
+                                          : `border-slate-300`
+                                      }
                                     `}
                                   >
                                     <AnimatePresence>
@@ -1991,9 +2024,11 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
                                 ? "房型对比"
                                 : "Plan Comparison"}
                             </span>
-                            <span className="
-                              ml-auto text-[12px] font-medium text-slate-400
-                            ">
+                            <span
+                              className="
+                                ml-auto text-[12px] font-medium text-slate-400
+                              "
+                            >
                               {compared.length}{" "}
                               {language === "zh" ? "个房型" : "plans"}
                             </span>
@@ -2207,18 +2242,18 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
                         flex items-center gap-1.5 rounded-lg border px-3 py-1.5
                         text-[12px] font-semibold transition-colors
                         ${
-               commentVote === vote && vote === 1
-                 ? `
-                   border-illini-orange/30 bg-illini-orange/10
-                   text-illini-orange
-                 `
-                 : commentVote === vote && vote === -1
-                   ? "border-red-200 bg-red-50 text-red-600"
-                   : `
-                     border-slate-200 bg-white text-slate-500
-                     hover:border-slate-300
-                   `
-             }
+                          commentVote === vote && vote === 1
+                            ? `
+                              border-illini-orange/30 bg-illini-orange/10
+                              text-illini-orange
+                            `
+                            : commentVote === vote && vote === -1
+                              ? "border-red-200 bg-red-50 text-red-600"
+                              : `
+                                border-slate-200 bg-white text-slate-500
+                                hover:border-slate-300
+                              `
+                        }
                       `}
                     >
                       <ThumbsUp
@@ -2226,10 +2261,10 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
                           size-3.5
                           ${vote === -1 ? "rotate-180" : ""}
                           ${
-                commentVote === vote && vote === 1
-                  ? `fill-illini-orange/20`
-                  : ""
-              }
+                            commentVote === vote && vote === 1
+                              ? `fill-illini-orange/20`
+                              : ""
+                          }
                         `}
                       />
                       {vote === 1 ? t.thumbsUpDorm : t.thumbsDownDorm}
@@ -2340,12 +2375,16 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
                                   bg-illini-orange/10 px-2 py-1
                                 "
                               >
-                                <ThumbsUp className="
-                                  size-3 fill-illini-orange text-illini-orange
-                                " />
-                                <span className="
-                                  text-[11px] font-bold text-illini-orange
-                                ">
+                                <ThumbsUp
+                                  className="
+                                    size-3 fill-illini-orange text-illini-orange
+                                  "
+                                />
+                                <span
+                                  className="
+                                    text-[11px] font-bold text-illini-orange
+                                  "
+                                >
                                   {t.recommended}
                                 </span>
                               </div>
@@ -2422,23 +2461,23 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
                             className={`
                               group flex items-center gap-1.5 transition-colors
                               ${
-                  comment.myVote === 1
-                    ? "text-illini-orange"
-                    : `
-                      text-slate-400
-                      hover:text-illini-orange
-                    `
-                }
+                                comment.myVote === 1
+                                  ? "text-illini-orange"
+                                  : `
+                                    text-slate-400
+                                    hover:text-illini-orange
+                                  `
+                              }
                             `}
                           >
                             <ThumbsUp
                               className={`
                                 size-3.5
                                 ${
-                   comment.myVote === 1
-                     ? `fill-illini-orange/20`
-                     : `group-hover:fill-illini-orange/20`
-                 }
+                                  comment.myVote === 1
+                                    ? `fill-illini-orange/20`
+                                    : `group-hover:fill-illini-orange/20`
+                                }
                               `}
                             />
                             <span className="text-[12px] font-semibold">

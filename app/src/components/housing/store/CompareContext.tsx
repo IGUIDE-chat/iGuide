@@ -84,6 +84,7 @@ export const CompareProvider: React.FC<{ children: ReactNode }> = ({
   );
 };
 
+/* eslint-disable react-refresh/only-export-components */
 export const useCompare = (): CompareContextType => {
   const ctx = useContext(CompareContext);
   if (!ctx) throw new Error("useCompare must be used within CompareProvider");
