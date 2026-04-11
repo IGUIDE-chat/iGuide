@@ -87,7 +87,7 @@ function uniqueStrings<T extends string>(
 	);
 }
 
-function sanitizeOptionalString(value: string | undefined) {
+function sanitizeOptionalString(value: string | null | undefined) {
 	const trimmed = value?.trim();
 	return trimmed ? trimmed : undefined;
 }

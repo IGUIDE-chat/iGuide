@@ -202,6 +202,10 @@ const DormMap: React.FC<DormMapProps> = ({
 		}
 
 		const bounds = mapRef.current.getBounds();
+		if (!bounds) {
+			setVisibleDorms([]);
+			return [];
+		}
 		const visible = safeDorms.filter((dorm) => {
 			const point = new mapboxgl.LngLat(dorm.lng, dorm.lat);
 			return bounds.contains(point);
