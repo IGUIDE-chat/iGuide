@@ -1,0 +1,2 @@
+{"url":"https://example.edu/page-1","title":"Sample <b>Page</b>","content":"<h1>Housing</h1><p>This is a sample crawler entry with enough text to import.</p>","category":"housing","links":["https://example.edu/page-2"],"timestamp":"2026-04-10T00:00:00.000Z"}
+{"url":"https://example.edu/page-2","title":"Another Page","content":"<div>Second page content for dry run verification.</div>","category":"academics","links":[],"timestamp":"2026-04-10T00:01:00.000Z"}
