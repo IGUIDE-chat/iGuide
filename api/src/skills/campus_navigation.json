@@ -1,0 +1,20 @@
+{
+	"id": "campus_navigation",
+	"name": "Campus Navigation",
+	"description": "Help students navigate between campus places and identify nearby dorm options",
+	"prompt_template": "Plan a route from {{origin}} to {{destination}} on or near UIUC campus. Include helpful navigation notes and mention nearby dorms that are relevant along the way.",
+	"required_tools": ["search_knowledge_base", "web_search"],
+	"output_format": "navigation_brief",
+	"parameters": {
+		"origin": {
+			"type": "string",
+			"description": "Starting location on or near campus",
+			"required": true
+		},
+		"destination": {
+			"type": "string",
+			"description": "Destination on or near campus",
+			"required": true
+		}
+	}
+}

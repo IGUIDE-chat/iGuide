@@ -10,6 +10,11 @@
 	"build": {
 		"watch_dir": "src"
 	},
+	"vars": {
+		"EMBEDDING_MODEL": "multilingual-e5-small",
+		"EMBEDDING_DIMENSIONS": "384",
+		"USE_TOOL_USE_RAG": "false"
+	},
 	"env": {
 		"production": {},
 		"development": {}

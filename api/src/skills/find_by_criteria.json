@@ -1,0 +1,25 @@
+{
+	"id": "find_by_criteria",
+	"name": "Find Dorms by Criteria",
+	"description": "Find dorm options that match a student's budget, location, and amenity preferences",
+	"prompt_template": "Find UIUC dorm options that match these criteria: price range {{price_range}}, preferred location {{location}}, desired amenities {{amenities}}. Return the strongest matches with trade-offs.",
+	"required_tools": ["search_knowledge_base"],
+	"output_format": "ranked_recommendations",
+	"parameters": {
+		"price_range": {
+			"type": "string",
+			"description": "Budget target or range such as low, mid, high, or a dollar range",
+			"required": true
+		},
+		"location": {
+			"type": "string",
+			"description": "Preferred campus area or proximity target",
+			"required": true
+		},
+		"amenities": {
+			"type": "string",
+			"description": "Comma-separated amenity preferences such as private bathroom, AC, dining hall",
+			"required": true
+		}
+	}
+}
