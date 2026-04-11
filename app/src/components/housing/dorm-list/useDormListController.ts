@@ -19,7 +19,7 @@ import { DormListText } from "./types";
 import {
   DEFAULT_FAVORITES_TARGET,
   DEFAULT_TOGGLE_TARGET,
-} from "./FavoriteFlyEffect";
+} from "./favoriteConstants";
 
 const DORM_LIST_TEXT: Record<Language, DormListText> = {
   en: {
