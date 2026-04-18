@@ -158,6 +158,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
       bannerBullets: [
         "Streamable HTTP only — stdio and legacy SSE are blocked.",
         "Credential-protected third-party endpoints are blocked — no credential fields are collected here.",
+        "Marketplace and template flows are not available in phase 1.",
         "Arbitrary public third-party MCP quality is not guaranteed by the platform.",
       ],
       // Add form
@@ -228,6 +229,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
       bannerBullets: [
         "仅支持 Streamable HTTP——stdio 和旧版 SSE 传输会被拦截。",
         "不支持需要凭证的第三方端点——这里不会收集任何凭证字段。",
+        "第一阶段不提供市场或模板流程。",
         "平台不对任意公开第三方 MCP 的服务质量作保证。",
       ],
       // Add form
