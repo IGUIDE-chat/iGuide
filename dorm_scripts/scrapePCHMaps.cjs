@@ -1,6 +1,7 @@
 const puppeteer = require("puppeteer-extra");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const fs = require("fs");
+const path = require("path");
 
 puppeteer.use(StealthPlugin());
 
@@ -171,7 +172,7 @@ async function main() {
   console.log(`Total PCH reviews pulled: ${allCollected.length}`);
 
   let fileContent = fs.readFileSync(
-    "src/components/housing/constants/googleReviews.ts",
+    path.resolve(__dirname, "../app/src/components/housing/constants/googleReviews.ts"),
     "utf8"
   );
 
@@ -191,7 +192,7 @@ async function main() {
   }
 
   fs.writeFileSync(
-    "src/components/housing/constants/googleReviews.ts",
+    path.resolve(__dirname, "../app/src/components/housing/constants/googleReviews.ts"),
     fileContent,
     "utf8"
   );

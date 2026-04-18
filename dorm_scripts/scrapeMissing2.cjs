@@ -1,4 +1,5 @@
 const puppeteer = require("puppeteer-extra");
+const path = require("path");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const fs = require("fs");
 
@@ -310,7 +311,7 @@ async function main() {
   }
 
   let fileContent = fs.readFileSync(
-    "src/components/housing/constants/googleReviews.ts",
+    path.resolve(__dirname, "../app/src/components/housing/constants/googleReviews.ts"),
     "utf8"
   );
 
@@ -330,7 +331,7 @@ async function main() {
     before + (needsComma ? ",\n" : "\n") + lines.join(",\n") + "\n" + after;
 
   fs.writeFileSync(
-    "src/components/housing/constants/googleReviews.ts",
+    path.resolve(__dirname, "../app/src/components/housing/constants/googleReviews.ts"),
     fileContent,
     "utf8"
   );

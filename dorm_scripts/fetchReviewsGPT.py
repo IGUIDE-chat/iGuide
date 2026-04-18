@@ -6,7 +6,7 @@ import concurrent.futures
 from pathlib import Path
 
 # Load env safely
-env_path = Path(__file__).resolve().parent.parent.parent / '.env.local'
+env_path = Path(__file__).resolve().parent.parent / 'app' / '.env.local'
 with open(env_path, 'r', encoding='utf-8') as f:
     for line in f:
         line = line.strip()
@@ -100,7 +100,7 @@ with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
 
 print(f"Total reviews extracted: {len(all_collected)}")
 
-target_file = Path(__file__).resolve().parent.parent / 'components/housing/constants/googleReviews.ts'
+target_file = Path(__file__).resolve().parent.parent / 'app/src/components/housing/constants/googleReviews.ts'
 
 with open(target_file, 'w', encoding='utf-8') as f:
     f.write('''import { DormComment } from '../../../services/dormCommentsService';
