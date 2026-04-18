@@ -13,16 +13,18 @@ Rules:
 - Place tags after the main answer, at the absolute end of your response.
 `;
 
+// Default to configured website language. Do not auto-switch based on input language.
+// Only switch on explicit user request.
 function buildLanguageInstruction(lang?: string): string {
 	if (lang === "zh") {
-		return "Reply in Simplified Chinese unless the user explicitly asks to switch languages.";
+		return "Reply in Simplified Chinese. Do not switch languages based on the language of the user's input. Only switch if the user explicitly requests a different language.";
 	}
 
 	if (lang === "en") {
-		return "Reply exclusively in English unless the user explicitly asks to switch languages.";
+		return "Reply in English. Do not switch languages based on the language of the user's input. Only switch if the user explicitly requests a different language.";
 	}
 
-	return "Mirror the user's language.";
+	return "Reply in the website's configured language. Do not auto-detect or switch languages based on the user's input language. Only switch if the user explicitly requests a different language.";
 }
 
 export function buildSystemPrompt(options: {

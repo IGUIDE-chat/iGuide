@@ -8,6 +8,10 @@ import { createGrepDocsTool } from "./tools/grep-docs";
 import { ToolRegistry } from "./tools/registry";
 import { createSearchKnowledgeBaseTool } from "./tools/search-knowledge-base";
 import { createWebSearchTool } from "./tools/web-search";
+import {
+	createMCPRouteServices,
+	maybeHandleIntegrationsRoute,
+} from "./mcp/routes";
 
 interface Env {
 	SUPABASE_URL: string;
@@ -89,6 +93,7 @@ export default {
 
 		try {
 			const url = new URL(request.url);
+			const mcpServices = createMCPRouteServices(env);
 
 			// 1. Geo-IP Detection
 			const cf = (request as any).cf;
@@ -203,6 +208,16 @@ export default {
 						},
 					},
 				);
+			}
+
+			const integrationsResponse = await maybeHandleIntegrationsRoute(
+				request,
+				mcpServices,
+				userId,
+				corsHeaders,
+			);
+			if (integrationsResponse) {
+				return integrationsResponse;
 			}
 
 			// Chat endpoint - proxy to VPS backend
