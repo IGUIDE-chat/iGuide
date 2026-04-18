@@ -445,7 +445,9 @@ export async function handleIntegrationsRoute(
 			connection.endpoint_url,
 		)) as MCPDiscoveryResult;
 		await services.connections.recordDiscoveryResult(connectionId, viewerId, result);
-		await services.tools.replaceDiscoveredTools(connectionId, result.tools);
+		if (result.success) {
+			await services.tools.replaceDiscoveredTools(connectionId, result.tools);
+		}
 		return jsonResponse(result, 200, responseHeaders);
 	}
 
