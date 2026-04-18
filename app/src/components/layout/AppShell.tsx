@@ -45,9 +45,16 @@ export const AppShell: React.FC<AppShellProps> = ({
             : 'pointer-events-none opacity-0'
           }
         `}
-        role="presentation"
+        role="button"
+        tabIndex={isSidebarOpen ? 0 : -1}
         aria-hidden={!isSidebarOpen}
         onClick={onToggleSidebar}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault()
+            onToggleSidebar()
+          }
+        }}
       />
 
       <aside

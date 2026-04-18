@@ -33,17 +33,6 @@ export default defineConfig(({ mode }) => {
 					body += chunk.toString();
 				});
 				req.on("end", () => {
-					if (requestPath === "/api/gemini") {
-						const apiKey = env.GOOGLE_API_KEY;
-						if (apiKey) {
-							mutableReq._geminiProxyPath =
-								`/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-							mutableReq._geminiProxyBody = body;
-						}
-					} else if (requestPath === "/api/tavily") {
-						mutableReq._tavilyProxyBody = body;
-					}
-
 					try {
 						const parsed = JSON.parse(body);
 						if (requestPath === "/api/gemini") {
@@ -64,7 +53,16 @@ export default defineConfig(({ mode }) => {
 							mutableReq._tavilyProxyBody = JSON.stringify(parsed);
 						}
 					} catch {
-						/* pass through as-is */
+						if (requestPath === "/api/gemini") {
+							const apiKey = env.GOOGLE_API_KEY;
+							if (apiKey) {
+								mutableReq._geminiProxyPath =
+									`/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+								mutableReq._geminiProxyBody = body;
+							}
+						} else if (requestPath === "/api/tavily") {
+							mutableReq._tavilyProxyBody = body;
+						}
 					}
 					next();
 				});
