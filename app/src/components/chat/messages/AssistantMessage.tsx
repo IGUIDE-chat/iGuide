@@ -21,6 +21,10 @@ interface AssistantMessageProps {
 	onFollowUpClick?: (text: string) => void;
 }
 
+const MAX_FOLLOW_UP_QUESTIONS = 3;
+const MAX_QUESTION_LENGTH = 50;
+const TRUNCATED_QUESTION_LENGTH = 47;
+
 export const AssistantMessage: React.FC<AssistantMessageProps> = ({
 	language = "zh",
 	botName = "iGuide",
@@ -151,7 +155,7 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
 									xmlns="http://www.w3.org/2000/svg"
 									fill="none"
 									viewBox="0 0 24 24"
-									aria-label="Loading"
+									aria-label={language === "zh" ? "加载中" : "Loading"}
 									role="img"
 								>
 									<circle
@@ -175,10 +179,12 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
 					{/* Follow-up chips */}
 					{meta?.followUpQuestions && meta.followUpQuestions.length > 0 && (
 						<div className="mt-3 flex flex-wrap gap-2">
-							{meta.followUpQuestions.slice(0, 3).map((question) => {
+							{meta.followUpQuestions
+								.slice(0, MAX_FOLLOW_UP_QUESTIONS)
+								.map((question) => {
 								const displayText =
-									question.length > 50
-										? `${question.substring(0, 47)}...`
+									question.length > MAX_QUESTION_LENGTH
+										? `${question.substring(0, TRUNCATED_QUESTION_LENGTH)}...`
 										: question;
 								return (
 									<button
