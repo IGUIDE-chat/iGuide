@@ -16,6 +16,11 @@ import React, {
 import Slider from "rc-slider";
 import { HISTOGRAM_DATA, ModalText } from "./modalText";
 
+const HISTOGRAM_ACTIVE_START_INDEX = 3;
+const HISTOGRAM_ACTIVE_END_INDEX = 10;
+const PRIMARY_COLOR = "#13294B";
+const NEUTRAL_COLOR = "#E5E7EB";
+
 interface PriceSectionProps {
 	t: ModalText;
 	priceLimits: [number, number];
@@ -101,6 +106,15 @@ const PriceSection: React.FC<PriceSectionProps> = ({
 		},
 		[commitRangeChange, normalizeRange, value],
 	);
+	const sliderHandleStyle = {
+		borderColor: PRIMARY_COLOR,
+		backgroundColor: "white",
+		opacity: 1,
+		boxShadow: `0 0 0 2px white, 0 0 0 3px ${PRIMARY_COLOR}`,
+		height: 22,
+		width: 22,
+		marginTop: -9,
+	};
 
 	return (
 		<section className="mb-8">
@@ -114,7 +128,11 @@ const PriceSection: React.FC<PriceSectionProps> = ({
 						className="flex-1 rounded-t-sm bg-gray-200 transition-colors duration-200"
 						style={{
 							height: `${height}%`,
-							backgroundColor: i > 3 && i < 10 ? "#13294B" : "#E5E7EB",
+							backgroundColor:
+								i > HISTOGRAM_ACTIVE_START_INDEX &&
+								i < HISTOGRAM_ACTIVE_END_INDEX
+									? PRIMARY_COLOR
+									: NEUTRAL_COLOR,
 						}}
 					/>
 				))}
@@ -138,28 +156,9 @@ const PriceSection: React.FC<PriceSectionProps> = ({
 						const next = normalizeRange([Number(val[0]), Number(val[1])]);
 						commitRangeChange(next);
 					}}
-					trackStyle={[{ backgroundColor: "#13294B", height: 4 }]}
-					railStyle={{ backgroundColor: "#E5E7EB", height: 4 }}
-					handleStyle={[
-						{
-							borderColor: "#13294B",
-							backgroundColor: "white",
-							opacity: 1,
-							boxShadow: "0 0 0 2px white, 0 0 0 3px #13294B",
-							height: 22,
-							width: 22,
-							marginTop: -9,
-						},
-						{
-							borderColor: "#13294B",
-							backgroundColor: "white",
-							opacity: 1,
-							boxShadow: "0 0 0 2px white, 0 0 0 3px #13294B",
-							height: 22,
-							width: 22,
-							marginTop: -9,
-						},
-					]}
+					trackStyle={[{ backgroundColor: PRIMARY_COLOR, height: 4 }]}
+					railStyle={{ backgroundColor: NEUTRAL_COLOR, height: 4 }}
+					handleStyle={[sliderHandleStyle, sliderHandleStyle]}
 				/>
 			</div>
 

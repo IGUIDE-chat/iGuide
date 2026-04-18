@@ -15,8 +15,6 @@ interface AppShellProps {
   children: React.ReactNode
   sidebarToggleButtonRef: React.RefObject<HTMLButtonElement | null>
   mobileSidebarButtonRef: React.RefObject<HTMLButtonElement | null>
-  onCloseSidebar: () => void
-  onOpenSidebar: () => void
   onToggleSidebar: () => void
 }
 
@@ -27,12 +25,10 @@ export const AppShell: React.FC<AppShellProps> = ({
   children,
   sidebarToggleButtonRef,
   mobileSidebarButtonRef,
-  onCloseSidebar,
-  onOpenSidebar,
   onToggleSidebar,
 }) => {
   const layout = useLayout()
-  const headerSlot = layout.mobileHeaderSlot
+  const headerSlot = layout?.mobileHeaderSlot ?? mobileHeader
 
   return (
     <div
@@ -49,10 +45,14 @@ export const AppShell: React.FC<AppShellProps> = ({
             : 'pointer-events-none opacity-0'
           }
         `}
-        onClick={onCloseSidebar}
+        role="presentation"
+        aria-hidden={!isSidebarOpen}
+        onClick={onToggleSidebar}
       />
 
       <aside
+        aria-label="Sidebar"
+        aria-hidden={!isSidebarOpen}
         className={`
           fixed inset-y-0 left-0 z-50 flex flex-col bg-[#171717] text-slate-200
           transition-all duration-300 ease-in-out
@@ -110,7 +110,8 @@ export const AppShell: React.FC<AppShellProps> = ({
         >
           <button
             ref={mobileSidebarButtonRef}
-            onClick={onOpenSidebar}
+            onClick={onToggleSidebar}
+            aria-label={isSidebarOpen ? 'Close sidebar' : 'Open sidebar'}
             className="
               flex size-10 shrink-0 items-center justify-center rounded-xl
               border border-slate-200 bg-slate-100 text-slate-500
@@ -130,7 +131,7 @@ export const AppShell: React.FC<AppShellProps> = ({
               />
             </svg>
           </button>
-          {headerSlot ?? mobileHeader}
+          {headerSlot}
         </div>
 
         <div className="relative min-w-0 flex-1 overflow-hidden">
