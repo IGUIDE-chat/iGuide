@@ -1,6 +1,7 @@
 import type {
 	MCPAdapterClient,
 	MCPDiscoveryResult,
+	MCPFailureReason,
 	MCPTestResult,
 } from "./adapter.ts";
 import {
@@ -19,6 +20,9 @@ import type {
 const INTEGRATIONS_LIMITATIONS = [
 	"Streamable HTTP only",
 	"Credential-protected third-party MCP endpoints are not supported",
+	"Stdio and legacy SSE transports are not supported",
+	"Marketplace/template flows are not available in phase 1",
+	"Arbitrary public third-party MCP quality is not guaranteed by the platform",
 ] as const;
 
 const CREDENTIAL_FIELD_PATTERN =
@@ -26,6 +30,17 @@ const CREDENTIAL_FIELD_PATTERN =
 
 interface JSONHeaders {
 	[key: string]: string;
+}
+
+class MCPRouteError extends Error {
+	constructor(
+		message: string,
+		readonly status: number,
+		readonly failureReason?: MCPFailureReason,
+	) {
+		super(message);
+		this.name = "MCPRouteError";
+	}
 }
 
 export interface MCPRouteServices {
@@ -77,6 +92,24 @@ function stripApiPrefix(pathname: string) {
 	return pathname.startsWith("/api/") ? pathname.slice(4) : pathname;
 }
 
+function parseEndpointUrl(endpointUrl: string): URL {
+	try {
+		return new URL(endpointUrl);
+	} catch {
+		throw new MCPRouteError("endpoint_url must be a valid URL", 400);
+	}
+}
+
+function assertNoCredentialedEndpoint(url: URL) {
+	if (url.username || url.password) {
+		throw new MCPRouteError(
+			"Credential-protected endpoints are not supported in phase 1",
+			400,
+			"auth_required",
+		);
+	}
+}
+
 function hasCredentialFields(value: unknown): boolean {
 	if (Array.isArray(value)) {
 		return value.some(hasCredentialFields);
@@ -109,31 +142,43 @@ async function readJSONBody(request: Request): Promise<Record<string, unknown>> 
 
 function parseCreateBody(body: Record<string, unknown>): CreateConnectionBody {
 	if (hasCredentialFields(body)) {
-		throw new Error("Credential fields are not supported in phase 1");
+		throw new MCPRouteError(
+			"Credential fields are not supported in phase 1",
+			400,
+			"auth_required",
+		);
 	}
 
 	if (typeof body.display_name !== "string" || !body.display_name.trim()) {
-		throw new Error("display_name is required");
+		throw new MCPRouteError("display_name is required", 400);
 	}
 
 	if (typeof body.endpoint_url !== "string" || !body.endpoint_url.trim()) {
-		throw new Error("endpoint_url is required");
+		throw new MCPRouteError("endpoint_url is required", 400);
 	}
 
+	const endpointUrl = body.endpoint_url.trim();
+	const parsedEndpointUrl = parseEndpointUrl(endpointUrl);
+	assertNoCredentialedEndpoint(parsedEndpointUrl);
+
 	if (body.transport !== "streamable_http") {
-		throw new Error("transport must be streamable_http");
+		throw new MCPRouteError(
+			"transport must be streamable_http",
+			400,
+			"unsupported_transport",
+		);
 	}
 
 	if (
 		body.description !== undefined &&
 		typeof body.description !== "string"
 	) {
-		throw new Error("description must be a string when provided");
+		throw new MCPRouteError("description must be a string when provided", 400);
 	}
 
 	return {
 		display_name: body.display_name.trim(),
-		endpoint_url: body.endpoint_url.trim(),
+		endpoint_url: endpointUrl,
 		transport: "streamable_http",
 		...(typeof body.description === "string"
 			? { description: body.description.trim() }
@@ -143,35 +188,40 @@ function parseCreateBody(body: Record<string, unknown>): CreateConnectionBody {
 
 function parseUpdateBody(body: Record<string, unknown>): UpdateConnectionBody {
 	if (hasCredentialFields(body)) {
-		throw new Error("Credential fields are not supported in phase 1");
+		throw new MCPRouteError(
+			"Credential fields are not supported in phase 1",
+			400,
+			"auth_required",
+		);
 	}
 
 	const patch: UpdateConnectionBody = {};
 
 	if (body.display_name !== undefined) {
 		if (typeof body.display_name !== "string" || !body.display_name.trim()) {
-			throw new Error("display_name must be a non-empty string");
+			throw new MCPRouteError("display_name must be a non-empty string", 400);
 		}
 		patch.display_name = body.display_name.trim();
 	}
 
 	if (body.description !== undefined) {
 		if (typeof body.description !== "string") {
-			throw new Error("description must be a string");
+			throw new MCPRouteError("description must be a string", 400);
 		}
 		patch.description = body.description.trim();
 	}
 
 	if (body.is_enabled !== undefined) {
 		if (typeof body.is_enabled !== "boolean") {
-			throw new Error("is_enabled must be a boolean");
+			throw new MCPRouteError("is_enabled must be a boolean", 400);
 		}
 		patch.is_enabled = body.is_enabled;
 	}
 
 	if (Object.keys(patch).length === 0) {
-		throw new Error(
+		throw new MCPRouteError(
 			"At least one of display_name, description, or is_enabled must be provided",
+			400,
 		);
 	}
 
@@ -180,8 +230,23 @@ function parseUpdateBody(body: Record<string, unknown>): UpdateConnectionBody {
 
 function assertMutableConnection(connection: MCPConnection) {
 	if (connection.owner_type === "platform") {
-		throw new Error("Platform-owned integrations are not mutable via user endpoints");
+		throw new MCPRouteError(
+			"Platform-owned integrations are not mutable via user endpoints",
+			403,
+		);
 	}
+}
+
+function assertPhase1CompatibleConnection(connection: MCPConnection) {
+	if (connection.transport !== "streamable_http") {
+		throw new MCPRouteError(
+			"Only streamable_http integrations can be tested or refreshed in phase 1",
+			400,
+			"unsupported_transport",
+		);
+	}
+
+	assertNoCredentialedEndpoint(parseEndpointUrl(connection.endpoint_url));
 }
 
 function mapConnectionWithMetadata(
@@ -354,6 +419,7 @@ export async function handleIntegrationsRoute(
 		}
 
 		assertMutableConnection(connection);
+		assertPhase1CompatibleConnection(connection);
 		const result = (await services.client.test(
 			connection.endpoint_url,
 		)) as MCPTestResult;
@@ -374,6 +440,7 @@ export async function handleIntegrationsRoute(
 		}
 
 		assertMutableConnection(connection);
+		assertPhase1CompatibleConnection(connection);
 		const result = (await services.client.discover(
 			connection.endpoint_url,
 		)) as MCPDiscoveryResult;
@@ -438,15 +505,20 @@ export async function maybeHandleIntegrationsRoute(
 			responseHeaders,
 		);
 	} catch (error) {
+		if (error instanceof MCPRouteError) {
+			return jsonResponse(
+				{
+					error: error.message,
+					...(error.failureReason
+						? { failure_reason: error.failureReason }
+						: {}),
+				},
+				error.status,
+				responseHeaders,
+			);
+		}
+
 		if (error instanceof Error) {
-			if (error.message.includes("Credential fields")) {
-				return jsonResponse({ error: error.message }, 400, responseHeaders);
-			}
-
-			if (error.message.includes("Platform-owned integrations")) {
-				return jsonResponse({ error: error.message }, 403, responseHeaders);
-			}
-
 			if (
 				error.message.includes("required") ||
 				error.message.includes("must be") ||

@@ -1,10 +1,14 @@
+import type { MCPConnection, MCPDiscoveredTool, MCPToolOverride } from "./types.ts";
 import type {
-	MCPConnection,
-	MCPDiscoveredTool,
-	MCPToolOverride,
-} from "./types.ts";
-import type { MCPDiscoveryResult, MCPTestResult } from "./adapter.ts";
+	MCPAdapterClient,
+	MCPDiscoveryResult,
+	MCPDiscoveredTool as AdapterDiscoveredTool,
+	MCPTestResult,
+} from "./adapter.ts";
+import { createMCPToolWrapper } from "./adapter.ts";
 import { createMCPStore, type MCPStore } from "./store.ts";
+import type { ToolDefinition } from "../tools/types.ts";
+import { StreamableHttpMCPClient } from "./streamable-http-client.ts";
 
 type CreateConnectionInput = Pick<
 	MCPConnection,
@@ -24,6 +28,25 @@ function asEnvRecord(env?: unknown): Record<string, unknown> | undefined {
 	return env && typeof env === "object"
 		? (env as Record<string, unknown>)
 		: undefined;
+}
+
+function isMCPStore(value: unknown): value is MCPStore {
+	return Boolean(
+		value &&
+			typeof value === "object" &&
+			"get" in value &&
+			"put" in value &&
+			"delete" in value &&
+			"list" in value,
+	);
+}
+
+function resolveStore(input?: unknown): MCPStore {
+	if (isMCPStore(input)) {
+		return input;
+	}
+
+	return createMCPStore({ env: asEnvRecord(input) });
 }
 
 function connectionKey(id: string): string {
@@ -78,7 +101,7 @@ export class MCPConnectionService {
 	private readonly store: MCPStore;
 
 	constructor(env?: unknown) {
-		this.store = createMCPStore({ env: asEnvRecord(env) });
+		this.store = resolveStore(env);
 	}
 
 	async listForViewer(viewerId: string): Promise<{
@@ -226,7 +249,12 @@ export class MCPDiscoveredToolService {
 	private readonly store: MCPStore;
 
 	constructor(env?: unknown) {
-		this.store = createMCPStore({ env: asEnvRecord(env) });
+		this.store = resolveStore(env);
+	}
+
+	async listTools(connectionId: string): Promise<MCPDiscoveredTool[]> {
+		const records = await this.store.list<MCPDiscoveredTool>(toolPrefix(connectionId));
+		return records.map((record) => record.value);
 	}
 
 	async listByConnectionIds(
@@ -276,7 +304,21 @@ export class MCPToolOverrideService {
 	private readonly store: MCPStore;
 
 	constructor(env?: unknown) {
-		this.store = createMCPStore({ env: asEnvRecord(env) });
+		this.store = resolveStore(env);
+	}
+
+	async getDisabledToolNames(
+		connectionId: string,
+		viewerId: string,
+	): Promise<string[]> {
+		const records = await this.store.list<MCPToolOverride>(
+			overridePrefix(connectionId, viewerId),
+		);
+
+		return records
+			.map((record) => record.value)
+			.filter((override) => override.is_disabled)
+			.map((override) => override.tool_name);
 	}
 
 	async listOverridesByConnectionIds(
@@ -330,5 +372,82 @@ export class MCPToolOverrideService {
 
 		await this.store.delete(key);
 		return existing;
+	}
+}
+
+interface RuntimeToolRegistry {
+	register(tool: ToolDefinition): void;
+}
+
+interface RuntimeLogger {
+	error(message?: unknown, ...optionalParams: unknown[]): void;
+	warn?(message?: unknown, ...optionalParams: unknown[]): void;
+}
+
+export interface RegisterRuntimeMCPToolsOptions {
+	registry: RuntimeToolRegistry;
+	viewerId: string;
+	env?: unknown;
+	store?: MCPStore;
+	client?: MCPAdapterClient;
+	logger?: RuntimeLogger;
+}
+
+function toAdapterDiscoveredTool(
+	connection: MCPConnection,
+	tool: MCPDiscoveredTool,
+): AdapterDiscoveredTool {
+	return {
+		url: connection.endpoint_url,
+		name: tool.name,
+		description: tool.description ?? `MCP tool ${tool.name}`,
+		parameters: tool.input_schema,
+	};
+}
+
+export async function registerRuntimeMCPTools({
+	registry,
+	viewerId,
+	env,
+	store,
+	client = new StreamableHttpMCPClient(),
+	logger = console,
+}: RegisterRuntimeMCPToolsOptions): Promise<void> {
+	const resolvedStore = store ?? createMCPStore({ env: asEnvRecord(env) });
+	const connections = new MCPConnectionService(resolvedStore);
+	const tools = new MCPDiscoveredToolService(resolvedStore);
+	const overrides = new MCPToolOverrideService(resolvedStore);
+	const visibleConnections = await connections.listForViewer(viewerId);
+
+	for (const connection of [
+		...visibleConnections.platform,
+		...visibleConnections.user,
+	]) {
+		if (!connection.is_enabled) {
+			continue;
+		}
+
+		try {
+			const [discoveredTools, disabledToolNames] = await Promise.all([
+				tools.listTools(connection.id),
+				overrides.getDisabledToolNames(connection.id, viewerId),
+			]);
+			const disabledToolNameSet = new Set(disabledToolNames);
+
+			for (const tool of discoveredTools) {
+				if (disabledToolNameSet.has(tool.name)) {
+					continue;
+				}
+
+				registry.register(
+					createMCPToolWrapper(toAdapterDiscoveredTool(connection, tool), client),
+				);
+			}
+		} catch (error) {
+			logger.error(
+				`Failed to load MCP tools for connection ${connection.id}`,
+				error,
+			);
+		}
 	}
 }

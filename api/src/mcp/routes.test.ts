@@ -201,6 +201,9 @@ test("GET /integrations returns platform/user sections and phase1 disclaimers", 
 	assert.deepEqual(body.phase1_limitations, [
 		"Streamable HTTP only",
 		"Credential-protected third-party MCP endpoints are not supported",
+		"Stdio and legacy SSE transports are not supported",
+		"Marketplace/template flows are not available in phase 1",
+		"Arbitrary public third-party MCP quality is not guaranteed by the platform",
 	]);
 	assert.equal(body.platform[0].owner_type, "platform");
 	assert.equal(body.user[0].owner_type, "user");
@@ -229,6 +232,51 @@ test("POST /integrations rejects credential fields", async () => {
 	assert.equal(resolved.status, 400);
 	const body = (await resolved.json()) as any;
 	assert.match(body.error, /credential/i);
+	assert.equal(body.failure_reason, "auth_required");
+});
+
+test("POST /integrations rejects unsupported transports with failure classification", async () => {
+	const response = await maybeHandleIntegrationsRoute(
+		new Request("https://api.example.com/integrations", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				display_name: "Legacy SSE",
+				endpoint_url: "https://example.com/sse",
+				transport: "sse",
+			}),
+		}),
+		createServices(),
+		"user-123",
+	);
+
+	const resolved = requireResponse(response);
+	assert.equal(resolved.status, 400);
+	const body = (await resolved.json()) as any;
+	assert.equal(body.failure_reason, "unsupported_transport");
+	assert.match(body.error, /streamable_http/i);
+});
+
+test("POST /integrations rejects credentialed endpoint URLs with failure classification", async () => {
+	const response = await maybeHandleIntegrationsRoute(
+		new Request("https://api.example.com/integrations", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				display_name: "Credentialed MCP",
+				endpoint_url: "https://user:pass@example.com/mcp",
+				transport: "streamable_http",
+			}),
+		}),
+		createServices(),
+		"user-123",
+	);
+
+	const resolved = requireResponse(response);
+	assert.equal(resolved.status, 400);
+	const body = (await resolved.json()) as any;
+	assert.equal(body.failure_reason, "auth_required");
+	assert.match(body.error, /credential|auth/i);
 });
 
 test("PUT on a platform-owned connection returns 403", async () => {

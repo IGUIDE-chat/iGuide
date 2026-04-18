@@ -12,6 +12,7 @@ import {
 	createMCPRouteServices,
 	maybeHandleIntegrationsRoute,
 } from "./mcp/routes";
+import { registerRuntimeMCPTools } from "./mcp/service";
 
 interface Env {
 	SUPABASE_URL: string;
@@ -278,6 +279,11 @@ export default {
 					createWebSearchTool(registry);
 					createGrepDocsTool(registry);
 					createCustomSkillsTool(registry);
+					await registerRuntimeMCPTools({
+						registry,
+						viewerId: userId,
+						env,
+					});
 
 					const { stream, writer } = createSSEStream();
 					const responseHeaders = {

@@ -1,11 +1,19 @@
 /**
  * @file ./src/components/profile/IntegrationsSection.tsx
- * @description Profile feature UI — MCP integrations shell (Task 7, phase 1)
+ * @description Profile feature UI — MCP integrations with add/test/save/details interactions (Task 8)
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from "react";
+import React, { useState } from "react";
 import { Language } from "../../types";
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+interface DiscoveredTool {
+  name: string;
+  description: string;
+  enabled: boolean;
+}
 
 interface PlatformConnection {
   id: string;
@@ -18,10 +26,84 @@ interface PlatformConnection {
 interface UserConnection {
   id: string;
   name: string;
+  description: string;
   status: "ok" | "error" | "unknown";
-  toolCount: number;
   url: string;
+  is_enabled: boolean;
+  tools: DiscoveredTool[];
 }
+
+type TestResult =
+  | { state: "idle" }
+  | { state: "loading" }
+  | { state: "success"; tools: Array<{ name: string; description: string }> }
+  | { state: "failure"; reason: MockFailureReason };
+
+type MockFailureReason =
+  | "unreachable"
+  | "auth_required"
+  | "invalid_mcp_response"
+  | "no_tools_discovered"
+  | "timeout"
+  | "unsupported_transport"
+  | "unknown";
+
+// ─── Mock async functions ─────────────────────────────────────────────────────
+
+const MOCK_TOOLS = [
+  { name: "search_campus", description: "Search campus info" },
+  { name: "get_events", description: "Get campus events" },
+];
+
+async function mockTestConnection(
+  url: string
+): Promise<{ ok: boolean; tools?: typeof MOCK_TOOLS; reason?: MockFailureReason }> {
+  await new Promise((r) => setTimeout(r, 1500));
+  const normalizedUrl = url.toLowerCase();
+  if (normalizedUrl.includes("auth") || normalizedUrl.includes("private")) {
+    return { ok: false, reason: "auth_required" };
+  }
+  if (normalizedUrl.includes("invalid") || normalizedUrl.includes("broken")) {
+    return { ok: false, reason: "invalid_mcp_response" };
+  }
+  if (normalizedUrl.includes("empty") || normalizedUrl.includes("notools")) {
+    return { ok: false, reason: "no_tools_discovered" };
+  }
+  if (normalizedUrl.includes("timeout") || normalizedUrl.includes("slow")) {
+    return { ok: false, reason: "timeout" };
+  }
+  if (normalizedUrl.includes("sse") || normalizedUrl.includes("stdio")) {
+    return { ok: false, reason: "unsupported_transport" };
+  }
+  if (normalizedUrl.includes("fail") || normalizedUrl.includes("down")) {
+    return { ok: false, reason: "unreachable" };
+  }
+  return { ok: true, tools: MOCK_TOOLS };
+}
+
+async function mockSaveConnection(data: {
+  name: string;
+  url: string;
+  description: string;
+  tools: typeof MOCK_TOOLS;
+}): Promise<UserConnection> {
+  await new Promise((r) => setTimeout(r, 800));
+  return {
+    id: `user-${Date.now()}`,
+    name: data.name,
+    description: data.description,
+    url: data.url,
+    status: "ok",
+    is_enabled: true,
+    tools: data.tools.map((t) => ({ ...t, enabled: true })),
+  };
+}
+
+async function mockDeleteConnection(_id: string): Promise<void> {
+  await new Promise((r) => setTimeout(r, 500));
+}
+
+// ─── Static data ──────────────────────────────────────────────────────────────
 
 const PLATFORM_CONNECTIONS: PlatformConnection[] = [
   {
@@ -33,7 +115,7 @@ const PLATFORM_CONNECTIONS: PlatformConnection[] = [
   },
 ];
 
-const USER_CONNECTIONS: UserConnection[] = [];
+// ─── Component ────────────────────────────────────────────────────────────────
 
 interface IntegrationsSectionProps {
   language: Language;
@@ -42,6 +124,21 @@ interface IntegrationsSectionProps {
 export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
   language,
 }) => {
+  // ── State ──────────────────────────────────────────────────────────────────
+  const [userConnections, setUserConnections] = useState<UserConnection[]>([]);
+
+  // Add form
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [addName, setAddName] = useState("");
+  const [addUrl, setAddUrl] = useState("");
+  const [addDesc, setAddDesc] = useState("");
+  const [testResult, setTestResult] = useState<TestResult>({ state: "idle" });
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Details panel
+  const [detailsId, setDetailsId] = useState<string | null>(null);
+
+  // ── i18n ───────────────────────────────────────────────────────────────────
   const t = {
     en: {
       title: "Integrations",
@@ -56,9 +153,62 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
       statusError: "Error",
       statusUnknown: "Unknown",
       emptyState: "No connections yet.",
-      emptyHint: "Add a Streamable HTTP MCP server to get started.",
-      bannerText:
-        "Phase 1 supports Streamable HTTP MCP servers only. Credential-protected third-party endpoints are not supported.",
+      emptyHint: "Add a public Streamable HTTP MCP server to get started.",
+      bannerTitle: "Phase 1 guardrails",
+      bannerBullets: [
+        "Streamable HTTP only — stdio and legacy SSE are blocked.",
+        "Credential-protected third-party endpoints are blocked — no credential fields are collected here.",
+        "Arbitrary public third-party MCP quality is not guaranteed by the platform.",
+      ],
+      // Add form
+      addTitle: "Add Connection",
+      displayName: "Display Name",
+      displayNamePlaceholder: "e.g. My Campus Tools",
+      endpointUrl: "Endpoint URL",
+      endpointUrlPlaceholder: "https://your-server.example.com/mcp",
+      description: "Description (optional)",
+      descriptionPlaceholder: "What does this server do?",
+      transport: "Transport",
+      transportValue: "Streamable HTTP",
+      transportHint: "Other transports stay blocked in phase 1.",
+      testConnection: "Test Connection",
+      testing: "Testing…",
+      testSuccess: "Connection ready to save",
+      testSuccessDetailPrefix: "Structured result",
+      testSuccessOutcome: "connected",
+      discoveredLabel: "discovered",
+      testFailure: "Connection test blocked",
+      failureReasonLabel: "Failure reason",
+      failureReasonDescriptions: {
+        unreachable: "The endpoint could not be reached from the current network path.",
+        auth_required:
+          "The endpoint appears to require credentials, which phase 1 intentionally does not support.",
+        invalid_mcp_response:
+          "The server responded, but not with a valid MCP tool-discovery payload.",
+        no_tools_discovered:
+          "The server responded without any discoverable tools.",
+        timeout: "The endpoint did not respond before the phase-1 timeout budget.",
+        unsupported_transport:
+          "This looks like a non-Streamable HTTP endpoint, which phase 1 blocks.",
+        unknown: "The endpoint failed for an uncategorized reason.",
+      },
+      saveConnection: "Save Connection",
+      saving: "Saving…",
+      cancel: "Cancel",
+      // Details panel
+      detailsTitle: "Connection Details",
+      connectionName: "Name",
+      connectionUrl: "URL",
+      connectionStatus: "Status",
+      discoveredTools: "Discovered Tools",
+      enableConnection: "Enable Connection",
+      testAgain: "Test Again",
+      refreshDiscovery: "Refresh Discovery",
+      deleteConnection: "Delete Connection",
+      confirmDelete: "Delete this connection? This cannot be undone.",
+      close: "Close",
+      enabled: "Enabled",
+      disabled: "Disabled",
     },
     zh: {
       title: "集成",
@@ -73,25 +223,202 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
       statusError: "错误",
       statusUnknown: "未知",
       emptyState: "暂无连接。",
-      emptyHint: "添加一个 Streamable HTTP MCP 服务器以开始使用。",
-      bannerText:
-        "第一阶段仅支持 Streamable HTTP MCP 服务器。不支持需要凭证的第三方端点。",
+      emptyHint: "添加一个公开的 Streamable HTTP MCP 服务器以开始使用。",
+      bannerTitle: "第一阶段限制",
+      bannerBullets: [
+        "仅支持 Streamable HTTP——stdio 和旧版 SSE 传输会被拦截。",
+        "不支持需要凭证的第三方端点——这里不会收集任何凭证字段。",
+        "平台不对任意公开第三方 MCP 的服务质量作保证。",
+      ],
+      // Add form
+      addTitle: "添加连接",
+      displayName: "显示名称",
+      displayNamePlaceholder: "例如：我的校园工具",
+      endpointUrl: "端点 URL",
+      endpointUrlPlaceholder: "https://your-server.example.com/mcp",
+      description: "描述（可选）",
+      descriptionPlaceholder: "这个服务器是做什么的？",
+      transport: "传输协议",
+      transportValue: "Streamable HTTP",
+      transportHint: "其他传输方式在第一阶段仍被拦截。",
+      testConnection: "测试连接",
+      testing: "测试中…",
+      testSuccess: "连接可保存",
+      testSuccessDetailPrefix: "结构化结果",
+      testSuccessOutcome: "已连接",
+      discoveredLabel: "已发现",
+      testFailure: "连接测试被拦截",
+      failureReasonLabel: "失败原因",
+      failureReasonDescriptions: {
+        unreachable: "当前网络路径无法访问该端点。",
+        auth_required: "该端点似乎需要凭证，而第一阶段刻意不支持此能力。",
+        invalid_mcp_response: "服务器有响应，但返回的不是有效的 MCP 工具发现结果。",
+        no_tools_discovered: "服务器响应成功，但没有发现任何工具。",
+        timeout: "该端点在第一阶段的超时预算内没有完成响应。",
+        unsupported_transport: "这看起来不是 Streamable HTTP 端点，因此会被第一阶段拦截。",
+        unknown: "该端点因未分类原因失败。",
+      },
+      saveConnection: "保存连接",
+      saving: "保存中…",
+      cancel: "取消",
+      // Details panel
+      detailsTitle: "连接详情",
+      connectionName: "名称",
+      connectionUrl: "URL",
+      connectionStatus: "状态",
+      discoveredTools: "已发现工具",
+      enableConnection: "启用连接",
+      testAgain: "重新测试",
+      refreshDiscovery: "刷新发现",
+      deleteConnection: "删除连接",
+      confirmDelete: "删除此连接？此操作无法撤销。",
+      close: "关闭",
+      enabled: "已启用",
+      disabled: "已禁用",
     },
   }[language];
 
-  const statusDot = (status: PlatformConnection["status"]) => {
+  // ── Helpers ────────────────────────────────────────────────────────────────
+
+  const statusDot = (status: "ok" | "error" | "unknown", dimmed = false) => {
+    const base = "size-2 rounded-full inline-block";
     if (status === "ok")
-      return <span className="size-2 rounded-full bg-emerald-400 inline-block" />;
+      return (
+        <span
+          className={`${base} ${dimmed ? "bg-emerald-300" : "bg-emerald-400"}`}
+        />
+      );
     if (status === "error")
-      return <span className="size-2 rounded-full bg-red-400 inline-block" />;
-    return <span className="size-2 rounded-full bg-slate-300 inline-block" />;
+      return (
+        <span
+          className={`${base} ${dimmed ? "bg-red-300" : "bg-red-400"}`}
+        />
+      );
+    return <span className={`${base} bg-slate-300`} />;
   };
 
-  const statusLabel = (status: PlatformConnection["status"]) => {
+  const statusLabel = (status: "ok" | "error" | "unknown") => {
     if (status === "ok") return t.statusOk;
     if (status === "error") return t.statusError;
     return t.statusUnknown;
   };
+
+  const toolCount = (conn: UserConnection) => conn.tools.length;
+
+  const getFailureReasonDescription = (reason: MockFailureReason) =>
+    t.failureReasonDescriptions[reason] ?? t.failureReasonDescriptions.unknown;
+
+  // ── Add form handlers ──────────────────────────────────────────────────────
+
+  const handleOpenAdd = () => {
+    setShowAddForm(true);
+    setAddName("");
+    setAddUrl("");
+    setAddDesc("");
+    setTestResult({ state: "idle" });
+  };
+
+  const handleCancelAdd = () => {
+    setShowAddForm(false);
+    setTestResult({ state: "idle" });
+  };
+
+  const handleTest = async () => {
+    if (!addUrl.trim()) return;
+    setTestResult({ state: "loading" });
+    const result = await mockTestConnection(addUrl.trim());
+    if (result.ok && result.tools) {
+      setTestResult({ state: "success", tools: result.tools });
+    } else {
+      setTestResult({ state: "failure", reason: result.reason ?? "unknown" });
+    }
+  };
+
+  const handleSave = async () => {
+    if (testResult.state !== "success") return;
+    setIsSaving(true);
+    const conn = await mockSaveConnection({
+      name: addName.trim(),
+      url: addUrl.trim(),
+      description: addDesc.trim(),
+      tools: testResult.tools,
+    });
+    setUserConnections((prev) => [...prev, conn]);
+    setIsSaving(false);
+    setShowAddForm(false);
+    setTestResult({ state: "idle" });
+  };
+
+  // ── Details panel handlers ─────────────────────────────────────────────────
+
+  const detailsConn = userConnections.find((c) => c.id === detailsId) ?? null;
+
+  const handleToggleConnection = (id: string) => {
+    setUserConnections((prev) =>
+      prev.map((c) =>
+        c.id === id ? { ...c, is_enabled: !c.is_enabled } : c
+      )
+    );
+  };
+
+  const handleToggleTool = (connId: string, toolName: string) => {
+    setUserConnections((prev) =>
+      prev.map((c) =>
+        c.id === connId
+          ? {
+              ...c,
+              tools: c.tools.map((t) =>
+                t.name === toolName ? { ...t, enabled: !t.enabled } : t
+              ),
+            }
+          : c
+      )
+    );
+  };
+
+  const handleTestAgain = async (id: string) => {
+    const conn = userConnections.find((c) => c.id === id);
+    if (!conn) return;
+    setUserConnections((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, status: "unknown" } : c))
+    );
+    const result = await mockTestConnection(conn.url);
+    setUserConnections((prev) =>
+      prev.map((c) =>
+        c.id === id
+          ? { ...c, status: result.ok ? "ok" : "error" }
+          : c
+      )
+    );
+  };
+
+  const handleRefreshDiscovery = async (id: string) => {
+    const conn = userConnections.find((c) => c.id === id);
+    if (!conn) return;
+    const result = await mockTestConnection(conn.url);
+    if (result.ok && result.tools) {
+      setUserConnections((prev) =>
+        prev.map((c) =>
+          c.id === id
+            ? {
+                ...c,
+                status: "ok",
+                tools: result.tools!.map((t) => ({ ...t, enabled: true })),
+              }
+            : c
+        )
+      );
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm(t.confirmDelete)) return;
+    await mockDeleteConnection(id);
+    setUserConnections((prev) => prev.filter((c) => c.id !== id));
+    if (detailsId === id) setDetailsId(null);
+  };
+
+  // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
     <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -99,81 +426,377 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
         <span>🔌</span> {t.title}
       </h3>
 
-      <div className="mb-5 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5">
-        <span className="mt-0.5 text-amber-500 shrink-0">⚠️</span>
-        <p className="text-xs text-amber-700 leading-relaxed">{t.bannerText}</p>
+      {/* Banner */}
+      <div className="mb-5 rounded-lg border border-amber-200 bg-amber-50 px-3 py-3">
+        <div className="mb-1.5 flex items-start gap-2">
+          <span className="mt-0.5 shrink-0 text-amber-500">⚠️</span>
+          <p className="text-xs font-semibold text-amber-800">{t.bannerTitle}</p>
+        </div>
+        <ul className="list-disc space-y-1 pl-6 text-xs leading-relaxed text-amber-700">
+          {t.bannerBullets.map((bullet) => (
+            <li key={bullet}>{bullet}</li>
+          ))}
+        </ul>
       </div>
 
+      {/* Platform Connections */}
       <div className="mb-5">
         <div className="mb-2 flex items-center justify-between">
           <div>
-            <p className="text-sm font-semibold text-slate-700">{t.platformTitle}</p>
+            <p className="text-sm font-semibold text-slate-700">
+              {t.platformTitle}
+            </p>
             <p className="text-xs text-slate-400">{t.platformDesc}</p>
           </div>
         </div>
-
         <div className="space-y-2">
           {PLATFORM_CONNECTIONS.map((conn) => (
             <div
               key={conn.id}
               className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-3 py-2.5"
             >
-              <div className="flex items-center gap-2.5 min-w-0">
+              <div className="flex min-w-0 items-center gap-2.5">
                 {statusDot(conn.status)}
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-slate-800 truncate">{conn.name}</p>
-                  <p className="text-xs text-slate-400 truncate">{conn.url}</p>
+                  <p className="truncate text-sm font-medium text-slate-800">
+                    {conn.name}
+                  </p>
+                  <p className="truncate text-xs text-slate-400">{conn.url}</p>
                 </div>
               </div>
               <div className="ml-3 shrink-0 text-right">
                 <span className="text-xs text-slate-500">
                   {conn.toolCount} {conn.toolCount === 1 ? t.tool : t.tools}
                 </span>
-                <p className="text-xs text-emerald-600 font-medium">{statusLabel(conn.status)}</p>
+                <p className="text-xs font-medium text-emerald-600">
+                  {statusLabel(conn.status)}
+                </p>
               </div>
             </div>
           ))}
         </div>
       </div>
 
+      {/* My Connections */}
       <div>
         <div className="mb-2 flex items-center justify-between">
           <div>
             <p className="text-sm font-semibold text-slate-700">{t.myTitle}</p>
             <p className="text-xs text-slate-400">{t.myDesc}</p>
           </div>
-          <button className="text-xs font-medium text-illini-orange transition-colors hover:text-illini-blue">
-            {t.add}
-          </button>
+          {!showAddForm && (
+            <button
+              onClick={handleOpenAdd}
+              className="text-xs font-medium text-illini-orange transition-colors hover:text-illini-blue"
+            >
+              {t.add}
+            </button>
+          )}
         </div>
 
-        {USER_CONNECTIONS.length === 0 ? (
+        {/* Add Connection Form */}
+        {showAddForm && (
+          <div className="mb-3 rounded-lg border border-slate-200 bg-slate-50 p-4">
+            <p className="mb-3 text-sm font-semibold text-slate-700">
+              {t.addTitle}
+            </p>
+
+            {/* Display Name */}
+            <div className="mb-2.5">
+              <label className="mb-1 block text-xs font-medium text-slate-500">
+                {t.displayName}
+              </label>
+              <input
+                type="text"
+                value={addName}
+                onChange={(e) => setAddName(e.target.value)}
+                placeholder={t.displayNamePlaceholder}
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder-slate-300 focus:border-illini-orange focus:outline-none focus:ring-2 focus:ring-illini-orange/30"
+              />
+            </div>
+
+            {/* Endpoint URL */}
+            <div className="mb-2.5">
+              <label className="mb-1 block text-xs font-medium text-slate-500">
+                {t.endpointUrl}
+              </label>
+              <input
+                type="url"
+                value={addUrl}
+                onChange={(e) => {
+                  setAddUrl(e.target.value);
+                  setTestResult({ state: "idle" });
+                }}
+                placeholder={t.endpointUrlPlaceholder}
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder-slate-300 focus:border-illini-orange focus:outline-none focus:ring-2 focus:ring-illini-orange/30"
+              />
+            </div>
+
+            {/* Description */}
+            <div className="mb-2.5">
+              <label className="mb-1 block text-xs font-medium text-slate-500">
+                {t.description}
+              </label>
+              <input
+                type="text"
+                value={addDesc}
+                onChange={(e) => setAddDesc(e.target.value)}
+                placeholder={t.descriptionPlaceholder}
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder-slate-300 focus:border-illini-orange focus:outline-none focus:ring-2 focus:ring-illini-orange/30"
+              />
+            </div>
+
+            {/* Transport (read-only) */}
+            <div className="mb-3">
+              <label className="mb-1 block text-xs font-medium text-slate-500">
+                {t.transport}
+              </label>
+              <div className="rounded-lg border border-slate-100 bg-white px-3 py-2 text-sm text-slate-400">
+                {t.transportValue}
+              </div>
+              <p className="mt-1 text-[11px] text-slate-400">{t.transportHint}</p>
+            </div>
+
+            {/* Test result message */}
+            {testResult.state === "success" && (
+              <div className="mb-3 flex items-start gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2">
+                <span className="mt-0.5 text-emerald-500">✓</span>
+                <div>
+                  <p className="text-xs font-medium text-emerald-700">
+                    {t.testSuccess}
+                  </p>
+                  <p className="text-xs text-emerald-600">
+                    {t.testSuccessDetailPrefix}: {t.testSuccessOutcome}; {testResult.tools.length}{" "}
+                    {testResult.tools.length === 1 ? t.tool : t.tools} {t.discoveredLabel}.
+                  </p>
+                  <p className="text-xs text-emerald-600">
+                    {testResult.tools.length}{" "}
+                    {testResult.tools.length === 1 ? t.tool : t.tools}:{" "}
+                    {testResult.tools.map((t) => t.name).join(", ")}
+                  </p>
+                </div>
+              </div>
+            )}
+            {testResult.state === "failure" && (
+              <div className="mb-3 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2">
+                <span className="mt-0.5 text-red-500">✕</span>
+                <div>
+                  <p className="text-xs font-medium text-red-700">
+                    {t.testFailure}
+                  </p>
+                  <p className="text-xs font-medium text-red-600">
+                    {t.failureReasonLabel}: <code>{testResult.reason}</code>
+                  </p>
+                  <p className="text-xs text-red-600">
+                    {getFailureReasonDescription(testResult.reason)}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleCancelAdd}
+                className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-200"
+              >
+                {t.cancel}
+              </button>
+              <button
+                onClick={handleTest}
+                disabled={
+                  !addUrl.trim() || testResult.state === "loading"
+                }
+                className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-200 disabled:opacity-40"
+              >
+                {testResult.state === "loading" ? t.testing : t.testConnection}
+              </button>
+              {testResult.state === "success" && (
+                <button
+                  onClick={handleSave}
+                  disabled={!addName.trim() || isSaving}
+                  className="rounded-full bg-illini-orange px-3 py-1 text-xs font-medium text-white transition-colors hover:bg-illini-blue disabled:opacity-40"
+                >
+                  {isSaving ? t.saving : t.saveConnection}
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Empty state */}
+        {userConnections.length === 0 && !showAddForm && (
           <div className="rounded-lg border border-dashed border-slate-200 bg-slate-50 px-4 py-5 text-center">
             <p className="text-sm text-slate-500">{t.emptyState}</p>
             <p className="mt-0.5 text-xs text-slate-400">{t.emptyHint}</p>
           </div>
-        ) : (
+        )}
+
+        {/* User connection cards */}
+        {userConnections.length > 0 && (
           <div className="space-y-2">
-            {USER_CONNECTIONS.map((conn) => (
-              <div
-                key={conn.id}
-                className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-3 py-2.5"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  {statusDot(conn.status)}
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-slate-800 truncate">{conn.name}</p>
-                    <p className="text-xs text-slate-400 truncate">{conn.url}</p>
+            {userConnections.map((conn) => (
+              <div key={conn.id}>
+                {/* Card row */}
+                <button
+                  onClick={() =>
+                    setDetailsId(detailsId === conn.id ? null : conn.id)
+                  }
+                  className="flex w-full items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-3 py-2.5 text-left transition-colors hover:bg-slate-100"
+                >
+                  <div className="flex min-w-0 items-center gap-2.5">
+                    {statusDot(conn.status, !conn.is_enabled)}
+                    <div className="min-w-0">
+                      <p
+                        className={`truncate text-sm font-medium ${conn.is_enabled ? "text-slate-800" : "text-slate-400"}`}
+                      >
+                        {conn.name}
+                      </p>
+                      <p className="truncate text-xs text-slate-400">
+                        {conn.url}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="ml-3 shrink-0 text-right">
-                  <span className="text-xs text-slate-500">
-                    {conn.toolCount} {conn.toolCount === 1 ? t.tool : t.tools}
-                  </span>
-                  <p className="text-xs font-medium" style={{ color: conn.status === "ok" ? "#10b981" : conn.status === "error" ? "#f87171" : "#94a3b8" }}>
-                    {statusLabel(conn.status)}
-                  </p>
-                </div>
+                  <div className="ml-3 flex shrink-0 items-center gap-2">
+                    <div className="text-right">
+                      <span className="text-xs text-slate-500">
+                        {toolCount(conn)}{" "}
+                        {toolCount(conn) === 1 ? t.tool : t.tools}
+                      </span>
+                      <p
+                        className={`text-xs font-medium ${conn.is_enabled ? "text-emerald-600" : "text-slate-400"}`}
+                      >
+                        {conn.is_enabled ? statusLabel(conn.status) : t.disabled}
+                      </p>
+                    </div>
+                    <span className="text-slate-300">
+                      {detailsId === conn.id ? "▲" : "▼"}
+                    </span>
+                  </div>
+                </button>
+
+                {/* Details panel (inline expansion) */}
+                {detailsId === conn.id && (
+                  <div className="mt-1 rounded-lg border border-slate-200 bg-white p-4">
+                    <div className="mb-3 flex items-center justify-between">
+                      <p className="text-sm font-semibold text-slate-700">
+                        {t.detailsTitle}
+                      </p>
+                      <button
+                        onClick={() => setDetailsId(null)}
+                        className="text-xs text-slate-400 hover:text-slate-600"
+                      >
+                        {t.close}
+                      </button>
+                    </div>
+
+                    {/* Meta */}
+                    <div className="mb-3 space-y-1.5 rounded-lg border border-slate-100 bg-slate-50 px-3 py-2.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-slate-400">
+                          {t.connectionName}
+                        </span>
+                        <span className="text-xs font-medium text-slate-700">
+                          {conn.name}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-slate-400">
+                          {t.connectionUrl}
+                        </span>
+                        <span className="max-w-[180px] truncate text-xs text-slate-500">
+                          {conn.url}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-slate-400">
+                          {t.connectionStatus}
+                        </span>
+                        <span className="flex items-center gap-1.5 text-xs font-medium text-slate-700">
+                          {statusDot(conn.status)}
+                          {statusLabel(conn.status)}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Enable/disable toggle */}
+                    <div className="mb-3 flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-3 py-2.5">
+                      <span className="text-xs font-medium text-slate-600">
+                        {t.enableConnection}
+                      </span>
+                      <button
+                        onClick={() => handleToggleConnection(conn.id)}
+                        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${conn.is_enabled ? "bg-illini-orange" : "bg-slate-200"}`}
+                        role="switch"
+                        aria-checked={conn.is_enabled}
+                      >
+                        <span
+                          className={`inline-block size-3.5 rounded-full bg-white shadow transition-transform ${conn.is_enabled ? "translate-x-4" : "translate-x-1"}`}
+                        />
+                      </button>
+                    </div>
+
+                    {/* Discovered tools */}
+                    <div className="mb-3">
+                      <p className="mb-1.5 text-xs font-semibold text-slate-500">
+                        {t.discoveredTools}
+                      </p>
+                      <div className="space-y-1.5">
+                        {conn.tools.map((tool) => (
+                          <div
+                            key={tool.name}
+                            className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-3 py-2"
+                          >
+                            <div className="min-w-0">
+                              <p
+                                className={`text-xs font-medium ${tool.enabled ? "text-slate-700" : "text-slate-400 line-through"}`}
+                              >
+                                {tool.name}
+                              </p>
+                              <p className="truncate text-xs text-slate-400">
+                                {tool.description}
+                              </p>
+                            </div>
+                            <button
+                              onClick={() =>
+                                handleToggleTool(conn.id, tool.name)
+                              }
+                              className={`ml-3 shrink-0 relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${tool.enabled ? "bg-illini-orange" : "bg-slate-200"}`}
+                              role="switch"
+                              aria-checked={tool.enabled}
+                            >
+                              <span
+                                className={`inline-block size-3.5 rounded-full bg-white shadow transition-transform ${tool.enabled ? "translate-x-4" : "translate-x-1"}`}
+                              />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Action buttons */}
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        onClick={() => void handleTestAgain(conn.id)}
+                        className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-200"
+                      >
+                        {t.testAgain}
+                      </button>
+                      <button
+                        onClick={() => void handleRefreshDiscovery(conn.id)}
+                        className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-200"
+                      >
+                        {t.refreshDiscovery}
+                      </button>
+                      <button
+                        onClick={() => void handleDelete(conn.id)}
+                        className="rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-500 transition-colors hover:bg-red-100"
+                      >
+                        {t.deleteConnection}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
