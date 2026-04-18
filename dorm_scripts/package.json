@@ -1,0 +1,15 @@
+{
+  "name": "dorm-scripts",
+  "version": "1.0.0",
+  "description": "Isolated dorm review generation and scraping scripts for iGuide",
+  "type": "commonjs",
+  "scripts": {
+    "scrape:pch": "node scrapePCHMaps.cjs",
+    "scrape:missing": "node scrapeMissing2.cjs"
+  },
+  "dependencies": {
+    "puppeteer": "^24.41.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  }
+}
