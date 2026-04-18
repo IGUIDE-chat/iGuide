@@ -55,9 +55,11 @@ const MOCK_TOOLS = [
   { name: "get_events", description: "Get campus events" },
 ];
 
-async function mockTestConnection(
-  url: string
-): Promise<{ ok: boolean; tools?: typeof MOCK_TOOLS; reason?: MockFailureReason }> {
+async function mockTestConnection(url: string): Promise<{
+  ok: boolean;
+  tools?: typeof MOCK_TOOLS;
+  reason?: MockFailureReason;
+}> {
   await new Promise((r) => setTimeout(r, 1500));
   const normalizedUrl = url.toLowerCase();
   if (normalizedUrl.includes("auth") || normalizedUrl.includes("private")) {
@@ -181,14 +183,16 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
       testFailure: "Connection test blocked",
       failureReasonLabel: "Failure reason",
       failureReasonDescriptions: {
-        unreachable: "The endpoint could not be reached from the current network path.",
+        unreachable:
+          "The endpoint could not be reached from the current network path.",
         auth_required:
           "The endpoint appears to require credentials, which phase 1 intentionally does not support.",
         invalid_mcp_response:
           "The server responded, but not with a valid MCP tool-discovery payload.",
         no_tools_discovered:
           "The server responded without any discoverable tools.",
-        timeout: "The endpoint did not respond before the phase-1 timeout budget.",
+        timeout:
+          "The endpoint did not respond before the phase-1 timeout budget.",
         unsupported_transport:
           "This looks like a non-Streamable HTTP endpoint, which phase 1 blocks.",
         unknown: "The endpoint failed for an uncategorized reason.",
@@ -254,10 +258,12 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
       failureReasonDescriptions: {
         unreachable: "当前网络路径无法访问该端点。",
         auth_required: "该端点似乎需要凭证，而第一阶段刻意不支持此能力。",
-        invalid_mcp_response: "服务器有响应，但返回的不是有效的 MCP 工具发现结果。",
+        invalid_mcp_response:
+          "服务器有响应，但返回的不是有效的 MCP 工具发现结果。",
         no_tools_discovered: "服务器响应成功，但没有发现任何工具。",
         timeout: "该端点在第一阶段的超时预算内没有完成响应。",
-        unsupported_transport: "这看起来不是 Streamable HTTP 端点，因此会被第一阶段拦截。",
+        unsupported_transport:
+          "这看起来不是 Streamable HTTP 端点，因此会被第一阶段拦截。",
         unknown: "该端点因未分类原因失败。",
       },
       saveConnection: "保存连接",
@@ -287,16 +293,29 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
     if (status === "ok")
       return (
         <span
-          className={`${base} ${dimmed ? "bg-emerald-300" : "bg-emerald-400"}`}
+          className={`
+            ${base}
+            ${dimmed ? "bg-emerald-300" : "bg-emerald-400"}
+          `}
         />
       );
     if (status === "error")
       return (
         <span
-          className={`${base} ${dimmed ? "bg-red-300" : "bg-red-400"}`}
+          className={`
+            ${base}
+            ${dimmed ? "bg-red-300" : "bg-red-400"}
+          `}
         />
       );
-    return <span className={`${base} bg-slate-300`} />;
+    return (
+      <span
+        className={`
+          ${base}
+          bg-slate-300
+        `}
+      />
+    );
   };
 
   const statusLabel = (status: "ok" | "error" | "unknown") => {
@@ -353,13 +372,11 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
 
   // ── Details panel handlers ─────────────────────────────────────────────────
 
-  const detailsConn = userConnections.find((c) => c.id === detailsId) ?? null;
+  const _detailsConn = userConnections.find((c) => c.id === detailsId) ?? null;
 
   const handleToggleConnection = (id: string) => {
     setUserConnections((prev) =>
-      prev.map((c) =>
-        c.id === id ? { ...c, is_enabled: !c.is_enabled } : c
-      )
+      prev.map((c) => (c.id === id ? { ...c, is_enabled: !c.is_enabled } : c))
     );
   };
 
@@ -387,9 +404,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
     const result = await mockTestConnection(conn.url);
     setUserConnections((prev) =>
       prev.map((c) =>
-        c.id === id
-          ? { ...c, status: result.ok ? "ok" : "error" }
-          : c
+        c.id === id ? { ...c, status: result.ok ? "ok" : "error" } : c
       )
     );
   };
@@ -423,18 +438,28 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
-    <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      <h3 className="mb-4 flex items-center gap-2 text-base font-bold text-slate-900">
+    <div
+      className="
+        mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm
+      "
+    >
+      <h3
+        className="
+          mb-4 flex items-center gap-2 text-base font-bold text-slate-900
+        "
+      >
         <span>🔌</span> {t.title}
       </h3>
 
       {/* Banner */}
-      <div className="mb-5 rounded-lg border border-amber-200 bg-amber-50 px-3 py-3">
+      <div className="mb-5 rounded-lg border border-amber-200 bg-amber-50 p-3">
         <div className="mb-1.5 flex items-start gap-2">
           <span className="mt-0.5 shrink-0 text-amber-500">⚠️</span>
-          <p className="text-xs font-semibold text-amber-800">{t.bannerTitle}</p>
+          <p className="text-xs font-semibold text-amber-800">
+            {t.bannerTitle}
+          </p>
         </div>
-        <ul className="list-disc space-y-1 pl-6 text-xs leading-relaxed text-amber-700">
+        <ul className="list-disc space-y-1 pl-6 text-xs/relaxed text-amber-700">
           {t.bannerBullets.map((bullet) => (
             <li key={bullet}>{bullet}</li>
           ))}
@@ -455,7 +480,10 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
           {PLATFORM_CONNECTIONS.map((conn) => (
             <div
               key={conn.id}
-              className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-3 py-2.5"
+              className="
+                flex items-center justify-between rounded-lg border
+                border-slate-100 bg-slate-50 px-3 py-2.5
+              "
             >
               <div className="flex min-w-0 items-center gap-2.5">
                 {statusDot(conn.status)}
@@ -489,7 +517,10 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
           {!showAddForm && (
             <button
               onClick={handleOpenAdd}
-              className="text-xs font-medium text-illini-orange transition-colors hover:text-illini-blue"
+              className="
+                text-xs font-medium text-illini-orange transition-colors
+                hover:text-illini-blue
+              "
             >
               {t.add}
             </button>
@@ -513,7 +544,12 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                 value={addName}
                 onChange={(e) => setAddName(e.target.value)}
                 placeholder={t.displayNamePlaceholder}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder-slate-300 focus:border-illini-orange focus:outline-none focus:ring-2 focus:ring-illini-orange/30"
+                className="
+                  w-full rounded-lg border border-slate-200 bg-white px-3 py-2
+                  text-sm text-slate-700 placeholder-slate-300
+                  focus:border-illini-orange focus:ring-2
+                  focus:ring-illini-orange/30 focus:outline-none
+                "
               />
             </div>
 
@@ -530,7 +566,12 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                   setTestResult({ state: "idle" });
                 }}
                 placeholder={t.endpointUrlPlaceholder}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder-slate-300 focus:border-illini-orange focus:outline-none focus:ring-2 focus:ring-illini-orange/30"
+                className="
+                  w-full rounded-lg border border-slate-200 bg-white px-3 py-2
+                  text-sm text-slate-700 placeholder-slate-300
+                  focus:border-illini-orange focus:ring-2
+                  focus:ring-illini-orange/30 focus:outline-none
+                "
               />
             </div>
 
@@ -544,7 +585,12 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                 value={addDesc}
                 onChange={(e) => setAddDesc(e.target.value)}
                 placeholder={t.descriptionPlaceholder}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder-slate-300 focus:border-illini-orange focus:outline-none focus:ring-2 focus:ring-illini-orange/30"
+                className="
+                  w-full rounded-lg border border-slate-200 bg-white px-3 py-2
+                  text-sm text-slate-700 placeholder-slate-300
+                  focus:border-illini-orange focus:ring-2
+                  focus:ring-illini-orange/30 focus:outline-none
+                "
               />
             </div>
 
@@ -553,23 +599,37 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
               <label className="mb-1 block text-xs font-medium text-slate-500">
                 {t.transport}
               </label>
-              <div className="rounded-lg border border-slate-100 bg-white px-3 py-2 text-sm text-slate-400">
+              <div
+                className="
+                  rounded-lg border border-slate-100 bg-white px-3 py-2 text-sm
+                  text-slate-400
+                "
+              >
                 {t.transportValue}
               </div>
-              <p className="mt-1 text-[11px] text-slate-400">{t.transportHint}</p>
+              <p className="mt-1 text-[11px] text-slate-400">
+                {t.transportHint}
+              </p>
             </div>
 
             {/* Test result message */}
             {testResult.state === "success" && (
-              <div className="mb-3 flex items-start gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2">
+              <div
+                className="
+                  mb-3 flex items-start gap-2 rounded-lg border
+                  border-emerald-200 bg-emerald-50 px-3 py-2
+                "
+              >
                 <span className="mt-0.5 text-emerald-500">✓</span>
                 <div>
                   <p className="text-xs font-medium text-emerald-700">
                     {t.testSuccess}
                   </p>
                   <p className="text-xs text-emerald-600">
-                    {t.testSuccessDetailPrefix}: {t.testSuccessOutcome}; {testResult.tools.length}{" "}
-                    {testResult.tools.length === 1 ? t.tool : t.tools} {t.discoveredLabel}.
+                    {t.testSuccessDetailPrefix}: {t.testSuccessOutcome};{" "}
+                    {testResult.tools.length}{" "}
+                    {testResult.tools.length === 1 ? t.tool : t.tools}{" "}
+                    {t.discoveredLabel}.
                   </p>
                   <p className="text-xs text-emerald-600">
                     {testResult.tools.length}{" "}
@@ -580,7 +640,12 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
               </div>
             )}
             {testResult.state === "failure" && (
-              <div className="mb-3 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2">
+              <div
+                className="
+                  mb-3 flex items-start gap-2 rounded-lg border border-red-200
+                  bg-red-50 px-3 py-2
+                "
+              >
                 <span className="mt-0.5 text-red-500">✕</span>
                 <div>
                   <p className="text-xs font-medium text-red-700">
@@ -600,16 +665,23 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
             <div className="flex items-center gap-2">
               <button
                 onClick={handleCancelAdd}
-                className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-200"
+                className="
+                  rounded-full bg-slate-100 px-3 py-1 text-xs font-medium
+                  text-slate-500 transition-colors
+                  hover:bg-slate-200
+                "
               >
                 {t.cancel}
               </button>
               <button
                 onClick={handleTest}
-                disabled={
-                  !addUrl.trim() || testResult.state === "loading"
-                }
-                className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-200 disabled:opacity-40"
+                disabled={!addUrl.trim() || testResult.state === "loading"}
+                className="
+                  rounded-full bg-slate-100 px-3 py-1 text-xs font-medium
+                  text-slate-600 transition-colors
+                  hover:bg-slate-200
+                  disabled:opacity-40
+                "
               >
                 {testResult.state === "loading" ? t.testing : t.testConnection}
               </button>
@@ -617,7 +689,12 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                 <button
                   onClick={handleSave}
                   disabled={!addName.trim() || isSaving}
-                  className="rounded-full bg-illini-orange px-3 py-1 text-xs font-medium text-white transition-colors hover:bg-illini-blue disabled:opacity-40"
+                  className="
+                    rounded-full bg-illini-orange px-3 py-1 text-xs font-medium
+                    text-white transition-colors
+                    hover:bg-illini-blue
+                    disabled:opacity-40
+                  "
                 >
                   {isSaving ? t.saving : t.saveConnection}
                 </button>
@@ -628,7 +705,12 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
 
         {/* Empty state */}
         {userConnections.length === 0 && !showAddForm && (
-          <div className="rounded-lg border border-dashed border-slate-200 bg-slate-50 px-4 py-5 text-center">
+          <div
+            className="
+              rounded-lg border border-dashed border-slate-200 bg-slate-50 px-4
+              py-5 text-center
+            "
+          >
             <p className="text-sm text-slate-500">{t.emptyState}</p>
             <p className="mt-0.5 text-xs text-slate-400">{t.emptyHint}</p>
           </div>
@@ -644,13 +726,20 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                   onClick={() =>
                     setDetailsId(detailsId === conn.id ? null : conn.id)
                   }
-                  className="flex w-full items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-3 py-2.5 text-left transition-colors hover:bg-slate-100"
+                  className="
+                    flex w-full items-center justify-between rounded-lg border
+                    border-slate-100 bg-slate-50 px-3 py-2.5 text-left
+                    transition-colors
+                    hover:bg-slate-100
+                  "
                 >
                   <div className="flex min-w-0 items-center gap-2.5">
                     {statusDot(conn.status, !conn.is_enabled)}
                     <div className="min-w-0">
                       <p
-                        className={`truncate text-sm font-medium ${conn.is_enabled ? "text-slate-800" : "text-slate-400"}`}
+                        className={`
+                          truncate text-sm font-medium
+                          ${conn.is_enabled ? "text-slate-800" : "text-slate-400"}`}
                       >
                         {conn.name}
                       </p>
@@ -666,9 +755,13 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                         {toolCount(conn) === 1 ? t.tool : t.tools}
                       </span>
                       <p
-                        className={`text-xs font-medium ${conn.is_enabled ? "text-emerald-600" : "text-slate-400"}`}
+                        className={`
+                          text-xs font-medium
+                          ${conn.is_enabled ? "text-emerald-600" : "text-slate-400"}`}
                       >
-                        {conn.is_enabled ? statusLabel(conn.status) : t.disabled}
+                        {conn.is_enabled
+                          ? statusLabel(conn.status)
+                          : t.disabled}
                       </p>
                     </div>
                     <span className="text-slate-300">
@@ -679,21 +772,33 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
 
                 {/* Details panel (inline expansion) */}
                 {detailsId === conn.id && (
-                  <div className="mt-1 rounded-lg border border-slate-200 bg-white p-4">
+                  <div
+                    className="
+                      mt-1 rounded-lg border border-slate-200 bg-white p-4
+                    "
+                  >
                     <div className="mb-3 flex items-center justify-between">
                       <p className="text-sm font-semibold text-slate-700">
                         {t.detailsTitle}
                       </p>
                       <button
                         onClick={() => setDetailsId(null)}
-                        className="text-xs text-slate-400 hover:text-slate-600"
+                        className="
+                          text-xs text-slate-400
+                          hover:text-slate-600
+                        "
                       >
                         {t.close}
                       </button>
                     </div>
 
                     {/* Meta */}
-                    <div className="mb-3 space-y-1.5 rounded-lg border border-slate-100 bg-slate-50 px-3 py-2.5">
+                    <div
+                      className="
+                        mb-3 space-y-1.5 rounded-lg border border-slate-100
+                        bg-slate-50 px-3 py-2.5
+                      "
+                    >
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-slate-400">
                           {t.connectionName}
@@ -706,7 +811,11 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                         <span className="text-xs text-slate-400">
                           {t.connectionUrl}
                         </span>
-                        <span className="max-w-[180px] truncate text-xs text-slate-500">
+                        <span
+                          className="
+                            max-w-[180px] truncate text-xs text-slate-500
+                          "
+                        >
                           {conn.url}
                         </span>
                       </div>
@@ -714,7 +823,12 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                         <span className="text-xs text-slate-400">
                           {t.connectionStatus}
                         </span>
-                        <span className="flex items-center gap-1.5 text-xs font-medium text-slate-700">
+                        <span
+                          className="
+                            flex items-center gap-1.5 text-xs font-medium
+                            text-slate-700
+                          "
+                        >
                           {statusDot(conn.status)}
                           {statusLabel(conn.status)}
                         </span>
@@ -722,18 +836,29 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                     </div>
 
                     {/* Enable/disable toggle */}
-                    <div className="mb-3 flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-3 py-2.5">
+                    <div
+                      className="
+                        mb-3 flex items-center justify-between rounded-lg border
+                        border-slate-100 bg-slate-50 px-3 py-2.5
+                      "
+                    >
                       <span className="text-xs font-medium text-slate-600">
                         {t.enableConnection}
                       </span>
                       <button
                         onClick={() => handleToggleConnection(conn.id)}
-                        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${conn.is_enabled ? "bg-illini-orange" : "bg-slate-200"}`}
+                        className={`
+                          relative inline-flex h-5 w-9 items-center rounded-full
+                          transition-colors
+                          ${conn.is_enabled ? "bg-illini-orange" : "bg-slate-200"}`}
                         role="switch"
                         aria-checked={conn.is_enabled}
                       >
                         <span
-                          className={`inline-block size-3.5 rounded-full bg-white shadow transition-transform ${conn.is_enabled ? "translate-x-4" : "translate-x-1"}`}
+                          className={`
+                            inline-block size-3.5 rounded-full bg-white
+                            shadow-sm transition-transform
+                            ${conn.is_enabled ? "translate-x-4" : "translate-x-1"}`}
                         />
                       </button>
                     </div>
@@ -747,11 +872,16 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                         {conn.tools.map((tool) => (
                           <div
                             key={tool.name}
-                            className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-3 py-2"
+                            className="
+                              flex items-center justify-between rounded-lg
+                              border border-slate-100 bg-slate-50 px-3 py-2
+                            "
                           >
                             <div className="min-w-0">
                               <p
-                                className={`text-xs font-medium ${tool.enabled ? "text-slate-700" : "text-slate-400 line-through"}`}
+                                className={`
+                                  text-xs font-medium
+                                  ${tool.enabled ? "text-slate-700" : "text-slate-400 line-through"}`}
                               >
                                 {tool.name}
                               </p>
@@ -763,12 +893,18 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                               onClick={() =>
                                 handleToggleTool(conn.id, tool.name)
                               }
-                              className={`ml-3 shrink-0 relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${tool.enabled ? "bg-illini-orange" : "bg-slate-200"}`}
+                              className={`
+                                relative ml-3 inline-flex h-5 w-9 shrink-0
+                                items-center rounded-full transition-colors
+                                ${tool.enabled ? "bg-illini-orange" : "bg-slate-200"}`}
                               role="switch"
                               aria-checked={tool.enabled}
                             >
                               <span
-                                className={`inline-block size-3.5 rounded-full bg-white shadow transition-transform ${tool.enabled ? "translate-x-4" : "translate-x-1"}`}
+                                className={`
+                                  inline-block size-3.5 rounded-full bg-white
+                                  shadow-sm transition-transform
+                                  ${tool.enabled ? "translate-x-4" : "translate-x-1"}`}
                               />
                             </button>
                           </div>
@@ -780,19 +916,31 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                     <div className="flex flex-wrap gap-2">
                       <button
                         onClick={() => void handleTestAgain(conn.id)}
-                        className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-200"
+                        className="
+                          rounded-full bg-slate-100 px-3 py-1 text-xs
+                          font-medium text-slate-500 transition-colors
+                          hover:bg-slate-200
+                        "
                       >
                         {t.testAgain}
                       </button>
                       <button
                         onClick={() => void handleRefreshDiscovery(conn.id)}
-                        className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-200"
+                        className="
+                          rounded-full bg-slate-100 px-3 py-1 text-xs
+                          font-medium text-slate-500 transition-colors
+                          hover:bg-slate-200
+                        "
                       >
                         {t.refreshDiscovery}
                       </button>
                       <button
                         onClick={() => void handleDelete(conn.id)}
-                        className="rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-500 transition-colors hover:bg-red-100"
+                        className="
+                          rounded-full bg-red-50 px-3 py-1 text-xs font-medium
+                          text-red-500 transition-colors
+                          hover:bg-red-100
+                        "
                       >
                         {t.deleteConnection}
                       </button>
