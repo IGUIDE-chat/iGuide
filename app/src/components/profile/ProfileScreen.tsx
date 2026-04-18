@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { Language } from "../../types";
 import { memoryService } from "../../services/memoryService";
+import { IntegrationsSection } from "./IntegrationsSection";
 
 interface ProfileScreenProps {
   language: Language;
@@ -483,6 +484,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             </div>
           )}
         </div>
+
+        <IntegrationsSection language={language} />
 
         {/* Actions */}
         <button
