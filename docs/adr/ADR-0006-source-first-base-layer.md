@@ -169,4 +169,4 @@ The source-first base layer therefore remains the grounding substrate even when 
 - `docs/adr/ADR-0005-course-domain.md`
 - `docs/adr/ADR-0007-supabase-hybrid-retrieval-and-migration.md`
 - `README.md`
-- `docs/development/db-schema-v1.md`
+- `docs/database/db-schema-v1.md`

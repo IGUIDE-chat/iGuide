@@ -102,7 +102,7 @@ These facets should exist both as structured payload and as rendered searchable 
 - User behavior shows that important course questions are still too hard to answer accurately with the two-level model.
 
 ## Related
-- `docs/development/db-schema-v1.md`
+- `docs/database/db-schema-v1.md`
 - `app/src/pages/courses/CoursesLandingPage.tsx`
 - `app/src/data/articles/registration101.ts`
 - `api/src/tools/search-knowledge-base.ts`

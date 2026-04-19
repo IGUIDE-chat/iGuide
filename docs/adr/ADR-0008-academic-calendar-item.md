@@ -160,4 +160,4 @@ If future product requirements need that level of workflow or policy logic, they
 - `docs/adr/ADR-0006-source-first-base-layer.md`
 - `docs/adr/ADR-0007-supabase-hybrid-retrieval-and-migration.md`
 - `README.md`
-- `docs/development/db-schema-v1.md`
+- `docs/database/db-schema-v1.md`

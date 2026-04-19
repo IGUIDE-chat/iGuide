@@ -168,4 +168,4 @@ If future product requirements need that level of housing workflow or inventory 
 - `docs/adr/ADR-0008-academic-calendar-item.md`
 - `docs/adr/ADR-0009-location-or-service.md`
 - `README.md`
-- `docs/development/db-schema-v1.md`
+- `docs/database/db-schema-v1.md`
