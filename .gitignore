@@ -1,17 +1,18 @@
 # agent configuration
-.agent/
-.gemini/
-.cursor/
-.codebuddy/
-.codex/
-.claude/
-.agents/
+.agent
+.gemini
+.cursor
+.codebuddy
+.codex
+.claude
+.agents
 
 # agent generated files
 .learnings
 .sisyphus
 .superpowers
 docs/superpowers
+.playwright-mcp
 
 # system Files
 .DS_Store
