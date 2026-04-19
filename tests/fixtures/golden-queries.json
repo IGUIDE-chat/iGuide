@@ -1,0 +1,86 @@
+[
+  {
+    "query": "CS 225 data structures",
+    "expected_domain": "course",
+    "expected_object_types": ["course"],
+    "expected_keywords": ["CS", "225", "data structures", "computer science"],
+    "freshness_class": "stable"
+  },
+  {
+    "query": "courses with prerequisite MATH 241",
+    "expected_domain": "course",
+    "expected_object_types": ["course"],
+    "expected_keywords": ["MATH", "241", "prerequisite", "calculus"],
+    "freshness_class": "stable"
+  },
+  {
+    "query": "Fall 2025 ECE offerings",
+    "expected_domain": "course",
+    "expected_object_types": ["course", "course_offering"],
+    "expected_keywords": ["ECE", "Fall 2025", "electrical", "computer engineering"],
+    "freshness_class": "semi_volatile"
+  },
+  {
+    "query": "dorms with single rooms near dining",
+    "expected_domain": "housing",
+    "expected_object_types": ["housing"],
+    "expected_keywords": ["dorm", "single room", "dining", "residence hall"],
+    "freshness_class": "semi_volatile"
+  },
+  {
+    "query": "Nugent Hall room types and amenities",
+    "expected_domain": "housing",
+    "expected_object_types": ["housing"],
+    "expected_keywords": ["Nugent Hall", "room type", "amenity", "UIUC"],
+    "freshness_class": "semi_volatile"
+  },
+  {
+    "query": "where can I print on campus",
+    "expected_domain": "location",
+    "expected_object_types": ["location_or_service"],
+    "expected_keywords": ["print", "campus", "library", "printing"],
+    "freshness_class": "semi_volatile"
+  },
+  {
+    "query": "Siebel Center hours and location",
+    "expected_domain": "location",
+    "expected_object_types": ["location_or_service"],
+    "expected_keywords": ["Siebel Center", "hours", "location", "ECE"],
+    "freshness_class": "semi_volatile"
+  },
+  {
+    "query": "when does Fall 2025 semester start",
+    "expected_domain": "calendar",
+    "expected_object_types": ["academic_calendar_item"],
+    "expected_keywords": ["Fall 2025", "semester", "start", "calendar"],
+    "freshness_class": "stable"
+  },
+  {
+    "query": "add drop deadline Fall 2025",
+    "expected_domain": "calendar",
+    "expected_object_types": ["academic_calendar_item"],
+    "expected_keywords": ["add drop", "deadline", "Fall 2025", "registration"],
+    "freshness_class": "stable"
+  },
+  {
+    "query": "CPT application process",
+    "expected_domain": "general",
+    "expected_object_types": [],
+    "expected_keywords": ["CPT", "application", "process", "OPT", "work authorization"],
+    "freshness_class": "stable"
+  },
+  {
+    "query": "new student orientation schedule",
+    "expected_domain": "general",
+    "expected_object_types": [],
+    "expected_keywords": ["orientation", "new student", "schedule", "arrival"],
+    "freshness_class": "semi_volatile"
+  },
+  {
+    "query": "campus dining options and hours",
+    "expected_domain": "general",
+    "expected_object_types": [],
+    "expected_keywords": ["dining", "food", "hours", "campus", "restaurant"],
+    "freshness_class": "volatile"
+  }
+]
