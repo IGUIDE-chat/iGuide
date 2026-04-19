@@ -41,7 +41,7 @@
 
 ### 1. 因为 source-layer 才是事实底座
 
-在 A1 模型里，source-layer 负责：
+在双层数据模型里，source-layer 负责：
 
 - 来源身份
 - 抓取/同步版本

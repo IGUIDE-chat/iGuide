@@ -54,7 +54,7 @@ The accepted architecture has three behavior layers:
 2. **Source-first for most campus information**
 3. **Freshness-aware routing for volatile domains**
 
-These layers sit on top of a strict A1 source-first base model:
+These layers sit on top of a strict four-layer source-first base model:
 
 ```text
 sources -> source_snapshots -> artifacts -> chunks
@@ -105,7 +105,7 @@ Examples include:
 - procedural pages
 - general narrative content
 
-These domains do not need first-class object models by default. They should enter through the A1 source pipeline and become searchable via artifact/chunk indexing.
+These domains do not need first-class object models by default. They should enter through the four-layer source pipeline and become searchable via artifact/chunk indexing.
 
 ---
 
@@ -157,7 +157,7 @@ not the default first source for “latest/current” answers.
 
 ---
 
-## A1 Source-First Base Model
+## Four-Layer Source-First Base Model
 
 The source layer is the canonical persistence shape for source-derived knowledge.
 
@@ -575,13 +575,13 @@ The repo already contains:
 This means the migration does not require inventing hybrid retrieval from scratch. Instead, the likely path is:
 
 1. keep the current Supabase retrieval substrate active
-2. evolve ingestion around the A1 source model
+2. evolve ingestion around the source-first base model
 3. map searchable artifacts/chunks into the retrieval substrate
 4. gradually improve ranking, filtering, provenance, and parity behavior
 
 ### Likely convergence target
 
-Over time, the retrieval path should evolve from today’s flatter `documents/document_chunks` model toward an A1-grounded source lineage where:
+Over time, the retrieval path should evolve from today’s flatter `documents/document_chunks` model toward a source-grounded lineage where:
 
 - object-first records point to source evidence
 - searchable source artifacts map cleanly into retrieval chunks
@@ -666,17 +666,17 @@ So the v2 design chooses **assistant-oriented structure**, not administrative co
 1. **Preserve ADR-aligned naming and boundaries**
    - do not re-expand object-first domains
 
-2. **Implement A1 source tables first**
+2. **Implement source-first base tables first**
    - `sources`
    - `source_snapshots`
    - `artifacts`
    - `chunks`
 
-3. **Bridge current retrieval to A1 lineage**
+3. **Bridge current retrieval to source lineage**
    - map searchable artifacts/chunks into Supabase retrieval
    - retain parity checks against QMD while needed
 
-4. **Implement object-first tables against A1 grounding**
+4. **Implement object-first tables against source grounding**
    - `course`
    - `course_offering`
    - `academic_calendar_item`

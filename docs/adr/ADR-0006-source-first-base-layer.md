@@ -23,7 +23,7 @@ The source layer also needs to support heterogeneous inputs such as webpages, RS
 The main design pressure is not relational elegance. The design standard is that the model must be able to obtain a precise, complete, and explainable index through tools, while the data layer remains portable across schools and robust to uneven source quality.
 
 ## Decision
-Adopt **A1: a strict four-layer source-first base model** as the canonical persistence shape for source-derived knowledge:
+Adopt **a strict four-layer source-first base model** as the canonical persistence shape for source-derived knowledge:
 
 1. **`sources`** — source definition and default retrieval/freshness policy
 2. **`source_snapshots`** — time-versioned captures of a source

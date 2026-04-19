@@ -54,7 +54,7 @@
 2. **大多数校园信息使用 source-first**
 3. **针对易变领域使用 freshness-aware routing**
 
-这三层建立在严格的 A1 source-first base model 之上：
+这三层建立在严格的四层 source-first 基础模型之上：
 
 ```text
 sources -> source_snapshots -> artifacts -> chunks
@@ -105,7 +105,7 @@ sources -> source_snapshots -> artifacts -> chunks
 - procedural pages
 - 一般性叙述内容
 
-这些领域默认不需要 first-class object model。它们应通过 A1 source pipeline 进入系统，并通过 artifact/chunk 索引变得可搜索。
+这些领域默认不需要 first-class object model。它们应通过四层 source pipeline 进入系统，并通过 artifact/chunk 索引变得可搜索。
 
 ---
 
@@ -157,7 +157,7 @@ sources -> source_snapshots -> artifacts -> chunks
 
 ---
 
-## A1 Source-First Base Model
+## 四层 Source-First 基础模型
 
 source 层是所有 source-derived knowledge 的**规范持久化形态**。
 
@@ -575,13 +575,13 @@ repo 中已经存在：
 这意味着迁移不需要从零发明 hybrid retrieval。更可能的路径是：
 
 1. 保持当前 Supabase retrieval substrate 继续可用
-2. 围绕 A1 source model 演进 ingestion
+2. 围绕 source-first 基础模型演进 ingestion
 3. 把 searchable artifacts/chunks 映射进 retrieval substrate
 4. 逐步提升 ranking、filtering、provenance 与 parity 行为
 
 ### 可能的收敛目标
 
-随着时间推移，retrieval path 应从今天更扁平的 `documents/document_chunks` 模型演进到一个基于 A1 的 source lineage 形态，在该形态中：
+随着时间推移，retrieval path 应从今天更扁平的 `documents/document_chunks` 模型演进到一种 source-grounded lineage 形态，在该形态中：
 
 - object-first 记录会指向 source evidence
 - searchable source artifacts 可以干净地映射到 retrieval chunks
@@ -666,17 +666,17 @@ repo 中已经存在：
 1. **保持 ADR 对齐的命名与边界**
    - 不要重新把 object-first 领域做大做重
 
-2. **先实现 A1 source tables**
+2. **先实现 source-first 基础表**
    - `sources`
    - `source_snapshots`
    - `artifacts`
    - `chunks`
 
-3. **把当前 retrieval bridge 到 A1 lineage**
+3. **把当前 retrieval bridge 到 source lineage**
    - 把 searchable artifacts/chunks 映射进 Supabase retrieval
    - 在需要时继续保留与 QMD 的 parity checks
 
-4. **在 A1 grounding 之上实现 object-first tables**
+4. **在 source grounding 之上实现 object-first tables**
    - `course`
    - `course_offering`
    - `academic_calendar_item`

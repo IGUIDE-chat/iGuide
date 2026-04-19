@@ -3,7 +3,7 @@
 ## TL;DR
 
 - **不需要重写现有爬虫。**
-- 现阶段应把 `raw_crawl.jsonl` 视为接入 A1 source-first 模型的**主入口**。
+- 现阶段应把 `raw_crawl.jsonl` 视为接入 source-first 基础模型的**主入口**。
 - `uiuc_knowledge_base/**/*.md` 应视为**派生 artifact**，而不是主事实源。
 - `crawl_state.json`、`pending_queue.json`、`blacklist.txt` 继续作为爬虫运行状态或 snapshot 元数据存在，不进入核心检索模型。
 - **PageRank 不再进入新核心模型。**我们不是搜索引擎，PageRank 不适合作为 AI 助手检索的核心信号。
@@ -34,9 +34,9 @@
 
 ---
 
-## A1 模型下应该如何理解这些输出
+## 在 source-first 基础模型下应该如何理解这些输出
 
-在 A1 source-first base layer 里，我们建议把现有爬虫输出理解成下面四层：
+在四层 source-first 基础层里，我们建议把现有爬虫输出理解成下面四层：
 
 ### 1. source
 
@@ -89,7 +89,7 @@
 
 ## 旧输出到新模型的映射
 
-| 现有产物 | 在 A1 中的定位 | 建议 |
+| 现有产物 | 在 source-first 基础模型中的定位 | 建议 |
 |---|---|---|
 | `raw_crawl.jsonl` | 主 artifact 输入锚点 | **保留并作为主入口** |
 | `raw_crawl.jsonl.url/title/content/links/timestamp` | artifact + snapshot 基础字段 | **保留** |
@@ -153,7 +153,7 @@
 
 因此：
 
-> `priority` 不应进入 A1 的核心 source-first 模型。
+> `priority` 不应进入核心 source-first 基础模型。
 
 ---
 
@@ -243,7 +243,7 @@
 
 这份文档只负责一件事：
 
-> 帮维护爬虫的同学理解：现有 crawler 在 A1 source-first 模型下应该如何被重新解释，以及哪些旧字段不应再继续作为核心设计前提。
+> 帮维护爬虫的同学理解：现有 crawler 在 source-first 基础模型下应该如何被重新解释，以及哪些旧字段不应再继续作为核心设计前提。
 
 ---
 

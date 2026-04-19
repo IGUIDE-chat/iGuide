@@ -100,7 +100,7 @@ When available, `location_or_service` may also include optional facets that impr
 These facets should remain optional. Missing map precision or missing service metadata should not prevent a valid `location_or_service` object from existing.
 
 ### Relationship to map data and source artifacts
-Map providers such as Google Maps should be treated as source/artifact inputs rather than as a separate object model. For example, a map-derived record may enter the A1 base layer as a source snapshot plus a `map_place` artifact, then project into `location_or_service` when it represents a stable user-facing destination.
+Map providers such as Google Maps should be treated as source/artifact inputs rather than as a separate object model. For example, a map-derived record may enter the source-first base layer as a source snapshot plus a `map_place` artifact, then project into `location_or_service` when it represents a stable user-facing destination.
 
 ### Explicit non-goals
 Do not use `location_or_service` to model:
