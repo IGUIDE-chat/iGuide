@@ -1,59 +1,24 @@
+import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const DEFAULT_EMBEDDING_MODEL = "multilingual-e5-small";
 const DEFAULT_EMBEDDING_DIMENSIONS = 384;
 const EMBEDDING_BATCH_SIZE = 32;
 const DEFAULT_CHUNK_SIZE = 2000;
 const DEFAULT_CHUNK_OVERLAP = 200;
+const DEFAULT_SCHOOL_ID = "uiuc";
 const PROGRESS_INTERVAL = 10;
 
 type SourceKind = "jsonl" | "markdown" | "directory";
+type ImportSourceKind = "manual" | "imported_qmd";
+type ArtifactType = "normalized_json" | "clean_markdown";
 
 interface CliOptions {
 	source: string;
 	dryRun: boolean;
 	limit?: number;
-}
-
-interface SourceDocument {
-	url: string;
-	title: string;
-	content: string;
-	source: string;
-	category: string | null;
-	metadata: Record<string, unknown>;
-}
-
-interface DocumentRecord {
-	id: string;
-	url: string | null;
-}
-
-interface DocumentPayload {
-	title: string;
-	content: string;
-	url: string;
-	source: string;
-	category: string | null;
-	embedding: number[] | null;
-	metadata: Record<string, unknown>;
-	indexed_at: string;
-}
-
-interface ChunkPayload {
-	document_id: string;
-	chunk_index: number;
-	content: string;
-	embedding: number[] | null;
-}
-
-interface ImportStats {
-	total_documents: number;
-	total_chunks: number;
-	new: number;
-	updated: number;
-	skipped: number;
 }
 
 interface RuntimeEnv {
@@ -63,11 +28,120 @@ interface RuntimeEnv {
 	embeddingApiKey?: string;
 	embeddingModel: string;
 	embeddingDimensions: number;
+	schoolId: string;
 }
 
 interface ParsedMarkdown {
 	frontmatter: Record<string, string>;
 	body: string;
+}
+
+interface JsonlLineRecord {
+	url: string;
+	title: string;
+	content: string;
+	category: string | null;
+	metadata: Record<string, unknown>;
+	raw: Record<string, unknown>;
+}
+
+interface ImportUnit {
+	filePath: string;
+	relativePath: string;
+	artifactType: ArtifactType;
+	contentText: string;
+	cleanedContent: string;
+	contentJson: Record<string, unknown>[] | null;
+	title: string;
+	canonicalUrl: string | null;
+	mimeType: string;
+	metadata: Record<string, unknown>;
+	rawContentHash: string;
+	chunks: string[];
+}
+
+interface ImportPlan {
+	sourcePath: string;
+	sourceKey: string;
+	sourceName: string;
+	sourceKind: ImportSourceKind;
+	units: ImportUnit[];
+	snapshotContentHash: string;
+	snapshotMetadata: Record<string, unknown>;
+}
+
+interface ImportStats {
+	total_files: number;
+	processed: number;
+	total_chunks: number;
+	skipped: number;
+	failed: number;
+	dry_run: boolean;
+}
+
+interface SourceRecord {
+	id: string;
+	source_key: string;
+}
+
+interface SourceSnapshotRecord {
+	id: string;
+}
+
+interface ArtifactRecord {
+	id: string;
+}
+
+interface SourcePayload {
+	school_id: string;
+	source_key: string;
+	name: string;
+	source_kind: ImportSourceKind;
+	is_active: boolean;
+	metadata: Record<string, unknown>;
+}
+
+interface SourceSnapshotPayload {
+	source_id: string;
+	snapshot_key: string;
+	capture_mode: "manual_import";
+	capture_status: "success";
+	captured_at: string;
+	is_current: boolean;
+	content_hash: string;
+	raw_metadata: Record<string, unknown>;
+}
+
+interface ArtifactPayload {
+	source_snapshot_id: string;
+	artifact_type: ArtifactType;
+	artifact_role: "primary";
+	mime_type: string;
+	language: "en";
+	title: string;
+	content_text: string;
+	content_json: Record<string, unknown>[] | null;
+	canonical_url: string | null;
+	is_searchable: boolean;
+	is_primary: boolean;
+	metadata: Record<string, unknown>;
+	parser_name: string;
+	parser_version: string;
+	normalization_status: string;
+}
+
+interface ChunkPayload {
+	artifact_id: string;
+	chunk_index: number;
+	chunk_text: string;
+	search_text: string;
+	token_count: number;
+	embedding: number[] | null;
+	is_active: boolean;
+	embedding_model: string;
+	metadata: Record<string, unknown>;
+	chunk_hash: string;
+	language: "en";
 }
 
 export function parseArgs(argv: string[]): CliOptions {
@@ -163,7 +237,11 @@ export function detectSourceKind(
 		return "jsonl";
 	}
 
-	if (sourcePath.endsWith(".md") || sourcePath.endsWith(".markdown")) {
+	if (
+		sourcePath.endsWith(".md") ||
+		sourcePath.endsWith(".markdown") ||
+		sourcePath.endsWith(".qmd")
+	) {
 		return "markdown";
 	}
 
@@ -201,80 +279,159 @@ function getEnv(): RuntimeEnv {
 			Number.isFinite(embeddingDimensions) && embeddingDimensions > 0
 				? embeddingDimensions
 				: DEFAULT_EMBEDDING_DIMENSIONS,
+		schoolId: process.env.SCHOOL_ID || DEFAULT_SCHOOL_ID,
 	};
 }
 
 async function main() {
-	const options = parseArgs(process.argv.slice(2));
+	const argv = process.argv.slice(2);
+	if (isHelpArg(argv)) {
+		printHelp();
+		return;
+	}
+
+	const options = parseArgs(argv);
 	const env = getEnv();
-	const documents = await loadSourceDocuments(options.source, options.limit);
+	const importPlan = await loadImportPlan(options.source, options.limit);
 
 	if (!options.dryRun) {
 		requireEnv(env);
 	}
 
 	const stats: ImportStats = {
-		total_documents: 0,
+		total_files: importPlan.units.length,
+		processed: 0,
 		total_chunks: 0,
-		new: 0,
-		updated: 0,
 		skipped: 0,
+		failed: 0,
+		dry_run: options.dryRun,
 	};
+
+	const sourcePayload = buildSourcePayload(importPlan, env.schoolId);
+	const snapshotKey = `${importPlan.sourceKey}-${Date.now()}`;
+	const snapshotMetadata = {
+		...importPlan.snapshotMetadata,
+		imported_via: "scripts/import-to-supabase.ts",
+	};
+
+	if (options.dryRun) {
+		const dryRunSnapshotId = `dry-run-snapshot:${snapshotKey}`;
+		for (const [index, unit] of importPlan.units.entries()) {
+			logDryRunChain(sourcePayload, dryRunSnapshotId, unit);
+			stats.processed += 1;
+			stats.total_chunks += unit.chunks.length;
+			logProgress(index + 1, stats);
+		}
+
+		console.log(JSON.stringify(stats, null, 2));
+		return;
+	}
 
 	const supabaseClient = new SupabaseRestClient(env);
 	const embeddingClient = new EmbeddingApiClient(env);
+	let source: SourceRecord | null = null;
+	let snapshot: SourceSnapshotRecord | null = null;
 
-	for (const [index, sourceDocument] of documents.entries()) {
-		const prepared = prepareDocument(sourceDocument);
-
-		if (!prepared) {
-			stats.skipped += 1;
-			continue;
-		}
-
-		const { document, chunks } = prepared;
-
-		if (options.dryRun) {
-			stats.total_documents += 1;
-			stats.total_chunks += chunks.length;
-			stats.new += 1;
-		} else {
-			const [documentEmbedding] = await embeddingClient.embedDocuments([
-				document.content,
-			]);
-			const chunkEmbeddings = await embeddingClient.embedDocuments(chunks);
-
-			const outcome = await upsertDocumentGraph(
-				supabaseClient,
-				document,
-				documentEmbedding ?? null,
-				chunks,
-				chunkEmbeddings,
-			);
-
-			stats.total_documents += 1;
-			stats.total_chunks += chunks.length;
-			if (outcome === "new") {
-				stats.new += 1;
-			} else {
-				stats.updated += 1;
+	for (const [index, unit] of importPlan.units.entries()) {
+		try {
+			if (!source) {
+				source = await supabaseClient.upsertSource(sourcePayload);
 			}
-		}
 
-		const processedCount = index + 1;
-		if (processedCount % PROGRESS_INTERVAL === 0) {
-			console.log(
+			if (!snapshot) {
+				await supabaseClient.markSnapshotsNotCurrent(source.id);
+				snapshot = await supabaseClient.insertSourceSnapshot({
+					source_id: source.id,
+					snapshot_key: snapshotKey,
+					capture_mode: "manual_import",
+					capture_status: "success",
+					captured_at: new Date().toISOString(),
+					is_current: true,
+					content_hash: importPlan.snapshotContentHash,
+					raw_metadata: snapshotMetadata,
+				});
+			}
+
+			if (unit.chunks.length === 0) {
+				stats.skipped += 1;
+				console.warn(
+					JSON.stringify({
+						event: "skip_file",
+						file: unit.relativePath,
+						reason: "No importable chunks produced",
+					}),
+				);
+				continue;
+			}
+
+			const chunkEmbeddings = await embeddingClient.embedDocuments(unit.chunks);
+			const artifact = await supabaseClient.insertArtifact({
+				source_snapshot_id: snapshot.id,
+				artifact_type: unit.artifactType,
+				artifact_role: "primary",
+				mime_type: unit.mimeType,
+				language: "en",
+				title: unit.title,
+				content_text: unit.contentText,
+				content_json: unit.contentJson,
+				canonical_url: unit.canonicalUrl,
+				is_searchable: true,
+				is_primary: true,
+				metadata: unit.metadata,
+				parser_name: "manual_import_pipeline",
+				parser_version: "a1",
+				normalization_status: "success",
+			});
+
+			const chunkPayloads: ChunkPayload[] = unit.chunks.map((chunk, chunkIndex) => ({
+				artifact_id: artifact.id,
+				chunk_index: chunkIndex,
+				chunk_text: chunk,
+				search_text: chunk,
+				token_count: approximateTokenCount(chunk),
+				embedding: chunkEmbeddings[chunkIndex] ?? null,
+				is_active: true,
+				embedding_model: env.embeddingModel,
+				metadata: {
+					source_path: unit.relativePath,
+					artifact_type: unit.artifactType,
+				},
+				chunk_hash: hashContent(`${unit.relativePath}:${chunkIndex}:${chunk}`),
+				language: "en",
+			}));
+
+			await supabaseClient.insertChunks(chunkPayloads);
+			stats.processed += 1;
+			stats.total_chunks += unit.chunks.length;
+		} catch (error) {
+			stats.failed += 1;
+			console.error(
 				JSON.stringify({
-					progress_documents: processedCount,
-					total_documents: stats.total_documents,
-					total_chunks: stats.total_chunks,
-					dry_run: options.dryRun,
+					event: "file_import_failed",
+					file: unit.relativePath,
+					error: error instanceof Error ? error.message : String(error),
 				}),
 			);
 		}
+
+		logProgress(index + 1, stats);
 	}
 
 	console.log(JSON.stringify(stats, null, 2));
+}
+
+function isHelpArg(argv: string[]): boolean {
+	return argv.includes("--help") || argv.includes("-h");
+}
+
+function printHelp() {
+	console.log(`Usage: npx tsx scripts/import-to-supabase.ts --source <path> [options]
+
+Options:
+  --source <path>   Source file or directory to import
+  --dry-run         Print the A1 import chain without writing to Supabase
+  --limit <n>       Limit the number of files processed
+  --help, -h        Show this help message`);
 }
 
 function requireEnv(env: RuntimeEnv) {
@@ -292,112 +449,118 @@ function requireEnv(env: RuntimeEnv) {
 	}
 }
 
-function prepareDocument(sourceDocument: SourceDocument) {
-	const cleanedTitle = cleanText(sourceDocument.title);
-	const cleanedContent = cleanText(sourceDocument.content);
-
-	if (!sourceDocument.url || !cleanedContent) {
-		return null;
-	}
-
-	const chunks = chunkText(cleanedContent);
-	if (chunks.length === 0) {
-		return null;
-	}
-
-	const document: DocumentPayload = {
-		title: cleanedTitle || sourceDocument.url,
-		content: cleanedContent,
-		url: sourceDocument.url,
-		source: sourceDocument.source,
-		category: sourceDocument.category,
-		embedding: null,
-		metadata: sourceDocument.metadata,
-		indexed_at: new Date().toISOString(),
+function buildSourcePayload(importPlan: ImportPlan, schoolId: string): SourcePayload {
+	return {
+		school_id: schoolId,
+		source_key: importPlan.sourceKey,
+		name: importPlan.sourceName,
+		source_kind: importPlan.sourceKind,
+		is_active: true,
+		metadata: {
+			import_source: importPlan.sourcePath,
+			file_count: importPlan.units.length,
+			source_kind: importPlan.sourceKind,
+		},
 	};
-
-	return { document, chunks };
 }
 
-async function upsertDocumentGraph(
-	supabaseClient: SupabaseRestClient,
-	document: DocumentPayload,
-	documentEmbedding: number[] | null,
-	chunks: string[],
-	chunkEmbeddings: number[][],
-): Promise<"new" | "updated"> {
-	const existing = await supabaseClient.findDocumentByUrl(document.url);
-	const payload = {
-		...document,
-		embedding: documentEmbedding,
-	};
-
-	const documentRecord = existing
-		? await supabaseClient.updateDocument(existing.id, payload)
-		: await supabaseClient.insertDocument(payload);
-
-	await supabaseClient.deleteChunksForDocument(documentRecord.id);
-
-	const chunkPayloads: ChunkPayload[] = chunks.map((content, index) => ({
-		document_id: documentRecord.id,
-		chunk_index: index,
-		content,
-		embedding: chunkEmbeddings[index] ?? null,
-	}));
-
-	await supabaseClient.insertChunks(chunkPayloads);
-	return existing ? "updated" : "new";
+function logDryRunChain(
+	sourcePayload: SourcePayload,
+	snapshotId: string,
+	unit: ImportUnit,
+) {
+	console.log(
+		JSON.stringify({
+			event: "dry_run_chain",
+			source_key: sourcePayload.source_key,
+			source_kind: sourcePayload.source_kind,
+			snapshot_id: snapshotId,
+			artifact_type: unit.artifactType,
+			file: unit.relativePath,
+			chunk_count: unit.chunks.length,
+		}),
+	);
 }
 
-async function loadSourceDocuments(
-	source: string,
-	limit?: number,
-): Promise<SourceDocument[]> {
+function logProgress(processedCount: number, stats: ImportStats) {
+	if (processedCount % PROGRESS_INTERVAL !== 0 && processedCount !== stats.total_files) {
+		return;
+	}
+
+	console.log(
+		JSON.stringify({
+			progress_files: processedCount,
+			processed: stats.processed,
+			failed: stats.failed,
+			skipped: stats.skipped,
+			total_chunks: stats.total_chunks,
+			dry_run: stats.dry_run,
+		}),
+	);
+}
+
+async function loadImportPlan(source: string, limit?: number): Promise<ImportPlan> {
 	const absoluteSource = path.resolve(source);
 	const stats = await fs.stat(absoluteSource);
-	const sourceKind = detectSourceKind(absoluteSource, stats.isDirectory());
+	const detectedKind = detectSourceKind(absoluteSource, stats.isDirectory());
+	const files = await resolveInputFiles(absoluteSource, detectedKind, limit);
 
-	let documents: SourceDocument[];
-
-	if (sourceKind === "jsonl") {
-		documents = await loadJsonlDocuments(absoluteSource);
-	} else if (sourceKind === "markdown") {
-		documents = [await loadMarkdownDocument(absoluteSource)];
-	} else {
-		documents = await loadDirectoryDocuments(absoluteSource);
+	if (files.length === 0) {
+		throw new Error(`No supported source files found in ${absoluteSource}`);
 	}
 
-	return typeof limit === "number" ? documents.slice(0, limit) : documents;
+	const units = await Promise.all(files.map((filePath) => loadImportUnit(absoluteSource, filePath)));
+	const sourceKind = deriveImportSourceKind(units);
+	const sourceName = deriveNameFromReference(absoluteSource);
+	const sourceKey = deriveSourceKey(absoluteSource);
+
+	return {
+		sourcePath: absoluteSource,
+		sourceKey,
+		sourceName,
+		sourceKind,
+		units,
+		snapshotContentHash: hashContent(
+			JSON.stringify(
+				units.map((unit) => ({
+					file: unit.relativePath,
+					hash: unit.rawContentHash,
+					chunk_count: unit.chunks.length,
+				})),
+			),
+		),
+		snapshotMetadata: {
+			source_path: absoluteSource,
+			file_count: units.length,
+			input_kind: detectedKind,
+			files: units.map((unit) => unit.relativePath),
+		},
+	};
 }
 
-async function loadDirectoryDocuments(directoryPath: string) {
-	const files = await walkDirectory(directoryPath);
-	const jsonlFiles = files.filter((filePath) => filePath.endsWith(".jsonl"));
-
-	if (jsonlFiles.length > 0) {
-		const prioritized = jsonlFiles.sort((left, right) => {
-			if (path.basename(left) === "raw_crawl.jsonl") {
-				return -1;
-			}
-			if (path.basename(right) === "raw_crawl.jsonl") {
-				return 1;
-			}
-			return left.localeCompare(right);
-		});
-
-		return loadJsonlDocuments(prioritized[0]);
+async function resolveInputFiles(
+	absoluteSource: string,
+	sourceKind: SourceKind,
+	limit?: number,
+): Promise<string[]> {
+	if (sourceKind !== "directory") {
+		return [absoluteSource];
 	}
 
-	const markdownFiles = files.filter(
-		(filePath) => filePath.endsWith(".md") || filePath.endsWith(".markdown"),
-	);
+	const files = await walkDirectory(absoluteSource);
+	const supportedFiles = files
+		.filter((filePath) => isSupportedFile(filePath))
+		.sort((left, right) => left.localeCompare(right));
 
-	if (markdownFiles.length === 0) {
-		throw new Error(`No supported source files found in ${directoryPath}`);
-	}
+	return typeof limit === "number" ? supportedFiles.slice(0, limit) : supportedFiles;
+}
 
-	return Promise.all(
-		markdownFiles.map((filePath) => loadMarkdownDocument(filePath)),
+function isSupportedFile(filePath: string): boolean {
+	return (
+		filePath.endsWith(".jsonl") ||
+		filePath.endsWith(".md") ||
+		filePath.endsWith(".markdown") ||
+		filePath.endsWith(".qmd")
 	);
 }
 
@@ -416,12 +579,106 @@ async function walkDirectory(directoryPath: string): Promise<string[]> {
 	return filePaths.flat();
 }
 
-async function loadJsonlDocuments(filePath: string): Promise<SourceDocument[]> {
-	const contents = await fs.readFile(filePath, "utf8");
+async function loadImportUnit(rootSource: string, filePath: string): Promise<ImportUnit> {
+	const stats = await fs.stat(filePath);
+	const kind = detectSourceKind(filePath, stats.isDirectory());
+	if (kind === "directory") {
+		throw new Error(`Directory imports must be expanded before loading units: ${filePath}`);
+	}
+
+	if (kind === "jsonl") {
+		return loadJsonlUnit(rootSource, filePath);
+	}
+
+	return loadMarkdownUnit(rootSource, filePath);
+}
+
+async function loadJsonlUnit(rootSource: string, filePath: string): Promise<ImportUnit> {
+	const rawContents = await fs.readFile(filePath, "utf8");
+	const records = parseJsonlRecords(rawContents, filePath);
+	const contentText = buildJsonlArtifactText(records);
+	const cleanedContent = cleanText(contentText);
+	const chunks = chunkText(cleanedContent);
+	const title = records[0]?.title || deriveNameFromReference(filePath);
+	const canonicalUrl = records[0]?.url || null;
+
+	return {
+		filePath,
+		relativePath: path.relative(rootSource, filePath) || path.basename(filePath),
+		artifactType: "normalized_json",
+		contentText,
+		cleanedContent,
+		contentJson: records.map((record) => record.raw),
+		title,
+		canonicalUrl,
+		mimeType: "application/x-ndjson",
+		metadata: {
+			source_type: "jsonl",
+			record_count: records.length,
+			file_path: filePath,
+		},
+		rawContentHash: hashContent(rawContents),
+		chunks,
+	};
+}
+
+async function loadMarkdownUnit(rootSource: string, filePath: string): Promise<ImportUnit> {
+	const rawContents = await fs.readFile(filePath, "utf8");
+	const parsed = parseMarkdown(rawContents);
+	const normalizedBody = normalizeMultilineText(parsed.body);
+	const cleanedContent = cleanText(normalizedBody);
+	const chunks = chunkText(cleanedContent);
+	const title =
+		parsed.frontmatter.title ||
+		findMarkdownHeading(parsed.body) ||
+		deriveNameFromReference(filePath);
+	const canonicalUrl = parsed.frontmatter.url || null;
+
+	return {
+		filePath,
+		relativePath: path.relative(rootSource, filePath) || path.basename(filePath),
+		artifactType: "clean_markdown",
+		contentText: normalizedBody,
+		cleanedContent,
+		contentJson: null,
+		title,
+		canonicalUrl,
+		mimeType: "text/markdown",
+		metadata: {
+			source_type: filePath.endsWith(".qmd") ? "qmd" : "markdown",
+			...parsed.frontmatter,
+			file_path: filePath,
+		},
+		rawContentHash: hashContent(rawContents),
+		chunks,
+	};
+}
+
+function deriveImportSourceKind(units: ImportUnit[]): ImportSourceKind {
+	const kinds = new Set(
+		units.map((unit) =>
+			unit.artifactType === "normalized_json" ? "manual" : "imported_qmd",
+		),
+	);
+
+	if (kinds.size > 1) {
+		throw new Error(
+			"Mixed markdown/qmd and jsonl imports in a single source path are not supported",
+		);
+	}
+
+	return (Array.from(kinds)[0] ?? "imported_qmd") as ImportSourceKind;
+}
+
+function parseJsonlRecords(contents: string, filePath: string): JsonlLineRecord[] {
 	const lines = contents
 		.split(/\r?\n/)
 		.map((line) => line.trim())
 		.filter(Boolean);
+
+	if (lines.length === 0) {
+		throw new Error(`No JSONL records found in ${filePath}`);
+	}
 
 	return lines.map((line, index) => {
 		let parsed: Record<string, unknown>;
@@ -437,36 +694,34 @@ async function loadJsonlDocuments(filePath: string): Promise<SourceDocument[]> {
 			url: asString(parsed.url),
 			title: asString(parsed.title),
 			content: asString(parsed.content),
-			source: filePath,
 			category: nullableString(parsed.category),
 			metadata: {
-				source_type: "jsonl",
 				links: Array.isArray(parsed.links) ? parsed.links : [],
 				timestamp: parsed.timestamp ?? null,
 			},
+			raw: parsed,
 		};
 	});
 }
 
-async function loadMarkdownDocument(filePath: string): Promise<SourceDocument> {
-	const contents = await fs.readFile(filePath, "utf8");
-	const parsed = parseMarkdown(contents);
-	const relativeSource = filePath;
+function buildJsonlArtifactText(records: JsonlLineRecord[]): string {
+	return normalizeMultilineText(
+		records
+			.map((record, index) => {
+				const lines = [
+					`Record ${index + 1}`,
+					record.title ? `Title: ${record.title}` : null,
+					record.url ? `URL: ${record.url}` : null,
+					record.category ? `Category: ${record.category}` : null,
+					record.content ? `Content: ${record.content}` : null,
+				]
+					.filter(Boolean)
+					.join("\n");
 
-	return {
-		url: parsed.frontmatter.url || "",
-		title:
-			parsed.frontmatter.title ||
-			findMarkdownHeading(parsed.body) ||
-			path.basename(filePath, path.extname(filePath)),
-		content: parsed.body,
-		source: relativeSource,
-		category: parsed.frontmatter.category || null,
-		metadata: {
-			source_type: "markdown",
-			...parsed.frontmatter,
-		},
-	};
+				return lines;
+			})
+			.join("\n\n"),
+	);
 }
 
 function parseMarkdown(contents: string): ParsedMarkdown {
@@ -513,6 +768,35 @@ function findMarkdownHeading(contents: string): string | null {
 	return match?.[1]?.trim() || null;
 }
 
+function normalizeMultilineText(input: string): string {
+	return decodeHtmlEntities(input).replace(/\r\n/g, "\n").trim();
+}
+
+function deriveNameFromReference(reference: string): string {
+	const sanitizedReference = reference.replace(/[?#].*$/, "");
+	const parsedPath = sanitizedReference.endsWith(path.sep)
+		? sanitizedReference.slice(0, -1)
+		: sanitizedReference;
+	return path.basename(parsedPath, path.extname(parsedPath)) || "import-source";
+}
+
+function deriveSourceKey(reference: string): string {
+	const name = deriveNameFromReference(reference)
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, "-")
+		.replace(/^-+|-+$/g, "");
+
+	return name || "import-source";
+}
+
+function approximateTokenCount(text: string): number {
+	return text.trim().split(/\s+/).filter(Boolean).length;
+}
+
+function hashContent(input: string): string {
+	return crypto.createHash("sha256").update(input).digest("hex");
+}
+
 function asString(value: unknown): string {
 	return typeof value === "string" ? value : "";
 }
@@ -521,7 +805,7 @@ function nullableString(value: unknown): string | null {
 	return typeof value === "string" && value.trim() ? value : null;
 }
 
-class EmbeddingApiClient {
+export class EmbeddingApiClient {
 	constructor(private readonly env: RuntimeEnv) {}
 
 	async embedDocuments(texts: string[]): Promise<number[][]> {
@@ -582,54 +866,61 @@ class EmbeddingApiClient {
 	}
 }
 
-class SupabaseRestClient {
+export class SupabaseRestClient {
 	constructor(private readonly env: RuntimeEnv) {}
 
-	async findDocumentByUrl(url: string): Promise<DocumentRecord | null> {
-		const response = await this.request(
-			`/documents?select=id,url&url=eq.${encodeURIComponent(url)}&limit=1`,
-		);
-		const rows = (await response.json()) as DocumentRecord[];
-		return rows[0] ?? null;
+	async upsertSource(payload: SourcePayload): Promise<SourceRecord> {
+		const response = await this.request("/sources?on_conflict=source_key&select=id,source_key", {
+			method: "POST",
+			headers: {
+				Prefer: "resolution=merge-duplicates,return=representation",
+			},
+			body: JSON.stringify(payload),
+		});
+		const rows = (await response.json()) as SourceRecord[];
+		if (!rows[0]) {
+			throw new Error("Supabase did not return source row");
+		}
+		return rows[0];
 	}
 
-	async insertDocument(payload: DocumentPayload): Promise<DocumentRecord> {
-		const response = await this.request("/documents", {
+	async markSnapshotsNotCurrent(sourceId: string): Promise<void> {
+		await this.request(`/source_snapshots?source_id=eq.${sourceId}&is_current=eq.true`, {
+			method: "PATCH",
+			body: JSON.stringify({ is_current: false }),
+		});
+	}
+
+	async insertSourceSnapshot(
+		payload: SourceSnapshotPayload,
+	): Promise<SourceSnapshotRecord> {
+		const response = await this.request("/source_snapshots?select=id", {
 			method: "POST",
 			headers: {
 				Prefer: "return=representation",
 			},
 			body: JSON.stringify(payload),
 		});
-		const rows = (await response.json()) as DocumentRecord[];
+		const rows = (await response.json()) as SourceSnapshotRecord[];
 		if (!rows[0]) {
-			throw new Error("Supabase did not return inserted document row");
+			throw new Error("Supabase did not return source snapshot row");
 		}
 		return rows[0];
 	}
 
-	async updateDocument(
-		id: string,
-		payload: DocumentPayload,
-	): Promise<DocumentRecord> {
-		const response = await this.request(`/documents?id=eq.${id}`, {
-			method: "PATCH",
+	async insertArtifact(payload: ArtifactPayload): Promise<ArtifactRecord> {
+		const response = await this.request("/artifacts?select=id", {
+			method: "POST",
 			headers: {
 				Prefer: "return=representation",
 			},
 			body: JSON.stringify(payload),
 		});
-		const rows = (await response.json()) as DocumentRecord[];
+		const rows = (await response.json()) as ArtifactRecord[];
 		if (!rows[0]) {
-			throw new Error(`Supabase did not return updated document row for ${id}`);
+			throw new Error("Supabase did not return artifact row");
 		}
 		return rows[0];
-	}
-
-	async deleteChunksForDocument(documentId: string): Promise<void> {
-		await this.request(`/document_chunks?document_id=eq.${documentId}`, {
-			method: "DELETE",
-		});
 	}
 
 	async insertChunks(payload: ChunkPayload[]): Promise<void> {
@@ -637,7 +928,7 @@ class SupabaseRestClient {
 			return;
 		}
 
-		await this.request("/document_chunks", {
+		await this.request("/chunks", {
 			method: "POST",
 			headers: {
 				Prefer: "return=minimal",
@@ -646,10 +937,7 @@ class SupabaseRestClient {
 		});
 	}
 
-	private async request(
-		relativePath: string,
-		init?: RequestInit,
-	): Promise<Response> {
+	private async request(relativePath: string, init?: RequestInit): Promise<Response> {
 		const response = await fetch(
 			`${this.env.supabaseUrl?.replace(/\/+$/, "")}/rest/v1${relativePath}`,
 			{
@@ -679,9 +967,7 @@ function isExecutedDirectly() {
 		return false;
 	}
 
-	return (
-		path.resolve(entryPath) === path.resolve(new URL(import.meta.url).pathname)
-	);
+	return path.resolve(entryPath) === path.resolve(fileURLToPath(import.meta.url));
 }
 
 if (isExecutedDirectly()) {
