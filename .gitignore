@@ -6,6 +6,7 @@
 .codex
 .claude
 .agents
+.opencode
 
 # agent generated files
 .learnings
