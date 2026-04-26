@@ -83,7 +83,7 @@ export const PrimaryNav: React.FC<PrimaryNavProps> = ({
           "
         >
           <BrandMark
-            className="h-[26px] w-[26px] rounded-md"
+            className="size-[26px] rounded-md"
             iconClassName="text-[10px]"
           />
           <SidebarLabel

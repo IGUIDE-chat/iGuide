@@ -616,7 +616,7 @@ const DormComparison: React.FC<DormComparisonProps> = ({
     const { planRows, prices, minPrice, validPrices } = getFloorPlanRows();
 
     return (
-      <div className="max-h-[calc(85vh-72px)] overflow-x-auto overflow-y-auto">
+      <div className="max-h-[calc(85vh-72px)] overflow-auto">
         <table className="w-full min-w-[760px] border-collapse">
           <thead>
             <tr className="bg-gray-50">

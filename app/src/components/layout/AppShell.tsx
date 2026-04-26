@@ -69,9 +69,9 @@ export const AppShell: React.FC<AppShellProps> = ({
           ${isSidebarOpen
             ? "translate-x-0"
             : `
-                -translate-x-full
-                md:w-0 md:translate-x-0 md:overflow-hidden
-              `
+              -translate-x-full
+              md:w-0 md:translate-x-0 md:overflow-hidden
+            `
           }
         `}
       >
