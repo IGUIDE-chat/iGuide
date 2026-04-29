@@ -23,11 +23,11 @@
     "postinstall": "pnpm run submodule:init && git config --local include.path ../.gitconfig"
   },
   "dependencies": {
-    "@assistant-ui/react": "^0.12.26",
+    "@assistant-ui/react": "^0.12.27",
     "@headlessui/react": "^2.2.10",
-    "@supabase/supabase-js": "^2.104.1",
+    "@supabase/supabase-js": "^2.105.1",
     "framer-motion": "^12.38.0",
-    "lucide-react": "^1.11.0",
+    "lucide-react": "^1.14.0",
     "mapbox-gl": "^3.22.0",
     "node": "^25.9.0",
     "pnpm": "^10.33.2",
