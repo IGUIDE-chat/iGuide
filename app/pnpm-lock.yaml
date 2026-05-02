@@ -9,23 +9,23 @@ importers:
   .:
     dependencies:
       '@assistant-ui/react':
-        specifier: ^0.12.26
-        version: 0.12.26(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5))
+        specifier: ^0.12.28
+        version: 0.12.28(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5))
       '@headlessui/react':
         specifier: ^2.2.10
         version: 2.2.10(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@supabase/supabase-js':
-        specifier: ^2.104.1
-        version: 2.104.1
+        specifier: ^2.105.1
+        version: 2.105.1
       framer-motion:
         specifier: ^12.38.0
         version: 12.38.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       lucide-react:
-        specifier: ^1.11.0
-        version: 1.11.0(react@19.2.5)
+        specifier: ^1.14.0
+        version: 1.14.0(react@19.2.5)
       mapbox-gl:
-        specifier: ^3.22.0
-        version: 3.22.0
+        specifier: ^3.23.0
+        version: 3.23.0
       node:
         specifier: ^25.9.0
         version: 25.9.0
@@ -43,7 +43,7 @@ importers:
         version: 19.2.5(react@19.2.5)
       react-map-gl:
         specifier: ^8.1.1
-        version: 8.1.1(mapbox-gl@3.22.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+        version: 8.1.1(mapbox-gl@3.23.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       react-markdown:
         specifier: ^10.1.0
         version: 10.1.0(@types/react@19.2.14)(react@19.2.5)
@@ -145,11 +145,11 @@ packages:
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
     engines: {node: '>=10'}
 
-  '@assistant-ui/core@0.1.15':
-    resolution: {integrity: sha512-nI6SoVDlJSfPOYKq/PGmS0NPO9UC8gshDxdvk/E5mCnxgehm+zklrBE1SzwMyRG7YyY2jznG+EPMLYVdpbzMKA==}
+  '@assistant-ui/core@0.1.17':
+    resolution: {integrity: sha512-IWIP98UVQ9W+oF0yz8XqFRtaX8HtozWVUWt6D/BSV6cyKwLfJ8niHtLG74bSnllTnGcreU2El3GR/tIodR1XuA==}
     peerDependencies:
-      '@assistant-ui/store': ^0.2.8
-      '@assistant-ui/tap': ^0.5.9
+      '@assistant-ui/store': ^0.2.9
+      '@assistant-ui/tap': ^0.5.10
       '@types/react': '*'
       assistant-cloud: ^0.1.27
       react: ^18 || ^19
@@ -164,8 +164,8 @@ packages:
       zustand:
         optional: true
 
-  '@assistant-ui/react@0.12.26':
-    resolution: {integrity: sha512-OjwfrQ0S1nsBzJN4ZpxltKJiJkteMAO1fkLSUU/Q3ZDpesLNgueL+wjcxCAct8ktnpaUs+3Q2nTrVuIJBPO3fw==}
+  '@assistant-ui/react@0.12.28':
+    resolution: {integrity: sha512-czjpexLK1lKnNDNM1YMJi8SufeKUWBICqiVUtiHMV+86PYGCwJykOZKkchI8MVbSQ62xZ8A1LfPO5W2IDjed3A==}
     peerDependencies:
       '@types/react': '*'
       '@types/react-dom': '*'
@@ -177,18 +177,18 @@ packages:
       '@types/react-dom':
         optional: true
 
-  '@assistant-ui/store@0.2.8':
-    resolution: {integrity: sha512-SAzo9RrUlRM7jo0X/q8oDk/uhPNoT5sM8rsfnWfuwOAMb/SRgPL6IjaxgtldFlpOK+TwaCQ3A1QsuOG8wCPs4Q==}
+  '@assistant-ui/store@0.2.9':
+    resolution: {integrity: sha512-EDd6yCfirb2OsAKoTo7HeMtqPG+1cqVlNXOzUsho35ZF3O1XQ2CyEY4iUbdhj3HfmWeZo7rmfhvbaYQVEqAfeA==}
     peerDependencies:
-      '@assistant-ui/tap': ^0.5.9
+      '@assistant-ui/tap': ^0.5.10
       '@types/react': '*'
       react: ^18 || ^19
     peerDependenciesMeta:
       '@types/react':
         optional: true
 
-  '@assistant-ui/tap@0.5.9':
-    resolution: {integrity: sha512-VLqRQ66okhqwtjGz9+NENEnEv5mVZDbrxFgMoQYS4IuM0FialWA0iZjm79ienUjq8SsJDho1Z28WvBnKUlZ6VA==}
+  '@assistant-ui/tap@0.5.10':
+    resolution: {integrity: sha512-sBHTf+q1geRyu5l4gJJp2hk6ZxwhHZHj39ixjC9ARADuIYedYv1B8bCNS82eTC/COpD1xe86mzvT/+HwIsO9WA==}
     peerDependencies:
       '@types/react': '*'
       react: ^18 || ^19
@@ -1303,31 +1303,31 @@ packages:
   '@standard-schema/spec@1.1.0':
     resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
 
-  '@supabase/auth-js@2.104.1':
-    resolution: {integrity: sha512-pqFnDKekq1isqlqnzqzyJ3mzmho+o+FjfVTqhKY3PFlwj2anx3OPznO1kbo1ZEwD8zg1r4EAFf/7pplLyX0ocQ==}
+  '@supabase/auth-js@2.105.1':
+    resolution: {integrity: sha512-zc4s8Xg4truwE1Q4Q8M8oUVDARMd05pKh73NyQsMbYU1HDdDN2iiKzena/yu+yJze3WrD4c092FdckPiK1rLQw==}
     engines: {node: '>=20.0.0'}
 
-  '@supabase/functions-js@2.104.1':
-    resolution: {integrity: sha512-JjAH4JN9rZzxh4plQnILPrQZXAG6ccoRS6z9hQAGmXpRSwJA+7CWbsDV2R82I8MROlGDsjqj1Ot/cWpTfdf6xg==}
+  '@supabase/functions-js@2.105.1':
+    resolution: {integrity: sha512-dTk1e7oE51VGc1lS2S0J0NLo0Wp4JYChj74ArJKbIWgoWuFwO0wcJYjeyOV3AAEpKst8/LQWUZOUKO1tRXBrpA==}
     engines: {node: '>=20.0.0'}
 
-  '@supabase/phoenix@0.4.0':
-    resolution: {integrity: sha512-RHSx8bHS02xwfHdAbX5Lpbo6PXbgyf7lTaXTlwtFDPwOIw64NnVRwFAXGojHhjtVYI+PEPNSWwkL90f4agN3bw==}
+  '@supabase/phoenix@0.4.1':
+    resolution: {integrity: sha512-hWGJkDAfWUNY8k0C080u3sGNFd2ncl9erhKgP7hnGkgJWEfT5Pd/SXal4QmWXBECVlZrannMAc9sBaaRyWpiUA==}
 
-  '@supabase/postgrest-js@2.104.1':
-    resolution: {integrity: sha512-RqlLpvgXsjcc27fLyHNGm3zN0KDWXbkdTdaFtaEdX83RsTEqH7BAmshH7zoUMml5lL04naUeRjS3B81O6jZcJw==}
+  '@supabase/postgrest-js@2.105.1':
+    resolution: {integrity: sha512-6SbtsoWC55xfsm7gbfLqvF+yIwTQEbjt+jFGf4klDpwSnUy17Hv5x0Dq52oqwTQlw6Ta0h1D5gTP0/pApqNojA==}
     engines: {node: '>=20.0.0'}
 
-  '@supabase/realtime-js@2.104.1':
-    resolution: {integrity: sha512-dVJHhFB2ErBd0/2qE9G8CedCrGoAtBfL9Q4zbSMXO7b1Cpld916ljSiX21mURUqijPf1WoPQG4Bp/averUzk/g==}
+  '@supabase/realtime-js@2.105.1':
+    resolution: {integrity: sha512-3X3cUEl5cJ4lRQHr1hXHx0b98OaL97RRO2vrRZ98FD91JV/MquZHhrGJSv/+IkOnjF6E2e0RUOxE8P3Zi035ow==}
     engines: {node: '>=20.0.0'}
 
-  '@supabase/storage-js@2.104.1':
-    resolution: {integrity: sha512-2bQaLbkRshctkUVuqamwYZDEd+0cGSc9DY9sjh92DcA5hu1F/1AP8p6gxGr76sgdK9Ngi0rh+2Kdh+uC4hcnGA==}
+  '@supabase/storage-js@2.105.1':
+    resolution: {integrity: sha512-owfdCNH5ikXXDusjzsgU6LavEBqGUoueOnL/9XIucld70/WJ/rbqp89K//c9QPICDNuegsmpoeasydDAiucLKQ==}
     engines: {node: '>=20.0.0'}
 
-  '@supabase/supabase-js@2.104.1':
-    resolution: {integrity: sha512-E0H/CtVmaGjiAy+ieZ5ZB/1EqxXcGdaFaAc23AE5zaYfz6NtCNDcmaEdoGPYMPFH5pE6drGG6e3ljPmkFoGVxQ==}
+  '@supabase/supabase-js@2.105.1':
+    resolution: {integrity: sha512-4gn6HmsAkCCVU7p8JmgKGhHJ5Btod4ZzSp8qKZf4JHaTxbhaIK86/usHzeLxWv7EJJDhBmILDmJOSOf9iF4CLA==}
     engines: {node: '>=20.0.0'}
 
   '@swc/helpers@0.5.21':
@@ -2796,8 +2796,8 @@ packages:
     resolution: {integrity: sha512-jumlc0BIUrS3qJGgIkWZsyfAM7NCWiBcCDhnd+3NNM5KbBmLTgHVfWBcg6W+rLUsIpzpERPsvwUP7CckAQSOoA==}
     engines: {node: '>=12'}
 
-  lucide-react@1.11.0:
-    resolution: {integrity: sha512-UOhjdztXCgdBReRcIhsvz2siIBogfv/lhJEIViCpLt924dO+GDms9T7DNoucI23s6kEPpe988m5N0D2ajnzb2g==}
+  lucide-react@1.14.0:
+    resolution: {integrity: sha512-+1mdWcfSJVUsaTIjN9zoezmUhfXo5l0vP7ekBMPo3jcS/aIkxHnXqAPsByszMZx/Y8oQBRJxJx5xg+RH3urzxA==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
@@ -2807,8 +2807,8 @@ packages:
   make-error@1.3.6:
     resolution: {integrity: sha512-s8UhlNe7vPKomQhC1qFelMokr/Sc3AgNbso3n74mVPA5LTZwkB9NlXf4XPamLxJE8h0gh73rM94xvwRT2CVInw==}
 
-  mapbox-gl@3.22.0:
-    resolution: {integrity: sha512-ZIpF+oAMcQoDlvABmiRkHoydyBR9zI6CyDeVRa2/iyua0/B2+rPuIzoCV/CgN14P5F0HVk53GIZw220WSqJPyA==}
+  mapbox-gl@3.23.0:
+    resolution: {integrity: sha512-zzjNAaMNvXnAVEUrYpOWmRVEBCIWgDAMLRPvSOoKY3smKvrINFVrRK/1jEpUDbEa7Ppf5Q/nwC6E07tz/i7IKw==}
 
   markdown-it@14.1.1:
     resolution: {integrity: sha512-BuU2qnTti9YKgK5N+IeMubp14ZUKUUw7yeJbkjtosvHiP0AZ5c8IAgEMk79D0eC8F23r4Ac/q8cAIFdm2FtyoA==}
@@ -3025,8 +3025,8 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
-  nanoid@5.1.9:
-    resolution: {integrity: sha512-ZUvP7KeBLe3OZ1ypw6dI/TzYJuvHP77IM4Ry73waSQTLn8/g8rpdjfyVAh7t1/+FjBtG4lCP42MEbDxOsRpBMw==}
+  nanoid@5.1.11:
+    resolution: {integrity: sha512-v+KEsUv2ps74PaSKv0gHTxTCgMXOIfBEbaqa6w6ISIGC7ZsvHN4N9oJ8d4cmf0n5oTzQz2SLmThbQWhjd/8eKg==}
     engines: {node: ^18 || >=20}
     hasBin: true
 
@@ -4035,6 +4035,9 @@ packages:
   zod@4.3.6:
     resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
 
+  zod@4.4.2:
+    resolution: {integrity: sha512-IynmDyxsEsb9RKzO3J9+4SxXnl2FTFSzNBaKKaMV6tsSk0rw9gYw9gs+JFCq/qk2LCZ78KDwyj+Z289TijSkUw==}
+
   zustand@5.0.12:
     resolution: {integrity: sha512-i77ae3aZq4dhMlRhJVCYgMLKuSiZAaUPAct2AksxQ+gOtimhGMdXljRT21P5BNpeT4kXlLIckvkPM029OljD7g==}
     engines: {node: '>=12.20.0'}
@@ -4060,23 +4063,23 @@ snapshots:
 
   '@alloc/quick-lru@5.2.0': {}
 
-  '@assistant-ui/core@0.1.15(@assistant-ui/store@0.2.8(@assistant-ui/tap@0.5.9(@types/react@19.2.14)(react@19.2.5))(@types/react@19.2.14)(react@19.2.5))(@assistant-ui/tap@0.5.9(@types/react@19.2.14)(react@19.2.5))(@types/react@19.2.14)(assistant-cloud@0.1.27)(react@19.2.5)(zustand@5.0.12(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5)))':
+  '@assistant-ui/core@0.1.17(@assistant-ui/store@0.2.9(@assistant-ui/tap@0.5.10(@types/react@19.2.14)(react@19.2.5))(@types/react@19.2.14)(react@19.2.5))(@assistant-ui/tap@0.5.10(@types/react@19.2.14)(react@19.2.5))(@types/react@19.2.14)(assistant-cloud@0.1.27)(react@19.2.5)(zustand@5.0.12(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5)))':
     dependencies:
-      '@assistant-ui/store': 0.2.8(@assistant-ui/tap@0.5.9(@types/react@19.2.14)(react@19.2.5))(@types/react@19.2.14)(react@19.2.5)
-      '@assistant-ui/tap': 0.5.9(@types/react@19.2.14)(react@19.2.5)
+      '@assistant-ui/store': 0.2.9(@assistant-ui/tap@0.5.10(@types/react@19.2.14)(react@19.2.5))(@types/react@19.2.14)(react@19.2.5)
+      '@assistant-ui/tap': 0.5.10(@types/react@19.2.14)(react@19.2.5)
       assistant-stream: 0.3.12
-      nanoid: 5.1.9
+      nanoid: 5.1.11
     optionalDependencies:
       '@types/react': 19.2.14
       assistant-cloud: 0.1.27
       react: 19.2.5
       zustand: 5.0.12(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5))
 
-  '@assistant-ui/react@0.12.26(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5))':
+  '@assistant-ui/react@0.12.28(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5))':
     dependencies:
-      '@assistant-ui/core': 0.1.15(@assistant-ui/store@0.2.8(@assistant-ui/tap@0.5.9(@types/react@19.2.14)(react@19.2.5))(@types/react@19.2.14)(react@19.2.5))(@assistant-ui/tap@0.5.9(@types/react@19.2.14)(react@19.2.5))(@types/react@19.2.14)(assistant-cloud@0.1.27)(react@19.2.5)(zustand@5.0.12(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5)))
-      '@assistant-ui/store': 0.2.8(@assistant-ui/tap@0.5.9(@types/react@19.2.14)(react@19.2.5))(@types/react@19.2.14)(react@19.2.5)
-      '@assistant-ui/tap': 0.5.9(@types/react@19.2.14)(react@19.2.5)
+      '@assistant-ui/core': 0.1.17(@assistant-ui/store@0.2.9(@assistant-ui/tap@0.5.10(@types/react@19.2.14)(react@19.2.5))(@types/react@19.2.14)(react@19.2.5))(@assistant-ui/tap@0.5.10(@types/react@19.2.14)(react@19.2.5))(@types/react@19.2.14)(assistant-cloud@0.1.27)(react@19.2.5)(zustand@5.0.12(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5)))
+      '@assistant-ui/store': 0.2.9(@assistant-ui/tap@0.5.10(@types/react@19.2.14)(react@19.2.5))(@types/react@19.2.14)(react@19.2.5)
+      '@assistant-ui/tap': 0.5.10(@types/react@19.2.14)(react@19.2.5)
       '@radix-ui/primitive': 1.1.3
       '@radix-ui/react-compose-refs': 1.1.2(@types/react@19.2.14)(react@19.2.5)
       '@radix-ui/react-context': 1.1.3(@types/react@19.2.14)(react@19.2.5)
@@ -4085,12 +4088,12 @@ snapshots:
       '@radix-ui/react-use-escape-keydown': 1.1.1(@types/react@19.2.14)(react@19.2.5)
       assistant-cloud: 0.1.27
       assistant-stream: 0.3.12
-      nanoid: 5.1.9
+      nanoid: 5.1.11
       radix-ui: 1.4.3(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       react: 19.2.5
       react-dom: 19.2.5(react@19.2.5)
       react-textarea-autosize: 8.5.9(@types/react@19.2.14)(react@19.2.5)
-      zod: 4.3.6
+      zod: 4.4.2
       zustand: 5.0.12(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5))
     optionalDependencies:
       '@types/react': 19.2.14
@@ -4099,15 +4102,15 @@ snapshots:
       - immer
       - use-sync-external-store
 
-  '@assistant-ui/store@0.2.8(@assistant-ui/tap@0.5.9(@types/react@19.2.14)(react@19.2.5))(@types/react@19.2.14)(react@19.2.5)':
+  '@assistant-ui/store@0.2.9(@assistant-ui/tap@0.5.10(@types/react@19.2.14)(react@19.2.5))(@types/react@19.2.14)(react@19.2.5)':
     dependencies:
-      '@assistant-ui/tap': 0.5.9(@types/react@19.2.14)(react@19.2.5)
+      '@assistant-ui/tap': 0.5.10(@types/react@19.2.14)(react@19.2.5)
       react: 19.2.5
       use-effect-event: 2.0.3(react@19.2.5)
     optionalDependencies:
       '@types/react': 19.2.14
 
-  '@assistant-ui/tap@0.5.9(@types/react@19.2.14)(react@19.2.5)':
+  '@assistant-ui/tap@0.5.10(@types/react@19.2.14)(react@19.2.5)':
     optionalDependencies:
       '@types/react': 19.2.14
       react: 19.2.5
@@ -5295,23 +5298,23 @@ snapshots:
 
   '@standard-schema/spec@1.1.0': {}
 
-  '@supabase/auth-js@2.104.1':
+  '@supabase/auth-js@2.105.1':
     dependencies:
       tslib: 2.8.1
 
-  '@supabase/functions-js@2.104.1':
+  '@supabase/functions-js@2.105.1':
     dependencies:
       tslib: 2.8.1
 
-  '@supabase/phoenix@0.4.0': {}
+  '@supabase/phoenix@0.4.1': {}
 
-  '@supabase/postgrest-js@2.104.1':
+  '@supabase/postgrest-js@2.105.1':
     dependencies:
       tslib: 2.8.1
 
-  '@supabase/realtime-js@2.104.1':
+  '@supabase/realtime-js@2.105.1':
     dependencies:
-      '@supabase/phoenix': 0.4.0
+      '@supabase/phoenix': 0.4.1
       '@types/ws': 8.18.1
       tslib: 2.8.1
       ws: 8.20.0
@@ -5319,18 +5322,18 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@supabase/storage-js@2.104.1':
+  '@supabase/storage-js@2.105.1':
     dependencies:
       iceberg-js: 0.8.1
       tslib: 2.8.1
 
-  '@supabase/supabase-js@2.104.1':
+  '@supabase/supabase-js@2.105.1':
     dependencies:
-      '@supabase/auth-js': 2.104.1
-      '@supabase/functions-js': 2.104.1
-      '@supabase/postgrest-js': 2.104.1
-      '@supabase/realtime-js': 2.104.1
-      '@supabase/storage-js': 2.104.1
+      '@supabase/auth-js': 2.105.1
+      '@supabase/functions-js': 2.105.1
+      '@supabase/postgrest-js': 2.105.1
+      '@supabase/realtime-js': 2.105.1
+      '@supabase/storage-js': 2.105.1
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -5595,12 +5598,12 @@ snapshots:
     dependencies:
       valibot: 1.3.1(typescript@6.0.3)
 
-  '@vis.gl/react-mapbox@8.1.1(mapbox-gl@3.22.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
+  '@vis.gl/react-mapbox@8.1.1(mapbox-gl@3.23.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
     dependencies:
       react: 19.2.5
       react-dom: 19.2.5(react@19.2.5)
     optionalDependencies:
-      mapbox-gl: 3.22.0
+      mapbox-gl: 3.23.0
 
   '@vis.gl/react-maplibre@8.1.1(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
     dependencies:
@@ -5716,7 +5719,7 @@ snapshots:
   assistant-stream@0.3.12:
     dependencies:
       '@standard-schema/spec': 1.1.0
-      nanoid: 5.1.9
+      nanoid: 5.1.11
       secure-json-parse: 4.1.0
 
   ast-types@0.13.4:
@@ -6868,7 +6871,7 @@ snapshots:
 
   lru-cache@7.18.3: {}
 
-  lucide-react@1.11.0(react@19.2.5):
+  lucide-react@1.14.0(react@19.2.5):
     dependencies:
       react: 19.2.5
 
@@ -6878,7 +6881,7 @@ snapshots:
 
   make-error@1.3.6: {}
 
-  mapbox-gl@3.22.0:
+  mapbox-gl@3.23.0:
     dependencies:
       '@mapbox/mapbox-gl-supported': 3.0.0
       '@mapbox/point-geometry': 1.1.0
@@ -7365,7 +7368,7 @@ snapshots:
 
   nanoid@3.3.12: {}
 
-  nanoid@5.1.9: {}
+  nanoid@5.1.11: {}
 
   natural-compare@1.4.0: {}
 
@@ -7742,14 +7745,14 @@ snapshots:
 
   react-is@18.3.1: {}
 
-  react-map-gl@8.1.1(mapbox-gl@3.22.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5):
+  react-map-gl@8.1.1(mapbox-gl@3.23.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5):
     dependencies:
-      '@vis.gl/react-mapbox': 8.1.1(mapbox-gl@3.22.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@vis.gl/react-mapbox': 8.1.1(mapbox-gl@3.23.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@vis.gl/react-maplibre': 8.1.1(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       react: 19.2.5
       react-dom: 19.2.5(react@19.2.5)
     optionalDependencies:
-      mapbox-gl: 3.22.0
+      mapbox-gl: 3.23.0
 
   react-markdown@10.1.0(@types/react@19.2.14)(react@19.2.5):
     dependencies:
@@ -8564,6 +8567,8 @@ snapshots:
   zod@3.25.76: {}
 
   zod@4.3.6: {}
+
+  zod@4.4.2: {}
 
   zustand@5.0.12(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5)):
     optionalDependencies:
