@@ -13,6 +13,12 @@ import {
 } from "./stream.ts";
 import { buildSystemPrompt } from "./prompts.ts";
 import { shouldEnableRetrievalTools } from "./retrieval-policy.ts";
+import {
+	buildProviderMessages,
+	convertToolResultToMessage,
+	type ProviderMessage,
+	type ProviderToolCall,
+} from "./messages.ts";
 import type { ToolRegistry } from "../tools/registry.ts";
 import type { OpenAITool, RequestContext, ToolResult } from "../tools/types.ts";
 
@@ -41,21 +47,9 @@ export interface AgentLoopResult {
 	metadata?: Record<string, unknown>;
 }
 
-interface ChatCompletionMessage {
-	role: "system" | "user" | "assistant" | "tool";
-	content: string | null;
-	tool_call_id?: string;
-	tool_calls?: DeepSeekToolCall[];
-}
+type ChatCompletionMessage = ProviderMessage;
 
-interface DeepSeekToolCall {
-	id: string;
-	type: "function";
-	function: {
-		name: string;
-		arguments: string;
-	};
-}
+type DeepSeekToolCall = ProviderToolCall;
 
 interface DeepSeekChoice {
 	message?: {
@@ -157,18 +151,6 @@ interface StreamingIterationOutcome {
 }
 
 const DEFAULT_MAX_ITERATIONS = 3;
-
-function normalizeHistoryRole(role: string): ChatCompletionMessage["role"] {
-	if (role === "assistant" || role === "system" || role === "tool") {
-		return role;
-	}
-
-	if (role === "model") {
-		return "assistant";
-	}
-
-	return "user";
-}
 
 function detectRegion(region?: string, env?: Record<string, string>): string {
 	const candidates = [
@@ -326,18 +308,6 @@ function parseToolArguments(
 	}
 
 	return parsed as Record<string, unknown>;
-}
-
-function buildToolResultContent(result: ToolResult): string {
-	if (!result.metadata && !result.truncated) {
-		return result.content;
-	}
-
-	return JSON.stringify({
-		content: result.content,
-		metadata: result.metadata,
-		truncated: result.truncated,
-	});
 }
 
 function buildIterationLimitMessage(lang?: string): string {
@@ -747,11 +717,10 @@ async function runStreamingIteration(options: {
 			content: streamResponse.content,
 			tool_calls: toolCalls,
 		},
-		...toolResults.map(
-			(toolResult): ChatCompletionMessage => ({
-				role: "tool",
-				tool_call_id: toolResult.toolCall.id,
-				content: buildToolResultContent(toolResult.result),
+		...toolResults.map((toolResult) =>
+			convertToolResultToMessage({
+				toolCall: toolResult.toolCall,
+				result: toolResult.result,
 			}),
 		),
 	];
@@ -867,23 +836,14 @@ export async function runAgentLoop(
 		region: provider.region,
 	};
 
-	const messages: ChatCompletionMessage[] = [
-		{
-			role: "system",
-			content: buildSystemPrompt({
-				userMemory,
-				lang: options.lang,
-			}),
-		},
-		...options.history.map((entry) => ({
-			role: normalizeHistoryRole(entry.role),
-			content: entry.content,
-		})),
-		{
-			role: "user",
-			content: options.message,
-		},
-	];
+	const messages = buildProviderMessages({
+		systemPrompt: buildSystemPrompt({
+			userMemory,
+			lang: options.lang,
+		}),
+		history: options.history,
+		message: options.message,
+	});
 	const tools = shouldEnableRetrievalTools(options.message) ? undefined : [];
 
 	const executedToolCalls: AgentLoopToolCall[] = [];
@@ -974,11 +934,13 @@ export async function runAgentLoop(
 				result: toolResult.result,
 			});
 
-			messages.push({
-				role: "tool",
-				tool_call_id: toolResult.toolCall.id,
-				content: buildToolResultContent(toolResult.result),
-			});
+
+			messages.push(
+				convertToolResultToMessage({
+					toolCall: toolResult.toolCall,
+					result: toolResult.result,
+				}),
+			);
 		}
 	}
 
@@ -1010,23 +972,14 @@ export async function runStreamingAgentLoop(
 		region: provider.region,
 	};
 
-	let messages: ChatCompletionMessage[] = [
-		{
-			role: "system",
-			content: buildSystemPrompt({
-				userMemory,
-				lang: options.lang,
-			}),
-		},
-		...options.history.map((entry) => ({
-			role: normalizeHistoryRole(entry.role),
-			content: entry.content,
-		})),
-		{
-			role: "user",
-			content: options.message,
-		},
-	];
+	let messages = buildProviderMessages({
+		systemPrompt: buildSystemPrompt({
+			userMemory,
+			lang: options.lang,
+		}),
+		history: options.history,
+		message: options.message,
+	});
 	const tools = shouldEnableRetrievalTools(options.message) ? undefined : [];
 
 	const executedToolCalls: AgentLoopToolCall[] = [];
