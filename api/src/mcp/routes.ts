@@ -48,6 +48,16 @@ class MCPRouteError extends Error {
 	}
 }
 
+class MCPJSONBodyError extends Error {
+	readonly cause: unknown;
+
+	constructor(message: string, cause: unknown) {
+		super(message);
+		this.name = "MCPJSONBodyError";
+		this.cause = cause;
+	}
+}
+
 export interface MCPRouteServices {
 	connections: Pick<
 		MCPConnectionService,
@@ -139,9 +149,9 @@ async function readJSONBody(request: Request): Promise<Record<string, unknown>> 
 
 		return body as Record<string, unknown>;
 	} catch (error) {
-		throw new Error(
+		throw new MCPJSONBodyError(
 			error instanceof Error ? error.message : "Invalid JSON request body",
-			{ cause: error },
+			error,
 		);
 	}
 }
