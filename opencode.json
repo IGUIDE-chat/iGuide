@@ -3,7 +3,8 @@
   "mcp": {
     "vite": {
       "type": "remote",
-      "url": "http://localhost:5173/__mcp/sse"
+      "url": "http://localhost:5173/__mcp/sse",
+      "enabled": false
     },
     "supabase": {
       "type": "remote",
@@ -14,8 +15,7 @@
       "command": [
         "mcp-remote",
         "https://docs.mcp.cloudflare.com/mcp"
-      ],
-      "enabled": false
+      ]
     }
   }
 }
