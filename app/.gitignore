@@ -1,2 +1,5 @@
 # files generated on build
 .vite
+
+# local debug artifacts
+.debug
