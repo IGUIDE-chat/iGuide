@@ -10,7 +10,7 @@ import {
   type AppendMessage,
   type ThreadMessageLike,
 } from "@assistant-ui/react";
-import { useChatSession } from "../../pages/chat/useChatSession";
+import { useChatSession } from "./useChatSession";
 import { type ChatMessage, type Language } from "../../types";
 
 interface ChatRuntimeProviderProps {

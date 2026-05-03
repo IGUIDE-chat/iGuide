@@ -1,7 +1,7 @@
 /**
- * @file ./src/pages/chat/useChatSession.ts
- * @description Page Route Component / Module
- * @description_zh 这是一个页面级路由编排器（Orchestrator）。只负责读取 URL 参数和组装 Feature Components。不要在这里写超过 300 行的 UI 逻辑。
+ * @file ./src/components/chat/useChatSession.ts
+ * @description Chat Behavioral Hook / Module
+ * @description_zh 这是一个聊天行为 hook（Orchestrator）。管理会话状态和消息处理逻辑。
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
