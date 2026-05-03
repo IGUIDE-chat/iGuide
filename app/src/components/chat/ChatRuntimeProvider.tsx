@@ -28,22 +28,6 @@ interface ChatSessionContextValue {
 export const ChatSessionContext =
   React.createContext<ChatSessionContextValue | null>(null);
 
-const convertMessage = (msg: ChatMessage): ThreadMessageLike => {
-  return {
-    id: msg.id,
-    role: msg.role === "model" ? "assistant" : "user",
-    content: [{ type: "text", text: msg.text }],
-    metadata: {
-      custom: {
-        thinkingSteps: msg.thinkingSteps,
-        isThinking: msg.isThinking,
-        followUpQuestions: msg.followUpQuestions,
-        isStreaming: msg.isStreaming,
-      },
-    },
-  };
-};
-
 const getTextFromAppendMessage = (message: AppendMessage): string | null => {
   const textPart = message.content.find((part) => part.type === "text");
 
@@ -66,18 +50,41 @@ export const ChatRuntimeProvider = ({
     onConversationCreated,
   });
 
-  const runtime = useExternalStoreRuntime({
-    messages,
-    convertMessage,
-    isRunning: isLoading,
-    onNew: async (message: AppendMessage) => {
-      const text = getTextFromAppendMessage(message);
-
-      if (text) {
-        await sendMessage(text);
-      }
+  const convertMessage = React.useCallback(
+    (msg: ChatMessage): ThreadMessageLike => {
+      return {
+        id: msg.id,
+        role: msg.role === "model" ? "assistant" : "user",
+        content: [{ type: "text", text: msg.text }],
+        metadata: {
+          custom: {
+            thinkingSteps: msg.thinkingSteps,
+            isThinking: msg.isThinking,
+            followUpQuestions: msg.followUpQuestions,
+            isStreaming: msg.isStreaming,
+          },
+        },
+      };
     },
-  });
+    []
+  );
+
+  const store = React.useMemo(
+    () => ({
+      messages,
+      convertMessage,
+      isRunning: isLoading,
+      onNew: async (message: AppendMessage) => {
+        const text = getTextFromAppendMessage(message);
+        if (text) {
+          await sendMessage(text);
+        }
+      },
+    }),
+    [messages, convertMessage, isLoading, sendMessage]
+  );
+
+  const runtime = useExternalStoreRuntime(store);
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>
