@@ -4,7 +4,7 @@
  */
 
 import * as React from "react";
-import { ThreadPrimitive, ComposerPrimitive } from "@assistant-ui/react";
+import { AuiIf, ThreadPrimitive, ComposerPrimitive } from "@assistant-ui/react";
 import { Language } from "../../types";
 import { UI_TEXT } from "../../i18n/uiText";
 import { ChatEmptyState } from "./ChatEmptyState";
@@ -18,16 +18,33 @@ interface ChatThreadProps {
 
 const containerClass = "w-full max-w-3xl mx-auto px-4";
 
+/**
+ * ChatThread — assistant-ui chat UI shell built on ThreadPrimitive and
+ * ComposerPrimitive.
+ *
+ * Primitive pattern choices:
+ * - ThreadPrimitive.Root / Viewport / Messages / ViewportFooter form
+ *   the structural chat shell. AuiIf condition={({ thread }) => thread.isEmpty}
+ *   renders the welcome state (replacing deprecated ThreadPrimitive.Empty)
+ *   when no messages exist. ThreadPrimitive.Messages iterates over the runtime
+ *   message list with custom UserMessage and AssistantMessage renderers.
+ * - ComposerPrimitive.Root / Input / Send provide the bottom-fixed input bar.
+ *   The composer lives inside ViewportFooter so it stays anchored to the
+ *   visible area while the message list scrolls behind it.
+ * - ChatSessionContext (from ChatRuntimeProvider) supplies sendMessage for
+ *   suggestion and follow-up clicks, keeping the UI decoupled from the
+ *   runtime's ExternalStore implementation.
+ */
 export const ChatThread = ({ language }: ChatThreadProps) => {
   const t = UI_TEXT[language];
   const ctx = React.useContext(ChatSessionContext);
 
   const handleSuggestionClick = (text: string) => {
-    void ctx?.sendMessage(text);
+    ctx?.appendMessage?.(text);
   };
 
   const handleFollowUpClick = (text: string) => {
-    void ctx?.sendMessage(text);
+    ctx?.appendMessage?.(text);
   };
 
   return (
@@ -35,7 +52,7 @@ export const ChatThread = ({ language }: ChatThreadProps) => {
       <ThreadPrimitive.Viewport className="w-full flex-1 overflow-y-auto">
         <div className="flex min-h-full flex-col">
           {/* Empty state — shown when no messages */}
-          <ThreadPrimitive.Empty>
+          <AuiIf condition={({ thread }) => thread.isEmpty}>
             <ChatEmptyState
               language={language}
               title={t.welcomeTitle}
@@ -43,7 +60,7 @@ export const ChatThread = ({ language }: ChatThreadProps) => {
               containerClass={containerClass}
               onSuggestionClick={handleSuggestionClick}
             />
-          </ThreadPrimitive.Empty>
+          </AuiIf>
 
           {/* Message list */}
           <div className="flex-col pt-14 pb-36">

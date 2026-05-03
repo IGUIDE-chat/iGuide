@@ -7,6 +7,7 @@ import * as React from "react";
 import {
   AssistantRuntimeProvider,
   useExternalStoreRuntime,
+  useAui,
   type AppendMessage,
   type ThreadMessageLike,
 } from "@assistant-ui/react";
@@ -22,7 +23,7 @@ interface ChatRuntimeProviderProps {
 
 /* eslint-disable react-refresh/only-export-components */
 interface ChatSessionContextValue {
-  sendMessage: (text: string) => Promise<void>;
+  appendMessage: (text: string) => void;
 }
 
 export const ChatSessionContext =
@@ -38,6 +39,22 @@ const getTextFromAppendMessage = (message: AppendMessage): string | null => {
   return null;
 };
 
+/**
+ * ChatRuntimeProvider — route-level assistant-ui runtime provider.
+ *
+ * Architectural notes:
+ * - AGENTS.md deviation: AGENTS.md:71 recommends placing AssistantRuntimeProvider
+ *   at the app root. This component intentionally mounts it at the /chat route
+ *   level instead. The chat feature is route-local, so scoping the runtime here
+ *   avoids polluting non-chat routes with chat state, context, and side effects.
+ * - ExternalStore pattern: uses useExternalStoreRuntime with a custom store
+ *   (backed by useChatSession) rather than the AI SDK transport. This gives
+ *   full control over message conversion, streaming metadata (thinking steps,
+ *   follow-up questions), and the custom SSE backend stream format.
+ * - ChatSessionContext: a sibling context that exposes sendMessage directly,
+ *   allowing child components (e.g. ChatThread, ChatEmptyState) to trigger
+ *   sends without coupling to the runtime internals.
+ */
 export const ChatRuntimeProvider = ({
   language,
   currentConversationId,
@@ -49,6 +66,18 @@ export const ChatRuntimeProvider = ({
     currentConversationId,
     onConversationCreated,
   });
+
+  const api = useAui();
+
+  const appendMessage = React.useCallback(
+    (text: string) => {
+      api.thread().append({
+        role: "user",
+        content: [{ type: "text", text }],
+      });
+    },
+    [api]
+  );
 
   const convertMessage = React.useCallback(
     (msg: ChatMessage): ThreadMessageLike => {
@@ -88,7 +117,7 @@ export const ChatRuntimeProvider = ({
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <ChatSessionContext.Provider value={{ sendMessage }}>
+      <ChatSessionContext.Provider value={{ appendMessage }}>
         {children}
       </ChatSessionContext.Provider>
     </AssistantRuntimeProvider>
