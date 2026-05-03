@@ -3,11 +3,13 @@ import type { StreamChunk } from "./ai/types";
 type StreamLanguage = "en" | "zh";
 
 interface WorkerToolStartPayload {
+  name?: string;
   tool?: string;
   args?: unknown;
 }
 
 interface WorkerToolResultPayload {
+  name?: string;
   tool?: string;
   status?: string;
   summary?: string;
@@ -102,8 +104,8 @@ function parseWorkerEvent(
           type: "tool_call",
           label:
             lang === "zh"
-              ? `调用工具: ${data.tool || "unknown"}`
-              : `Calling tool: ${data.tool || "unknown"}`,
+              ?           `调用工具: ${data.name ?? data.tool ?? "unknown"}`
+              : `Calling tool: ${data.name ?? data.tool ?? "unknown"}`,
           detail: stringifyDetail(data.args),
         },
       },
@@ -121,8 +123,8 @@ function parseWorkerEvent(
           type: "processing",
           label:
             lang === "zh"
-              ? `工具完成: ${data.tool || "unknown"}`
-              : `Tool finished: ${data.tool || "unknown"}`,
+              ?           `工具完成: ${data.name ?? data.tool ?? "unknown"}`
+              : `Tool finished: ${data.name ?? data.tool ?? "unknown"}`,
           detail: detail || undefined,
         },
       },
