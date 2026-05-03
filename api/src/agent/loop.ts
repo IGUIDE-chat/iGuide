@@ -3,18 +3,18 @@ import {
 	withFallback,
 	type FallbackEvent,
 	type FallbackReason,
-} from "./fallback";
+} from "./fallback.ts";
 import {
 	sendContent,
 	sendDone,
 	sendFallback,
 	sendToolResult,
 	sendToolStart,
-} from "./stream";
-import { buildSystemPrompt } from "./prompts";
-import { shouldEnableRetrievalTools } from "./retrieval-policy";
-import type { ToolRegistry } from "../tools/registry";
-import type { OpenAITool, RequestContext, ToolResult } from "../tools/types";
+} from "./stream.ts";
+import { buildSystemPrompt } from "./prompts.ts";
+import { shouldEnableRetrievalTools } from "./retrieval-policy.ts";
+import type { ToolRegistry } from "../tools/registry.ts";
+import type { OpenAITool, RequestContext, ToolResult } from "../tools/types.ts";
 
 export interface AgentLoopOptions {
 	message: string;

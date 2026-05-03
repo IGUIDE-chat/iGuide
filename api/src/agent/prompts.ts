@@ -1,4 +1,4 @@
-import { fillPromptTemplate, joinPromptSections } from './promptComposition'
+import { fillPromptTemplate, joinPromptSections } from './promptComposition.ts'
 import languageDefaultInstruction from './prompts/language-default.md'
 import languageEnInstruction from './prompts/language-en.md'
 import languageZhInstruction from './prompts/language-zh.md'
