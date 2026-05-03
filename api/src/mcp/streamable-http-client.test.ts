@@ -1,5 +1,7 @@
-import { createMCPToolWrapper } from "./adapter";
-import { StreamableHttpMCPClient } from "./streamable-http-client";
+import test from "node:test";
+
+import { createMCPToolWrapper } from "./adapter.ts";
+import { StreamableHttpMCPClient } from "./streamable-http-client.ts";
 
 type TestCase = {
 	name: string;
@@ -261,13 +263,6 @@ const tests: TestCase[] = [
 	},
 ];
 
-async function main(): Promise<void> {
-	for (const test of tests) {
-		await test.run();
-		console.log(`PASS ${test.name}`);
-	}
-
-	console.log(`PASS ${tests.length} tests`);
+for (const testCase of tests) {
+	test(testCase.name, testCase.run);
 }
-
-void main();
