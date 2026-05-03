@@ -33,13 +33,18 @@ interface JSONHeaders {
 }
 
 class MCPRouteError extends Error {
+	readonly status: number;
+	readonly failureReason?: MCPFailureReason;
+
 	constructor(
 		message: string,
-		readonly status: number,
-		readonly failureReason?: MCPFailureReason,
+		status: number,
+		failureReason?: MCPFailureReason,
 	) {
 		super(message);
 		this.name = "MCPRouteError";
+		this.status = status;
+		this.failureReason = failureReason;
 	}
 }
 
@@ -136,9 +141,10 @@ async function readJSONBody(request: Request): Promise<Record<string, unknown>> 
 	} catch (error) {
 		throw new Error(
 			error instanceof Error ? error.message : "Invalid JSON request body",
+			{ cause: error },
 		);
 	}
-	}
+}
 
 function parseCreateBody(body: Record<string, unknown>): CreateConnectionBody {
 	if (hasCredentialFields(body)) {

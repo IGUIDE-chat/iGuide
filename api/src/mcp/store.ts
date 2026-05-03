@@ -64,10 +64,13 @@ function buildKey(namespace: string, key: string): string {
 }
 
 class MapMCPStore implements MCPStore {
-	constructor(
-		private readonly storage: Map<string, string>,
-		private readonly namespace: string,
-	) {}
+	private readonly storage: Map<string, string>;
+	private readonly namespace: string;
+
+	constructor(storage: Map<string, string>, namespace: string) {
+		this.storage = storage;
+		this.namespace = namespace;
+	}
 
 	async get<T>(key: string): Promise<T | null> {
 		return deserialize<T>(this.storage.get(buildKey(this.namespace, key)) ?? null);
@@ -101,10 +104,13 @@ class MapMCPStore implements MCPStore {
 }
 
 class KVMCPStore implements MCPStore {
-	constructor(
-		private readonly kv: KVNamespaceLike,
-		private readonly namespace: string,
-	) {}
+	private readonly kv: KVNamespaceLike;
+	private readonly namespace: string;
+
+	constructor(kv: KVNamespaceLike, namespace: string) {
+		this.kv = kv;
+		this.namespace = namespace;
+	}
 
 	async get<T>(key: string): Promise<T | null> {
 		const value = await this.kv.get(buildKey(this.namespace, key), "text");
