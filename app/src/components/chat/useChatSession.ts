@@ -288,36 +288,56 @@ export const useChatSession = ({
         }
 
         // Extract and strip memory tags (invisible to user)
-        const userSoulMatch = fullText.match(
-          /<user_soul>([\s\S]*?)<\/user_soul>/
-        );
-        const userMemoryMatch = fullText.match(
-          /<user_memory>([\s\S]*?)<\/user_memory>/
-        );
-        const convMemoryMatch = fullText.match(
-          /<conv_memory>([\s\S]*?)<\/conv_memory>/
-        );
+        let userSoulMatch: RegExpMatchArray | null = null;
+        let userMemoryMatch: RegExpMatchArray | null = null;
+        let convMemoryMatch: RegExpMatchArray | null = null;
+
+        try {
+          userSoulMatch = fullText.match(
+            /<user_soul>([\s\S]*?)<\/user_soul>/
+          );
+          userMemoryMatch = fullText.match(
+            /<user_memory>([\s\S]*?)<\/user_memory>/
+          );
+          convMemoryMatch = fullText.match(
+            /<conv_memory>([\s\S]*?)<\/conv_memory>/
+          );
+          fullText = fullText
+            .replace(/<user_soul>[\s\S]*?<\/user_soul>/g, "")
+            .replace(/<user_memory>[\s\S]*?<\/user_memory>/g, "")
+            .replace(/<conv_memory>[\s\S]*?<\/conv_memory>/g, "")
+            .trim();
+        } catch {
+          // Regex failed — skip memory extraction, keep fullText as-is
+        }
+
+        // Clean up unclosed/partial tags that would leak into visible text
         fullText = fullText
-          .replace(/<user_soul>[\s\S]*?<\/user_soul>/g, "")
-          .replace(/<user_memory>[\s\S]*?<\/user_memory>/g, "")
-          .replace(/<conv_memory>[\s\S]*?<\/conv_memory>/g, "")
+          .replace(/<user_soul>[\s\S]*/g, "")
+          .replace(/<user_memory>[\s\S]*/g, "")
+          .replace(/<conv_memory>[\s\S]*/g, "")
           .trim();
+
+        // If all content was stripped, ensure clean empty string
+        if (!fullText.trim()) {
+          fullText = "";
+        }
 
         // Persist extracted memories (fire-and-forget)
         if (user && (userSoulMatch || userMemoryMatch || convMemoryMatch)) {
           const uid = user.id;
           const cid = conversationId;
-          if (userSoulMatch?.[1]?.trim()) {
-            void memoryService.appendSoul(uid, userSoulMatch[1].trim());
+          const soulContent = userSoulMatch?.[1]?.trim();
+          if (soulContent) {
+            void memoryService.appendSoul(uid, soulContent);
           }
-          if (userMemoryMatch?.[1]?.trim()) {
-            void memoryService.appendUserMemory(uid, userMemoryMatch[1].trim());
+          const userMemContent = userMemoryMatch?.[1]?.trim();
+          if (userMemContent) {
+            void memoryService.appendUserMemory(uid, userMemContent);
           }
-          if (convMemoryMatch?.[1]?.trim() && cid) {
-            void memoryService.updateConversationMemory(
-              cid,
-              convMemoryMatch[1].trim()
-            );
+          const convMemContent = convMemoryMatch?.[1]?.trim();
+          if (convMemContent && cid) {
+            void memoryService.updateConversationMemory(cid, convMemContent);
           }
         }
 
