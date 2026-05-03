@@ -147,6 +147,11 @@ export default defineConfig(({ mode }) => {
   return {
     server: {
       proxy: {
+        "/api/chat": {
+          target: "http://localhost:8787/chat",
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api\/chat/, ""),
+        },
         "/api/coze": {
           target: "https://api.coze.com",
           changeOrigin: true,
