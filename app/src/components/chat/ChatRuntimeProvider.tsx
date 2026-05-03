@@ -39,6 +39,24 @@ const getTextFromAppendMessage = (message: AppendMessage): string | null => {
   return null;
 };
 
+const AppendMessageInner = ({ children }: { children: React.ReactNode }) => {
+  const api = useAui();
+  const appendMessage = React.useCallback(
+    (text: string) => {
+      api.thread().append({
+        role: "user",
+        content: [{ type: "text", text }],
+      });
+    },
+    [api]
+  );
+  return (
+    <ChatSessionContext.Provider value={{ appendMessage }}>
+      {children}
+    </ChatSessionContext.Provider>
+  );
+};
+
 /**
  * ChatRuntimeProvider — route-level assistant-ui runtime provider.
  *
@@ -51,9 +69,9 @@ const getTextFromAppendMessage = (message: AppendMessage): string | null => {
  *   (backed by useChatSession) rather than the AI SDK transport. This gives
  *   full control over message conversion, streaming metadata (thinking steps,
  *   follow-up questions), and the custom SSE backend stream format.
- * - ChatSessionContext: a sibling context that exposes sendMessage directly,
- *   allowing child components (e.g. ChatThread, ChatEmptyState) to trigger
- *   sends without coupling to the runtime internals.
+ * - ChatSessionContext: exposed by AppendMessageInner (rendered inside the
+ *   AssistantRuntimeProvider) so useAui() runs within the required provider
+ *   context. Child components use appendMessage to send via the runtime API.
  */
 export const ChatRuntimeProvider = ({
   language,
@@ -66,18 +84,6 @@ export const ChatRuntimeProvider = ({
     currentConversationId,
     onConversationCreated,
   });
-
-  const api = useAui();
-
-  const appendMessage = React.useCallback(
-    (text: string) => {
-      api.thread().append({
-        role: "user",
-        content: [{ type: "text", text }],
-      });
-    },
-    [api]
-  );
 
   const convertMessage = React.useCallback(
     (msg: ChatMessage): ThreadMessageLike => {
@@ -117,9 +123,7 @@ export const ChatRuntimeProvider = ({
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <ChatSessionContext.Provider value={{ appendMessage }}>
-        {children}
-      </ChatSessionContext.Provider>
+      <AppendMessageInner>{children}</AppendMessageInner>
     </AssistantRuntimeProvider>
   );
 };
