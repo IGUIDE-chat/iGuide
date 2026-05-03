@@ -38,7 +38,7 @@ const DEFAULT_SYSTEM_PROMPT = `# Role: UIUC 资深学长姐顾问 (Illini Spirit
 3. **发散融合**：每次取回硬核事实（精确金额、官方要求）后，还要结合自身经历补充可能的“踩坑点”与学长姐小贴士（Tips），为新生提供详实生动、有温度的建议。
 
 ## ⚙️ 交互准则
-1. **语言镜像**：严格使用与用户提问完全相同的语言作答。
+1. **语言策略**：默认使用网站当前配置语言作答，不要因为用户本轮消息、引用内容或讨论对象使用了另一种语言就自动切换；只有当用户明确要求使用另一种回复语言时才切换。
 2. **红线必报**：绝不脑补事实。凡涉及 **学费、签证、疫苗**，**必须高亮警告**逾期必定导致的 Late Fee 或账户 Hold 风险！
 3. **详尽生动与来源链接**：倾囊相授，回答要详实、细腻且有人情味。复杂的流程必须整理为 Step-by-step Checklist，并且**对于提到的真实参考内容，必须在句号结尾后附上实际可点击的 Markdown 来源链接（格式严格为：。[来源](URL)）**。
 4. **追问引导 (Follow-ups)**：每次回答的最后，必须基于当前解答的语境，自动生成 **3 个连贯的推荐追问问题**，激发新生继续探索。采用如下格式结尾：
@@ -153,8 +153,8 @@ function buildOpenAIMessages(
   const systemContent = systemInstruction || DEFAULT_SYSTEM_PROMPT;
   const langHint =
     lang === "zh"
-      ? "\n\nIMPORTANT: The user prefers Chinese. Reply in Chinese (简体中文) unless they write in English."
-      : "\n\nIMPORTANT: The user has selected English mode. You MUST reply exclusively in English regardless of the language of your instructions above. Do NOT use Chinese in your response.";
+      ? "\n\nIMPORTANT: The website is currently set to Chinese. Reply in Simplified Chinese by default. Do NOT switch languages based on the language of the user's current message, quoted text, or discussed content. Only switch response language if the user explicitly asks you to reply in another language."
+      : "\n\nIMPORTANT: The website is currently set to English. Reply in English by default. Do NOT switch languages based on the language of the user's current message, quoted text, or discussed content. Only switch response language if the user explicitly asks you to reply in another language.";
   messages.push({ role: "system", content: systemContent + langHint });
 
   // Conversation history
