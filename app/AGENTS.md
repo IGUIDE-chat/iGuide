@@ -60,3 +60,15 @@ For structure-affecting changes:
    validation.
 5. Only require `npm run verify:architecture` if the script exists in
    `package.json`.
+
+## assistant-ui
+
+This project uses assistant-ui for chat interfaces.
+
+Documentation: https://www.assistant-ui.com/llms-full.txt
+
+Key patterns:
+- Use AssistantRuntimeProvider at the app root
+- Thread component for full chat interface
+- AssistantModal for floating chat widget
+- useChatRuntime hook with AI SDK transport
