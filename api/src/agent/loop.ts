@@ -15,10 +15,11 @@ import { buildSystemPrompt } from "./prompts.ts";
 import { shouldEnableRetrievalTools } from "./retrieval-policy.ts";
 import {
 	buildProviderMessages,
-	convertToolResultToMessage,
+	convertObservationToMessage,
 	type ProviderMessage,
 	type ProviderToolCall,
 } from "./messages.ts";
+import { buildObservation } from "./observation.ts";
 import type { ToolRegistry } from "../tools/registry.ts";
 import type { OpenAITool, RequestContext, ToolResult } from "../tools/types.ts";
 
@@ -718,10 +719,15 @@ async function runStreamingIteration(options: {
 			tool_calls: toolCalls,
 		},
 		...toolResults.map((toolResult) =>
-			convertToolResultToMessage({
-				toolCall: toolResult.toolCall,
-				result: toolResult.result,
-			}),
+			convertObservationToMessage(
+				buildObservation({
+					toolCallId: toolResult.toolCall.id,
+					toolName: toolResult.toolCall.function.name,
+					input: toolResult.args,
+					result: toolResult.result,
+					stepIndex: options.iterations,
+				}),
+			),
 		),
 	];
 
@@ -934,12 +940,16 @@ export async function runAgentLoop(
 				result: toolResult.result,
 			});
 
-
 			messages.push(
-				convertToolResultToMessage({
-					toolCall: toolResult.toolCall,
-					result: toolResult.result,
-				}),
+				convertObservationToMessage(
+					buildObservation({
+						toolCallId: toolResult.toolCall.id,
+						toolName: toolResult.toolCall.function.name,
+						input: toolResult.args,
+						result: toolResult.result,
+						stepIndex: iterations,
+					}),
+				),
 			);
 		}
 	}

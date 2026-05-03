@@ -1,3 +1,4 @@
+import type { Observation } from "./observation.ts";
 import type { ToolResult } from "../tools/types.ts";
 
 export interface ProviderToolCall {
@@ -80,6 +81,20 @@ export function buildToolResultContent(result: ToolResult): string {
 		metadata: result.metadata,
 		truncated: result.truncated,
 	});
+}
+
+export function convertObservationToMessage(
+	observation: Observation,
+): ProviderMessage {
+	if (observation.providerMessage) {
+		return observation.providerMessage;
+	}
+
+	return {
+		role: "tool",
+		tool_call_id: observation.toolCallId,
+		content: observation.raw,
+	};
 }
 
 export function convertToolResultToMessage(options: {
