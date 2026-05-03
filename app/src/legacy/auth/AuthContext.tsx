@@ -166,8 +166,8 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         updateName,
         isLoading,
         isGuest: !user,
-        setIsGuest: () => { },
-        requestLogin: () => { },
+        setIsGuest: () => {},
+        requestLogin: () => {},
       }}
     >
       {children}

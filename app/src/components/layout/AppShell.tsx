@@ -42,9 +42,10 @@ export const AppShell: React.FC<AppShellProps> = ({
         className={`
           fixed inset-0 z-40 w-64 bg-black/50 transition-opacity duration-300
           md:hidden
-          ${isSidebarOpen
-            ? "pointer-events-auto opacity-100"
-            : "pointer-events-none opacity-0"
+          ${
+            isSidebarOpen
+              ? "pointer-events-auto opacity-100"
+              : "pointer-events-none opacity-0"
           }
         `}
         role="button"
@@ -52,9 +53,9 @@ export const AppShell: React.FC<AppShellProps> = ({
         aria-hidden={!isSidebarOpen}
         onClick={onToggleSidebar}
         onKeyDown={(event) => {
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault()
-            onToggleSidebar()
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            onToggleSidebar();
           }
         }}
       />
@@ -66,9 +67,10 @@ export const AppShell: React.FC<AppShellProps> = ({
           fixed inset-y-0 left-0 z-50 flex flex-col bg-[#171717] text-slate-200
           transition-all duration-300 ease-in-out
           md:relative
-          ${isSidebarOpen
-            ? "translate-x-0"
-            : `
+          ${
+            isSidebarOpen
+              ? "translate-x-0"
+              : `
               -translate-x-full
               md:w-0 md:translate-x-0 md:overflow-hidden
             `
@@ -120,7 +122,7 @@ export const AppShell: React.FC<AppShellProps> = ({
           <button
             ref={mobileSidebarButtonRef}
             onClick={onToggleSidebar}
-            aria-label={isSidebarOpen ? 'Close sidebar' : 'Open sidebar'}
+            aria-label={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
             className="
               flex size-10 shrink-0 items-center justify-center rounded-xl
               border border-slate-200 bg-slate-100 text-slate-500

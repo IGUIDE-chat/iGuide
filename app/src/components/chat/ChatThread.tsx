@@ -19,7 +19,7 @@ interface ChatThreadProps {
 const containerClass = "w-full max-w-3xl mx-auto px-4";
 
 const toTextareaValue = (
-  value: React.TextareaHTMLAttributes<HTMLTextAreaElement>["value"],
+  value: React.TextareaHTMLAttributes<HTMLTextAreaElement>["value"]
 ) => {
   if (Array.isArray(value)) {
     return value.join(",");
@@ -28,29 +28,24 @@ const toTextareaValue = (
   return value?.toString() ?? "";
 };
 
-const isNativeInputComposing = (event: React.ChangeEvent<HTMLTextAreaElement>) =>
-  event.nativeEvent instanceof InputEvent && event.nativeEvent.isComposing;
+const isNativeInputComposing = (
+  event: React.ChangeEvent<HTMLTextAreaElement>
+) => event.nativeEvent instanceof InputEvent && event.nativeEvent.isComposing;
 
 const ImeSafeComposerTextarea = React.forwardRef<
   HTMLTextAreaElement,
   React.TextareaHTMLAttributes<HTMLTextAreaElement>
 >(
   (
-    {
-      onChange,
-      onCompositionEnd,
-      onCompositionStart,
-      value,
-      ...props
-    },
-    ref,
+    { onChange, onCompositionEnd, onCompositionStart, value, ...props },
+    ref
   ) => {
     const isComposingRef = React.useRef(false);
     const [compositionValue, setCompositionValue] = React.useState("");
     const controlledValue = toTextareaValue(value);
 
     const handleCompositionStart = (
-      event: React.CompositionEvent<HTMLTextAreaElement>,
+      event: React.CompositionEvent<HTMLTextAreaElement>
     ) => {
       isComposingRef.current = true;
       setCompositionValue(event.currentTarget.value);
@@ -66,7 +61,7 @@ const ImeSafeComposerTextarea = React.forwardRef<
     };
 
     const handleCompositionEnd = (
-      event: React.CompositionEvent<HTMLTextAreaElement>,
+      event: React.CompositionEvent<HTMLTextAreaElement>
     ) => {
       isComposingRef.current = false;
       setCompositionValue(event.currentTarget.value);
@@ -83,7 +78,7 @@ const ImeSafeComposerTextarea = React.forwardRef<
         onCompositionStart={handleCompositionStart}
       />
     );
-  },
+  }
 );
 
 ImeSafeComposerTextarea.displayName = "ImeSafeComposerTextarea";

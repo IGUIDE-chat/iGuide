@@ -293,9 +293,7 @@ export const useChatSession = ({
         let convMemoryMatch: RegExpMatchArray | null = null;
 
         try {
-          userSoulMatch = fullText.match(
-            /<user_soul>([\s\S]*?)<\/user_soul>/
-          );
+          userSoulMatch = fullText.match(/<user_soul>([\s\S]*?)<\/user_soul>/);
           userMemoryMatch = fullText.match(
             /<user_memory>([\s\S]*?)<\/user_memory>/
           );

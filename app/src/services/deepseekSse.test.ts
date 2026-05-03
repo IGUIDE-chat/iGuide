@@ -148,7 +148,10 @@ test("Legacy tool payload: tool_start with { tool } remains supported", () => {
   // SHOULD PASS: existing parser handles `tool` field correctly
   assert.equal(chunks.length, 1);
   assert.equal(chunks[0].thinkingStep?.type, "tool_call");
-  assert.equal(chunks[0].thinkingStep?.label, "Calling tool: search_knowledge_base");
+  assert.equal(
+    chunks[0].thinkingStep?.label,
+    "Calling tool: search_knowledge_base"
+  );
   assert.equal(chunks[0].thinkingStep?.detail, '{"query":"dorms"}');
 });
 
