@@ -16,6 +16,24 @@
         "mcp-remote",
         "https://docs.mcp.cloudflare.com/mcp"
       ]
+    },
+    "cloudflare-worker-builds": {
+      "type": "remote",
+      "url": "https://builds.mcp.cloudflare.com/mcp",
+      "oauth": {}
+    },
+    "cloudflare-observability": {
+      "type": "remote",
+      "url": "https://observability.mcp.cloudflare.com/mcp"
+    },
+    "cloudflare-dns": {
+      "type": "remote",
+      "url": "https://dns-analytics.mcp.cloudflare.com/mcp",
+      "oauth": {}
+    },
+    "cloudflare-agents-sdk-docs": {
+      "type": "remote",
+      "url": "https://agents.cloudflare.com/mcp"
     }
   }
 }
