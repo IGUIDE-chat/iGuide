@@ -1,10 +1,3 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "rules": [
-    {
-      "type": "Text",
-      "globs": ["**/*.md"],
-      "fallthrough": true,
-    },
-  ],
+  "$schema": "node_modules/wrangler/config-schema.json"
 }
