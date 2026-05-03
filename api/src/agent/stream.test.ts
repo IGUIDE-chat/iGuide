@@ -8,6 +8,11 @@ import {
 	sendContent,
 	sendFallback,
 	sendDone,
+	emitAgentStep,
+	emitToolDecision,
+	emitObservation,
+	emitToolBlocked,
+	emitFinalizing,
 } from "./stream.ts";
 
 interface ParsedSSEEvent {
@@ -277,4 +282,162 @@ test("all five event types are distinct", async () => {
 	assert.ok(eventTypes.has("content"));
 	assert.ok(eventTypes.has("fallback"));
 	assert.ok(eventTypes.has("done"));
+});
+
+test("agent_step payload includes step and iterations", async () => {
+	const { writer, events } = createTestWriterPair();
+
+	await emitAgentStep(writer, 2, 5);
+	await writer.close();
+
+	const parsed = await events;
+	assert.equal(parsed.length, 1);
+	assert.equal(parsed[0].event, "agent_step");
+
+	const payload = parsed[0].data as Record<string, unknown>;
+	assert.equal(payload.step, 2);
+	assert.equal(payload.iterations, 5);
+});
+
+test("tool_decision payload includes name and reason", async () => {
+	const { writer, events } = createTestWriterPair();
+
+	await emitToolDecision(writer, "web_search", "local results insufficient");
+	await writer.close();
+
+	const parsed = await events;
+	assert.equal(parsed.length, 1);
+	assert.equal(parsed[0].event, "tool_decision");
+
+	const payload = parsed[0].data as Record<string, unknown>;
+	assert.equal(payload.name, "web_search");
+	assert.equal(payload.reason, "local results insufficient");
+});
+
+test("observation payload includes name, status, and bounded summary", async () => {
+	const { writer, events } = createTestWriterPair();
+
+	await emitObservation(writer, "web_search", "success", "3 results returned");
+	await writer.close();
+
+	const parsed = await events;
+	assert.equal(parsed.length, 1);
+	assert.equal(parsed[0].event, "observation");
+
+	const payload = parsed[0].data as Record<string, unknown>;
+	assert.equal(payload.name, "web_search");
+	assert.equal(payload.status, "success");
+	assert.equal(payload.summary, "3 results returned");
+});
+
+test("observation payload does not include raw content", async () => {
+	const { writer, events } = createTestWriterPair();
+
+	await emitObservation(writer, "search_knowledge_base", "success", "5 results");
+	await writer.close();
+
+	const parsed = await events;
+	const payload = parsed[0].data as Record<string, unknown>;
+	assert.ok(!("content" in payload), "observation must NOT have raw content field");
+	assert.ok(!("results" in payload), "observation must NOT have raw results field");
+	assert.ok(!("data" in payload), "observation must NOT have raw data field");
+});
+
+test("tool_blocked payload includes name and reason", async () => {
+	const { writer, events } = createTestWriterPair();
+
+	await emitToolBlocked(writer, "web_search", "rate limit exceeded");
+	await writer.close();
+
+	const parsed = await events;
+	assert.equal(parsed.length, 1);
+	assert.equal(parsed[0].event, "tool_blocked");
+
+	const payload = parsed[0].data as Record<string, unknown>;
+	assert.equal(payload.name, "web_search");
+	assert.equal(payload.reason, "rate limit exceeded");
+});
+
+test("finalizing payload includes reason", async () => {
+	const { writer, events } = createTestWriterPair();
+
+	await emitFinalizing(writer, "max_iterations");
+	await writer.close();
+
+	const parsed = await events;
+	assert.equal(parsed.length, 1);
+	assert.equal(parsed[0].event, "finalizing");
+
+	const payload = parsed[0].data as Record<string, unknown>;
+	assert.equal(payload.reason, "max_iterations");
+});
+
+test("trace events do not break existing event order", async () => {
+	const { writer, events } = createTestWriterPair();
+
+	await emitAgentStep(writer, 1, 0);
+	await emitToolDecision(writer, "search_knowledge_base", "user query about housing");
+	await sendToolStart(writer, "search_knowledge_base", { query: "housing" });
+	await emitObservation(writer, "search_knowledge_base", "success", "5 results");
+	await sendToolResult(writer, "search_knowledge_base", "success", "5 results");
+	await sendContent(writer, "Here are the results...");
+	await emitFinalizing(writer, "complete");
+	await sendDone(writer, { prompt_tokens: 50, completion_tokens: 30 });
+	await writer.close();
+
+	const parsed = await events;
+	assert.equal(parsed.length, 8);
+
+	const eventNames = parsed.map((e) => e.event);
+	assert.deepEqual(eventNames, [
+		"agent_step",
+		"tool_decision",
+		"tool_start",
+		"observation",
+		"tool_result",
+		"content",
+		"finalizing",
+		"done",
+	]);
+});
+
+test("existing tool_start test still passes (backward compat)", async () => {
+	const { writer, events } = createTestWriterPair();
+
+	await sendToolStart(writer, "search_knowledge_base", { query: "housing" });
+	await writer.close();
+
+	const parsed = await events;
+	assert.equal(parsed.length, 1, "Should emit exactly one event");
+	assert.equal(parsed[0].event, "tool_start");
+
+	const payload = parsed[0].data as Record<string, unknown>;
+	assert.equal(
+		payload.name,
+		"search_knowledge_base",
+		"tool_start payload must use 'name' field",
+	);
+	assert.ok(!("tool" in payload), "tool_start must NOT have 'tool' field");
+	assert.deepEqual(payload.args, { query: "housing" });
+});
+
+test("existing tool_result test still passes (backward compat)", async () => {
+	const { writer, events } = createTestWriterPair();
+
+	await sendToolResult(writer, "search_knowledge_base", "success", "2 results");
+	await writer.close();
+
+	const parsed = await events;
+	assert.equal(parsed.length, 1);
+	assert.equal(parsed[0].event, "tool_result");
+
+	const payload = parsed[0].data as Record<string, unknown>;
+	assert.equal(
+		payload.name,
+		"search_knowledge_base",
+		"tool_result payload must use 'name' field",
+	);
+	assert.ok(!("tool" in payload), "tool_result must NOT have 'tool' field");
+	assert.equal(payload.status, "success");
+	assert.equal(payload.summary, "2 results");
 });

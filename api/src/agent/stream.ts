@@ -90,3 +90,58 @@ export async function sendDone(
 		usage,
 	});
 }
+
+export async function emitAgentStep(
+	writer: SSEWriter,
+	stepIndex: number,
+	iterationCount: number,
+): Promise<void> {
+	await writeEvent(writer, "agent_step", {
+		step: stepIndex,
+		iterations: iterationCount,
+	});
+}
+
+export async function emitToolDecision(
+	writer: SSEWriter,
+	toolName: string,
+	reason: string,
+): Promise<void> {
+	await writeEvent(writer, "tool_decision", {
+		name: toolName,
+		reason,
+	});
+}
+
+export async function emitObservation(
+	writer: SSEWriter,
+	toolName: string,
+	status: "success" | "error",
+	summary: string,
+): Promise<void> {
+	await writeEvent(writer, "observation", {
+		name: toolName,
+		status,
+		summary,
+	});
+}
+
+export async function emitToolBlocked(
+	writer: SSEWriter,
+	toolName: string,
+	reason: string,
+): Promise<void> {
+	await writeEvent(writer, "tool_blocked", {
+		name: toolName,
+		reason,
+	});
+}
+
+export async function emitFinalizing(
+	writer: SSEWriter,
+	stopReason: string,
+): Promise<void> {
+	await writeEvent(writer, "finalizing", {
+		reason: stopReason,
+	});
+}
