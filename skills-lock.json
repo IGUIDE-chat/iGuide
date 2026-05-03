@@ -25,6 +25,12 @@
       "skillPath": "skills/cloudflare/SKILL.md",
       "computedHash": "ecc9c0211c605451f7e8b437724f84810fe013d5ca6c653c51d046139d4ecbf7"
     },
+    "manual-frontend-qa": {
+      "source": "arcadi4/skills",
+      "sourceType": "github",
+      "skillPath": "manual-frontend-qa/SKILL.md",
+      "computedHash": "ddbbeec4944fd7d2a2c59c6aa4e5e8298d78c986e79f62c499795a837c7b122c"
+    },
     "primitives": {
       "source": "assistant-ui/skills",
       "sourceType": "github",
