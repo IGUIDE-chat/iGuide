@@ -19,7 +19,8 @@ import {
 	type ProviderMessage,
 	type ProviderToolCall,
 } from "./messages.ts";
-import { buildObservation } from "./observation.ts";
+import { executeToolAction } from "./actions.ts";
+import type { Observation } from "./observation.ts";
 import type { ToolRegistry } from "../tools/registry.ts";
 import type { OpenAITool, RequestContext, ToolResult } from "../tools/types.ts";
 
@@ -133,8 +134,7 @@ interface ParsedStreamResponse {
 
 interface ExecutedStreamingToolResult {
 	toolCall: DeepSeekToolCall;
-	args: Record<string, unknown>;
-	result: ToolResult;
+	observation: Observation;
 }
 
 interface StreamingIterationOutcome {
@@ -284,31 +284,6 @@ async function getUserMemoryBlock(
 	}
 
 	return sections.length > 0 ? sections.join("\n\n") : undefined;
-}
-
-function createToolErrorResult(payload: Record<string, unknown>): ToolResult {
-	return {
-		content: JSON.stringify(payload),
-		metadata: {
-			error: true,
-		},
-	};
-}
-
-function parseToolArguments(
-	toolCall: DeepSeekToolCall,
-): Record<string, unknown> {
-	const rawArguments = toolCall.function.arguments?.trim();
-	if (!rawArguments) {
-		return {};
-	}
-
-	const parsed = JSON.parse(rawArguments) as unknown;
-	if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
-		throw new Error("Tool arguments must be a JSON object");
-	}
-
-	return parsed as Record<string, unknown>;
 }
 
 function buildIterationLimitMessage(lang?: string): string {
@@ -536,11 +511,6 @@ async function readDeepSeekStreamingResponse(options: {
 	};
 }
 
-function summarizeToolResult(result: ToolResult): string {
-	const summary = result.content.replace(/\s+/g, " ").trim();
-	return summary.length > 200 ? `${summary.slice(0, 197)}...` : summary;
-}
-
 function parseToolFailureReason(result: ToolResult): FallbackReason | null {
 	if (!result.metadata?.error) {
 		return null;
@@ -554,6 +524,14 @@ function parseToolFailureReason(result: ToolResult): FallbackReason | null {
 	}
 }
 
+function observationToToolResult(observation: Observation): ToolResult {
+	return {
+		content: observation.raw,
+		metadata: observation.status === "error" ? { error: true } : undefined,
+		truncated: observation.truncated ? true : undefined,
+	};
+}
+
 function getFallbackReason(
 	toolResults: ExecutedStreamingToolResult[],
 ): FallbackReason | undefined {
@@ -562,7 +540,7 @@ function getFallbackReason(
 	}
 
 	const reasons = toolResults.map((entry) =>
-		parseToolFailureReason(entry.result),
+		parseToolFailureReason(observationToToolResult(entry.observation)),
 	);
 	if (reasons.some((reason) => reason === null)) {
 		return undefined;
@@ -613,44 +591,29 @@ async function executeStreamingToolCalls(options: {
 	registry: ToolRegistry;
 	requestContext: RequestContext;
 	writer: WritableStreamDefaultWriter<string>;
+	stepIndex: number;
 }): Promise<ExecutedStreamingToolResult[]> {
 	const toolResults: ExecutedStreamingToolResult[] = [];
 
 	for (const toolCall of options.toolCalls) {
-		let args: Record<string, unknown> = {};
-		let result: ToolResult;
+		const observation = await executeToolAction({
+			toolCall,
+			registry: options.registry,
+			requestContext: options.requestContext,
+			stepIndex: options.stepIndex,
+		});
+		await sendToolStart(options.writer, observation.toolName, observation.input);
 
-		try {
-			args = parseToolArguments(toolCall);
-			await sendToolStart(options.writer, toolCall.function.name, args);
-			result = await options.registry.execute(
-				toolCall.function.name,
-				args,
-				options.requestContext,
-			);
-		} catch (error) {
-			result = createToolErrorResult({
-				error: "invalid_arguments",
-				tool: toolCall.function.name,
-				message:
-					error instanceof Error ? error.message : "Invalid tool arguments",
-				raw_arguments: toolCall.function.arguments,
-			});
-			await sendToolStart(options.writer, toolCall.function.name, args);
-		}
-
-		const status = result.metadata?.error ? "error" : "success";
 		await sendToolResult(
 			options.writer,
-			toolCall.function.name,
-			status,
-			summarizeToolResult(result),
+			observation.toolName,
+			observation.status,
+			observation.summary,
 		);
 
 		toolResults.push({
 			toolCall,
-			args,
-			result,
+			observation,
 		});
 	}
 
@@ -709,6 +672,7 @@ async function runStreamingIteration(options: {
 		registry: options.registry,
 		requestContext: options.requestContext,
 		writer: options.writer,
+		stepIndex: options.iterations,
 	});
 
 	const nextMessages = [
@@ -719,15 +683,7 @@ async function runStreamingIteration(options: {
 			tool_calls: toolCalls,
 		},
 		...toolResults.map((toolResult) =>
-			convertObservationToMessage(
-				buildObservation({
-					toolCallId: toolResult.toolCall.id,
-					toolName: toolResult.toolCall.function.name,
-					input: toolResult.args,
-					result: toolResult.result,
-					stepIndex: options.iterations,
-				}),
-			),
+			convertObservationToMessage(toolResult.observation),
 		),
 	];
 
@@ -735,9 +691,9 @@ async function runStreamingIteration(options: {
 		...options.executedToolCalls,
 		...toolResults.map(
 			(toolResult): AgentLoopToolCall => ({
-				name: toolResult.toolCall.function.name,
-				args: toolResult.args,
-				result: toolResult.result,
+				name: toolResult.observation.toolName,
+				args: toolResult.observation.input,
+				result: observationToToolResult(toolResult.observation),
 			}),
 		),
 	];
@@ -899,35 +855,19 @@ export async function runAgentLoop(
 			tool_calls: toolCalls,
 		});
 
-		const toolResults = await Promise.all(
-			toolCalls.map(async (toolCall) => {
-				let args: Record<string, unknown> = {};
-				let result: ToolResult;
-
-				try {
-					args = parseToolArguments(toolCall);
-					result = await options.registry.execute(
-						toolCall.function.name,
-						args,
-						requestContext,
-					);
-				} catch (error) {
-					result = createToolErrorResult({
-						error: "invalid_arguments",
-						tool: toolCall.function.name,
-						message:
-							error instanceof Error ? error.message : "Invalid tool arguments",
-						raw_arguments: toolCall.function.arguments,
-					});
-				}
-
-				return {
-					toolCall,
-					args,
-					result,
-				};
-			}),
-		);
+		const toolResults: Array<{
+			toolCall: DeepSeekToolCall;
+			observation: Observation;
+		}> = [];
+		for (const toolCall of toolCalls) {
+			const observation = await executeToolAction({
+				toolCall,
+				registry: options.registry,
+				requestContext,
+				stepIndex: iterations,
+			});
+			toolResults.push({ toolCall, observation });
+		}
 
 		if (toolResults.length === 0) {
 			break;
@@ -935,21 +875,13 @@ export async function runAgentLoop(
 
 		for (const toolResult of toolResults) {
 			executedToolCalls.push({
-				name: toolResult.toolCall.function.name,
-				args: toolResult.args,
-				result: toolResult.result,
+				name: toolResult.observation.toolName,
+				args: toolResult.observation.input,
+				result: observationToToolResult(toolResult.observation),
 			});
 
 			messages.push(
-				convertObservationToMessage(
-					buildObservation({
-						toolCallId: toolResult.toolCall.id,
-						toolName: toolResult.toolCall.function.name,
-						input: toolResult.args,
-						result: toolResult.result,
-						stepIndex: iterations,
-					}),
-				),
+				convertObservationToMessage(toolResult.observation),
 			);
 		}
 	}
