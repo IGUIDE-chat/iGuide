@@ -5,6 +5,7 @@ import { defineConfig, loadEnv, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import { qmdSearchPlugin } from "./scripts/qmdSearchGateway";
 import type { IncomingMessage } from "http";
+import { ViteMcp } from "vite-plugin-mcp";
 
 type ProxyMutableRequest = IncomingMessage & {
 	_geminiProxyBody?: string;
@@ -103,7 +104,7 @@ export default defineConfig(({ mode }) => {
 				},
 			},
 		},
-		plugins: [qmdSearchPlugin(), react()],
+		plugins: [qmdSearchPlugin(), react(), ViteMcp()],
 		define: {
 			// Only inject public keys that are safe for frontend
 			// NEVER inject sensitive API keys here
