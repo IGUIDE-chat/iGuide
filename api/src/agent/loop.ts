@@ -14,6 +14,9 @@ import {
 	sendFallback,
 	sendToolResult,
 	sendToolStart,
+	emitAgentStep,
+	emitObservation,
+	emitFinalizing,
 } from "./stream.ts";
 import { buildSystemPrompt } from "./prompts.ts";
 import { shouldEnableRetrievalTools } from "./retrieval-policy.ts";
@@ -572,7 +575,15 @@ async function executeStreamingToolCalls(options: {
 			requestContext: options.requestContext,
 			stepIndex: options.stepIndex,
 		});
+
 		await sendToolStart(options.writer, observation.toolName, observation.input);
+
+		await emitObservation(
+			options.writer,
+			observation.toolName,
+			observation.status,
+			observation.summary,
+		);
 
 		await sendToolResult(
 			options.writer,
@@ -605,6 +616,8 @@ async function runStreamingIteration(options: {
 	iterations: number;
 	tools?: OpenAITool[];
 }): Promise<StreamingIterationOutcome> {
+	await emitAgentStep(options.writer, options.iterations, options.iterations);
+
 	const reader = await callDeepSeekStream({
 		provider: options.provider,
 		messages: options.messages,
@@ -1042,6 +1055,7 @@ export async function runStreamingAgentLoop(
 			}
 
 			if (!iterationOutcome.nextMessages) {
+				await emitFinalizing(options.writer, iterationOutcome.metadata?.stopReason ?? "complete");
 				await sendDone(options.writer, iterationOutcome.usage);
 				doneSent = true;
 				return {
@@ -1065,35 +1079,39 @@ export async function runStreamingAgentLoop(
 			fallback_level: 2,
 		});
 
-		const fallbackOutcome = await runDirectFallbackResponse({
-			provider,
-			messages,
-			registry: options.registry,
-			writer: options.writer,
-			usage,
-			executedToolCalls,
-			iterations,
-			reason: "max_iterations_exceeded",
+		const maxIterationStop = evaluateStopCondition({
+			iterationCount: iterations,
+			maxIterations,
+			toolCalls: [
+				{
+					id: "max_iterations",
+					type: "function",
+					function: {
+						name: "max_iterations",
+						arguments: "{}",
+					},
+				},
+			],
 		});
-		usage.prompt_tokens = fallbackOutcome.usage.prompt_tokens;
-		usage.completion_tokens = fallbackOutcome.usage.completion_tokens;
-		usage.total_tokens = fallbackOutcome.usage.total_tokens;
-		logFallbackEvent({
-			timestamp: new Date().toISOString(),
-			query: options.message,
-			failure_reason: "max_iterations_exceeded",
-			fallback_level: 3,
-		});
+		const disclaimer = buildIterationLimitMessage(options.lang);
+		const maxIterContent = lastAssistantContent
+			? `${lastAssistantContent}\n\n${disclaimer}`
+			: disclaimer;
+
+		await emitFinalizing(options.writer, "max_iterations");
 		await sendFallback(options.writer, "max_iterations_exceeded");
-		await sendDone(options.writer, fallbackOutcome.usage);
+		await sendDone(options.writer, usage);
 		doneSent = true;
 
 		return {
-			content: fallbackOutcome.content || lastAssistantContent,
-			toolCalls: fallbackOutcome.toolCalls,
+			content: maxIterContent,
+			toolCalls: executedToolCalls,
 			iterations,
-			usage: fallbackOutcome.usage,
+			usage,
 			metadata: {
+				stopReason: maxIterationStop.reason,
+				stopSemanticLabel: maxIterationStop.semanticLabel,
+				fallbackReason: maxIterationStop.fallbackReason,
 				fallback: true,
 				fallbackLevel: 2,
 				reason: "max_iterations_exceeded",
