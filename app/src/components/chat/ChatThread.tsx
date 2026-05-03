@@ -18,6 +18,76 @@ interface ChatThreadProps {
 
 const containerClass = "w-full max-w-3xl mx-auto px-4";
 
+const toTextareaValue = (
+  value: React.TextareaHTMLAttributes<HTMLTextAreaElement>["value"],
+) => {
+  if (Array.isArray(value)) {
+    return value.join(",");
+  }
+
+  return value?.toString() ?? "";
+};
+
+const isNativeInputComposing = (event: React.ChangeEvent<HTMLTextAreaElement>) =>
+  event.nativeEvent instanceof InputEvent && event.nativeEvent.isComposing;
+
+const ImeSafeComposerTextarea = React.forwardRef<
+  HTMLTextAreaElement,
+  React.TextareaHTMLAttributes<HTMLTextAreaElement>
+>(
+  (
+    {
+      onChange,
+      onCompositionEnd,
+      onCompositionStart,
+      value,
+      ...props
+    },
+    ref,
+  ) => {
+    const isComposingRef = React.useRef(false);
+    const [compositionValue, setCompositionValue] = React.useState("");
+    const controlledValue = toTextareaValue(value);
+
+    const handleCompositionStart = (
+      event: React.CompositionEvent<HTMLTextAreaElement>,
+    ) => {
+      isComposingRef.current = true;
+      setCompositionValue(event.currentTarget.value);
+      onCompositionStart?.(event);
+    };
+
+    const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+      if (isComposingRef.current || isNativeInputComposing(event)) {
+        setCompositionValue(event.currentTarget.value);
+      }
+
+      onChange?.(event);
+    };
+
+    const handleCompositionEnd = (
+      event: React.CompositionEvent<HTMLTextAreaElement>,
+    ) => {
+      isComposingRef.current = false;
+      setCompositionValue(event.currentTarget.value);
+      onCompositionEnd?.(event);
+    };
+
+    return (
+      <textarea
+        {...props}
+        ref={ref}
+        value={isComposingRef.current ? compositionValue : controlledValue}
+        onChange={handleChange}
+        onCompositionEnd={handleCompositionEnd}
+        onCompositionStart={handleCompositionStart}
+      />
+    );
+  },
+);
+
+ImeSafeComposerTextarea.displayName = "ImeSafeComposerTextarea";
+
 /**
  * ChatThread — assistant-ui chat UI shell built on ThreadPrimitive and
  * ComposerPrimitive.
@@ -100,6 +170,7 @@ export const ChatThread = ({ language }: ChatThreadProps) => {
                     text-slate-900 placeholder-slate-400
                     focus:outline-none
                   "
+                  render={<ImeSafeComposerTextarea />}
                   rows={1}
                 />
                 <ComposerPrimitive.Send
