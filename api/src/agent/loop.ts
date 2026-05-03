@@ -5,6 +5,10 @@ import {
 	type FallbackReason,
 } from "./fallback.ts";
 import {
+	DEFAULT_MAX_ITERATIONS,
+	evaluateStopCondition,
+} from "./bounds.ts";
+import {
 	sendContent,
 	sendDone,
 	sendFallback,
@@ -150,8 +154,6 @@ interface StreamingIterationOutcome {
 	nextMessages?: ChatCompletionMessage[];
 	fallbackReason?: FallbackReason;
 }
-
-const DEFAULT_MAX_ITERATIONS = 3;
 
 function detectRegion(region?: string, env?: Record<string, string>): string {
 	const candidates = [
@@ -511,44 +513,12 @@ async function readDeepSeekStreamingResponse(options: {
 	};
 }
 
-function parseToolFailureReason(result: ToolResult): FallbackReason | null {
-	if (!result.metadata?.error) {
-		return null;
-	}
-
-	try {
-		const payload = JSON.parse(result.content) as { error?: string };
-		return payload.error === "timeout" ? "tool_timeout" : "tool_failure";
-	} catch {
-		return "tool_failure";
-	}
-}
-
 function observationToToolResult(observation: Observation): ToolResult {
 	return {
 		content: observation.raw,
 		metadata: observation.status === "error" ? { error: true } : undefined,
 		truncated: observation.truncated ? true : undefined,
 	};
-}
-
-function getFallbackReason(
-	toolResults: ExecutedStreamingToolResult[],
-): FallbackReason | undefined {
-	if (toolResults.length === 0) {
-		return undefined;
-	}
-
-	const reasons = toolResults.map((entry) =>
-		parseToolFailureReason(observationToToolResult(entry.observation)),
-	);
-	if (reasons.some((reason) => reason === null)) {
-		return undefined;
-	}
-
-	return reasons.every((reason) => reason === "tool_timeout")
-		? "tool_timeout"
-		: "tool_failure";
 }
 
 function buildSimplifiedRetryMessages(
@@ -659,11 +629,19 @@ async function runStreamingIteration(options: {
 
 	const toolCalls = streamResponse.toolCalls;
 	if (toolCalls.length === 0) {
+		const responseStop = evaluateStopCondition({
+			iterationCount: options.iterations,
+			toolCalls,
+		});
 		return {
 			content: streamResponse.content,
 			toolCalls: options.executedToolCalls,
 			iterations: options.iterations,
 			usage,
+			metadata: {
+				stopReason: responseStop.reason,
+				stopSemanticLabel: responseStop.semanticLabel,
+			},
 		};
 	}
 
@@ -704,7 +682,11 @@ async function runStreamingIteration(options: {
 		iterations: options.iterations,
 		usage,
 		nextMessages,
-		fallbackReason: getFallbackReason(toolResults),
+		fallbackReason: evaluateStopCondition({
+			iterationCount: options.iterations,
+			toolCalls,
+			observations: toolResults.map((toolResult) => toolResult.observation),
+		}).fallbackReason ?? undefined,
 	};
 }
 
@@ -840,12 +822,21 @@ export async function runAgentLoop(
 		}
 
 		const toolCalls = responseMessage.tool_calls ?? [];
-		if (toolCalls.length === 0) {
+		const responseStop = evaluateStopCondition({
+			iterationCount: iterations,
+			maxIterations,
+			toolCalls,
+		});
+		if (responseStop.shouldStop && responseStop.reason === "final_answer") {
 			return {
 				content: assistantContent || lastAssistantContent,
 				toolCalls: executedToolCalls,
 				iterations,
 				usage,
+				metadata: {
+					stopReason: responseStop.reason,
+					stopSemanticLabel: responseStop.semanticLabel,
+				},
 			};
 		}
 
@@ -869,6 +860,13 @@ export async function runAgentLoop(
 			toolResults.push({ toolCall, observation });
 		}
 
+		const toolStop = evaluateStopCondition({
+			iterationCount: iterations,
+			maxIterations,
+			toolCalls,
+			observations: toolResults.map((toolResult) => toolResult.observation),
+		});
+
 		if (toolResults.length === 0) {
 			break;
 		}
@@ -884,8 +882,36 @@ export async function runAgentLoop(
 				convertObservationToMessage(toolResult.observation),
 			);
 		}
+
+		if (toolStop.shouldStop && toolStop.reason !== "max_iterations") {
+			return {
+				content: assistantContent || lastAssistantContent,
+				toolCalls: executedToolCalls,
+				iterations,
+				usage,
+				metadata: {
+					stopReason: toolStop.reason,
+					stopSemanticLabel: toolStop.semanticLabel,
+					fallbackReason: toolStop.fallbackReason,
+				},
+			};
+		}
 	}
 
+	const maxIterationStop = evaluateStopCondition({
+		iterationCount: iterations,
+		maxIterations,
+		toolCalls: [
+			{
+				id: "max_iterations",
+				type: "function",
+				function: {
+					name: "max_iterations",
+					arguments: "{}",
+				},
+			},
+		],
+	});
 	const disclaimer = buildIterationLimitMessage(options.lang);
 	const content = lastAssistantContent
 		? `${lastAssistantContent}\n\n${disclaimer}`
@@ -896,6 +922,11 @@ export async function runAgentLoop(
 		toolCalls: executedToolCalls,
 		iterations,
 		usage,
+		metadata: {
+			stopReason: maxIterationStop.reason,
+			stopSemanticLabel: maxIterationStop.semanticLabel,
+			fallbackReason: maxIterationStop.fallbackReason,
+		},
 	};
 }
 

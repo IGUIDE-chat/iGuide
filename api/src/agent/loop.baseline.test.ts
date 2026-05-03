@@ -269,6 +269,11 @@ test("content-only response stops without tool calls", async () => {
 		assert.equal(result.toolCalls.length, 0, "No tool calls should be made");
 		assert.equal(result.content, "Here is a direct answer without needing tools.");
 		assert.equal(result.iterations, 1, "Should stop after 1 iteration");
+		assert.equal(result.metadata?.stopReason, "final_answer");
+		assert.equal(
+			result.metadata?.stopSemanticLabel,
+			"final_answer_no_tool_calls",
+		);
 	} finally {
 		globalThis.fetch = originalFetch;
 	}
@@ -314,6 +319,12 @@ test("max iterations triggers fallback behavior", async () => {
 		assert.ok(
 			result.content.includes("maximum tool-call iterations"),
 			"Should include max iterations disclaimer",
+		);
+		assert.equal(result.metadata?.stopReason, "max_iterations");
+		assert.equal(result.metadata?.stopSemanticLabel, "max_iterations_reached");
+		assert.equal(
+			result.metadata?.fallbackReason,
+			"max_iterations_exceeded",
 		);
 
 		assert.ok(result.toolCalls.length > 0, "Should have made some tool calls");
