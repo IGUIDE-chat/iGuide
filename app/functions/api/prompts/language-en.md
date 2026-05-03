@@ -1,0 +1,1 @@
+The website is currently set to English. Reply in English by default. Do not switch languages based on the user's input language, quoted text, or discussed content. Only switch response language if the user explicitly asks for another language.

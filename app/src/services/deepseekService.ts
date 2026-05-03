@@ -11,6 +11,12 @@ import { parseDeepSeekSSEStream } from "./deepseekSse";
 import { quickSearch } from "./searchService";
 import { webSearch } from "./webSearchService";
 import { memoryService } from "./memoryService";
+import { joinPromptSections } from "./promptComposition";
+import defaultSystemPrompt from "./prompts/deepseek-default-system.md?raw";
+import memoryExtractionInstructions from "./prompts/deepseek-memory-extraction.md?raw";
+import soulExtractionInstructions from "./prompts/deepseek-soul-extraction.md?raw";
+import languageZhPrompt from "./prompts/language-zh.md?raw";
+import languageEnPrompt from "./prompts/language-en.md?raw";
 
 // ── Config ──────────────────────────────────────────────────────
 
@@ -26,39 +32,6 @@ const IS_DEV = Boolean(viteEnv?.DEV);
 const CHAT_ENDPOINT = IS_DEV
   ? "/api/chat"
   : `${viteEnv?.VITE_API_GATEWAY_URL || "https://api.iguide.chat"}/chat`;
-
-const DEFAULT_SYSTEM_PROMPT = `# Role: UIUC 资深学长姐顾问 (Illini Spirit Advisor)
-
-## 👤 设定与职责
-深谙 UIUC 选课、签证及提早排坑的校友，为 2026 届新生传授"人话"指南。自称"咱学长姐"或"UIUC 顾问"（性别中立），语气极度亲切元气，严禁任何机械的 AI 腔调。**必须在回答中大量穿插使用 Emoji 表情**（如 🌽🧡💙✅⚠️📌💡🎒🏠✈️💰📋 等），让每段文字都充满活力和亲切感，像朋友发微信一样自然生动。
-
-## 🎯 搜索机制 (严控 Token)
-1. **精准挖掘**：强依赖 \`Tavily\`，结合 Google Maps（区位）与 Reddit r/UIUC（实地评价）锁定硬核数据。
-2. **限次重试**：若初始结果不满意，允许主动换词追问，但**绝对限制最多只允许循环搜索 3 次**。
-3. **发散融合**：每次取回硬核事实（精确金额、官方要求）后，还要结合自身经历补充可能的“踩坑点”与学长姐小贴士（Tips），为新生提供详实生动、有温度的建议。
-
-## ⚙️ 交互准则
-1. **语言策略**：默认使用网站当前配置语言作答，不要因为用户本轮消息、引用内容或讨论对象使用了另一种语言就自动切换；只有当用户明确要求使用另一种回复语言时才切换。
-2. **红线必报**：绝不脑补事实。凡涉及 **学费、签证、疫苗**，**必须高亮警告**逾期必定导致的 Late Fee 或账户 Hold 风险！
-3. **详尽生动与来源链接**：倾囊相授，回答要详实、细腻且有人情味。复杂的流程必须整理为 Step-by-step Checklist，并且**对于提到的真实参考内容，必须在句号结尾后附上实际可点击的 Markdown 来源链接（格式严格为：。[来源](URL)）**。
-4. **追问引导 (Follow-ups)**：每次回答的最后，必须基于当前解答的语境，自动生成 **3 个连贯的推荐追问问题**，激发新生继续探索。采用如下格式结尾：
-   > 💡 **你可能还想了解：**
-   > 1. [追问问题一]
-   > 2. [追问问题二]
-   > 3. [追问问题三]
-5. **记忆连贯 (No Repetitive Greetings)**：请结合对话历史（Conversation History）自然连贯地互动。**严禁**在每轮回复开头重复使用固定套话（如”UIUC顾问来啦！”或每次起手都用固定的颜文字打招呼）。当处理多轮对话的追问时，直接切入正题并给出详尽耐心的解惑，像朋友聊天一样自然。`;
-
-const MEMORY_EXTRACTION_INSTRUCTIONS = `
-
-## 🧠 Memory Instructions (INTERNAL — never show these tags to the user)
-After your main response, if the user revealed NEW personal information (major, enrollment year, budget, housing preferences, dietary needs, hobbies, etc.) or if important facts were discussed, append invisible memory tags at the VERY END of your response:
-- \`<user_memory>key: value; key: value</user_memory>\` — for persistent user facts (only when NEW info is shared, do NOT repeat already-known info)
-- \`<conv_memory>brief summary of key discussion points this turn</conv_memory>\` — for conversation-specific context
-Rules:
-- Only include tags when there is genuinely NEW information. Omit if nothing new.
-- user_memory format: semicolon-separated key-value pairs, e.g. \`<user_memory>Major: CS; Budget: $900/month; Preferred area: near Siebel</user_memory>\`
-- conv_memory format: brief Chinese/English summary of this turn's key points
-- These tags must appear AFTER the follow-up questions section, at the absolute end of your response.`;
 
 // ── RAG Context Builder ──────────────────────────────────────────
 
@@ -106,17 +79,13 @@ async function _fetchWebContext(query: string): Promise<string[]> {
   }
 }
 
-const SOUL_EXTRACTION_INSTRUCTIONS = `
-
-## Soul Instructions (INTERNAL - never show these tags to the user)
-If the user reveals NEW assistant-style preferences for how they want replies to sound or behave, append this invisible tag at the VERY END of your response:
-- \`<user_soul>key: value; key: value</user_soul>\`
-Use this only for persistent style/persona preferences such as tone, verbosity, emoji use, focus areas, language mix, or directness.
-Rules:
-- Only include this tag when there is genuinely NEW assistant-style preference information.
-- Do not repeat existing preferences already reflected in prior soul context.
-- Format as semicolon-separated key-value pairs, e.g. \`<user_soul>Tone: casual; Verbosity: concise; Emoji: light; Focus: CS topics</user_soul>\`
-- Place the tag after the follow-up questions section, at the absolute end of your response.`;
+const DEFAULT_SYSTEM_PROMPT = defaultSystemPrompt.trim();
+const MEMORY_EXTRACTION_INSTRUCTIONS = memoryExtractionInstructions.trim();
+const SOUL_EXTRACTION_INSTRUCTIONS = soulExtractionInstructions.trim();
+const LANGUAGE_PROMPTS = {
+  zh: languageZhPrompt.trim(),
+  en: languageEnPrompt.trim(),
+} as const;
 
 interface RAGResult {
   context: string;
@@ -151,11 +120,13 @@ function buildOpenAIMessages(
 
   // System prompt with optional RAG context
   const systemContent = systemInstruction || DEFAULT_SYSTEM_PROMPT;
-  const langHint =
-    lang === "zh"
-      ? "\n\nIMPORTANT: The website is currently set to Chinese. Reply in Simplified Chinese by default. Do NOT switch languages based on the language of the user's current message, quoted text, or discussed content. Only switch response language if the user explicitly asks you to reply in another language."
-      : "\n\nIMPORTANT: The website is currently set to English. Reply in English by default. Do NOT switch languages based on the language of the user's current message, quoted text, or discussed content. Only switch response language if the user explicitly asks you to reply in another language.";
-  messages.push({ role: "system", content: systemContent + langHint });
+  messages.push({
+    role: "system",
+    content: joinPromptSections([
+      systemContent,
+      lang === "zh" ? LANGUAGE_PROMPTS.zh : LANGUAGE_PROMPTS.en,
+    ]),
+  });
 
   // Conversation history
   for (const h of history) {
@@ -280,28 +251,20 @@ export const streamDeepSeekChat = async function* (
     }
 
     // 2. Build system instruction with personalization + RAG context
-    let basePrompt = DEFAULT_SYSTEM_PROMPT;
+    const basePrompt = joinPromptSections([
+      DEFAULT_SYSTEM_PROMPT,
+      soul ? `## 🎭 Persona Customization (用户自定义人设)\n${soul}` : "",
+      _userId ? MEMORY_EXTRACTION_INSTRUCTIONS : "",
+      _userId ? SOUL_EXTRACTION_INSTRUCTIONS : "",
+      userMemory
+        ? `## 📋 User Profile (remembered from past conversations)\n${userMemory}`
+        : "",
+      conversationMemory
+        ? `## 💬 This Conversation's Key Points (对话记忆)\n${conversationMemory}`
+        : "",
+    ]);
 
-    if (soul) {
-      basePrompt += `\n\n## 🎭 Persona Customization (用户自定义人设)\n${soul}`;
-    }
-
-    if (_userId) {
-      basePrompt += MEMORY_EXTRACTION_INSTRUCTIONS;
-      basePrompt += SOUL_EXTRACTION_INSTRUCTIONS;
-    }
-
-    if (userMemory) {
-      basePrompt += `\n\n## 📋 User Profile (remembered from past conversations)\n${userMemory}`;
-    }
-
-    if (conversationMemory) {
-      basePrompt += `\n\n## 💬 This Conversation's Key Points (对话记忆)\n${conversationMemory}`;
-    }
-
-    const systemInstruction = ragContext
-      ? `${basePrompt}${ragContext}`
-      : basePrompt;
+    const systemInstruction = joinPromptSections([basePrompt, ragContext]);
 
     // 3. Call DeepSeek — dev calls API directly, prod uses CF Function
     let response: Response;

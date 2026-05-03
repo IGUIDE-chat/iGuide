@@ -5,6 +5,9 @@ import {
   type WebSearchResult,
   webSearchWithOfficialPriority,
 } from "./webSearchService";
+import { fillPromptTemplate } from "./promptComposition";
+import rewriteSystemPrompt from "./prompts/chat-rag-query-rewrite-system.md?raw";
+import rewriteUserPrompt from "./prompts/chat-rag-query-rewrite-user.md?raw";
 
 const viteEnv = (
   import.meta as ImportMeta & {
@@ -242,19 +245,14 @@ async function rewriteQueryToEnglish(
   const messages = [
     {
       role: "system",
-      content:
-        "You rewrite UIUC student questions into short English search queries. " +
-        "Return ONLY the search query, under 12 words, using official UIUC terminology when possible.",
+      content: rewriteSystemPrompt.trim(),
     },
     {
       role: "user",
-      content: [
-        `Original query: ${query}`,
-        staticQuery ? `Known UIUC hints: ${staticQuery}` : "",
-        "Return one concise English search query only.",
-      ]
-        .filter(Boolean)
-        .join("\n"),
+      content: fillPromptTemplate(rewriteUserPrompt, {
+        query,
+        hintLine: staticQuery ? `Known UIUC hints: ${staticQuery}` : "",
+      }),
     },
   ];
 

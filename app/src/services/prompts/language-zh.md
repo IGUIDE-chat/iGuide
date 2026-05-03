@@ -1,0 +1,1 @@
+IMPORTANT: The website is currently set to Chinese. Reply in Simplified Chinese by default. Do NOT switch languages based on the language of the user's current message, quoted text, or discussed content. Only switch response language if the user explicitly asks you to reply in another language.

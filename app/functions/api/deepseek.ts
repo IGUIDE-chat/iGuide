@@ -1,5 +1,10 @@
 // [FUNCTION] DeepSeek Chat API proxy — supports both streaming (SSE) and non-streaming.
 // [函数] DeepSeek 聊天 API 代理 — 支持流式 (SSE) 和非流式响应。
+import { joinPromptSections } from "../../src/services/promptComposition";
+import defaultSystemPrompt from "./prompts/deepseek-default-system.md?raw";
+import languageEnPrompt from "./prompts/language-en.md?raw";
+import languageZhPrompt from "./prompts/language-zh.md?raw";
+
 type PagesFunction<T = unknown> = (context: {
   request: Request;
   env: T;
@@ -28,14 +33,11 @@ interface DeepSeekBody {
   lang?: "en" | "zh";
 }
 
-const DEFAULT_SYSTEM_PROMPT = `# Role: UIUC 资深学长姐顾问 (Illini Spirit Advisor)
-
-## 👤 设定与职责
-深谙 UIUC 选课、签证及提早排坑的校友，为 2026 届新生传授“人话”指南。自称“咱学长姐”或“UIUC 顾问”（性别中立），语气极度亲切元气 🌽🧡💙，严禁任何机械的 AI 腔调。
-
-## ⚙️ 交互准则
-1. **语言策略**：默认使用网站当前配置语言作答，不要因为用户本轮消息、引用内容或讨论对象使用了另一种语言就自动切换；只有当用户明确要求使用另一种回复语言时才切换。
-2. **红线必报**：绝不脑补事实。凡涉及学费、签证、疫苗，必须高亮警告逾期风险！`;
+const DEFAULT_SYSTEM_PROMPT = defaultSystemPrompt.trim();
+const LANGUAGE_PROMPTS = {
+  zh: languageZhPrompt.trim(),
+  en: languageEnPrompt.trim(),
+} as const;
 
 function buildMessages(
   body: DeepSeekBody
@@ -52,13 +54,14 @@ function buildMessages(
       ? body.systemInstruction
       : DEFAULT_SYSTEM_PROMPT;
 
-  const langHint =
-    body.lang === "zh"
-      ? "\n\nThe website is currently set to Chinese. Reply in Simplified Chinese by default. Do not switch languages based on the user's input language, quoted text, or discussed content. Only switch response language if the user explicitly asks for another language."
-      : "\n\nThe website is currently set to English. Reply in English by default. Do not switch languages based on the user's input language, quoted text, or discussed content. Only switch response language if the user explicitly asks for another language.";
-
   return [
-    { role: "system", content: systemInstruction + langHint },
+    {
+      role: "system",
+      content: joinPromptSections([
+        systemInstruction,
+        body.lang === "zh" ? LANGUAGE_PROMPTS.zh : LANGUAGE_PROMPTS.en,
+      ]),
+    },
     ...history.map((item) => ({
       role: item.role === "model" ? "assistant" : "user",
       content: item.text,
