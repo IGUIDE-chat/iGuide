@@ -12,6 +12,7 @@ import {
 	sendToolStart,
 } from "./stream";
 import { buildSystemPrompt } from "./prompts";
+import { shouldEnableRetrievalTools } from "./retrieval-policy";
 import type { ToolRegistry } from "../tools/registry";
 import type { OpenAITool, RequestContext, ToolResult } from "../tools/types";
 
@@ -883,6 +884,7 @@ export async function runAgentLoop(
 			content: options.message,
 		},
 	];
+	const tools = shouldEnableRetrievalTools(options.message) ? undefined : [];
 
 	const executedToolCalls: AgentLoopToolCall[] = [];
 	const usage = {
@@ -898,6 +900,7 @@ export async function runAgentLoop(
 			provider,
 			messages,
 			registry: options.registry,
+			tools,
 		});
 		usage.prompt_tokens += data.usage?.prompt_tokens ?? 0;
 		usage.completion_tokens += data.usage?.completion_tokens ?? 0;
@@ -1024,6 +1027,7 @@ export async function runStreamingAgentLoop(
 			content: options.message,
 		},
 	];
+	const tools = shouldEnableRetrievalTools(options.message) ? undefined : [];
 
 	const executedToolCalls: AgentLoopToolCall[] = [];
 	const usage = {
@@ -1049,6 +1053,7 @@ export async function runStreamingAgentLoop(
 						usage,
 						executedToolCalls,
 						iterations,
+						tools,
 					}),
 				{
 					query: options.message,

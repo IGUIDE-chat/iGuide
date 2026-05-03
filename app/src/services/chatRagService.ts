@@ -8,6 +8,7 @@ import {
 import { fillPromptTemplate } from "./promptComposition";
 import rewriteSystemPrompt from "./prompts/chat-rag-query-rewrite-system.md?raw";
 import rewriteUserPrompt from "./prompts/chat-rag-query-rewrite-user.md?raw";
+import { shouldFetchRetrievalContext } from "./retrievalIntent";
 
 const viteEnv = (
   import.meta as ImportMeta & {
@@ -482,6 +483,10 @@ export async function fetchChatRAGContext(
   lang: string
 ): Promise<ChatRAGResult> {
   if (isToolUseRagEnabled()) {
+    return { context: "", hasQMD: false, hasWeb: false };
+  }
+
+  if (!shouldFetchRetrievalContext(query)) {
     return { context: "", hasQMD: false, hasWeb: false };
   }
 
