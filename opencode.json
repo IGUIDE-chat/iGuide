@@ -2,7 +2,7 @@
   "mcp": {
     "vite": {
       "type": "remote",
-      "url": "http://localhost:3000/__mcp/sse"
+      "url": "http://localhost:5173/__mcp/sse"
     },
     "supabase": {
       "type": "remote",

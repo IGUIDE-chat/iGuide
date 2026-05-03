@@ -1,24 +1,15 @@
 // [CONFIG] Vite build configuration and plugin setup.
 // [配置] Vite 构建配置和插件设置。
 import path from "path";
-import { defineConfig, loadEnv, type Plugin } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import { qmdSearchPlugin } from "./scripts/qmdSearchGateway";
-import type { IncomingMessage } from "http";
 import { ViteMcp } from "vite-plugin-mcp";
-
-type ProxyMutableRequest = IncomingMessage & {
-	_geminiProxyBody?: string;
-	_geminiProxyPath?: string;
-	_tavilyProxyBody?: string;
-};
 
 export default defineConfig(({ mode }) => {
 	const env = loadEnv(mode, ".", "");
 	return {
 		server: {
-			port: 3000,
-			host: "0.0.0.0",
 			proxy: {
 				"/api/coze": {
 					target: "https://api.coze.com",
