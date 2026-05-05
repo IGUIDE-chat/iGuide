@@ -1,3 +1,4 @@
+import { callSupabaseRpc } from "../lib/supabase-rpc";
 import { ToolDefinition, ToolResult, RequestContext } from "./types";
 
 interface KeywordSearchArgs {
@@ -64,38 +65,17 @@ export function createGrepDocsTool(registry: any): ToolDefinition {
 				};
 			}
 
-			const matchCount = Math.min(Math.max(limit || 5, 1), 50);
-			const supabaseUrl = ctx.env.SUPABASE_URL;
-			const anonKey = ctx.env.SUPABASE_ANON_KEY;
+		const matchCount = Math.min(Math.max(limit || 5, 1), 50);
 
-			if (!supabaseUrl || !anonKey) {
-				return {
-					content: "Error: Supabase credentials not configured",
-				};
-			}
-
-			try {
-				const rpcUrl = `${supabaseUrl}/rest/v1/rpc/keyword_search`;
-				const response = await fetch(rpcUrl, {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-						apikey: anonKey,
-						Authorization: `Bearer ${anonKey}`,
-					},
-					body: JSON.stringify({
-						query_text: pattern,
-						match_count: matchCount,
-					}),
-				});
-
-				if (!response.ok) {
-					return {
-						content: `Error: Supabase RPC returned ${response.status}`,
-					};
-				}
-
-				const results = (await response.json()) as KeywordSearchResult[];
+		try {
+			const results = await callSupabaseRpc<KeywordSearchResult[]>(
+				ctx,
+				"keyword_search",
+				{
+					query_text: pattern,
+					match_count: matchCount,
+				},
+			);
 
 				if (results.length === 0) {
 					return {
