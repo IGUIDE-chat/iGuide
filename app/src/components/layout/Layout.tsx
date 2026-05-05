@@ -411,6 +411,8 @@ export const Layout: React.FC<LayoutProps> = ({
         sidebarToggleButtonRef={sidebarToggleButtonRef}
         mobileSidebarButtonRef={mobileSidebarButtonRef}
         onToggleSidebar={() => setIsSidebarOpen((current) => !current)}
+        onCloseSidebar={() => setIsSidebarOpen(false)}
+        onOpenSidebar={() => setIsSidebarOpen(true)}
         mobileHeader={mobileHeader}
         sidebar={
           <>
