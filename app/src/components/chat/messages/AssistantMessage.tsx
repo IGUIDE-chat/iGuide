@@ -33,9 +33,6 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
   const message = useMessage();
   const meta = message.metadata?.custom as AssistantMessageMeta | undefined;
 
-  const textPart = message.content.find((p) => p.type === "text");
-  const text = textPart && textPart.type === "text" ? textPart.text : "";
-
   return (
     <MessagePrimitive.Root className="flex w-full border-b border-transparent py-6">
       <div
@@ -122,7 +119,8 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
             />
           )}
 
-          {/* Prose / markdown body */}
+          {/* Message parts — text uses the existing markdown renderer; tool calls
+              fall through to assistant-ui's registered Tool UI renderers. */}
           <div
             aria-live="polite"
             className="
@@ -130,100 +128,117 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
               text-slate-800
             "
           >
-            <TypewriterMarkdown
-              content={text}
-              components={{
-                a: ({ node: _node, ...props }) => (
-                  <a
-                    {...props}
-                    className="
-                      text-illini-orange
-                      hover:underline
-                    "
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  />
-                ),
-                code: ({ node: _node, className, children, ...props }) => {
-                  const isInline = !className;
-                  return isInline ? (
-                    <code
-                      className="rounded-sm bg-slate-100 px-1 py-0.5 text-xs"
-                      {...props}
-                    >
-                      {children}
-                    </code>
-                  ) : (
-                    <code
-                      className="
-                        block overflow-x-auto rounded-sm bg-slate-100 p-2
-                        text-xs
-                      "
-                      {...props}
-                    >
-                      {children}
-                    </code>
-                  );
-                },
-                ul: ({ node: _node, ...props }) => (
-                  <ul className="list-inside list-disc space-y-1" {...props} />
-                ),
-                ol: ({ node: _node, ...props }) => (
-                  <ol
-                    className="list-inside list-decimal space-y-1"
-                    {...props}
-                  />
-                ),
-                p: ({ node: _node, ...props }) => (
-                  <p
-                    className="
-                      mb-2
-                      last:mb-0
-                    "
-                    {...props}
-                  />
-                ),
-                img: ({ node: _node, alt, ...props }) => (
-                  <img
-                    {...props}
-                    alt={alt ?? ""}
-                    className="
-                      my-2 h-auto max-w-full rounded-lg border border-slate-200
-                      shadow-sm
-                    "
-                    loading="lazy"
-                  />
-                ),
-              }}
-            />
+            <MessagePrimitive.Parts>
+              {({ part }) => {
+                if (part.type !== "text") return null;
 
-            {/* Streaming spinner */}
-            {meta?.isStreaming && (
-              <span className="ml-1 inline-flex items-center align-middle">
-                <svg
-                  className="size-3.5 animate-spin text-illini-orange"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  aria-label="Loading"
-                  role="img"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
-                </svg>
-              </span>
-            )}
+                return (
+                  <>
+                    <TypewriterMarkdown
+                      content={part.text}
+                      components={{
+                        a: ({ node: _node, ...props }) => (
+                          <a
+                            {...props}
+                            className="
+                              text-illini-orange
+                              hover:underline
+                            "
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          />
+                        ),
+                        code: ({
+                          node: _node,
+                          className,
+                          children,
+                          ...props
+                        }) => {
+                          const isInline = !className;
+                          return isInline ? (
+                            <code
+                              className="rounded-sm bg-slate-100 px-1 py-0.5 text-xs"
+                              {...props}
+                            >
+                              {children}
+                            </code>
+                          ) : (
+                            <code
+                              className="
+                                block overflow-x-auto rounded-sm bg-slate-100 p-2
+                                text-xs
+                              "
+                              {...props}
+                            >
+                              {children}
+                            </code>
+                          );
+                        },
+                        ul: ({ node: _node, ...props }) => (
+                          <ul
+                            className="list-inside list-disc space-y-1"
+                            {...props}
+                          />
+                        ),
+                        ol: ({ node: _node, ...props }) => (
+                          <ol
+                            className="list-inside list-decimal space-y-1"
+                            {...props}
+                          />
+                        ),
+                        p: ({ node: _node, ...props }) => (
+                          <p
+                            className="
+                              mb-2
+                              last:mb-0
+                            "
+                            {...props}
+                          />
+                        ),
+                        img: ({ node: _node, alt, ...props }) => (
+                          <img
+                            {...props}
+                            alt={alt ?? ""}
+                            className="
+                              my-2 h-auto max-w-full rounded-lg border
+                              border-slate-200 shadow-sm
+                            "
+                            loading="lazy"
+                          />
+                        ),
+                      }}
+                    />
+
+                    {part.status.type === "running" && (
+                      <span className="ml-1 inline-flex items-center align-middle">
+                        <svg
+                          className="size-3.5 animate-spin text-illini-orange"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          aria-label="Loading"
+                          role="img"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          />
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          />
+                        </svg>
+                      </span>
+                    )}
+                  </>
+                );
+              }}
+            </MessagePrimitive.Parts>
           </div>
 
           {/* Follow-up chips */}

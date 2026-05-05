@@ -119,7 +119,7 @@ const getToolCallParts = (steps: ThinkingStep[] | undefined): ToolCallPart[] => 
         type: "tool-call" as const,
         toolCallId: `${step.id}-${toolName}`,
         toolName,
-        args: parseJsonObject(step.detail),
+        args: parseJsonObject(step.detail) as ToolCallPart["args"],
         ...(result && { result }),
       },
     ];

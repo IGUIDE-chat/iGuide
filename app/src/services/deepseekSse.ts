@@ -49,6 +49,12 @@ function stringifyDetail(value: unknown): string | undefined {
   }
 }
 
+function getWorkerToolName(
+  payload: WorkerToolStartPayload | WorkerToolResultPayload
+) {
+  return payload.name ?? payload.tool ?? "unknown";
+}
+
 function parseLegacyDelta(
   payload: unknown,
   state: SSEParserState,
@@ -97,6 +103,7 @@ function parseWorkerEvent(
 ): StreamChunk[] {
   if (eventName === "tool_start") {
     const data = payload as WorkerToolStartPayload;
+    const toolName = getWorkerToolName(data);
     return [
       {
         text: "",
@@ -104,8 +111,8 @@ function parseWorkerEvent(
           type: "tool_call",
           label:
             lang === "zh"
-              ? `调用工具: ${data.name ?? data.tool ?? "unknown"}`
-              : `Calling tool: ${data.name ?? data.tool ?? "unknown"}`,
+              ? `调用工具: ${toolName}`
+              : `Calling tool: ${toolName}`,
           detail: stringifyDetail(data.args),
         },
       },
@@ -114,6 +121,7 @@ function parseWorkerEvent(
 
   if (eventName === "tool_result") {
     const data = payload as WorkerToolResultPayload;
+    const toolName = getWorkerToolName(data);
     const detail = [data.status, data.summary].filter(Boolean).join(" — ");
 
     return [
@@ -123,8 +131,8 @@ function parseWorkerEvent(
           type: "processing",
           label:
             lang === "zh"
-              ? `工具完成: ${data.name ?? data.tool ?? "unknown"}`
-              : `Tool finished: ${data.name ?? data.tool ?? "unknown"}`,
+              ? `工具完成: ${toolName}`
+              : `Tool finished: ${toolName}`,
           detail: detail || undefined,
         },
       },
