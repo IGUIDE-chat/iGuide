@@ -1,11 +1,12 @@
-import { describe, it, expect } from "bun:test";
+import { describe, it } from "node:test";
+import assert from "node:assert/strict";
 import {
   toThreadMessage,
   fromThreadMessage,
   isChatMessage,
   isThreadMessageLike,
 } from "../messageAdapter";
-import type { ChatMessage, ThinkingStep } from "../../../types";
+import type { ChatMessage, ThinkingStep } from "../../../../types";
 
 describe("messageAdapter", () => {
   const mockThinkingStep: ThinkingStep = {
@@ -30,13 +31,16 @@ describe("messageAdapter", () => {
     it("should convert user ChatMessage to ThreadMessageLike", () => {
       const result = toThreadMessage(mockChatMessage);
 
-      expect(result.id).toBe("msg-1");
-      expect(result.role).toBe("user");
-      expect(result.content[0].type).toBe("text");
-      expect((result.content[0] as { type: "text"; text: string }).text).toBe(
+      assert.equal(result.id, "msg-1");
+      assert.equal(result.role, "user");
+      assert.notEqual(typeof result.content, "string");
+      const firstPart = Array.isArray(result.content) ? result.content[0] : null;
+      assert.equal(firstPart?.type, "text");
+      assert.equal(
+        (firstPart as { type: "text"; text: string }).text,
         "Hello, world!"
       );
-      expect(result.metadata?.custom).toEqual({
+      assert.deepEqual(result.metadata?.custom, {
         thinkingSteps: [mockThinkingStep],
         isThinking: false,
         followUpQuestions: ["What's next?"],
@@ -52,7 +56,7 @@ describe("messageAdapter", () => {
 
       const result = toThreadMessage(modelMessage);
 
-      expect(result.role).toBe("assistant");
+      assert.equal(result.role, "assistant");
     });
   });
 
@@ -61,13 +65,13 @@ describe("messageAdapter", () => {
       const threadMessage = toThreadMessage(mockChatMessage);
       const result = fromThreadMessage(threadMessage);
 
-      expect(result.id).toBe("msg-1");
-      expect(result.role).toBe("user");
-      expect(result.text).toBe("Hello, world!");
-      expect(result.followUpQuestions).toEqual(["What's next?"]);
-      expect(result.thinkingSteps).toEqual([mockThinkingStep]);
-      expect(result.isThinking).toBe(false);
-      expect(result.isStreaming).toBe(false);
+      assert.equal(result.id, "msg-1");
+      assert.equal(result.role, "user");
+      assert.equal(result.text, "Hello, world!");
+      assert.deepEqual(result.followUpQuestions, ["What's next?"]);
+      assert.deepEqual(result.thinkingSteps, [mockThinkingStep]);
+      assert.equal(result.isThinking, false);
+      assert.equal(result.isStreaming, false);
     });
 
     it("should convert assistant ThreadMessageLike back to model role", () => {
@@ -77,48 +81,44 @@ describe("messageAdapter", () => {
       });
       const result = fromThreadMessage(threadMessage);
 
-      expect(result.role).toBe("model");
+      assert.equal(result.role, "model");
     });
   });
 
   describe("isChatMessage", () => {
     it("should return true for valid ChatMessage", () => {
-      expect(isChatMessage(mockChatMessage)).toBe(true);
+      assert.equal(isChatMessage(mockChatMessage), true);
     });
 
     it("should return false for null", () => {
-      expect(isChatMessage(null)).toBe(false);
+      assert.equal(isChatMessage(null), false);
     });
 
     it("should return false for object missing required fields", () => {
-      expect(isChatMessage({ id: "1" })).toBe(false);
+      assert.equal(isChatMessage({ id: "1" }), false);
     });
 
     it("should return false for invalid role", () => {
-      expect(isChatMessage({ id: "1", role: "invalid", text: "hi" })).toBe(
-        false
-      );
+      assert.equal(isChatMessage({ id: "1", role: "invalid", text: "hi" }), false);
     });
   });
 
   describe("isThreadMessageLike", () => {
     it("should return true for valid ThreadMessageLike", () => {
       const threadMessage = toThreadMessage(mockChatMessage);
-      expect(isThreadMessageLike(threadMessage)).toBe(true);
+      assert.equal(isThreadMessageLike(threadMessage), true);
     });
 
     it("should return false for null", () => {
-      expect(isThreadMessageLike(null)).toBe(false);
+      assert.equal(isThreadMessageLike(null), false);
     });
 
     it("should return false for object missing required fields", () => {
-      expect(isThreadMessageLike({ id: "1" })).toBe(false);
+      assert.equal(isThreadMessageLike({ id: "1" }), false);
     });
 
     it("should return false for invalid role", () => {
-      expect(
-        isThreadMessageLike({ id: "1", role: "invalid" })
-      ).toBe(false);
+      assert.equal(isThreadMessageLike({ id: "1", role: "invalid" }), false);
     });
   });
 });
