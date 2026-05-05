@@ -1055,7 +1055,8 @@ export async function runStreamingAgentLoop(
 			}
 
 			if (!iterationOutcome.nextMessages) {
-				await emitFinalizing(options.writer, iterationOutcome.metadata?.stopReason ?? "complete");
+				const stopReason = iterationOutcome.metadata?.stopReason as string | undefined;
+				await emitFinalizing(options.writer, stopReason ?? "complete");
 				await sendDone(options.writer, iterationOutcome.usage);
 				doneSent = true;
 				return {
