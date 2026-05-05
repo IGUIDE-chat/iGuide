@@ -60,6 +60,7 @@ export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({
     <div className="mb-2">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
+        aria-expanded={isExpanded}
         className="
           group flex items-center gap-1.5 text-xs text-slate-500
           transition-colors

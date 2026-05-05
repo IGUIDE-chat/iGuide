@@ -85,6 +85,7 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
 
           {/* Prose / markdown body */}
           <div
+            aria-live="polite"
             className="
               prose prose-slate prose-sm max-w-none leading-relaxed
               text-slate-800

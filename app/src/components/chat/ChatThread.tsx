@@ -168,21 +168,22 @@ export const ChatThread = ({ language }: ChatThreadProps) => {
                   render={<ImeSafeComposerTextarea />}
                   rows={1}
                 />
-                <ComposerPrimitive.Send
-                  className="
-                    absolute top-1/2 right-2 -translate-y-1/2 rounded-full
-                    bg-black p-2 text-white transition-all
-                    hover:opacity-80
-                    disabled:cursor-not-allowed disabled:bg-slate-100
-                    disabled:text-slate-300
-                  "
-                >
+                 <ComposerPrimitive.Send
+                   aria-label="Send"
+                   className="
+                     absolute top-1/2 right-2 -translate-y-1/2 rounded-full
+                     bg-black p-2 text-white transition-all
+                     hover:opacity-80
+                     disabled:cursor-not-allowed disabled:bg-slate-100
+                     disabled:text-slate-300
+                   "
+                 >
                   <svg
                     className="size-4"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
-                    aria-label="Send"
+                    aria-hidden="true"
                   >
                     <path
                       strokeLinecap="round"
