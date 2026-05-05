@@ -8,7 +8,6 @@ import {
 import { fillPromptTemplate } from "./promptComposition";
 import rewriteSystemPrompt from "./prompts/chat-rag-query-rewrite-system.md?raw";
 import rewriteUserPrompt from "./prompts/chat-rag-query-rewrite-user.md?raw";
-import { shouldFetchRetrievalContext } from "./retrievalIntent";
 
 const viteEnv = (
   import.meta as ImportMeta & {
@@ -486,7 +485,9 @@ export async function fetchChatRAGContext(
     return { context: "", hasQMD: false, hasWeb: false };
   }
 
-  if (!shouldFetchRetrievalContext(query)) {
+  // Legacy frontend retrieval path - backend now handles retrieval policy
+  const normalized = normalizeWhitespace(query).toLowerCase();
+  if (!normalized) {
     return { context: "", hasQMD: false, hasWeb: false };
   }
 
