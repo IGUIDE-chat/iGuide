@@ -5,19 +5,45 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useReducer, useState } from "react";
 import { Language, ChatMessage, ThinkingStep } from "../../types";
 import { streamChatResponse } from "../../services/ai";
 import { conversationService } from "../../services/conversationService";
 import { localConversationService } from "../../services/localConversationService";
 import { memoryService } from "../../services/memoryService";
 import { useAuth } from "../../contexts/AuthContext";
+import { useThrottle } from "../../hooks/useThrottle";
 
 interface UseChatSessionOptions {
   language: Language;
   currentConversationId: string | null;
   onConversationCreated?: (conversationId: string) => void;
 }
+
+type MessageAction =
+  | { type: "SET_MESSAGES"; payload: ChatMessage[] }
+  | { type: "ADD_MESSAGE"; payload: ChatMessage }
+  | { type: "UPDATE_MESSAGE"; payload: { id: string; updates: Partial<ChatMessage> } }
+  | { type: "REPLACE_MESSAGE"; payload: ChatMessage };
+
+const messageReducer = (state: ChatMessage[], action: MessageAction): ChatMessage[] => {
+  switch (action.type) {
+    case "SET_MESSAGES":
+      return action.payload;
+    case "ADD_MESSAGE":
+      return [...state, action.payload];
+    case "UPDATE_MESSAGE":
+      return state.map((msg) =>
+        msg.id === action.payload.id ? { ...msg, ...action.payload.updates } : msg
+      );
+    case "REPLACE_MESSAGE":
+      return state.map((msg) =>
+        msg.id === action.payload.id ? action.payload : msg
+      );
+    default:
+      return state;
+  }
+};
 
 const NEW_CHAT_TITLE = {
   en: "New Chat",
@@ -59,10 +85,26 @@ export const useChatSession = ({
   onConversationCreated,
 }: UseChatSessionOptions) => {
   const { user } = useAuth();
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, dispatch] = useReducer(messageReducer, []);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+
+  const updateMessageText = useCallback((id: string, text: string, steps: ThinkingStep[]) => {
+    dispatch({
+      type: "UPDATE_MESSAGE",
+      payload: {
+        id,
+        updates: {
+          text,
+          isThinking: false,
+          thinkingSteps: [...steps],
+        },
+      },
+    });
+  }, []);
+
+  const throttledUpdateMessageText = useThrottle(updateMessageText, 100);
 
   const loadConversation = useCallback(
     async (conversationId: string) => {
@@ -75,7 +117,7 @@ export const useChatSession = ({
         }
 
         if (data?.messages) {
-          setMessages(service.convertToChatMessages(data.messages));
+          dispatch({ type: "SET_MESSAGES", payload: service.convertToChatMessages(data.messages) });
         }
       } catch (error) {
         console.error("Failed to load conversation:", error);
@@ -93,7 +135,7 @@ export const useChatSession = ({
     }
 
     if (!currentConversationId) {
-      setMessages([]);
+      dispatch({ type: "SET_MESSAGES", payload: [] });
       return;
     }
 
@@ -115,12 +157,12 @@ export const useChatSession = ({
       }
 
       const userMsg: ChatMessage = {
-        id: Date.now().toString(),
+        id: crypto.randomUUID(),
         role: "user",
         text,
       };
 
-      setMessages((prev) => [...prev, userMsg]);
+      dispatch({ type: "ADD_MESSAGE", payload: userMsg });
       setInput("");
       setIsLoading(true);
 
@@ -154,10 +196,10 @@ export const useChatSession = ({
       }
 
       try {
-        const aiMsgId = (Date.now() + 1).toString();
-        setMessages((prev) => [
-          ...prev,
-          {
+        const aiMsgId = crypto.randomUUID();
+        dispatch({
+          type: "ADD_MESSAGE",
+          payload: {
             id: aiMsgId,
             role: "model",
             text: "",
@@ -173,7 +215,7 @@ export const useChatSession = ({
               },
             ],
           },
-        ]);
+        });
 
         const stream = await streamChatResponse(
           messages.map((message) => ({
@@ -189,12 +231,9 @@ export const useChatSession = ({
         let fullText = "";
         let followUpQuestions: string[] | undefined;
         const thinkingSteps: ThinkingStep[] = [];
-        let lastUpdateTime = Date.now();
-        const updateInterval = 50;
 
         for await (const chunk of stream) {
           if (chunk.thinkingStep) {
-            // Mark previous step as done
             if (thinkingSteps.length > 0) {
               thinkingSteps[thinkingSteps.length - 1].done = true;
             }
@@ -207,50 +246,34 @@ export const useChatSession = ({
               done: false,
             };
             thinkingSteps.push(step);
-            setMessages((prev) =>
-              prev.map((message) =>
-                message.id === aiMsgId
-                  ? { ...message, thinkingSteps: [...thinkingSteps] }
-                  : message
-              )
-            );
+            dispatch({
+              type: "UPDATE_MESSAGE",
+              payload: {
+                id: aiMsgId,
+                updates: { thinkingSteps: [...thinkingSteps] },
+              },
+            });
           }
 
           if (chunk.text) {
             fullText += chunk.text;
-            const now = Date.now();
-            // First text chunk means thinking is done
             if (fullText === chunk.text && thinkingSteps.length > 0) {
               thinkingSteps.forEach((s) => {
                 s.done = true;
               });
             }
-            if (now - lastUpdateTime >= updateInterval) {
-              setMessages((prev) =>
-                prev.map((message) =>
-                  message.id === aiMsgId
-                    ? {
-                        ...message,
-                        text: fullText,
-                        isThinking: false,
-                        thinkingSteps: [...thinkingSteps],
-                      }
-                    : message
-                )
-              );
-              lastUpdateTime = now;
-            }
+            throttledUpdateMessageText(aiMsgId, fullText, thinkingSteps);
           }
 
           if (chunk.followUpQuestions) {
             followUpQuestions = chunk.followUpQuestions;
-            setMessages((prev) =>
-              prev.map((message) =>
-                message.id === aiMsgId
-                  ? { ...message, followUpQuestions: chunk.followUpQuestions }
-                  : message
-              )
-            );
+            dispatch({
+              type: "UPDATE_MESSAGE",
+              payload: {
+                id: aiMsgId,
+                updates: { followUpQuestions: chunk.followUpQuestions },
+              },
+            });
           }
         }
 
@@ -354,9 +377,7 @@ export const useChatSession = ({
           thinkingSteps: thinkingSteps.length > 0 ? thinkingSteps : undefined,
         };
 
-        setMessages((prev) =>
-          prev.map((message) => (message.id === aiMsgId ? aiMsg : message))
-        );
+        dispatch({ type: "REPLACE_MESSAGE", payload: aiMsg });
 
         if (conversationId && aiMsg.text.trim()) {
           try {
@@ -369,14 +390,14 @@ export const useChatSession = ({
           }
         }
       } catch {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: Date.now().toString(),
+        dispatch({
+          type: "ADD_MESSAGE",
+          payload: {
+            id: crypto.randomUUID(),
             role: "model",
             text: CONNECTION_ERROR[language],
           },
-        ]);
+        });
       } finally {
         setIsLoading(false);
       }
