@@ -9,7 +9,8 @@
         "moduleResolution": "bundler",
         "allowImportingTsExtensions": true,
         "types": [
-            "@cloudflare/workers-types"
+            "@cloudflare/workers-types",
+            "@types/node"
         ],
         "resolveJsonModule": true,
         "allowJs": true,
