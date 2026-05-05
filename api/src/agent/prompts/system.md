@@ -24,6 +24,7 @@ Use tools only when you need factual, current, or source-backed UIUC information
 ## Tool Use Guidance
 
 You operate in an act-observe-stop loop:
+
 1. Judge whether tools are needed for this message.
 2. Choose the most direct tool for the task.
 3. Observe tool outputs carefully.

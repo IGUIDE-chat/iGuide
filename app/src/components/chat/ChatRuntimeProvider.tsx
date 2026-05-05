@@ -12,7 +12,11 @@ import {
   type ThreadMessageLike,
 } from "@assistant-ui/react";
 import { useChatSession } from "./useChatSession";
-import { type ChatMessage, type Language, type ThinkingStep } from "../../types";
+import {
+  type ChatMessage,
+  type Language,
+  type ThinkingStep,
+} from "../../types";
 import { ChatErrorBoundary } from "./ChatErrorBoundary";
 import { GrepDocsToolUI, SearchToolUI, WebSearchToolUI } from "./tools";
 
@@ -99,10 +103,13 @@ const getToolResultStep = (
     .slice(startIndex + 1)
     .find(
       (step) =>
-        step.type === "processing" && getToolNameFromLabel(step.label) === toolName
+        step.type === "processing" &&
+        getToolNameFromLabel(step.label) === toolName
     );
 
-const getToolCallParts = (steps: ThinkingStep[] | undefined): ToolCallPart[] => {
+const getToolCallParts = (
+  steps: ThinkingStep[] | undefined
+): ToolCallPart[] => {
   if (!steps?.length) return [];
 
   return steps.flatMap((step, index) => {

@@ -3,7 +3,11 @@
  * @description Chat (AI) Component / Module
  */
 
-import { MessagePrimitive, ActionBarPrimitive, useMessage } from "@assistant-ui/react";
+import {
+  MessagePrimitive,
+  ActionBarPrimitive,
+  useMessage,
+} from "@assistant-ui/react";
 import { ThinkingProcess } from "../ThinkingProcess";
 import { Typewriter } from "../../ui/Typewriter";
 import { ThinkingStep } from "../../../types";
@@ -20,10 +24,6 @@ interface AssistantMessageProps {
   botName?: string;
   onFollowUpClick?: (text: string) => void;
 }
-
-const MAX_FOLLOW_UP_QUESTIONS = 3;
-const MAX_QUESTION_LENGTH = 50;
-const TRUNCATED_QUESTION_LENGTH = 47;
 
 export const AssistantMessage: React.FC<AssistantMessageProps> = ({
   language = "zh",
@@ -65,9 +65,12 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
             autohide="not-last"
             className="absolute top-0 right-0 flex gap-1"
           >
-            <ActionBarPrimitive.Copy 
+            <ActionBarPrimitive.Copy
               aria-label="Copy message"
-              className="rounded-md p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
+              className="
+                rounded-md p-1.5 text-slate-500 transition-colors
+                hover:bg-slate-100 hover:text-slate-700
+              "
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -85,9 +88,12 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
               </svg>
             </ActionBarPrimitive.Copy>
-            <ActionBarPrimitive.Reload 
+            <ActionBarPrimitive.Reload
               aria-label="Regenerate response"
-              className="rounded-md p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
+              className="
+                rounded-md p-1.5 text-slate-500 transition-colors
+                hover:bg-slate-100 hover:text-slate-700
+              "
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -167,7 +173,9 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
                           const isInline = !className;
                           return isInline ? (
                             <code
-                              className="rounded-sm bg-slate-100 px-1 py-0.5 text-xs"
+                              className="
+                                rounded-sm bg-slate-100 px-1 py-0.5 text-xs
+                              "
                               {...props}
                             >
                               {children}
@@ -175,8 +183,8 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
                           ) : (
                             <code
                               className="
-                                block overflow-x-auto rounded-sm bg-slate-100 p-2
-                                text-xs
+                                block overflow-x-auto rounded-sm bg-slate-100
+                                p-2 text-xs
                               "
                               {...props}
                             >

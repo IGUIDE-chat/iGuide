@@ -15,7 +15,9 @@ export const GrepDocsToolUI = makeAssistantToolUI<
   render: ({ args, result, status }) => (
     <ToolCard
       icon="📄"
-      title={status.type === "running" ? "Searching documents" : "Document grep"}
+      title={
+        status.type === "running" ? "Searching documents" : "Document grep"
+      }
       primaryLabel="Pattern:"
       primaryValue={getStringArg(args, ["pattern", "query"], "Search pattern")}
       metricLabel="Matched files:"

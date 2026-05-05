@@ -1,14 +1,16 @@
 import { useRef, useCallback } from "react";
 
-export const useThrottle = <T extends (...args: any[]) => void>(
+export const useThrottle = <T extends (...args: unknown[]) => void>(
   callback: T,
   delay: number
 ): T => {
   const lastRun = useRef(0);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
 
-  return useCallback(
-    ((...args: Parameters<T>) => {
+  const throttledFn = useCallback(
+    (...args: unknown[]) => {
       const now = Date.now();
       const timeSinceLastRun = now - lastRun.current;
 
@@ -19,15 +21,14 @@ export const useThrottle = <T extends (...args: any[]) => void>(
         if (timeoutRef.current) {
           clearTimeout(timeoutRef.current);
         }
-        timeoutRef.current = setTimeout(
-          () => {
-            lastRun.current = Date.now();
-            callback(...args);
-          },
-          delay - timeSinceLastRun
-        );
+        timeoutRef.current = setTimeout(() => {
+          lastRun.current = Date.now();
+          callback(...args);
+        }, delay - timeSinceLastRun);
       }
-    }) as T,
+    },
     [callback, delay]
   );
+
+  return throttledFn as T;
 };

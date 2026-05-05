@@ -119,7 +119,8 @@ function buildOpenAIMessages(
 
   // System prompt with optional RAG context
   const systemContent = systemInstruction || DEFAULT_SYSTEM_PROMPT;
-  const languagePrompt = lang === "zh" ? LANGUAGE_PROMPTS.zh : LANGUAGE_PROMPTS.en;
+  const languagePrompt =
+    lang === "zh" ? LANGUAGE_PROMPTS.zh : LANGUAGE_PROMPTS.en;
   messages.push({
     role: "system",
     content: [systemContent, languagePrompt].filter(Boolean).join("\n\n"),
@@ -259,9 +260,13 @@ export const streamDeepSeekChat = async function* (
       conversationMemory
         ? `## 💬 This Conversation's Key Points (对话记忆)\n${conversationMemory}`
         : "",
-    ].filter(s => s?.trim()).join("\n\n");
+    ]
+      .filter((s) => s?.trim())
+      .join("\n\n");
 
-    const systemInstruction = [basePrompt, ragContext].filter(s => s?.trim()).join("\n\n");
+    const systemInstruction = [basePrompt, ragContext]
+      .filter((s) => s?.trim())
+      .join("\n\n");
 
     // 3. Call DeepSeek — dev calls API directly, prod uses CF Function
     let response: Response;

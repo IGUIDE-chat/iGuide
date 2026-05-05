@@ -19,7 +19,7 @@ export function toThreadMessage(msg: ChatMessage): ThreadMessageLike {
 
 export function fromThreadMessage(
   msg: ThreadMessageLike,
-  fallbackRole: "user" | "model" = "model"
+  _fallbackRole: "user" | "model" = "model"
 ): ChatMessage {
   const custom = msg.metadata?.custom as
     | {
@@ -38,7 +38,7 @@ export function fromThreadMessage(
     const textContent = content?.find(
       (part: { type: string; text?: string }) => part.type === "text"
     );
-    text = textContent?.type === "text" ? textContent.text ?? "" : "";
+    text = textContent?.type === "text" ? (textContent.text ?? "") : "";
   }
 
   return {

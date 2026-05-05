@@ -139,25 +139,25 @@ This section only lists Worker-relevant configuration. For broader deployment se
 
 ### Required Environment Variables
 
-| Variable | Description | Required |
-|---|---|---|
-| `SUPABASE_URL` | Supabase project URL | Yes |
-| `SUPABASE_ANON_KEY` | Supabase anon key for auth verification | Yes |
-| `SUPABASE_SERVICE_ROLE_KEY` | Service role key for privileged server-side operations | Yes |
-| `DEEPSEEK_API_KEY` | DeepSeek API key | Yes |
-| `TAVILY_API_KEY` | Tavily API key | Yes |
-| `USE_TOOL_USE_RAG` | Feature flag for the new server-side tool-use path | Yes |
-| `EMBEDDING_API_BASE_URL` | Managed embedding provider base URL | Yes |
-| `EMBEDDING_API_KEY` | Managed embedding provider API key | Yes |
-| `EMBEDDING_MODEL` | Embedding model identifier | Yes |
-| `EMBEDDING_DIMENSIONS` | Embedding dimension expected by Supabase schema | Yes |
+| Variable                    | Description                                            | Required |
+| --------------------------- | ------------------------------------------------------ | -------- |
+| `SUPABASE_URL`              | Supabase project URL                                   | Yes      |
+| `SUPABASE_ANON_KEY`         | Supabase anon key for auth verification                | Yes      |
+| `SUPABASE_SERVICE_ROLE_KEY` | Service role key for privileged server-side operations | Yes      |
+| `DEEPSEEK_API_KEY`          | DeepSeek API key                                       | Yes      |
+| `TAVILY_API_KEY`            | Tavily API key                                         | Yes      |
+| `USE_TOOL_USE_RAG`          | Feature flag for the new server-side tool-use path     | Yes      |
+| `EMBEDDING_API_BASE_URL`    | Managed embedding provider base URL                    | Yes      |
+| `EMBEDDING_API_KEY`         | Managed embedding provider API key                     | Yes      |
+| `EMBEDDING_MODEL`           | Embedding model identifier                             | Yes      |
+| `EMBEDDING_DIMENSIONS`      | Embedding dimension expected by Supabase schema        | Yes      |
 
 ### Optional Environment Variables
 
-| Variable | Description | Required |
-|---|---|---|
-| `EMBEDDING_FALLBACK_URL` | Optional self-hosted embedding fallback endpoint | No |
-| `SILICONFLOW_API_KEY` | Optional regional model-routing provider if still used in this Worker | No |
+| Variable                 | Description                                                           | Required |
+| ------------------------ | --------------------------------------------------------------------- | -------- |
+| `EMBEDDING_FALLBACK_URL` | Optional self-hosted embedding fallback endpoint                      | No       |
+| `SILICONFLOW_API_KEY`    | Optional regional model-routing provider if still used in this Worker | No       |
 
 `EMBEDDING_FALLBACK_URL` must stay optional. Do not treat a VPS as a default dependency for this Worker.
 

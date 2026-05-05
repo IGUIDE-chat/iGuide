@@ -23,7 +23,7 @@ interface AppShellProps {
 export const AppShell: React.FC<AppShellProps> = ({
   isSidebarOpen,
   sidebar,
-  mobileHeader,
+  mobileHeader: _mobileHeader,
   children,
   sidebarToggleButtonRef,
   mobileSidebarButtonRef,
@@ -71,9 +71,9 @@ export const AppShell: React.FC<AppShellProps> = ({
             isSidebarOpen
               ? "translate-x-0"
               : `
-              -translate-x-full
-              md:w-0 md:translate-x-0 md:overflow-hidden
-            `
+                -translate-x-full
+                md:w-0 md:translate-x-0 md:overflow-hidden
+              `
           }
         `}
       >

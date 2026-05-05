@@ -188,7 +188,9 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
             key={historyItem.id}
             id={historyItem.id}
             isActive={historyItem.articleId === currentArticleId}
-            onClick={() => navigate(`/library/article/${historyItem.articleId}`)}
+            onClick={() =>
+              navigate(`/library/article/${historyItem.articleId}`)
+            }
             activeBgClass="bg-white/10 text-white"
             inactiveBgClass="text-slate-300 hover:bg-white/5 hover:text-white"
           >

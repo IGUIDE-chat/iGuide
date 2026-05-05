@@ -72,7 +72,11 @@ const AnimateTypewriter: React.FC<{
   );
 };
 
-const useStreamText = (text: string, speed: number, onComplete?: () => void) => {
+const useStreamText = (
+  text: string,
+  speed: number,
+  onComplete?: () => void
+) => {
   const [displayedText, setDisplayedText] = React.useState("");
   const [currentIndex, setCurrentIndex] = React.useState(0);
 
@@ -116,13 +120,16 @@ export const Typewriter: React.FC<TypewriterProps> = ({
   const streamedText = useStreamText(
     mode === "stream" ? text : "",
     speed,
-    mode === "stream" ? onComplete : undefined,
+    mode === "stream" ? onComplete : undefined
   );
 
   if (mode === "static") {
     if (markdown) {
       return (
-        <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+          components={markdownComponents}
+        >
           {text || ""}
         </ReactMarkdown>
       );
@@ -147,7 +154,10 @@ export const Typewriter: React.FC<TypewriterProps> = ({
             max-w-none text-gray-800
           "
         >
-          <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={markdownComponents}
+          >
             {streamedText}
           </ReactMarkdown>
         </div>

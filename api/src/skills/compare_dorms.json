@@ -1,15 +1,15 @@
 {
-	"id": "compare_dorms",
-	"name": "Compare Dorms",
-	"description": "Compare two or more dorm halls",
-	"prompt_template": "Compare the following dorms: {{dorm_names}}. Include location, price, amenities, dining options.",
-	"required_tools": ["search_knowledge_base"],
-	"output_format": "comparison_table",
-	"parameters": {
-		"dorm_names": {
-			"type": "string",
-			"description": "Comma-separated dorm names",
-			"required": true
-		}
-	}
+  "id": "compare_dorms",
+  "name": "Compare Dorms",
+  "description": "Compare two or more dorm halls",
+  "prompt_template": "Compare the following dorms: {{dorm_names}}. Include location, price, amenities, dining options.",
+  "required_tools": ["search_knowledge_base"],
+  "output_format": "comparison_table",
+  "parameters": {
+    "dorm_names": {
+      "type": "string",
+      "description": "Comma-separated dorm names",
+      "required": true
+    }
+  }
 }

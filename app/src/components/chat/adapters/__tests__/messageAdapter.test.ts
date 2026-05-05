@@ -34,7 +34,9 @@ describe("messageAdapter", () => {
       assert.equal(result.id, "msg-1");
       assert.equal(result.role, "user");
       assert.notEqual(typeof result.content, "string");
-      const firstPart = Array.isArray(result.content) ? result.content[0] : null;
+      const firstPart = Array.isArray(result.content)
+        ? result.content[0]
+        : null;
       assert.equal(firstPart?.type, "text");
       assert.equal(
         (firstPart as { type: "text"; text: string }).text,
@@ -99,7 +101,10 @@ describe("messageAdapter", () => {
     });
 
     it("should return false for invalid role", () => {
-      assert.equal(isChatMessage({ id: "1", role: "invalid", text: "hi" }), false);
+      assert.equal(
+        isChatMessage({ id: "1", role: "invalid", text: "hi" }),
+        false
+      );
     });
   });
 

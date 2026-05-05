@@ -1,1134 +1,1132 @@
 import {
-	logFallbackEvent,
-	withFallback,
-	type FallbackEvent,
-	type FallbackReason,
-} from "./fallback.ts";
+  logFallbackEvent,
+  withFallback,
+  type FallbackEvent,
+  type FallbackReason,
+} from './fallback.ts'
+import { DEFAULT_MAX_ITERATIONS, evaluateStopCondition } from './bounds.ts'
 import {
-	DEFAULT_MAX_ITERATIONS,
-	evaluateStopCondition,
-} from "./bounds.ts";
+  sendContent,
+  sendDone,
+  sendFallback,
+  sendToolResult,
+  sendToolStart,
+  emitAgentStep,
+  emitObservation,
+  emitFinalizing,
+} from './stream.ts'
+import { buildSystemPrompt } from './prompts.ts'
+import { shouldEnableRetrievalTools } from './retrieval-policy.ts'
 import {
-	sendContent,
-	sendDone,
-	sendFallback,
-	sendToolResult,
-	sendToolStart,
-	emitAgentStep,
-	emitObservation,
-	emitFinalizing,
-} from "./stream.ts";
-import { buildSystemPrompt } from "./prompts.ts";
-import { shouldEnableRetrievalTools } from "./retrieval-policy.ts";
-import {
-	buildProviderMessages,
-	convertObservationToMessage,
-	type ProviderMessage,
-	type ProviderToolCall,
-} from "./messages.ts";
-import { executeToolAction } from "./actions.ts";
-import type { Observation } from "./observation.ts";
-import type { ToolRegistry } from "../tools/registry.ts";
-import type { OpenAITool, RequestContext, ToolResult } from "../tools/types.ts";
+  buildProviderMessages,
+  convertObservationToMessage,
+  type ProviderMessage,
+  type ProviderToolCall,
+} from './messages.ts'
+import { executeToolAction } from './actions.ts'
+import type { Observation } from './observation.ts'
+import type { ToolRegistry } from '../tools/registry.ts'
+import type { OpenAITool, RequestContext, ToolResult } from '../tools/types.ts'
 
 export interface AgentLoopOptions {
-	message: string;
-	history: Array<{ role: string; content: string }>;
-	registry: ToolRegistry;
-	env: Record<string, string>;
-	userId?: string;
-	region?: string;
-	maxIterations?: number;
-	lang?: string;
+  message: string
+  history: Array<{ role: string; content: string }>
+  registry: ToolRegistry
+  env: Record<string, string>
+  userId?: string
+  region?: string
+  maxIterations?: number
+  lang?: string
 }
 
 export interface AgentLoopToolCall {
-	name: string;
-	args: Record<string, unknown>;
-	result: ToolResult;
+  name: string
+  args: Record<string, unknown>
+  result: ToolResult
 }
 
 export interface AgentLoopResult {
-	content: string;
-	toolCalls: AgentLoopToolCall[];
-	iterations: number;
-	usage?: { prompt_tokens: number; completion_tokens: number };
-	metadata?: Record<string, unknown>;
+  content: string
+  toolCalls: AgentLoopToolCall[]
+  iterations: number
+  usage?: { prompt_tokens: number; completion_tokens: number }
+  metadata?: Record<string, unknown>
 }
 
-type ChatCompletionMessage = ProviderMessage;
+type ChatCompletionMessage = ProviderMessage
 
-type DeepSeekToolCall = ProviderToolCall;
+type DeepSeekToolCall = ProviderToolCall
 
 interface DeepSeekChoice {
-	message?: {
-		role: "assistant";
-		content: string | null;
-		reasoning_content?: string | null;
-		tool_calls?: DeepSeekToolCall[] | null;
-	};
-	finish_reason?: string | null;
+  message?: {
+    role: 'assistant'
+    content: string | null
+    reasoning_content?: string | null
+    tool_calls?: DeepSeekToolCall[] | null
+  }
+  finish_reason?: string | null
 }
 
 interface DeepSeekStreamDeltaToolCall {
-	index: number;
-	id?: string;
-	type?: "function";
-	function?: {
-		name?: string;
-		arguments?: string;
-	};
+  index: number
+  id?: string
+  type?: 'function'
+  function?: {
+    name?: string
+    arguments?: string
+  }
 }
 
 interface DeepSeekStreamChoice {
-	delta?: {
-		role?: "assistant";
-		content?: string | null;
-		reasoning_content?: string | null;
-		tool_calls?: DeepSeekStreamDeltaToolCall[] | null;
-	};
-	finish_reason?: string | null;
+  delta?: {
+    role?: 'assistant'
+    content?: string | null
+    reasoning_content?: string | null
+    tool_calls?: DeepSeekStreamDeltaToolCall[] | null
+  }
+  finish_reason?: string | null
 }
 
 interface DeepSeekStreamChunk {
-	choices?: DeepSeekStreamChoice[];
-	usage?: DeepSeekUsage;
-	error?: {
-		message?: string;
-	};
+  choices?: DeepSeekStreamChoice[]
+  usage?: DeepSeekUsage
+  error?: {
+    message?: string
+  }
 }
 
 interface DeepSeekUsage {
-	prompt_tokens?: number;
-	completion_tokens?: number;
-	total_tokens?: number;
+  prompt_tokens?: number
+  completion_tokens?: number
+  total_tokens?: number
 }
 
 interface DeepSeekResponse {
-	choices?: DeepSeekChoice[];
-	usage?: DeepSeekUsage;
-	error?: {
-		message?: string;
-	};
+  choices?: DeepSeekChoice[]
+  usage?: DeepSeekUsage
+  error?: {
+    message?: string
+  }
 }
 
 interface ProviderConfig {
-	endpoint: string;
-	apiKey: string;
-	region: string;
+  endpoint: string
+  apiKey: string
+  region: string
 }
 
 interface StreamingToolCallAccumulator {
-	id: string;
-	index: number;
-	type: "function";
-	function: {
-		name: string;
-		arguments: string;
-	};
+  id: string
+  index: number
+  type: 'function'
+  function: {
+    name: string
+    arguments: string
+  }
 }
 
 interface StreamingAgentLoopOptions extends AgentLoopOptions {
-	writer: WritableStreamDefaultWriter<string>;
+  writer: WritableStreamDefaultWriter<string>
 }
 
 interface ParsedStreamResponse {
-	content: string;
-	toolCalls: DeepSeekToolCall[];
-	usage?: DeepSeekUsage;
-	finishReason?: string | null;
+  content: string
+  toolCalls: DeepSeekToolCall[]
+  usage?: DeepSeekUsage
+  finishReason?: string | null
 }
 
 interface ExecutedStreamingToolResult {
-	toolCall: DeepSeekToolCall;
-	observation: Observation;
+  toolCall: DeepSeekToolCall
+  observation: Observation
 }
 
 interface StreamingIterationOutcome {
-	content: string;
-	toolCalls: AgentLoopToolCall[];
-	iterations: number;
-	usage: {
-		prompt_tokens: number;
-		completion_tokens: number;
-		total_tokens: number;
-	};
-	metadata?: Record<string, unknown>;
-	nextMessages?: ChatCompletionMessage[];
-	fallbackReason?: FallbackReason;
+  content: string
+  toolCalls: AgentLoopToolCall[]
+  iterations: number
+  usage: {
+    prompt_tokens: number
+    completion_tokens: number
+    total_tokens: number
+  }
+  metadata?: Record<string, unknown>
+  nextMessages?: ChatCompletionMessage[]
+  fallbackReason?: FallbackReason
 }
 
 function detectRegion(region?: string, env?: Record<string, string>): string {
-	const candidates = [
-		region,
-		env?.USER_REGION,
-		env?.X_USER_REGION,
-		env?.CF_REGION,
-		env?.USER_COUNTRY,
-		env?.X_USER_COUNTRY,
-		env?.CF_COUNTRY,
-	]
-		.filter(Boolean)
-		.map((value) => value!.toUpperCase());
+  const candidates = [
+    region,
+    env?.USER_REGION,
+    env?.X_USER_REGION,
+    env?.CF_REGION,
+    env?.USER_COUNTRY,
+    env?.X_USER_COUNTRY,
+    env?.CF_COUNTRY,
+  ]
+    .filter(Boolean)
+    .map((value) => value!.toUpperCase())
 
-	return candidates.some((value) => value === "CN" || value === "CHINA")
-		? "CN"
-		: "Global";
+  return candidates.some((value) => value === 'CN' || value === 'CHINA')
+    ? 'CN'
+    : 'Global'
 }
 
 function getProviderConfig(options: {
-	region?: string;
-	env: Record<string, string>;
+  region?: string
+  env: Record<string, string>
 }): ProviderConfig {
-	const detectedRegion = detectRegion(options.region, options.env);
-	const deepSeekKey = options.env.DEEPSEEK_API_KEY;
-	const siliconFlowKey = options.env.SILICONFLOW_API_KEY;
+  const detectedRegion = detectRegion(options.region, options.env)
+  const deepSeekKey = options.env.DEEPSEEK_API_KEY
+  const siliconFlowKey = options.env.SILICONFLOW_API_KEY
 
-	if (detectedRegion === "CN" && siliconFlowKey) {
-		return {
-			endpoint: "https://api.siliconflow.cn/v1/chat/completions",
-			apiKey: siliconFlowKey,
-			region: "CN",
-		};
-	}
+  if (detectedRegion === 'CN' && siliconFlowKey) {
+    return {
+      endpoint: 'https://api.siliconflow.cn/v1/chat/completions',
+      apiKey: siliconFlowKey,
+      region: 'CN',
+    }
+  }
 
-	if (deepSeekKey) {
-		return {
-			endpoint: "https://api.deepseek.com/chat/completions",
-			apiKey: deepSeekKey,
-			region: "Global",
-		};
-	}
+  if (deepSeekKey) {
+    return {
+      endpoint: 'https://api.deepseek.com/chat/completions',
+      apiKey: deepSeekKey,
+      region: 'Global',
+    }
+  }
 
-	if (siliconFlowKey) {
-		return {
-			endpoint: "https://api.siliconflow.cn/v1/chat/completions",
-			apiKey: siliconFlowKey,
-			region: detectedRegion,
-		};
-	}
+  if (siliconFlowKey) {
+    return {
+      endpoint: 'https://api.siliconflow.cn/v1/chat/completions',
+      apiKey: siliconFlowKey,
+      region: detectedRegion,
+    }
+  }
 
-	throw new Error("No DeepSeek-compatible API key configured");
+  throw new Error('No DeepSeek-compatible API key configured')
 }
 
 function buildSupabaseHeaders(env: Record<string, string>): HeadersInit | null {
-	const supabaseUrl = env.SUPABASE_URL;
-	const authKey = env.SUPABASE_SERVICE_KEY || env.SUPABASE_ANON_KEY;
+  const supabaseUrl = env.SUPABASE_URL
+  const authKey = env.SUPABASE_SERVICE_KEY || env.SUPABASE_ANON_KEY
 
-	if (!supabaseUrl || !authKey) {
-		return null;
-	}
+  if (!supabaseUrl || !authKey) {
+    return null
+  }
 
-	return {
-		apikey: authKey,
-		Authorization: `Bearer ${authKey}`,
-	};
+  return {
+    apikey: authKey,
+    Authorization: `Bearer ${authKey}`,
+  }
 }
 
 async function fetchSingleColumn(options: {
-	env: Record<string, string>;
-	table: string;
-	column: string;
-	userId: string;
+  env: Record<string, string>
+  table: string
+  column: string
+  userId: string
 }): Promise<string> {
-	const supabaseUrl = options.env.SUPABASE_URL;
-	const headers = buildSupabaseHeaders(options.env);
+  const supabaseUrl = options.env.SUPABASE_URL
+  const headers = buildSupabaseHeaders(options.env)
 
-	if (!supabaseUrl || !headers) {
-		return "";
-	}
+  if (!supabaseUrl || !headers) {
+    return ''
+  }
 
-	const endpoint = new URL(`${supabaseUrl}/rest/v1/${options.table}`);
-	endpoint.searchParams.set("select", options.column);
-	endpoint.searchParams.set("user_id", `eq.${options.userId}`);
-	endpoint.searchParams.set("limit", "1");
+  const endpoint = new URL(`${supabaseUrl}/rest/v1/${options.table}`)
+  endpoint.searchParams.set('select', options.column)
+  endpoint.searchParams.set('user_id', `eq.${options.userId}`)
+  endpoint.searchParams.set('limit', '1')
 
-	try {
-		const response = await fetch(endpoint.toString(), { headers });
-		if (!response.ok) {
-			return "";
-		}
+  try {
+    const response = await fetch(endpoint.toString(), { headers })
+    if (!response.ok) {
+      return ''
+    }
 
-		const payload = (await response.json()) as Array<Record<string, unknown>>;
-		const value = payload[0]?.[options.column];
-		return typeof value === "string" ? value : "";
-	} catch {
-		return "";
-	}
+    const payload = (await response.json()) as Array<Record<string, unknown>>
+    const value = payload[0]?.[options.column]
+    return typeof value === 'string' ? value : ''
+  } catch {
+    return ''
+  }
 }
 
 async function getUserMemoryBlock(
-	userId: string | undefined,
-	env: Record<string, string>,
+  userId: string | undefined,
+  env: Record<string, string>
 ): Promise<string | undefined> {
-	if (!userId) {
-		return undefined;
-	}
+  if (!userId) {
+    return undefined
+  }
 
-	const [soul, userMemory] = await Promise.all([
-		fetchSingleColumn({
-			env,
-			table: "user_souls",
-			column: "soul_prompt",
-			userId,
-		}),
-		fetchSingleColumn({
-			env,
-			table: "user_memories",
-			column: "memory_text",
-			userId,
-		}),
-	]);
+  const [soul, userMemory] = await Promise.all([
+    fetchSingleColumn({
+      env,
+      table: 'user_souls',
+      column: 'soul_prompt',
+      userId,
+    }),
+    fetchSingleColumn({
+      env,
+      table: 'user_memories',
+      column: 'memory_text',
+      userId,
+    }),
+  ])
 
-	const sections: string[] = [];
-	if (soul) {
-		sections.push(`### Persona Preferences\n${soul}`);
-	}
-	if (userMemory) {
-		sections.push(`### Remembered User Facts\n${userMemory}`);
-	}
+  const sections: string[] = []
+  if (soul) {
+    sections.push(`### Persona Preferences\n${soul}`)
+  }
+  if (userMemory) {
+    sections.push(`### Remembered User Facts\n${userMemory}`)
+  }
 
-	return sections.length > 0 ? sections.join("\n\n") : undefined;
+  return sections.length > 0 ? sections.join('\n\n') : undefined
 }
 
 function buildIterationLimitMessage(lang?: string): string {
-	if (lang === "zh") {
-		return "我已经达到本轮可用的最大工具调用次数，下面的回答可能不完整。";
-	}
+  if (lang === 'zh') {
+    return '我已经达到本轮可用的最大工具调用次数，下面的回答可能不完整。'
+  }
 
-	return "I reached the maximum tool-call iterations for this turn, so the answer below may be incomplete.";
+  return 'I reached the maximum tool-call iterations for this turn, so the answer below may be incomplete.'
 }
 
 async function callDeepSeek(options: {
-	provider: ProviderConfig;
-	messages: ChatCompletionMessage[];
-	registry: ToolRegistry;
-	tools?: OpenAITool[];
+  provider: ProviderConfig
+  messages: ChatCompletionMessage[]
+  registry: ToolRegistry
+  tools?: OpenAITool[]
 }): Promise<DeepSeekResponse> {
-	const response = await fetch(options.provider.endpoint, {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-			Authorization: `Bearer ${options.provider.apiKey}`,
-		},
-		body: JSON.stringify({
-			model: "deepseek-chat",
-			messages: options.messages,
-			tools: options.tools ?? options.registry.toOpenAITools(),
-			stream: false,
-		}),
-	});
+  const response = await fetch(options.provider.endpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${options.provider.apiKey}`,
+    },
+    body: JSON.stringify({
+      model: 'deepseek-chat',
+      messages: options.messages,
+      tools: options.tools ?? options.registry.toOpenAITools(),
+      stream: false,
+    }),
+  })
 
-	if (!response.ok) {
-		const errorText = await response.text();
-		throw new Error(
-			`DeepSeek API returned ${response.status}${errorText ? `: ${errorText}` : ""}`,
-		);
-	}
+  if (!response.ok) {
+    const errorText = await response.text()
+    throw new Error(
+      `DeepSeek API returned ${response.status}${errorText ? `: ${errorText}` : ''}`
+    )
+  }
 
-	return (await response.json()) as DeepSeekResponse;
+  return (await response.json()) as DeepSeekResponse
 }
 
 async function callDeepSeekStream(options: {
-	provider: ProviderConfig;
-	messages: ChatCompletionMessage[];
-	registry: ToolRegistry;
-	tools?: OpenAITool[];
+  provider: ProviderConfig
+  messages: ChatCompletionMessage[]
+  registry: ToolRegistry
+  tools?: OpenAITool[]
 }): Promise<ReadableStreamDefaultReader<Uint8Array>> {
-	const response = await fetch(options.provider.endpoint, {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-			Authorization: `Bearer ${options.provider.apiKey}`,
-		},
-		body: JSON.stringify({
-			model: "deepseek-chat",
-			messages: options.messages,
-			tools: options.tools ?? options.registry.toOpenAITools(),
-			stream: true,
-			stream_options: {
-				include_usage: true,
-			},
-		}),
-	});
+  const response = await fetch(options.provider.endpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${options.provider.apiKey}`,
+    },
+    body: JSON.stringify({
+      model: 'deepseek-chat',
+      messages: options.messages,
+      tools: options.tools ?? options.registry.toOpenAITools(),
+      stream: true,
+      stream_options: {
+        include_usage: true,
+      },
+    }),
+  })
 
-	if (!response.ok) {
-		const errorText = await response.text();
-		throw new Error(
-			`DeepSeek API returned ${response.status}${errorText ? `: ${errorText}` : ""}`,
-		);
-	}
+  if (!response.ok) {
+    const errorText = await response.text()
+    throw new Error(
+      `DeepSeek API returned ${response.status}${errorText ? `: ${errorText}` : ''}`
+    )
+  }
 
-	if (!response.body) {
-		throw new Error("DeepSeek streaming response missing body");
-	}
+  if (!response.body) {
+    throw new Error('DeepSeek streaming response missing body')
+  }
 
-	return response.body.getReader();
+  return response.body.getReader()
 }
 
 function createToolCallAccumulator(
-	index: number,
+  index: number
 ): StreamingToolCallAccumulator {
-	return {
-		id: `tool_call_${index}`,
-		index,
-		type: "function",
-		function: {
-			name: "",
-			arguments: "",
-		},
-	};
+  return {
+    id: `tool_call_${index}`,
+    index,
+    type: 'function',
+    function: {
+      name: '',
+      arguments: '',
+    },
+  }
 }
 
 function accumulateStreamingToolCalls(
-	accumulators: Map<number, StreamingToolCallAccumulator>,
-	deltaToolCalls: DeepSeekStreamDeltaToolCall[] | null | undefined,
+  accumulators: Map<number, StreamingToolCallAccumulator>,
+  deltaToolCalls: DeepSeekStreamDeltaToolCall[] | null | undefined
 ): void {
-	if (!deltaToolCalls || deltaToolCalls.length === 0) {
-		return;
-	}
+  if (!deltaToolCalls || deltaToolCalls.length === 0) {
+    return
+  }
 
-	for (const deltaToolCall of deltaToolCalls) {
-		const accumulator =
-			accumulators.get(deltaToolCall.index) ||
-			createToolCallAccumulator(deltaToolCall.index);
+  for (const deltaToolCall of deltaToolCalls) {
+    const accumulator =
+      accumulators.get(deltaToolCall.index) ||
+      createToolCallAccumulator(deltaToolCall.index)
 
-		if (deltaToolCall.id) {
-			accumulator.id = deltaToolCall.id;
-		}
+    if (deltaToolCall.id) {
+      accumulator.id = deltaToolCall.id
+    }
 
-		if (deltaToolCall.type) {
-			accumulator.type = deltaToolCall.type;
-		}
+    if (deltaToolCall.type) {
+      accumulator.type = deltaToolCall.type
+    }
 
-		if (deltaToolCall.function?.name) {
-			accumulator.function.name += deltaToolCall.function.name;
-		}
+    if (deltaToolCall.function?.name) {
+      accumulator.function.name += deltaToolCall.function.name
+    }
 
-		if (deltaToolCall.function?.arguments) {
-			accumulator.function.arguments += deltaToolCall.function.arguments;
-		}
+    if (deltaToolCall.function?.arguments) {
+      accumulator.function.arguments += deltaToolCall.function.arguments
+    }
 
-		accumulators.set(deltaToolCall.index, accumulator);
-	}
+    accumulators.set(deltaToolCall.index, accumulator)
+  }
 }
 
 function finalizeStreamingToolCalls(
-	accumulators: Map<number, StreamingToolCallAccumulator>,
+  accumulators: Map<number, StreamingToolCallAccumulator>
 ): DeepSeekToolCall[] {
-	return Array.from(accumulators.values())
-		.sort((a, b) => a.index - b.index)
-		.map((toolCall) => ({
-			id: toolCall.id,
-			type: toolCall.type,
-			function: {
-				name: toolCall.function.name,
-				arguments: toolCall.function.arguments,
-			},
-		}));
+  return Array.from(accumulators.values())
+    .sort((a, b) => a.index - b.index)
+    .map((toolCall) => ({
+      id: toolCall.id,
+      type: toolCall.type,
+      function: {
+        name: toolCall.function.name,
+        arguments: toolCall.function.arguments,
+      },
+    }))
 }
 
 async function readDeepSeekStreamingResponse(options: {
-	reader: ReadableStreamDefaultReader<Uint8Array>;
-	writer: WritableStreamDefaultWriter<string>;
+  reader: ReadableStreamDefaultReader<Uint8Array>
+  writer: WritableStreamDefaultWriter<string>
 }): Promise<ParsedStreamResponse> {
-	const decoder = new TextDecoder();
-	let buffer = "";
-	let content = "";
-	let finishReason: string | null = null;
-	let latestUsage: DeepSeekUsage | undefined;
-	const toolCallAccumulators = new Map<number, StreamingToolCallAccumulator>();
+  const decoder = new TextDecoder()
+  let buffer = ''
+  let content = ''
+  let finishReason: string | null = null
+  let latestUsage: DeepSeekUsage | undefined
+  const toolCallAccumulators = new Map<number, StreamingToolCallAccumulator>()
 
-	const processChunk = async (chunkText: string): Promise<void> => {
-		const lines = chunkText
-			.split("\n")
-			.map((line) => line.trim())
-			.filter(Boolean);
+  const processChunk = async (chunkText: string): Promise<void> => {
+    const lines = chunkText
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean)
 
-		for (const line of lines) {
-			if (!line.startsWith("data: ")) {
-				continue;
-			}
+    for (const line of lines) {
+      if (!line.startsWith('data: ')) {
+        continue
+      }
 
-			const payload = line.slice(6);
-			if (payload === "[DONE]") {
-				continue;
-			}
+      const payload = line.slice(6)
+      if (payload === '[DONE]') {
+        continue
+      }
 
-			const data = JSON.parse(payload) as DeepSeekStreamChunk;
-			if (data.error?.message) {
-				throw new Error(data.error.message);
-			}
+      const data = JSON.parse(payload) as DeepSeekStreamChunk
+      if (data.error?.message) {
+        throw new Error(data.error.message)
+      }
 
-			if (data.usage) {
-				latestUsage = data.usage;
-			}
+      if (data.usage) {
+        latestUsage = data.usage
+      }
 
-			const choice = data.choices?.[0];
-			if (!choice) {
-				continue;
-			}
+      const choice = data.choices?.[0]
+      if (!choice) {
+        continue
+      }
 
-			finishReason = choice.finish_reason ?? finishReason;
-			const delta = choice.delta;
-			if (!delta) {
-				continue;
-			}
+      finishReason = choice.finish_reason ?? finishReason
+      const delta = choice.delta
+      if (!delta) {
+        continue
+      }
 
-			if (typeof delta.content === "string" && delta.content.length > 0) {
-				content += delta.content;
-				await sendContent(options.writer, delta.content);
-			}
+      if (typeof delta.content === 'string' && delta.content.length > 0) {
+        content += delta.content
+        await sendContent(options.writer, delta.content)
+      }
 
-			accumulateStreamingToolCalls(toolCallAccumulators, delta.tool_calls);
-		}
-	};
+      accumulateStreamingToolCalls(toolCallAccumulators, delta.tool_calls)
+    }
+  }
 
-	while (true) {
-		const { done, value } = await options.reader.read();
-		if (done) {
-			buffer += decoder.decode();
-			break;
-		}
+  while (true) {
+    const { done, value } = await options.reader.read()
+    if (done) {
+      buffer += decoder.decode()
+      break
+    }
 
-		buffer += decoder.decode(value, { stream: true });
-		const events = buffer.split("\n\n");
-		buffer = events.pop() || "";
+    buffer += decoder.decode(value, { stream: true })
+    const events = buffer.split('\n\n')
+    buffer = events.pop() || ''
 
-		for (const eventText of events) {
-			if (!eventText.trim()) {
-				continue;
-			}
+    for (const eventText of events) {
+      if (!eventText.trim()) {
+        continue
+      }
 
-			await processChunk(eventText);
-		}
-	}
+      await processChunk(eventText)
+    }
+  }
 
-	if (buffer.trim()) {
-		await processChunk(buffer);
-	}
+  if (buffer.trim()) {
+    await processChunk(buffer)
+  }
 
-	return {
-		content,
-		toolCalls: finalizeStreamingToolCalls(toolCallAccumulators),
-		usage: latestUsage,
-		finishReason,
-	};
+  return {
+    content,
+    toolCalls: finalizeStreamingToolCalls(toolCallAccumulators),
+    usage: latestUsage,
+    finishReason,
+  }
 }
 
 function observationToToolResult(observation: Observation): ToolResult {
-	return {
-		content: observation.raw,
-		metadata: observation.status === "error" ? { error: true } : undefined,
-		truncated: observation.truncated ? true : undefined,
-	};
+  return {
+    content: observation.raw,
+    metadata: observation.status === 'error' ? { error: true } : undefined,
+    truncated: observation.truncated ? true : undefined,
+  }
 }
 
 function buildSimplifiedRetryMessages(
-	messages: ChatCompletionMessage[],
-	reason: FallbackReason,
+  messages: ChatCompletionMessage[],
+  reason: FallbackReason
 ): ChatCompletionMessage[] {
-	const [systemMessage, ...rest] = messages;
-	const trimmedContext = rest.slice(-4);
-	const retryInstruction =
-		reason === "tool_timeout"
-			? "Fallback retry: tool requests timed out. Retry with one tool only and minimal context."
-			: "Fallback retry: tool use failed. Retry with one tool only and minimal context.";
+  const [systemMessage, ...rest] = messages
+  const trimmedContext = rest.slice(-4)
+  const retryInstruction =
+    reason === 'tool_timeout'
+      ? 'Fallback retry: tool requests timed out. Retry with one tool only and minimal context.'
+      : 'Fallback retry: tool use failed. Retry with one tool only and minimal context.'
 
-	return [
-		systemMessage,
-		{
-			role: "system",
-			content: retryInstruction,
-		},
-		...trimmedContext,
-	];
+  return [
+    systemMessage,
+    {
+      role: 'system',
+      content: retryInstruction,
+    },
+    ...trimmedContext,
+  ]
 }
 
 function buildDirectFallbackMessages(
-	messages: ChatCompletionMessage[],
+  messages: ChatCompletionMessage[]
 ): ChatCompletionMessage[] {
-	return [
-		messages[0],
-		...messages.slice(-4),
-		{
-			role: "user",
-			content:
-				"Tool access is unavailable. Answer directly without tools using general knowledge, be explicit about uncertainty, and keep helping the user.",
-		},
-	];
+  return [
+    messages[0],
+    ...messages.slice(-4),
+    {
+      role: 'user',
+      content:
+        'Tool access is unavailable. Answer directly without tools using general knowledge, be explicit about uncertainty, and keep helping the user.',
+    },
+  ]
 }
 
 async function executeStreamingToolCalls(options: {
-	toolCalls: DeepSeekToolCall[];
-	registry: ToolRegistry;
-	requestContext: RequestContext;
-	writer: WritableStreamDefaultWriter<string>;
-	stepIndex: number;
+  toolCalls: DeepSeekToolCall[]
+  registry: ToolRegistry
+  requestContext: RequestContext
+  writer: WritableStreamDefaultWriter<string>
+  stepIndex: number
 }): Promise<ExecutedStreamingToolResult[]> {
-	const toolResults: ExecutedStreamingToolResult[] = [];
+  const toolResults: ExecutedStreamingToolResult[] = []
 
-	for (const toolCall of options.toolCalls) {
-		const observation = await executeToolAction({
-			toolCall,
-			registry: options.registry,
-			requestContext: options.requestContext,
-			stepIndex: options.stepIndex,
-		});
+  for (const toolCall of options.toolCalls) {
+    const observation = await executeToolAction({
+      toolCall,
+      registry: options.registry,
+      requestContext: options.requestContext,
+      stepIndex: options.stepIndex,
+    })
 
-		await sendToolStart(options.writer, observation.toolName, observation.input);
+    await sendToolStart(options.writer, observation.toolName, observation.input)
 
-		await emitObservation(
-			options.writer,
-			observation.toolName,
-			observation.status,
-			observation.summary,
-		);
+    await emitObservation(
+      options.writer,
+      observation.toolName,
+      observation.status,
+      observation.summary
+    )
 
-		await sendToolResult(
-			options.writer,
-			observation.toolName,
-			observation.status,
-			observation.summary,
-		);
+    await sendToolResult(
+      options.writer,
+      observation.toolName,
+      observation.status,
+      observation.summary
+    )
 
-		toolResults.push({
-			toolCall,
-			observation,
-		});
-	}
+    toolResults.push({
+      toolCall,
+      observation,
+    })
+  }
 
-	return toolResults;
+  return toolResults
 }
 
 async function runStreamingIteration(options: {
-	provider: ProviderConfig;
-	messages: ChatCompletionMessage[];
-	registry: ToolRegistry;
-	requestContext: RequestContext;
-	writer: WritableStreamDefaultWriter<string>;
-	usage: {
-		prompt_tokens: number;
-		completion_tokens: number;
-		total_tokens: number;
-	};
-	executedToolCalls: AgentLoopToolCall[];
-	iterations: number;
-	tools?: OpenAITool[];
+  provider: ProviderConfig
+  messages: ChatCompletionMessage[]
+  registry: ToolRegistry
+  requestContext: RequestContext
+  writer: WritableStreamDefaultWriter<string>
+  usage: {
+    prompt_tokens: number
+    completion_tokens: number
+    total_tokens: number
+  }
+  executedToolCalls: AgentLoopToolCall[]
+  iterations: number
+  tools?: OpenAITool[]
 }): Promise<StreamingIterationOutcome> {
-	await emitAgentStep(options.writer, options.iterations, options.iterations);
+  await emitAgentStep(options.writer, options.iterations, options.iterations)
 
-	const reader = await callDeepSeekStream({
-		provider: options.provider,
-		messages: options.messages,
-		registry: options.registry,
-		tools: options.tools,
-	});
+  const reader = await callDeepSeekStream({
+    provider: options.provider,
+    messages: options.messages,
+    registry: options.registry,
+    tools: options.tools,
+  })
 
-	const streamResponse = await readDeepSeekStreamingResponse({
-		reader,
-		writer: options.writer,
-	});
+  const streamResponse = await readDeepSeekStreamingResponse({
+    reader,
+    writer: options.writer,
+  })
 
-	const usage = {
-		prompt_tokens:
-			options.usage.prompt_tokens + (streamResponse.usage?.prompt_tokens ?? 0),
-		completion_tokens:
-			options.usage.completion_tokens +
-			(streamResponse.usage?.completion_tokens ?? 0),
-		total_tokens:
-			options.usage.total_tokens + (streamResponse.usage?.total_tokens ?? 0),
-	};
+  const usage = {
+    prompt_tokens:
+      options.usage.prompt_tokens + (streamResponse.usage?.prompt_tokens ?? 0),
+    completion_tokens:
+      options.usage.completion_tokens +
+      (streamResponse.usage?.completion_tokens ?? 0),
+    total_tokens:
+      options.usage.total_tokens + (streamResponse.usage?.total_tokens ?? 0),
+  }
 
-	const toolCalls = streamResponse.toolCalls;
-	if (toolCalls.length === 0) {
-		const responseStop = evaluateStopCondition({
-			iterationCount: options.iterations,
-			toolCalls,
-		});
-		return {
-			content: streamResponse.content,
-			toolCalls: options.executedToolCalls,
-			iterations: options.iterations,
-			usage,
-			metadata: {
-				stopReason: responseStop.reason,
-				stopSemanticLabel: responseStop.semanticLabel,
-			},
-		};
-	}
+  const toolCalls = streamResponse.toolCalls
+  if (toolCalls.length === 0) {
+    const responseStop = evaluateStopCondition({
+      iterationCount: options.iterations,
+      toolCalls,
+    })
+    return {
+      content: streamResponse.content,
+      toolCalls: options.executedToolCalls,
+      iterations: options.iterations,
+      usage,
+      metadata: {
+        stopReason: responseStop.reason,
+        stopSemanticLabel: responseStop.semanticLabel,
+      },
+    }
+  }
 
-	const toolResults = await executeStreamingToolCalls({
-		toolCalls,
-		registry: options.registry,
-		requestContext: options.requestContext,
-		writer: options.writer,
-		stepIndex: options.iterations,
-	});
+  const toolResults = await executeStreamingToolCalls({
+    toolCalls,
+    registry: options.registry,
+    requestContext: options.requestContext,
+    writer: options.writer,
+    stepIndex: options.iterations,
+  })
 
-	const nextMessages = [
-		...options.messages,
-		{
-			role: "assistant" as const,
-			content: streamResponse.content,
-			tool_calls: toolCalls,
-		},
-		...toolResults.map((toolResult) =>
-			convertObservationToMessage(toolResult.observation),
-		),
-	];
+  const nextMessages = [
+    ...options.messages,
+    {
+      role: 'assistant' as const,
+      content: streamResponse.content,
+      tool_calls: toolCalls,
+    },
+    ...toolResults.map((toolResult) =>
+      convertObservationToMessage(toolResult.observation)
+    ),
+  ]
 
-	const executedToolCalls = [
-		...options.executedToolCalls,
-		...toolResults.map(
-			(toolResult): AgentLoopToolCall => ({
-				name: toolResult.observation.toolName,
-				args: toolResult.observation.input,
-				result: observationToToolResult(toolResult.observation),
-			}),
-		),
-	];
+  const executedToolCalls = [
+    ...options.executedToolCalls,
+    ...toolResults.map(
+      (toolResult): AgentLoopToolCall => ({
+        name: toolResult.observation.toolName,
+        args: toolResult.observation.input,
+        result: observationToToolResult(toolResult.observation),
+      })
+    ),
+  ]
 
-	return {
-		content: streamResponse.content,
-		toolCalls: executedToolCalls,
-		iterations: options.iterations,
-		usage,
-		nextMessages,
-		fallbackReason: evaluateStopCondition({
-			iterationCount: options.iterations,
-			toolCalls,
-			observations: toolResults.map((toolResult) => toolResult.observation),
-		}).fallbackReason ?? undefined,
-	};
+  return {
+    content: streamResponse.content,
+    toolCalls: executedToolCalls,
+    iterations: options.iterations,
+    usage,
+    nextMessages,
+    fallbackReason:
+      evaluateStopCondition({
+        iterationCount: options.iterations,
+        toolCalls,
+        observations: toolResults.map((toolResult) => toolResult.observation),
+      }).fallbackReason ?? undefined,
+  }
 }
 
 async function runDirectFallbackResponse(options: {
-	provider: ProviderConfig;
-	messages: ChatCompletionMessage[];
-	registry: ToolRegistry;
-	writer: WritableStreamDefaultWriter<string>;
-	usage: {
-		prompt_tokens: number;
-		completion_tokens: number;
-		total_tokens: number;
-	};
-	executedToolCalls: AgentLoopToolCall[];
-	iterations: number;
-	reason: FallbackReason;
+  provider: ProviderConfig
+  messages: ChatCompletionMessage[]
+  registry: ToolRegistry
+  writer: WritableStreamDefaultWriter<string>
+  usage: {
+    prompt_tokens: number
+    completion_tokens: number
+    total_tokens: number
+  }
+  executedToolCalls: AgentLoopToolCall[]
+  iterations: number
+  reason: FallbackReason
 }): Promise<StreamingIterationOutcome> {
-	const disclaimer =
-		"I couldn't search our knowledge base. Here's what I know generally...";
-	await sendContent(options.writer, `${disclaimer}\n\n`, {
-		fallback: true,
-		fallbackLevel: 2,
-		reason: options.reason,
-	});
+  const disclaimer =
+    "I couldn't search our knowledge base. Here's what I know generally..."
+  await sendContent(options.writer, `${disclaimer}\n\n`, {
+    fallback: true,
+    fallbackLevel: 2,
+    reason: options.reason,
+  })
 
-	try {
-		const reader = await callDeepSeekStream({
-			provider: options.provider,
-			messages: buildDirectFallbackMessages(options.messages),
-			registry: options.registry,
-			tools: [],
-		});
-		const streamResponse = await readDeepSeekStreamingResponse({
-			reader,
-			writer: options.writer,
-		});
-		return {
-			content: `${disclaimer}\n\n${streamResponse.content}`,
-			toolCalls: options.executedToolCalls,
-			iterations: options.iterations,
-			usage: {
-				prompt_tokens:
-					options.usage.prompt_tokens +
-					(streamResponse.usage?.prompt_tokens ?? 0),
-				completion_tokens:
-					options.usage.completion_tokens +
-					(streamResponse.usage?.completion_tokens ?? 0),
-				total_tokens:
-					options.usage.total_tokens +
-					(streamResponse.usage?.total_tokens ?? 0),
-			},
-			metadata: {
-				fallback: true,
-				fallbackLevel: 2,
-				reason: options.reason,
-			},
-		};
-	} catch {
-		const genericContent =
-			"I couldn't search our knowledge base. Here's what I know generally... I may be missing specifics, but you can share more details and I'll do my best to help.";
-		await sendContent(
-			options.writer,
-			"I may be missing specifics, but you can share more details and I'll do my best to help.",
-		);
-		return {
-			content: genericContent,
-			toolCalls: options.executedToolCalls,
-			iterations: options.iterations,
-			usage: options.usage,
-			metadata: {
-				fallback: true,
-				fallbackLevel: 2,
-				reason: options.reason,
-			},
-		};
-	}
+  try {
+    const reader = await callDeepSeekStream({
+      provider: options.provider,
+      messages: buildDirectFallbackMessages(options.messages),
+      registry: options.registry,
+      tools: [],
+    })
+    const streamResponse = await readDeepSeekStreamingResponse({
+      reader,
+      writer: options.writer,
+    })
+    return {
+      content: `${disclaimer}\n\n${streamResponse.content}`,
+      toolCalls: options.executedToolCalls,
+      iterations: options.iterations,
+      usage: {
+        prompt_tokens:
+          options.usage.prompt_tokens +
+          (streamResponse.usage?.prompt_tokens ?? 0),
+        completion_tokens:
+          options.usage.completion_tokens +
+          (streamResponse.usage?.completion_tokens ?? 0),
+        total_tokens:
+          options.usage.total_tokens +
+          (streamResponse.usage?.total_tokens ?? 0),
+      },
+      metadata: {
+        fallback: true,
+        fallbackLevel: 2,
+        reason: options.reason,
+      },
+    }
+  } catch {
+    const genericContent =
+      "I couldn't search our knowledge base. Here's what I know generally... I may be missing specifics, but you can share more details and I'll do my best to help."
+    await sendContent(
+      options.writer,
+      "I may be missing specifics, but you can share more details and I'll do my best to help."
+    )
+    return {
+      content: genericContent,
+      toolCalls: options.executedToolCalls,
+      iterations: options.iterations,
+      usage: options.usage,
+      metadata: {
+        fallback: true,
+        fallbackLevel: 2,
+        reason: options.reason,
+      },
+    }
+  }
 }
 
 export async function runAgentLoop(
-	options: AgentLoopOptions,
+  options: AgentLoopOptions
 ): Promise<AgentLoopResult> {
-	const maxIterations = options.maxIterations ?? DEFAULT_MAX_ITERATIONS;
-	const userMemory = await getUserMemoryBlock(options.userId, options.env);
-	const provider = getProviderConfig({
-		region: options.region,
-		env: options.env,
-	});
-	const requestContext: RequestContext = {
-		env: options.env,
-		userId: options.userId,
-		region: provider.region,
-	};
+  const maxIterations = options.maxIterations ?? DEFAULT_MAX_ITERATIONS
+  const userMemory = await getUserMemoryBlock(options.userId, options.env)
+  const provider = getProviderConfig({
+    region: options.region,
+    env: options.env,
+  })
+  const requestContext: RequestContext = {
+    env: options.env,
+    userId: options.userId,
+    region: provider.region,
+  }
 
-	const messages = buildProviderMessages({
-		systemPrompt: buildSystemPrompt({
-			userMemory,
-			lang: options.lang,
-		}),
-		history: options.history,
-		message: options.message,
-	});
-	const tools = shouldEnableRetrievalTools(options.message) ? undefined : [];
+  const messages = buildProviderMessages({
+    systemPrompt: buildSystemPrompt({
+      userMemory,
+      lang: options.lang,
+    }),
+    history: options.history,
+    message: options.message,
+  })
+  const tools = shouldEnableRetrievalTools(options.message) ? undefined : []
 
-	const executedToolCalls: AgentLoopToolCall[] = [];
-	const usage = {
-		prompt_tokens: 0,
-		completion_tokens: 0,
-	};
-	let iterations = 0;
-	let lastAssistantContent = "";
+  const executedToolCalls: AgentLoopToolCall[] = []
+  const usage = {
+    prompt_tokens: 0,
+    completion_tokens: 0,
+  }
+  let iterations = 0
+  let lastAssistantContent = ''
 
-	for (let index = 0; index < maxIterations; index += 1) {
-		iterations = index + 1;
-		const data = await callDeepSeek({
-			provider,
-			messages,
-			registry: options.registry,
-			tools,
-		});
-		usage.prompt_tokens += data.usage?.prompt_tokens ?? 0;
-		usage.completion_tokens += data.usage?.completion_tokens ?? 0;
+  for (let index = 0; index < maxIterations; index += 1) {
+    iterations = index + 1
+    const data = await callDeepSeek({
+      provider,
+      messages,
+      registry: options.registry,
+      tools,
+    })
+    usage.prompt_tokens += data.usage?.prompt_tokens ?? 0
+    usage.completion_tokens += data.usage?.completion_tokens ?? 0
 
-		const responseMessage = data.choices?.[0]?.message;
-		if (!responseMessage) {
-			throw new Error(
-				data.error?.message || "DeepSeek response missing message",
-			);
-		}
+    const responseMessage = data.choices?.[0]?.message
+    if (!responseMessage) {
+      throw new Error(
+        data.error?.message || 'DeepSeek response missing message'
+      )
+    }
 
-		const assistantContent = responseMessage.content ?? "";
-		if (assistantContent) {
-			lastAssistantContent = assistantContent;
-		}
+    const assistantContent = responseMessage.content ?? ''
+    if (assistantContent) {
+      lastAssistantContent = assistantContent
+    }
 
-		const toolCalls = responseMessage.tool_calls ?? [];
-		const responseStop = evaluateStopCondition({
-			iterationCount: iterations,
-			maxIterations,
-			toolCalls,
-		});
-		if (responseStop.shouldStop && responseStop.reason === "final_answer") {
-			return {
-				content: assistantContent || lastAssistantContent,
-				toolCalls: executedToolCalls,
-				iterations,
-				usage,
-				metadata: {
-					stopReason: responseStop.reason,
-					stopSemanticLabel: responseStop.semanticLabel,
-				},
-			};
-		}
+    const toolCalls = responseMessage.tool_calls ?? []
+    const responseStop = evaluateStopCondition({
+      iterationCount: iterations,
+      maxIterations,
+      toolCalls,
+    })
+    if (responseStop.shouldStop && responseStop.reason === 'final_answer') {
+      return {
+        content: assistantContent || lastAssistantContent,
+        toolCalls: executedToolCalls,
+        iterations,
+        usage,
+        metadata: {
+          stopReason: responseStop.reason,
+          stopSemanticLabel: responseStop.semanticLabel,
+        },
+      }
+    }
 
-		messages.push({
-			role: "assistant",
-			content: responseMessage.content,
-			tool_calls: toolCalls,
-		});
+    messages.push({
+      role: 'assistant',
+      content: responseMessage.content,
+      tool_calls: toolCalls,
+    })
 
-		const toolResults: Array<{
-			toolCall: DeepSeekToolCall;
-			observation: Observation;
-		}> = [];
-		for (const toolCall of toolCalls) {
-			const observation = await executeToolAction({
-				toolCall,
-				registry: options.registry,
-				requestContext,
-				stepIndex: iterations,
-			});
-			toolResults.push({ toolCall, observation });
-		}
+    const toolResults: Array<{
+      toolCall: DeepSeekToolCall
+      observation: Observation
+    }> = []
+    for (const toolCall of toolCalls) {
+      const observation = await executeToolAction({
+        toolCall,
+        registry: options.registry,
+        requestContext,
+        stepIndex: iterations,
+      })
+      toolResults.push({ toolCall, observation })
+    }
 
-		const toolStop = evaluateStopCondition({
-			iterationCount: iterations,
-			maxIterations,
-			toolCalls,
-			observations: toolResults.map((toolResult) => toolResult.observation),
-		});
+    const toolStop = evaluateStopCondition({
+      iterationCount: iterations,
+      maxIterations,
+      toolCalls,
+      observations: toolResults.map((toolResult) => toolResult.observation),
+    })
 
-		if (toolResults.length === 0) {
-			break;
-		}
+    if (toolResults.length === 0) {
+      break
+    }
 
-		for (const toolResult of toolResults) {
-			executedToolCalls.push({
-				name: toolResult.observation.toolName,
-				args: toolResult.observation.input,
-				result: observationToToolResult(toolResult.observation),
-			});
+    for (const toolResult of toolResults) {
+      executedToolCalls.push({
+        name: toolResult.observation.toolName,
+        args: toolResult.observation.input,
+        result: observationToToolResult(toolResult.observation),
+      })
 
-			messages.push(
-				convertObservationToMessage(toolResult.observation),
-			);
-		}
+      messages.push(convertObservationToMessage(toolResult.observation))
+    }
 
-		if (toolStop.shouldStop && toolStop.reason !== "max_iterations") {
-			return {
-				content: assistantContent || lastAssistantContent,
-				toolCalls: executedToolCalls,
-				iterations,
-				usage,
-				metadata: {
-					stopReason: toolStop.reason,
-					stopSemanticLabel: toolStop.semanticLabel,
-					fallbackReason: toolStop.fallbackReason,
-				},
-			};
-		}
-	}
+    if (toolStop.shouldStop && toolStop.reason !== 'max_iterations') {
+      return {
+        content: assistantContent || lastAssistantContent,
+        toolCalls: executedToolCalls,
+        iterations,
+        usage,
+        metadata: {
+          stopReason: toolStop.reason,
+          stopSemanticLabel: toolStop.semanticLabel,
+          fallbackReason: toolStop.fallbackReason,
+        },
+      }
+    }
+  }
 
-	const maxIterationStop = evaluateStopCondition({
-		iterationCount: iterations,
-		maxIterations,
-		toolCalls: [
-			{
-				id: "max_iterations",
-				type: "function",
-				function: {
-					name: "max_iterations",
-					arguments: "{}",
-				},
-			},
-		],
-	});
-	const disclaimer = buildIterationLimitMessage(options.lang);
-	const content = lastAssistantContent
-		? `${lastAssistantContent}\n\n${disclaimer}`
-		: disclaimer;
+  const maxIterationStop = evaluateStopCondition({
+    iterationCount: iterations,
+    maxIterations,
+    toolCalls: [
+      {
+        id: 'max_iterations',
+        type: 'function',
+        function: {
+          name: 'max_iterations',
+          arguments: '{}',
+        },
+      },
+    ],
+  })
+  const disclaimer = buildIterationLimitMessage(options.lang)
+  const content = lastAssistantContent
+    ? `${lastAssistantContent}\n\n${disclaimer}`
+    : disclaimer
 
-	return {
-		content,
-		toolCalls: executedToolCalls,
-		iterations,
-		usage,
-		metadata: {
-			stopReason: maxIterationStop.reason,
-			stopSemanticLabel: maxIterationStop.semanticLabel,
-			fallbackReason: maxIterationStop.fallbackReason,
-		},
-	};
+  return {
+    content,
+    toolCalls: executedToolCalls,
+    iterations,
+    usage,
+    metadata: {
+      stopReason: maxIterationStop.reason,
+      stopSemanticLabel: maxIterationStop.semanticLabel,
+      fallbackReason: maxIterationStop.fallbackReason,
+    },
+  }
 }
 
 export async function runStreamingAgentLoop(
-	options: StreamingAgentLoopOptions,
+  options: StreamingAgentLoopOptions
 ): Promise<AgentLoopResult> {
-	const maxIterations = options.maxIterations ?? DEFAULT_MAX_ITERATIONS;
-	const userMemory = await getUserMemoryBlock(options.userId, options.env);
-	const provider = getProviderConfig({
-		region: options.region,
-		env: options.env,
-	});
-	const requestContext: RequestContext = {
-		env: options.env,
-		userId: options.userId,
-		region: provider.region,
-	};
+  const maxIterations = options.maxIterations ?? DEFAULT_MAX_ITERATIONS
+  const userMemory = await getUserMemoryBlock(options.userId, options.env)
+  const provider = getProviderConfig({
+    region: options.region,
+    env: options.env,
+  })
+  const requestContext: RequestContext = {
+    env: options.env,
+    userId: options.userId,
+    region: provider.region,
+  }
 
-	let messages = buildProviderMessages({
-		systemPrompt: buildSystemPrompt({
-			userMemory,
-			lang: options.lang,
-		}),
-		history: options.history,
-		message: options.message,
-	});
-	const tools = shouldEnableRetrievalTools(options.message) ? undefined : [];
+  let messages = buildProviderMessages({
+    systemPrompt: buildSystemPrompt({
+      userMemory,
+      lang: options.lang,
+    }),
+    history: options.history,
+    message: options.message,
+  })
+  const tools = shouldEnableRetrievalTools(options.message) ? undefined : []
 
-	const executedToolCalls: AgentLoopToolCall[] = [];
-	const usage = {
-		prompt_tokens: 0,
-		completion_tokens: 0,
-		total_tokens: 0,
-	};
-	let iterations = 0;
-	let lastAssistantContent = "";
-	let doneSent = false;
+  const executedToolCalls: AgentLoopToolCall[] = []
+  const usage = {
+    prompt_tokens: 0,
+    completion_tokens: 0,
+    total_tokens: 0,
+  }
+  let iterations = 0
+  let lastAssistantContent = ''
+  let doneSent = false
 
-	try {
-		for (let index = 0; index < maxIterations; index += 1) {
-			iterations = index + 1;
-			const iterationOutcome = await withFallback(
-				() =>
-					runStreamingIteration({
-						provider,
-						messages,
-						registry: options.registry,
-						requestContext,
-						writer: options.writer,
-						usage,
-						executedToolCalls,
-						iterations,
-						tools,
-					}),
-				{
-					query: options.message,
-					evaluate: (result) => ({
-						shouldFallback: Boolean(result.fallbackReason),
-						reason: result.fallbackReason,
-					}),
-					retryOnce: (reason, previousResult) => {
-						const simplifiedTools = (previousResult?.nextMessages ?? [])
-							.slice()
-							.reverse()
-							.flatMap((message) => message.tool_calls ?? [])
-							.slice(0, 1)
-							.map((toolCall) => toolCall.function.name);
-						const allowedTools = options.registry
-							.toOpenAITools()
-							.filter((tool) =>
-								simplifiedTools.length === 0
-									? false
-									: simplifiedTools.includes(tool.function.name),
-							);
-						return runStreamingIteration({
-							provider,
-							messages: buildSimplifiedRetryMessages(messages, reason),
-							registry: options.registry,
-							requestContext,
-							writer: options.writer,
-							usage,
-							executedToolCalls,
-							iterations,
-							tools: allowedTools,
-						});
-					},
-					directResponse: (reason) =>
-						runDirectFallbackResponse({
-							provider,
-							messages,
-							registry: options.registry,
-							writer: options.writer,
-							usage,
-							executedToolCalls,
-							iterations,
-							reason,
-						}),
-					onFallbackEvent: async (event: FallbackEvent) => {
-						if (event.fallback_level === 3) {
-							await sendFallback(options.writer, event.failure_reason);
-						}
-					},
-					onError: () => "tool_failure",
-				},
-			);
+  try {
+    for (let index = 0; index < maxIterations; index += 1) {
+      iterations = index + 1
+      const iterationOutcome = await withFallback(
+        () =>
+          runStreamingIteration({
+            provider,
+            messages,
+            registry: options.registry,
+            requestContext,
+            writer: options.writer,
+            usage,
+            executedToolCalls,
+            iterations,
+            tools,
+          }),
+        {
+          query: options.message,
+          evaluate: (result) => ({
+            shouldFallback: Boolean(result.fallbackReason),
+            reason: result.fallbackReason,
+          }),
+          retryOnce: (reason, previousResult) => {
+            const simplifiedTools = (previousResult?.nextMessages ?? [])
+              .slice()
+              .reverse()
+              .flatMap((message) => message.tool_calls ?? [])
+              .slice(0, 1)
+              .map((toolCall) => toolCall.function.name)
+            const allowedTools = options.registry
+              .toOpenAITools()
+              .filter((tool) =>
+                simplifiedTools.length === 0
+                  ? false
+                  : simplifiedTools.includes(tool.function.name)
+              )
+            return runStreamingIteration({
+              provider,
+              messages: buildSimplifiedRetryMessages(messages, reason),
+              registry: options.registry,
+              requestContext,
+              writer: options.writer,
+              usage,
+              executedToolCalls,
+              iterations,
+              tools: allowedTools,
+            })
+          },
+          directResponse: (reason) =>
+            runDirectFallbackResponse({
+              provider,
+              messages,
+              registry: options.registry,
+              writer: options.writer,
+              usage,
+              executedToolCalls,
+              iterations,
+              reason,
+            }),
+          onFallbackEvent: async (event: FallbackEvent) => {
+            if (event.fallback_level === 3) {
+              await sendFallback(options.writer, event.failure_reason)
+            }
+          },
+          onError: () => 'tool_failure',
+        }
+      )
 
-			usage.prompt_tokens = iterationOutcome.usage.prompt_tokens;
-			usage.completion_tokens = iterationOutcome.usage.completion_tokens;
-			usage.total_tokens = iterationOutcome.usage.total_tokens;
+      usage.prompt_tokens = iterationOutcome.usage.prompt_tokens
+      usage.completion_tokens = iterationOutcome.usage.completion_tokens
+      usage.total_tokens = iterationOutcome.usage.total_tokens
 
-			if (iterationOutcome.content) {
-				lastAssistantContent = iterationOutcome.content;
-			}
+      if (iterationOutcome.content) {
+        lastAssistantContent = iterationOutcome.content
+      }
 
-			if (!iterationOutcome.nextMessages) {
-				const stopReason = iterationOutcome.metadata?.stopReason as string | undefined;
-				await emitFinalizing(options.writer, stopReason ?? "complete");
-				await sendDone(options.writer, iterationOutcome.usage);
-				doneSent = true;
-				return {
-					content: iterationOutcome.content || lastAssistantContent,
-					toolCalls: iterationOutcome.toolCalls,
-					iterations,
-					usage: iterationOutcome.usage,
-					metadata: iterationOutcome.metadata,
-				};
-			}
+      if (!iterationOutcome.nextMessages) {
+        const stopReason = iterationOutcome.metadata?.stopReason as
+          | string
+          | undefined
+        await emitFinalizing(options.writer, stopReason ?? 'complete')
+        await sendDone(options.writer, iterationOutcome.usage)
+        doneSent = true
+        return {
+          content: iterationOutcome.content || lastAssistantContent,
+          toolCalls: iterationOutcome.toolCalls,
+          iterations,
+          usage: iterationOutcome.usage,
+          metadata: iterationOutcome.metadata,
+        }
+      }
 
-			messages = iterationOutcome.nextMessages;
-			executedToolCalls.length = 0;
-			executedToolCalls.push(...iterationOutcome.toolCalls);
-		}
+      messages = iterationOutcome.nextMessages
+      executedToolCalls.length = 0
+      executedToolCalls.push(...iterationOutcome.toolCalls)
+    }
 
-		logFallbackEvent({
-			timestamp: new Date().toISOString(),
-			query: options.message,
-			failure_reason: "max_iterations_exceeded",
-			fallback_level: 2,
-		});
+    logFallbackEvent({
+      timestamp: new Date().toISOString(),
+      query: options.message,
+      failure_reason: 'max_iterations_exceeded',
+      fallback_level: 2,
+    })
 
-		const maxIterationStop = evaluateStopCondition({
-			iterationCount: iterations,
-			maxIterations,
-			toolCalls: [
-				{
-					id: "max_iterations",
-					type: "function",
-					function: {
-						name: "max_iterations",
-						arguments: "{}",
-					},
-				},
-			],
-		});
-		const disclaimer = buildIterationLimitMessage(options.lang);
-		const maxIterContent = lastAssistantContent
-			? `${lastAssistantContent}\n\n${disclaimer}`
-			: disclaimer;
+    const maxIterationStop = evaluateStopCondition({
+      iterationCount: iterations,
+      maxIterations,
+      toolCalls: [
+        {
+          id: 'max_iterations',
+          type: 'function',
+          function: {
+            name: 'max_iterations',
+            arguments: '{}',
+          },
+        },
+      ],
+    })
+    const disclaimer = buildIterationLimitMessage(options.lang)
+    const maxIterContent = lastAssistantContent
+      ? `${lastAssistantContent}\n\n${disclaimer}`
+      : disclaimer
 
-		await emitFinalizing(options.writer, "max_iterations");
-		await sendFallback(options.writer, "max_iterations_exceeded");
-		await sendDone(options.writer, usage);
-		doneSent = true;
+    await emitFinalizing(options.writer, 'max_iterations')
+    await sendFallback(options.writer, 'max_iterations_exceeded')
+    await sendDone(options.writer, usage)
+    doneSent = true
 
-		return {
-			content: maxIterContent,
-			toolCalls: executedToolCalls,
-			iterations,
-			usage,
-			metadata: {
-				stopReason: maxIterationStop.reason,
-				stopSemanticLabel: maxIterationStop.semanticLabel,
-				fallbackReason: maxIterationStop.fallbackReason,
-				fallback: true,
-				fallbackLevel: 2,
-				reason: "max_iterations_exceeded",
-			},
-		};
-	} catch (error) {
-		const message = error instanceof Error ? error.message : "Unknown error";
-		await sendContent(options.writer, `\n(Error: ${message})`);
-		if (!doneSent) {
-			await sendDone(options.writer, {
-				...usage,
-				error: message,
-			});
-		}
-		throw error;
-	} finally {
-		await options.writer.close();
-	}
+    return {
+      content: maxIterContent,
+      toolCalls: executedToolCalls,
+      iterations,
+      usage,
+      metadata: {
+        stopReason: maxIterationStop.reason,
+        stopSemanticLabel: maxIterationStop.semanticLabel,
+        fallbackReason: maxIterationStop.fallbackReason,
+        fallback: true,
+        fallbackLevel: 2,
+        reason: 'max_iterations_exceeded',
+      },
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+    await sendContent(options.writer, `\n(Error: ${message})`)
+    if (!doneSent) {
+      await sendDone(options.writer, {
+        ...usage,
+        error: message,
+      })
+    }
+    throw error
+  } finally {
+    await options.writer.close()
+  }
 }

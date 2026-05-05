@@ -250,7 +250,10 @@ async function rewriteQueryToEnglish(
       role: "user",
       content: rewriteUserPrompt
         .replace(/\{\{\s*query\s*\}\}/g, query)
-        .replace(/\{\{\s*hintLine\s*\}\}/g, staticQuery ? `Known UIUC hints: ${staticQuery}` : ""),
+        .replace(
+          /\{\{\s*hintLine\s*\}\}/g,
+          staticQuery ? `Known UIUC hints: ${staticQuery}` : ""
+        ),
     },
   ];
 

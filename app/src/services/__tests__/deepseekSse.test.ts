@@ -1,10 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import {
-  createSSEParserState,
-  parseDeepSeekSSELine,
-} from "../deepseekSse.ts";
+import { createSSEParserState, parseDeepSeekSSELine } from "../deepseekSse.ts";
 
 test("tool_start event: parses Worker payload with name field", () => {
   const state = createSSEParserState();
@@ -34,7 +31,10 @@ test("tool_start event: parses legacy payload with tool field", () => {
 
   assert.equal(chunks.length, 1);
   assert.equal(chunks[0].thinkingStep?.type, "tool_call");
-  assert.equal(chunks[0].thinkingStep?.label, "Calling tool: search_knowledge_base");
+  assert.equal(
+    chunks[0].thinkingStep?.label,
+    "Calling tool: search_knowledge_base"
+  );
 });
 
 test("tool_start event: uses Chinese locale labels", () => {
@@ -128,11 +128,7 @@ test("content event: returns empty for empty content", () => {
   const state = createSSEParserState();
 
   parseDeepSeekSSELine("event: content", state, "en");
-  const chunks = parseDeepSeekSSELine(
-    'data: {"delta":""}',
-    state,
-    "en"
-  );
+  const chunks = parseDeepSeekSSELine('data: {"delta":""}', state, "en");
 
   assert.equal(chunks.length, 0);
 });
@@ -213,11 +209,7 @@ test("handles [DONE] marker", () => {
 
 test("handles malformed JSON gracefully", () => {
   const state = createSSEParserState();
-  const chunks = parseDeepSeekSSELine(
-    "data: {invalid json}",
-    state,
-    "en"
-  );
+  const chunks = parseDeepSeekSSELine("data: {invalid json}", state, "en");
   assert.equal(chunks.length, 0);
 });
 
@@ -225,11 +217,7 @@ test("ignores unknown events", () => {
   const state = createSSEParserState();
 
   parseDeepSeekSSELine("event: unknown_event", state, "en");
-  const chunks = parseDeepSeekSSELine(
-    'data: {"some":"data"}',
-    state,
-    "en"
-  );
+  const chunks = parseDeepSeekSSELine('data: {"some":"data"}', state, "en");
 
   assert.equal(chunks.length, 0);
 });

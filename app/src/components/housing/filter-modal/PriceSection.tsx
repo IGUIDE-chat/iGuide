@@ -16,10 +16,6 @@ import React, {
 import Slider from "rc-slider";
 import { HISTOGRAM_DATA, ModalText } from "./modalText";
 
-const HISTOGRAM_ACTIVE_START_INDEX = 3;
-const HISTOGRAM_ACTIVE_END_INDEX = 10;
-const PRIMARY_COLOR = "#13294B";
-const NEUTRAL_COLOR = "#E5E7EB";
 
 interface PriceSectionProps {
   t: ModalText;

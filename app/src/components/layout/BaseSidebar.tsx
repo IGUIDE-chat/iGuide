@@ -6,6 +6,7 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const sidebarItemAnimation = {
   layout: true,
   initial: { opacity: 0, x: -20, height: 0 },
@@ -27,6 +28,7 @@ export interface TimeCategoryLabels {
   older: string;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const getTimeCategory = (
   dateStr: string,
   labels: TimeCategoryLabels
@@ -42,6 +44,7 @@ export const getTimeCategory = (
   return labels.older;
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const getCategoryOrder = (labels: TimeCategoryLabels): string[] => [
   labels.pinned,
   labels.today,
@@ -50,6 +53,7 @@ export const getCategoryOrder = (labels: TimeCategoryLabels): string[] => [
   labels.older,
 ];
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const groupByCategory = <T extends { isPinned: boolean }>(
   items: T[],
   getDate: (item: T) => string,
@@ -95,7 +99,12 @@ export const BaseSidebar: React.FC<BaseSidebarProps> = ({
   );
 
   return (
-    <div className={`flex h-full flex-col ${className}`}>
+    <div
+      className={`
+        flex h-full flex-col
+        ${className}
+      `}
+    >
       {header}
 
       <div className="no-scrollbar flex-1 overflow-y-auto px-2">
@@ -154,8 +163,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
     {...sidebarItemAnimation}
     onClick={onClick}
     className={`
-      group relative cursor-pointer rounded-lg p-2
-      transition-all
+      group relative cursor-pointer rounded-lg p-2 transition-all
       ${isActive ? activeBgClass : inactiveBgClass}
     `}
   >
@@ -183,7 +191,10 @@ export const PinButton: React.FC<PinButtonProps> = ({
     title={label}
   >
     <svg
-      className={`size-3.5 ${isPinned ? "text-illini-orange" : "text-slate-400"}`}
+      className={`
+        size-3.5
+        ${isPinned ? "text-illini-orange" : "text-slate-400"}
+      `}
       fill={isPinned ? "currentColor" : "none"}
       stroke="currentColor"
       viewBox="0 0 24 24"
@@ -203,7 +214,10 @@ interface DeleteButtonProps {
   label: string;
 }
 
-export const DeleteButton: React.FC<DeleteButtonProps> = ({ onClick, label }) => (
+export const DeleteButton: React.FC<DeleteButtonProps> = ({
+  onClick,
+  label,
+}) => (
   <button
     onClick={onClick}
     className="
@@ -243,7 +257,9 @@ interface SidebarEmptyStateProps {
   message: string;
 }
 
-export const SidebarEmptyState: React.FC<SidebarEmptyStateProps> = ({ message }) => (
+export const SidebarEmptyState: React.FC<SidebarEmptyStateProps> = ({
+  message,
+}) => (
   <div className="px-2 py-6 text-center">
     <p className="text-xs text-slate-500">{message}</p>
   </div>

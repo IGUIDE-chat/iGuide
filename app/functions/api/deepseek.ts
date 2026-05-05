@@ -59,7 +59,9 @@ function buildMessages(
       content: [
         systemInstruction,
         body.lang === "zh" ? LANGUAGE_PROMPTS.zh : LANGUAGE_PROMPTS.en,
-      ].filter(s => s?.trim()).join("\n\n"),
+      ]
+        .filter((s) => s?.trim())
+        .join("\n\n"),
     },
     ...history.map((item) => ({
       role: item.role === "model" ? "assistant" : "user",

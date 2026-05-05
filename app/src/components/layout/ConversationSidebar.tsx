@@ -199,7 +199,10 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                       ${
                         conv.id === currentConversationId
                           ? "text-white"
-                          : "text-slate-300 group-hover:text-white"
+                          : `
+                            text-slate-300
+                            group-hover:text-white
+                          `
                       }
                     `}
                   >
@@ -214,10 +217,9 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
 
                 <div
                   className={`
-                    absolute inset-y-0 right-0 flex w-24
-                    items-center justify-end gap-0.5
-                    bg-linear-to-l to-transparent px-2 opacity-0
-                    transition-all duration-200
+                    absolute inset-y-0 right-0 flex w-24 items-center
+                    justify-end gap-0.5 bg-linear-to-l to-transparent px-2
+                    opacity-0 transition-all duration-200
                     group-hover:opacity-100
                     ${
                       conv.id === currentConversationId

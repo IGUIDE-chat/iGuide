@@ -23,10 +23,16 @@ interface UseChatSessionOptions {
 type MessageAction =
   | { type: "SET_MESSAGES"; payload: ChatMessage[] }
   | { type: "ADD_MESSAGE"; payload: ChatMessage }
-  | { type: "UPDATE_MESSAGE"; payload: { id: string; updates: Partial<ChatMessage> } }
+  | {
+      type: "UPDATE_MESSAGE";
+      payload: { id: string; updates: Partial<ChatMessage> };
+    }
   | { type: "REPLACE_MESSAGE"; payload: ChatMessage };
 
-const messageReducer = (state: ChatMessage[], action: MessageAction): ChatMessage[] => {
+const messageReducer = (
+  state: ChatMessage[],
+  action: MessageAction
+): ChatMessage[] => {
   switch (action.type) {
     case "SET_MESSAGES":
       return action.payload;
@@ -34,7 +40,9 @@ const messageReducer = (state: ChatMessage[], action: MessageAction): ChatMessag
       return [...state, action.payload];
     case "UPDATE_MESSAGE":
       return state.map((msg) =>
-        msg.id === action.payload.id ? { ...msg, ...action.payload.updates } : msg
+        msg.id === action.payload.id
+          ? { ...msg, ...action.payload.updates }
+          : msg
       );
     case "REPLACE_MESSAGE":
       return state.map((msg) =>
@@ -90,19 +98,22 @@ export const useChatSession = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
-  const updateMessageText = useCallback((id: string, text: string, steps: ThinkingStep[]) => {
-    dispatch({
-      type: "UPDATE_MESSAGE",
-      payload: {
-        id,
-        updates: {
-          text,
-          isThinking: false,
-          thinkingSteps: [...steps],
+  const updateMessageText = useCallback(
+    (id: string, text: string, steps: ThinkingStep[]) => {
+      dispatch({
+        type: "UPDATE_MESSAGE",
+        payload: {
+          id,
+          updates: {
+            text,
+            isThinking: false,
+            thinkingSteps: [...steps],
+          },
         },
-      },
-    });
-  }, []);
+      });
+    },
+    []
+  );
 
   const throttledUpdateMessageText = useThrottle(updateMessageText, 100);
 
@@ -117,7 +128,10 @@ export const useChatSession = ({
         }
 
         if (data?.messages) {
-          dispatch({ type: "SET_MESSAGES", payload: service.convertToChatMessages(data.messages) });
+          dispatch({
+            type: "SET_MESSAGES",
+            payload: service.convertToChatMessages(data.messages),
+          });
         }
       } catch (error) {
         console.error("Failed to load conversation:", error);
@@ -408,6 +422,7 @@ export const useChatSession = ({
       language,
       messages,
       onConversationCreated,
+      throttledUpdateMessageText,
       user,
     ]
   );

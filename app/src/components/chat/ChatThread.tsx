@@ -153,31 +153,31 @@ export const ChatThread = ({ language }: ChatThreadProps) => {
             <div className={containerClass}>
               <ComposerPrimitive.Root
                 className="
-                  relative overflow-hidden rounded-[26px] border border-slate-200
-                  bg-white shadow-md transition-all
+                  relative overflow-hidden rounded-[26px] border
+                  border-slate-200 bg-white shadow-md transition-all
                   focus-within:ring-1 focus-within:ring-slate-300
                 "
               >
                 <ComposerPrimitive.Input
                   placeholder={t.inputPlaceholder}
                   className="
-                    w-full resize-none bg-transparent py-3.5 pr-12 pl-5 text-base
-                    text-slate-900 placeholder-slate-400
+                    w-full resize-none bg-transparent py-3.5 pr-12 pl-5
+                    text-base text-slate-900 placeholder-slate-400
                     focus:outline-none
                   "
                   render={<ImeSafeComposerTextarea />}
                   rows={1}
                 />
-                 <ComposerPrimitive.Send
-                   aria-label="Send"
-                   className="
-                     absolute top-1/2 right-2 -translate-y-1/2 rounded-full
-                     bg-black p-2 text-white transition-all
-                     hover:opacity-80
-                     disabled:cursor-not-allowed disabled:bg-slate-100
-                     disabled:text-slate-300
-                   "
-                 >
+                <ComposerPrimitive.Send
+                  aria-label="Send"
+                  className="
+                    absolute top-1/2 right-2 -translate-y-1/2 rounded-full
+                    bg-black p-2 text-white transition-all
+                    hover:opacity-80
+                    disabled:cursor-not-allowed disabled:bg-slate-100
+                    disabled:text-slate-300
+                  "
+                >
                   <svg
                     className="size-4"
                     fill="none"
