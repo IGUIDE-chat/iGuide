@@ -12,7 +12,9 @@ import {
   type ThreadMessageLike,
 } from "@assistant-ui/react";
 import { useChatSession } from "./useChatSession";
-import { type ChatMessage, type Language } from "../../types";
+import { type ChatMessage, type Language, type ThinkingStep } from "../../types";
+import { ChatErrorBoundary } from "./ChatErrorBoundary";
+import { GrepDocsToolUI, SearchToolUI, WebSearchToolUI } from "./tools";
 
 interface ChatRuntimeProviderProps {
   language: Language;
@@ -37,6 +39,121 @@ const getTextFromAppendMessage = (message: AppendMessage): string | null => {
   }
 
   return null;
+};
+
+const TOOL_NAMES = [
+  "search_knowledge_base",
+  "web_search",
+  "grep_docs",
+] as const;
+
+type ToolName = (typeof TOOL_NAMES)[number];
+
+type ToolCallPart = Extract<
+  ThreadMessageLike["content"] extends string
+    ? never
+    : ThreadMessageLike["content"][number],
+  { type: "tool-call" }
+>;
+
+const isToolName = (value: string | undefined): value is ToolName =>
+  !!value && TOOL_NAMES.includes(value as ToolName);
+
+const getToolNameFromLabel = (label: string) => {
+  const [, candidate] = label.split(":");
+  const toolName = candidate?.trim();
+
+  return isToolName(toolName) ? toolName : undefined;
+};
+
+const parseJsonObject = (value: string | undefined) => {
+  if (!value) return {};
+
+  try {
+    const parsed = JSON.parse(value);
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+      ? (parsed as Record<string, unknown>)
+      : {};
+  } catch {
+    return {};
+  }
+};
+
+const parseToolResult = (detail: string | undefined) => {
+  if (!detail) return undefined;
+  const [status, ...summaryParts] = detail.split(" — ");
+  const summary = summaryParts.join(" — ");
+
+  return {
+    ...(status && { status }),
+    summary: summary || detail,
+  };
+};
+
+const getToolResultStep = (
+  steps: ThinkingStep[],
+  toolName: ToolName,
+  startIndex: number
+) =>
+  steps
+    .slice(startIndex + 1)
+    .find(
+      (step) =>
+        step.type === "processing" && getToolNameFromLabel(step.label) === toolName
+    );
+
+const getToolCallParts = (steps: ThinkingStep[] | undefined): ToolCallPart[] => {
+  if (!steps?.length) return [];
+
+  return steps.flatMap((step, index) => {
+    if (step.type !== "tool_call") return [];
+
+    const toolName = getToolNameFromLabel(step.label);
+    if (!toolName) return [];
+
+    const resultStep = getToolResultStep(steps, toolName, index);
+    const result = parseToolResult(resultStep?.detail);
+
+    return [
+      {
+        type: "tool-call" as const,
+        toolCallId: `${step.id}-${toolName}`,
+        toolName,
+        args: parseJsonObject(step.detail),
+        ...(result && { result }),
+      },
+    ];
+  });
+};
+
+const toAssistantThreadMessage = (msg: ChatMessage): ThreadMessageLike => {
+  const role = msg.role === "model" ? "assistant" : "user";
+  const content: ThreadMessageLike["content"] =
+    role === "assistant"
+      ? [
+          ...getToolCallParts(msg.thinkingSteps),
+          { type: "text" as const, text: msg.text },
+        ]
+      : [{ type: "text" as const, text: msg.text }];
+
+  return {
+    id: msg.id,
+    role,
+    content,
+    ...(role === "assistant" && {
+      status: msg.isStreaming
+        ? ({ type: "running" } as const)
+        : ({ type: "complete", reason: "stop" } as const),
+    }),
+    metadata: {
+      custom: {
+        thinkingSteps: msg.thinkingSteps,
+        isThinking: msg.isThinking,
+        followUpQuestions: msg.followUpQuestions,
+        isStreaming: msg.isStreaming,
+      },
+    },
+  };
 };
 
 const AppendMessageInner = ({ children }: { children: React.ReactNode }) => {
@@ -85,29 +202,10 @@ export const ChatRuntimeProvider = ({
     onConversationCreated,
   });
 
-  const convertMessage = React.useCallback(
-    (msg: ChatMessage): ThreadMessageLike => {
-      return {
-        id: msg.id,
-        role: msg.role === "model" ? "assistant" : "user",
-        content: [{ type: "text", text: msg.text }],
-        metadata: {
-          custom: {
-            thinkingSteps: msg.thinkingSteps,
-            isThinking: msg.isThinking,
-            followUpQuestions: msg.followUpQuestions,
-            isStreaming: msg.isStreaming,
-          },
-        },
-      };
-    },
-    []
-  );
-
   const store = React.useMemo(
     () => ({
       messages,
-      convertMessage,
+      convertMessage: toAssistantThreadMessage,
       isRunning: isLoading,
       onNew: async (message: AppendMessage) => {
         const text = getTextFromAppendMessage(message);
@@ -116,7 +214,7 @@ export const ChatRuntimeProvider = ({
         }
       },
     }),
-    [messages, convertMessage, isLoading, sendMessage]
+    [messages, isLoading, sendMessage]
   );
 
   const runtime = useExternalStoreRuntime(store);
@@ -124,6 +222,9 @@ export const ChatRuntimeProvider = ({
   return (
     <ChatErrorBoundary>
       <AssistantRuntimeProvider runtime={runtime}>
+        <SearchToolUI />
+        <WebSearchToolUI />
+        <GrepDocsToolUI />
         <AppendMessageInner>{children}</AppendMessageInner>
       </AssistantRuntimeProvider>
     </ChatErrorBoundary>
