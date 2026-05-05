@@ -122,8 +122,10 @@ export const ChatRuntimeProvider = ({
   const runtime = useExternalStoreRuntime(store);
 
   return (
-    <AssistantRuntimeProvider runtime={runtime}>
-      <AppendMessageInner>{children}</AppendMessageInner>
-    </AssistantRuntimeProvider>
+    <ChatErrorBoundary>
+      <AssistantRuntimeProvider runtime={runtime}>
+        <AppendMessageInner>{children}</AppendMessageInner>
+      </AssistantRuntimeProvider>
+    </ChatErrorBoundary>
   );
 };
