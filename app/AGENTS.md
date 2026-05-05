@@ -72,3 +72,20 @@ Key patterns:
 - Thread component for full chat interface
 - AssistantModal for floating chat widget
 - useChatRuntime hook with AI SDK transport
+
+## Chat Components
+
+### General Chat (`src/components/chat/**` + `src/pages/chat/ChatPage.tsx`)
+- Full-page general-purpose chat interface
+- Uses assistant-ui runtime (ChatRuntimeProvider, ChatThread)
+- Supports tool-use (SearchToolUI, WebSearchToolUI, GrepDocsToolUI)
+- Conversation management with persistent IDs
+- Route: `/chat`
+
+### Housing Chat (`src/components/housing/AIChat.tsx`)
+- Housing/dorm-specific floating chat widget
+- Dorm mention detection and highlighting
+- Shows dorm cards with navigation to dorm details
+- Uses housing-specific i18n and streamChatResponse
+- Embedded in DormDetailPage and DormListPage
+- Domain-specific to housing module per Colocation Principle
