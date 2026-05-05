@@ -5,7 +5,7 @@
 
 import { MessagePrimitive, ActionBarPrimitive, useMessage } from "@assistant-ui/react";
 import { ThinkingProcess } from "../ThinkingProcess";
-import { TypewriterMarkdown } from "../TypewriterMarkdown";
+import { Typewriter } from "../../ui/Typewriter";
 import { ThinkingStep } from "../../../types";
 
 interface AssistantMessageMeta {
@@ -134,9 +134,11 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
 
                 return (
                   <>
-                    <TypewriterMarkdown
-                      content={part.text}
-                      components={{
+                    <Typewriter
+                      text={part.text}
+                      mode="static"
+                      markdown
+                      markdownComponents={{
                         a: ({ node: _node, ...props }) => (
                           <a
                             {...props}

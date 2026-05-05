@@ -6,15 +6,23 @@
  */
 
 import * as React from "react";
-// [LAYOUT] Sidebar component displaying chat history and conversation management.
-// [布局] 显示对话历史和管理的侧边栏组件。
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { TypewriterText } from "../ui/TypewriterText";
+import { Typewriter } from "../ui/Typewriter";
 import { ConversationSummary } from "../../types";
 import { conversationService } from "../../services/conversationService";
 import { localConversationService } from "../../services/localConversationService";
 import { useAuth } from "../../contexts/AuthContext";
+import {
+  BaseSidebar,
+  SidebarItem,
+  PinButton,
+  DeleteButton,
+  SidebarLoadingSpinner,
+  SidebarEmptyState,
+  groupByCategory,
+  getCategoryOrder,
+  TimeCategoryLabels,
+} from "./BaseSidebar";
 
 interface ConversationSidebarProps {
   currentConversationId: string | null;
@@ -59,6 +67,14 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
       older: "更早",
     },
   }[language];
+
+  const categoryLabels: TimeCategoryLabels = {
+    pinned: t.pinned,
+    today: t.today,
+    yesterday: t.yesterday,
+    thisWeek: t.thisWeek,
+    older: t.older,
+  };
 
   // ... (keep usage of hooks)
 
@@ -147,213 +163,84 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
     }
   };
 
-  const getTimeCategory = (dateStr: string) => {
-    const date = new Date(dateStr);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 0) return t.today;
-    if (diffDays === 1) return t.yesterday;
-    if (diffDays <= 7) return t.thisWeek;
-    return t.older;
-  };
-
-  const groupedConversations = conversations.reduce(
-    (groups, conv) => {
-      if (conv.isPinned) {
-        if (!groups[t.pinned]) groups[t.pinned] = [];
-        groups[t.pinned].push(conv);
-      } else {
-        const category = getTimeCategory(conv.updatedAt);
-        if (!groups[category]) groups[category] = [];
-        groups[category].push(conv);
-      }
-      return groups;
-    },
-    {} as Record<string, ConversationSummary[]>
+  const groupedConversations = groupByCategory(
+    conversations,
+    (conv) => conv.updatedAt,
+    categoryLabels
   );
 
-  const categoryOrder = [t.pinned, t.today, t.yesterday, t.thisWeek, t.older];
-
-  // Removed early return for !user to allow guest mode
-  // if (!user) return null;
+  const categoryOrder = getCategoryOrder(categoryLabels);
 
   return (
     <>
-      <div className="flex h-full min-h-0 flex-col px-3">
-        {/* Conversations List */}
-        <div className="no-scrollbar flex-1 overflow-y-auto">
-          {isLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <div
-                className="
-                  size-5 animate-spin rounded-full border-2 border-illini-orange
-                  border-t-transparent
-                "
-              ></div>
-            </div>
-          ) : conversations.length === 0 ? (
-            <div className="px-2 py-6 text-center">
-              <p className="text-xs text-slate-500">{t.noConversations}</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {categoryOrder.map((category) => {
-                const convs = groupedConversations[category];
-                if (!convs || convs.length === 0) return null;
-
-                return (
-                  <div key={category}>
-                    <h4
-                      className="
-                        mb-1.5 px-2 text-[10px] font-semibold tracking-wider
-                        text-slate-500 uppercase
-                      "
-                    >
-                      {category}
-                    </h4>
-                    <div className="space-y-0.5">
-                      <AnimatePresence initial={false}>
-                        {convs.map((conv) => (
-                          <motion.div
-                            key={conv.id}
-                            layout
-                            initial={{ opacity: 0, x: -20, height: 0 }}
-                            animate={{ opacity: 1, x: 0, height: "auto" }}
-                            exit={{ opacity: 0, height: 0 }}
-                            transition={{
-                              type: "spring",
-                              stiffness: 500,
-                              damping: 30,
-                              opacity: { duration: 0.2 },
-                            }}
-                            onClick={() => onSelectConversation(conv.id)}
-                            className={`
-                              group relative cursor-pointer rounded-lg p-2
-                              transition-all
-                              ${
-                                conv.id === currentConversationId
-                                  ? "bg-white/20 text-white"
-                                  : `
-                                    text-slate-300
-                                    hover:bg-white/10
-                                  `
-                              }
-                            `}
-                          >
-                            <div className="relative overflow-hidden">
-                              <div className="pr-1">
-                                <div
-                                  className={`
-                                    truncate text-xs font-medium
-                                    ${
-                                      conv.id === currentConversationId
-                                        ? "text-white"
-                                        : `
-                                          text-slate-300
-                                          group-hover:text-white
-                                        `
-                                    }
-                                  `}
-                                >
-                                  <TypewriterText text={conv.title} />
-                                </div>
-                                {conv.messageCount !== undefined &&
-                                  conv.messageCount > 0 && (
-                                    <p
-                                      className="
-                                        mt-0.5 text-[10px] text-slate-500
-                                      "
-                                    >
-                                      {conv.messageCount}{" "}
-                                      {language === "zh" ? "条" : "msgs"}
-                                    </p>
-                                  )}
-                              </div>
-
-                              <div
-                                className={`
-                                  absolute inset-y-0 right-0 flex w-24
-                                  items-center justify-end gap-0.5
-                                  bg-linear-to-l to-transparent px-2 opacity-0
-                                  transition-all duration-200
-                                  group-hover:opacity-100
-                                  ${
-                                    conv.id === currentConversationId
-                                      ? "from-[#454545] via-[#454545]"
-                                      : "from-[#2E2E2E] via-[#2E2E2E]"
-                                  }
-                                `}
-                              >
-                                <button
-                                  onClick={(e) =>
-                                    handleTogglePin(conv.id, conv.isPinned, e)
-                                  }
-                                  className="
-                                    rounded-md p-1 transition-colors
-                                    hover:bg-white/10
-                                  "
-                                  title={conv.isPinned ? t.unpin : t.pin}
-                                >
-                                  <svg
-                                    className={`
-                                      size-3.5
-                                      ${
-                                        conv.isPinned
-                                          ? `text-illini-orange`
-                                          : `text-slate-400`
-                                      }
-                                    `}
-                                    fill={
-                                      conv.isPinned ? "currentColor" : "none"
-                                    }
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth={2}
-                                      d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
-                                    />
-                                  </svg>
-                                </button>
-                                <button
-                                  onClick={(e) => handleDeleteClick(conv.id, e)}
-                                  className="
-                                    rounded-md p-1 transition-colors
-                                    hover:bg-red-500/20
-                                  "
-                                  title={t.delete}
-                                >
-                                  <svg
-                                    className="size-3.5 text-red-400"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth={2}
-                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                    />
-                                  </svg>
-                                </button>
-                              </div>
-                            </div>
-                          </motion.div>
-                        ))}
-                      </AnimatePresence>
-                    </div>
+      <BaseSidebar
+        className="px-3"
+        groupedItems={groupedConversations as Record<string, unknown[]>}
+        categoryOrder={categoryOrder}
+        isLoading={isLoading}
+        loadingState={<SidebarLoadingSpinner />}
+        emptyState={<SidebarEmptyState message={t.noConversations} />}
+        renderItem={(item) => {
+          const conv = item as ConversationSummary;
+          return (
+            <SidebarItem
+              key={conv.id}
+              id={conv.id}
+              isActive={conv.id === currentConversationId}
+              onClick={() => onSelectConversation(conv.id)}
+              activeBgClass="bg-white/20 text-white"
+              inactiveBgClass="text-slate-300 hover:bg-white/10"
+            >
+              <div className="relative overflow-hidden">
+                <div className="pr-1">
+                  <div
+                    className={`
+                      truncate text-xs font-medium
+                      ${
+                        conv.id === currentConversationId
+                          ? "text-white"
+                          : "text-slate-300 group-hover:text-white"
+                      }
+                    `}
+                  >
+                    <Typewriter text={conv.title} mode="animate" />
                   </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      </div>
+                  {conv.messageCount !== undefined && conv.messageCount > 0 && (
+                    <p className="mt-0.5 text-[10px] text-slate-500">
+                      {conv.messageCount} {language === "zh" ? "条" : "msgs"}
+                    </p>
+                  )}
+                </div>
+
+                <div
+                  className={`
+                    absolute inset-y-0 right-0 flex w-24
+                    items-center justify-end gap-0.5
+                    bg-linear-to-l to-transparent px-2 opacity-0
+                    transition-all duration-200
+                    group-hover:opacity-100
+                    ${
+                      conv.id === currentConversationId
+                        ? "from-[#454545] via-[#454545]"
+                        : "from-[#2E2E2E] via-[#2E2E2E]"
+                    }
+                  `}
+                >
+                  <PinButton
+                    isPinned={conv.isPinned}
+                    onClick={(e) => handleTogglePin(conv.id, conv.isPinned, e)}
+                    label={conv.isPinned ? t.unpin : t.pin}
+                  />
+                  <DeleteButton
+                    onClick={(e) => handleDeleteClick(conv.id, e)}
+                    label={t.delete}
+                  />
+                </div>
+              </div>
+            </SidebarItem>
+          );
+        }}
+      />
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (

@@ -13,7 +13,7 @@ import { useSharedDormInteraction } from "../housing/store/DormUserInteractionCo
 import { useDormData } from "../housing/store/DormDataContext";
 import { Language } from "../../types";
 import { Dorm } from "../housing/types/index";
-import { TypewriterText } from "../ui/TypewriterText";
+import { Typewriter } from "../ui/Typewriter";
 
 interface DormSidebarProps {
   language: Language;
@@ -211,12 +211,13 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
                         }
                       `}
                     >
-                      <TypewriterText
+                      <Typewriter
                         text={
                           language === "zh" && item.nameZh
                             ? item.nameZh
                             : item.name
                         }
+                        mode="animate"
                       />
                     </div>
                   </div>

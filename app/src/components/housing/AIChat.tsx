@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { ChatMessage } from "./types/index";
 import { streamChatResponse } from "../../services/ai";
 import { isDormMention, findMentionedDorms } from "../../utils/housingUtils";
-import { TypewriterText } from "./TypewriterText";
+import { Typewriter } from "../ui/Typewriter";
 import { Language } from "../../types";
 import { aiChatTexts } from "./i18n/dormTexts";
 
@@ -239,7 +239,27 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                     `}
                   >
                     {msg.role === "model" && isRecent ? (
-                      <TypewriterText text={msg.text} />
+                      <Typewriter
+                        text={msg.text}
+                        mode="stream"
+                        markdown
+                        markdownComponents={{
+                          strong: ({ ...props }) => {
+                            const content = String(props.children);
+                            const isDorm = isDormMention(content);
+                            return (
+                              <span
+                                className={
+                                  isDorm
+                                    ? "font-extrabold text-illini-orange"
+                                    : "font-bold text-gray-900"
+                                }
+                                {...props}
+                              />
+                            );
+                          },
+                        }}
+                      />
                     ) : msg.role === "user" ? (
                       <span className="font-medium whitespace-pre-wrap text-white">
                         {msg.text}

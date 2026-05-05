@@ -5,15 +5,22 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-// [LAYOUT] Sidebar component displaying reading history and pinned articles.
-// [布局] 显示阅读历史和置顶文章的侧边栏组件。
 import React, { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { TypewriterText } from "../ui/TypewriterText";
+import { Typewriter } from "../ui/Typewriter";
 import { LibraryHistoryItem } from "../../types";
 import { libraryService } from "../../services/libraryService";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../services/supabase";
+import {
+  BaseSidebar,
+  SidebarItem,
+  PinButton,
+  DeleteButton,
+  SidebarEmptyState,
+  groupByCategory,
+  getCategoryOrder,
+  TimeCategoryLabels,
+} from "./BaseSidebar";
 
 interface LibrarySidebarProps {
   language: "en" | "zh";
@@ -55,6 +62,14 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
       delete: "删除",
     },
   }[language];
+
+  const categoryLabels: TimeCategoryLabels = {
+    pinned: t.pinned,
+    today: t.today,
+    yesterday: t.yesterday,
+    thisWeek: t.thisWeek,
+    older: t.older,
+  };
 
   const loadHistory = async () => {
     const data = await libraryService.getHistory();
@@ -130,183 +145,88 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
     }
   };
 
-  const getTimeCategory = (dateStr: string) => {
-    const date = new Date(dateStr);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 0) return t.today;
-    if (diffDays <= 1) return t.yesterday;
-    if (diffDays <= 7) return t.thisWeek;
-    return t.older;
-  };
-
-  const groupedHistory = history.reduce(
-    (groups, item) => {
-      let category;
-      if (item.isPinned) {
-        category = t.pinned;
-      } else {
-        category = getTimeCategory(item.viewedAt);
-      }
-
-      if (!groups[category]) groups[category] = [];
-      groups[category].push(item);
-      return groups;
-    },
-    {} as Record<string, LibraryHistoryItem[]>
+  const groupedHistory = groupByCategory(
+    history,
+    (item) => item.viewedAt,
+    categoryLabels
   );
 
-  const categoryOrder = [t.pinned, t.today, t.yesterday, t.thisWeek, t.older];
+  const categoryOrder = getCategoryOrder(categoryLabels);
 
   return (
-    <div className="flex h-full flex-col bg-[#171717]">
-      <div className="mb-2 flex items-center justify-between px-3 py-2">
-        <h3
-          className="
-            text-xs font-semibold tracking-wider text-slate-400 uppercase
-          "
-        >
-          {t.title}
-        </h3>
-        {history.length > 0 && (
-          <button
-            onClick={handleClearHistory}
+    <BaseSidebar
+      className="bg-[#171717]"
+      header={
+        <div className="mb-2 flex items-center justify-between px-3 py-2">
+          <h3
             className="
-              text-[10px] text-slate-500 transition-colors
-              hover:text-white
+              text-xs font-semibold tracking-wider text-slate-400 uppercase
             "
           >
-            {t.clear}
-          </button>
-        )}
-      </div>
-
-      <div className="no-scrollbar flex-1 space-y-4 overflow-y-auto px-2">
-        {history.length === 0 ? (
-          <div className="py-8 text-center">
-            <p className="text-xs text-slate-600">{t.empty}</p>
-          </div>
-        ) : (
-          categoryOrder.map((category) => {
-            const items = groupedHistory[category];
-            if (!items || items.length === 0) return null;
-
-            return (
-              <div key={category}>
-                <h4 className="mb-1.5 px-2 text-[10px] font-medium text-slate-500">
-                  {category}
-                </h4>
-                <div className="space-y-0.5">
-                  <AnimatePresence initial={false}>
-                    {items.map((item) => (
-                      <motion.div
-                        key={item.id}
-                        layout
-                        initial={{ opacity: 0, x: -20, height: 0 }}
-                        animate={{ opacity: 1, x: 0, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{
-                          type: "spring",
-                          stiffness: 500,
-                          damping: 30,
-                          opacity: { duration: 0.2 },
-                        }}
-                        onClick={() =>
-                          navigate(`/library/article/${item.articleId}`)
-                        }
-                        className={`
-                          group relative cursor-pointer rounded-md px-3 py-2
-                          transition-colors
-                          ${
-                            item.articleId === currentArticleId
-                              ? "bg-white/10 text-white"
-                              : `
-                                text-slate-300
-                                hover:bg-white/5 hover:text-white
-                              `
-                          }
-                        `}
-                      >
-                        <div className="flex items-start justify-between gap-1.5">
-                          <div className="min-w-0 flex-1">
-                            <div className="flex truncate text-xs font-medium">
-                              <TypewriterText
-                                text={
-                                  language === "zh" && item.articleTitleZh
-                                    ? item.articleTitleZh
-                                    : item.articleTitle
-                                }
-                              />
-                            </div>
-                          </div>
-                          <div
-                            className="
-                              flex gap-0.5 opacity-0 transition-opacity
-                              group-hover:opacity-100
-                            "
-                          >
-                            <button
-                              onClick={(e) =>
-                                handleTogglePin(item.id, item.isPinned, e)
-                              }
-                              className="
-                                rounded-sm p-1
-                                hover:bg-illini-orange/20
-                              "
-                              title={item.isPinned ? t.unpin : t.pin}
-                            >
-                              <svg
-                                className={`
-                                  size-3
-                                  ${item.isPinned ? `text-illini-orange` : `text-slate-400`}
-                                `}
-                                fill={item.isPinned ? "currentColor" : "none"}
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
-                                />
-                              </svg>
-                            </button>
-                            <button
-                              onClick={(e) => handleDeleteClick(item.id, e)}
-                              className="
-                                rounded-sm p-1
-                                hover:bg-red-500/20
-                              "
-                              title={t.delete}
-                            >
-                              <svg
-                                className="size-3 text-red-400"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                />
-                              </svg>
-                            </button>
-                          </div>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
+            {t.title}
+          </h3>
+          {history.length > 0 && (
+            <button
+              onClick={handleClearHistory}
+              className="
+                text-[10px] text-slate-500 transition-colors
+                hover:text-white
+              "
+            >
+              {t.clear}
+            </button>
+          )}
+        </div>
+      }
+      groupedItems={groupedHistory as Record<string, unknown[]>}
+      categoryOrder={categoryOrder}
+      emptyState={<SidebarEmptyState message={t.empty} />}
+      renderItem={(item) => {
+        const historyItem = item as LibraryHistoryItem;
+        return (
+          <SidebarItem
+            key={historyItem.id}
+            id={historyItem.id}
+            isActive={historyItem.articleId === currentArticleId}
+            onClick={() => navigate(`/library/article/${historyItem.articleId}`)}
+            activeBgClass="bg-white/10 text-white"
+            inactiveBgClass="text-slate-300 hover:bg-white/5 hover:text-white"
+          >
+            <div className="flex items-start justify-between gap-1.5">
+              <div className="min-w-0 flex-1">
+                <div className="flex truncate text-xs font-medium">
+                  <Typewriter
+                    text={
+                      language === "zh" && historyItem.articleTitleZh
+                        ? historyItem.articleTitleZh
+                        : historyItem.articleTitle
+                    }
+                    mode="animate"
+                  />
                 </div>
               </div>
-            );
-          })
-        )}
-      </div>
-    </div>
+              <div
+                className="
+                  flex gap-0.5 opacity-0 transition-opacity
+                  group-hover:opacity-100
+                "
+              >
+                <PinButton
+                  isPinned={historyItem.isPinned}
+                  onClick={(e) =>
+                    handleTogglePin(historyItem.id, historyItem.isPinned, e)
+                  }
+                  label={historyItem.isPinned ? t.unpin : t.pin}
+                />
+                <DeleteButton
+                  onClick={(e) => handleDeleteClick(historyItem.id, e)}
+                  label={t.delete}
+                />
+              </div>
+            </div>
+          </SidebarItem>
+        );
+      }}
+    />
   );
 };
