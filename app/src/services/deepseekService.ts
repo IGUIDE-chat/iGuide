@@ -11,7 +11,6 @@ import { parseDeepSeekSSEStream } from "./deepseekSse";
 import { quickSearch } from "./searchService";
 import { webSearch } from "./webSearchService";
 import { memoryService } from "./memoryService";
-import { joinPromptSections } from "./promptComposition";
 import defaultSystemPrompt from "./prompts/deepseek-default-system.md?raw";
 import memoryExtractionInstructions from "./prompts/deepseek-memory-extraction.md?raw";
 import soulExtractionInstructions from "./prompts/deepseek-soul-extraction.md?raw";
@@ -120,12 +119,10 @@ function buildOpenAIMessages(
 
   // System prompt with optional RAG context
   const systemContent = systemInstruction || DEFAULT_SYSTEM_PROMPT;
+  const languagePrompt = lang === "zh" ? LANGUAGE_PROMPTS.zh : LANGUAGE_PROMPTS.en;
   messages.push({
     role: "system",
-    content: joinPromptSections([
-      systemContent,
-      lang === "zh" ? LANGUAGE_PROMPTS.zh : LANGUAGE_PROMPTS.en,
-    ]),
+    content: [systemContent, languagePrompt].filter(Boolean).join("\n\n"),
   });
 
   // Conversation history
@@ -251,7 +248,7 @@ export const streamDeepSeekChat = async function* (
     }
 
     // 2. Build system instruction with personalization + RAG context
-    const basePrompt = joinPromptSections([
+    const basePrompt = [
       DEFAULT_SYSTEM_PROMPT,
       soul ? `## 🎭 Persona Customization (用户自定义人设)\n${soul}` : "",
       _userId ? MEMORY_EXTRACTION_INSTRUCTIONS : "",
@@ -262,9 +259,9 @@ export const streamDeepSeekChat = async function* (
       conversationMemory
         ? `## 💬 This Conversation's Key Points (对话记忆)\n${conversationMemory}`
         : "",
-    ]);
+    ].filter(s => s?.trim()).join("\n\n");
 
-    const systemInstruction = joinPromptSections([basePrompt, ragContext]);
+    const systemInstruction = [basePrompt, ragContext].filter(s => s?.trim()).join("\n\n");
 
     // 3. Call DeepSeek — dev calls API directly, prod uses CF Function
     let response: Response;

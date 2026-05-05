@@ -1,6 +1,5 @@
 // [FUNCTION] DeepSeek Chat API proxy — supports both streaming (SSE) and non-streaming.
 // [函数] DeepSeek 聊天 API 代理 — 支持流式 (SSE) 和非流式响应。
-import { joinPromptSections } from "../../src/services/promptComposition";
 import defaultSystemPrompt from "./prompts/deepseek-default-system.txt";
 import languageEnPrompt from "./prompts/language-en.txt";
 import languageZhPrompt from "./prompts/language-zh.txt";
@@ -57,10 +56,10 @@ function buildMessages(
   return [
     {
       role: "system",
-      content: joinPromptSections([
+      content: [
         systemInstruction,
         body.lang === "zh" ? LANGUAGE_PROMPTS.zh : LANGUAGE_PROMPTS.en,
-      ]),
+      ].filter(s => s?.trim()).join("\n\n"),
     },
     ...history.map((item) => ({
       role: item.role === "model" ? "assistant" : "user",

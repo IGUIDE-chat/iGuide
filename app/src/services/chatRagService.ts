@@ -5,7 +5,6 @@ import {
   type WebSearchResult,
   webSearchWithOfficialPriority,
 } from "./webSearchService";
-import { fillPromptTemplate } from "./promptComposition";
 import rewriteSystemPrompt from "./prompts/chat-rag-query-rewrite-system.md?raw";
 import rewriteUserPrompt from "./prompts/chat-rag-query-rewrite-user.md?raw";
 
@@ -249,10 +248,9 @@ async function rewriteQueryToEnglish(
     },
     {
       role: "user",
-      content: fillPromptTemplate(rewriteUserPrompt, {
-        query,
-        hintLine: staticQuery ? `Known UIUC hints: ${staticQuery}` : "",
-      }),
+      content: rewriteUserPrompt
+        .replace(/\{\{\s*query\s*\}\}/g, query)
+        .replace(/\{\{\s*hintLine\s*\}\}/g, staticQuery ? `Known UIUC hints: ${staticQuery}` : ""),
     },
   ];
 
