@@ -7,20 +7,20 @@ updates:
       cronjob: "30 11 * * 3,6"
     open-pull-requests-limit: 10
     groups:
-      production-minor-patch:
+      minor:
         dependency-type: "production"
         update-types:
           - "minor"
           - "patch"
-      development-minor-patch:
+      major:
+        dependency-type: "production"
+        update-types:
+          - "major"
+      dev-minor:
         dependency-type: "development"
         update-types:
           - "minor"
           - "patch"
-      production-major:
-        dependency-type: "production"
-        update-types:
-          - "major"
 
   - package-ecosystem: "npm"
     directory: "/api"
@@ -29,42 +29,42 @@ updates:
       cronjob: "30 11 * * 3,6"
     open-pull-requests-limit: 10
     groups:
-      production-minor-patch:
+      minor:
         dependency-type: "production"
         update-types:
           - "minor"
           - "patch"
-      development-minor-patch:
+      major:
+        dependency-type: "production"
+        update-types:
+          - "major"
+      dev-minor:
         dependency-type: "development"
         update-types:
           - "minor"
           - "patch"
-      production-major:
-        dependency-type: "production"
-        update-types:
-          - "major"
 
-  - package-ecosystem: "pip"
-    directory: "/data_collection"
-    schedule:
-      interval: "cron"
-      cronjob: "30 11 * * 3,6"
-    open-pull-requests-limit: 10
-    groups:
-      production-minor-patch:
-        dependency-type: "production"
-        update-types:
-          - "minor"
-          - "patch"
-      development-minor-patch:
-        dependency-type: "development"
-        update-types:
-          - "minor"
-          - "patch"
-      production-major:
-        dependency-type: "production"
-        update-types:
-          - "major"
+  # - package-ecosystem: "pip"
+  #   directory: "/data_collection"
+  #   schedule:
+  #     interval: "cron"
+  #     cronjob: "30 11 * * 3,6"
+  #   open-pull-requests-limit: 10
+  #   groups:
+  #     minor:
+  #       dependency-type: "production"
+  #       update-types:
+  #         - "minor"
+  #         - "patch"
+  #     major:
+  #       dependency-type: "production"
+  #       update-types:
+  #         - "major"
+  #     dev-minor:
+  #       dependency-type: "development"
+  #       update-types:
+  #         - "minor"
+  #         - "patch"
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -77,3 +77,4 @@ updates:
         update-types:
           - "minor"
           - "patch"
+          - "major"
