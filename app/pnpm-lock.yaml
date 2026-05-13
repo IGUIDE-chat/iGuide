@@ -27,8 +27,8 @@ importers:
         specifier: ^3.23.1
         version: 3.23.1
       pnpm:
-        specifier: ^11.0.9
-        version: 11.0.9
+        specifier: ^11.1.1
+        version: 11.1.1
       rc-slider:
         specifier: ^11.1.9
         version: 11.1.9(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -3050,8 +3050,8 @@ packages:
     resolution: {integrity: sha512-wQ0b/W4Fr01qtpHlqSqspcj3EhBvimsdh0KlHhH8HRZnMsEa0ea2fTULOXOS9ccQr3om+GcGRk4e+isrZWV8qQ==}
     engines: {node: '>=16.20.0'}
 
-  pnpm@11.0.9:
-    resolution: {integrity: sha512-NM6C5ngCM8+crYaFApqPgdLgYZbFqbrZiHn3QklAxoF8TkUk+304uFU87tSLl1i4668avTYAwjLEyM9zZghvOA==}
+  pnpm@11.1.1:
+    resolution: {integrity: sha512-0f319zxhe2T6GlaoHDyN/g6WbjOmAQqiVrUXrne+Idk+Ba/8DeGoOw5PKdVp9otEaujwaM1yR8C7PfD7TXvfmg==}
     engines: {node: '>=22.13'}
     hasBin: true
 
@@ -7198,7 +7198,7 @@ snapshots:
 
   pkce-challenge@5.0.1: {}
 
-  pnpm@11.0.9: {}
+  pnpm@11.1.1: {}
 
   possible-typed-array-names@1.1.0: {}
 

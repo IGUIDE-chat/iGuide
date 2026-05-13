@@ -29,7 +29,7 @@
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.14.0",
     "mapbox-gl": "^3.23.1",
-    "pnpm": "^11.0.9",
+    "pnpm": "^11.1.1",
     "rc-slider": "^11.1.9",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
