@@ -368,7 +368,6 @@ const DormMap: React.FC<DormMapProps> = ({
       if (fitBoundsTimerRef.current) {
         clearTimeout(fitBoundsTimerRef.current);
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
       const map = mapRef.current;
       if (map) {
         map.getMap().scrollZoom.enable();

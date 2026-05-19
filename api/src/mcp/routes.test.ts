@@ -204,7 +204,6 @@ test('GET /integrations returns platform/user sections and phase1 disclaimers', 
 
   const resolved = requireResponse(response)
   assert.equal(resolved.status, 200)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test fixture JSON response
   const body = (await resolved.json()) as any
   assert.deepEqual(body.phase1_limitations, [
     'Streamable HTTP only',
@@ -238,7 +237,6 @@ test('POST /integrations rejects credential fields', async () => {
 
   const resolved = requireResponse(response)
   assert.equal(resolved.status, 400)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test fixture JSON response
   const body = (await resolved.json()) as any
   assert.match(body.error, /credential/i)
   assert.equal(body.failure_reason, 'auth_required')
@@ -261,7 +259,6 @@ test('POST /integrations rejects unsupported transports with failure classificat
 
   const resolved = requireResponse(response)
   assert.equal(resolved.status, 400)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test fixture JSON response
   const body = (await resolved.json()) as any
   assert.equal(body.failure_reason, 'unsupported_transport')
   assert.match(body.error, /streamable_http/i)
@@ -284,7 +281,6 @@ test('POST /integrations rejects credentialed endpoint URLs with failure classif
 
   const resolved = requireResponse(response)
   assert.equal(resolved.status, 400)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test fixture JSON response
   const body = (await resolved.json()) as any
   assert.equal(body.failure_reason, 'auth_required')
   assert.match(body.error, /credential|auth/i)
@@ -322,7 +318,6 @@ test('PUT on a platform-owned connection returns 403', async () => {
 
   const resolved = requireResponse(response)
   assert.equal(resolved.status, 403)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test fixture JSON response
   const body = (await resolved.json()) as any
   assert.match(body.error, /platform/i)
 })

@@ -204,7 +204,6 @@ export const HousingProvider: React.FC<{ children: ReactNode }> = ({
   );
 };
 
-/* eslint-disable react-refresh/only-export-components */
 export const useHousingFilters = () => {
   const context = useContext(HousingFiltersContext);
   if (context === undefined) {
@@ -213,7 +212,6 @@ export const useHousingFilters = () => {
   return context;
 };
 
-/* eslint-disable react-refresh/only-export-components */
 export const useHousingMapUi = () => {
   const context = useContext(HousingMapUiContext);
   if (context === undefined) {
@@ -222,7 +220,6 @@ export const useHousingMapUi = () => {
   return context;
 };
 
-/* eslint-disable react-refresh/only-export-components */
 export const useHousing = (): HousingContextType => {
   const filters = useHousingFilters();
   const mapUi = useHousingMapUi();

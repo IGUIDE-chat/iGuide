@@ -32,7 +32,6 @@ interface ToolCardProps {
   isLoading: boolean;
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export function getStringArg(
   args: SearchToolArgs,
   keys: Array<keyof SearchToolArgs>,
@@ -46,14 +45,12 @@ export function getStringArg(
   return fallback;
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export function getResultSummary(result: ToolSummaryResult | undefined) {
   if (!result) return "";
   if (typeof result === "string") return result;
   return result.summary ?? "";
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export function getResultMetric(
   result: ToolSummaryResult | undefined,
   keys: string[],

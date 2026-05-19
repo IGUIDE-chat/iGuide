@@ -109,7 +109,6 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
   // Reload conversations when user changes OR when a new conversation is created/selected
   useEffect(() => {
     loadConversations();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, currentConversationId]);
 
   const handleTogglePin = async (

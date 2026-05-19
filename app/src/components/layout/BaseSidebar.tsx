@@ -6,7 +6,6 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const sidebarItemAnimation = {
   layout: true,
   initial: { opacity: 0, x: -20, height: 0 },
@@ -28,7 +27,6 @@ export interface TimeCategoryLabels {
   older: string;
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const getTimeCategory = (
   dateStr: string,
   labels: TimeCategoryLabels
@@ -44,7 +42,6 @@ export const getTimeCategory = (
   return labels.older;
 };
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const getCategoryOrder = (labels: TimeCategoryLabels): string[] => [
   labels.pinned,
   labels.today,
@@ -53,7 +50,6 @@ export const getCategoryOrder = (labels: TimeCategoryLabels): string[] => [
   labels.older,
 ];
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const groupByCategory = <T extends { isPinned: boolean }>(
   items: T[],
   getDate: (item: T) => string,

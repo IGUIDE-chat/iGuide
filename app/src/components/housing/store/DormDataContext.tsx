@@ -83,7 +83,6 @@ export const DormDataProvider: React.FC<{ children: ReactNode }> = ({
   );
 };
 
-/* eslint-disable react-refresh/only-export-components */
 export const useDormData = (): DormDataContextType => {
   const ctx = useContext(DormDataContext);
   if (!ctx) {

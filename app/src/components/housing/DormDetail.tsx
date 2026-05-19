@@ -102,7 +102,6 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
 
   useEffect(() => {
     if (dorm) addToHistory(dorm);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- dorm?.id is sufficient; full dorm reference triggers re-render loops
   }, [dorm?.id, addToHistory]);
 
   useEffect(() => {
@@ -119,7 +118,6 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
         );
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- dorm?.id is sufficient for scroll trigger; full dorm reference is unnecessary
   }, [location.hash, dorm?.id]);
 
   useEffect(() => {

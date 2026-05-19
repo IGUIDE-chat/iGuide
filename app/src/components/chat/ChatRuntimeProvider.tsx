@@ -27,7 +27,6 @@ interface ChatRuntimeProviderProps {
   children: React.ReactNode;
 }
 
-/* eslint-disable react-refresh/only-export-components */
 interface ChatSessionContextValue {
   appendMessage: (text: string) => void;
 }
