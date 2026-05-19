@@ -12,21 +12,17 @@
     "tail": "wrangler tail",
     "test": "node --test --experimental-strip-types --loader ./src/test/loaders/md-loader.ts \"src/**/*.test.ts\"",
     "types": "wrangler types",
-    "lint": "eslint src --ext .ts",
-    "lint:fix": "eslint src --ext .ts --fix",
+    "lint": "oxlint src",
+    "lint:fix": "oxlint --fix src",
     "style": "prettier --check .",
     "style:fix": "prettier --write ."
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260510.1",
-    "@eslint/js": "^10.0.1",
     "@types/node": "^25.6.2",
-    "eslint": "^10.3.0",
-    "eslint-config-prettier": "^10.1.8",
-    "globals": "^17.6.0",
+    "oxlint": "^1.65.0",
     "prettier": "^3.8.3",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.59.2",
     "wrangler": "^4.90.0"
   }
 }
