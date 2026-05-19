@@ -335,13 +335,6 @@ async function vectorSearch(query, lang, limit) {
     .slice(0, limit);
 }
 
-// ── BM25 Search (QMD CLI) ───────────────────────────────────────
-function commandForMode(mode) {
-  if (mode === "bm25") return "search";
-  if (mode === "vector") return "vsearch";
-  return "query";
-}
-
 function matchesLang(filePath, lang) {
   // Normalize: strip qmd:// prefix, ensure leading slash for consistent matching
   let norm = filePath

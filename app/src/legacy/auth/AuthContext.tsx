@@ -112,8 +112,6 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 
     setIsLoading(false);
     return true;
-    setIsLoading(false);
-    return true;
   };
 
   const loginWithGoogle = async (): Promise<boolean> => {

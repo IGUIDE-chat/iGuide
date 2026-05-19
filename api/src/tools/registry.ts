@@ -144,7 +144,7 @@ export class ToolRegistry {
       ...result,
       content: truncatedContent,
       metadata: {
-        ...(result.metadata || {}),
+        ...result.metadata,
         original_bytes: contentBytes.length,
         truncated_bytes: this.textEncoder.encode(truncatedContent).length,
       },

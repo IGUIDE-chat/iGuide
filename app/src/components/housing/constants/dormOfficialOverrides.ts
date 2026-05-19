@@ -32,7 +32,7 @@ export function applyDormOfficialOverride(dorm: Dorm): Dorm {
     ...override,
     structuredTags: override.structuredTags
       ? {
-          ...(dorm.structuredTags ?? {}),
+          ...dorm.structuredTags,
           ...override.structuredTags,
         }
       : dorm.structuredTags,
