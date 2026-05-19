@@ -1,5 +1,5 @@
 {
-  "name": "api-gateway",
+  "name": "@iguide/api",
   "version": "0.1.0",
   "description": "Cloudflare Worker API Gateway for IlliniGuide",
   "main": "src/index.ts",
@@ -24,7 +24,6 @@
     "eslint": "^10.3.0",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.6.0",
-    "pnpm": "^11.0.9",
     "prettier": "^3.8.3",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.2",

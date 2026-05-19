@@ -1,5 +1,5 @@
 {
-  "name": "illiniguide---uiuc-knowledge-base",
+  "name": "@iguide/app",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -20,7 +20,7 @@
     "sync:qmd": "npx tsx scripts/sync-qmd-index.ts",
     "typecheck": "tsc --noEmit",
     "validate:dorm-data": "npx tsx scripts/validate-dorm-data.ts",
-    "postinstall": "pnpm run submodule:init && git config --local include.path ../.gitconfig"
+    "postinstall": "git submodule update --init --recursive && git config --local include.path ../.gitconfig"
   },
   "dependencies": {
     "@assistant-ui/react": "^0.14.0",
@@ -29,7 +29,6 @@
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.14.0",
     "mapbox-gl": "^3.23.1",
-    "pnpm": "^11.0.9",
     "rc-slider": "^11.1.9",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",

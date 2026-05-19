@@ -1,5 +1,7 @@
 packages:
-  - '.'
+  - app
+  - api
+
 allowBuilds:
   esbuild: true
   sharp: true
