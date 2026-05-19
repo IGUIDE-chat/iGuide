@@ -6,3 +6,17 @@ allowBuilds:
   esbuild: true
   sharp: true
   workerd: true
+
+minimumReleaseAgeExclude:
+  - '@cloudflare/workers-types@4.20260519.1'
+  - '@supabase/auth-js@2.106.0'
+  - '@supabase/functions-js@2.106.0'
+  - '@supabase/postgrest-js@2.106.0'
+  - '@supabase/realtime-js@2.106.0'
+  - '@supabase/storage-js@2.106.0'
+  - '@supabase/supabase-js@2.106.0'
+  - '@types/node@25.9.0'
+  - framer-motion@12.39.0
+  - mapbox-gl@3.24.0
+  - motion-dom@12.39.0
+  - motion-utils@12.39.0
