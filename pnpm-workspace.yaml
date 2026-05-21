@@ -20,3 +20,9 @@ minimumReleaseAgeExclude:
   - mapbox-gl@3.24.0
   - motion-dom@12.39.0
   - motion-utils@12.39.0
+  - '@supabase/auth-js@2.106.1'
+  - '@supabase/functions-js@2.106.1'
+  - '@supabase/postgrest-js@2.106.1'
+  - '@supabase/realtime-js@2.106.1'
+  - '@supabase/storage-js@2.106.1'
+  - '@supabase/supabase-js@2.106.1'
