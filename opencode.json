@@ -38,6 +38,10 @@
     "webstorm": {
       "type": "remote",
       "url": "http://127.0.0.1:64343/sse"
+    },
+    "supabase-local": {
+      "type": "remote",
+      "url": "http://127.0.0.1:54321/mcp"
     }
   }
 }
