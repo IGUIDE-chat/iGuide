@@ -50,6 +50,7 @@
     "oxlint": "^1.67.0",
     "postcss": "^8.5.15",
     "prettier": "^3.8.3",
+    "supabase": "^2.101.0",
     "tailwindcss": "^4.3.0",
     "ts-morph": "^28.0.0",
     "ts-node": "^10.9.2",
