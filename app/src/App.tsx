@@ -13,7 +13,7 @@ import { Layout } from "./components/layout/Layout";
 import { AppRoutes } from "./app/routes";
 import { useAuth } from "./contexts/AuthContext";
 import { HousingProvider } from "./components/housing/store/HousingContext";
-import { DormDataProvider } from "./components/housing/store/DormDataContext";
+import { HousingDataProvider } from "./components/housing/store/HousingDataContext";
 import { DormUserInteractionProvider } from "./components/housing/store/DormUserInteractionContext";
 import { CompareProvider } from "./components/housing/store/CompareContext";
 import { Language } from "./types";
@@ -123,7 +123,7 @@ export default function App() {
           transition={{ duration: 0.4, ease: "easeOut" }}
           className="size-full"
         >
-          <DormDataProvider>
+          <HousingDataProvider>
             <CompareProvider>
               <HousingProvider>
                 <DormUserInteractionProvider>
@@ -145,7 +145,7 @@ export default function App() {
                 </DormUserInteractionProvider>
               </HousingProvider>
             </CompareProvider>
-          </DormDataProvider>
+          </HousingDataProvider>
         </motion.div>
       )}
     </AnimatePresence>

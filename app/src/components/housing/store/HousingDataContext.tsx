@@ -1,13 +1,10 @@
 /**
- * @file ./src/components/housing/store/DormDataContext.tsx
+ * @file ./src/components/housing/store/HousingDataContext.tsx
  * @description Housing (Dorms) Component / Module
  * @description_zh 此文件属于 Housing 业务域（限界上下文）。请勿在此引入其他业务（如 chat, library）的代码。保持高内聚，不要把 Housing 独有的逻辑泄露到外层全局目录。
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-// [CONTEXT] Provides dorm data from Supabase with static fallback.
-// Static data is lazy-loaded via dynamic import to avoid bloating the initial bundle.
-// DB data replaces it once loaded.
 import React, {
   createContext,
   useContext,
@@ -18,20 +15,20 @@ import React, {
   ReactNode,
 } from "react";
 import { Dorm } from "../types/index";
-import { dormService } from "../../../services/dormService";
+import { housingService } from "../../../services/housingService";
 
-interface DormDataContextType {
+interface HousingDataContextType {
   dorms: Dorm[];
   isLoading: boolean;
   refreshDorms: () => Promise<void>;
   getDormById: (id: string) => Dorm | undefined;
 }
 
-const DormDataContext = createContext<DormDataContextType | undefined>(
+const HousingDataContext = createContext<HousingDataContextType | undefined>(
   undefined
 );
 
-export const DormDataProvider: React.FC<{ children: ReactNode }> = ({
+export const HousingDataProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [dorms, setDorms] = useState<Dorm[]>([]);
@@ -40,20 +37,19 @@ export const DormDataProvider: React.FC<{ children: ReactNode }> = ({
   const loadDorms = useCallback(async () => {
     setIsLoading(true);
     try {
-      const dbDorms = await dormService.getAllDorms();
-      setDorms(dbDorms);
+      const housing = await housingService.getHousing();
+      setDorms(housing as unknown as Dorm[]);
     } catch (err) {
       console.error(
-        "[DormDataContext] Failed to load from DB, loading static fallback:",
+        "[HousingDataContext] Failed to load from DB, loading static fallback:",
         err
       );
-      // Lazy-load static data only as a fallback
       try {
         const { UIUC_DORMS } = await import("../constants/dormData");
         setDorms(UIUC_DORMS);
       } catch (importErr) {
         console.error(
-          "[DormDataContext] Failed to load static fallback:",
+          "[HousingDataContext] Failed to load static fallback:",
           importErr
         );
       }
@@ -71,22 +67,22 @@ export const DormDataProvider: React.FC<{ children: ReactNode }> = ({
     [dorms]
   );
 
-  const value = useMemo<DormDataContextType>(
+  const value = useMemo<HousingDataContextType>(
     () => ({ dorms, isLoading, refreshDorms: loadDorms, getDormById }),
     [dorms, isLoading, loadDorms, getDormById]
   );
 
   return (
-    <DormDataContext.Provider value={value}>
+    <HousingDataContext.Provider value={value}>
       {children}
-    </DormDataContext.Provider>
+    </HousingDataContext.Provider>
   );
 };
 
-export const useDormData = (): DormDataContextType => {
-  const ctx = useContext(DormDataContext);
+export const useDormData = (): HousingDataContextType => {
+  const ctx = useContext(HousingDataContext);
   if (!ctx) {
-    throw new Error("useDormData must be used within a DormDataProvider");
+    throw new Error("useDormData must be used within a HousingDataProvider");
   }
   return ctx;
 };

@@ -193,6 +193,49 @@ export interface DormFavorite {
   updated_at: string;
 }
 
+// V2 Housing type matching object-first housing table
+export interface Housing {
+  id: string;
+  school_id: string;
+  housing_type: string;
+  name: string;
+  display_name: string | null;
+  summary: string | null;
+  status: string;
+  canonical_url: string | null;
+  search_text: string | null;
+  source_id: string | null;
+  source_snapshot_id: string | null;
+  primary_artifact_id: string | null;
+  address_text: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  campus_zone: string | null;
+  location_hint_text: string | null;
+  audience_tags: string[] | null;
+  eligibility_text: string | null;
+  gender_policy: string | null;
+  room_type_tags: string[] | null;
+  bathroom_style: string | null;
+  contract_type_tags: string[] | null;
+  meal_plan_required: boolean | null;
+  amenity_tags: string[] | null;
+  llc_tags: string[] | null;
+  price_text: string | null;
+  price_period: string | null;
+  application_url: string | null;
+  availability_cycle_text: string | null;
+  comparison_notes: string | null;
+  housing_policy_notes: string | null;
+  image_urls: string[] | null;
+  related_housing_codes: string[] | null;
+  room_options: Record<string, unknown> | null;
+  contract_options: Record<string, unknown> | null;
+  pricing_options: Record<string, unknown> | null;
+  created_at: string;
+  updated_at: string;
+}
+
 // Legacy FilterOption — kept temporarily for migration
 export enum FilterOption {
   ALL = "All",

@@ -12,7 +12,7 @@ import React, {
   ReactNode,
 } from "react";
 import { Dorm } from "../types/index";
-import { useDormData } from "./DormDataContext";
+import { useDormData } from "./HousingDataContext";
 
 const MAX_COMPARE = 4;
 

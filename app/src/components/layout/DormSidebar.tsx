@@ -10,7 +10,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Clock, Heart, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useSharedDormInteraction } from "../housing/store/DormUserInteractionContext";
-import { useDormData } from "../housing/store/DormDataContext";
+import { useDormData } from "../housing/store/HousingDataContext";
 import { Language } from "../../types";
 import { Dorm } from "../housing/types/index";
 import { Typewriter } from "../ui/Typewriter";

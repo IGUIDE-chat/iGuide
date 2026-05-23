@@ -21,7 +21,7 @@ import {
   FilterOption,
 } from "../types/index";
 import { getPriceRangeFromData } from "../constants/pricing";
-import { useDormData } from "./DormDataContext";
+import { useDormData } from "./HousingDataContext";
 
 interface HousingFiltersContextType {
   searchTerm: string;

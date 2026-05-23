@@ -19,7 +19,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import "rc-slider/assets/index.css";
 import { useHousingFilters } from "./store/HousingContext";
 import { getPriceRangeFromData } from "./constants/pricing";
-import { useDormData } from "./store/DormDataContext";
+import { useDormData } from "./store/HousingDataContext";
 import {
   BathroomCountFilter,
   BathroomScope,

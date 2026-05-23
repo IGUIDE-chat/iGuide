@@ -13,7 +13,7 @@ import {
   type DormFavorite,
 } from "../../../services/dormFavoritesService";
 import { useAuth } from "../../../contexts/AuthContext";
-import { useDormData } from "../store/DormDataContext";
+import { useDormData } from "../store/HousingDataContext";
 
 const FAVORITES_KEY = "uiuc-dorm-favorites";
 const HISTORY_KEY = "uiuc-dorm-history";

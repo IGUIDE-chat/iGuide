@@ -9,7 +9,7 @@ import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Dorm } from "../types/index";
 import { getPriceRangeFromData } from "../constants/pricing";
-import { useDormData } from "../store/DormDataContext";
+import { useDormData } from "../store/HousingDataContext";
 import { useHousingFilters } from "../store/HousingContext";
 import { useSharedDormInteraction } from "../store/DormUserInteractionContext";
 import { useLayout } from "../../../contexts/LayoutContext";

@@ -4,7 +4,7 @@ import { motion, AnimatePresence, Variants } from "framer-motion";
 import { ArrowLeft, Heart, Pencil } from "lucide-react";
 import { TAG_REGISTRY } from "./constants/metadata";
 import { useSharedDormInteraction } from "./store/DormUserInteractionContext";
-import { useDormData } from "./store/DormDataContext";
+import { useDormData } from "./store/HousingDataContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { dormService } from "../../services/dormService";
 import { useDormComments } from "./hooks/useDormComments";
