@@ -4,50 +4,27 @@ import { callSupabaseRpc } from '../lib/supabase-rpc'
 import { ToolRegistry } from './registry'
 import type { RequestContext, ToolDefinition, ToolResult } from './types'
 
-const KNOWLEDGE_BASE_CATEGORIES = [
-  'housing',
-  'academics',
-  'visa',
-  'campus_life',
-  'financial',
-  'general',
-] as const
-
-type KnowledgeBaseCategory = (typeof KNOWLEDGE_BASE_CATEGORIES)[number]
-
 interface SearchKnowledgeBaseArgs {
   query: string
-  category?: KnowledgeBaseCategory
   limit?: number
 }
 
 interface HybridSearchResult {
-  id: string
+  chunk_id: string
   title: string
-  content: string
+  chunk_text: string
   url: string
-  category: string
-  similarity: number | null
+  semantic_rank: number | null
   fts_rank: number | null
   rrf_score: number
 }
 
 interface KeywordSearchResult {
-  id: string
+  chunk_id: string
   title: string
-  content: string
+  chunk_text: string
   url: string
-  category: string
-  fts_rank: number
-}
-
-function isKnowledgeBaseCategory(
-  value: unknown
-): value is KnowledgeBaseCategory {
-  return (
-    typeof value === 'string' &&
-    KNOWLEDGE_BASE_CATEGORIES.includes(value as KnowledgeBaseCategory)
-  )
+  fts_score: number
 }
 
 function normalizeLimit(value: unknown): number {
@@ -56,17 +33,6 @@ function normalizeLimit(value: unknown): number {
   }
 
   return Math.min(Math.max(Math.floor(value), 1), 10)
-}
-
-function filterByCategory<T extends { category: string }>(
-  results: T[],
-  category?: KnowledgeBaseCategory
-): T[] {
-  if (!category) {
-    return results
-  }
-
-  return results.filter((result) => result.category === category)
 }
 
 function buildSnippet(content: string): string {
@@ -81,7 +47,7 @@ function formatHybridResults(results: HybridSearchResult[]): string {
   return results
     .map(
       (result) =>
-        `## ${result.title}\nScore: ${result.rrf_score.toFixed(4)}\nURL: ${result.url}\n\n${buildSnippet(result.content)}\n---`
+        `## ${result.title}\nScore: ${result.rrf_score.toFixed(4)}\nURL: ${result.url}\n\n${buildSnippet(result.chunk_text)}\n---`
     )
     .join('\n')
 }
@@ -94,7 +60,7 @@ function formatKeywordResults(results: KeywordSearchResult[]): string {
   return results
     .map(
       (result) =>
-        `## ${result.title}\nScore: ${result.fts_rank.toFixed(4)}\nURL: ${result.url}\n\n${buildSnippet(result.content)}\n---`
+        `## ${result.title}\nScore: ${result.fts_score.toFixed(4)}\nURL: ${result.url}\n\n${buildSnippet(result.chunk_text)}\n---`
     )
     .join('\n')
 }
@@ -102,7 +68,7 @@ function formatKeywordResults(results: KeywordSearchResult[]): string {
 function parseArgs(
   args: Record<string, unknown>
 ): SearchKnowledgeBaseArgs | ToolResult {
-  const { query, category, limit } = args
+  const { query, limit } = args
 
   if (typeof query !== 'string' || query.trim().length === 0) {
     return {
@@ -111,16 +77,8 @@ function parseArgs(
     }
   }
 
-  if (category !== undefined && !isKnowledgeBaseCategory(category)) {
-    return {
-      content:
-        'Error: category must be one of housing, academics, visa, campus_life, financial, general',
-    }
-  }
-
   return {
     query: query.trim(),
-    category,
     limit: normalizeLimit(limit),
   }
 }
@@ -138,11 +96,6 @@ export function createSearchKnowledgeBaseTool(
         query: {
           type: 'string',
           description: 'Search query',
-        },
-        category: {
-          type: 'string',
-          description: 'Optional category filter',
-          enum: KNOWLEDGE_BASE_CATEGORIES,
         },
         limit: {
           type: 'integer',
@@ -163,7 +116,7 @@ export function createSearchKnowledgeBaseTool(
         return parsedArgs
       }
 
-      const { query, category, limit } = parsedArgs
+      const { query, limit } = parsedArgs
       let queryEmbedding: number[]
 
       try {
@@ -182,7 +135,7 @@ export function createSearchKnowledgeBaseTool(
 
           return {
             content: formatKeywordResults(
-              filterByCategory(fallbackResults, category).slice(0, limit)
+              fallbackResults.slice(0, limit)
             ),
             metadata: {
               degraded: true,
@@ -219,7 +172,7 @@ export function createSearchKnowledgeBaseTool(
 
         return {
           content: formatHybridResults(
-            filterByCategory(results, category).slice(0, limit)
+            results.slice(0, limit)
           ),
         }
       } catch (rpcError) {
