@@ -6,8 +6,8 @@
  */
 
 import React from "react";
-import { AgentLandingPage } from "../../components/AgentLandingPage";
 import { Language } from "../../types";
+import CourseListPage from "./CourseListPage";
 
 interface CoursesLandingPageProps {
   language: Language;
@@ -16,7 +16,7 @@ interface CoursesLandingPageProps {
 const CoursesLandingPage: React.FC<CoursesLandingPageProps> = ({
   language,
 }) => {
-  return <AgentLandingPage type="courses" language={language} />;
+  return <CourseListPage language={language} />;
 };
 
 export default CoursesLandingPage;
