@@ -4,8 +4,9 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Language } from "../../types";
+import { supabase } from "../../services/supabase";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -33,6 +34,16 @@ interface UserConnection {
   tools: DiscoveredTool[];
 }
 
+interface ApiConnection {
+  id: string;
+  display_name: string;
+  description?: string;
+  endpoint_url: string;
+  last_test_status?: string | null;
+  is_enabled: boolean;
+  tools?: Array<{ name: string; description?: string }>;
+}
+
 type TestResult =
   | { state: "idle" }
   | { state: "loading" }
@@ -48,16 +59,100 @@ type MockFailureReason =
   | "unsupported_transport"
   | "unknown";
 
-// ─── Mock async functions ─────────────────────────────────────────────────────
+// ─── API helpers ──────────────────────────────────────────────────────────────
 
-const MOCK_TOOLS = [
-  { name: "search_campus", description: "Search campus info" },
-  { name: "get_events", description: "Get campus events" },
-];
+const API_BASE = (import.meta as { env: Record<string, string> }).env.VITE_API_URL || "http://localhost:8787";
+
+async function getAuthToken(): Promise<string | null> {
+  const { data: { session } } = await supabase.auth.getSession();
+  return session?.access_token ?? null;
+}
+
+async function apiFetch(path: string, options: RequestInit = {}): Promise<Response> {
+  const token = await getAuthToken();
+  return fetch(`${API_BASE}${path}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...((options.headers as Record<string, string>) || {}),
+    },
+  });
+}
+
+async function fetchConnectionsFromApi(): Promise<{ platform: PlatformConnection[]; user: UserConnection[] }> {
+  const res = await apiFetch("/integrations");
+  if (!res.ok) throw new Error(`Failed to load integrations: ${res.status}`);
+  const data = await res.json() as { platform?: ApiConnection[]; user?: ApiConnection[] };
+  return {
+    platform: (data.platform || []).map((c) => ({
+      id: c.id,
+      name: c.display_name,
+      status: c.last_test_status === "ok" ? "ok" : (c.last_test_status ? "error" : "unknown"),
+      toolCount: (c.tools || []).length,
+      url: c.endpoint_url,
+    })),
+    user: (data.user || []).map((c) => ({
+      id: c.id,
+      name: c.display_name,
+      description: c.description || "",
+      status: c.last_test_status === "ok" ? "ok" : (c.last_test_status ? "error" : "unknown"),
+      url: c.endpoint_url,
+      is_enabled: c.is_enabled,
+      tools: (c.tools || []).map((t) => ({
+        name: t.name,
+        description: t.description || "",
+        enabled: true,
+      })),
+    })),
+  };
+}
+
+async function saveConnectionToApi(data: {
+  name: string;
+  url: string;
+  description: string;
+}): Promise<UserConnection> {
+  const res = await apiFetch("/integrations", {
+    method: "POST",
+    body: JSON.stringify({
+      display_name: data.name,
+      endpoint_url: data.url,
+      transport: "streamable_http",
+      description: data.description || undefined,
+    }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: "Unknown error" })) as { error?: string };
+    throw new Error(err.error || `Failed to save: ${res.status}`);
+  }
+  const conn = await res.json() as ApiConnection;
+  return {
+    id: conn.id,
+    name: conn.display_name,
+    description: conn.description || "",
+    status: conn.last_test_status === "ok" ? "ok" : (conn.last_test_status ? "error" : "unknown"),
+    url: conn.endpoint_url,
+    is_enabled: conn.is_enabled,
+    tools: (conn.tools || []).map((t) => ({
+      name: t.name,
+      description: t.description || "",
+      enabled: true,
+    })),
+  };
+}
+
+async function deleteConnectionFromApi(id: string): Promise<void> {
+  const res = await apiFetch(`/integrations/${id}`, { method: "DELETE" });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: "Unknown error" })) as { error?: string };
+    throw new Error(err.error || `Failed to delete: ${res.status}`);
+  }
+}
 
 async function mockTestConnection(url: string): Promise<{
   ok: boolean;
-  tools?: typeof MOCK_TOOLS;
+  tools?: Array<{ name: string; description: string }>;
   reason?: MockFailureReason;
 }> {
   await new Promise((r) => setTimeout(r, 1500));
@@ -80,42 +175,14 @@ async function mockTestConnection(url: string): Promise<{
   if (normalizedUrl.includes("fail") || normalizedUrl.includes("down")) {
     return { ok: false, reason: "unreachable" };
   }
-  return { ok: true, tools: MOCK_TOOLS };
-}
-
-async function mockSaveConnection(data: {
-  name: string;
-  url: string;
-  description: string;
-  tools: typeof MOCK_TOOLS;
-}): Promise<UserConnection> {
-  await new Promise((r) => setTimeout(r, 800));
   return {
-    id: `user-${Date.now()}`,
-    name: data.name,
-    description: data.description,
-    url: data.url,
-    status: "ok",
-    is_enabled: true,
-    tools: data.tools.map((t) => ({ ...t, enabled: true })),
+    ok: true,
+    tools: [
+      { name: "search_campus", description: "Search campus info" },
+      { name: "get_events", description: "Get campus events" },
+    ],
   };
 }
-
-async function mockDeleteConnection(_id: string): Promise<void> {
-  await new Promise((r) => setTimeout(r, 500));
-}
-
-// ─── Static data ──────────────────────────────────────────────────────────────
-
-const PLATFORM_CONNECTIONS: PlatformConnection[] = [
-  {
-    id: "uiuc-campus-tools",
-    name: "UIUC Campus Tools",
-    status: "ok",
-    toolCount: 3,
-    url: "https://mcp.illinois.edu/campus-tools",
-  },
-];
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -127,7 +194,22 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
   language,
 }) => {
   // ── State ──────────────────────────────────────────────────────────────────
+  const [platformConnections, setPlatformConnections] = useState<PlatformConnection[]>([]);
   const [userConnections, setUserConnections] = useState<UserConnection[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setIsLoading(true);
+    setLoadError(null);
+    fetchConnectionsFromApi()
+      .then(({ platform, user }) => {
+        setPlatformConnections(platform);
+        setUserConnections(user);
+      })
+      .catch((err: unknown) => setLoadError(err instanceof Error ? err.message : "Failed to load integrations"))
+      .finally(() => setIsLoading(false));
+  }, []);
 
   // Add form
   const [showAddForm, setShowAddForm] = useState(false);
@@ -358,16 +440,23 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
   const handleSave = async () => {
     if (testResult.state !== "success") return;
     setIsSaving(true);
-    const conn = await mockSaveConnection({
-      name: addName.trim(),
-      url: addUrl.trim(),
-      description: addDesc.trim(),
-      tools: testResult.tools,
-    });
-    setUserConnections((prev) => [...prev, conn]);
-    setIsSaving(false);
-    setShowAddForm(false);
-    setTestResult({ state: "idle" });
+    try {
+      await saveConnectionToApi({
+        name: addName.trim(),
+        url: addUrl.trim(),
+        description: addDesc.trim(),
+      });
+      const { platform, user } = await fetchConnectionsFromApi();
+      setPlatformConnections(platform);
+      setUserConnections(user);
+      setIsSaving(false);
+      setShowAddForm(false);
+      setTestResult({ state: "idle" });
+    } catch (err) {
+      console.error("Failed to save connection:", err);
+      setIsSaving(false);
+      alert(err instanceof Error ? err.message : "Failed to save connection");
+    }
   };
 
   // ── Details panel handlers ─────────────────────────────────────────────────
@@ -430,9 +519,16 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
 
   const handleDelete = async (id: string) => {
     if (!confirm(t.confirmDelete)) return;
-    await mockDeleteConnection(id);
-    setUserConnections((prev) => prev.filter((c) => c.id !== id));
-    if (detailsId === id) setDetailsId(null);
+    try {
+      await deleteConnectionFromApi(id);
+      const { platform, user } = await fetchConnectionsFromApi();
+      setPlatformConnections(platform);
+      setUserConnections(user);
+      if (detailsId === id) setDetailsId(null);
+    } catch (err) {
+      console.error("Failed to delete connection:", err);
+      alert(err instanceof Error ? err.message : "Failed to delete connection");
+    }
   };
 
   // ── Render ─────────────────────────────────────────────────────────────────
@@ -477,7 +573,31 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
           </div>
         </div>
         <div className="space-y-2">
-          {PLATFORM_CONNECTIONS.map((conn) => (
+          {isLoading && (
+            <p className="py-2 text-xs text-slate-400">Loading…</p>
+          )}
+          {!isLoading && loadError && (
+            <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2">
+              <p className="text-xs text-red-600">{loadError}</p>
+              <button
+                onClick={() => {
+                  setIsLoading(true);
+                  setLoadError(null);
+                  fetchConnectionsFromApi()
+                    .then(({ platform, user }) => {
+                      setPlatformConnections(platform);
+                      setUserConnections(user);
+                    })
+                    .catch((err: unknown) => setLoadError(err instanceof Error ? err.message : "Failed to load integrations"))
+                    .finally(() => setIsLoading(false));
+                }}
+                className="mt-1 text-xs font-medium text-red-500 hover:text-red-700"
+              >
+                Retry
+              </button>
+            </div>
+          )}
+          {!isLoading && !loadError && platformConnections.map((conn) => (
             <div
               key={conn.id}
               className="
@@ -704,7 +824,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
         )}
 
         {/* Empty state */}
-        {userConnections.length === 0 && !showAddForm && (
+        {!isLoading && userConnections.length === 0 && !showAddForm && (
           <div
             className="
               rounded-lg border border-dashed border-slate-200 bg-slate-50 px-4
