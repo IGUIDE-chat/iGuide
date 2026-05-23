@@ -49,9 +49,13 @@ export async function withFallback<T>(
     reason: FallbackReason,
     level: 1 | 2 | 3
   ): Promise<void> => {
-    const event = createFallbackEvent(options.query, reason, level)
-    logFallbackEvent(event)
-    await options.onFallbackEvent?.(event)
+    try {
+      const event = createFallbackEvent(options.query, reason, level)
+      logFallbackEvent(event)
+      await options.onFallbackEvent?.(event)
+    } catch (emitError) {
+      console.error('[withFallback] emit failed:', emitError)
+    }
   }
 
   let initialResult: T

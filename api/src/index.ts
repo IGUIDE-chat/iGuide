@@ -303,6 +303,9 @@ export default {
             region,
             lang: body.lang,
             writer,
+          }).catch((error) => {
+            console.error('[index.ts] Streaming agent loop error (sync catch):', error)
+            console.error('[index.ts] Stack:', error instanceof Error ? error.stack : 'N/A')
           }).catch(async (error) => {
             console.error('Streaming agent loop error:', error)
           })

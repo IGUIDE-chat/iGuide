@@ -181,6 +181,7 @@ function getProviderConfig(options: {
   const detectedRegion = detectRegion(options.region, options.env)
   const deepSeekKey = options.env.DEEPSEEK_API_KEY
   const siliconFlowKey = options.env.SILICONFLOW_API_KEY
+  const deepSeekEndpointOverride = options.env.DEEPSEEK_ENDPOINT
 
   if (detectedRegion === 'CN' && siliconFlowKey) {
     return {
@@ -192,7 +193,7 @@ function getProviderConfig(options: {
 
   if (deepSeekKey) {
     return {
-      endpoint: 'https://api.deepseek.com/chat/completions',
+      endpoint: deepSeekEndpointOverride || 'https://api.deepseek.com/chat/completions',
       apiKey: deepSeekKey,
       region: 'Global',
     }
@@ -333,25 +334,33 @@ async function callDeepSeekStream(options: {
   registry: ToolRegistry
   tools?: OpenAITool[]
 }): Promise<ReadableStreamDefaultReader<Uint8Array>> {
-  const response = await fetch(options.provider.endpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${options.provider.apiKey}`,
-    },
-    body: JSON.stringify({
-      model: 'deepseek-chat',
-      messages: options.messages,
-      tools: options.tools ?? options.registry.toOpenAITools(),
-      stream: true,
-      stream_options: {
-        include_usage: true,
+  let response: Response
+  try {
+    response = await fetch(options.provider.endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${options.provider.apiKey}`,
       },
-    }),
-  })
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: options.messages,
+        tools: options.tools ?? options.registry.toOpenAITools(),
+        stream: true,
+        stream_options: {
+          include_usage: true,
+        },
+      }),
+    })
+  } catch (fetchError) {
+    console.error('[callDeepSeekStream] Fetch failed:', fetchError)
+    console.error('[callDeepSeekStream] Endpoint:', options.provider.endpoint)
+    throw fetchError
+  }
 
   if (!response.ok) {
     const errorText = await response.text()
+    console.error('[callDeepSeekStream] Non-OK response:', response.status, errorText)
     throw new Error(
       `DeepSeek API returned ${response.status}${errorText ? `: ${errorText}` : ''}`
     )
@@ -453,7 +462,15 @@ async function readDeepSeekStreamingResponse(options: {
         continue
       }
 
-      const data = JSON.parse(payload) as DeepSeekStreamChunk
+      let data: DeepSeekStreamChunk
+      try {
+        data = JSON.parse(payload) as DeepSeekStreamChunk
+      } catch (parseError) {
+        console.error('[readDeepSeekStreamingResponse] JSON parse failed')
+        console.error('Raw payload:', payload)
+        console.error('Parse error:', parseError instanceof Error ? parseError.message : parseError)
+        throw parseError
+      }
       if (data.error?.message) {
         throw new Error(data.error.message)
       }
@@ -614,19 +631,27 @@ async function runStreamingIteration(options: {
   iterations: number
   tools?: OpenAITool[]
 }): Promise<StreamingIterationOutcome> {
-  await emitAgentStep(options.writer, options.iterations, options.iterations)
+  let streamResponse: ParsedStreamResponse
+  
+  try {
+    await emitAgentStep(options.writer, options.iterations, options.iterations)
 
-  const reader = await callDeepSeekStream({
-    provider: options.provider,
-    messages: options.messages,
-    registry: options.registry,
-    tools: options.tools,
-  })
+    const reader = await callDeepSeekStream({
+      provider: options.provider,
+      messages: options.messages,
+      registry: options.registry,
+      tools: options.tools,
+    })
 
-  const streamResponse = await readDeepSeekStreamingResponse({
-    reader,
-    writer: options.writer,
-  })
+    streamResponse = await readDeepSeekStreamingResponse({
+      reader,
+      writer: options.writer,
+    })
+  } catch (error) {
+    console.error('[runStreamingIteration] Error in initial flow:', error)
+    console.error('[runStreamingIteration] Stack:', error instanceof Error ? error.stack : 'N/A')
+    throw error
+  }
 
   const usage = {
     prompt_tokens:
@@ -1054,7 +1079,11 @@ export async function runStreamingAgentLoop(
             }),
           onFallbackEvent: async (event: FallbackEvent) => {
             if (event.fallback_level === 3) {
-              await sendFallback(options.writer, event.failure_reason)
+              try {
+                await sendFallback(options.writer, event.failure_reason)
+              } catch (fallbackError) {
+                console.error('[onFallbackEvent] sendFallback failed:', fallbackError)
+              }
             }
           },
           onError: () => 'tool_failure',
@@ -1136,6 +1165,9 @@ export async function runStreamingAgentLoop(
       },
     }
   } catch (error) {
+    console.error('[runStreamingAgentLoop] Caught error before re-throw')
+    console.error('Error:', error)
+    console.error('Stack:', error instanceof Error ? error.stack : 'N/A')
     const message = error instanceof Error ? error.message : 'Unknown error'
     await sendContent(options.writer, `\n(Error: ${message})`)
     if (!doneSent) {
