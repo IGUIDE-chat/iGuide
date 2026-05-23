@@ -17,6 +17,7 @@ import {
 } from './stream.ts'
 import { buildSystemPrompt } from './prompts.ts'
 import { shouldEnableRetrievalTools } from './retrieval-policy.ts'
+import { analyzeFreshness } from './freshness-router.ts'
 import {
   buildProviderMessages,
   convertObservationToMessage,
@@ -791,15 +792,24 @@ export async function runAgentLoop(
     region: provider.region,
   }
 
-  const messages = buildProviderMessages({
-    systemPrompt: buildSystemPrompt({
-      userMemory,
-      lang: options.lang,
-    }),
+  let systemPrompt = buildSystemPrompt({
+    userMemory,
+    lang: options.lang,
+  })
+  const tools = shouldEnableRetrievalTools(options.message) ? undefined : []
+
+  if (options.env['USE_TOOL_USE_RAG'] === 'true' && tools === undefined) {
+    const freshnessGuidance = await analyzeFreshness(options.message, options.env)
+    if (freshnessGuidance) {
+      systemPrompt = systemPrompt + '\n\n## Freshness Routing\n' + freshnessGuidance
+    }
+  }
+
+  let messages = buildProviderMessages({
+    systemPrompt,
     history: options.history,
     message: options.message,
   })
-  const tools = shouldEnableRetrievalTools(options.message) ? undefined : []
 
   const executedToolCalls: AgentLoopToolCall[] = []
   const usage = {
@@ -954,15 +964,24 @@ export async function runStreamingAgentLoop(
     region: provider.region,
   }
 
+  let systemPrompt = buildSystemPrompt({
+    userMemory,
+    lang: options.lang,
+  })
+  const tools = shouldEnableRetrievalTools(options.message) ? undefined : []
+
+  if (options.env['USE_TOOL_USE_RAG'] === 'true' && tools === undefined) {
+    const freshnessGuidance = await analyzeFreshness(options.message, options.env)
+    if (freshnessGuidance) {
+      systemPrompt = systemPrompt + '\n\n## Freshness Routing\n' + freshnessGuidance
+    }
+  }
+
   let messages = buildProviderMessages({
-    systemPrompt: buildSystemPrompt({
-      userMemory,
-      lang: options.lang,
-    }),
+    systemPrompt,
     history: options.history,
     message: options.message,
   })
-  const tools = shouldEnableRetrievalTools(options.message) ? undefined : []
 
   const executedToolCalls: AgentLoopToolCall[] = []
   const usage = {
