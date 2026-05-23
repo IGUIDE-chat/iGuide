@@ -210,7 +210,7 @@ function getProviderConfig(options: {
 
 function buildSupabaseHeaders(env: Record<string, string>): HeadersInit | null {
   const supabaseUrl = env.SUPABASE_URL
-  const authKey = env.SUPABASE_SERVICE_KEY || env.SUPABASE_ANON_KEY
+  const authKey = env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_ANON_KEY
 
   if (!supabaseUrl || !authKey) {
     return null

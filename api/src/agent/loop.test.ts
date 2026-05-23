@@ -37,7 +37,7 @@ function createTestEnv(): Record<string, string> {
     DEEPSEEK_API_KEY: 'test-key',
     SUPABASE_URL: '',
     SUPABASE_ANON_KEY: '',
-    SUPABASE_SERVICE_KEY: '',
+    SUPABASE_SERVICE_ROLE_KEY: '',
   }
 }
 

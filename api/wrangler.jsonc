@@ -24,6 +24,8 @@
   },
   "env": {
     "production": {},
-    "development": {},
+    "development": {
+      "USE_TOOL_USE_RAG": "true",
+    },
   },
 }
