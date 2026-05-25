@@ -3,15 +3,24 @@
  * @description Chat (AI) Component / Module
  */
 
-import { MessagePrimitive } from "@assistant-ui/react";
+import type { UIMessage } from "ai";
 
 interface UserMessageProps {
+  message: UIMessage;
   userRole?: string;
 }
 
-export function UserMessage({ userRole = "You" }: UserMessageProps) {
+const extractText = (message: UIMessage): string =>
+  message.parts
+    .filter((p): p is { type: "text"; text: string } => p.type === "text")
+    .map((p) => p.text)
+    .join("");
+
+export function UserMessage({ message, userRole = "You" }: UserMessageProps) {
+  const text = extractText(message);
+
   return (
-    <MessagePrimitive.Root className="flex w-full border-b border-transparent py-6">
+    <div className="flex w-full border-b border-transparent py-6">
       <div className="mx-auto flex w-full max-w-3xl flex-row-reverse gap-4 px-4">
         <div className="relative flex shrink-0 flex-col items-end">
           <div
@@ -46,10 +55,10 @@ export function UserMessage({ userRole = "You" }: UserMessageProps) {
               whitespace-pre-wrap text-slate-800
             "
           >
-            <MessagePrimitive.Parts />
+            {text}
           </div>
         </div>
       </div>
-    </MessagePrimitive.Root>
+    </div>
   );
 }
