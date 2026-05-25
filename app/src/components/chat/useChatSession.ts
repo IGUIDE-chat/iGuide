@@ -233,7 +233,7 @@ export const useChatSession = ({
 
         const stream = await streamChatResponse(
           messages.map((message) => ({
-            role: message.role,
+            role: message.role as "user" | "model",
             text: message.text,
           })),
           userMsg.text,

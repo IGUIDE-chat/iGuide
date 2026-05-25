@@ -57,7 +57,7 @@ export interface ThinkingStep {
 
 export interface ChatMessage {
   id: string;
-  role: "user" | "model";
+  role: "user" | "model" | "assistant" | "tool";
   text: string;
   /** Alias for `text`, used by AI SDK adapters. Populated alongside `text` during conversion. */
   content?: string;
@@ -65,6 +65,14 @@ export interface ChatMessage {
   followUpQuestions?: string[];
   thinkingSteps?: ThinkingStep[];
   isThinking?: boolean;
+  /** Tool-call data for assistant messages (array of { id, name, arguments }). */
+  tool_calls?: Array<{
+    id: string;
+    name: string;
+    arguments: string;
+  }>;
+  /** Tool-call ID linking tool-result messages to their originating tool-call. */
+  tool_call_id?: string;
 }
 
 export interface ConversationSummary {

@@ -104,7 +104,9 @@ export const conversationService = {
 
     const { data: messages, error: msgError } = await supabase
       .from("messages")
-      .select("*")
+      .select(
+        "id, conversation_id, role, content, follow_up_questions, tool_calls, tool_call_id, created_at"
+      )
       .eq("conversation_id", conversationId)
       .order("created_at", { ascending: true });
 
@@ -191,13 +193,40 @@ export const conversationService = {
 
   /**
    * Convert Supabase messages to ChatMessage format
+   *
+   * Handles `"user"`, `"assistant"` (and legacy `"model"`), and `"tool"` roles.
+   * Passes through `tool_calls` and `tool_call_id` from the DB columns.
+   * Legacy `"model"` rows are preserved as `role: "model"` for backward compat.
    */
   convertToChatMessages(messages: Message[]): ChatMessage[] {
-    return messages.map((msg) => ({
-      id: msg.id,
-      role: msg.role as "user" | "model",
-      text: msg.content,
-      followUpQuestions: msg.follow_up_questions || undefined,
-    }));
+    return messages.map((msg) => {
+      const role =
+        msg.role === "assistant"
+          ? ("model" as const)
+          : msg.role;
+
+      const chatMsg: ChatMessage = {
+        id: msg.id,
+        role,
+        text: msg.content,
+        content: msg.content,
+        followUpQuestions: msg.follow_up_questions || undefined,
+      };
+
+      // Pass through tool_call_id for tool messages
+      if (msg.role === "tool" && msg.tool_call_id) {
+        chatMsg.tool_call_id = msg.tool_call_id;
+      }
+
+      // Pass through tool_calls for assistant/model messages
+      if (
+        (msg.role === "assistant" || msg.role === "model") &&
+        Array.isArray(msg.tool_calls)
+      ) {
+        chatMsg.tool_calls = msg.tool_calls as ChatMessage["tool_calls"];
+      }
+
+      return chatMsg;
+    });
   },
 };

@@ -88,9 +88,11 @@ export interface Conversation {
 export interface Message {
   id: string;
   conversation_id: string;
-  role: "user" | "model";
+  role: "user" | "assistant" | "model" | "tool";
   content: string;
   follow_up_questions?: string[];
+  tool_calls?: unknown;
+  tool_call_id?: string;
   created_at: string;
 }
 

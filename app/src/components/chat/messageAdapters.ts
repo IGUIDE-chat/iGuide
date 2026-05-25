@@ -15,22 +15,64 @@ import type { ChatMessage } from "../../types";
 /**
  * Convert one or more legacy ChatMessages to AI SDK UIMessages.
  *
- * Each message maps the `text` or `content` field into a `parts` array
- * with a single text part.  Model messages get `role: "assistant"`;
- * user messages get `role: "user"`.
+ * - `"user"` messages → `role: "user"` with a single text part
+ * - `"model"` / `"assistant"` messages → `role: "assistant"` with a text part
+ *   plus optional tool-call parts when `msg.tool_calls` is present
+ * - `"tool"` messages → `role: "tool"` with a tool-result part using
+ *   `msg.tool_call_id` and the parsed result from `msg.content`
  */
 export function chatMessagesToUIMessages(legacy: ChatMessage[]): UIMessage[] {
   return legacy.map((msg) => {
-    const role = msg.role === "model" ? "assistant" : "user";
-    const text = msg.text ?? msg.content ?? "";
+    let role: "user" | "assistant" | "tool";
+    const parts: UIMessagePart<UIDataTypes, UITools>[] = [];
+
+    if (msg.role === "user") {
+      role = "user";
+      const text = msg.text ?? msg.content ?? "";
+      parts.push({ type: "text", text } as UIMessagePart<UIDataTypes, UITools>);
+    } else if (msg.role === "tool") {
+      role = "tool";
+      let result: unknown = msg.content ?? "";
+      try {
+        result = JSON.parse(msg.content ?? "{}");
+      } catch {
+        // content is plain text, use as-is
+      }
+      parts.push({
+        type: "tool-result",
+        toolCallId: msg.tool_call_id ?? "",
+        toolName: "",
+        args: {},
+        result,
+      } as unknown as UIMessagePart<UIDataTypes, UITools>);
+    } else {
+      // "model" (legacy) or "assistant"
+      role = "assistant";
+      const text = msg.text ?? msg.content ?? "";
+      parts.push({ type: "text", text } as UIMessagePart<UIDataTypes, UITools>);
+
+      if (msg.tool_calls && msg.tool_calls.length > 0) {
+        for (const tc of msg.tool_calls) {
+          let args: unknown = {};
+          try {
+            args = JSON.parse(tc.arguments);
+          } catch {
+            // arguments string is not valid JSON, use empty object
+          }
+          parts.push({
+            type: "tool-call",
+            toolCallId: tc.id,
+            toolName: tc.name,
+            args,
+          } as unknown as UIMessagePart<UIDataTypes, UITools>);
+        }
+      }
+    }
 
     return {
       id: msg.id,
       role,
-      parts: [{ type: "text", text }] as UIMessagePart<UIDataTypes, UITools>[],
-      // The remaining UIMessage fields (metadata, etc.) are optional at runtime;
-      // the interface requires them only when generics dictate.  TypeScript
-      // structural compatibility allows this minimal shape.
+      parts,
     } as UIMessage;
   });
 }

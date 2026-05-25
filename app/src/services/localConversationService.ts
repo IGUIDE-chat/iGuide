@@ -119,7 +119,7 @@ export const localConversationService = {
     const newMessage: LocalMessage = {
       id: Date.now().toString(),
       conversation_id: conversationId,
-      role: message.role,
+      role: message.role as "user" | "model",
       content: message.text,
       created_at: new Date().toISOString(),
       follow_up_questions: message.followUpQuestions,
