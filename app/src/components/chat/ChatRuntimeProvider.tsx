@@ -1,238 +1,211 @@
 /**
  * @file ./src/components/chat/ChatRuntimeProvider.tsx
- * @description Chat (AI) Component / Module
+ * @description Chat runtime provider — wraps useChat from @ai-sdk/react and
+ *   exposes a stable ChatSessionContext for child components.
  */
 
 import * as React from "react";
-import {
-  AssistantRuntimeProvider,
-  useExternalStoreRuntime,
-  useAui,
-  type AppendMessage,
-  type ThreadMessageLike,
-} from "@assistant-ui/react";
-import { useChatSession } from "./useChatSession";
-import {
-  type ChatMessage,
-  type Language,
-  type ThinkingStep,
-} from "../../types";
+import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport, type UIMessage } from "ai";
+import { useAuth } from "../../contexts/AuthContext";
+import { supabase } from "../../services/supabase";
+import { conversationService } from "../../services/conversationService";
+import { localConversationService } from "../../services/localConversationService";
+import { chatMessagesToUIMessages } from "./messageAdapters";
+import { extractMemoryTags } from "./memoryTagExtraction";
+import { extractFollowUps } from "./followUpExtraction";
+import { memoryService } from "../../services/memoryService";
 import { ChatErrorBoundary } from "./ChatErrorBoundary";
-import { GrepDocsToolUI, SearchToolUI, WebSearchToolUI } from "./tools";
-
-interface ChatRuntimeProviderProps {
-  language: Language;
-  currentConversationId: string | null;
-  onConversationCreated: (id: string) => void;
-  children: React.ReactNode;
-}
 
 interface ChatSessionContextValue {
+  messages: UIMessage[];
+  input: string;
+  setInput: (v: string) => void;
+  handleSubmit: (e?: React.FormEvent) => void;
+  append: (text: string) => void;
+  /** @deprecated Transitional alias for `append`; removed in T13 once ChatThread is migrated. */
   appendMessage: (text: string) => void;
+  stop: () => void;
+  isLoading: boolean;
+  error?: Error;
+  followUps: string[] | null;
 }
 
 export const ChatSessionContext =
   React.createContext<ChatSessionContextValue | null>(null);
 
-const getTextFromAppendMessage = (message: AppendMessage): string | null => {
-  const textPart = message.content.find((part) => part.type === "text");
+interface ChatRuntimeProviderProps {
+  language: string;
+  currentConversationId: string | null;
+  onConversationCreated: (id: string) => void;
+  children: React.ReactNode;
+}
 
-  if (textPart && textPart.type === "text") {
-    return textPart.text;
-  }
-
-  return null;
-};
-
-const TOOL_NAMES = [
-  "search_knowledge_base",
-  "web_search",
-  "grep_docs",
-] as const;
-
-type ToolName = (typeof TOOL_NAMES)[number];
-
-type ToolCallPart = Extract<
-  ThreadMessageLike["content"] extends string
-    ? never
-    : ThreadMessageLike["content"][number],
-  { type: "tool-call" }
->;
-
-const isToolName = (value: string | undefined): value is ToolName =>
-  !!value && TOOL_NAMES.includes(value as ToolName);
-
-const getToolNameFromLabel = (label: string) => {
-  const [, candidate] = label.split(":");
-  const toolName = candidate?.trim();
-
-  return isToolName(toolName) ? toolName : undefined;
-};
-
-const parseJsonObject = (value: string | undefined) => {
-  if (!value) return {};
-
-  try {
-    const parsed = JSON.parse(value);
-    return parsed && typeof parsed === "object" && !Array.isArray(parsed)
-      ? (parsed as Record<string, unknown>)
-      : {};
-  } catch {
-    return {};
-  }
-};
-
-const parseToolResult = (detail: string | undefined) => {
-  if (!detail) return undefined;
-  const [status, ...summaryParts] = detail.split(" — ");
-  const summary = summaryParts.join(" — ");
-
-  return {
-    ...(status && { status }),
-    summary: summary || detail,
-  };
-};
-
-const getToolResultStep = (
-  steps: ThinkingStep[],
-  toolName: ToolName,
-  startIndex: number
-) =>
-  steps
-    .slice(startIndex + 1)
-    .find(
-      (step) =>
-        step.type === "processing" &&
-        getToolNameFromLabel(step.label) === toolName
-    );
-
-const getToolCallParts = (
-  steps: ThinkingStep[] | undefined
-): ToolCallPart[] => {
-  if (!steps?.length) return [];
-
-  return steps.flatMap((step, index) => {
-    if (step.type !== "tool_call") return [];
-
-    const toolName = getToolNameFromLabel(step.label);
-    if (!toolName) return [];
-
-    const resultStep = getToolResultStep(steps, toolName, index);
-    const result = parseToolResult(resultStep?.detail);
-
-    return [
-      {
-        type: "tool-call" as const,
-        toolCallId: `${step.id}-${toolName}`,
-        toolName,
-        args: parseJsonObject(step.detail) as ToolCallPart["args"],
-        ...(result && { result }),
-      },
-    ];
-  });
-};
-
-const toAssistantThreadMessage = (msg: ChatMessage): ThreadMessageLike => {
-  const role = msg.role === "model" ? "assistant" : "user";
-  const content: ThreadMessageLike["content"] =
-    role === "assistant"
-      ? [
-          ...getToolCallParts(msg.thinkingSteps),
-          { type: "text" as const, text: msg.text },
-        ]
-      : [{ type: "text" as const, text: msg.text }];
-
-  return {
-    id: msg.id,
-    role,
-    content,
-    ...(role === "assistant" && {
-      status: msg.isStreaming
-        ? ({ type: "running" } as const)
-        : ({ type: "complete", reason: "stop" } as const),
-    }),
-    metadata: {
-      custom: {
-        thinkingSteps: msg.thinkingSteps,
-        isThinking: msg.isThinking,
-        followUpQuestions: msg.followUpQuestions,
-        isStreaming: msg.isStreaming,
-      },
-    },
-  };
-};
-
-const AppendMessageInner = ({ children }: { children: React.ReactNode }) => {
-  const api = useAui();
-  const appendMessage = React.useCallback(
-    (text: string) => {
-      api.thread().append({
-        role: "user",
-        content: [{ type: "text", text }],
-      });
-    },
-    [api]
-  );
-  return (
-    <ChatSessionContext.Provider value={{ appendMessage }}>
-      {children}
-    </ChatSessionContext.Provider>
-  );
-};
-
-/**
- * ChatRuntimeProvider — route-level assistant-ui runtime provider.
- *
- * Architectural notes:
- * - AGENTS.md deviation: AGENTS.md:71 recommends placing AssistantRuntimeProvider
- *   at the app root. This component intentionally mounts it at the /chat route
- *   level instead. The chat feature is route-local, so scoping the runtime here
- *   avoids polluting non-chat routes with chat state, context, and side effects.
- * - ExternalStore pattern: uses useExternalStoreRuntime with a custom store
- *   (backed by useChatSession) rather than the AI SDK transport. This gives
- *   full control over message conversion, streaming metadata (thinking steps,
- *   follow-up questions), and the custom SSE backend stream format.
- * - ChatSessionContext: exposed by AppendMessageInner (rendered inside the
- *   AssistantRuntimeProvider) so useAui() runs within the required provider
- *   context. Child components use appendMessage to send via the runtime API.
- */
 export const ChatRuntimeProvider = ({
   language,
   currentConversationId,
   onConversationCreated,
   children,
 }: ChatRuntimeProviderProps) => {
-  const { messages, isLoading, sendMessage } = useChatSession({
-    language,
-    currentConversationId,
-    onConversationCreated,
-  });
+  const { user } = useAuth();
+  const service = user ? conversationService : localConversationService;
 
-  const store = React.useMemo(
-    () => ({
-      messages,
-      convertMessage: toAssistantThreadMessage,
-      isRunning: isLoading,
-      onNew: async (message: AppendMessage) => {
-        const text = getTextFromAppendMessage(message);
-        if (text) {
-          await sendMessage(text);
-        }
-      },
-    }),
-    [messages, isLoading, sendMessage]
+  const [input, setInput] = React.useState("");
+  const [followUps, setFollowUps] = React.useState<string[] | null>(null);
+  const [initialMessages, setInitialMessages] = React.useState<
+    UIMessage[] | undefined
+  >(undefined);
+
+  const conversationIdRef = React.useRef(currentConversationId);
+  conversationIdRef.current = currentConversationId;
+
+  const languageRef = React.useRef(language);
+  languageRef.current = language;
+
+  // Hydrate prior conversation messages
+  React.useEffect(() => {
+    if (!currentConversationId) {
+      setInitialMessages([]);
+      return;
+    }
+    let cancelled = false;
+    void (async () => {
+      const { data } = await service.getConversation(currentConversationId);
+      if (cancelled) return;
+      if (data?.messages) {
+        const chatMessages = service.convertToChatMessages(
+          data.messages as never
+        );
+        setInitialMessages(chatMessagesToUIMessages(chatMessages));
+      } else {
+        setInitialMessages([]);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [currentConversationId, service]);
+
+  const apiUrl = import.meta.env.VITE_API_GATEWAY_URL
+    ? `${import.meta.env.VITE_API_GATEWAY_URL}/chat`
+    : "/chat";
+
+  const transport = React.useMemo(
+    () =>
+      new DefaultChatTransport({
+        api: apiUrl,
+        body: () => ({
+          conversationId: conversationIdRef.current,
+          lang: languageRef.current,
+        }),
+        headers: async (): Promise<Record<string, string>> => {
+          const {
+            data: { session },
+          } = await supabase.auth.getSession();
+          return session?.access_token
+            ? { Authorization: `Bearer ${session.access_token}` }
+            : {};
+        },
+      }),
+    [apiUrl]
   );
 
-  const runtime = useExternalStoreRuntime(store);
+  const chat = useChat({
+    transport,
+    messages: initialMessages,
+    onFinish: ({ message }) => {
+      const text =
+        message.parts
+          ?.filter((p): p is { type: "text"; text: string } => p.type === "text")
+          .map((p) => p.text)
+          .join("") ?? "";
+
+      const memoryTags = extractMemoryTags(text);
+      if (
+        user &&
+        (memoryTags.userSoul || memoryTags.userMemory || memoryTags.convMemory)
+      ) {
+        if (memoryTags.userSoul)
+          void memoryService.appendSoul(user.id, memoryTags.userSoul);
+        if (memoryTags.userMemory)
+          void memoryService.appendUserMemory(user.id, memoryTags.userMemory);
+        if (memoryTags.convMemory && conversationIdRef.current)
+          void memoryService.updateConversationMemory(
+            conversationIdRef.current,
+            memoryTags.convMemory
+          );
+      }
+
+      const fu = extractFollowUps(text);
+      if (fu) setFollowUps(fu);
+    },
+    onError: (err) => console.error("[useChat]", err),
+  });
+
+  const isLoading =
+    chat.status === "submitted" || chat.status === "streaming";
+
+  // Lazy-create conversation on first append
+  const append = React.useCallback(
+    async (text: string) => {
+      if (!conversationIdRef.current) {
+        const { data } = await service.createConversation(
+          undefined,
+          text.slice(0, 30)
+        );
+        if (data) {
+          conversationIdRef.current = data.id;
+          onConversationCreated(data.id);
+        }
+      }
+      await chat.sendMessage({ text });
+    },
+    [chat, onConversationCreated, service]
+  );
+
+  const handleSubmit = React.useCallback(
+    (e?: React.FormEvent) => {
+      e?.preventDefault();
+      if (!input.trim() || isLoading) return;
+      void append(input);
+      setInput("");
+    },
+    [input, isLoading, append]
+  );
+
+  const ctxValue = React.useMemo<ChatSessionContextValue>(
+    () => {
+      const appendFn = (t: string) => void append(t);
+      return {
+        messages: chat.messages,
+        input,
+        setInput,
+        handleSubmit,
+        append: appendFn,
+        appendMessage: appendFn,
+        stop: chat.stop,
+        isLoading,
+        error: chat.error,
+        followUps,
+      };
+    },
+    [
+      chat.messages,
+      chat.stop,
+      chat.error,
+      input,
+      handleSubmit,
+      append,
+      isLoading,
+      followUps,
+    ]
+  );
 
   return (
     <ChatErrorBoundary>
-      <AssistantRuntimeProvider runtime={runtime}>
-        <SearchToolUI />
-        <WebSearchToolUI />
-        <GrepDocsToolUI />
-        <AppendMessageInner>{children}</AppendMessageInner>
-      </AssistantRuntimeProvider>
+      <ChatSessionContext.Provider value={ctxValue}>
+        {children}
+      </ChatSessionContext.Provider>
     </ChatErrorBoundary>
   );
 };
