@@ -1,9 +1,36 @@
 /**
  * @file ./src/components/chat/followUpExtraction.ts
- * @description Stub for T16 — follow-up question extraction is ported in a later task.
+ * @description Extracts follow-up questions from AI chat responses.
+ * Ported verbatim from useChatSession.ts lines 298-325.
  */
 
-export function extractFollowUps(_text: string): string[] | null {
-  // T16 — return null until follow-up extraction is ported
-  return null;
+/**
+ * Extracts follow-up questions from a chat response text.
+ *
+ * Looks for a Chinese "💡 你可能还想了解：" header followed by bullet-point
+ * questions. Returns the extracted questions or null if no header is found.
+ */
+export function extractFollowUps(text: string): string[] | null {
+  const followUpHeaderMatch = text.match(/\n+.*💡.*[你您]可能还想.*[:：\n]/);
+
+  if (!followUpHeaderMatch) {
+    return null;
+  }
+
+  const splitIndex = followUpHeaderMatch.index!;
+  const followUpText = text.substring(
+    splitIndex + followUpHeaderMatch[0].length,
+  );
+
+  const questions = followUpText
+    .split("\n")
+    .map((line) =>
+      line
+        .replace(/^[>\s\d.*[\]-]+/, "")
+        .replace(/\]?$/, "")
+        .trim(),
+    )
+    .filter((line) => line.length > 0 && line.length < 150);
+
+  return questions.length > 0 ? questions : null;
 }
