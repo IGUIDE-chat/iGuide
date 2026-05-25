@@ -1,6 +1,6 @@
 import { tool } from 'ai'
 import { z } from 'zod'
-import type { RequestContext } from './types'
+import type { RequestContext } from './types.ts'
 
 interface TavilyResponse {
   results?: Array<{

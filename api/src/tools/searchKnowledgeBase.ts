@@ -1,9 +1,9 @@
 import { tool } from 'ai'
 import { z } from 'zod'
-import { getEmbeddingConfig } from '../lib/embedding-config'
-import { EmbeddingClient } from '../lib/embeddings'
-import { callSupabaseRpc } from '../lib/supabase-rpc'
-import type { RequestContext } from './types'
+import { getEmbeddingConfig } from '../lib/embedding-config.ts'
+import { EmbeddingClient } from '../lib/embeddings.ts'
+import { callSupabaseRpc } from '../lib/supabase-rpc.ts'
+import type { RequestContext } from './types.ts'
 
 interface HybridSearchResult {
   chunk_id: string

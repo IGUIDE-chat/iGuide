@@ -3,7 +3,7 @@ import { z } from 'zod'
 import campusNavigationSkill from '../skills/campus_navigation.json'
 import compareDormsSkill from '../skills/compare_dorms.json'
 import findByCriteriaSkill from '../skills/find_by_criteria.json'
-import type { RequestContext } from './types'
+import type { RequestContext } from './types.ts'
 
 type SkillParameterType = 'string' | 'number' | 'boolean'
 
