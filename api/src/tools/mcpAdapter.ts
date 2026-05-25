@@ -15,8 +15,7 @@ export function toolDefToAISDK(
 ) {
   return tool({
     description: td.description,
-    parameters: z.object({}).passthrough(),
-    // @ts-expect-error - AI SDK tool() execute signature inference issue
+    inputSchema: z.object({}).passthrough(),
     execute: async (args: any, _options: any) => {
       const result = await td.execute(args, ctx)
       return result.content

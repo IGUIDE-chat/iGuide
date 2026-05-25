@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-import { streamText } from 'ai'
+import { streamText, convertToModelMessages } from 'ai'
 import { verifyAndCacheJwt } from './auth/jwtCache.ts'
 import { ipRateLimit, userRateLimit } from './middleware/ratelimit.ts'
 import { createSearchKnowledgeBaseTool } from './tools/searchKnowledgeBase.ts'
@@ -108,11 +108,14 @@ app.post(
   async (c, next) => userRateLimit(c.env.CHAT_USER_LIMITER)(c, next),
   async (c) => {
     const body = await c.req.json()
-    const { messages, conversationId, lang = 'en' } = body
+    const { messages: rawMessages, conversationId, lang = 'en' } = body
 
-    if (!Array.isArray(messages) || messages.length === 0) {
+    if (!Array.isArray(rawMessages) || rawMessages.length === 0) {
       return c.json({ error: 'Messages array required' }, 400)
     }
+
+    // Convert UIMessages (from @ai-sdk/react) to ModelMessages (for streamText)
+    const messages = await convertToModelMessages(rawMessages)
 
     const userId = c.get('userId')
     const region = c.get('region')
@@ -125,8 +128,13 @@ app.post(
 
     // Build tools only if user query is substantive
     const lastMessage = messages[messages.length - 1]
-    const userText = lastMessage?.content || ''
-    const shouldUseTool = typeof userText === 'string' && userText.length > 3
+    const lastContent = lastMessage?.content
+    const userText = typeof lastContent === 'string'
+      ? lastContent
+      : Array.isArray(lastContent)
+        ? lastContent.filter((p: any) => p.type === 'text').map((p: any) => p.text).join('')
+        : ''
+    const shouldUseTool = userText.length > 3
 
     let tools: Record<string, any> = {}
     if (shouldUseTool) {
@@ -167,7 +175,7 @@ app.post(
       },
     })
 
-    return result.toTextStreamResponse()
+    return result.toUIMessageStreamResponse()
   }
 )
 

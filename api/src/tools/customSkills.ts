@@ -193,8 +193,7 @@ export function createCustomSkillsTool(_ctx: RequestContext) {
   return tool({
     description:
       'Expand predefined structured-query skills into prompt instructions and required tool sequences.',
-    parameters: customSkillsSchema,
-    // @ts-expect-error - AI SDK tool() execute signature inference issue
+    inputSchema: customSkillsSchema,
     execute: async (args: any) => {
       const { skill_id, parameters } = args as z.infer<typeof customSkillsSchema>
       const skill = SKILL_MAP.get(skill_id)

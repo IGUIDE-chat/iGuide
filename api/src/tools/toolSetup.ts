@@ -31,8 +31,7 @@ export function wrapTools(
   for (const [name, customTool] of Object.entries(tools)) {
     result[name] = tool({
       description: customTool.description,
-      parameters: customTool.parameters,
-      // @ts-expect-error - AI SDK tool() execute signature inference issue
+      inputSchema: customTool.parameters,
       execute: async (args: any, options: any) => {
         return customTool.execute(args, context)
       },

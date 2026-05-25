@@ -51,17 +51,17 @@ function formatKeywordResults(results: KeywordSearchResult[]): string {
 
 const searchKnowledgeBaseSchema = z.object({
   query: z.string().describe('Search query'),
-  limit: z.number().int().min(1).max(10).default(5).describe('Max results'),
+  limit: z.number().int().min(1).max(10).optional().describe('Max results (default 5)'),
 })
 
 export function createSearchKnowledgeBaseTool(ctx: RequestContext) {
   return tool({
     description:
       'Search the UIUC knowledge base using hybrid semantic + keyword search. Use for questions about housing, courses, campus life, policies.',
-    parameters: searchKnowledgeBaseSchema,
-    // @ts-expect-error - AI SDK tool() execute signature inference issue
+    inputSchema: searchKnowledgeBaseSchema,
     execute: async (args: any, options: any) => {
-      const { query, limit } = args as z.infer<typeof searchKnowledgeBaseSchema>
+      const { query, limit: rawLimit } = args as z.infer<typeof searchKnowledgeBaseSchema>
+      const limit = rawLimit ?? 5
       const { abortSignal } = options as { abortSignal?: AbortSignal }
       let queryEmbedding: number[]
 

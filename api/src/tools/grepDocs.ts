@@ -36,7 +36,7 @@ const grepDocsSchema = z.object({
     .int()
     .min(1)
     .max(50)
-    .default(5)
+    .optional()
     .describe('Maximum number of results (default 5)'),
 })
 
@@ -44,12 +44,11 @@ export function createGrepDocsTool(ctx: RequestContext) {
   return tool({
     description:
       'Search documents for exact keyword or phrase matches. Use when looking for specific terms, policy numbers, dates, or exact phrases.',
-    parameters: grepDocsSchema,
-    // @ts-expect-error - AI SDK tool() execute signature inference issue
+    inputSchema: grepDocsSchema,
     execute: async (args: any, options: any) => {
-      const { pattern, limit } = args as z.infer<typeof grepDocsSchema>
+      const { pattern, limit: rawLimit } = args as z.infer<typeof grepDocsSchema>
       const { abortSignal } = options as { abortSignal?: AbortSignal }
-      const matchCount = Math.min(Math.max(limit, 1), 50)
+      const matchCount = Math.min(Math.max(rawLimit ?? 5, 1), 50)
 
       const results = await callSupabaseRpc<KeywordSearchResult[]>(
         ctx,

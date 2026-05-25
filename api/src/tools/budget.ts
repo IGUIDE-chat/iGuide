@@ -51,7 +51,7 @@ function truncateResult(result: string, maxBytes: number): string {
   if (contentLimit <= 0) return TRUNCATION_SUFFIX
 
   // Decode from bytes to maintain UTF-8 character boundaries
-  const decoder = new TextDecoder('utf-8', { fatal: false })
+  const decoder = new TextDecoder('utf-8', { fatal: false, ignoreBOM: true })
   return decoder.decode(bytes.slice(0, contentLimit)) + TRUNCATION_SUFFIX
 }
 
