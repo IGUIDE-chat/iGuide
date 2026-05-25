@@ -59,6 +59,8 @@ export interface ChatMessage {
   id: string;
   role: "user" | "model";
   text: string;
+  /** Alias for `text`, used by AI SDK adapters. Populated alongside `text` during conversion. */
+  content?: string;
   isStreaming?: boolean;
   followUpQuestions?: string[];
   thinkingSteps?: ThinkingStep[];
