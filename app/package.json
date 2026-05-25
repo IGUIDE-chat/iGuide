@@ -50,6 +50,7 @@
     "dotenv": "^17.4.2",
     "postcss": "^8.5.15",
     "tailwindcss": "^4.3.0",
-    "vite-plugin-mcp": "^0.3.2"
+    "vite-plugin-mcp": "^0.3.2",
+    "vitest": "^4.1.7"
   }
 }
