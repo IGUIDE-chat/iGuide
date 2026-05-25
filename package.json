@@ -9,5 +9,15 @@
     "typecheck": "pnpm --filter @iguide/app typecheck",
     "lint": "pnpm -r --if-present lint",
     "test": "pnpm -r --if-present test"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "oxlint": "^1.66.0",
+    "prettier": "^3.8.3",
+    "supabase": "^2.101.0",
+    "tsx": "^4.22.3",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.14",
+    "wrangler": "^4.94.0"
   }
 }

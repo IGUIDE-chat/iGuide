@@ -18,12 +18,7 @@
     "style:fix": "prettier --write ."
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260527.1",
-    "@types/node": "^25.9.1",
-    "oxlint": "^1.67.0",
-    "prettier": "^3.8.3",
-    "typescript": "^6.0.3",
-    "wrangler": "^4.95.0"
+    "@cloudflare/workers-types": "^4.20260527.1"
   },
   "dependencies": {
     "@ai-sdk/deepseek": "^2.0.35",
