@@ -9,6 +9,10 @@ importers:
   .: {}
 
   api:
+    dependencies:
+      hono:
+        specifier: ^4.12.22
+        version: 4.12.22
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^4.20260527.1
