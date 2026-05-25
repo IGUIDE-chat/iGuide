@@ -82,28 +82,42 @@ app.get('/health', (c) => {
   })
 })
 
-// Auth middleware for /chat
-const authMiddleware = async (c: any, next: any) => {
+// Optional auth: signed-in users get payload.sub; guests get guest_<ipHash>
+// so per-user rate limiting and MCP global-visibility filtering still apply.
+async function guestUserIdForIp(ip: string): Promise<string> {
+  const data = new TextEncoder().encode(ip)
+  const hash = await crypto.subtle.digest('SHA-256', data)
+  const hex = Array.from(new Uint8Array(hash).slice(0, 8))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+  return `guest_${hex}`
+}
+
+const resolveUser = async (c: any, next: any) => {
   const authHeader = c.req.header('Authorization')
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return c.json({ error: 'Unauthorized' }, 401)
+  const token =
+    authHeader && authHeader.startsWith('Bearer ')
+      ? authHeader.replace('Bearer ', '').trim()
+      : ''
+
+  if (token) {
+    const payload = await verifyAndCacheJwt(token, caches.default, c.env)
+    if (payload) {
+      c.set('userId', payload.sub)
+      await next()
+      return
+    }
   }
 
-  const token = authHeader.replace('Bearer ', '')
-  const payload = await verifyAndCacheJwt(token, caches.default, c.env)
-
-  if (!payload) {
-    return c.json({ error: 'Invalid or expired token' }, 401)
-  }
-
-  c.set('userId', payload.sub)
+  const ip = c.req.header('cf-connecting-ip') || 'unknown'
+  c.set('userId', await guestUserIdForIp(ip))
   await next()
 }
 
 // POST /chat with auth + rate limiting + streamText
 app.post(
   '/chat',
-  authMiddleware,
+  resolveUser,
   async (c, next) => ipRateLimit(c.env.CHAT_IP_LIMITER)(c, next),
   async (c, next) => userRateLimit(c.env.CHAT_USER_LIMITER)(c, next),
   async (c) => {
@@ -160,6 +174,9 @@ app.post(
       messages,
       tools,
       onFinish: async ({ response }) => {
+        if (userId.startsWith('guest_')) {
+          return
+        }
         c.executionCtx.waitUntil(
           persistTurn({
             env: c.env as any,
