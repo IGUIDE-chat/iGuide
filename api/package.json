@@ -18,8 +18,8 @@
     "style:fix": "prettier --write ."
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260520.1",
-    "wrangler": "^4.93.0"
+    "@cloudflare/workers-types": "^4.20260525.1",
+    "wrangler": "^4.94.0"
   },
   "dependencies": {
     "hono": "^4.12.22"
