@@ -5,135 +5,102 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, X, Send, Sparkles, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { ChatMessage } from "./types/index";
-import { streamChatResponse } from "../../services/ai";
+import { useChat } from "@ai-sdk/react";
+import {
+  DefaultChatTransport,
+  type UIDataTypes,
+  type UIMessage,
+  type UIMessagePart,
+  type UITools,
+} from "ai";
 import { isDormMention, findMentionedDorms } from "../../utils/housingUtils";
 import { Typewriter } from "../ui/Typewriter";
 import { Language } from "../../types";
 import { aiChatTexts } from "./i18n/dormTexts";
+import { ImeSafeTextarea } from "../chat/ImeSafeTextarea";
+import { supabase } from "../../services/supabase";
 
 interface AIChatProps {
   language: Language;
 }
 
+const extractText = (
+  parts: UIMessagePart<UIDataTypes, UITools>[]
+): string =>
+  parts
+    .filter((p): p is { type: "text"; text: string } => p.type === "text")
+    .map((p) => p.text)
+    .join("");
+
 const AIChat: React.FC<AIChatProps> = ({ language }) => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const t = aiChatTexts[language];
 
-  useEffect(() => {
-    setMessages([
+  const languageRef = useRef(language);
+  languageRef.current = language;
+
+  const apiUrl = import.meta.env.VITE_API_GATEWAY_URL
+    ? `${import.meta.env.VITE_API_GATEWAY_URL}/chat`
+    : "/chat";
+
+  const transport = useMemo(
+    () =>
+      new DefaultChatTransport({
+        api: apiUrl,
+        body: () => ({
+          lang: languageRef.current,
+        }),
+        headers: async (): Promise<Record<string, string>> => {
+          const {
+            data: { session },
+          } = await supabase.auth.getSession();
+          return session?.access_token
+            ? { Authorization: `Bearer ${session.access_token}` }
+            : {};
+        },
+      }),
+    [apiUrl]
+  );
+
+  const initialMessages = useMemo<UIMessage[]>(
+    () => [
       {
         id: "welcome",
-        role: "model",
-        text: t.initialMessage,
-        timestamp: new Date(),
-      },
-    ]);
-  }, [t.initialMessage]);
+        role: "assistant",
+        parts: [{ type: "text", text: t.initialMessage }],
+      } as UIMessage,
+    ],
+    [t.initialMessage]
+  );
+
+  const chat = useChat({
+    transport,
+    messages: initialMessages,
+    onError: (err) => console.error("[housing AIChat]", err),
+  });
+
+  const isLoading =
+    chat.status === "submitted" || chat.status === "streaming";
 
   useEffect(() => {
     if (!isOpen) return;
     messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
   }, [isOpen]);
 
-  const handleSend = async () => {
-    if (!inputText.trim() || isLoading) return;
-
-    const userMessage: ChatMessage = {
-      id: Date.now().toString(),
-      role: "user",
-      text: inputText,
-      timestamp: new Date(),
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
+  const handleSend = () => {
+    const trimmed = inputText.trim();
+    if (!trimmed || isLoading) return;
+    void chat.sendMessage({ text: trimmed });
     setInputText("");
-    setIsLoading(true);
-
-    try {
-      const botMessageId = (Date.now() + 1).toString();
-      const historyForCoze = messages
-        .filter((message) => message.id !== "welcome")
-        .map((message) => ({
-          role: message.role,
-          text: message.text,
-        }));
-
-      const stream = streamChatResponse(
-        historyForCoze,
-        userMessage.text,
-        language
-      );
-      let responseText = "";
-      let hasRenderedBotMessage = false;
-
-      for await (const chunk of stream) {
-        if (!chunk.text) {
-          continue;
-        }
-
-        if (!hasRenderedBotMessage) {
-          responseText = chunk.text;
-          hasRenderedBotMessage = true;
-          setMessages((prev) => [
-            ...prev,
-            {
-              id: botMessageId,
-              role: "model",
-              text: responseText,
-              timestamp: new Date(),
-            },
-          ]);
-          continue;
-        }
-
-        responseText += chunk.text;
-        const currentText = responseText;
-        setMessages((prev) =>
-          prev.map((message) =>
-            message.id === botMessageId
-              ? { ...message, text: currentText }
-              : message
-          )
-        );
-      }
-
-      if (!responseText.trim()) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: botMessageId,
-            role: "model",
-            text: "No response received. Please try again.",
-            timestamp: new Date(),
-          },
-        ]);
-      }
-    } catch (error) {
-      console.error(error);
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: (Date.now() + 2).toString(),
-          role: "model",
-          text: "Connection failed. Please try again.",
-          timestamp: new Date(),
-        },
-      ]);
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -204,11 +171,13 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
           "
         >
           <AnimatePresence initial={false}>
-            {messages.map((msg, index) => {
+            {chat.messages.map((msg, index) => {
+              const isAssistant = msg.role === "assistant";
+              const isUser = msg.role === "user";
+              const text = extractText(msg.parts);
               const isRecent =
-                index === messages.length - 1 && msg.role === "model";
-              const mentionedDorms =
-                msg.role === "model" ? findMentionedDorms(msg.text) : [];
+                index === chat.messages.length - 1 && isAssistant;
+              const mentionedDorms = isAssistant ? findMentionedDorms(text) : [];
 
               return (
                 <motion.div
@@ -218,7 +187,7 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                   transition={{ duration: 0.3, ease: "easeOut" }}
                   className={`
                     flex flex-col
-                    ${msg.role === "user" ? "items-end" : `items-start`}
+                    ${isUser ? "items-end" : `items-start`}
                   `}
                 >
                   <div
@@ -226,7 +195,7 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                       overflow-hidden rounded-2xl px-5 py-4 text-sm/relaxed
                       shadow-sm
                       ${
-                        msg.role === "user"
+                        isUser
                           ? `
                             max-w-[85%] rounded-br-none bg-illini-blue
                             font-medium text-white
@@ -238,9 +207,9 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                       }
                     `}
                   >
-                    {msg.role === "model" && isRecent ? (
+                    {isAssistant && isRecent ? (
                       <Typewriter
-                        text={msg.text}
+                        text={text}
                         mode="stream"
                         markdown
                         markdownComponents={{
@@ -260,9 +229,9 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                           },
                         }}
                       />
-                    ) : msg.role === "user" ? (
+                    ) : isUser ? (
                       <span className="font-medium whitespace-pre-wrap text-white">
-                        {msg.text}
+                        {text}
                       </span>
                     ) : (
                       <div
@@ -293,13 +262,13 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                             },
                           }}
                         >
-                          {msg.text}
+                          {text}
                         </ReactMarkdown>
                       </div>
                     )}
                   </div>
 
-                  {msg.role === "model" && mentionedDorms.length > 0 && (
+                  {isAssistant && mentionedDorms.length > 0 && (
                     <div className="mt-3 ml-2 flex w-full flex-col gap-3">
                       {mentionedDorms.map((dorm) =>
                         (() => {
@@ -394,7 +363,7 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
 
         <div className="border-t border-gray-100 bg-white p-4">
           <div className="relative">
-            <textarea
+            <ImeSafeTextarea
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               onKeyDown={handleKeyDown}
