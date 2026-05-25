@@ -57,13 +57,22 @@ const ALLOWED_ORIGINS = [
   'http://localhost:3000',
 ]
 
+const PREVIEW_ORIGIN_PATTERNS: RegExp[] = [
+  /^https:\/\/[a-z0-9-]+\.iguide-6d0\.pages\.dev$/i,
+]
+
+function isAllowedOrigin(origin: string | undefined): origin is string {
+  if (!origin) return false
+  if (ALLOWED_ORIGINS.includes(origin)) return true
+  return PREVIEW_ORIGIN_PATTERNS.some((re) => re.test(origin))
+}
+
 const app = new Hono<{ Bindings: Env; Variables: Variables }>()
 
-// CORS middleware
 app.use(
   '*',
   cors({
-    origin: (origin) => (ALLOWED_ORIGINS.includes(origin) ? origin : ''),
+    origin: (origin) => (isAllowedOrigin(origin) ? origin : ''),
     allowMethods: ['GET', 'POST', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization'],
     maxAge: 86400,
