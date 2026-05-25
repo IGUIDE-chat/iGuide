@@ -33,7 +33,7 @@ export interface MCPStoreOptions {
 }
 
 const DEFAULT_NAMESPACE = 'mcp'
-const DEFAULT_BINDING_NAME = 'KV'
+const DEFAULT_BINDING_NAME = 'MCP_TOOLS_KV'
 
 const globalScope = globalThis as typeof globalThis & {
   __mcpStoreMap__?: Map<string, string>
