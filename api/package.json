@@ -18,7 +18,7 @@
     "style:fix": "prettier --write ."
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260520.1"
+    "@cloudflare/workers-types": "^4.20260525.1"
   },
   "dependencies": {
     "@ai-sdk/deepseek": "^2.0.35",
