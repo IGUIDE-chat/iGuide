@@ -141,6 +141,38 @@ export const conversationService = {
   },
 
   /**
+   * Edit an existing message's content and stamp `edited_at`.
+   * Used by the user-message regenerate flow.
+   */
+  async editMessage(
+    conversationId: string,
+    messageId: string,
+    newContent: string
+  ) {
+    const { data, error } = await supabase
+      .from("messages")
+      .update({ content: newContent, edited_at: new Date().toISOString() })
+      .eq("id", messageId)
+      .eq("conversation_id", conversationId)
+      .select()
+      .single();
+    return { data, error };
+  },
+
+  /**
+   * Delete all messages in a conversation strictly after the given ISO timestamp.
+   * Used to truncate assistant + tool turns when a user edits an earlier message.
+   */
+  async deleteMessagesAfter(conversationId: string, afterIso: string) {
+    const { error } = await supabase
+      .from("messages")
+      .delete()
+      .eq("conversation_id", conversationId)
+      .gt("created_at", afterIso);
+    return { error };
+  },
+
+  /**
    * Update conversation's Coze conversation ID
    */
   async updateCozeConversationId(

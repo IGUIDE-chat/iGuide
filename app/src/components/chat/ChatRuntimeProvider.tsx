@@ -29,6 +29,7 @@ interface ChatSessionContextValue {
   isLoading: boolean;
   error?: Error;
   followUps: string[] | null;
+  editAndRegenerate: (messageId: string, newText: string) => Promise<void>;
 }
 
 export const ChatSessionContext =
@@ -173,6 +174,60 @@ export const ChatRuntimeProvider = ({
     [input, isLoading, append]
   );
 
+  const editAndRegenerate = React.useCallback(
+    async (messageId: string, newText: string) => {
+      const idx = chat.messages.findIndex((m) => m.id === messageId);
+      if (idx === -1) return;
+      const msg = chat.messages[idx];
+      if (msg.role !== "user") return;
+
+      const edited: UIMessage = {
+        ...msg,
+        parts: [{ type: "text" as const, text: newText }],
+      };
+      const truncated = chat.messages.slice(0, idx + 1);
+      truncated[truncated.length - 1] = edited;
+      chat.setMessages(truncated);
+      setFollowUps(null);
+
+      if (conversationIdRef.current) {
+        const editFn = (
+          service as {
+            editMessage?: (
+              cid: string,
+              mid: string,
+              text: string
+            ) => Promise<{ data?: { created_at?: string } | null }>;
+          }
+        ).editMessage;
+        const deleteAfterFn = (
+          service as {
+            deleteMessagesAfter?: (
+              cid: string,
+              afterIso: string
+            ) => Promise<unknown>;
+          }
+        ).deleteMessagesAfter;
+
+        let pivotIso: string | undefined;
+        if (editFn) {
+          const result = await editFn(
+            conversationIdRef.current,
+            messageId,
+            newText
+          );
+          pivotIso = result?.data?.created_at ?? undefined;
+        }
+        if (deleteAfterFn && pivotIso) {
+          await deleteAfterFn(conversationIdRef.current, pivotIso);
+        }
+      }
+
+      await chat.regenerate();
+    },
+    [chat, service]
+  );
+
   const ctxValue = React.useMemo<ChatSessionContextValue>(
     () => {
       const appendFn = (t: string) => void append(t);
@@ -187,6 +242,7 @@ export const ChatRuntimeProvider = ({
         isLoading,
         error: chat.error,
         followUps,
+        editAndRegenerate,
       };
     },
     [
@@ -198,6 +254,7 @@ export const ChatRuntimeProvider = ({
       append,
       isLoading,
       followUps,
+      editAndRegenerate,
     ]
   );
 
