@@ -1,3 +1,6 @@
+export { CustomSkillsToolUI } from "./CustomSkillsToolUI";
 export { GrepDocsToolUI } from "./GrepDocsToolUI";
+export { MCPToolUI } from "./MCPToolUI";
 export { SearchToolUI } from "./SearchToolUI";
+export { ToolPart } from "./ToolPart";
 export { WebSearchToolUI } from "./WebSearchToolUI";

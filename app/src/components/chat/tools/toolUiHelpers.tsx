@@ -1,10 +1,39 @@
 import type { ReactNode } from "react";
+import type { ToolCallPart, ToolResultPart } from "ai";
 
 export type SearchToolArgs = {
   query?: string;
   pattern?: string;
   [key: string]: unknown;
 };
+
+export function extractToolArgs(toolCall: ToolCallPart): SearchToolArgs {
+  const input = toolCall.input;
+  if (input && typeof input === "object" && !Array.isArray(input)) {
+    return input as SearchToolArgs;
+  }
+  return {};
+}
+
+export function extractToolResult(
+  toolResult: ToolResultPart | undefined
+): ToolSummaryResult | undefined {
+  if (!toolResult) return undefined;
+  const output = toolResult.output;
+  if (!output) return undefined;
+  if (output.type === "text" || output.type === "error-text") {
+    return output.value;
+  }
+  if (output.type === "json" || output.type === "error-json") {
+    const value = output.value;
+    if (typeof value === "string") return value;
+    if (value && typeof value === "object" && !Array.isArray(value)) {
+      return value as ToolSummaryResult;
+    }
+    return undefined;
+  }
+  return undefined;
+}
 
 export type ToolSummaryResult =
   | string
