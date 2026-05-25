@@ -19,10 +19,6 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260520.1",
-    "@types/node": "^25.9.1",
-    "oxlint": "^1.66.0",
-    "prettier": "^3.8.3",
-    "typescript": "^6.0.3",
     "wrangler": "^4.93.0"
   }
 }
