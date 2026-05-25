@@ -193,7 +193,8 @@ function getProviderConfig(options: {
 
   if (deepSeekKey) {
     return {
-      endpoint: deepSeekEndpointOverride || 'https://api.deepseek.com/chat/completions',
+      endpoint:
+        deepSeekEndpointOverride || 'https://api.deepseek.com/chat/completions',
       apiKey: deepSeekKey,
       region: 'Global',
     }
@@ -360,7 +361,11 @@ async function callDeepSeekStream(options: {
 
   if (!response.ok) {
     const errorText = await response.text()
-    console.error('[callDeepSeekStream] Non-OK response:', response.status, errorText)
+    console.error(
+      '[callDeepSeekStream] Non-OK response:',
+      response.status,
+      errorText
+    )
     throw new Error(
       `DeepSeek API returned ${response.status}${errorText ? `: ${errorText}` : ''}`
     )
@@ -468,7 +473,10 @@ async function readDeepSeekStreamingResponse(options: {
       } catch (parseError) {
         console.error('[readDeepSeekStreamingResponse] JSON parse failed')
         console.error('Raw payload:', payload)
-        console.error('Parse error:', parseError instanceof Error ? parseError.message : parseError)
+        console.error(
+          'Parse error:',
+          parseError instanceof Error ? parseError.message : parseError
+        )
         throw parseError
       }
       if (data.error?.message) {
@@ -632,7 +640,7 @@ async function runStreamingIteration(options: {
   tools?: OpenAITool[]
 }): Promise<StreamingIterationOutcome> {
   let streamResponse: ParsedStreamResponse
-  
+
   try {
     await emitAgentStep(options.writer, options.iterations, options.iterations)
 
@@ -649,7 +657,10 @@ async function runStreamingIteration(options: {
     })
   } catch (error) {
     console.error('[runStreamingIteration] Error in initial flow:', error)
-    console.error('[runStreamingIteration] Stack:', error instanceof Error ? error.stack : 'N/A')
+    console.error(
+      '[runStreamingIteration] Stack:',
+      error instanceof Error ? error.stack : 'N/A'
+    )
     throw error
   }
 
@@ -824,9 +835,13 @@ export async function runAgentLoop(
   const tools = shouldEnableRetrievalTools(options.message) ? undefined : []
 
   if (options.env['USE_TOOL_USE_RAG'] === 'true' && tools === undefined) {
-    const freshnessGuidance = await analyzeFreshness(options.message, options.env)
+    const freshnessGuidance = await analyzeFreshness(
+      options.message,
+      options.env
+    )
     if (freshnessGuidance) {
-      systemPrompt = systemPrompt + '\n\n## Freshness Routing\n' + freshnessGuidance
+      systemPrompt =
+        systemPrompt + '\n\n## Freshness Routing\n' + freshnessGuidance
     }
   }
 
@@ -996,9 +1011,13 @@ export async function runStreamingAgentLoop(
   const tools = shouldEnableRetrievalTools(options.message) ? undefined : []
 
   if (options.env['USE_TOOL_USE_RAG'] === 'true' && tools === undefined) {
-    const freshnessGuidance = await analyzeFreshness(options.message, options.env)
+    const freshnessGuidance = await analyzeFreshness(
+      options.message,
+      options.env
+    )
     if (freshnessGuidance) {
-      systemPrompt = systemPrompt + '\n\n## Freshness Routing\n' + freshnessGuidance
+      systemPrompt =
+        systemPrompt + '\n\n## Freshness Routing\n' + freshnessGuidance
     }
   }
 
@@ -1082,7 +1101,10 @@ export async function runStreamingAgentLoop(
               try {
                 await sendFallback(options.writer, event.failure_reason)
               } catch (fallbackError) {
-                console.error('[onFallbackEvent] sendFallback failed:', fallbackError)
+                console.error(
+                  '[onFallbackEvent] sendFallback failed:',
+                  fallbackError
+                )
               }
             }
           },

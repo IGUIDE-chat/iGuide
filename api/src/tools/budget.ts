@@ -64,7 +64,7 @@ function truncateResult(result: string, maxBytes: number): string {
  */
 export function withGuards<T extends Record<string, Tool>>(
   rawTools: T,
-  opts: BudgetOptions = {},
+  opts: BudgetOptions = {}
 ): T {
   const maxCalls = opts.maxCalls ?? DEFAULTS.maxCalls
   const timeoutMs = opts.timeoutMs ?? DEFAULTS.timeoutMs

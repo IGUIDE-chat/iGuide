@@ -16,7 +16,6 @@ import React, {
 import Slider from "rc-slider";
 import { HISTOGRAM_DATA, ModalText } from "./modalText";
 
-
 interface PriceSectionProps {
   t: ModalText;
   priceLimits: [number, number];

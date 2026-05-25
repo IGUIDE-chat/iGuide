@@ -1,9 +1,79 @@
 const DOMAIN_KEYWORDS = {
-  course: ['course', 'class', 'prerequisite', 'syllabus', 'cs ', 'ece ', 'math ', 'credit', 'professor', 'instructor', 'enrollment', 'registration', 'curriculum', 'major', 'minor', 'degree', 'elective'],
-  housing: ['dorm', 'housing', 'residence hall', 'room', 'amenit', 'lease', 'dining hall', 'meal plan', 'cafeteria', 'residential'],
-  location: ['map', 'location', 'where is', 'directions', 'building', 'office', 'address', 'open', 'hours', 'close', 'parking', 'transportation'],
-  calendar: ['calendar', 'deadline', 'semester', 'fall 2025', 'spring', 'add drop', 'registration date', 'holiday', 'exam schedule', 'break', 'tuition due'],
-  student_life: ['orientation', 'student org', 'club', 'dining', 'food', 'cpt', 'opt', 'international student', 'health service', 'counseling', 'career fair', 'tutoring', 'wellness', 'gym', 'recreation']
+  course: [
+    'course',
+    'class',
+    'prerequisite',
+    'syllabus',
+    'cs ',
+    'ece ',
+    'math ',
+    'credit',
+    'professor',
+    'instructor',
+    'enrollment',
+    'registration',
+    'curriculum',
+    'major',
+    'minor',
+    'degree',
+    'elective',
+  ],
+  housing: [
+    'dorm',
+    'housing',
+    'residence hall',
+    'room',
+    'amenit',
+    'lease',
+    'dining hall',
+    'meal plan',
+    'cafeteria',
+    'residential',
+  ],
+  location: [
+    'map',
+    'location',
+    'where is',
+    'directions',
+    'building',
+    'office',
+    'address',
+    'open',
+    'hours',
+    'close',
+    'parking',
+    'transportation',
+  ],
+  calendar: [
+    'calendar',
+    'deadline',
+    'semester',
+    'fall 2025',
+    'spring',
+    'add drop',
+    'registration date',
+    'holiday',
+    'exam schedule',
+    'break',
+    'tuition due',
+  ],
+  student_life: [
+    'orientation',
+    'student org',
+    'club',
+    'dining',
+    'food',
+    'cpt',
+    'opt',
+    'international student',
+    'health service',
+    'counseling',
+    'career fair',
+    'tutoring',
+    'wellness',
+    'gym',
+    'recreation',
+  ],
 }
 
 interface Source {
@@ -17,7 +87,7 @@ interface Source {
 function detectDomain(message: string): string | null {
   const normalized = message.toLowerCase()
   for (const [domain, keywords] of Object.entries(DOMAIN_KEYWORDS)) {
-    if (keywords.some(keyword => normalized.includes(keyword))) {
+    if (keywords.some((keyword) => normalized.includes(keyword))) {
       return domain
     }
   }
@@ -30,7 +100,9 @@ function buildGuidance(sources: Source[]): string {
   const lines: string[] = []
   for (const source of sources) {
     const policyDesc = getPolicyDescription(source.default_retrieval_policy)
-    lines.push(`The ${source.name} source (${source.source_key}) has policy: ${source.default_retrieval_policy} and freshness: ${source.freshness_class}. ${policyDesc}`)
+    lines.push(
+      `The ${source.name} source (${source.source_key}) has policy: ${source.default_retrieval_policy} and freshness: ${source.freshness_class}. ${policyDesc}`
+    )
   }
   return lines.join('\n')
 }
@@ -50,7 +122,10 @@ function getPolicyDescription(policy: string): string {
   }
 }
 
-export async function analyzeFreshness(message: string, env: Record<string, string>): Promise<string> {
+export async function analyzeFreshness(
+  message: string,
+  env: Record<string, string>
+): Promise<string> {
   const domain = detectDomain(message)
   if (!domain) return ''
 
@@ -78,7 +153,7 @@ export async function analyzeFreshness(message: string, env: Record<string, stri
       return ''
     }
 
-    const sources = await response.json() as Source[]
+    const sources = (await response.json()) as Source[]
     return buildGuidance(sources)
   } catch (error) {
     console.warn('Freshness routing query failed:', error)

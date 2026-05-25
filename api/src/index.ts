@@ -37,7 +37,9 @@ type Variables = {
   region: string
 }
 
-async function registerMCPTools(ctx: RequestContext): Promise<Record<string, any>> {
+async function registerMCPTools(
+  ctx: RequestContext
+): Promise<Record<string, any>> {
   if (!ctx.userId) {
     return {}
   }
@@ -58,12 +60,15 @@ const ALLOWED_ORIGINS = [
 const app = new Hono<{ Bindings: Env; Variables: Variables }>()
 
 // CORS middleware
-app.use('*', cors({
-  origin: (origin) => ALLOWED_ORIGINS.includes(origin) ? origin : '',
-  allowMethods: ['GET', 'POST', 'OPTIONS'],
-  allowHeaders: ['Content-Type', 'Authorization'],
-  maxAge: 86400,
-}))
+app.use(
+  '*',
+  cors({
+    origin: (origin) => (ALLOWED_ORIGINS.includes(origin) ? origin : ''),
+    allowMethods: ['GET', 'POST', 'OPTIONS'],
+    allowHeaders: ['Content-Type', 'Authorization'],
+    maxAge: 86400,
+  })
+)
 
 // Region detection middleware
 app.use('*', async (c, next) => {
@@ -143,11 +148,15 @@ app.post(
     // Build tools only if user query is substantive
     const lastMessage = messages[messages.length - 1]
     const lastContent = lastMessage?.content
-    const userText = typeof lastContent === 'string'
-      ? lastContent
-      : Array.isArray(lastContent)
-        ? lastContent.filter((p: any) => p.type === 'text').map((p: any) => p.text).join('')
-        : ''
+    const userText =
+      typeof lastContent === 'string'
+        ? lastContent
+        : Array.isArray(lastContent)
+          ? lastContent
+              .filter((p: any) => p.type === 'text')
+              .map((p: any) => p.text)
+              .join('')
+          : ''
     const shouldUseTool = userText.length > 3
 
     let tools: Record<string, any> = {}
@@ -161,12 +170,16 @@ app.post(
       }
     }
 
-    const provider = resolveProvider({ env: c.env as unknown as Record<string, string | undefined>, region: region as 'CN' | 'Global' })
+    const provider = resolveProvider({
+      env: c.env as unknown as Record<string, string | undefined>,
+      region: region as 'CN' | 'Global',
+    })
     const model = provider('deepseek-v4-flash')
 
-    const systemPrompt = lang === 'zh'
-      ? '你是 IlliniGuide AI 助手，专门帮助 UIUC 学生解答关于校园生活、课程、住宿等问题。'
-      : 'You are IlliniGuide AI assistant, helping UIUC students with campus life, courses, housing, and more.'
+    const systemPrompt =
+      lang === 'zh'
+        ? '你是 IlliniGuide AI 助手，专门帮助 UIUC 学生解答关于校园生活、课程、住宿等问题。'
+        : 'You are IlliniGuide AI assistant, helping UIUC students with campus life, courses, housing, and more.'
 
     const result = streamText({
       model,
@@ -280,19 +293,25 @@ app.all('/integrations/*', async (c) => {
 
 // 404 handler
 app.notFound((c) => {
-  return c.json({
-    error: 'Not found',
-    path: new URL(c.req.url).pathname,
-  }, 404)
+  return c.json(
+    {
+      error: 'Not found',
+      path: new URL(c.req.url).pathname,
+    },
+    404
+  )
 })
 
 // Error handler
 app.onError((err, c) => {
   console.error('Worker error:', err)
-  return c.json({
-    error: 'Internal server error',
-    message: err.message,
-  }, 500)
+  return c.json(
+    {
+      error: 'Internal server error',
+      message: err.message,
+    },
+    500
+  )
 })
 
 export default app

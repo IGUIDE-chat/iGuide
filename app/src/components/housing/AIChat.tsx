@@ -30,9 +30,7 @@ interface AIChatProps {
   language: Language;
 }
 
-const extractText = (
-  parts: UIMessagePart<UIDataTypes, UITools>[]
-): string =>
+const extractText = (parts: UIMessagePart<UIDataTypes, UITools>[]): string =>
   parts
     .filter((p): p is { type: "text"; text: string } => p.type === "text")
     .map((p) => p.text)
@@ -88,8 +86,7 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
     onError: (err) => console.error("[housing AIChat]", err),
   });
 
-  const isLoading =
-    chat.status === "submitted" || chat.status === "streaming";
+  const isLoading = chat.status === "submitted" || chat.status === "streaming";
 
   useEffect(() => {
     if (!isOpen) return;
@@ -177,7 +174,9 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
               const text = extractText(msg.parts);
               const isRecent =
                 index === chat.messages.length - 1 && isAssistant;
-              const mentionedDorms = isAssistant ? findMentionedDorms(text) : [];
+              const mentionedDorms = isAssistant
+                ? findMentionedDorms(text)
+                : [];
 
               return (
                 <motion.div

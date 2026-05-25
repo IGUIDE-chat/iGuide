@@ -101,7 +101,9 @@ async function collectSSEEvents(
           const data = JSON.parse(jsonStr)
           events.push({ event: currentEvent, data })
           currentEvent = ''
-        } catch { /* JSON parse failure during SSE parsing */ }
+        } catch {
+          /* JSON parse failure during SSE parsing */
+        }
       }
     }
   }

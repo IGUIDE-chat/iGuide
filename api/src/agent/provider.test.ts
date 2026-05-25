@@ -7,7 +7,10 @@ await mock.module('@ai-sdk/deepseek', {
   exports: {
     createDeepSeek(options: { baseURL?: string; apiKey?: string }) {
       capturedCalls.push({ baseURL: options.baseURL, apiKey: options.apiKey })
-      const provider = (modelId: string) => ({ modelId, baseURL: options.baseURL })
+      const provider = (modelId: string) => ({
+        modelId,
+        baseURL: options.baseURL,
+      })
       provider.languageModel = (modelId: string) => ({ modelId })
       provider.chat = (modelId: string) => ({ modelId })
       provider.textEmbeddingModel = () => {
@@ -68,6 +71,6 @@ test('Global region uses api.deepseek.com', () => {
 test('throws when no key is configured', () => {
   assert.throws(
     () => resolveProvider({ env: {}, region: 'Global' }),
-    /No provider key configured/,
+    /No provider key configured/
   )
 })

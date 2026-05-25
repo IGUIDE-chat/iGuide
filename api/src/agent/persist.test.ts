@@ -11,7 +11,9 @@ interface CapturedRequest {
   body: unknown
 }
 
-function makeMockFetch(responses: Array<{ ok: boolean; status: number; body?: string }>) {
+function makeMockFetch(
+  responses: Array<{ ok: boolean; status: number; body?: string }>
+) {
   const captured: CapturedRequest[] = []
   let callIndex = 0
 
@@ -37,7 +39,12 @@ function makeMockFetch(responses: Array<{ ok: boolean; status: number; body?: st
       }
     }
 
-    captured.push({ url, method: init?.method ?? 'GET', headers, body: parsedBody })
+    captured.push({
+      url,
+      method: init?.method ?? 'GET',
+      headers,
+      body: parsedBody,
+    })
 
     const resp = responses[callIndex] ?? { ok: true, status: 200 }
     callIndex++

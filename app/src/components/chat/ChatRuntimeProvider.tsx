@@ -117,7 +117,9 @@ export const ChatRuntimeProvider = ({
     onFinish: ({ message }) => {
       const text =
         message.parts
-          ?.filter((p): p is { type: "text"; text: string } => p.type === "text")
+          ?.filter(
+            (p): p is { type: "text"; text: string } => p.type === "text"
+          )
           .map((p) => p.text)
           .join("") ?? "";
 
@@ -143,8 +145,7 @@ export const ChatRuntimeProvider = ({
     onError: (err) => console.error("[useChat]", err),
   });
 
-  const isLoading =
-    chat.status === "submitted" || chat.status === "streaming";
+  const isLoading = chat.status === "submitted" || chat.status === "streaming";
 
   // Lazy-create conversation on first append
   const append = React.useCallback(
@@ -228,35 +229,32 @@ export const ChatRuntimeProvider = ({
     [chat, service]
   );
 
-  const ctxValue = React.useMemo<ChatSessionContextValue>(
-    () => {
-      const appendFn = (t: string) => void append(t);
-      return {
-        messages: chat.messages,
-        input,
-        setInput,
-        handleSubmit,
-        append: appendFn,
-        appendMessage: appendFn,
-        stop: chat.stop,
-        isLoading,
-        error: chat.error,
-        followUps,
-        editAndRegenerate,
-      };
-    },
-    [
-      chat.messages,
-      chat.stop,
-      chat.error,
+  const ctxValue = React.useMemo<ChatSessionContextValue>(() => {
+    const appendFn = (t: string) => void append(t);
+    return {
+      messages: chat.messages,
       input,
+      setInput,
       handleSubmit,
-      append,
+      append: appendFn,
+      appendMessage: appendFn,
+      stop: chat.stop,
       isLoading,
+      error: chat.error,
       followUps,
       editAndRegenerate,
-    ]
-  );
+    };
+  }, [
+    chat.messages,
+    chat.stop,
+    chat.error,
+    input,
+    handleSubmit,
+    append,
+    isLoading,
+    followUps,
+    editAndRegenerate,
+  ]);
 
   return (
     <ChatErrorBoundary>

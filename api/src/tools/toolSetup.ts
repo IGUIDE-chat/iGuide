@@ -24,7 +24,7 @@ export interface CustomTool {
 export function wrapTools(
   tools: Record<string, CustomTool>,
   context: ToolContext,
-  budget?: ToolBudget,
+  budget?: ToolBudget
 ): Record<string, ReturnType<typeof tool>> {
   const result: Record<string, any> = {}
 

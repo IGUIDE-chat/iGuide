@@ -50,7 +50,7 @@ function rowToHousing(row: Record<string, unknown>): Housing {
 async function getHousing(schoolId?: string): Promise<Housing[]> {
   try {
     let query = supabase.from(TABLE).select("*").eq("status", "active");
-    
+
     if (schoolId) {
       query = query.eq("school_id", schoolId);
     } else {
@@ -58,16 +58,16 @@ async function getHousing(schoolId?: string): Promise<Housing[]> {
     }
 
     const { data, error } = await query;
-    
+
     if (error) {
       console.error("[housingService] getHousing error:", error);
       return [];
     }
-    
+
     if (!data || data.length === 0) {
       return [];
     }
-    
+
     return data.map(rowToHousing);
   } catch (err) {
     console.error("[housingService] getHousing exception:", err);
@@ -82,16 +82,16 @@ async function getHousingById(id: string): Promise<Housing | undefined> {
       .select("*")
       .eq("id", id)
       .maybeSingle();
-    
+
     if (error) {
       console.error("[housingService] getHousingById error:", error);
       return undefined;
     }
-    
+
     if (!data) {
       return undefined;
     }
-    
+
     return rowToHousing(data);
   } catch (err) {
     console.error("[housingService] getHousingById exception:", err);

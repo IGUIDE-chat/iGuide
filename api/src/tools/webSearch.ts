@@ -61,7 +61,9 @@ export function createWebSearchTool(ctx: RequestContext) {
       'Search the web for current, time-sensitive, or externally sourced UIUC information when the knowledge base does not have answers. Do not use for greetings, thanks, acknowledgements, or casual conversation.',
     inputSchema: webSearchSchema,
     execute: async (args: any, options: any) => {
-      const { query, max_results: rawMaxResults } = args as z.infer<typeof webSearchSchema>
+      const { query, max_results: rawMaxResults } = args as z.infer<
+        typeof webSearchSchema
+      >
       const { abortSignal } = options as { abortSignal?: AbortSignal }
       const max_results = rawMaxResults ?? 5
       const apiKey = ctx.env.TAVILY_API_KEY

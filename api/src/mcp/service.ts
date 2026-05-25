@@ -401,7 +401,7 @@ export interface RegisterRuntimeMCPToolsOptions {
 
 function jsonSchemaToZod(schema: Record<string, unknown>): z.ZodTypeAny {
   const type = schema.type as string | undefined
-  
+
   if (type === 'string') return z.string()
   if (type === 'number') return z.number()
   if (type === 'integer') return z.number().int()
@@ -411,7 +411,9 @@ function jsonSchemaToZod(schema: Record<string, unknown>): z.ZodTypeAny {
     return items ? z.array(jsonSchemaToZod(items)) : z.array(z.any())
   }
   if (type === 'object') {
-    const properties = schema.properties as Record<string, Record<string, unknown>> | undefined
+    const properties = schema.properties as
+      | Record<string, Record<string, unknown>>
+      | undefined
     if (properties) {
       const shape: Record<string, z.ZodTypeAny> = {}
       for (const [key, propSchema] of Object.entries(properties)) {
@@ -421,7 +423,7 @@ function jsonSchemaToZod(schema: Record<string, unknown>): z.ZodTypeAny {
     }
     return z.record(z.string(), z.any())
   }
-  
+
   return z.any()
 }
 
@@ -479,9 +481,7 @@ export async function registerRuntimeMCPTools({
               return callResult.tool_result.content
             }
 
-            throw new Error(
-              callResult.error_message ?? 'MCP call failed'
-            )
+            throw new Error(callResult.error_message ?? 'MCP call failed')
           },
         })
       }

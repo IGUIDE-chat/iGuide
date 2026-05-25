@@ -19,7 +19,7 @@ export function extractFollowUps(text: string): string[] | null {
 
   const splitIndex = followUpHeaderMatch.index!;
   const followUpText = text.substring(
-    splitIndex + followUpHeaderMatch[0].length,
+    splitIndex + followUpHeaderMatch[0].length
   );
 
   const questions = followUpText
@@ -28,7 +28,7 @@ export function extractFollowUps(text: string): string[] | null {
       line
         .replace(/^[>\s\d.*[\]-]+/, "")
         .replace(/\]?$/, "")
-        .trim(),
+        .trim()
     )
     .filter((line) => line.length > 0 && line.length < 150);
 

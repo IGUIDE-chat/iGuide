@@ -4,7 +4,7 @@ import { extractFollowUps } from "./followUpExtraction";
 describe("extractFollowUps", () => {
   it("extracts follow-up questions with bullet points", () => {
     const result = extractFollowUps(
-      "answer\n\n💡 你可能还想了解：\n- Q1\n- Q2",
+      "answer\n\n💡 你可能还想了解：\n- Q1\n- Q2"
     );
     expect(result).toEqual(["Q1", "Q2"]);
   });
@@ -26,21 +26,21 @@ describe("extractFollowUps", () => {
 
   it("handles 您 variant character", () => {
     const result = extractFollowUps(
-      "answer\n\n💡 您可能还想了解：\n- question 1\n- question 2",
+      "answer\n\n💡 您可能还想了解：\n- question 1\n- question 2"
     );
     expect(result).toEqual(["question 1", "question 2"]);
   });
 
   it("cleans leading markers from lines (numbers, dots, brackets, dashes)", () => {
     const result = extractFollowUps(
-      "text\n\n💡 你可能还想了解：\n- item\n* item2\n1. item3\n[1] item4",
+      "text\n\n💡 你可能还想了解：\n- item\n* item2\n1. item3\n[1] item4"
     );
     expect(result).toEqual(["item", "item2", "item3", "item4"]);
   });
 
   it("filters empty lines and lines with only whitespace", () => {
     const result = extractFollowUps(
-      "text\n\n💡 你可能还想了解：\n- Q1\n  \n- Q2\n\n",
+      "text\n\n💡 你可能还想了解：\n- Q1\n  \n- Q2\n\n"
     );
     expect(result).toEqual(["Q1", "Q2"]);
   });
@@ -49,7 +49,7 @@ describe("extractFollowUps", () => {
     const longLine = "a".repeat(160);
     const shortLine = "Q1";
     const result = extractFollowUps(
-      `text\n\n💡 你可能还想了解：\n- ${longLine}\n- ${shortLine}`,
+      `text\n\n💡 你可能还想了解：\n- ${longLine}\n- ${shortLine}`
     );
     expect(result).toEqual(["Q1"]);
   });
@@ -66,14 +66,14 @@ describe("extractFollowUps", () => {
 
   it("handles newline before the bulb emoji", () => {
     const result = extractFollowUps(
-      "some answer here\n\n💡 你可能还想了解：\n- How to apply?\n- Deadlines?",
+      "some answer here\n\n💡 你可能还想了解：\n- How to apply?\n- Deadlines?"
     );
     expect(result).toEqual(["How to apply?", "Deadlines?"]);
   });
 
   it("trims whitespace from extracted questions", () => {
     const result = extractFollowUps(
-      "text\n\n💡 你可能还想了解：\n-  question with space  ",
+      "text\n\n💡 你可能还想了解：\n-  question with space  "
     );
     expect(result).toEqual(["question with space"]);
   });

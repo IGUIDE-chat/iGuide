@@ -48,7 +48,9 @@ async function collectSSEEvents(
           const data = JSON.parse(jsonStr)
           events.push({ event: currentEvent, data })
           currentEvent = ''
-        } catch { /* JSON parse failure during SSE parsing */ }
+        } catch {
+          /* JSON parse failure during SSE parsing */
+        }
       }
     }
   }
@@ -276,12 +278,6 @@ test('fallback response emits fallback then done', async () => {
   assert.equal(parsed[1].event, 'done')
 })
 
-
-
-
-
-
-
 test('trace events do not break existing event order', async () => {
   const { writer, events } = createTestWriterPair()
 
@@ -314,7 +310,3 @@ test('trace events do not break existing event order', async () => {
     'done',
   ])
 })
-
-
-
-

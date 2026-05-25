@@ -9,10 +9,7 @@ import type { ToolDefinition, RequestContext } from './types.ts'
  * The execute result extracts content from ToolResult to match AI SDK's
  * expected return type (string).
  */
-export function toolDefToAISDK(
-  td: ToolDefinition,
-  ctx: RequestContext,
-) {
+export function toolDefToAISDK(td: ToolDefinition, ctx: RequestContext) {
   return tool({
     description: td.description,
     inputSchema: z.object({}).passthrough(),
@@ -30,7 +27,7 @@ export function toolDefToAISDK(
  */
 export function mcpToolsToAISDK(
   tools: ToolDefinition[],
-  ctx: RequestContext,
+  ctx: RequestContext
 ): Record<string, any> {
   const result: Record<string, any> = {}
   for (const td of tools) {

@@ -61,10 +61,7 @@ export const ChatThread = ({ language }: ChatThreadProps) => {
 
   return (
     <div className="relative flex size-full flex-col">
-      <div
-        ref={viewportRef}
-        className="w-full flex-1 overflow-y-auto"
-      >
+      <div ref={viewportRef} className="w-full flex-1 overflow-y-auto">
         <div className="flex min-h-full flex-col">
           {isEmpty && (
             <ChatEmptyState
@@ -80,11 +77,7 @@ export const ChatThread = ({ language }: ChatThreadProps) => {
             {ctx.messages.map((m) => {
               if (m.role === "user") {
                 return (
-                  <UserMessage
-                    key={m.id}
-                    message={m}
-                    userRole={t.userRole}
-                  />
+                  <UserMessage key={m.id} message={m} userRole={t.userRole} />
                 );
               }
               return (
@@ -93,9 +86,7 @@ export const ChatThread = ({ language }: ChatThreadProps) => {
                   message={m}
                   language={language}
                   botName={t.botName}
-                  followUps={
-                    m.id === lastMessageId ? ctx.followUps : null
-                  }
+                  followUps={m.id === lastMessageId ? ctx.followUps : null}
                   onFollowUpClick={handleFollowUpClick}
                 />
               );

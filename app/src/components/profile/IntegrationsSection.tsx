@@ -61,14 +61,21 @@ type MockFailureReason =
 
 // ─── API helpers ──────────────────────────────────────────────────────────────
 
-const API_BASE = (import.meta as { env: Record<string, string> }).env.VITE_API_URL || "http://localhost:8787";
+const API_BASE =
+  (import.meta as { env: Record<string, string> }).env.VITE_API_URL ||
+  "http://localhost:8787";
 
 async function getAuthToken(): Promise<string | null> {
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   return session?.access_token ?? null;
 }
 
-async function apiFetch(path: string, options: RequestInit = {}): Promise<Response> {
+async function apiFetch(
+  path: string,
+  options: RequestInit = {}
+): Promise<Response> {
   const token = await getAuthToken();
   return fetch(`${API_BASE}${path}`, {
     ...options,
@@ -80,15 +87,26 @@ async function apiFetch(path: string, options: RequestInit = {}): Promise<Respon
   });
 }
 
-async function fetchConnectionsFromApi(): Promise<{ platform: PlatformConnection[]; user: UserConnection[] }> {
+async function fetchConnectionsFromApi(): Promise<{
+  platform: PlatformConnection[];
+  user: UserConnection[];
+}> {
   const res = await apiFetch("/integrations");
   if (!res.ok) throw new Error(`Failed to load integrations: ${res.status}`);
-  const data = await res.json() as { platform?: ApiConnection[]; user?: ApiConnection[] };
+  const data = (await res.json()) as {
+    platform?: ApiConnection[];
+    user?: ApiConnection[];
+  };
   return {
     platform: (data.platform || []).map((c) => ({
       id: c.id,
       name: c.display_name,
-      status: c.last_test_status === "ok" ? "ok" : (c.last_test_status ? "error" : "unknown"),
+      status:
+        c.last_test_status === "ok"
+          ? "ok"
+          : c.last_test_status
+            ? "error"
+            : "unknown",
       toolCount: (c.tools || []).length,
       url: c.endpoint_url,
     })),
@@ -96,7 +114,12 @@ async function fetchConnectionsFromApi(): Promise<{ platform: PlatformConnection
       id: c.id,
       name: c.display_name,
       description: c.description || "",
-      status: c.last_test_status === "ok" ? "ok" : (c.last_test_status ? "error" : "unknown"),
+      status:
+        c.last_test_status === "ok"
+          ? "ok"
+          : c.last_test_status
+            ? "error"
+            : "unknown",
       url: c.endpoint_url,
       is_enabled: c.is_enabled,
       tools: (c.tools || []).map((t) => ({
@@ -123,15 +146,22 @@ async function saveConnectionToApi(data: {
     }),
   });
   if (!res.ok) {
-    const err = await res.json().catch(() => ({ error: "Unknown error" })) as { error?: string };
+    const err = (await res
+      .json()
+      .catch(() => ({ error: "Unknown error" }))) as { error?: string };
     throw new Error(err.error || `Failed to save: ${res.status}`);
   }
-  const conn = await res.json() as ApiConnection;
+  const conn = (await res.json()) as ApiConnection;
   return {
     id: conn.id,
     name: conn.display_name,
     description: conn.description || "",
-    status: conn.last_test_status === "ok" ? "ok" : (conn.last_test_status ? "error" : "unknown"),
+    status:
+      conn.last_test_status === "ok"
+        ? "ok"
+        : conn.last_test_status
+          ? "error"
+          : "unknown",
     url: conn.endpoint_url,
     is_enabled: conn.is_enabled,
     tools: (conn.tools || []).map((t) => ({
@@ -145,7 +175,9 @@ async function saveConnectionToApi(data: {
 async function deleteConnectionFromApi(id: string): Promise<void> {
   const res = await apiFetch(`/integrations/${id}`, { method: "DELETE" });
   if (!res.ok) {
-    const err = await res.json().catch(() => ({ error: "Unknown error" })) as { error?: string };
+    const err = (await res
+      .json()
+      .catch(() => ({ error: "Unknown error" }))) as { error?: string };
     throw new Error(err.error || `Failed to delete: ${res.status}`);
   }
 }
@@ -194,7 +226,9 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
   language,
 }) => {
   // ── State ──────────────────────────────────────────────────────────────────
-  const [platformConnections, setPlatformConnections] = useState<PlatformConnection[]>([]);
+  const [platformConnections, setPlatformConnections] = useState<
+    PlatformConnection[]
+  >([]);
   const [userConnections, setUserConnections] = useState<UserConnection[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -207,7 +241,11 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
         setPlatformConnections(platform);
         setUserConnections(user);
       })
-      .catch((err: unknown) => setLoadError(err instanceof Error ? err.message : "Failed to load integrations"))
+      .catch((err: unknown) =>
+        setLoadError(
+          err instanceof Error ? err.message : "Failed to load integrations"
+        )
+      )
       .finally(() => setIsLoading(false));
   }, []);
 
@@ -573,9 +611,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
           </div>
         </div>
         <div className="space-y-2">
-          {isLoading && (
-            <p className="py-2 text-xs text-slate-400">Loading…</p>
-          )}
+          {isLoading && <p className="py-2 text-xs text-slate-400">Loading…</p>}
           {!isLoading && loadError && (
             <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2">
               <p className="text-xs text-red-600">{loadError}</p>
@@ -588,7 +624,13 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                       setPlatformConnections(platform);
                       setUserConnections(user);
                     })
-                    .catch((err: unknown) => setLoadError(err instanceof Error ? err.message : "Failed to load integrations"))
+                    .catch((err: unknown) =>
+                      setLoadError(
+                        err instanceof Error
+                          ? err.message
+                          : "Failed to load integrations"
+                      )
+                    )
                     .finally(() => setIsLoading(false));
                 }}
                 className="mt-1 text-xs font-medium text-red-500 hover:text-red-700"
@@ -597,33 +639,37 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
               </button>
             </div>
           )}
-          {!isLoading && !loadError && platformConnections.map((conn) => (
-            <div
-              key={conn.id}
-              className="
+          {!isLoading &&
+            !loadError &&
+            platformConnections.map((conn) => (
+              <div
+                key={conn.id}
+                className="
                 flex items-center justify-between rounded-lg border
                 border-slate-100 bg-slate-50 px-3 py-2.5
               "
-            >
-              <div className="flex min-w-0 items-center gap-2.5">
-                {statusDot(conn.status)}
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-slate-800">
-                    {conn.name}
+              >
+                <div className="flex min-w-0 items-center gap-2.5">
+                  {statusDot(conn.status)}
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-slate-800">
+                      {conn.name}
+                    </p>
+                    <p className="truncate text-xs text-slate-400">
+                      {conn.url}
+                    </p>
+                  </div>
+                </div>
+                <div className="ml-3 shrink-0 text-right">
+                  <span className="text-xs text-slate-500">
+                    {conn.toolCount} {conn.toolCount === 1 ? t.tool : t.tools}
+                  </span>
+                  <p className="text-xs font-medium text-emerald-600">
+                    {statusLabel(conn.status)}
                   </p>
-                  <p className="truncate text-xs text-slate-400">{conn.url}</p>
                 </div>
               </div>
-              <div className="ml-3 shrink-0 text-right">
-                <span className="text-xs text-slate-500">
-                  {conn.toolCount} {conn.toolCount === 1 ? t.tool : t.tools}
-                </span>
-                <p className="text-xs font-medium text-emerald-600">
-                  {statusLabel(conn.status)}
-                </p>
-              </div>
-            </div>
-          ))}
+            ))}
         </div>
       </div>
 

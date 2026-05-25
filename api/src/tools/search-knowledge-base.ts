@@ -134,9 +134,7 @@ export function createSearchKnowledgeBaseTool(
           )
 
           return {
-            content: formatKeywordResults(
-              fallbackResults.slice(0, limit)
-            ),
+            content: formatKeywordResults(fallbackResults.slice(0, limit)),
             metadata: {
               degraded: true,
               reason: 'embedding_unavailable',
@@ -171,9 +169,7 @@ export function createSearchKnowledgeBaseTool(
         )
 
         return {
-          content: formatHybridResults(
-            results.slice(0, limit)
-          ),
+          content: formatHybridResults(results.slice(0, limit)),
         }
       } catch (rpcError) {
         const message =

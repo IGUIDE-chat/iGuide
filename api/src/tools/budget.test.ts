@@ -49,7 +49,7 @@ test('over budget rejects 11th call when maxCalls=10', async () => {
 
   await assert.rejects(
     () => guarded.test_tool.execute!({}),
-    ToolBudgetExceededError,
+    ToolBudgetExceededError
   )
 })
 
@@ -67,10 +67,7 @@ test('timeout rejects after timeoutMs', async () => {
 
   const guarded = withGuards(tools, { timeoutMs: 50, maxCalls: 10 })
 
-  await assert.rejects(
-    () => guarded.slow_tool.execute!({}),
-    ToolTimeoutError,
-  )
+  await assert.rejects(() => guarded.slow_tool.execute!({}), ToolTimeoutError)
 })
 
 test('truncation kicks in past maxResultBytes', async () => {

@@ -10,7 +10,9 @@ export interface MemoryTags {
   convMemory?: string;
 }
 
-export function extractMemoryTags(text: string): MemoryTags & { cleaned: string } {
+export function extractMemoryTags(
+  text: string
+): MemoryTags & { cleaned: string } {
   let userSoul: string | undefined;
   let userMemory: string | undefined;
   let convMemory: string | undefined;
@@ -18,8 +20,12 @@ export function extractMemoryTags(text: string): MemoryTags & { cleaned: string 
 
   try {
     const userSoulMatch = text.match(/<user_soul>([\s\S]*?)<\/user_soul>/);
-    const userMemoryMatch = text.match(/<user_memory>([\s\S]*?)<\/user_memory>/);
-    const convMemoryMatch = text.match(/<conv_memory>([\s\S]*?)<\/conv_memory>/);
+    const userMemoryMatch = text.match(
+      /<user_memory>([\s\S]*?)<\/user_memory>/
+    );
+    const convMemoryMatch = text.match(
+      /<conv_memory>([\s\S]*?)<\/conv_memory>/
+    );
 
     if (userSoulMatch) userSoul = userSoulMatch[1].trim();
     if (userMemoryMatch) userMemory = userMemoryMatch[1].trim();

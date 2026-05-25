@@ -232,10 +232,7 @@ export const conversationService = {
    */
   convertToChatMessages(messages: Message[]): ChatMessage[] {
     return messages.map((msg) => {
-      const role =
-        msg.role === "assistant"
-          ? ("model" as const)
-          : msg.role;
+      const role = msg.role === "assistant" ? ("model" as const) : msg.role;
 
       const chatMsg: ChatMessage = {
         id: msg.id,

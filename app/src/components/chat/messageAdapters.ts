@@ -83,10 +83,12 @@ export function chatMessagesToUIMessages(legacy: ChatMessage[]): UIMessage[] {
  * Non-text parts (tool-calls, reasoning, file, data, step-start, source-url,
  * source-document) are silently skipped.
  */
-export function extractAssistantText(parts: UIMessagePart<UIDataTypes, UITools>[]): string {
+export function extractAssistantText(
+  parts: UIMessagePart<UIDataTypes, UITools>[]
+): string {
   return parts
-    .filter((part): part is { type: "text"; text: string } =>
-      part.type === "text"
+    .filter(
+      (part): part is { type: "text"; text: string } => part.type === "text"
     )
     .map((part) => part.text)
     .join("");

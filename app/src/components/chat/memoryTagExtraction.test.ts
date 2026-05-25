@@ -3,7 +3,9 @@ import { extractMemoryTags } from "./memoryTagExtraction";
 
 describe("extractMemoryTags", () => {
   it("extracts user_soul and returns cleaned text", () => {
-    const result = extractMemoryTags("hello <user_soul>likes ramen</user_soul> bye");
+    const result = extractMemoryTags(
+      "hello <user_soul>likes ramen</user_soul> bye"
+    );
     expect(result.userSoul).toBe("likes ramen");
     expect(result.cleaned).toBe("hello  bye".trim());
     expect(result.userMemory).toBeUndefined();
@@ -11,7 +13,9 @@ describe("extractMemoryTags", () => {
   });
 
   it("trims whitespace from cleaned text", () => {
-    const result = extractMemoryTags("hello <user_soul>likes ramen</user_soul> bye");
+    const result = extractMemoryTags(
+      "hello <user_soul>likes ramen</user_soul> bye"
+    );
     expect(result.cleaned).toBe("hello  bye".trim());
   });
 
@@ -40,7 +44,9 @@ describe("extractMemoryTags", () => {
   });
 
   it("extracts conv_memory", () => {
-    const result = extractMemoryTags("text <conv_memory>summary here</conv_memory> end");
+    const result = extractMemoryTags(
+      "text <conv_memory>summary here</conv_memory> end"
+    );
     expect(result.convMemory).toBe("summary here");
     expect(result.cleaned).toBe("text  end".trim());
   });
@@ -56,7 +62,9 @@ describe("extractMemoryTags", () => {
   });
 
   it("trims whitespace inside tag content", () => {
-    const result = extractMemoryTags("<user_soul>  spaced content  </user_soul>");
+    const result = extractMemoryTags(
+      "<user_soul>  spaced content  </user_soul>"
+    );
     expect(result.userSoul).toBe("spaced content");
   });
 

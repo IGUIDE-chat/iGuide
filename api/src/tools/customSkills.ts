@@ -195,7 +195,9 @@ export function createCustomSkillsTool(_ctx: RequestContext) {
       'Expand predefined structured-query skills into prompt instructions and required tool sequences.',
     inputSchema: customSkillsSchema,
     execute: async (args: any) => {
-      const { skill_id, parameters } = args as z.infer<typeof customSkillsSchema>
+      const { skill_id, parameters } = args as z.infer<
+        typeof customSkillsSchema
+      >
       const skill = SKILL_MAP.get(skill_id)
 
       if (!skill) {

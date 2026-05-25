@@ -37,7 +37,10 @@ const summarizeToolResult = (result: unknown): string | undefined => {
 };
 
 const markdownComponents = {
-  a: ({ node: _node, ...props }: { node?: unknown } & React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
+  a: ({
+    node: _node,
+    ...props
+  }: { node?: unknown } & React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
     <a
       {...props}
       className="
@@ -80,13 +83,22 @@ const markdownComponents = {
       </code>
     );
   },
-  ul: ({ node: _node, ...props }: { node?: unknown } & React.HTMLAttributes<HTMLUListElement>) => (
+  ul: ({
+    node: _node,
+    ...props
+  }: { node?: unknown } & React.HTMLAttributes<HTMLUListElement>) => (
     <ul className="list-inside list-disc space-y-1" {...props} />
   ),
-  ol: ({ node: _node, ...props }: { node?: unknown } & React.OlHTMLAttributes<HTMLOListElement>) => (
+  ol: ({
+    node: _node,
+    ...props
+  }: { node?: unknown } & React.OlHTMLAttributes<HTMLOListElement>) => (
     <ol className="list-inside list-decimal space-y-1" {...props} />
   ),
-  p: ({ node: _node, ...props }: { node?: unknown } & React.HTMLAttributes<HTMLParagraphElement>) => (
+  p: ({
+    node: _node,
+    ...props
+  }: { node?: unknown } & React.HTMLAttributes<HTMLParagraphElement>) => (
     <p
       className="
         mb-2
@@ -123,20 +135,11 @@ interface ToolCallLike {
   args?: unknown;
 }
 
-const renderToolPart = (
-  part: ToolCallLike,
-  key: string
-): React.ReactNode => {
+const renderToolPart = (part: ToolCallLike, key: string): React.ReactNode => {
   const type = part.type;
 
   if (type === "tool-call") {
-    return (
-      <ToolStatus
-        key={key}
-        toolName={part.toolName}
-        status="searching"
-      />
-    );
+    return <ToolStatus key={key} toolName={part.toolName} status="searching" />;
   }
 
   if (type === "tool-result") {
@@ -198,8 +201,7 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
     }
   }, [message]);
 
-  const showFollowUps =
-    !!followUps && followUps.length > 0 && !isLoading;
+  const showFollowUps = !!followUps && followUps.length > 0 && !isLoading;
 
   return (
     <div className="flex w-full border-b border-transparent py-6">
