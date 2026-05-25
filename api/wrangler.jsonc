@@ -5,30 +5,30 @@
   "compatibility_date": "2026-04-08",
   "compatibility_flags": ["nodejs_compat"],
   "observability": {
-    "enabled": true,
+    "enabled": true
   },
   "build": {
-    "watch_dir": "src",
+    "watch_dir": "src"
   },
   "rules": [
     {
       "type": "Text",
       "globs": ["**/*.md"],
-      "fallthrough": true,
-    },
+      "fallthrough": true
+    }
   ],
   "ratelimits": [
     { "name": "CHAT_IP_LIMITER", "namespace_id": "1001", "simple": { "limit": 30, "period": 60 } },
-    { "name": "CHAT_USER_LIMITER", "namespace_id": "1002", "simple": { "limit": 60, "period": 60 } },
+    { "name": "CHAT_USER_LIMITER", "namespace_id": "1002", "simple": { "limit": 60, "period": 60 } }
   ],
   "kv_namespaces": [
-    { "binding": "MCP_TOOLS_KV", "id": "placeholder" },
+    { "binding": "MCP_TOOLS_KV", "id": "99794b117ecd4f5c9c8432f1dfa32ecb" }
   ],
   "vars": {
     "EMBEDDING_MODEL": "multilingual-e5-small",
-    "EMBEDDING_DIMENSIONS": "384",
+    "EMBEDDING_DIMENSIONS": "384"
   },
   "env": {
-    "production": {},
-  },
+    "production": {}
+  }
 }
