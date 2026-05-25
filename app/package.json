@@ -23,9 +23,11 @@
     "postinstall": "git submodule update --init --recursive && git config --local include.path ../.gitconfig"
   },
   "dependencies": {
+    "@ai-sdk/react": "^3.0.193",
     "@assistant-ui/react": "^0.14.0",
     "@headlessui/react": "^2.2.10",
     "@supabase/supabase-js": "^2.106.1",
+    "ai": "^6.0.191",
     "framer-motion": "^12.39.0",
     "lucide-react": "^1.14.0",
     "mapbox-gl": "^3.24.0",
@@ -35,7 +37,8 @@
     "react-map-gl": "^8.1.1",
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.15.0",
-    "remark-gfm": "^4.0.1"
+    "remark-gfm": "^4.0.1",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260520.1",
