@@ -67,6 +67,18 @@
       "skillPath": "assistant-ui/skills/setup/SKILL.md",
       "computedHash": "283c7cbc08cbc1a3b58307083f505a24fcc8b5e5621608d6e1fb88034b1afce0"
     },
+    "slop-design": {
+      "source": "arcadi4/skills",
+      "sourceType": "github",
+      "skillPath": "slop-design/SKILL.md",
+      "computedHash": "12f3e602b91314eb4d87d736a62046c0034b1ea6c4c83cb40f2f170c017afaea"
+    },
+    "slop-tests": {
+      "source": "arcadi4/skills",
+      "sourceType": "github",
+      "skillPath": "slop-tests/SKILL.md",
+      "computedHash": "e4d86681e211381755697aa94c0761dd8a511d006957c560d9fa1bcdc117deb6"
+    },
     "streaming": {
       "source": "assistant-ui/skills",
       "sourceType": "github",
