@@ -10,7 +10,7 @@
     "deploy": "wrangler deploy",
     "deploy:production": "wrangler deploy --env production",
     "tail": "wrangler tail",
-    "test": "node --test --experimental-strip-types --loader ./src/test/loaders/md-loader.ts \"src/**/*.test.ts\"",
+    "test": "node --test --experimental-strip-types --experimental-test-module-mocks --loader ./src/test/loaders/md-loader.ts \"src/**/*.test.ts\"",
     "types": "wrangler types",
     "lint": "oxlint src",
     "lint:fix": "oxlint --fix src",
