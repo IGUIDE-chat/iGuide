@@ -37,21 +37,15 @@ type Variables = {
   region: string
 }
 
-/**
- * Register MCP tools by converting ToolDefinitions to AI SDK tool() format.
- * Currently returns empty object — MCP service implementation pending.
- * When MCP services are built:
- *
- *   import { mcpToolsToAISDK } from './tools/mcpAdapter.ts'
- *   const mcpDefs = await someMCPService.getTools(ctx)
- *   return mcpToolsToAISDK(mcpDefs, ctx)
- *
- * For a single tool:
- *
- *   return { my_tool: toolDefToAISDK(someToolDef, ctx) }
- */
 async function registerMCPTools(ctx: RequestContext): Promise<Record<string, any>> {
-  return {}
+  if (!ctx.userId) {
+    return {}
+  }
+  const { registerRuntimeMCPTools } = await import('./mcp/service.ts')
+  return registerRuntimeMCPTools({
+    viewerId: ctx.userId,
+    env: ctx.env,
+  })
 }
 
 const ALLOWED_ORIGINS = [
