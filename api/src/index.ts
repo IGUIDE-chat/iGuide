@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-import { streamText, convertToModelMessages } from 'ai'
+import { streamText, convertToModelMessages, stepCountIs } from 'ai'
 import { verifyAndCacheJwt } from './auth/jwtCache.ts'
 import { ipRateLimit, userRateLimit } from './middleware/ratelimit.ts'
 import { createSearchKnowledgeBaseTool } from './tools/searchKnowledgeBase.ts'
@@ -47,6 +47,58 @@ async function registerMCPTools(
   return registerRuntimeMCPTools({
     viewerId: ctx.userId,
     env: ctx.env,
+  })
+}
+
+const DSML_BLOCK_PATTERN = /<｜｜DSML｜｜tool_calls>[\s\S]*?<\/｜｜DSML｜｜tool_calls>/g
+const DSML_TAG_PATTERN = /<\/?｜｜DSML｜｜[^<>]*>/g
+const DSML_HOLDBACK_PREFIX = '<'
+
+function cleanDsml(text: string): string {
+  return text.replace(DSML_BLOCK_PATTERN, '').replace(DSML_TAG_PATTERN, '')
+}
+
+const stripDsmlTransform = () => {
+  let buffer = ''
+  return new TransformStream<any, any>({
+    transform(part, controller) {
+      if (part.type !== 'text-delta' || typeof part.text !== 'string') {
+        if (buffer && (part.type === 'text-end' || part.type === 'finish-step' || part.type === 'finish')) {
+          const flushed = cleanDsml(buffer)
+          buffer = ''
+          if (flushed) {
+            controller.enqueue({ type: 'text-delta', id: part.id, text: flushed })
+          }
+        }
+        controller.enqueue(part)
+        return
+      }
+      buffer += part.text
+      const lastUnsafeIdx = buffer.lastIndexOf(DSML_HOLDBACK_PREFIX)
+      let safeBoundary = buffer.length
+      if (lastUnsafeIdx >= 0) {
+        const tail = buffer.slice(lastUnsafeIdx)
+        const isCompleteTag = /^<\/?｜｜DSML｜｜[^<>]*>/.test(tail)
+        if (!isCompleteTag) {
+          safeBoundary = lastUnsafeIdx
+        }
+      }
+      const safe = buffer.slice(0, safeBoundary)
+      buffer = buffer.slice(safeBoundary)
+      const cleaned = cleanDsml(safe)
+      if (cleaned) {
+        controller.enqueue({ ...part, text: cleaned })
+      }
+    },
+    flush(controller) {
+      if (buffer) {
+        const cleaned = cleanDsml(buffer)
+        buffer = ''
+        if (cleaned) {
+          controller.enqueue({ type: 'text-delta', id: 'flush', text: cleaned })
+        }
+      }
+    },
   })
 }
 
@@ -190,11 +242,32 @@ app.post(
         ? '你是 IlliniGuide AI 助手，专门帮助 UIUC 学生解答关于校园生活、课程、住宿等问题。'
         : 'You are IlliniGuide AI assistant, helping UIUC students with campus life, courses, housing, and more.'
 
+    const MAX_STEPS = 8
     const result = streamText({
       model,
       system: systemPrompt,
       messages,
       tools,
+      // AI SDK v6 streamText defaults to stepCountIs(1); without a wider budget,
+      // the tool-call consumes the only step and the model never produces a text reply.
+      stopWhen: stepCountIs(MAX_STEPS),
+      // On the final allowed step, force the model to answer in text instead of
+      // calling yet another tool. Otherwise a model that keeps trying tools will
+      // exhaust the step budget without producing a reply.
+      prepareStep: ({ stepNumber }) => {
+        if (stepNumber >= MAX_STEPS - 1) {
+          const finalSystem =
+            lang === 'zh'
+              ? `${systemPrompt}\n\n注意：你已用完工具调用次数。请直接基于到目前为止收集到的信息用中文回答用户的问题，不要再尝试调用任何工具。`
+              : `${systemPrompt}\n\nNote: You have exhausted your tool budget. Answer the user's question directly in English using whatever information you have gathered so far. Do not attempt to call any further tools.`
+          return { toolChoice: 'none', system: finalSystem }
+        }
+        return {}
+      },
+      // DeepSeek occasionally emits its native DSML tool-call markup as text when
+      // toolChoice is 'none'. Strip these markers from text deltas so the user
+      // never sees them.
+      experimental_transform: stripDsmlTransform,
       onFinish: async ({ response }) => {
         if (userId.startsWith('guest_')) {
           return
