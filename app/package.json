@@ -9,8 +9,6 @@
     "lint": "oxlint src functions scripts",
     "lint:fix": "oxlint --fix src functions scripts",
     "postinstall": "git submodule update --init --recursive && git config --local include.path ../.gitconfig",
-    "style": "prettier --check . && pnpm run style:md",
-    "style:fix": "prettier --write . && pnpm run style:md:fix",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
