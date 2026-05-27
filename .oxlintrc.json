@@ -1,0 +1,91 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "typescript",
+    "unicorn",
+    "oxc",
+    "import",
+    "react",
+    "jsx-a11y",
+    "react-perf",
+    "promise",
+    "node",
+    "vitest"
+  ],
+  "categories": {
+    "correctness": "warn",
+    "suspicious": "warn",
+    "perf": "warn"
+  },
+  "env": {
+    "builtin": true
+  },
+  "settings": {
+    "react": {
+      "version": "19.2.6"
+    }
+  },
+  "options": {
+    "reportUnusedDisableDirectives": "warn",
+    "respectEslintDisableDirectives": true
+  },
+  "ignorePatterns": [
+    "node_modules/**",
+    "dist/**",
+    "build/**",
+    "coverage/**",
+    ".wrangler/**",
+    "app/.vite/**",
+    "app/.debug/**",
+    "app/tests/artifacts/**",
+    "app/src/legacy/**",
+    "src/legacy/**",
+    "app/src/components/housing/legacy/**",
+    "src/components/housing/legacy/**",
+    "supabase/.temp/**",
+    "**/*.min.*",
+    "**/*.generated.*",
+    "**/*.gen.*",
+    "**/worker-configuration.d.ts"
+  ],
+  "rules": {
+    "no-console": "warn"
+  },
+  "overrides": [
+    {
+      "files": ["app/src/**/*.{js,jsx,ts,tsx}", "app/functions/**/*.{js,jsx,ts,tsx}", "src/**/*.{js,jsx,ts,tsx}", "functions/**/*.{js,jsx,ts,tsx}"],
+      "env": {
+        "browser": true,
+        "worker": true,
+        "serviceworker": true
+      }
+    },
+    {
+      "files": ["api/src/**/*.{js,mjs,cjs,ts}", "src/**/*.{js,mjs,cjs,ts}"],
+      "env": {
+        "node": true,
+        "worker": true,
+        "serviceworker": true
+      }
+    },
+    {
+      "files": ["**/*.test.{js,jsx,ts,tsx}", "**/*.spec.{js,jsx,ts,tsx}", "**/__tests__/**/*.{js,jsx,ts,tsx}"],
+      "env": {
+        "node": true,
+        "vitest": true
+      },
+      "rules": {
+        "no-console": "off"
+      }
+    },
+    {
+      "files": ["app/scripts/**/*.{js,mjs,cjs,ts}", "scripts/**/*.{js,mjs,cjs,ts}"],
+      "env": {
+        "node": true
+      },
+      "rules": {
+        "no-console": "off"
+      }
+    }
+  ]
+}
