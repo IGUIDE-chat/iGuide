@@ -1,26 +1,17 @@
 {
   "name": "@iguide/app",
   "private": true,
-  "version": "0.0.0",
+  "version": "v0.0.0",
   "type": "module",
   "scripts": {
-    "audit:dorm-media": "npx tsx scripts/audit-dorm-media.ts",
     "build": "vite build",
     "dev": "vite",
-    "generate:qmd-content": "npx tsx scripts/generate-qmd-markdown.ts",
-    "lint:fix": "oxlint --fix src functions scripts",
     "lint": "oxlint src functions scripts",
-    "preview": "vite preview",
-    "style:fix": "prettier --write . && pnpm run style:md:fix",
-    "style:md:fix": "markdownlint-cli2 --fix \"**/*.md\" \"#node_modules\"",
-    "style:md": "markdownlint-cli2 \"**/*.md\" \"#node_modules\"",
+    "lint:fix": "oxlint --fix src functions scripts",
+    "postinstall": "git submodule update --init --recursive && git config --local include.path ../.gitconfig",
     "style": "prettier --check . && pnpm run style:md",
-    "submodule:init": "git submodule update --init --recursive",
-    "submodule:update": "git submodule update --remote --merge",
-    "sync:qmd": "npx tsx scripts/sync-qmd-index.ts",
-    "typecheck": "tsc --noEmit",
-    "validate:dorm-data": "npx tsx scripts/validate-dorm-data.ts",
-    "postinstall": "git submodule update --init --recursive && git config --local include.path ../.gitconfig"
+    "style:fix": "prettier --write . && pnpm run style:md:fix",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@assistant-ui/react": "^0.14.11",

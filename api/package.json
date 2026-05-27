@@ -6,16 +6,16 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "wrangler dev --config wrangler.jsonc",
     "deploy": "wrangler deploy",
     "deploy:production": "wrangler deploy --env production",
-    "tail": "wrangler tail",
-    "test": "node --test --experimental-strip-types --experimental-test-module-mocks --loader ./src/test/loaders/md-loader.ts \"src/**/*.test.ts\"",
-    "types": "wrangler types",
+    "dev": "wrangler dev --config wrangler.jsonc",
     "lint": "oxlint src",
     "lint:fix": "oxlint --fix src",
     "style": "prettier --check .",
-    "style:fix": "prettier --write ."
+    "style:fix": "prettier --write .",
+    "tail": "wrangler tail",
+    "test": "node --test --experimental-strip-types --experimental-test-module-mocks --loader ./src/test/loaders/md-loader.ts \"src/**/*.test.ts\"",
+    "types": "wrangler types"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260527.1"
