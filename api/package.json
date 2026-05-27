@@ -9,8 +9,6 @@
     "deploy": "wrangler deploy",
     "deploy:production": "wrangler deploy --env production",
     "dev": "wrangler dev --config wrangler.jsonc",
-    "lint": "oxlint src",
-    "lint:fix": "oxlint --fix src",
     "tail": "wrangler tail",
     "test": "node --test --experimental-strip-types --experimental-test-module-mocks --loader ./src/test/loaders/md-loader.ts \"src/**/*.test.ts\"",
     "types": "wrangler types"
