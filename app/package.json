@@ -23,10 +23,10 @@
     "postinstall": "git submodule update --init --recursive && git config --local include.path ../.gitconfig"
   },
   "dependencies": {
-    "@assistant-ui/react": "^0.14.0",
+    "@assistant-ui/react": "^0.14.11",
     "@headlessui/react": "^2.2.10",
-    "@supabase/supabase-js": "^2.106.1",
-    "framer-motion": "^12.39.0",
+    "@supabase/supabase-js": "^2.106.2",
+    "framer-motion": "^12.40.0",
     "lucide-react": "^1.14.0",
     "mapbox-gl": "^3.24.0",
     "rc-slider": "^11.1.9",
