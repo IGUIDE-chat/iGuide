@@ -68,9 +68,7 @@ export const LayoutProvider: React.FC<{
     ]
   )
   return (
-    <LayoutContext.Provider value={value}>
-      {children}
-    </LayoutContext.Provider>
+    <LayoutContext.Provider value={value}>{children}</LayoutContext.Provider>
   )
 }
 

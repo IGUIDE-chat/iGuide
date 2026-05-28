@@ -26,15 +26,16 @@ import { aiChatTexts } from "./i18n/dormTexts"
 import { ImeSafeTextarea } from "../chat/ImeSafeTextarea"
 import { supabase } from "../../services/supabase"
 
-const DormMentionStrong = ({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) => {
+const DormMentionStrong = ({
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLSpanElement>) => {
   const content = String(children)
   const isDorm = isDormMention(content)
   return (
     <span
       className={
-        isDorm
-          ? "text-illini-orange font-extrabold"
-          : "font-bold text-gray-900"
+        isDorm ? "text-illini-orange font-extrabold" : "font-bold text-gray-900"
       }
       {...props}
     >

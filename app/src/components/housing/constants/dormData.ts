@@ -2273,7 +2273,9 @@ const enrichDormZhContent = (dorm: Dorm): Dorm => {
   }
 }
 
-export const UIUC_DORMS: Dorm[] = RAW_UIUC_DORMS.map((d) => applyDormOfficialOverride(d))
+export const UIUC_DORMS: Dorm[] = RAW_UIUC_DORMS.map((d) =>
+  applyDormOfficialOverride(d)
+)
   .map((d) => finalizeDormRecord(d))
   .map((d) => enrichDormZhContent(d))
   .map((d) => normalizeDorm(d))

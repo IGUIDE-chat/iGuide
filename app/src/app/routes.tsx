@@ -48,9 +48,7 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({
   const loadingText = language === "zh" ? "页面加载中..." : "Loading page..."
 
   const fallbackEl = useMemo(
-    () => (
-      <div className="p-6 text-center text-slate-600">{loadingText}</div>
-    ),
+    () => <div className="p-6 text-center text-slate-600">{loadingText}</div>,
     [loadingText]
   )
 
@@ -105,7 +103,10 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({
         <Route path="/" element={navigateHome} />
         <Route path="/chat" element={chatEl} />
         <Route path="/library" element={libraryEl} />
-        <Route path="/library/category/:categoryId" element={libraryCategoryEl} />
+        <Route
+          path="/library/category/:categoryId"
+          element={libraryCategoryEl}
+        />
         <Route path="/library/article/:articleId" element={libraryArticleEl} />
         <Route path="/profile" element={profileEl} />
         <Route path="/courses" element={coursesEl} />

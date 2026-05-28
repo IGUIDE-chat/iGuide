@@ -3,7 +3,10 @@ export function joinPromptSections(
 ): string {
   return sections
     .map((section) => section?.trim())
-    .filter((section): section is string => section !== null && section !== undefined && section.length > 0)
+    .filter(
+      (section): section is string =>
+        section !== null && section !== undefined && section.length > 0
+    )
     .join("\n\n")
 }
 

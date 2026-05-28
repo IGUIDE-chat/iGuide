@@ -83,7 +83,12 @@ function uniqueStrings<T extends string>(
   items: Array<T | undefined | null>
 ): T[] {
   return Array.from(
-    new Set(items.filter((value): value is T => value !== null && value !== undefined && value !== ""))
+    new Set(
+      items.filter(
+        (value): value is T =>
+          value !== null && value !== undefined && value !== ""
+      )
+    )
   )
 }
 
@@ -327,4 +332,11 @@ function sanitizeFloorPlansForStorage(
   return floorPlans.map((plan) => sanitizeFloorPlanForStorage(plan))
 }
 
-export { getDormPriceRange, normalizeCategorizedTags, buildLegacyDormTags, finalizeDormRecord, sanitizeFloorPlanForStorage, sanitizeFloorPlansForStorage }
+export {
+  getDormPriceRange,
+  normalizeCategorizedTags,
+  buildLegacyDormTags,
+  finalizeDormRecord,
+  sanitizeFloorPlanForStorage,
+  sanitizeFloorPlansForStorage,
+}

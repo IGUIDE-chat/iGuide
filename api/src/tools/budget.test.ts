@@ -61,7 +61,9 @@ test("timeout rejects after timeoutMs", async () => {
       description: "slow",
       parameters: z.object({}),
       execute: async () => {
-        await new Promise<void>((resolve) => { setTimeout(resolve, 200) })
+        await new Promise<void>((resolve) => {
+          setTimeout(resolve, 200)
+        })
         return "too late"
       },
     }),

@@ -26,7 +26,10 @@ async function testUpdate() {
     .single()
   console.log("Current:", JSON.stringify(dorm?.categorized_tags))
 
-  const ct = { ...dorm?.categorized_tags, llcNames: newLlcNames } as Record<string, unknown>
+  const ct = { ...dorm?.categorized_tags, llcNames: newLlcNames } as Record<
+    string,
+    unknown
+  >
 
   console.log("Updating with:", JSON.stringify(ct))
   const { error } = await supabase

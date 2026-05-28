@@ -612,7 +612,8 @@ const DormMap: React.FC<DormMapProps> = ({
               {language === "zh" ? "区域" : "Zones"}
             </span>
             <div className="relative inline-flex cursor-pointer items-center">
-              <input aria-label="Toggle option"
+              <input
+                aria-label="Toggle option"
                 type="checkbox"
                 className="peer sr-only"
                 checked={showZones}
@@ -627,7 +628,8 @@ const DormMap: React.FC<DormMapProps> = ({
               {language === "zh" ? "地标" : "Landmarks"}
             </span>
             <div className="relative inline-flex cursor-pointer items-center">
-              <input aria-label="Toggle option"
+              <input
+                aria-label="Toggle option"
                 type="checkbox"
                 className="peer sr-only"
                 checked={showLandmarks}

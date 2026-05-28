@@ -93,7 +93,12 @@ export function withGuards<T extends Record<string, Tool>>(
 
     guarded[name] = {
       ...rawTool,
-      execute: createGuardedExecute(rawExecute, { budget, maxCalls, timeoutMs, maxResultBytes }),
+      execute: createGuardedExecute(rawExecute, {
+        budget,
+        maxCalls,
+        timeoutMs,
+        maxResultBytes,
+      }),
     }
   }
 
@@ -102,7 +107,12 @@ export function withGuards<T extends Record<string, Tool>>(
 
 function createGuardedExecute(
   rawExecute: (input: unknown, options?: unknown) => unknown,
-  opts: { budget: { callCount: number }; maxCalls: number; timeoutMs: number; maxResultBytes: number },
+  opts: {
+    budget: { callCount: number }
+    maxCalls: number
+    timeoutMs: number
+    maxResultBytes: number
+  }
 ) {
   const { budget, maxCalls, timeoutMs, maxResultBytes } = opts
   return async (input: unknown, options?: unknown) => {

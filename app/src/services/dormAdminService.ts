@@ -239,7 +239,11 @@ async function updateDorm(
   }
 
   // Auto-recalculate price_range when price changes
-  if (safeUpdates.price !== null && safeUpdates.price !== undefined && typeof safeUpdates.price === "number") {
+  if (
+    safeUpdates.price !== null &&
+    safeUpdates.price !== undefined &&
+    typeof safeUpdates.price === "number"
+  ) {
     safeUpdates.price_range = getDormPriceRange(safeUpdates.price as number)
   }
 
@@ -384,4 +388,10 @@ export const dormAdminService = {
   restoreSnapshot,
 }
 
-export { type DormUpdate, type DormMutationResult, type EditHistoryEntry, type DormImageUploadResult, buildSummary }
+export {
+  type DormUpdate,
+  type DormMutationResult,
+  type EditHistoryEntry,
+  type DormImageUploadResult,
+  buildSummary,
+}

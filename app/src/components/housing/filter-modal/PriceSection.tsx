@@ -176,7 +176,8 @@ const PriceSection: React.FC<PriceSectionProps> = ({
           <div className="text-xs text-gray-500">{t.minPrice}</div>
           <div className="flex items-center">
             <span className="text-lg">$</span>
-            <input aria-label="Number input"
+            <input
+              aria-label="Number input"
               type="number"
               step={100}
               value={minInput}
@@ -206,7 +207,8 @@ const PriceSection: React.FC<PriceSectionProps> = ({
           <div className="text-xs text-gray-500">{t.maxPrice}</div>
           <div className="flex items-center">
             <span className="text-lg">$</span>
-            <input aria-label="Number input"
+            <input
+              aria-label="Number input"
               type="number"
               step={100}
               value={maxInput}

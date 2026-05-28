@@ -10,7 +10,9 @@ interface GenerateCommentOptions {
   upvotes: number
 }
 
-const generateCommentFromOptions = (opts: GenerateCommentOptions): DormComment => {
+const generateCommentFromOptions = (
+  opts: GenerateCommentOptions
+): DormComment => {
   const date = new Date(Date.now() - opts.daysAgo * 24 * 60 * 60 * 1000)
 
   return {
@@ -34,7 +36,15 @@ const generateComment = (
   content: string,
   ...rest: [1 | -1 | null, number, number]
 ): DormComment =>
-  generateCommentFromOptions({ id, dorm_id, display_name, content, dorm_vote: rest[0], daysAgo: rest[1], upvotes: rest[2] })
+  generateCommentFromOptions({
+    id,
+    dorm_id,
+    display_name,
+    content,
+    dorm_vote: rest[0],
+    daysAgo: rest[1],
+    upvotes: rest[2],
+  })
 
 export const GOOGLE_REVIEWS: DormComment[] = [
   generateComment(

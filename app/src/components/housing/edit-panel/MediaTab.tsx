@@ -53,7 +53,12 @@ const ImageChip: React.FC<{
     tabIndex={0}
     className="group relative size-16 shrink-0 cursor-pointer overflow-hidden rounded-lg border border-gray-200 bg-gray-50"
     onClick={onClick}
-    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); (e.currentTarget as HTMLElement).click() } }}
+    onKeyDown={(e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault()
+        ;(e.currentTarget as HTMLElement).click()
+      }
+    }}
   >
     <img src={url} alt="" className="size-full object-cover" />
     <button
@@ -101,7 +106,8 @@ const MultiImageField: React.FC<{
         </div>
       )}
       <div className="flex gap-2">
-        <input aria-label="Input field"
+        <input
+          aria-label="Input field"
           type="text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
@@ -121,7 +127,8 @@ const MultiImageField: React.FC<{
             <Upload size={14} />
           )}
           <span className="text-xs font-medium">{t.actions.upload}</span>
-          <input aria-label="Input field"
+          <input
+            aria-label="Input field"
             type="file"
             accept="image/*"
             className="hidden"
@@ -172,7 +179,8 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
     <>
       <Field label={t.labels.imageUrl}>
         <div className="flex gap-2">
-          <input aria-label="Input field"
+          <input
+            aria-label="Input field"
             type="text"
             value={form.imageUrl || ""}
             onChange={(event) => form.setImageUrl(event.target.value)}
@@ -186,7 +194,8 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
               <Upload size={16} />
             )}
             <span className="text-xs font-medium">{t.actions.upload}</span>
-            <input aria-label="Input field"
+            <input
+              aria-label="Input field"
               type="file"
               accept="image/*"
               className="hidden"
@@ -342,7 +351,8 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                   <div className="space-y-3 border-t border-gray-200 px-3 pt-1 pb-3">
                     <div className="grid grid-cols-2 gap-2">
                       <Field label="Official Room Name">
-                        <input aria-label="Input field"
+                        <input
+                          aria-label="Input field"
                           type="text"
                           value={plan.officialName ?? ""}
                           onChange={(event) =>
@@ -358,7 +368,8 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                         />
                       </Field>
                       <Field label={t.labels.layoutKind}>
-                        <select aria-label="Select option"
+                        <select
+                          aria-label="Select option"
                           value={layoutKind}
                           onChange={(event) =>
                             update(
@@ -384,7 +395,8 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                         </select>
                       </Field>
                       <Field label={t.labels.bathroomType}>
-                        <select aria-label="Select option"
+                        <select
+                          aria-label="Select option"
                           value={scope}
                           onChange={(event) =>
                             update(
@@ -410,7 +422,8 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                       </Field>
                       {layoutKind !== "Studio" && (
                         <Field label={t.labels.bedCount}>
-                          <select aria-label="Select option"
+                          <select
+                            aria-label="Select option"
                             value={plan.bedCount ?? 1}
                             onChange={(event) =>
                               update(
@@ -431,7 +444,8 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                         </Field>
                       )}
                       <Field label={t.labels.bathroomCount}>
-                        <input aria-label="Number input"
+                        <input
+                          aria-label="Number input"
                           type="number"
                           min={0}
                           value={
@@ -455,7 +469,8 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                         />
                       </Field>
                       <Field label={t.labels.pricePerYear}>
-                        <input aria-label="Number input"
+                        <input
+                          aria-label="Number input"
                           type="number"
                           min={0}
                           value={plan.price ?? ""}
@@ -474,7 +489,8 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                         />
                       </Field>
                       <Field label={t.labels.sqft}>
-                        <input aria-label="Number input"
+                        <input
+                          aria-label="Number input"
                           type="number"
                           min={0}
                           value={plan.sqft ?? ""}
@@ -493,7 +509,8 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                         />
                       </Field>
                       <Field label={t.labels.bedSize}>
-                        <select aria-label="Select option"
+                        <select
+                          aria-label="Select option"
                           value={plan.bedSize ?? ""}
                           onChange={(event) =>
                             update(
@@ -517,7 +534,8 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                       </Field>
                     </div>
                     <Field label={t.labels.shortDescription}>
-                      <input aria-label="Input field"
+                      <input
+                        aria-label="Input field"
                         type="text"
                         value={plan.description ?? ""}
                         onChange={(event) =>

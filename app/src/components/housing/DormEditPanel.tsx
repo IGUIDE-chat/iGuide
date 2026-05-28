@@ -43,7 +43,11 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({
     },
     { id: "details" as const, icon: <Info size={14} />, label: t.tabs.details },
     { id: "tags" as const, icon: <Tag size={14} />, label: t.tabs.tags },
-    { id: "media" as const, icon: <Image size={14} alt="" aria-hidden="true" />, label: t.tabs.media },
+    {
+      id: "media" as const,
+      icon: <Image size={14} alt="" aria-hidden="true" />,
+      label: t.tabs.media,
+    },
     {
       id: "history" as const,
       icon: <History size={14} />,

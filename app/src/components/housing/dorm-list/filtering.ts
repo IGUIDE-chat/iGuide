@@ -114,7 +114,10 @@ export const filterAndSortDorms = (dorms: Dorm[], filters: DormFilterState) => {
       filters.bedCountFilters.length > 0 &&
       !filters.bedCountFilters.some((threshold) =>
         roomOptions.some(
-          (option) => option.bedCount !== null && option.bedCount !== undefined && option.bedCount >= threshold
+          (option) =>
+            option.bedCount !== null &&
+            option.bedCount !== undefined &&
+            option.bedCount >= threshold
         )
       )
     ) {
@@ -130,7 +133,9 @@ export const filterAndSortDorms = (dorms: Dorm[], filters: DormFilterState) => {
             )
           }
           return (
-            option.bathroomCount !== null && option.bathroomCount !== undefined && option.bathroomCount >= threshold
+            option.bathroomCount !== null &&
+            option.bathroomCount !== undefined &&
+            option.bathroomCount >= threshold
           )
         })
       )

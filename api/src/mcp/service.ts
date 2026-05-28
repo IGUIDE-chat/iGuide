@@ -300,7 +300,9 @@ export class MCPDiscoveredToolService {
           id: key,
           connection_id: connectionId,
           name: mcpToolDef.name,
-          ...(mcpToolDef.description ? { description: mcpToolDef.description } : {}),
+          ...(mcpToolDef.description
+            ? { description: mcpToolDef.description }
+            : {}),
           input_schema: mcpToolDef.parameters,
           discovered_at: discoveredAt,
         }

@@ -163,7 +163,10 @@ function getFloorPlanGroupKey(
 ) {
   const fallbackScope = getStorageBathroomScope(fallbackType, [plan])
   const normalized = normalizeFloorPlan(plan, fallbackScope)
-  const specialType = normalized.bedCount === null || normalized.bedCount === undefined ? (normalized.type ?? "") : ""
+  const specialType =
+    normalized.bedCount === null || normalized.bedCount === undefined
+      ? (normalized.type ?? "")
+      : ""
   return [
     normalized.officialName?.trim().toLowerCase() ?? "",
     normalized.bedCount ?? "na",

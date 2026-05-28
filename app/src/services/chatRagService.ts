@@ -527,7 +527,10 @@ async function fetchChatRAGContext(
   const englishQuery =
     queries.find((candidate) => candidate !== primaryQuery) ?? null
 
-  async function safeQmdSearch(q: string, searchLang: "en" | "zh"): Promise<SearchResult[]> {
+  async function safeQmdSearch(
+    q: string,
+    searchLang: "en" | "zh"
+  ): Promise<SearchResult[]> {
     try {
       const response = await quickSearch(q, searchLang, QMD_RESULT_LIMIT)
       return response.results

@@ -192,7 +192,8 @@ interface InferBathroomCountParams {
 }
 
 function inferBathroomCount(params: InferBathroomCountParams) {
-  const { bedCount, legacyBathroomCount, scope, description, specialType } = params
+  const { bedCount, legacyBathroomCount, scope, description, specialType } =
+    params
   if (scope === "communal") {
     return 0
   }
@@ -263,10 +264,7 @@ function getRoomCodeLabel(labelCode: string, language: "en" | "zh") {
   return labelCode
 }
 
-function getBedCountLabel(
-  bedCount: number | null,
-  language: "en" | "zh"
-) {
+function getBedCountLabel(bedCount: number | null, language: "en" | "zh") {
   if (bedCount === null || bedCount === undefined) {
     return language === "zh" ? "特殊房型" : "Special Layout"
   }
@@ -279,17 +277,11 @@ function getBedCountLabel(
   return language === "zh" ? `${bedCount}人间` : `${bedCount}-Bed`
 }
 
-function getBathroomScopeLabel(
-  scope: BathroomScope,
-  language: "en" | "zh"
-) {
+function getBathroomScopeLabel(scope: BathroomScope, language: "en" | "zh") {
   return BATHROOM_SCOPE_LABELS[scope][language]
 }
 
-function getBathroomTagLabel(
-  scope: BathroomScope,
-  language: "en" | "zh"
-) {
+function getBathroomTagLabel(scope: BathroomScope, language: "en" | "zh") {
   return BATHROOM_TAG_LABELS[scope][language]
 }
 
@@ -310,7 +302,11 @@ function getBathroomSecondaryLabel(
     return getBathroomScopeLabel(option.bathroomScope, language)
   }
 
-  if (option.bathroomCount !== null && option.bathroomCount !== undefined && option.bathroomCount > 1) {
+  if (
+    option.bathroomCount !== null &&
+    option.bathroomCount !== undefined &&
+    option.bathroomCount > 1
+  ) {
     return getBathroomCountLabel(option.bathroomCount, language)
   }
 
@@ -390,7 +386,11 @@ function hasMultipleBathroomVariants(
   option: RoomLabelOption,
   relatedOptions: RoomLabelOption[]
 ) {
-  if (option.bedCount === null || option.bedCount === undefined || isSpecialRoomType(option.labelCode)) {
+  if (
+    option.bedCount === null ||
+    option.bedCount === undefined ||
+    isSpecialRoomType(option.labelCode)
+  ) {
     return false
   }
 
@@ -453,7 +453,9 @@ function getRoomRangeSummary(
       uniqueOptions
         .filter(
           (option) =>
-            !isSpecialRoomType(option.labelCode) && option.bedCount !== null && option.bedCount !== undefined
+            !isSpecialRoomType(option.labelCode) &&
+            option.bedCount !== null &&
+            option.bedCount !== undefined
         )
         .map((option) => option.bedCount as number)
     )
@@ -477,9 +479,8 @@ function getRoomRangeSummary(
 
   let occupancyLabel: string
   if (occupancyParts.length > 0) {
-    occupancyLabel = language === "zh"
-      ? occupancyParts.join("、")
-      : occupancyParts.join("/")
+    occupancyLabel =
+      language === "zh" ? occupancyParts.join("、") : occupancyParts.join("/")
   } else {
     occupancyLabel = language === "zh" ? "房型多样" : "Multiple layouts"
   }
@@ -489,20 +490,20 @@ function getRoomRangeSummary(
   )
   let bathroomLabel: string
   if (scopes.length === 1) {
-    bathroomLabel = language === "en"
-      ? (
-          {
-            communal: "Shared bath",
-            "individual-use": "Communal single-use",
-            "semi-private": "Semi-private",
-            private: "Private bath",
-          } satisfies Record<BathroomScope, string>
-        )[scopes[0]]
-      : getBathroomScopeLabel(scopes[0], language)
+    bathroomLabel =
+      language === "en"
+        ? (
+            {
+              communal: "Shared bath",
+              "individual-use": "Communal single-use",
+              "semi-private": "Semi-private",
+              private: "Private bath",
+            } satisfies Record<BathroomScope, string>
+          )[scopes[0]]
+        : getBathroomScopeLabel(scopes[0], language)
   } else {
-    bathroomLabel = language === "en"
-      ? "Mixed bath"
-      : MIXED_BATHROOM_LABELS[language]
+    bathroomLabel =
+      language === "en" ? "Mixed bath" : MIXED_BATHROOM_LABELS[language]
   }
 
   return {
@@ -658,7 +659,9 @@ function deriveRoomOptions(
     roomOptions: options,
     roomTypes: options
       .map((option) => option.labelCode)
-      .filter((value): value is RoomType => value !== undefined && value !== null),
+      .filter(
+        (value): value is RoomType => value !== undefined && value !== null
+      ),
   }
 }
 
@@ -727,4 +730,25 @@ function normalizeDorm(dorm: Dorm): Dorm {
   }
 }
 
-export { type RoomOptionLabels, type RoomRangeSummary, getStorageBathroomScope, getPersistedBathroomType, buildRoomLabelCode, getRoomCodeLabel, getBedCountLabel, getBathroomScopeLabel, getBathroomTagLabel, getRoomOptionLabels, getRoomRangeSummary, getRoomTypeCountLabel, getRoomDisplayLabel, getRoomDetailLabel, getRoomOptionKey, normalizeFloorPlan, deriveRoomOptions, getDormBathroomSummary, getDormBathroomTagSummary, normalizeDorm }
+export {
+  type RoomOptionLabels,
+  type RoomRangeSummary,
+  getStorageBathroomScope,
+  getPersistedBathroomType,
+  buildRoomLabelCode,
+  getRoomCodeLabel,
+  getBedCountLabel,
+  getBathroomScopeLabel,
+  getBathroomTagLabel,
+  getRoomOptionLabels,
+  getRoomRangeSummary,
+  getRoomTypeCountLabel,
+  getRoomDisplayLabel,
+  getRoomDetailLabel,
+  getRoomOptionKey,
+  normalizeFloorPlan,
+  deriveRoomOptions,
+  getDormBathroomSummary,
+  getDormBathroomTagSummary,
+  normalizeDorm,
+}

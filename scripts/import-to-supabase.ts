@@ -357,7 +357,9 @@ async function main() {
           return
         }
 
-        const chunkEmbeddings = await embeddingClient.embedDocuments(unit.chunks)
+        const chunkEmbeddings = await embeddingClient.embedDocuments(
+          unit.chunks
+        )
         const artifact = await supabaseClient.insertArtifact({
           source_snapshot_id: snapshot.id,
           artifact_type: unit.artifactType,

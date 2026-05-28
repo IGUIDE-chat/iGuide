@@ -63,7 +63,7 @@ export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({
   return (
     <div className="mb-2">
       <button
-            type="button"
+        type="button"
         onClick={() => setIsExpanded(!isExpanded)}
         aria-expanded={isExpanded}
         className="group flex items-center gap-1.5 text-xs text-slate-500 transition-colors hover:text-slate-700"

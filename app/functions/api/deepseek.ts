@@ -171,10 +171,11 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       },
     })
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Unexpected server error."
-    return new Response(
-      JSON.stringify({ error: message }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    )
+    const message =
+      error instanceof Error ? error.message : "Unexpected server error."
+    return new Response(JSON.stringify({ error: message }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    })
   }
 }

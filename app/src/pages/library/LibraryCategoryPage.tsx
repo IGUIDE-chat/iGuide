@@ -35,10 +35,7 @@ const LibraryCategoryPage: React.FC<LibraryCategoryPageProps> = ({
     })
   }, [language])
 
-  const handleBackClick = useCallback(
-    () => navigate("/library"),
-    [navigate]
-  )
+  const handleBackClick = useCallback(() => navigate("/library"), [navigate])
 
   const handleArticleClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {

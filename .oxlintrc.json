@@ -70,7 +70,10 @@
     "no-shadow": "warn",
     "no-duplicate-imports": "off",
     "no-nested-ternary": "warn",
-    "sort-imports": ["warn", { "ignoreDeclarationSort": true, "allowSeparatedGroups": true }],
+    "sort-imports": [
+      "warn",
+      { "ignoreDeclarationSort": true, "allowSeparatedGroups": true }
+    ],
     "max-params": ["warn", { "max": 4 }],
     "no-underscore-dangle": "off",
     "no-template-curly-in-string": "warn",

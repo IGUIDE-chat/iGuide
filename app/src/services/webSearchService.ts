@@ -208,4 +208,9 @@ async function webSearchWithOfficialPriority(
   }
 }
 
-export { type WebSearchResult, isUiucOfficialUrl, webSearch, webSearchWithOfficialPriority }
+export {
+  type WebSearchResult,
+  isUiucOfficialUrl,
+  webSearch,
+  webSearchWithOfficialPriority,
+}

@@ -159,29 +159,35 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
           <div className="mb-3 flex gap-2">
             {([1, -1] as const).map((vote) => {
               let voteClasses: string
-              if (commentVote === vote && vote === 1) {voteClasses = `border-illini-orange/30 bg-illini-orange/10 text-illini-orange`}
-              else if (commentVote === vote && vote === -1) {voteClasses = "border-red-200 bg-red-50 text-red-600"}
-              else {voteClasses = `border-slate-200 bg-white text-slate-500 hover:border-slate-300`}
+              if (commentVote === vote && vote === 1) {
+                voteClasses = `border-illini-orange/30 bg-illini-orange/10 text-illini-orange`
+              } else if (commentVote === vote && vote === -1) {
+                voteClasses = "border-red-200 bg-red-50 text-red-600"
+              } else {
+                voteClasses = `border-slate-200 bg-white text-slate-500 hover:border-slate-300`
+              }
 
               return (
-              <motion.button
-                key={vote}
-                type="button"
-                whileHover={{ scale: 1.04 }}
-                whileTap={{ scale: 0.94 }}
-                onClick={() =>
-                  setCommentVote(commentVote === vote ? null : vote)
-                }
-                className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[12px] font-semibold transition-colors ${voteClasses} `}
-              >
-                <ThumbsUp
-                  className={`size-3.5 ${vote === -1 ? "rotate-180" : ""} ${commentVote === vote && vote === 1 ? "fill-illini-orange/20" : ""}`}
-                />
-                {vote === 1 ? t.thumbsUpDorm : t.thumbsDownDorm}
-              </motion.button>
-            )})}
+                <motion.button
+                  key={vote}
+                  type="button"
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.94 }}
+                  onClick={() =>
+                    setCommentVote(commentVote === vote ? null : vote)
+                  }
+                  className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[12px] font-semibold transition-colors ${voteClasses} `}
+                >
+                  <ThumbsUp
+                    className={`size-3.5 ${vote === -1 ? "rotate-180" : ""} ${commentVote === vote && vote === 1 ? "fill-illini-orange/20" : ""}`}
+                  />
+                  {vote === 1 ? t.thumbsUpDorm : t.thumbsDownDorm}
+                </motion.button>
+              )
+            })}
           </div>
-          <textarea aria-label="Text input"
+          <textarea
+            aria-label="Text input"
             value={commentContent}
             onChange={(e) => setCommentContent(e.target.value)}
             placeholder={t.leaveComment}
@@ -356,8 +362,14 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
                       >
                         <Globe className="size-3.5" />
                         {(() => {
-                          if (translating[comment.id]) {return language === "zh" ? "翻译中..." : "Translating..."}
-                          if (translations[comment.id]) {return language === "zh" ? "显示原文" : "Original"}
+                          if (translating[comment.id]) {
+                            return language === "zh"
+                              ? "翻译中..."
+                              : "Translating..."
+                          }
+                          if (translations[comment.id]) {
+                            return language === "zh" ? "显示原文" : "Original"
+                          }
                           return language === "zh" ? "翻译" : "Translate"
                         })()}
                       </button>

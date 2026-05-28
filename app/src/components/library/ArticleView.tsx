@@ -21,7 +21,12 @@ interface ArticleViewProps {
   language: Language
 }
 
-const MarkdownLink = ({ children, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement> & { children?: React.ReactNode }) => (
+const MarkdownLink = ({
+  children,
+  ...props
+}: React.AnchorHTMLAttributes<HTMLAnchorElement> & {
+  children?: React.ReactNode
+}) => (
   <a
     {...props}
     className="text-illini-orange hover:underline"
@@ -48,32 +53,47 @@ const MarkdownP = (props: React.HTMLAttributes<HTMLParagraphElement>) => (
   <p className="mb-4 leading-relaxed last:mb-0" {...props} />
 )
 
-const MarkdownH1 = ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+const MarkdownH1 = ({
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLHeadingElement>) => (
   <h1 className="mt-6 mb-3 text-2xl font-bold text-slate-900" {...props}>
     {children}
   </h1>
 )
 
-const MarkdownH2 = ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+const MarkdownH2 = ({
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLHeadingElement>) => (
   <h2 className="mt-5 mb-2 text-xl font-bold text-slate-800" {...props}>
     {children}
   </h2>
 )
 
-const MarkdownH3 = ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+const MarkdownH3 = ({
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLHeadingElement>) => (
   <h3 className="mt-4 mb-2 text-lg font-bold text-slate-800" {...props}>
     {children}
   </h3>
 )
 
-const MarkdownBlockquote = (props: React.BlockquoteHTMLAttributes<HTMLQuoteElement>) => (
+const MarkdownBlockquote = (
+  props: React.BlockquoteHTMLAttributes<HTMLQuoteElement>
+) => (
   <blockquote
     className="border-illini-blue my-4 rounded-r border-l-4 bg-slate-50 py-2 pl-4 italic"
     {...props}
   />
 )
 
-const MarkdownCode = ({ className, children, ...props }: React.HTMLAttributes<HTMLElement>) => {
+const MarkdownCode = ({
+  className,
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLElement>) => {
   const isInline = !className
   return isInline ? (
     <code
@@ -131,7 +151,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
   return (
     <div className="animate-fade-in-up">
       <button
-            type="button"
+        type="button"
         onClick={onBack}
         className="mb-6 flex items-center gap-1 text-sm text-slate-500 transition-colors hover:text-slate-900"
       >
@@ -179,7 +199,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
           <div className="flex flex-wrap gap-2">
             {articleText.tags.map((tag) => (
               <button
-            type="button"
+                type="button"
                 key={tag}
                 onClick={() => onSearch(tag)}
                 className="hover:text-illini-blue cursor-pointer text-xs text-slate-500 transition-colors hover:underline"

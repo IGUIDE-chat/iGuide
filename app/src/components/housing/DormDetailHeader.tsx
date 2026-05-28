@@ -38,9 +38,13 @@ export const DormDetailHeader: React.FC<DormDetailHeaderProps> = ({
   const housingMeta = getHousingTypeMeta(dorm.housingType)
   const bathroomLabel = getDormBathroomSummary(dorm, language)
   let diningLabel: string
-  if (dorm.dining === "inside") {diningLabel = language === "zh" ? "自带食堂" : "Dining Hall"}
-  else if (dorm.dining === "nearby") {diningLabel = language === "zh" ? "附近食堂" : "Dining Nearby"}
-  else {diningLabel = language === "zh" ? "无食堂" : "No Dining"}
+  if (dorm.dining === "inside") {
+    diningLabel = language === "zh" ? "自带食堂" : "Dining Hall"
+  } else if (dorm.dining === "nearby") {
+    diningLabel = language === "zh" ? "附近食堂" : "Dining Nearby"
+  } else {
+    diningLabel = language === "zh" ? "无食堂" : "No Dining"
+  }
   const acZh = dorm.ac ? "有空调" : "无空调"
   const acEn = dorm.ac ? "A/C" : "No A/C"
   const acLabel = language === "zh" ? acZh : acEn
@@ -81,18 +85,20 @@ export const DormDetailHeader: React.FC<DormDetailHeaderProps> = ({
                 tag === "llc" &&
                 (dorm.categorizedTags?.llcNames?.length ?? 0) > 1
               ) {
-                return (dorm.categorizedTags?.llcNames ?? []).map((llcName, j) => (
-                  <motion.span
-                    key={`llc-${llcName}`}
-                    initial={{ opacity: 0, scale: 0.85 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.3 + (i + j) * 0.06 }}
-                    className="bg-illini-orange/10 text-illini-orange inline-flex items-center gap-1 rounded-full px-3 py-1 text-[12px] font-bold md:text-[13px]"
-                  >
-                    {Icon && <Icon className="size-3.5" strokeWidth={1.5} />}
-                    {llcName}
-                  </motion.span>
-                ))
+                return (dorm.categorizedTags?.llcNames ?? []).map(
+                  (llcName, j) => (
+                    <motion.span
+                      key={`llc-${llcName}`}
+                      initial={{ opacity: 0, scale: 0.85 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.3 + (i + j) * 0.06 }}
+                      className="bg-illini-orange/10 text-illini-orange inline-flex items-center gap-1 rounded-full px-3 py-1 text-[12px] font-bold md:text-[13px]"
+                    >
+                      {Icon && <Icon className="size-3.5" strokeWidth={1.5} />}
+                      {llcName}
+                    </motion.span>
+                  )
+                )
               }
               return (
                 <motion.span

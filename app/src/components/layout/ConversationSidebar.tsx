@@ -269,14 +269,14 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
               </p>
               <div className="flex gap-3">
                 <button
-            type="button"
+                  type="button"
                   onClick={() => setShowDeleteConfirm(null)}
                   className="flex-1 rounded-lg bg-white/5 px-4 py-2 text-sm font-medium text-slate-300 transition-colors hover:bg-white/10"
                 >
                   {language === "zh" ? "取消" : "Cancel"}
                 </button>
                 <button
-            type="button"
+                  type="button"
                   onClick={confirmDelete}
                   className="flex-1 rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-600"
                 >

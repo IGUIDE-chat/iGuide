@@ -52,7 +52,9 @@ export const ToolStatus: React.FC<ToolStatusProps> = ({
 
   let label: string
   if (status === "done") {
-    label = summary ?? (toolName ? `Done: ${TOOL_LABELS[toolName] ?? toolName}` : "Done")
+    label =
+      summary ??
+      (toolName ? `Done: ${TOOL_LABELS[toolName] ?? toolName}` : "Done")
   } else if (toolName) {
     label = getToolLabel(toolName)
   } else {

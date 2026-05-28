@@ -298,18 +298,26 @@ export const Layout: React.FC<LayoutProps> = ({
   const viewModeAriaLabel = viewMode === "list" ? mapLabel : listLabel
 
   let mobileHeaderTitle: string
-  if (activeTab === "chat") {mobileHeaderTitle = t.chatTab}
-  else if (activeTab === "library") {mobileHeaderTitle = t.libraryTab}
-  else if (activeTab === "courses") {mobileHeaderTitle = t.coursesTab}
-  else if (activeTab === "dorms") {mobileHeaderTitle = t.dormsTab}
-  else if (activeTab === "resume") {mobileHeaderTitle = t.resumeTab}
-  else {mobileHeaderTitle = t.chatTab}
+  if (activeTab === "chat") {
+    mobileHeaderTitle = t.chatTab
+  } else if (activeTab === "library") {
+    mobileHeaderTitle = t.libraryTab
+  } else if (activeTab === "courses") {
+    mobileHeaderTitle = t.coursesTab
+  } else if (activeTab === "dorms") {
+    mobileHeaderTitle = t.dormsTab
+  } else if (activeTab === "resume") {
+    mobileHeaderTitle = t.resumeTab
+  } else {
+    mobileHeaderTitle = t.chatTab
+  }
 
   const mobileHeader = isHousingMobileHeader ? (
     <div className="flex min-w-0 flex-1 items-center gap-2">
       <div className="relative min-w-0 flex-1">
         <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-gray-400" />
-        <input aria-label="Input field"
+        <input
+          aria-label="Input field"
           type="text"
           className="block h-10 w-full rounded-full border border-gray-200 bg-gray-50/50 pr-3 pl-9 text-sm/5 placeholder-gray-400 shadow-sm transition-all focus:border-black/20 focus:ring-2 focus:ring-black/5 focus:outline-none"
           placeholder={

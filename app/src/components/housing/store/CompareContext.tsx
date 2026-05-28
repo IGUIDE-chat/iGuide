@@ -56,7 +56,10 @@ export const CompareProvider: React.FC<{ children: ReactNode }> = ({
   const closeCompare = useCallback(() => setIsCompareOpen(false), [])
 
   const compareDorms = useMemo(
-    () => compareIds.map((id) => getDormById(id)).filter((d): d is Dorm => d !== undefined),
+    () =>
+      compareIds
+        .map((id) => getDormById(id))
+        .filter((d): d is Dorm => d !== undefined),
     [compareIds, getDormById]
   )
 

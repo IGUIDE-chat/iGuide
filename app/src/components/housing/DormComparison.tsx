@@ -155,9 +155,7 @@ const RoomOptionsCell: React.FC<CellProps> = ({ dorm, language }) => {
     deriveRoomOptions(dorm.floorPlans, dorm.bathroomType).roomOptions
   const roomSummary = getRoomRangeSummary(roomOptions, language)
   return (
-    <span className="text-sm text-gray-700">
-      {roomSummary.occupancyLabel}
-    </span>
+    <span className="text-sm text-gray-700">{roomSummary.occupancyLabel}</span>
   )
 }
 
@@ -167,9 +165,7 @@ const BathroomCell: React.FC<CellProps> = ({ dorm, language }) => {
     deriveRoomOptions(dorm.floorPlans, dorm.bathroomType).roomOptions
   const roomSummary = getRoomRangeSummary(roomOptions, language)
   return (
-    <span className="text-sm text-gray-600">
-      {roomSummary.bathroomLabel}
-    </span>
+    <span className="text-sm text-gray-600">{roomSummary.bathroomLabel}</span>
   )
 }
 
@@ -301,7 +297,10 @@ const DormComparison: React.FC<DormComparisonProps> = ({
             labelCode: plan.labelCode,
           }
           return (
-            <span key={`item-${String(i)}`} className="font-semibold text-gray-800">
+            <span
+              key={`item-${String(i)}`}
+              className="font-semibold text-gray-800"
+            >
               {plan.officialName ||
                 getRoomOptionLabels(opt, language).primaryLabel}
             </span>
@@ -341,7 +340,11 @@ const DormComparison: React.FC<DormComparisonProps> = ({
           }
           const scope = plan.bathroomScope ?? "communal"
           const scopeLabel = getBathroomScopeLabel(scope, language)
-          if (plan.bathroomCount !== null && plan.bathroomCount !== undefined && plan.bathroomCount > 0) {
+          if (
+            plan.bathroomCount !== null &&
+            plan.bathroomCount !== undefined &&
+            plan.bathroomCount > 0
+          ) {
             let bathUnit: string
             if (language === "zh") {
               bathUnit = "卫"
@@ -374,14 +377,20 @@ const DormComparison: React.FC<DormComparisonProps> = ({
           const p = hasPublishedPrice(plan.price) ? plan.price : null
           if (p !== null) {
             return (
-              <span key={`item-${String(i)}`} className="text-illini-orange font-bold">
+              <span
+                key={`item-${String(i)}`}
+                className="text-illini-orange font-bold"
+              >
                 {formatPrice(p)}
               </span>
             )
           }
           if (plan.available === false) {
             return (
-              <span key={`item-${String(i)}`} className="text-[13px] text-red-500">
+              <span
+                key={`item-${String(i)}`}
+                className="text-[13px] text-red-500"
+              >
                 {language === "zh" ? "暂不可订" : "Sold out"}
               </span>
             )
@@ -399,7 +408,10 @@ const DormComparison: React.FC<DormComparisonProps> = ({
           return p === null ? (
             <React.Fragment key={`item-${String(i)}`}>—</React.Fragment>
           ) : (
-            <span key={`item-${String(i)}`} className="font-semibold text-gray-700">
+            <span
+              key={`item-${String(i)}`}
+              className="font-semibold text-gray-700"
+            >
               ~{formatPrice(Math.round(p / 12))}
             </span>
           )
@@ -549,7 +561,8 @@ const DormComparison: React.FC<DormComparisonProps> = ({
                     </div>
                     <div className="border-b border-gray-100 px-4 py-3">
                       <div className="relative">
-                        <select aria-label="Select option"
+                        <select
+                          aria-label="Select option"
                           value={currentIdx}
                           onChange={(e) =>
                             setSelectedPlanIdx((prev) => ({
@@ -732,7 +745,8 @@ const DormComparison: React.FC<DormComparisonProps> = ({
                     className="border-r border-gray-200 p-3 last:border-r-0"
                   >
                     <div className="relative">
-                      <select aria-label="Select option"
+                      <select
+                        aria-label="Select option"
                         value={currentIdx}
                         onChange={(e) =>
                           setSelectedPlanIdx((prev) => ({

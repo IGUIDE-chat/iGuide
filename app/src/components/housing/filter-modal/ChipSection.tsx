@@ -24,7 +24,13 @@ interface ChipButtonProps {
   unselectedClass: string
 }
 
-const ChipButton = memo(function ChipButton({ value, label, isSelected, onToggle, unselectedClass }: ChipButtonProps) {
+const ChipButton = memo(function ChipButton({
+  value,
+  label,
+  isSelected,
+  onToggle,
+  unselectedClass,
+}: ChipButtonProps) {
   const handleClick = useCallback(() => onToggle(value), [onToggle, value])
   return (
     <button

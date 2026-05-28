@@ -272,7 +272,11 @@ function buildRoomOptionLine(
     option.bathroomScope === "individual-use"
   ) {
     parts.push(getBathroomScopeLabel(option.bathroomScope, lang))
-  } else if (option.bathroomCount !== null && option.bathroomCount !== undefined && option.bathroomCount > 0) {
+  } else if (
+    option.bathroomCount !== null &&
+    option.bathroomCount !== undefined &&
+    option.bathroomCount > 0
+  ) {
     parts.push(
       lang === "zh"
         ? `${option.bathroomCount}卫`
@@ -441,7 +445,10 @@ function mapDormRow(row: Record<string, unknown>): DormDocumentRecord {
         (row.housing_type as Dorm["housingType"]) ??
         fallbackDorm?.housingType ??
         "URH",
-      ac: row.ac === null || row.ac === undefined ? (fallbackDorm?.ac ?? false) : Boolean(row.ac),
+      ac:
+        row.ac === null || row.ac === undefined
+          ? (fallbackDorm?.ac ?? false)
+          : Boolean(row.ac),
       dining:
         (row.dining as Dorm["dining"]) ?? fallbackDorm?.dining ?? "nearby",
       diningNearbyDetail:

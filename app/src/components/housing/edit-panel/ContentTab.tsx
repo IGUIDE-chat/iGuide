@@ -40,7 +40,8 @@ export const ContentTab: React.FC<ContentTabProps> = ({ form }) => {
       {form.contentLang === "en" ? (
         <>
           <Field label={t.labels.name}>
-            <input aria-label="Input field"
+            <input
+              aria-label="Input field"
               type="text"
               value={form.name}
               onChange={(event) => form.setName(event.target.value)}
@@ -48,7 +49,8 @@ export const ContentTab: React.FC<ContentTabProps> = ({ form }) => {
             />
           </Field>
           <Field label={t.labels.description}>
-            <textarea aria-label="Text input"
+            <textarea
+              aria-label="Text input"
               rows={4}
               value={form.description}
               onChange={(event) => form.setDescription(event.target.value)}
@@ -76,7 +78,8 @@ export const ContentTab: React.FC<ContentTabProps> = ({ form }) => {
                   </button>
                 ))}
               </div>
-              <input aria-label="Input field"
+              <input
+                aria-label="Input field"
                 type="text"
                 value={form.location}
                 onChange={(event) => form.setLocation(event.target.value)}
@@ -103,7 +106,8 @@ export const ContentTab: React.FC<ContentTabProps> = ({ form }) => {
       ) : (
         <>
           <Field label={t.labels.name}>
-            <input aria-label="Input field"
+            <input
+              aria-label="Input field"
               type="text"
               value={form.nameZh}
               onChange={(event) => form.setNameZh(event.target.value)}
@@ -111,7 +115,8 @@ export const ContentTab: React.FC<ContentTabProps> = ({ form }) => {
             />
           </Field>
           <Field label={t.labels.description}>
-            <textarea aria-label="Text input"
+            <textarea
+              aria-label="Text input"
               rows={4}
               value={form.descriptionZh}
               onChange={(event) => form.setDescriptionZh(event.target.value)}
@@ -139,7 +144,8 @@ export const ContentTab: React.FC<ContentTabProps> = ({ form }) => {
                   </button>
                 ))}
               </div>
-              <input aria-label="Input field"
+              <input
+                aria-label="Input field"
                 type="text"
                 value={form.locationZh}
                 onChange={(event) => form.setLocationZh(event.target.value)}

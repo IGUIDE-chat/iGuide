@@ -61,7 +61,8 @@ export const AppShell: React.FC<AppShellProps> = ({
 
       <main className="relative flex size-full min-w-0 flex-1 flex-col bg-white">
         <div className="absolute top-3 left-3 z-40 hidden md:block">
-          <button aria-label="Action"
+          <button
+            aria-label="Action"
             type="button"
             ref={sidebarToggleButtonRef}
             onClick={onToggleSidebar}

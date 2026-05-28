@@ -182,7 +182,9 @@ const ExpandedImageNav: React.FC<{
   <>
     <button
       type="button"
-      aria-label={language === "zh" ? "上一张户型图" : "Previous floor plan image"}
+      aria-label={
+        language === "zh" ? "上一张户型图" : "Previous floor plan image"
+      }
       onClick={onPrev}
       className="absolute top-1/2 left-3 z-10 flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/35 text-white backdrop-blur-sm transition-colors hover:bg-black/55"
     >
@@ -402,7 +404,12 @@ export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
                     e.stopPropagation()
                     onLightboxOpen(planImages, 0)
                   }}
-                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); (e.currentTarget as HTMLElement).click() } }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault()
+                      ;(e.currentTarget as HTMLElement).click()
+                    }
+                  }}
                 >
                   {hasThumb ? (
                     <img
@@ -439,7 +446,9 @@ export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
                       bedLabel={bedLabel}
                       bathLabel={bathLabel}
                       sqft={plan.sqft}
-                      sqftLabel={t.sqft || (language === "zh" ? "平方英尺" : "sqft")}
+                      sqftLabel={
+                        t.sqft || (language === "zh" ? "平方英尺" : "sqft")
+                      }
                     />
 
                     {planPrice === null ? (

@@ -91,14 +91,22 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
   const config = AGENT_CONFIG[type]
 
   let title: string
-  if (type === "courses") {title = t.coursesTitle}
-  else if (type === "dorms") {title = t.dormsTitle}
-  else {title = t.resumeTitle}
+  if (type === "courses") {
+    title = t.coursesTitle
+  } else if (type === "dorms") {
+    title = t.dormsTitle
+  } else {
+    title = t.resumeTitle
+  }
 
   let desc: string
-  if (type === "courses") {desc = t.coursesDesc}
-  else if (type === "dorms") {desc = t.dormsDesc}
-  else {desc = t.resumeDesc}
+  if (type === "courses") {
+    desc = t.coursesDesc
+  } else if (type === "dorms") {
+    desc = t.dormsDesc
+  } else {
+    desc = t.resumeDesc
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -173,7 +181,8 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="mx-auto max-w-xs space-y-3">
-            <input aria-label="Input field"
+            <input
+              aria-label="Input field"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}

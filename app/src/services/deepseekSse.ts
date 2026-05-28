@@ -228,4 +228,9 @@ async function* parseDeepSeekSSEStream(
   }
 }
 
-export { type SSEParserState, createSSEParserState, parseDeepSeekSSELine, parseDeepSeekSSEStream }
+export {
+  type SSEParserState,
+  createSSEParserState,
+  parseDeepSeekSSELine,
+  parseDeepSeekSSEStream,
+}

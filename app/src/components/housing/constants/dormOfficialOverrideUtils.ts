@@ -73,7 +73,9 @@ function normalizeOverrideMedia<T extends DormOverride>(override: T): T {
     imageUrl: override.imageUrl
       ? normalizeOfficialMediaUrl(override.imageUrl)
       : override.imageUrl,
-    galleryImages: override.galleryImages?.map((u) => normalizeOfficialMediaUrl(u)),
+    galleryImages: override.galleryImages?.map((u) =>
+      normalizeOfficialMediaUrl(u)
+    ),
     floorPlans: override.floorPlans?.map((p) => normalizeFloorPlanMedia(p)),
   }
 }

@@ -217,9 +217,13 @@ function getDiningLabel(dorm: Dorm, language: Language) {
 
 function getCardTagClasses(tag: CardTagItem) {
   let toneClasses: string
-  if (tag.tone === "muted") {toneClasses = "border-gray-200/70 bg-gray-100/70 text-gray-400"}
-  else if (tag.tone === "positive") {toneClasses = "border-emerald-200 bg-emerald-50 text-emerald-700"}
-  else {toneClasses = "border-slate-200 bg-slate-50 text-slate-700"}
+  if (tag.tone === "muted") {
+    toneClasses = "border-gray-200/70 bg-gray-100/70 text-gray-400"
+  } else if (tag.tone === "positive") {
+    toneClasses = "border-emerald-200 bg-emerald-50 text-emerald-700"
+  } else {
+    toneClasses = "border-slate-200 bg-slate-50 text-slate-700"
+  }
 
   return `inline-flex min-w-0 shrink-0 items-center overflow-hidden text-ellipsis whitespace-nowrap rounded-full border px-2 py-1 text-[11px] font-medium max-w-[8.5rem] ${toneClasses}`
 }
@@ -377,7 +381,12 @@ const DormCard: React.FC<DormCardProps> = ({
       type="button"
       tabIndex={0}
       onClick={() => onViewDetails(dorm)}
-      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); (e.currentTarget as HTMLElement).click() } }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault()
+          ;(e.currentTarget as HTMLElement).click()
+        }
+      }}
       onMouseEnter={() => onHoverDorm?.(dorm.id)}
       onMouseLeave={() => onHoverDorm?.(null)}
       className="dorm-card group relative flex size-full cursor-pointer flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-shadow duration-300 hover:shadow-md"

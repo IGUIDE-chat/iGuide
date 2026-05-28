@@ -18,9 +18,7 @@ export function extractFollowUps(text: string): string[] | null {
   }
 
   const splitIndex = followUpHeaderMatch.index ?? 0
-  const followUpText = text.slice(
-    splitIndex + followUpHeaderMatch[0].length
-  )
+  const followUpText = text.slice(splitIndex + followUpHeaderMatch[0].length)
 
   const questions = followUpText
     .split("\n")

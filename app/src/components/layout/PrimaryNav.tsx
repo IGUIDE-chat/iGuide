@@ -85,7 +85,7 @@ export const PrimaryNav: React.FC<PrimaryNavProps> = ({
           </SidebarLabel>
         </div>
         <button
-            type="button"
+          type="button"
           onClick={onCloseSidebar}
           className="p-2 text-slate-400 hover:text-white md:hidden"
         >

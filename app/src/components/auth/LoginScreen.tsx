@@ -60,9 +60,13 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
   }
 
   let submitLabel: string
-  if (loading) {submitLabel = t.processing}
-  else if (isLogin) {submitLabel = t.loginAction}
-  else {submitLabel = t.registerAction}
+  if (loading) {
+    submitLabel = t.processing
+  } else if (isLogin) {
+    submitLabel = t.loginAction
+  } else {
+    submitLabel = t.registerAction
+  }
 
   return (
     <button
@@ -73,13 +77,18 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
           onGuestLogin?.()
         }
       }}
-      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); (e.currentTarget as HTMLElement).click() } }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault()
+          ;(e.currentTarget as HTMLElement).click()
+        }
+      }}
       className="from-illini-blue/10 to-illini-orange/10 relative flex min-h-screen cursor-default items-start justify-center overflow-y-auto bg-linear-to-br via-white px-4 pt-16 md:pt-32"
     >
       {/* Language Switcher - Responsive Position */}
       <div className="absolute top-4 right-4 z-50 md:top-8 md:right-8">
         <button
-            type="button"
+          type="button"
           onClick={() => onLanguageChange(language === "en" ? "zh" : "en")}
           className="hover:border-illini-blue/30 hover:text-illini-blue flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-3 py-2 text-sm font-semibold text-slate-600 shadow-sm backdrop-blur-md transition-all md:px-4 md:py-2.5"
         >
@@ -142,7 +151,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
 
         {/* Google Login */}
         <button
-            type="button"
+          type="button"
           onClick={() => loginWithGoogle()}
           className="group mb-3 flex w-full items-center justify-center gap-3 rounded-xl border border-slate-200 px-4 py-3 font-medium text-slate-700 transition-all hover:border-slate-300 hover:bg-slate-50"
         >
@@ -156,7 +165,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
 
         {/* Microsoft Login */}
         <button
-            type="button"
+          type="button"
           onClick={() => loginWithMicrosoft()}
           className="group mb-6 flex w-full items-center justify-center gap-3 rounded-xl border border-slate-200 px-4 py-3 font-medium text-slate-700 transition-all hover:border-slate-300 hover:bg-slate-50"
         >
@@ -185,7 +194,10 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="login-email" className="mb-2 ml-1 block text-sm font-bold text-slate-700">
+            <label
+              htmlFor="login-email"
+              className="mb-2 ml-1 block text-sm font-bold text-slate-700"
+            >
               {t.emailLabel}
             </label>
             <input
@@ -201,7 +213,10 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
           </div>
 
           <div>
-            <label htmlFor="login-password" className="mb-2 ml-1 block text-sm font-bold text-slate-700">
+            <label
+              htmlFor="login-password"
+              className="mb-2 ml-1 block text-sm font-bold text-slate-700"
+            >
               {t.passwordLabel}
             </label>
             <input

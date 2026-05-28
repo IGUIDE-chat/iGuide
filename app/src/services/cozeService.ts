@@ -329,7 +329,9 @@ const streamChatResponse = async function* (
       return { outputs, abort }
     }
 
-    const yieldLines = (lines: string[]): { outputs: StreamResponse[]; abort: boolean } => {
+    const yieldLines = (
+      lines: string[]
+    ): { outputs: StreamResponse[]; abort: boolean } => {
       const allOutputs: StreamResponse[] = []
       for (const line of lines) {
         const { outputs, abort } = handleLine(line.trim())
@@ -376,7 +378,8 @@ const streamChatResponse = async function* (
     }
   } catch (error: unknown) {
     console.error("Stream Error:", error)
-    const message = error instanceof Error ? error.message : "Failed to reach Coze API"
+    const message =
+      error instanceof Error ? error.message : "Failed to reach Coze API"
     yield {
       text: `\n(Connection Error: ${message}. Please check your internet or CORS settings.)`,
     }

@@ -66,7 +66,8 @@ const AmenitiesSection: React.FC<AmenitiesSectionProps> = ({
               } `}
             >
               {isSelected && <Check size={16} strokeWidth={3} />}
-              <input aria-label="Toggle option"
+              <input
+                aria-label="Toggle option"
                 type="checkbox"
                 className="hidden"
                 checked={isSelected}

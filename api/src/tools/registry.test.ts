@@ -161,7 +161,9 @@ test("execute returns timeout error when tool exceeds timeoutMs", async () => {
     description: "Takes too long",
     parameters: {},
     async execute(): Promise<ToolResult> {
-      await new Promise<void>((resolve) => { setTimeout(resolve, 200) })
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, 200)
+      })
       return { content: "should not reach" }
     },
   }
@@ -184,7 +186,9 @@ test("fast tool completes before timeout", async () => {
     description: "Completes quickly",
     parameters: {},
     async execute(): Promise<ToolResult> {
-      await new Promise<void>((resolve) => { setTimeout(resolve, 10) })
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, 10)
+      })
       return { content: "fast result" }
     },
   }

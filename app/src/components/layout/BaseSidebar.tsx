@@ -173,8 +173,9 @@ export const PinButton: React.FC<PinButtonProps> = ({
   onClick,
   label,
 }) => (
-  <button aria-label="Action"
-            type="button"
+  <button
+    aria-label="Action"
+    type="button"
     onClick={onClick}
     className="rounded-md p-1 transition-colors hover:bg-white/10"
     title={label}
@@ -204,8 +205,9 @@ export const DeleteButton: React.FC<DeleteButtonProps> = ({
   onClick,
   label,
 }) => (
-  <button aria-label="Action"
-            type="button"
+  <button
+    aria-label="Action"
+    type="button"
     onClick={onClick}
     className="rounded-md p-1 transition-colors hover:bg-red-500/20"
     title={label}

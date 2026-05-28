@@ -25,7 +25,9 @@ export type PriceTier = keyof typeof PRICE_TIERS
 
 // Calculate dynamic min/max from actual data
 export const getPriceRangeFromData = (dorms: Dorm[] = []): [number, number] => {
-  const prices = dorms.map((d) => d.price).filter((p) => p !== null && p !== undefined && p > 0)
+  const prices = dorms
+    .map((d) => d.price)
+    .filter((p) => p !== null && p !== undefined && p > 0)
   if (prices.length === 0) {
     return [0, 20000]
   }

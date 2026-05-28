@@ -37,4 +37,10 @@ interface AIProvider {
   streamChatResponse: StreamChatResponseFn
 }
 
-export { type StreamChunk, type ChatHistoryItem, type StreamChatResponseParams, type StreamChatResponseFn, type AIProvider }
+export {
+  type StreamChunk,
+  type ChatHistoryItem,
+  type StreamChatResponseParams,
+  type StreamChatResponseFn,
+  type AIProvider,
+}

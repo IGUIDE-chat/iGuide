@@ -163,7 +163,7 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
               {ct.compareBar(compareIds.length)}
             </span>
             <button
-            type="button"
+              type="button"
               onClick={openCompare}
               disabled={compareIds.length < 2}
               className="rounded-full bg-white/20 px-4 py-1.5 text-sm font-semibold transition-colors hover:bg-white/30 disabled:cursor-not-allowed disabled:opacity-40"
@@ -171,7 +171,7 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
               {ct.compare}
             </button>
             <button
-            type="button"
+              type="button"
               onClick={clearCompare}
               className="rounded-full p-1.5 transition-colors hover:bg-white/20"
               aria-label={ct.clear}

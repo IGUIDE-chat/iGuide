@@ -233,7 +233,9 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
   const neutralTags = allTags.filter(
     (tag) => TAG_REGISTRY[tag]?.cardTone === "neutral"
   )
-  const mutedTags = allTags.filter((tag) => TAG_REGISTRY[tag]?.cardTone === "muted")
+  const mutedTags = allTags.filter(
+    (tag) => TAG_REGISTRY[tag]?.cardTone === "muted"
+  )
 
   const defaultPlanScope = getStorageBathroomScope(
     dorm.bathroomType,

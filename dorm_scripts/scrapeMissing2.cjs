@@ -5,10 +5,15 @@ const fs = require("fs")
 
 puppeteer.use(StealthPlugin())
 
-const wait = (ms) => new Promise((resolve) => { setTimeout(resolve, ms) })
+const wait = (ms) =>
+  new Promise((resolve) => {
+    setTimeout(resolve, ms)
+  })
 
 async function scrollToLoadMore(page, remainingIterations) {
-  if (remainingIterations <= 0) { return }
+  if (remainingIterations <= 0) {
+    return
+  }
 
   // Try the known scrollable container
   await page.evaluate(() => {
@@ -40,7 +45,11 @@ async function scrollToLoadMore(page, remainingIterations) {
   // Click "More" buttons to expand review text
   const moreButtons = await page.$$("button.w8nwRe.kyuRq")
   await Promise.all(
-    moreButtons.map((btn) => btn.click().catch(() => { /* ignore click errors */ }))
+    moreButtons.map((btn) =>
+      btn.click().catch(() => {
+        /* ignore click errors */
+      })
+    )
   )
   await wait(500)
 
@@ -94,7 +103,9 @@ const missingDorms = [
 async function scrapeWithRetry(page, dormId, url) {
   try {
     const data = await scrapeDorm(page, dormId, url)
-    if (data.length > 0) { return data }
+    if (data.length > 0) {
+      return data
+    }
   } catch (err) {
     console.log(`[${dormId}] Error attempt 1: ${err.message}`)
   }
@@ -103,7 +114,9 @@ async function scrapeWithRetry(page, dormId, url) {
   const searchUrl = `https://www.google.com/maps/search/${dormId.replaceAll("-", "+")}+hall+UIUC+Champaign`
   try {
     const data = await scrapeDorm(page, dormId, searchUrl)
-    if (data.length > 0) { return data }
+    if (data.length > 0) {
+      return data
+    }
   } catch (err) {
     console.log(`[${dormId}] Retry error: ${err.message}`)
   }
@@ -112,7 +125,9 @@ async function scrapeWithRetry(page, dormId, url) {
 }
 
 async function processMissingDorms(page, dorms, allCollected, index = 0) {
-  if (index >= dorms.length) { return }
+  if (index >= dorms.length) {
+    return
+  }
 
   const { dormId, url } = dorms[index]
   const data = await scrapeWithRetry(page, dormId, url)
@@ -196,7 +211,9 @@ async function scrapeDorm(page, dormId, mapUrl) {
       )
       clicked = true
       console.log(`[${dormId}] Clicked review action button.`)
-    } catch { /* all clicks failed */ }
+    } catch {
+      /* all clicks failed */
+    }
   }
 
   // Method 4: Look for the reviews count text and click it

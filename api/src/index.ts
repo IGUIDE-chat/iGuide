@@ -2,7 +2,11 @@ import { type Context, Hono, type Next } from "hono"
 import { cors } from "hono/cors"
 import { convertToModelMessages, stepCountIs, streamText } from "ai"
 import { verifyAndCacheJwt } from "./auth/jwtCache.ts"
-import { type RateLimitBinding, ipRateLimit, userRateLimit } from "./middleware/ratelimit.ts"
+import {
+  type RateLimitBinding,
+  ipRateLimit,
+  userRateLimit,
+} from "./middleware/ratelimit.ts"
 import { createSearchKnowledgeBaseTool } from "./tools/searchKnowledgeBase.ts"
 import { createWebSearchTool } from "./tools/webSearch.ts"
 import { createGrepDocsTool } from "./tools/grepDocs.ts"
@@ -10,7 +14,11 @@ import { createCustomSkillsTool } from "./tools/customSkills.ts"
 
 import { type RequestContext } from "./tools/types.ts"
 import { resolveProvider } from "./agent/provider.ts"
-import { type PersistEnv, type ResponseMessage, persistTurn } from "./agent/persist.ts"
+import {
+  type PersistEnv,
+  type ResponseMessage,
+  persistTurn,
+} from "./agent/persist.ts"
 
 interface Env {
   SUPABASE_URL: string
@@ -148,7 +156,8 @@ app.use(
 
 // Region detection middleware
 app.use("*", async (c, next) => {
-  const country = (c.req.raw as unknown as { cf?: { country?: string } }).cf?.country || "US"
+  const country =
+    (c.req.raw as unknown as { cf?: { country?: string } }).cf?.country || "US"
   const region = country === "CN" ? "CN" : "Global"
   c.set("region", region)
   await next()
@@ -174,7 +183,10 @@ async function guestUserIdForIp(ip: string): Promise<string> {
   return `guest_${hex}`
 }
 
-const resolveUser = async (c: Context<{ Bindings: Env; Variables: Variables }>, next: Next) => {
+const resolveUser = async (
+  c: Context<{ Bindings: Env; Variables: Variables }>,
+  next: Next
+) => {
   const authHeader = c.req.header("Authorization")
   const token =
     authHeader && authHeader.startsWith("Bearer ")

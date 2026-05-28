@@ -5,10 +5,15 @@ const path = require("path")
 
 puppeteer.use(StealthPlugin())
 
-const wait = (ms) => new Promise((resolve) => { setTimeout(resolve, ms) })
+const wait = (ms) =>
+  new Promise((resolve) => {
+    setTimeout(resolve, ms)
+  })
 
 async function scrollToLoadMore(page, remainingIterations) {
-  if (remainingIterations <= 0) { return }
+  if (remainingIterations <= 0) {
+    return
+  }
 
   const scrollableSelector = "div.m6QErb.D5yXZc.xiA65.transparentBackground"
   const element = await page.$(scrollableSelector)
@@ -30,7 +35,11 @@ async function scrollToLoadMore(page, remainingIterations) {
 
   const moreButtons = await page.$$("button.w8nwRe.kyuRq")
   await Promise.all(
-    moreButtons.map((btn) => btn.click().catch(() => { /* ignore click errors */ }))
+    moreButtons.map((btn) =>
+      btn.click().catch(() => {
+        /* ignore click errors */
+      })
+    )
   )
   await wait(500)
 
@@ -49,14 +58,18 @@ const pchDorms = {
 async function scrapeWithRetry(page, dormId, query) {
   try {
     const data = await scrapeDorm(page, dormId, query)
-    if (data.length > 0) { return data }
+    if (data.length > 0) {
+      return data
+    }
   } catch (err) {
     console.log(`[${dormId}] Error: ${err.message}`)
   }
 
   try {
     const data = await scrapeDorm(page, dormId, query)
-    if (data.length > 0) { return data }
+    if (data.length > 0) {
+      return data
+    }
   } catch (err) {
     console.log(`[${dormId}] Retry error: ${err.message}`)
   }
@@ -65,7 +78,9 @@ async function scrapeWithRetry(page, dormId, query) {
 }
 
 async function processDormEntries(page, entries, allCollected, index = 0) {
-  if (index >= entries.length) { return }
+  if (index >= entries.length) {
+    return
+  }
 
   const [dormId, query] = entries[index]
   const data = await scrapeWithRetry(page, dormId, query)

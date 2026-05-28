@@ -96,9 +96,7 @@ function getTagLabel(tag: string, language: Language): string {
 // ── New categorized tag utilities ───────────────────────────────────────────
 
 /** Collect all tags from categorized tags, sorted by priority (ascending = more important first). */
-function getAllTagsSorted(
-  categorizedTags: DormCategorizedTags
-): DormTag[] {
+function getAllTagsSorted(categorizedTags: DormCategorizedTags): DormTag[] {
   const all: DormTag[] = [
     ...(categorizedTags.livingConditions ?? []),
     ...(categorizedTags.facilities ?? []),
@@ -249,4 +247,13 @@ function getHeroTags(
     .slice(0, maxCount)
 }
 
-export { KNOWN_TAGS, type CardTagItem, getTagLabel, getAllTagsSorted, getDetailTagDisplay, getCardTagCandidates, getCardTagItems, getHeroTags }
+export {
+  KNOWN_TAGS,
+  type CardTagItem,
+  getTagLabel,
+  getAllTagsSorted,
+  getDetailTagDisplay,
+  getCardTagCandidates,
+  getCardTagItems,
+  getHeroTags,
+}

@@ -34,7 +34,9 @@ describe("messageAdapter", () => {
       assert.equal(result.id, "msg-1")
       assert.equal(result.role, "user")
       assert.ok(Array.isArray(result.content), "content should be an array")
-      const firstPart = (result.content as Array<{ type: string; text: string }>)[0]
+      const firstPart = (
+        result.content as Array<{ type: string; text: string }>
+      )[0]
       assert.equal(firstPart?.type, "text")
       assert.equal(
         (firstPart as { type: "text"; text: string }).text,

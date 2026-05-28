@@ -26,7 +26,8 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
   return (
     <>
       <Field label={t.labels.housingType}>
-        <select aria-label="Select option"
+        <select
+          aria-label="Select option"
           value={form.housingType}
           onChange={(event) =>
             form.setHousingType(event.target.value as Dorm["housingType"])
@@ -41,7 +42,8 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
         </select>
       </Field>
       <Field label={t.labels.annualPrice}>
-        <input aria-label="Number input"
+        <input
+          aria-label="Number input"
           type="number"
           min={0}
           value={form.price}
@@ -50,7 +52,8 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
         />
       </Field>
       <Field label={t.labels.applicationFee}>
-        <input aria-label="Number input"
+        <input
+          aria-label="Number input"
           type="number"
           min={0}
           value={form.applicationFee}
@@ -65,7 +68,8 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
         onChange={form.setAc}
       />
       <Field label={t.labels.dining}>
-        <select aria-label="Select option"
+        <select
+          aria-label="Select option"
           value={form.dining}
           onChange={(event) => form.setDining(event.target.value as DiningType)}
           className={inputCls}
@@ -79,7 +83,8 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
       </Field>
       {form.dining === "nearby" && (
         <Field label={t.labels.dining}>
-          <input aria-label="Input field"
+          <input
+            aria-label="Input field"
             type="text"
             value={form.diningNearbyDetail}
             onChange={(event) => form.setDiningNearbyDetail(event.target.value)}
@@ -89,7 +94,8 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
         </Field>
       )}
       <Field label={t.labels.bathroomType}>
-        <select aria-label="Select option"
+        <select
+          aria-label="Select option"
           value={form.bathroomType}
           onChange={(event) =>
             form.setBathroomType(event.target.value as BathroomType)
@@ -104,7 +110,8 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
         </select>
       </Field>
       <Field label={t.labels.address}>
-        <input aria-label="Input field"
+        <input
+          aria-label="Input field"
           type="text"
           value={form.address}
           onChange={(event) => form.setAddress(event.target.value)}
@@ -113,7 +120,8 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
         />
       </Field>
       <Field label={t.labels.addressZh}>
-        <input aria-label="Input field"
+        <input
+          aria-label="Input field"
           type="text"
           value={form.addressZh}
           onChange={(event) => form.setAddressZh(event.target.value)}
@@ -122,7 +130,8 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
         />
       </Field>
       <Field label={t.labels.website}>
-        <input aria-label="Input field"
+        <input
+          aria-label="Input field"
           type="url"
           value={form.website}
           onChange={(event) => form.setWebsite(event.target.value)}
