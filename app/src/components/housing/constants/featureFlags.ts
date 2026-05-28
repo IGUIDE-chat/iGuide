@@ -9,4 +9,4 @@
  * - false（默认）：隐藏 Google Reviews，评论列表和统计数据仅显示 Supabase 真实用户评论。
  * - true：合并 Google Reviews 数据到评论列表和统计中。
  */
-export const SHOW_GOOGLE_REVIEWS = false;
+export const SHOW_GOOGLE_REVIEWS = false

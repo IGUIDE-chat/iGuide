@@ -1,9 +1,9 @@
-import { tool } from 'ai'
-import { z } from 'zod'
-import { getEmbeddingConfig } from '../lib/embedding-config.ts'
-import { EmbeddingClient } from '../lib/embeddings.ts'
-import { callSupabaseRpc } from '../lib/supabase-rpc.ts'
-import  { type RequestContext } from './types.ts'
+import { tool } from "ai"
+import { z } from "zod"
+import { getEmbeddingConfig } from "../lib/embedding-config.ts"
+import { EmbeddingClient } from "../lib/embeddings.ts"
+import { callSupabaseRpc } from "../lib/supabase-rpc.ts"
+import { type RequestContext } from "./types.ts"
 
 interface HybridSearchResult {
   chunk_id: string
@@ -25,7 +25,7 @@ interface KeywordSearchResult {
 
 function formatHybridResults(results: HybridSearchResult[]): string {
   if (results.length === 0) {
-    return 'No knowledge base results found.'
+    return "No knowledge base results found."
   }
 
   return results
@@ -33,12 +33,12 @@ function formatHybridResults(results: HybridSearchResult[]): string {
       (result) =>
         `## ${result.title}\nScore: ${result.rrf_score.toFixed(4)}\nURL: ${result.url}\n\n${result.chunk_text.slice(0, 300)}\n---`
     )
-    .join('\n')
+    .join("\n")
 }
 
 function formatKeywordResults(results: KeywordSearchResult[]): string {
   if (results.length === 0) {
-    return 'No knowledge base results found.'
+    return "No knowledge base results found."
   }
 
   return results
@@ -46,24 +46,24 @@ function formatKeywordResults(results: KeywordSearchResult[]): string {
       (result) =>
         `## ${result.title}\nScore: ${result.fts_score.toFixed(4)}\nURL: ${result.url}\n\n${result.chunk_text.slice(0, 300)}\n---`
     )
-    .join('\n')
+    .join("\n")
 }
 
 const searchKnowledgeBaseSchema = z.object({
-  query: z.string().describe('Search query'),
+  query: z.string().describe("Search query"),
   limit: z
     .number()
     .int()
     .min(1)
     .max(10)
     .optional()
-    .describe('Max results (default 5)'),
+    .describe("Max results (default 5)"),
 })
 
 export function createSearchKnowledgeBaseTool(ctx: RequestContext) {
   return tool({
     description:
-      'Search the UIUC knowledge base using hybrid semantic + keyword search. Use for questions about housing, courses, campus life, policies.',
+      "Search the UIUC knowledge base using hybrid semantic + keyword search. Use for questions about housing, courses, campus life, policies.",
     inputSchema: searchKnowledgeBaseSchema,
     execute: async (args: any, options: any) => {
       const { query, limit: rawLimit } = args as z.infer<
@@ -80,7 +80,7 @@ export function createSearchKnowledgeBaseTool(ctx: RequestContext) {
         try {
           const fallbackResults = await callSupabaseRpc<KeywordSearchResult[]>(
             ctx,
-            'keyword_search',
+            "keyword_search",
             {
               query_text: query,
               match_count: limit,
@@ -98,10 +98,10 @@ export function createSearchKnowledgeBaseTool(ctx: RequestContext) {
       try {
         const results = await callSupabaseRpc<HybridSearchResult[]>(
           ctx,
-          'hybrid_search',
+          "hybrid_search",
           {
             query_text: query,
-            query_embedding: `[${queryEmbedding.join(',')}]`,
+            query_embedding: `[${queryEmbedding.join(",")}]`,
             match_count: limit,
           }
         )

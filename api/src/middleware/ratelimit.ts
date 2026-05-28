@@ -1,4 +1,4 @@
-import  { type MiddlewareHandler } from 'hono'
+import { type MiddlewareHandler } from "hono"
 
 /**
  * Cloudflare Rate Limiting binding interface.
@@ -29,11 +29,11 @@ export interface RateLimitBinding {
  */
 export function ipRateLimit(binding: RateLimitBinding): MiddlewareHandler {
   return async (c, next) => {
-    const ip = c.req.header('cf-connecting-ip') || 'unknown'
+    const ip = c.req.header("cf-connecting-ip") || "unknown"
     const { success } = await binding.limit({ key: `chat:ip:${ip}` })
     if (!success) {
-      return c.json({ error: 'rate_limited' }, 429 as const, {
-        'Retry-After': '30',
+      return c.json({ error: "rate_limited" }, 429 as const, {
+        "Retry-After": "30",
       })
     }
     await next()
@@ -50,15 +50,15 @@ export function ipRateLimit(binding: RateLimitBinding): MiddlewareHandler {
  */
 export function userRateLimit(binding: RateLimitBinding): MiddlewareHandler {
   return async (c, next) => {
-    const userId = c.get('userId') as string | undefined
+    const userId = c.get("userId") as string | undefined
     if (!userId) {
       await next()
       return
     }
     const { success } = await binding.limit({ key: `chat:user:${userId}` })
     if (!success) {
-      return c.json({ error: 'rate_limited' }, 429 as const, {
-        'Retry-After': '30',
+      return c.json({ error: "rate_limited" }, 429 as const, {
+        "Retry-After": "30",
       })
     }
     await next()

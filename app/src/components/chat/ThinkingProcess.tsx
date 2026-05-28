@@ -5,14 +5,14 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { type ThinkingStep } from "../../types";
+import { useEffect, useRef, useState } from "react"
+import { AnimatePresence, motion } from "framer-motion"
+import { type ThinkingStep } from "../../types"
 
 interface ThinkingProcessProps {
-  steps: ThinkingStep[];
-  isThinking: boolean;
-  language?: "en" | "zh";
+  steps: ThinkingStep[]
+  isThinking: boolean
+  language?: "en" | "zh"
 }
 
 const stepIcons: Record<ThinkingStep["type"], string> = {
@@ -20,59 +20,54 @@ const stepIcons: Record<ThinkingStep["type"], string> = {
   searching: "🔍",
   tool_call: "⚙️",
   processing: "📝",
-};
+}
 
 const ThinkingDots = () => (
   <span className="ml-1 inline-flex items-center gap-0.5">
     {[0, 1, 2].map((i) => (
       <motion.span
         key={i}
-        className="size-1 rounded-full bg-illini-orange"
+        className="bg-illini-orange size-1 rounded-full"
         animate={{ opacity: [0.3, 1, 0.3] }}
         transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }}
       />
     ))}
   </span>
-);
+)
 
 export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({
   steps,
   isThinking,
   language = "zh",
 }) => {
-  const [isExpanded, setIsExpanded] = useState(true);
-  const wasThinking = useRef(true);
+  const [isExpanded, setIsExpanded] = useState(true)
+  const wasThinking = useRef(true)
 
   // Auto-collapse after thinking completes
   useEffect(() => {
     if (wasThinking.current && !isThinking) {
-      const timer = setTimeout(() => setIsExpanded(false), 1500);
-      return () => clearTimeout(timer);
+      const timer = setTimeout(() => setIsExpanded(false), 1500)
+      return () => clearTimeout(timer)
     }
-    wasThinking.current = isThinking;
-  }, [isThinking]);
+    wasThinking.current = isThinking
+  }, [isThinking])
 
-  if (steps.length === 0 && !isThinking) {return null;}
+  if (steps.length === 0 && !isThinking) {
+    return null
+  }
 
-  const latestStep = steps.at(-1);
+  const latestStep = steps.at(-1)
 
   return (
     <div className="mb-2">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         aria-expanded={isExpanded}
-        className="
-          group flex items-center gap-1.5 text-xs text-slate-500
-          transition-colors
-          hover:text-slate-700
-        "
+        className="group flex items-center gap-1.5 text-xs text-slate-500 transition-colors hover:text-slate-700"
       >
         {isThinking ? (
           <motion.div
-            className="
-              size-3.5 rounded-full border-2 border-illini-orange
-              border-t-transparent
-            "
+            className="border-illini-orange size-3.5 rounded-full border-2 border-t-transparent"
             animate={{ rotate: 360 }}
             transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
           />
@@ -105,10 +100,7 @@ export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({
           </span>
         )}
         <svg
-          className={`
-            size-3 transition-transform
-            ${isExpanded ? "rotate-180" : ""}
-          `}
+          className={`size-3 transition-transform ${isExpanded ? "rotate-180" : ""} `}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -165,5 +157,5 @@ export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({
         )}
       </AnimatePresence>
     </div>
-  );
-};
+  )
+}

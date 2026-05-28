@@ -7,21 +7,21 @@
 
 // [SERVICE] Read dorms from Supabase `dorms` table with static fallback.
 // [服务] 从 Supabase `dorms` 表读取宿舍数据，静态数据作为 fallback。
-import { supabase } from "./supabase";
-import { type Dorm } from "../components/housing/types/index";
-import { normalizeDorm } from "../utils/roomOptions";
+import { supabase } from "./supabase"
+import { type Dorm } from "../components/housing/types/index"
+import { normalizeDorm } from "../utils/roomOptions"
 import {
   finalizeDormRecord,
   sanitizeFloorPlansForStorage,
-} from "../utils/dormData";
+} from "../utils/dormData"
 
-const TABLE = "dorms";
+const TABLE = "dorms"
 
 /** Lazy-load static dorm data to avoid pulling ~160KB into the initial bundle. */
 async function getStaticDorms(): Promise<Dorm[]> {
   const { UIUC_DORMS } =
-    await import("../components/housing/constants/dormData");
-  return UIUC_DORMS;
+    await import("../components/housing/constants/dormData")
+  return UIUC_DORMS
 }
 
 /** Map a snake_case DB row to camelCase Dorm. */
@@ -69,24 +69,24 @@ function rowToDorm(row: Record<string, unknown>): Dorm {
       address_zh: (row.address_zh as string) ?? undefined,
       website: (row.website as string) ?? undefined,
     })
-  );
+  )
 }
 
 /** Fetch all dorms. Falls back to static data on failure. */
 async function getAllDorms(): Promise<Dorm[]> {
   try {
-    const { data, error } = await supabase.from(TABLE).select("*");
+    const { data, error } = await supabase.from(TABLE).select("*")
     if (error) {
-      console.error("[dormService] getAllDorms error:", error);
-      return getStaticDorms();
+      console.error("[dormService] getAllDorms error:", error)
+      return getStaticDorms()
     }
     if (!data || data.length === 0) {
-      return getStaticDorms();
+      return getStaticDorms()
     }
-    return data.map(rowToDorm);
+    return data.map(rowToDorm)
   } catch (err) {
-    console.error("[dormService] getAllDorms exception:", err);
-    return getStaticDorms();
+    console.error("[dormService] getAllDorms exception:", err)
+    return getStaticDorms()
   }
 }
 
@@ -97,21 +97,21 @@ async function getDormById(id: string): Promise<Dorm | undefined> {
       .from(TABLE)
       .select("*")
       .eq("id", id)
-      .maybeSingle();
+      .maybeSingle()
     if (error) {
-      console.error("[dormService] getDormById error:", error);
-      const all = await getStaticDorms();
-      return all.find((d) => d.id === id);
+      console.error("[dormService] getDormById error:", error)
+      const all = await getStaticDorms()
+      return all.find((d) => d.id === id)
     }
     if (!data) {
-      const all = await getStaticDorms();
-      return all.find((d) => d.id === id);
+      const all = await getStaticDorms()
+      return all.find((d) => d.id === id)
     }
-    return rowToDorm(data);
+    return rowToDorm(data)
   } catch (err) {
-    console.error("[dormService] getDormById exception:", err);
-    const all = await getStaticDorms();
-    return all.find((d) => d.id === id);
+    console.error("[dormService] getDormById exception:", err)
+    const all = await getStaticDorms()
+    return all.find((d) => d.id === id)
   }
 }
 
@@ -119,4 +119,4 @@ export const dormService = {
   getAllDorms,
   getDormById,
   rowToDorm,
-};
+}

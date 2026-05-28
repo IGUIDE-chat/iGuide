@@ -5,19 +5,19 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from "react";
-import { useLayout } from "../../contexts/LayoutContext";
+import React from "react"
+import { useLayout } from "../../contexts/LayoutContext"
 
 interface AppShellProps {
-  isSidebarOpen: boolean;
-  sidebar: React.ReactNode;
-  mobileHeader: React.ReactNode;
-  children: React.ReactNode;
-  sidebarToggleButtonRef: React.RefObject<HTMLButtonElement | null>;
-  mobileSidebarButtonRef: React.RefObject<HTMLButtonElement | null>;
-  onCloseSidebar: () => void;
-  onOpenSidebar: () => void;
-  onToggleSidebar: () => void;
+  isSidebarOpen: boolean
+  sidebar: React.ReactNode
+  mobileHeader: React.ReactNode
+  children: React.ReactNode
+  sidebarToggleButtonRef: React.RefObject<HTMLButtonElement | null>
+  mobileSidebarButtonRef: React.RefObject<HTMLButtonElement | null>
+  onCloseSidebar: () => void
+  onOpenSidebar: () => void
+  onToggleSidebar: () => void
 }
 
 export const AppShell: React.FC<AppShellProps> = ({
@@ -29,33 +29,25 @@ export const AppShell: React.FC<AppShellProps> = ({
   mobileSidebarButtonRef,
   onToggleSidebar,
 }) => {
-  const layout = useLayout();
-  const headerSlot = layout.mobileHeaderSlot;
+  const layout = useLayout()
+  const headerSlot = layout.mobileHeaderSlot
 
   return (
-    <div
-      className="
-        flex h-dvh w-full overflow-hidden bg-white font-sans text-slate-900
-      "
-    >
+    <div className="flex h-dvh w-full overflow-hidden bg-white font-sans text-slate-900">
       <div
-        className={`
-          fixed inset-0 z-40 w-64 bg-black/50 transition-opacity duration-300
-          md:hidden
-          ${
-            isSidebarOpen
-              ? "pointer-events-auto opacity-100"
-              : "pointer-events-none opacity-0"
-          }
-        `}
+        className={`fixed inset-0 z-40 w-64 bg-black/50 transition-opacity duration-300 md:hidden ${
+          isSidebarOpen
+            ? "pointer-events-auto opacity-100"
+            : "pointer-events-none opacity-0"
+        } `}
         role="button"
         tabIndex={isSidebarOpen ? 0 : -1}
         aria-hidden={!isSidebarOpen}
         onClick={onToggleSidebar}
         onKeyDown={(event) => {
           if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            onToggleSidebar();
+            event.preventDefault()
+            onToggleSidebar()
           }
         }}
       />
@@ -63,37 +55,21 @@ export const AppShell: React.FC<AppShellProps> = ({
       <aside
         aria-label="Sidebar"
         aria-hidden={!isSidebarOpen}
-        className={`
-          fixed inset-y-0 left-0 z-50 flex flex-col bg-[#171717] text-slate-200
-          transition-all duration-300 ease-in-out
-          md:relative
-          ${
-            isSidebarOpen
-              ? "translate-x-0"
-              : `
-                -translate-x-full
-                md:w-0 md:translate-x-0 md:overflow-hidden
-              `
-          }
-        `}
+        className={`fixed inset-y-0 left-0 z-50 flex flex-col bg-[#171717] text-slate-200 transition-all duration-300 ease-in-out md:relative ${
+          isSidebarOpen
+            ? "translate-x-0"
+            : `-translate-x-full md:w-0 md:translate-x-0 md:overflow-hidden`
+        } `}
       >
         <div className="flex h-full w-64 flex-col">{sidebar}</div>
       </aside>
 
       <main className="relative flex size-full min-w-0 flex-1 flex-col bg-white">
-        <div
-          className="
-            absolute top-3 left-3 z-40 hidden
-            md:block
-          "
-        >
+        <div className="absolute top-3 left-3 z-40 hidden md:block">
           <button
             ref={sidebarToggleButtonRef}
             onClick={onToggleSidebar}
-            className="
-              rounded-md p-2 text-slate-400 transition-colors
-              hover:bg-illini-blue/5 hover:text-illini-blue
-            "
+            className="hover:bg-illini-blue/5 hover:text-illini-blue rounded-md p-2 text-slate-400 transition-colors"
             title={isSidebarOpen ? "Close Sidebar" : "Open Sidebar"}
           >
             <svg
@@ -112,21 +88,12 @@ export const AppShell: React.FC<AppShellProps> = ({
           </button>
         </div>
 
-        <div
-          className="
-            sticky top-0 z-20 flex items-center gap-2 border-b border-slate-100
-            bg-white p-3
-            md:hidden
-          "
-        >
+        <div className="sticky top-0 z-20 flex items-center gap-2 border-b border-slate-100 bg-white p-3 md:hidden">
           <button
             ref={mobileSidebarButtonRef}
             onClick={onToggleSidebar}
             aria-label={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
-            className="
-              flex size-10 shrink-0 items-center justify-center rounded-xl
-              border border-slate-200 bg-slate-100 text-slate-500
-            "
+            className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-slate-100 text-slate-500"
           >
             <svg
               className="size-6"
@@ -150,5 +117,5 @@ export const AppShell: React.FC<AppShellProps> = ({
         </div>
       </main>
     </div>
-  );
-};
+  )
+}

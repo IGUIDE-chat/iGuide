@@ -1,5 +1,9 @@
-import  { type ToolRegistry } from './registry'
-import { type RequestContext, type ToolDefinition, type ToolResult } from './types'
+import { type ToolRegistry } from "./registry"
+import {
+  type RequestContext,
+  type ToolDefinition,
+  type ToolResult,
+} from "./types"
 
 interface TavilyResponse {
   results?: Array<{
@@ -18,7 +22,7 @@ interface WebSearchArgs {
 function isUiucOfficialUrl(url: string): boolean {
   try {
     const hostname = new URL(url).hostname.toLowerCase()
-    return hostname === 'illinois.edu' || hostname.endsWith('.illinois.edu')
+    return hostname === "illinois.edu" || hostname.endsWith(".illinois.edu")
   } catch {
     return false
   }
@@ -41,7 +45,7 @@ function formatResults(
   }>
 ): string {
   if (results.length === 0) {
-    return 'No results found for the search query.'
+    return "No results found for the search query."
   }
 
   return results
@@ -49,28 +53,28 @@ function formatResults(
       (result) =>
         `## ${result.title}\nSource: ${result.url}\n\n${result.content}\n---`
     )
-    .join('\n')
+    .join("\n")
 }
 
 export function createWebSearchTool(registry: ToolRegistry): ToolDefinition {
   const tool: ToolDefinition = {
-    name: 'web_search',
+    name: "web_search",
     description:
-      'Search the web for current, time-sensitive, or externally sourced UIUC information when the knowledge base does not have answers. Do not use for greetings, thanks, acknowledgements, or casual conversation.',
+      "Search the web for current, time-sensitive, or externally sourced UIUC information when the knowledge base does not have answers. Do not use for greetings, thanks, acknowledgements, or casual conversation.",
     parameters: {
-      type: 'object',
+      type: "object",
       properties: {
         query: {
-          type: 'string',
-          description: 'Search query',
+          type: "string",
+          description: "Search query",
         },
         max_results: {
-          type: 'number',
-          description: 'Maximum number of results (default 5, max 10)',
+          type: "number",
+          description: "Maximum number of results (default 5, max 10)",
           default: 5,
         },
       },
-      required: ['query'],
+      required: ["query"],
     },
     execute: async (
       args: Record<string, unknown>,
@@ -78,9 +82,9 @@ export function createWebSearchTool(registry: ToolRegistry): ToolDefinition {
     ): Promise<ToolResult> => {
       const { query, max_results = 5 } = args as unknown as WebSearchArgs
 
-      if (!query || typeof query !== 'string') {
+      if (!query || typeof query !== "string") {
         return {
-          content: 'Error: query parameter is required and must be a string',
+          content: "Error: query parameter is required and must be a string",
         }
       }
 
@@ -89,21 +93,21 @@ export function createWebSearchTool(registry: ToolRegistry): ToolDefinition {
 
       if (!apiKey) {
         return {
-          content: 'Error: TAVILY_API_KEY not configured',
+          content: "Error: TAVILY_API_KEY not configured",
         }
       }
 
       try {
-        const response = await fetch('https://api.tavily.com/search', {
-          method: 'POST',
+        const response = await fetch("https://api.tavily.com/search", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             api_key: apiKey,
             query,
             max_results: limit,
-            include_domains: ['illinois.edu', 'housing.illinois.edu'],
+            include_domains: ["illinois.edu", "housing.illinois.edu"],
           }),
         })
 

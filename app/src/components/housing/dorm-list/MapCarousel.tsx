@@ -5,24 +5,24 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { useRef } from "react";
-import { Heart } from "lucide-react";
-import { type Dorm } from "../types/index";
-import { type Language } from "../../../types";
-import { formatPrice } from "../constants/pricing";
+import React, { useRef } from "react"
+import { Heart } from "lucide-react"
+import { type Dorm } from "../types/index"
+import { type Language } from "../../../types"
+import { formatPrice } from "../constants/pricing"
 
 /** Max movement (px) between pointer down/up to count as a tap, not a scroll drag. */
-const TAP_MOVE_THRESHOLD_PX = 14;
+const TAP_MOVE_THRESHOLD_PX = 14
 
 interface MapCarouselCardProps {
-  dorm: Dorm;
-  isFav: boolean;
-  dormName: string;
-  locationLabel: string;
-  t: { campus: string; perYear: string };
-  onToggleFavorite: (dorm: Dorm, e?: React.MouseEvent) => void;
-  onViewDetails: (dorm: Dorm) => void;
-  onHoverDorm: (id: string | null) => void;
+  dorm: Dorm
+  isFav: boolean
+  dormName: string
+  locationLabel: string
+  t: { campus: string; perYear: string }
+  onToggleFavorite: (dorm: Dorm, e?: React.MouseEvent) => void
+  onViewDetails: (dorm: Dorm) => void
+  onHoverDorm: (id: string | null) => void
 }
 
 const MapCarouselCard: React.FC<MapCarouselCardProps> = ({
@@ -35,20 +35,24 @@ const MapCarouselCard: React.FC<MapCarouselCardProps> = ({
   onViewDetails,
   onHoverDorm,
 }) => {
-  const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
+  const pointerStartRef = useRef<{ x: number; y: number } | null>(null)
 
   const activateIfTap = (e: React.PointerEvent) => {
-    if (!pointerStartRef.current) {return;}
-    if ((e.target as HTMLElement).closest("button")) {
-      pointerStartRef.current = null;
-      return;
+    if (!pointerStartRef.current) {
+      return
     }
-    const dx = e.clientX - pointerStartRef.current.x;
-    const dy = e.clientY - pointerStartRef.current.y;
-    pointerStartRef.current = null;
-    if (Math.hypot(dx, dy) > TAP_MOVE_THRESHOLD_PX) {return;}
-    onViewDetails(dorm);
-  };
+    if ((e.target as HTMLElement).closest("button")) {
+      pointerStartRef.current = null
+      return
+    }
+    const dx = e.clientX - pointerStartRef.current.x
+    const dy = e.clientY - pointerStartRef.current.y
+    pointerStartRef.current = null
+    if (Math.hypot(dx, dy) > TAP_MOVE_THRESHOLD_PX) {
+      return
+    }
+    onViewDetails(dorm)
+  }
 
   return (
     <div
@@ -56,33 +60,27 @@ const MapCarouselCard: React.FC<MapCarouselCardProps> = ({
       tabIndex={0}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          onViewDetails(dorm);
+          e.preventDefault()
+          onViewDetails(dorm)
         }
       }}
       onPointerDown={(e) => {
-        if (e.pointerType === "mouse" && e.button !== 0) {return;}
-        pointerStartRef.current = { x: e.clientX, y: e.clientY };
+        if (e.pointerType === "mouse" && e.button !== 0) {
+          return
+        }
+        pointerStartRef.current = { x: e.clientX, y: e.clientY }
       }}
       onPointerUp={(e) => {
-        activateIfTap(e);
+        activateIfTap(e)
       }}
       onPointerCancel={() => {
-        pointerStartRef.current = null;
+        pointerStartRef.current = null
       }}
       onMouseEnter={() => onHoverDorm(dorm.id)}
       onMouseLeave={() => onHoverDorm(null)}
-      className="
-        w-[210px] shrink-0 cursor-pointer touch-manipulation snap-start
-      "
+      className="w-[210px] shrink-0 cursor-pointer touch-manipulation snap-start"
     >
-      <div
-        className="
-          flex h-[72px] flex-row overflow-hidden rounded-xl border
-          border-gray-100/80 bg-white/95 shadow-[0_4px_14px_rgba(0,0,0,0.14)]
-          backdrop-blur-md
-        "
-      >
+      <div className="flex h-[72px] flex-row overflow-hidden rounded-xl border border-gray-100/80 bg-white/95 shadow-[0_4px_14px_rgba(0,0,0,0.14)] backdrop-blur-md">
         {/* Thumbnail */}
         <div className="relative w-[72px] shrink-0">
           <img
@@ -93,21 +91,17 @@ const MapCarouselCard: React.FC<MapCarouselCardProps> = ({
             className="pointer-events-none size-full object-cover"
             onError={(e) => {
               e.currentTarget.src =
-                "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400";
+                "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400"
             }}
           />
           {/* Housing type badge */}
           {(dorm.housingType === "URH" || dorm.housingType === "PCH") && (
             <div
-              className={`
-                absolute top-1 left-1 rounded-sm px-1 py-0.5 text-[8px]
-                font-bold tracking-wider text-white uppercase
-                ${
-                  dorm.housingType === "URH"
-                    ? `bg-illini-orange/90`
-                    : `bg-illini-blue/90`
-                }
-              `}
+              className={`absolute top-1 left-1 rounded-sm px-1 py-0.5 text-[8px] font-bold tracking-wider text-white uppercase ${
+                dorm.housingType === "URH"
+                  ? `bg-illini-orange/90`
+                  : `bg-illini-blue/90`
+              } `}
             >
               {dorm.housingType}
             </div>
@@ -135,17 +129,14 @@ const MapCarouselCard: React.FC<MapCarouselCardProps> = ({
               onPointerDown={(e) => e.stopPropagation()}
               onPointerUp={(e) => e.stopPropagation()}
               onClick={(e) => {
-                e.stopPropagation();
-                onToggleFavorite(dorm, e);
+                e.stopPropagation()
+                onToggleFavorite(dorm, e)
               }}
               type="button"
               className="-mr-0.5 rounded-full p-1"
             >
               <Heart
-                className={`
-                  size-3.5 transition-colors
-                  ${isFav ? `fill-red-500 text-red-500` : `text-gray-300`}
-                `}
+                className={`size-3.5 transition-colors ${isFav ? `fill-red-500 text-red-500` : `text-gray-300`} `}
                 strokeWidth={2}
               />
             </button>
@@ -153,18 +144,18 @@ const MapCarouselCard: React.FC<MapCarouselCardProps> = ({
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
 interface MapCarouselProps {
-  dorms: Dorm[];
-  language: Language;
-  favoritesSet: Set<string>;
-  onToggleFavorite: (dorm: Dorm, e?: React.MouseEvent) => void;
-  onViewDetails: (dorm: Dorm) => void;
-  onHoverDorm: (id: string | null) => void;
-  scrollContainerRef: React.RefObject<HTMLDivElement | null>;
-  onHoveringChange: (hovering: boolean) => void;
+  dorms: Dorm[]
+  language: Language
+  favoritesSet: Set<string>
+  onToggleFavorite: (dorm: Dorm, e?: React.MouseEvent) => void
+  onViewDetails: (dorm: Dorm) => void
+  onHoverDorm: (id: string | null) => void
+  scrollContainerRef: React.RefObject<HTMLDivElement | null>
+  onHoveringChange: (hovering: boolean) => void
 }
 
 const MapCarousel: React.FC<MapCarouselProps> = ({
@@ -180,21 +171,13 @@ const MapCarousel: React.FC<MapCarouselProps> = ({
   const t =
     language === "zh"
       ? { campus: "校区", perYear: "/年" }
-      : { campus: "Campus", perYear: "/ yr" };
+      : { campus: "Campus", perYear: "/ yr" }
 
   return (
-    <div
-      className="
-        absolute inset-x-0 bottom-4 z-20 px-3
-        xl:hidden
-      "
-    >
+    <div className="absolute inset-x-0 bottom-4 z-20 px-3 xl:hidden">
       <div
         ref={scrollContainerRef}
-        className="
-          scrollbar-hide flex snap-x snap-mandatory gap-2.5 overflow-x-auto
-          overscroll-x-contain pr-10 pb-1
-        "
+        className="scrollbar-hide flex snap-x snap-mandatory gap-2.5 overflow-x-auto overscroll-x-contain pr-10 pb-1"
         style={{
           scrollBehavior: "smooth",
           scrollPaddingInlineStart: "4px",
@@ -207,12 +190,12 @@ const MapCarousel: React.FC<MapCarouselProps> = ({
       >
         {dorms.map((dorm) => {
           const dormName =
-            language === "zh" && dorm.name_zh ? dorm.name_zh : dorm.name;
+            language === "zh" && dorm.name_zh ? dorm.name_zh : dorm.name
           const locationLabel =
             language === "zh" && dorm.location_zh
               ? dorm.location_zh
-              : dorm.location;
-          const isFav = favoritesSet.has(dorm.id);
+              : dorm.location
+          const isFav = favoritesSet.has(dorm.id)
 
           return (
             <MapCarouselCard
@@ -226,11 +209,11 @@ const MapCarousel: React.FC<MapCarouselProps> = ({
               onViewDetails={onViewDetails}
               onHoverDorm={onHoverDorm}
             />
-          );
+          )
         })}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default MapCarousel;
+export default MapCarousel

@@ -11,16 +11,16 @@
  * questions. Returns the extracted questions or null if no header is found.
  */
 export function extractFollowUps(text: string): string[] | null {
-  const followUpHeaderMatch = text.match(/\n+.*💡.*[你您]可能还想.*[:：\n]/);
+  const followUpHeaderMatch = text.match(/\n+.*💡.*[你您]可能还想.*[:：\n]/)
 
   if (!followUpHeaderMatch) {
-    return null;
+    return null
   }
 
-  const splitIndex = followUpHeaderMatch.index!;
+  const splitIndex = followUpHeaderMatch.index!
   const followUpText = text.substring(
     splitIndex + followUpHeaderMatch[0].length
-  );
+  )
 
   const questions = followUpText
     .split("\n")
@@ -30,7 +30,7 @@ export function extractFollowUps(text: string): string[] | null {
         .replace(/\]?$/, "")
         .trim()
     )
-    .filter((line) => line.length > 0 && line.length < 150);
+    .filter((line) => line.length > 0 && line.length < 150)
 
-  return questions.length > 0 ? questions : null;
+  return questions.length > 0 ? questions : null
 }

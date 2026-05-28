@@ -1,11 +1,11 @@
-import { tool } from 'ai'
-import { z } from 'zod'
-import campusNavigationSkill from '../skills/campus_navigation.json'
-import compareDormsSkill from '../skills/compare_dorms.json'
-import findByCriteriaSkill from '../skills/find_by_criteria.json'
-import  { type RequestContext } from './types.ts'
+import { tool } from "ai"
+import { z } from "zod"
+import campusNavigationSkill from "../skills/campus_navigation.json"
+import compareDormsSkill from "../skills/compare_dorms.json"
+import findByCriteriaSkill from "../skills/find_by_criteria.json"
+import { type RequestContext } from "./types.ts"
 
-type SkillParameterType = 'string' | 'number' | 'boolean'
+type SkillParameterType = "string" | "number" | "boolean"
 
 interface SkillParameterDefinition {
   type: SkillParameterType
@@ -24,16 +24,16 @@ interface SkillConfig {
 }
 
 function isSkillParameterType(value: unknown): value is SkillParameterType {
-  return value === 'string' || value === 'number' || value === 'boolean'
+  return value === "string" || value === "number" || value === "boolean"
 }
 
 function isObjectRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
+  return typeof value === "object" && value !== null && !Array.isArray(value)
 }
 
 function parseSkillConfig(rawConfig: unknown): SkillConfig {
   if (!isObjectRecord(rawConfig)) {
-    throw new Error('Invalid skill config: expected object')
+    throw new Error("Invalid skill config: expected object")
   }
 
   const {
@@ -47,16 +47,16 @@ function parseSkillConfig(rawConfig: unknown): SkillConfig {
   } = rawConfig
 
   if (
-    typeof id !== 'string' ||
-    typeof name !== 'string' ||
-    typeof description !== 'string' ||
-    typeof prompt_template !== 'string' ||
-    typeof output_format !== 'string' ||
+    typeof id !== "string" ||
+    typeof name !== "string" ||
+    typeof description !== "string" ||
+    typeof prompt_template !== "string" ||
+    typeof output_format !== "string" ||
     !Array.isArray(required_tools) ||
-    required_tools.some((toolName) => typeof toolName !== 'string') ||
+    required_tools.some((toolName) => typeof toolName !== "string") ||
     !isObjectRecord(parameters)
   ) {
-    throw new Error(`Invalid skill config: ${String(id ?? 'unknown')}`)
+    throw new Error(`Invalid skill config: ${String(id ?? "unknown")}`)
   }
 
   const parsedParameters: Record<string, SkillParameterDefinition> = {}
@@ -69,8 +69,8 @@ function parseSkillConfig(rawConfig: unknown): SkillConfig {
     const { type, description: parameterDescription, required } = definition
     if (
       !isSkillParameterType(type) ||
-      typeof parameterDescription !== 'string' ||
-      typeof required !== 'boolean'
+      typeof parameterDescription !== "string" ||
+      typeof required !== "boolean"
     ) {
       throw new Error(`Invalid parameter definition: ${parameterName}`)
     }
@@ -105,19 +105,19 @@ function matchesParameterType(
   type: SkillParameterType,
   value: unknown
 ): boolean {
-  if (type === 'string') {
-    return typeof value === 'string' && value.trim().length > 0
+  if (type === "string") {
+    return typeof value === "string" && value.trim().length > 0
   }
 
-  if (type === 'number') {
-    return typeof value === 'number' && Number.isFinite(value)
+  if (type === "number") {
+    return typeof value === "number" && Number.isFinite(value)
   }
 
-  return typeof value === 'boolean'
+  return typeof value === "boolean"
 }
 
 function formatParameterValue(value: unknown): string {
-  if (typeof value === 'string') {
+  if (typeof value === "string") {
     return value.trim()
   }
 
@@ -150,7 +150,7 @@ function validateSkillParameters(
 
   for (const [name, definition] of Object.entries(skill.parameters)) {
     const value = parameters[name]
-    if (value === undefined || value === null || value === '') {
+    if (value === undefined || value === null || value === "") {
       if (definition.required) {
         missingParameters.push(name)
       }
@@ -161,7 +161,7 @@ function validateSkillParameters(
       invalidParameters.push({
         parameter: name,
         expected_type: definition.type,
-        received_type: Array.isArray(value) ? 'array' : typeof value,
+        received_type: Array.isArray(value) ? "array" : typeof value,
       })
     }
   }
@@ -170,7 +170,7 @@ function validateSkillParameters(
     throw new Error(
       JSON.stringify(
         {
-          error: 'Invalid parameters',
+          error: "Invalid parameters",
           skill_id: skill.id,
           missing_parameters: missingParameters,
           invalid_parameters: invalidParameters,
@@ -183,16 +183,16 @@ function validateSkillParameters(
 }
 
 const customSkillsSchema = z.object({
-  skill_id: z.string().describe('Predefined skill ID to execute'),
+  skill_id: z.string().describe("Predefined skill ID to execute"),
   parameters: z
     .record(z.string(), z.unknown())
-    .describe('Parameter values used to expand the skill prompt template'),
+    .describe("Parameter values used to expand the skill prompt template"),
 })
 
 export function createCustomSkillsTool(_ctx: RequestContext) {
   return tool({
     description:
-      'Expand predefined structured-query skills into prompt instructions and required tool sequences.',
+      "Expand predefined structured-query skills into prompt instructions and required tool sequences.",
     inputSchema: customSkillsSchema,
     execute: async (args: any) => {
       const { skill_id, parameters } = args as z.infer<
@@ -204,7 +204,7 @@ export function createCustomSkillsTool(_ctx: RequestContext) {
         throw new Error(
           JSON.stringify(
             {
-              error: 'Unknown skill',
+              error: "Unknown skill",
               available_skills: SKILL_CONFIGS.map(
                 ({ id, name, description }) => ({
                   id,

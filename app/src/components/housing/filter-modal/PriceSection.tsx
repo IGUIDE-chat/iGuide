@@ -12,16 +12,16 @@ import React, {
   useLayoutEffect,
   useRef,
   useState,
-} from "react";
-import Slider from "rc-slider";
-import { HISTOGRAM_DATA, type ModalText } from "./modalText";
+} from "react"
+import Slider from "rc-slider"
+import { HISTOGRAM_DATA, type ModalText } from "./modalText"
 
 interface PriceSectionProps {
-  t: ModalText;
-  priceLimits: [number, number];
-  value: [number, number];
-  onChange: (range: [number, number]) => void;
-  normalizeRange: (range: [number, number]) => [number, number];
+  t: ModalText
+  priceLimits: [number, number]
+  value: [number, number]
+  onChange: (range: [number, number]) => void
+  normalizeRange: (range: [number, number]) => [number, number]
 }
 
 const PriceSection: React.FC<PriceSectionProps> = ({
@@ -31,76 +31,80 @@ const PriceSection: React.FC<PriceSectionProps> = ({
   onChange,
   normalizeRange,
 }) => {
-  const pendingRangeRef = useRef<[number, number] | null>(null);
-  const frameRef = useRef<number | null>(null);
-  const [minInput, setMinInput] = useState<string>(() => String(value[0]));
-  const [maxInput, setMaxInput] = useState<string>(() => String(value[1]));
-  const minEditingRef = useRef(false);
-  const maxEditingRef = useRef(false);
+  const pendingRangeRef = useRef<[number, number] | null>(null)
+  const frameRef = useRef<number | null>(null)
+  const [minInput, setMinInput] = useState<string>(() => String(value[0]))
+  const [maxInput, setMaxInput] = useState<string>(() => String(value[1]))
+  const minEditingRef = useRef(false)
+  const maxEditingRef = useRef(false)
 
   const flushPending = useCallback(() => {
-    frameRef.current = null;
-    const pending = pendingRangeRef.current;
-    if (!pending) {return;}
-    pendingRangeRef.current = null;
-    onChange(pending);
-  }, [onChange]);
+    frameRef.current = null
+    const pending = pendingRangeRef.current
+    if (!pending) {
+      return
+    }
+    pendingRangeRef.current = null
+    onChange(pending)
+  }, [onChange])
 
   const queueRangeChange = useCallback(
     (nextRange: [number, number]) => {
-      pendingRangeRef.current = nextRange;
-      if (frameRef.current !== null) {return;}
-      frameRef.current = window.requestAnimationFrame(flushPending);
+      pendingRangeRef.current = nextRange
+      if (frameRef.current !== null) {
+        return
+      }
+      frameRef.current = window.requestAnimationFrame(flushPending)
     },
     [flushPending]
-  );
+  )
 
   const commitRangeChange = useCallback(
     (nextRange: [number, number]) => {
       if (frameRef.current !== null) {
-        window.cancelAnimationFrame(frameRef.current);
-        frameRef.current = null;
+        window.cancelAnimationFrame(frameRef.current)
+        frameRef.current = null
       }
-      pendingRangeRef.current = null;
-      onChange(nextRange);
+      pendingRangeRef.current = null
+      onChange(nextRange)
     },
     [onChange]
-  );
+  )
 
   useEffect(() => {
     return () => {
       if (frameRef.current !== null) {
-        window.cancelAnimationFrame(frameRef.current);
+        window.cancelAnimationFrame(frameRef.current)
       }
-    };
-  }, []);
+    }
+  }, [])
 
   useLayoutEffect(() => {
     if (!minEditingRef.current) {
-      setMinInput(String(value[0]));
+      setMinInput(String(value[0]))
     }
     if (!maxEditingRef.current) {
-      setMaxInput(String(value[1]));
+      setMaxInput(String(value[1]))
     }
-  }, [value]);
+  }, [value])
 
   const commitMinInput = useCallback(
     (raw: string) => {
-      const parsed = Number.parseInt(raw, 10);
-      const nextMin = Number.isFinite(parsed) ? parsed : value[0];
-      commitRangeChange(normalizeRange([nextMin, value[1]]));
+      const parsed = Number.parseInt(raw, 10)
+      const nextMin = Number.isFinite(parsed) ? parsed : value[0]
+      commitRangeChange(normalizeRange([nextMin, value[1]]))
     },
     [commitRangeChange, normalizeRange, value]
-  );
+  )
 
   const commitMaxInput = useCallback(
     (raw: string) => {
-      const parsed = Number.parseInt(raw, 10);
-      const nextMax = Number.isFinite(parsed) ? parsed : value[1];
-      commitRangeChange(normalizeRange([value[0], nextMax]));
+      const parsed = Number.parseInt(raw, 10)
+      const nextMax = Number.isFinite(parsed) ? parsed : value[1]
+      commitRangeChange(normalizeRange([value[0], nextMax]))
     },
     [commitRangeChange, normalizeRange, value]
-  );
+  )
 
   return (
     <section className="mb-8">
@@ -111,9 +115,7 @@ const PriceSection: React.FC<PriceSectionProps> = ({
         {HISTOGRAM_DATA.map((height, i) => (
           <div
             key={i}
-            className="
-              flex-1 rounded-t-sm bg-gray-200 transition-colors duration-200
-            "
+            className="flex-1 rounded-t-sm bg-gray-200 transition-colors duration-200"
             style={{
               height: `${height}%`,
               backgroundColor: i > 3 && i < 10 ? "#13294B" : "#E5E7EB",
@@ -131,14 +133,18 @@ const PriceSection: React.FC<PriceSectionProps> = ({
           step={100}
           value={value}
           onChange={(val) => {
-            if (!Array.isArray(val) || val.length !== 2) {return;}
-            const next = normalizeRange([Number(val[0]), Number(val[1])]);
-            queueRangeChange(next);
+            if (!Array.isArray(val) || val.length !== 2) {
+              return
+            }
+            const next = normalizeRange([Number(val[0]), Number(val[1])])
+            queueRangeChange(next)
           }}
           onChangeComplete={(val) => {
-            if (!Array.isArray(val) || val.length !== 2) {return;}
-            const next = normalizeRange([Number(val[0]), Number(val[1])]);
-            commitRangeChange(next);
+            if (!Array.isArray(val) || val.length !== 2) {
+              return
+            }
+            const next = normalizeRange([Number(val[0]), Number(val[1])])
+            commitRangeChange(next)
           }}
           trackStyle={[{ backgroundColor: "#13294B", height: 4 }]}
           railStyle={{ backgroundColor: "#E5E7EB", height: 4 }}
@@ -166,14 +172,7 @@ const PriceSection: React.FC<PriceSectionProps> = ({
       </div>
 
       <div className="flex items-center gap-4">
-        <div
-          className="
-            flex-1 rounded-xl border border-gray-300 px-3 py-2 transition-colors
-            focus-within:border-illini-orange focus-within:ring-2
-            focus-within:ring-illini-orange
-            hover:border-illini-orange
-          "
-        >
+        <div className="focus-within:border-illini-orange focus-within:ring-illini-orange hover:border-illini-orange flex-1 rounded-xl border border-gray-300 px-3 py-2 transition-colors focus-within:ring-2">
           <div className="text-xs text-gray-500">{t.minPrice}</div>
           <div className="flex items-center">
             <span className="text-lg">$</span>
@@ -182,33 +181,28 @@ const PriceSection: React.FC<PriceSectionProps> = ({
               step={100}
               value={minInput}
               onFocus={() => {
-                minEditingRef.current = true;
+                minEditingRef.current = true
               }}
               onChange={(e) => {
-                setMinInput(e.target.value);
+                setMinInput(e.target.value)
               }}
               onBlur={(e) => {
-                minEditingRef.current = false;
-                commitMinInput(e.target.value);
+                minEditingRef.current = false
+                commitMinInput(e.target.value)
               }}
               onKeyDown={(e) => {
-                if (e.key !== "Enter") {return;}
-                commitMinInput((e.currentTarget as HTMLInputElement).value);
-                e.currentTarget.blur();
+                if (e.key !== "Enter") {
+                  return
+                }
+                commitMinInput((e.currentTarget as HTMLInputElement).value)
+                e.currentTarget.blur()
               }}
               className="ml-1 w-full text-lg outline-none"
             />
           </div>
         </div>
         <div className="text-gray-400">-</div>
-        <div
-          className="
-            flex-1 rounded-xl border border-gray-300 px-3 py-2 transition-colors
-            focus-within:border-illini-orange focus-within:ring-2
-            focus-within:ring-illini-orange
-            hover:border-illini-orange
-          "
-        >
+        <div className="focus-within:border-illini-orange focus-within:ring-illini-orange hover:border-illini-orange flex-1 rounded-xl border border-gray-300 px-3 py-2 transition-colors focus-within:ring-2">
           <div className="text-xs text-gray-500">{t.maxPrice}</div>
           <div className="flex items-center">
             <span className="text-lg">$</span>
@@ -217,19 +211,21 @@ const PriceSection: React.FC<PriceSectionProps> = ({
               step={100}
               value={maxInput}
               onFocus={() => {
-                maxEditingRef.current = true;
+                maxEditingRef.current = true
               }}
               onChange={(e) => {
-                setMaxInput(e.target.value);
+                setMaxInput(e.target.value)
               }}
               onBlur={(e) => {
-                maxEditingRef.current = false;
-                commitMaxInput(e.target.value);
+                maxEditingRef.current = false
+                commitMaxInput(e.target.value)
               }}
               onKeyDown={(e) => {
-                if (e.key !== "Enter") {return;}
-                commitMaxInput((e.currentTarget as HTMLInputElement).value);
-                e.currentTarget.blur();
+                if (e.key !== "Enter") {
+                  return
+                }
+                commitMaxInput((e.currentTarget as HTMLInputElement).value)
+                e.currentTarget.blur()
               }}
               className="ml-1 w-full text-lg outline-none"
             />
@@ -237,7 +233,7 @@ const PriceSection: React.FC<PriceSectionProps> = ({
         </div>
       </div>
     </section>
-  );
-};
+  )
+}
 
-export default memo(PriceSection);
+export default memo(PriceSection)

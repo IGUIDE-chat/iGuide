@@ -1,7 +1,7 @@
-import { supabase } from "./supabase";
-import { type Housing } from "../components/housing/types/index";
+import { supabase } from "./supabase"
+import { type Housing } from "../components/housing/types/index"
 
-const TABLE = "housing";
+const TABLE = "housing"
 
 function rowToHousing(row: Record<string, unknown>): Housing {
   return {
@@ -44,34 +44,34 @@ function rowToHousing(row: Record<string, unknown>): Housing {
     pricing_options: (row.pricing_options as Record<string, unknown>) ?? null,
     created_at: row.created_at as string,
     updated_at: row.updated_at as string,
-  };
+  }
 }
 
 async function getHousing(schoolId?: string): Promise<Housing[]> {
   try {
-    let query = supabase.from(TABLE).select("*").eq("status", "active");
+    let query = supabase.from(TABLE).select("*").eq("status", "active")
 
     if (schoolId) {
-      query = query.eq("school_id", schoolId);
+      query = query.eq("school_id", schoolId)
     } else {
-      query = query.eq("school_id", "uiuc");
+      query = query.eq("school_id", "uiuc")
     }
 
-    const { data, error } = await query;
+    const { data, error } = await query
 
     if (error) {
-      console.error("[housingService] getHousing error:", error);
-      return [];
+      console.error("[housingService] getHousing error:", error)
+      return []
     }
 
     if (!data || data.length === 0) {
-      return [];
+      return []
     }
 
-    return data.map(rowToHousing);
+    return data.map(rowToHousing)
   } catch (err) {
-    console.error("[housingService] getHousing exception:", err);
-    return [];
+    console.error("[housingService] getHousing exception:", err)
+    return []
   }
 }
 
@@ -81,21 +81,21 @@ async function getHousingById(id: string): Promise<Housing | undefined> {
       .from(TABLE)
       .select("*")
       .eq("id", id)
-      .maybeSingle();
+      .maybeSingle()
 
     if (error) {
-      console.error("[housingService] getHousingById error:", error);
-      return undefined;
+      console.error("[housingService] getHousingById error:", error)
+      return undefined
     }
 
     if (!data) {
-      return undefined;
+      return undefined
     }
 
-    return rowToHousing(data);
+    return rowToHousing(data)
   } catch (err) {
-    console.error("[housingService] getHousingById exception:", err);
-    return undefined;
+    console.error("[housingService] getHousingById exception:", err)
+    return undefined
   }
 }
 
@@ -103,4 +103,4 @@ export const housingService = {
   getHousing,
   getHousingById,
   rowToHousing,
-};
+}

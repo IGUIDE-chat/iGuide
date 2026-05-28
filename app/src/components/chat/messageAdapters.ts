@@ -9,8 +9,13 @@
  * NOT for use with @assistant-ui/react (see adapters/messageAdapter.ts for that).
  */
 
-import  { type UIDataTypes, type UIMessage, type UIMessagePart, type UITools } from "ai";
-import  { type ChatMessage } from "../../types";
+import {
+  type UIDataTypes,
+  type UIMessage,
+  type UIMessagePart,
+  type UITools,
+} from "ai"
+import { type ChatMessage } from "../../types"
 
 /**
  * Convert one or more legacy ChatMessages to AI SDK UIMessages.
@@ -23,18 +28,18 @@ import  { type ChatMessage } from "../../types";
  */
 export function chatMessagesToUIMessages(legacy: ChatMessage[]): UIMessage[] {
   return legacy.map((msg) => {
-    let role: "user" | "assistant" | "tool";
-    const parts: Array<UIMessagePart<UIDataTypes, UITools>> = [];
+    let role: "user" | "assistant" | "tool"
+    const parts: Array<UIMessagePart<UIDataTypes, UITools>> = []
 
     if (msg.role === "user") {
-      role = "user";
-      const text = msg.text ?? msg.content ?? "";
-      parts.push({ type: "text", text } as UIMessagePart<UIDataTypes, UITools>);
+      role = "user"
+      const text = msg.text ?? msg.content ?? ""
+      parts.push({ type: "text", text } as UIMessagePart<UIDataTypes, UITools>)
     } else if (msg.role === "tool") {
-      role = "tool";
-      let result: unknown = msg.content ?? "";
+      role = "tool"
+      let result: unknown = msg.content ?? ""
       try {
-        result = JSON.parse(msg.content ?? "{}");
+        result = JSON.parse(msg.content ?? "{}")
       } catch {
         // content is plain text, use as-is
       }
@@ -44,18 +49,18 @@ export function chatMessagesToUIMessages(legacy: ChatMessage[]): UIMessage[] {
         toolName: "",
         args: {},
         result,
-      } as unknown as UIMessagePart<UIDataTypes, UITools>);
+      } as unknown as UIMessagePart<UIDataTypes, UITools>)
     } else {
       // "model" (legacy) or "assistant"
-      role = "assistant";
-      const text = msg.text ?? msg.content ?? "";
-      parts.push({ type: "text", text } as UIMessagePart<UIDataTypes, UITools>);
+      role = "assistant"
+      const text = msg.text ?? msg.content ?? ""
+      parts.push({ type: "text", text } as UIMessagePart<UIDataTypes, UITools>)
 
       if (msg.tool_calls && msg.tool_calls.length > 0) {
         for (const tc of msg.tool_calls) {
-          let args: unknown = {};
+          let args: unknown = {}
           try {
-            args = JSON.parse(tc.arguments);
+            args = JSON.parse(tc.arguments)
           } catch {
             // arguments string is not valid JSON, use empty object
           }
@@ -64,7 +69,7 @@ export function chatMessagesToUIMessages(legacy: ChatMessage[]): UIMessage[] {
             toolCallId: tc.id,
             toolName: tc.name,
             args,
-          } as unknown as UIMessagePart<UIDataTypes, UITools>);
+          } as unknown as UIMessagePart<UIDataTypes, UITools>)
         }
       }
     }
@@ -73,8 +78,8 @@ export function chatMessagesToUIMessages(legacy: ChatMessage[]): UIMessage[] {
       id: msg.id,
       role,
       parts,
-    } as UIMessage;
-  });
+    } as UIMessage
+  })
 }
 
 /**
@@ -91,5 +96,5 @@ export function extractAssistantText(
       (part): part is { type: "text"; text: string } => part.type === "text"
     )
     .map((part) => part.text)
-    .join("");
+    .join("")
 }

@@ -1,12 +1,12 @@
-import  { type Tool } from 'ai'
+import { type Tool } from "ai"
 
 /**
  * Thrown when the tool call budget (maxCalls) is exceeded.
  */
 export class ToolBudgetExceededError extends Error {
   constructor() {
-    super('tool_budget_exceeded')
-    this.name = 'ToolBudgetExceededError'
+    super("tool_budget_exceeded")
+    this.name = "ToolBudgetExceededError"
   }
 }
 
@@ -15,8 +15,8 @@ export class ToolBudgetExceededError extends Error {
  */
 export class ToolTimeoutError extends Error {
   constructor() {
-    super('tool_timeout')
-    this.name = 'ToolTimeoutError'
+    super("tool_timeout")
+    this.name = "ToolTimeoutError"
   }
 }
 
@@ -35,23 +35,29 @@ const DEFAULTS = {
   maxResultBytes: 4_096,
 } as const satisfies BudgetOptions
 
-const TRUNCATION_SUFFIX = '\n...[truncated]'
+const TRUNCATION_SUFFIX = "\n...[truncated]"
 
 function truncateResult(result: string, maxBytes: number): string {
-  if (maxBytes <= 0) {return TRUNCATION_SUFFIX}
+  if (maxBytes <= 0) {
+    return TRUNCATION_SUFFIX
+  }
 
   const encoder = new TextEncoder()
   const bytes = encoder.encode(result)
 
-  if (bytes.length <= maxBytes) {return result}
+  if (bytes.length <= maxBytes) {
+    return result
+  }
 
   const suffixBytes = encoder.encode(TRUNCATION_SUFFIX).length
   const contentLimit = Math.max(0, maxBytes - suffixBytes)
 
-  if (contentLimit <= 0) {return TRUNCATION_SUFFIX}
+  if (contentLimit <= 0) {
+    return TRUNCATION_SUFFIX
+  }
 
   // Decode from bytes to maintain UTF-8 character boundaries
-  const decoder = new TextDecoder('utf-8', { fatal: false, ignoreBOM: true })
+  const decoder = new TextDecoder("utf-8", { fatal: false, ignoreBOM: true })
   return decoder.decode(bytes.slice(0, contentLimit)) + TRUNCATION_SUFFIX
 }
 
@@ -80,7 +86,7 @@ export function withGuards<T extends Record<string, Tool>>(
       | ((input: unknown, options?: unknown) => unknown)
       | undefined
 
-    if (typeof rawExecute !== 'function') {
+    if (typeof rawExecute !== "function") {
       guarded[name] = rawTool as Tool
       continue
     }
@@ -116,7 +122,7 @@ export function withGuards<T extends Record<string, Tool>>(
           }
         })
 
-        if (typeof result === 'string' && maxResultBytes > 0) {
+        if (typeof result === "string" && maxResultBytes > 0) {
           return truncateResult(result, maxResultBytes)
         }
 

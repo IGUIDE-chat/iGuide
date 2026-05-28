@@ -1,21 +1,21 @@
-import  { type ToolCallPart, type ToolResultPart } from "ai";
+import { type ToolCallPart, type ToolResultPart } from "ai"
 import {
   ToolCard,
   extractToolArgs,
   extractToolResult,
   getResultMetric,
   getStringArg,
-} from "./toolUiHelpers";
+} from "./toolUiHelpers"
 
 interface GrepDocsToolUIProps {
-  toolCall: ToolCallPart;
-  toolResult?: ToolResultPart;
+  toolCall: ToolCallPart
+  toolResult?: ToolResultPart
 }
 
 export function GrepDocsToolUI({ toolCall, toolResult }: GrepDocsToolUIProps) {
-  const isLoading = !toolResult;
-  const args = extractToolArgs(toolCall);
-  const result = extractToolResult(toolResult);
+  const isLoading = !toolResult
+  const args = extractToolArgs(toolCall)
+  const result = extractToolResult(toolResult)
   return (
     <ToolCard
       icon="📄"
@@ -31,5 +31,5 @@ export function GrepDocsToolUI({ toolCall, toolResult }: GrepDocsToolUIProps) {
       )}
       isLoading={isLoading}
     />
-  );
+  )
 }

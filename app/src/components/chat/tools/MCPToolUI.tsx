@@ -1,29 +1,29 @@
-import  { type ToolCallPart, type ToolResultPart } from "ai";
+import { type ToolCallPart, type ToolResultPart } from "ai"
 import {
   ToolCard,
   extractToolArgs,
   extractToolResult,
   getResultMetric,
   getStringArg,
-} from "./toolUiHelpers";
+} from "./toolUiHelpers"
 
 interface MCPToolUIProps {
-  toolCall: ToolCallPart;
-  toolResult?: ToolResultPart;
+  toolCall: ToolCallPart
+  toolResult?: ToolResultPart
 }
 
 function humanizeMCPName(toolName: string): string {
   const stripped = toolName.startsWith("mcp_")
     ? toolName.slice("mcp_".length)
-    : toolName;
-  return stripped.replaceAll(/[_-]+/g, " ").trim() || toolName;
+    : toolName
+  return stripped.replaceAll(/[_-]+/g, " ").trim() || toolName
 }
 
 export function MCPToolUI({ toolCall, toolResult }: MCPToolUIProps) {
-  const isLoading = !toolResult;
-  const args = extractToolArgs(toolCall);
-  const result = extractToolResult(toolResult);
-  const label = humanizeMCPName(toolCall.toolName);
+  const isLoading = !toolResult
+  const args = extractToolArgs(toolCall)
+  const result = extractToolResult(toolResult)
+  const label = humanizeMCPName(toolCall.toolName)
   return (
     <ToolCard
       icon="🔧"
@@ -43,5 +43,5 @@ export function MCPToolUI({ toolCall, toolResult }: MCPToolUIProps) {
       )}
       isLoading={isLoading}
     />
-  );
+  )
 }

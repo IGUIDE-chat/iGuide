@@ -5,18 +5,18 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from "react";
-import { type Language } from "../../types";
-import CourseListPage from "./CourseListPage";
+import React from "react"
+import { type Language } from "../../types"
+import CourseListPage from "./CourseListPage"
 
 interface CoursesLandingPageProps {
-  language: Language;
+  language: Language
 }
 
 const CoursesLandingPage: React.FC<CoursesLandingPageProps> = ({
   language,
 }) => {
-  return <CourseListPage language={language} />;
-};
+  return <CourseListPage language={language} />
+}
 
-export default CoursesLandingPage;
+export default CoursesLandingPage

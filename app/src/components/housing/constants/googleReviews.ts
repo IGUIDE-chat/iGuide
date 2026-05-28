@@ -1,4 +1,4 @@
-import { type DormComment } from "../../../services/dormCommentsService";
+import { type DormComment } from "../../../services/dormCommentsService"
 
 const generateComment = (
   id: string,
@@ -9,7 +9,7 @@ const generateComment = (
   daysAgo: number,
   upvotes: number
 ): DormComment => {
-  const date = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000);
+  const date = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000)
 
   return {
     id: id,
@@ -23,8 +23,8 @@ const generateComment = (
     upvotes,
     downvotes: 0,
     myVote: null,
-  };
-};
+  }
+}
 
 export const GOOGLE_REVIEWS: DormComment[] = [
   generateComment(
@@ -4302,4 +4302,4 @@ export const GOOGLE_REVIEWS: DormComment[] = [
     194,
     10
   ),
-];
+]

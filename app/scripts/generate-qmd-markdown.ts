@@ -3,140 +3,137 @@
  * @description Generates the Markdown corpus consumed by tobi/qmd.
  */
 
-import fs from "node:fs/promises";
-import path from "node:path";
-import { execFileSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
-import dotenv from "dotenv";
-import { createClient } from "@supabase/supabase-js";
+import fs from "node:fs/promises"
+import path from "node:path"
+import { execFileSync } from "node:child_process"
+import { fileURLToPath } from "node:url"
+import dotenv from "dotenv"
+import { createClient } from "@supabase/supabase-js"
 
-import { ARTICLES } from "../src/data/articles/index";
-import  { type Article } from "../src/types";
-import { UIUC_DORMS } from "../src/components/housing/constants/dormData";
-import  {
+import { ARTICLES } from "../src/data/articles/index"
+import { type Article } from "../src/types"
+import { UIUC_DORMS } from "../src/components/housing/constants/dormData"
+import {
   type BathroomScope,
   type Dorm,
-} from "../src/components/housing/types/index";
+} from "../src/components/housing/types/index"
 import {
   finalizeDormRecord,
   sanitizeFloorPlansForStorage,
-} from "../src/utils/dormData";
-import {
-  getDormBathroomSummary,
-  normalizeDorm,
-} from "../src/utils/roomOptions";
+} from "../src/utils/dormData"
+import { getDormBathroomSummary, normalizeDorm } from "../src/utils/roomOptions"
 
-const __dirname = import.meta.dirname;
-const PROJECT_ROOT = path.resolve(__dirname, "..");
-const QMD_ROOT = path.resolve(PROJECT_ROOT, "../qmd-content");
+const __dirname = import.meta.dirname
+const PROJECT_ROOT = path.resolve(__dirname, "..")
+const QMD_ROOT = path.resolve(PROJECT_ROOT, "../qmd-content")
 const HANDBOOK_OCR_SCRIPT = path.resolve(
   PROJECT_ROOT,
   "scripts/generate-handbook-ocr.py"
-);
-const PYTHON_CMD = process.env.PYTHON ?? "python";
-const TODAY = new Date().toISOString().slice(0, 10);
-const DORMS_TABLE = "dorms";
+)
+const PYTHON_CMD = process.env.PYTHON ?? "python"
+const TODAY = new Date().toISOString().slice(0, 10)
+const DORMS_TABLE = "dorms"
 
-dotenv.config({ path: path.resolve(PROJECT_ROOT, ".env.local"), quiet: true });
-dotenv.config({ path: path.resolve(PROJECT_ROOT, ".env"), quiet: true });
+dotenv.config({ path: path.resolve(PROJECT_ROOT, ".env.local"), quiet: true })
+dotenv.config({ path: path.resolve(PROJECT_ROOT, ".env"), quiet: true })
 
 interface DormDocumentRecord {
-  dorm: Dorm;
-  updatedAt: string;
-  source: string;
+  dorm: Dorm
+  updatedAt: string
+  source: string
 }
 
 interface Frontmatter {
-  id: string;
-  type: "article" | "dorm" | "handbook";
-  lang: "en" | "zh";
-  source: string;
-  title: string;
-  updated_at: string;
-  category?: string;
-  tags?: string[];
+  id: string
+  type: "article" | "dorm" | "handbook"
+  lang: "en" | "zh"
+  source: string
+  title: string
+  updated_at: string
+  category?: string
+  tags?: string[]
 }
 
 function sanitizeLine(value: string | undefined | null) {
-  return (value ?? "").replaceAll('\r\n', "\n").trim();
+  return (value ?? "").replaceAll("\r\n", "\n").trim()
 }
 
 function sanitizeParagraph(value: string | undefined | null) {
-  return sanitizeLine(value).replaceAll(/\n{3,}/g, "\n\n");
+  return sanitizeLine(value).replaceAll(/\n{3,}/g, "\n\n")
 }
 
 function yamlString(value: string) {
-  return JSON.stringify(value);
+  return JSON.stringify(value)
 }
 
 function renderFrontmatter(frontmatter: Frontmatter) {
-  const lines = ["---"];
+  const lines = ["---"]
 
   for (const [key, value] of Object.entries(frontmatter)) {
     if (value == null) {
-      continue;
+      continue
     }
 
     if (Array.isArray(value)) {
-      lines.push(`${key}:`);
+      lines.push(`${key}:`)
       for (const item of value) {
-        lines.push(`  - ${yamlString(item)}`);
+        lines.push(`  - ${yamlString(item)}`)
       }
-      continue;
+      continue
     }
 
-    lines.push(`${key}: ${yamlString(String(value))}`);
+    lines.push(`${key}: ${yamlString(String(value))}`)
   }
 
-  lines.push("---", "");
-  return lines.join("\n");
+  lines.push("---", "")
+  return lines.join("\n")
 }
 
 function renderBulletList(items: Array<string | undefined>, emptyText: string) {
-  const normalized = items.map((item) => sanitizeLine(item)).filter(Boolean);
+  const normalized = items.map((item) => sanitizeLine(item)).filter(Boolean)
 
   if (normalized.length === 0) {
-    return `- ${emptyText}`;
+    return `- ${emptyText}`
   }
 
-  return normalized.map((item) => `- ${item}`).join("\n");
+  return normalized.map((item) => `- ${item}`).join("\n")
 }
 
 function renderOptionalValue(label: string, value: string | undefined) {
-  const normalized = sanitizeLine(value);
-  return normalized ? `- ${label}: ${normalized}` : undefined;
+  const normalized = sanitizeLine(value)
+  return normalized ? `- ${label}: ${normalized}` : undefined
 }
 
 function getArticleTitle(article: Article, lang: "en" | "zh") {
   return lang === "zh"
     ? sanitizeLine(article.title_zh) || article.title
-    : article.title;
+    : article.title
 }
 
 function getArticleSummary(article: Article, lang: "en" | "zh") {
   return lang === "zh"
     ? sanitizeLine(article.summary_zh) || article.summary
-    : article.summary;
+    : article.summary
 }
 
 function getArticleContent(article: Article, lang: "en" | "zh") {
   return lang === "zh"
     ? sanitizeParagraph(article.content_zh) ||
         sanitizeParagraph(article.content)
-    : sanitizeParagraph(article.content);
+    : sanitizeParagraph(article.content)
 }
 
 function getArticleTags(article: Article, lang: "en" | "zh") {
   return lang === "zh" && article.tags_zh?.length
     ? article.tags_zh
-    : article.tags;
+    : article.tags
 }
 
 function buildArticleMarkdown(article: Article, lang: "en" | "zh") {
-  const title = getArticleTitle(article, lang);
-  const summary = getArticleSummary(article, lang);
-  const content = getArticleContent(article, lang);
-  const tags = getArticleTags(article, lang);
+  const title = getArticleTitle(article, lang)
+  const summary = getArticleSummary(article, lang)
+  const content = getArticleContent(article, lang)
+  const tags = getArticleTags(article, lang)
 
   const frontmatter = renderFrontmatter({
     id: article.id,
@@ -147,7 +144,7 @@ function buildArticleMarkdown(article: Article, lang: "en" | "zh") {
     updated_at: article.lastUpdated,
     category: article.category,
     tags,
-  });
+  })
 
   return (
     frontmatter +
@@ -167,32 +164,32 @@ function buildArticleMarkdown(article: Article, lang: "en" | "zh") {
       content,
       "",
     ].join("\n")
-  );
+  )
 }
 
 function getDormTitle(dorm: Dorm, lang: "en" | "zh") {
-  return lang === "zh" ? sanitizeLine(dorm.name_zh) || dorm.name : dorm.name;
+  return lang === "zh" ? sanitizeLine(dorm.name_zh) || dorm.name : dorm.name
 }
 
 function getDormDescription(dorm: Dorm, lang: "en" | "zh") {
   return lang === "zh"
     ? sanitizeParagraph(dorm.description_zh) ||
         sanitizeParagraph(dorm.description)
-    : sanitizeParagraph(dorm.description);
+    : sanitizeParagraph(dorm.description)
 }
 
 function getDormPros(dorm: Dorm, lang: "en" | "zh") {
-  return lang === "zh" && dorm.pros_zh?.length ? dorm.pros_zh : dorm.pros;
+  return lang === "zh" && dorm.pros_zh?.length ? dorm.pros_zh : dorm.pros
 }
 
 function getDormCons(dorm: Dorm, lang: "en" | "zh") {
-  return lang === "zh" && dorm.cons_zh?.length ? dorm.cons_zh : dorm.cons;
+  return lang === "zh" && dorm.cons_zh?.length ? dorm.cons_zh : dorm.cons
 }
 
 function getDormLocation(dorm: Dorm, lang: "en" | "zh") {
   return lang === "zh"
     ? sanitizeLine(dorm.location_zh) || dorm.location
-    : dorm.location;
+    : dorm.location
 }
 
 function getHousingTypeLabel(
@@ -200,11 +197,11 @@ function getHousingTypeLabel(
   lang: "en" | "zh"
 ) {
   if (lang === "zh") {
-    return housingType === "URH" ? "大学宿舍（URH）" : "认证私营宿舍（PCH）";
+    return housingType === "URH" ? "大学宿舍（URH）" : "认证私营宿舍（PCH）"
   }
   return housingType === "URH"
     ? "University Residence Halls (URH)"
-    : "Private Certified Housing (PCH)";
+    : "Private Certified Housing (PCH)"
 }
 
 function getDiningLabel(dining: Dorm["dining"], lang: "en" | "zh") {
@@ -219,16 +216,16 @@ function getDiningLabel(dining: Dorm["dining"], lang: "en" | "zh") {
       nearby: "附近就餐",
       none: "无配套餐饮",
     },
-  };
+  }
 
-  return labels[lang][dining];
+  return labels[lang][dining]
 }
 
 function getAcLabel(ac: boolean, lang: "en" | "zh") {
   if (lang === "zh") {
-    return ac ? "有空调" : "无空调";
+    return ac ? "有空调" : "无空调"
   }
-  return ac ? "Air-conditioned" : "No AC";
+  return ac ? "Air-conditioned" : "No AC"
 }
 
 function getBathroomScopeLabel(scope: BathroomScope, lang: "en" | "zh") {
@@ -245,84 +242,84 @@ function getBathroomScopeLabel(scope: BathroomScope, lang: "en" | "zh") {
       "semi-private": "半独立卫浴",
       private: "独立卫浴",
     },
-  };
+  }
 
-  return labels[lang][scope];
+  return labels[lang][scope]
 }
 
 function formatCurrency(value: number | undefined) {
   return typeof value === "number" && Number.isFinite(value)
     ? `$${value.toLocaleString("en-US")}`
-    : undefined;
+    : undefined
 }
 
 function buildRoomOptionLine(
   option: NonNullable<Dorm["roomOptions"]>[number],
   lang: "en" | "zh"
 ) {
-  const parts: string[] = [];
+  const parts: string[] = []
 
   if (option.labelCode) {
-    parts.push(option.labelCode);
+    parts.push(option.labelCode)
   }
   if (option.bedCount != null) {
     parts.push(
       lang === "zh" ? `${option.bedCount}人` : `${option.bedCount} bed`
-    );
+    )
   }
   if (
     option.bathroomScope === "communal" ||
     option.bathroomScope === "individual-use"
   ) {
-    parts.push(getBathroomScopeLabel(option.bathroomScope, lang));
+    parts.push(getBathroomScopeLabel(option.bathroomScope, lang))
   } else if (option.bathroomCount != null && option.bathroomCount > 0) {
     parts.push(
       lang === "zh"
         ? `${option.bathroomCount}卫`
         : `${option.bathroomCount} bath`
-    );
+    )
   } else {
-    parts.push(getBathroomScopeLabel(option.bathroomScope, lang));
+    parts.push(getBathroomScopeLabel(option.bathroomScope, lang))
   }
 
-  return parts.join(" | ");
+  return parts.join(" | ")
 }
 
 function buildFloorPlanLine(
   plan: NonNullable<Dorm["floorPlans"]>[number],
   lang: "en" | "zh"
 ) {
-  const parts: string[] = [];
+  const parts: string[] = []
   const displayName =
     sanitizeLine(plan.officialName) ||
     plan.labelCode ||
     plan.type ||
-    (lang === "zh" ? "未命名房型" : "Unnamed layout");
+    (lang === "zh" ? "未命名房型" : "Unnamed layout")
 
-  parts.push(displayName);
+  parts.push(displayName)
 
   if (typeof plan.price === "number") {
-    parts.push(formatCurrency(plan.price) ?? "");
+    parts.push(formatCurrency(plan.price) ?? "")
   }
   if (typeof plan.sqft === "number" && Number.isFinite(plan.sqft)) {
-    parts.push(`${plan.sqft} sqft`);
+    parts.push(`${plan.sqft} sqft`)
   }
   if (plan.bedSize) {
-    parts.push(plan.bedSize);
+    parts.push(plan.bedSize)
   }
   if (plan.description) {
-    parts.push(sanitizeLine(plan.description));
+    parts.push(sanitizeLine(plan.description))
   }
 
-  return parts.filter(Boolean).join(" | ");
+  return parts.filter(Boolean).join(" | ")
 }
 
 function buildDormMarkdown(record: DormDocumentRecord, lang: "en" | "zh") {
-  const { dorm, updatedAt, source } = record;
-  const title = getDormTitle(dorm, lang);
-  const description = getDormDescription(dorm, lang);
-  const website = sanitizeLine(dorm.website);
-  const imageUrl = sanitizeLine(dorm.imageUrl);
+  const { dorm, updatedAt, source } = record
+  const title = getDormTitle(dorm, lang)
+  const description = getDormDescription(dorm, lang)
+  const website = sanitizeLine(dorm.website)
+  const imageUrl = sanitizeLine(dorm.imageUrl)
 
   const quickFacts = [
     renderOptionalValue(
@@ -350,19 +347,19 @@ function buildDormMarkdown(record: DormDocumentRecord, lang: "en" | "zh") {
     ),
     renderOptionalValue(lang === "zh" ? "官网" : "Website", website),
     renderOptionalValue(lang === "zh" ? "主图" : "Primary Image", imageUrl),
-  ].filter(Boolean) as string[];
+  ].filter(Boolean) as string[]
 
   const roomOptions = dorm.roomOptions?.length
     ? dorm.roomOptions
         .map((option) => `- ${buildRoomOptionLine(option, lang)}`)
         .join("\n")
-    : `- ${lang === "zh" ? "无房型选项数据" : "No room option data"}`;
+    : `- ${lang === "zh" ? "无房型选项数据" : "No room option data"}`
 
   const floorPlans = dorm.floorPlans?.length
     ? dorm.floorPlans
         .map((plan) => `- ${buildFloorPlanLine(plan, lang)}`)
         .join("\n")
-    : `- ${lang === "zh" ? "无详细户型数据" : "No detailed floor plan data"}`;
+    : `- ${lang === "zh" ? "无详细户型数据" : "No detailed floor plan data"}`
 
   const frontmatter = renderFrontmatter({
     id: dorm.id,
@@ -372,7 +369,7 @@ function buildDormMarkdown(record: DormDocumentRecord, lang: "en" | "zh") {
     title,
     updated_at: updatedAt,
     tags: dorm.tags,
-  });
+  })
 
   return (
     frontmatter +
@@ -417,11 +414,11 @@ function buildDormMarkdown(record: DormDocumentRecord, lang: "en" | "zh") {
       floorPlans,
       "",
     ].join("\n")
-  );
+  )
 }
 
 function mapDormRow(row: Record<string, unknown>): DormDocumentRecord {
-  const fallbackDorm = UIUC_DORMS.find((item) => item.id === row.id);
+  const fallbackDorm = UIUC_DORMS.find((item) => item.id === row.id)
   const dorm = finalizeDormRecord(
     normalizeDorm({
       id: row.id as string,
@@ -489,13 +486,13 @@ function mapDormRow(row: Record<string, unknown>): DormDocumentRecord {
       address_zh: (row.address_zh as string) ?? fallbackDorm?.address_zh,
       website: (row.website as string) ?? fallbackDorm?.website,
     })
-  );
+  )
 
   return {
     dorm,
     updatedAt: typeof row.updated_at === "string" ? row.updated_at : TODAY,
     source: "supabase:dorms",
-  };
+  }
 }
 
 function fallbackDormRecords(): DormDocumentRecord[] {
@@ -503,101 +500,101 @@ function fallbackDormRecords(): DormDocumentRecord[] {
     dorm,
     updatedAt: TODAY,
     source: "src/components/housing/constants/dormData.ts",
-  }));
+  }))
 }
 
 async function fetchDormRecords(): Promise<DormDocumentRecord[]> {
-  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL
   const supabaseKey =
     process.env.SUPABASE_SERVICE_KEY ||
     process.env.SUPABASE_ANON_KEY ||
-    process.env.VITE_SUPABASE_ANON_KEY;
+    process.env.VITE_SUPABASE_ANON_KEY
 
   if (!supabaseUrl || !supabaseKey) {
     console.warn(
       "[qmd] Supabase env missing. Falling back to static dorm data."
-    );
-    return fallbackDormRecords();
+    )
+    return fallbackDormRecords()
   }
 
   try {
-    const supabase = createClient(supabaseUrl, supabaseKey);
-    const { data, error } = await supabase.from(DORMS_TABLE).select("*");
+    const supabase = createClient(supabaseUrl, supabaseKey)
+    const { data, error } = await supabase.from(DORMS_TABLE).select("*")
 
     if (error) {
       console.warn(
         `[qmd] Failed to fetch dorms from Supabase: ${error.message}`
-      );
-      return fallbackDormRecords();
+      )
+      return fallbackDormRecords()
     }
 
     if (!data?.length) {
       console.warn(
         "[qmd] Supabase dorm query returned no rows. Falling back to static dorm data."
-      );
-      return fallbackDormRecords();
+      )
+      return fallbackDormRecords()
     }
 
-    return data.map((row) => mapDormRow(row as Record<string, unknown>));
+    return data.map((row) => mapDormRow(row as Record<string, unknown>))
   } catch (error) {
     console.warn(
       "[qmd] Supabase dorm fetch threw. Falling back to static dorm data.",
       error
-    );
-    return fallbackDormRecords();
+    )
+    return fallbackDormRecords()
   }
 }
 
 async function resetManagedDirectories() {
-  await fs.mkdir(QMD_ROOT, { recursive: true });
+  await fs.mkdir(QMD_ROOT, { recursive: true })
   await Promise.all([
     fs.rm(path.join(QMD_ROOT, "articles"), { recursive: true, force: true }),
     fs.rm(path.join(QMD_ROOT, "dorms"), { recursive: true, force: true }),
     fs.rm(path.join(QMD_ROOT, "handbook"), { recursive: true, force: true }),
-  ]);
+  ])
 }
 
 async function ensureDir(dirPath: string) {
-  await fs.mkdir(dirPath, { recursive: true });
+  await fs.mkdir(dirPath, { recursive: true })
 }
 
 async function writeFile(filePath: string, content: string) {
-  await ensureDir(path.dirname(filePath));
-  await fs.writeFile(filePath, content, "utf8");
+  await ensureDir(path.dirname(filePath))
+  await fs.writeFile(filePath, content, "utf8")
 }
 
 async function generateArticleCorpus() {
   for (const lang of ["en", "zh"] as const) {
-    const outputDir = path.join(QMD_ROOT, "articles", lang);
-    await ensureDir(outputDir);
+    const outputDir = path.join(QMD_ROOT, "articles", lang)
+    await ensureDir(outputDir)
 
     for (const article of ARTICLES) {
       await writeFile(
         path.join(outputDir, `${article.id}.md`),
         buildArticleMarkdown(article, lang)
-      );
+      )
     }
   }
 
-  console.log(`[qmd] Wrote ${ARTICLES.length * 2} article documents.`);
+  console.log(`[qmd] Wrote ${ARTICLES.length * 2} article documents.`)
 }
 
 async function generateDormCorpus() {
-  const records = await fetchDormRecords();
+  const records = await fetchDormRecords()
 
   for (const lang of ["en", "zh"] as const) {
-    const outputDir = path.join(QMD_ROOT, "dorms", lang);
-    await ensureDir(outputDir);
+    const outputDir = path.join(QMD_ROOT, "dorms", lang)
+    await ensureDir(outputDir)
 
     for (const record of records) {
       await writeFile(
         path.join(outputDir, `${record.dorm.id}.md`),
         buildDormMarkdown(record, lang)
-      );
+      )
     }
   }
 
-  console.log(`[qmd] Wrote ${records.length * 2} dorm documents.`);
+  console.log(`[qmd] Wrote ${records.length * 2} dorm documents.`)
 }
 
 function generateHandbookCorpus() {
@@ -606,7 +603,7 @@ function generateHandbookCorpus() {
     "handbook",
     "zh",
     "uiuc-new-student-handbook-2025.md"
-  );
+  )
 
   execFileSync(
     PYTHON_CMD,
@@ -615,25 +612,25 @@ function generateHandbookCorpus() {
       cwd: PROJECT_ROOT,
       stdio: "inherit",
     }
-  );
+  )
 
-  console.log(`[qmd] Wrote handbook document to ${outputPath}.`);
+  console.log(`[qmd] Wrote handbook document to ${outputPath}.`)
 }
 
 export async function generateQmdMarkdown() {
-  await resetManagedDirectories();
-  await generateArticleCorpus();
-  await generateDormCorpus();
-  generateHandbookCorpus();
+  await resetManagedDirectories()
+  await generateArticleCorpus()
+  await generateDormCorpus()
+  generateHandbookCorpus()
 }
 
 const isDirectRun =
   typeof process.argv[1] === "string" &&
-  path.resolve(process.argv[1]) === import.meta.filename;
+  path.resolve(process.argv[1]) === import.meta.filename
 
 if (isDirectRun) {
   generateQmdMarkdown().catch((error) => {
-    console.error("[qmd] Markdown generation failed:", error);
-    process.exit(1);
-  });
+    console.error("[qmd] Markdown generation failed:", error)
+    process.exit(1)
+  })
 }

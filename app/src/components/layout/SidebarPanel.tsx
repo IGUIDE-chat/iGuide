@@ -5,20 +5,20 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from "react";
-import { type Language } from "../../types";
-import { ConversationSidebar } from "./ConversationSidebar";
-import { LibrarySidebar } from "./LibrarySidebar";
-import { DormSidebar } from "./DormSidebar";
+import React from "react"
+import { type Language } from "../../types"
+import { ConversationSidebar } from "./ConversationSidebar"
+import { LibrarySidebar } from "./LibrarySidebar"
+import { DormSidebar } from "./DormSidebar"
 
 interface SidebarPanelProps {
-  activeTab: string;
-  language: Language;
-  currentPath: string;
-  currentConversationId?: string | null;
-  onNewConversation?: () => void;
-  onSelectConversation?: (conversationId: string | null) => void;
-  favoritesIconRef: React.RefObject<SVGSVGElement | null>;
+  activeTab: string
+  language: Language
+  currentPath: string
+  currentConversationId?: string | null
+  onNewConversation?: () => void
+  onSelectConversation?: (conversationId: string | null) => void
+  favoritesIconRef: React.RefObject<SVGSVGElement | null>
 }
 
 export const SidebarPanel: React.FC<SidebarPanelProps> = ({
@@ -31,12 +31,7 @@ export const SidebarPanel: React.FC<SidebarPanelProps> = ({
   favoritesIconRef,
 }) => {
   return (
-    <div
-      className="
-        mx-3 flex min-h-0 flex-1 flex-col overflow-hidden border-t
-        border-white/10 pt-2
-      "
-    >
+    <div className="mx-3 flex min-h-0 flex-1 flex-col overflow-hidden border-t border-white/10 pt-2">
       {activeTab === "chat" && (
         <ConversationSidebar
           currentConversationId={currentConversationId ?? null}
@@ -67,5 +62,5 @@ export const SidebarPanel: React.FC<SidebarPanelProps> = ({
         />
       )}
     </div>
-  );
-};
+  )
+}

@@ -1,7 +1,7 @@
-import { tool } from 'ai'
-import { z } from 'zod'
-import { callSupabaseRpc } from '../lib/supabase-rpc.ts'
-import  { type RequestContext } from './types.ts'
+import { tool } from "ai"
+import { z } from "zod"
+import { callSupabaseRpc } from "../lib/supabase-rpc.ts"
+import { type RequestContext } from "./types.ts"
 
 interface KeywordSearchResult {
   id: string
@@ -14,7 +14,7 @@ interface KeywordSearchResult {
 
 function formatResults(results: KeywordSearchResult[]): string {
   if (results.length === 0) {
-    return 'No documents matched the pattern.'
+    return "No documents matched the pattern."
   }
 
   return results
@@ -22,28 +22,28 @@ function formatResults(results: KeywordSearchResult[]): string {
       const snippet = result.content.slice(0, 300)
       return `## ${result.title}\nURL: ${result.url}\nRelevance: ${result.fts_rank.toFixed(2)}\n\n${snippet}\n---`
     })
-    .join('\n')
+    .join("\n")
 }
 
 const grepDocsSchema = z.object({
-  pattern: z.string().describe('Keyword or phrase to search for'),
+  pattern: z.string().describe("Keyword or phrase to search for"),
   category: z
     .string()
     .optional()
-    .describe('Optional document category to filter by'),
+    .describe("Optional document category to filter by"),
   limit: z
     .number()
     .int()
     .min(1)
     .max(50)
     .optional()
-    .describe('Maximum number of results (default 5)'),
+    .describe("Maximum number of results (default 5)"),
 })
 
 export function createGrepDocsTool(ctx: RequestContext) {
   return tool({
     description:
-      'Search documents for exact keyword or phrase matches. Use when looking for specific terms, policy numbers, dates, or exact phrases.',
+      "Search documents for exact keyword or phrase matches. Use when looking for specific terms, policy numbers, dates, or exact phrases.",
     inputSchema: grepDocsSchema,
     execute: async (args: any, options: any) => {
       const { pattern, limit: rawLimit } = args as z.infer<
@@ -54,7 +54,7 @@ export function createGrepDocsTool(ctx: RequestContext) {
 
       const results = await callSupabaseRpc<KeywordSearchResult[]>(
         ctx,
-        'keyword_search',
+        "keyword_search",
         {
           query_text: pattern,
           match_count: matchCount,

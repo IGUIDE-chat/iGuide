@@ -1,15 +1,15 @@
-import  {
+import {
   type MCPAdapterClient,
   type MCPCallResult,
   type MCPDiscoveredTool,
   type MCPDiscoveryResult,
   type MCPFailureReason,
   type MCPTestResult,
-} from './adapter'
-import  { type ToolResult } from '../tools/types'
+} from "./adapter"
+import { type ToolResult } from "../tools/types"
 
-const JSON_RPC_VERSION = '2.0'
-const PROTOCOL_VERSION = '2024-11-05'
+const JSON_RPC_VERSION = "2.0"
+const PROTOCOL_VERSION = "2024-11-05"
 const DEFAULT_TIMEOUT_MS = 10_000
 
 type JsonRpcId = 1 | 2 | 3
@@ -17,7 +17,7 @@ type JsonRpcId = 1 | 2 | 3
 interface JsonRpcRequest {
   jsonrpc: typeof JSON_RPC_VERSION
   id: JsonRpcId
-  method: 'initialize' | 'tools/list' | 'tools/call'
+  method: "initialize" | "tools/list" | "tools/call"
   params: Record<string, unknown>
 }
 
@@ -57,16 +57,16 @@ export class StreamableHttpMCPClient implements MCPAdapterClient {
   }
 
   async test(url: string): Promise<MCPTestResult> {
-    const request = this.buildRequest(1, 'initialize', {
+    const request = this.buildRequest(1, "initialize", {
       protocolVersion: PROTOCOL_VERSION,
       capabilities: {},
       clientInfo: {
-        name: 'iguide',
-        version: '1.0',
+        name: "iguide",
+        version: "1.0",
       },
     })
 
-    const response = await this.send(url, request, 'invalid_mcp_response')
+    const response = await this.send(url, request, "invalid_mcp_response")
     if (!response.success) {
       return {
         success: false,
@@ -85,8 +85,8 @@ export class StreamableHttpMCPClient implements MCPAdapterClient {
   }
 
   async discover(url: string): Promise<MCPDiscoveryResult> {
-    const request = this.buildRequest(2, 'tools/list', {})
-    const response = await this.send(url, request, 'invalid_mcp_response')
+    const request = this.buildRequest(2, "tools/list", {})
+    const response = await this.send(url, request, "invalid_mcp_response")
 
     if (!response.success) {
       return {
@@ -115,12 +115,12 @@ export class StreamableHttpMCPClient implements MCPAdapterClient {
     toolName: string,
     args: unknown
   ): Promise<MCPCallResult> {
-    const request = this.buildRequest(3, 'tools/call', {
+    const request = this.buildRequest(3, "tools/call", {
       name: toolName,
       arguments: isRecord(args) ? args : {},
     })
 
-    const response = await this.send(url, request, 'unknown')
+    const response = await this.send(url, request, "unknown")
     if (!response.success) {
       return {
         success: false,
@@ -156,7 +156,7 @@ export class StreamableHttpMCPClient implements MCPAdapterClient {
 
   private buildRequest(
     id: JsonRpcId,
-    method: JsonRpcRequest['method'],
+    method: JsonRpcRequest["method"],
     params: Record<string, unknown>
   ): JsonRpcRequest {
     return {
@@ -178,10 +178,10 @@ export class StreamableHttpMCPClient implements MCPAdapterClient {
 
     try {
       const response = await this.fetchImpl(url, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
+          "Content-Type": "application/json",
+          Accept: "application/json",
         },
         body: JSON.stringify(payload),
         signal: controller.signal,
@@ -192,7 +192,7 @@ export class StreamableHttpMCPClient implements MCPAdapterClient {
       if (response.status === 401 || response.status === 403) {
         return {
           success: false,
-          failure_reason: 'auth_required',
+          failure_reason: "auth_required",
           error_message: `MCP endpoint requires authentication (${response.status})`,
           latency_ms,
         }
@@ -203,8 +203,8 @@ export class StreamableHttpMCPClient implements MCPAdapterClient {
       if (!response.ok) {
         return {
           success: false,
-          failure_reason: 'invalid_mcp_response',
-          error_message: `MCP endpoint returned HTTP ${response.status}${responseText ? `: ${responseText}` : ''}`,
+          failure_reason: "invalid_mcp_response",
+          error_message: `MCP endpoint returned HTTP ${response.status}${responseText ? `: ${responseText}` : ""}`,
           latency_ms,
         }
       }
@@ -213,7 +213,7 @@ export class StreamableHttpMCPClient implements MCPAdapterClient {
       if (!parsedResponse.success) {
         return {
           success: false,
-          failure_reason: 'invalid_mcp_response',
+          failure_reason: "invalid_mcp_response",
           error_message: parsedResponse.error_message,
           latency_ms,
         }
@@ -222,8 +222,8 @@ export class StreamableHttpMCPClient implements MCPAdapterClient {
       if (!isRecord(parsedResponse.value)) {
         return {
           success: false,
-          failure_reason: 'invalid_mcp_response',
-          error_message: 'MCP response must be a JSON object',
+          failure_reason: "invalid_mcp_response",
+          error_message: "MCP response must be a JSON object",
           latency_ms,
           raw_response: parsedResponse.value,
         }
@@ -235,15 +235,15 @@ export class StreamableHttpMCPClient implements MCPAdapterClient {
       ) {
         return {
           success: false,
-          failure_reason: 'invalid_mcp_response',
+          failure_reason: "invalid_mcp_response",
           error_message:
-            'MCP response did not match the expected JSON-RPC envelope',
+            "MCP response did not match the expected JSON-RPC envelope",
           latency_ms,
           raw_response: parsedResponse.value,
         }
       }
 
-      if ('error' in parsedResponse.value) {
+      if ("error" in parsedResponse.value) {
         const error = parsedResponse.value.error
         return {
           success: false,
@@ -257,8 +257,8 @@ export class StreamableHttpMCPClient implements MCPAdapterClient {
       if (!isRecord(parsedResponse.value.result)) {
         return {
           success: false,
-          failure_reason: 'invalid_mcp_response',
-          error_message: 'MCP response result was missing or invalid',
+          failure_reason: "invalid_mcp_response",
+          error_message: "MCP response result was missing or invalid",
           latency_ms,
           raw_response: parsedResponse.value,
         }
@@ -274,7 +274,7 @@ export class StreamableHttpMCPClient implements MCPAdapterClient {
       if (isAbortError(error)) {
         return {
           success: false,
-          failure_reason: 'timeout',
+          failure_reason: "timeout",
           error_message: `MCP request timed out after ${this.timeoutMs}ms`,
           latency_ms: null,
         }
@@ -282,11 +282,11 @@ export class StreamableHttpMCPClient implements MCPAdapterClient {
 
       return {
         success: false,
-        failure_reason: 'unreachable',
+        failure_reason: "unreachable",
         error_message:
           error instanceof Error
             ? error.message
-            : 'MCP endpoint was unreachable',
+            : "MCP endpoint was unreachable",
         latency_ms: null,
       }
     } finally {
@@ -305,10 +305,10 @@ export class StreamableHttpMCPClient implements MCPAdapterClient {
         success: false,
         result: {
           success: false,
-          failure_reason: 'invalid_mcp_response',
+          failure_reason: "invalid_mcp_response",
           tools: [],
           error_message:
-            'MCP tools/list response did not contain a tools array',
+            "MCP tools/list response did not contain a tools array",
         },
       }
     }
@@ -318,9 +318,9 @@ export class StreamableHttpMCPClient implements MCPAdapterClient {
         success: false,
         result: {
           success: false,
-          failure_reason: 'no_tools_discovered',
+          failure_reason: "no_tools_discovered",
           tools: [],
-          error_message: 'MCP endpoint returned no tools',
+          error_message: "MCP endpoint returned no tools",
         },
       }
     }
@@ -328,14 +328,14 @@ export class StreamableHttpMCPClient implements MCPAdapterClient {
     const tools: MCPDiscoveredTool[] = []
 
     for (const entry of result.tools) {
-      if (!isRecord(entry) || typeof entry.name !== 'string') {
+      if (!isRecord(entry) || typeof entry.name !== "string") {
         return {
           success: false,
           result: {
             success: false,
-            failure_reason: 'invalid_mcp_response',
+            failure_reason: "invalid_mcp_response",
             tools: [],
-            error_message: 'MCP tools/list returned a malformed tool entry',
+            error_message: "MCP tools/list returned a malformed tool entry",
           },
         }
       }
@@ -345,7 +345,7 @@ export class StreamableHttpMCPClient implements MCPAdapterClient {
           success: false,
           result: {
             success: false,
-            failure_reason: 'invalid_mcp_response',
+            failure_reason: "invalid_mcp_response",
             tools: [],
             error_message: `MCP tool ${entry.name} is missing a valid inputSchema`,
           },
@@ -356,7 +356,7 @@ export class StreamableHttpMCPClient implements MCPAdapterClient {
         url,
         name: entry.name,
         description:
-          typeof entry.description === 'string' ? entry.description : '',
+          typeof entry.description === "string" ? entry.description : "",
         parameters: entry.inputSchema,
       })
     }
@@ -382,8 +382,8 @@ export class StreamableHttpMCPClient implements MCPAdapterClient {
       tool_result: {
         content,
         metadata: {
-          adapter: 'mcp',
-          transport: 'streamable_http',
+          adapter: "mcp",
+          transport: "streamable_http",
           url,
           tool: toolName,
         },
@@ -400,7 +400,7 @@ function parseJson(
   if (!value) {
     return {
       success: false,
-      error_message: 'MCP response body was empty',
+      error_message: "MCP response body was empty",
     }
   }
 
@@ -415,23 +415,23 @@ function parseJson(
       error_message:
         error instanceof Error
           ? `MCP response was not valid JSON: ${error.message}`
-          : 'MCP response was not valid JSON',
+          : "MCP response was not valid JSON",
     }
   }
 }
 
 function formatRpcError(error: unknown): string {
   if (!isRecord(error)) {
-    return 'MCP endpoint returned a JSON-RPC error'
+    return "MCP endpoint returned a JSON-RPC error"
   }
 
   const rpcError = error as JsonRpcError
   const codePart =
-    typeof rpcError.code === 'number' ? ` (${rpcError.code})` : ''
+    typeof rpcError.code === "number" ? ` (${rpcError.code})` : ""
   const messagePart =
-    typeof rpcError.message === 'string'
+    typeof rpcError.message === "string"
       ? rpcError.message
-      : 'MCP endpoint returned a JSON-RPC error'
+      : "MCP endpoint returned a JSON-RPC error"
 
   return `${messagePart}${codePart}`
 }
@@ -452,21 +452,21 @@ function formatToolContent(
     .map((item) => {
       if (
         isRecord(item) &&
-        item.type === 'text' &&
-        typeof item.text === 'string'
+        item.type === "text" &&
+        typeof item.text === "string"
       ) {
         return item.text
       }
 
       return JSON.stringify(item)
     })
-    .join('\n')
+    .join("\n")
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
+  return typeof value === "object" && value !== null && !Array.isArray(value)
 }
 
 function isAbortError(error: unknown): boolean {
-  return error instanceof Error && error.name === 'AbortError'
+  return error instanceof Error && error.name === "AbortError"
 }

@@ -5,21 +5,21 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { cozeProvider } from "./providers/cozeProvider";
-import { geminiProvider } from "./providers/geminiProvider";
-import { deepseekProvider } from "./providers/deepseekProvider";
-import { type StreamChatResponseFn } from "./types";
+import { cozeProvider } from "./providers/cozeProvider"
+import { geminiProvider } from "./providers/geminiProvider"
+import { deepseekProvider } from "./providers/deepseekProvider"
+import { type StreamChatResponseFn } from "./types"
 
 // Force deepseek to ensure the transition from Coze takes effect regardless of Cloudflare env vars
-const providerKey = "deepseek";
+const providerKey = "deepseek"
 const providers = {
   coze: cozeProvider,
   gemini: geminiProvider,
   deepseek: deepseekProvider,
-};
-const activeProvider = providers[providerKey];
+}
+const activeProvider = providers[providerKey]
 
-export const getActiveAIProvider = () => activeProvider.id;
+export const getActiveAIProvider = () => activeProvider.id
 
 export const streamChatResponse: StreamChatResponseFn = (
   history,
@@ -34,5 +34,5 @@ export const streamChatResponse: StreamChatResponseFn = (
     lang,
     conversationId,
     userId
-  );
-};
+  )
+}

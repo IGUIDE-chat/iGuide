@@ -7,15 +7,15 @@
 
 // [UTILITY] Tag label i18n and hero tag selection utilities.
 // [工具] 标签国际化和 Hero 标签选择工具。
-import { type Language } from "../types";
+import { type Language } from "../types"
 import {
   type DormCategorizedTags,
   type DormTag,
-} from "../components/housing/types/index";
+} from "../components/housing/types/index"
 import {
   TAG_REGISTRY,
   getTagDisplay,
-} from "../components/housing/constants/metadata";
+} from "../components/housing/constants/metadata"
 
 // ── Legacy tag map (kept for backward compat during migration) ──────────────
 
@@ -81,16 +81,16 @@ const TAG_ZH_MAP: Record<string, string> = {
   Apartment: "公寓型",
   "Suite Style": "套房型",
   Premium: "高端",
-};
+}
 
-export const KNOWN_TAGS: string[] = Object.keys(TAG_ZH_MAP).toSorted();
+export const KNOWN_TAGS: string[] = Object.keys(TAG_ZH_MAP).toSorted()
 
 /** Legacy: Return the localised label for an old-style string tag. */
 export function getTagLabel(tag: string, language: Language): string {
   if (language === "zh") {
-    return TAG_ZH_MAP[tag] ?? tag;
+    return TAG_ZH_MAP[tag] ?? tag
   }
-  return tag;
+  return tag
 }
 
 // ── New categorized tag utilities ───────────────────────────────────────────
@@ -103,21 +103,21 @@ export function getAllTagsSorted(
     ...(categorizedTags.livingConditions ?? []),
     ...(categorizedTags.facilities ?? []),
     ...(categorizedTags.lifestyle ?? []),
-  ];
+  ]
   return all
     .filter((tag) => Object.prototype.hasOwnProperty.call(TAG_REGISTRY, tag))
     .toSorted((a, b) => {
-      const pa = TAG_REGISTRY[a]?.priority ?? 99;
-      const pb = TAG_REGISTRY[b]?.priority ?? 99;
-      return pa - pb;
-    });
+      const pa = TAG_REGISTRY[a]?.priority ?? 99
+      const pb = TAG_REGISTRY[b]?.priority ?? 99
+      return pa - pb
+    })
 }
 
 export interface CardTagItem {
-  id: string;
-  label: string;
-  layer: "secondary" | "vibe";
-  tone: "positive" | "neutral" | "muted";
+  id: string
+  label: string
+  layer: "secondary" | "vibe"
+  tone: "positive" | "neutral" | "muted"
 }
 
 function getCardTagDisplay(
@@ -126,14 +126,14 @@ function getCardTagDisplay(
   language: Language
 ): string {
   if (tag === "llc" && categorizedTags.llcNames?.length) {
-    const llcName = categorizedTags.llcNames[0];
+    const llcName = categorizedTags.llcNames[0]
     if (language === "en") {
-      return llcName.replace(/\s+(LLC|Community)$/i, "");
+      return llcName.replace(/\s+(LLC|Community)$/i, "")
     }
-    return llcName;
+    return llcName
   }
 
-  return getTagDisplay(tag, language);
+  return getTagDisplay(tag, language)
 }
 
 export function getDetailTagDisplay(
@@ -142,16 +142,16 @@ export function getDetailTagDisplay(
   language: Language
 ): string {
   if (tag === "llc") {
-    const llcNames = categorizedTags.llcNames ?? [];
+    const llcNames = categorizedTags.llcNames ?? []
     if (llcNames.length === 1) {
-      return llcNames[0];
+      return llcNames[0]
     }
     if (llcNames.length > 1) {
-      return language === "zh" ? "多个 LLC" : "Multiple LLCs";
+      return language === "zh" ? "多个 LLC" : "Multiple LLCs"
     }
   }
 
-  return getTagDisplay(tag, language);
+  return getTagDisplay(tag, language)
 }
 
 export function getCardTagCandidates(
@@ -164,48 +164,48 @@ export function getCardTagCandidates(
       const toneWeight = (tag: DormTag) => {
         switch (TAG_REGISTRY[tag]?.cardTone) {
           case "muted":
-            return 0;
+            return 0
           case "neutral":
-            return 1;
+            return 1
           case "positive":
-            return 2;
+            return 2
           default:
-            return 3;
+            return 3
         }
-      };
-      const toneA = toneWeight(a);
-      const toneB = toneWeight(b);
+      }
+      const toneA = toneWeight(a)
+      const toneB = toneWeight(b)
       if (toneA !== toneB) {
-        return toneA - toneB;
+        return toneA - toneB
       }
 
-      const layerA = TAG_REGISTRY[a]?.cardLayer === "secondary" ? 0 : 1;
-      const layerB = TAG_REGISTRY[b]?.cardLayer === "secondary" ? 0 : 1;
+      const layerA = TAG_REGISTRY[a]?.cardLayer === "secondary" ? 0 : 1
+      const layerB = TAG_REGISTRY[b]?.cardLayer === "secondary" ? 0 : 1
       if (layerA !== layerB) {
-        return layerA - layerB;
+        return layerA - layerB
       }
 
-      const priorityA = TAG_REGISTRY[a]?.cardPriority ?? 99;
-      const priorityB = TAG_REGISTRY[b]?.cardPriority ?? 99;
+      const priorityA = TAG_REGISTRY[a]?.cardPriority ?? 99
+      const priorityB = TAG_REGISTRY[b]?.cardPriority ?? 99
       if (priorityA !== priorityB) {
-        return priorityA - priorityB;
+        return priorityA - priorityB
       }
 
       return (
         (TAG_REGISTRY[a]?.priority ?? 99) - (TAG_REGISTRY[b]?.priority ?? 99)
-      );
-    });
+      )
+    })
 
-  const seenLabels = new Set<string>();
-  const items: CardTagItem[] = [];
+  const seenLabels = new Set<string>()
+  const items: CardTagItem[] = []
 
   for (const tag of rankedTags) {
-    const label = getCardTagDisplay(tag, categorizedTags, language);
+    const label = getCardTagDisplay(tag, categorizedTags, language)
     if (seenLabels.has(label)) {
-      continue;
+      continue
     }
 
-    seenLabels.add(label);
+    seenLabels.add(label)
     items.push({
       id:
         tag === "llc" && categorizedTags.llcNames?.length
@@ -215,10 +215,10 @@ export function getCardTagCandidates(
       layer:
         TAG_REGISTRY[tag]?.cardLayer === "secondary" ? "secondary" : "vibe",
       tone: TAG_REGISTRY[tag]?.cardTone ?? "neutral",
-    });
+    })
   }
 
-  return items;
+  return items
 }
 
 export function getCardTagItems(
@@ -226,12 +226,12 @@ export function getCardTagItems(
   language: Language,
   maxCount = 4
 ): { items: CardTagItem[]; overflowCount: number } {
-  const items = getCardTagCandidates(categorizedTags, language);
+  const items = getCardTagCandidates(categorizedTags, language)
 
   return {
     items: items.slice(0, maxCount),
     overflowCount: Math.max(items.length - maxCount, 0),
-  };
+  }
 }
 
 /**
@@ -242,8 +242,8 @@ export function getHeroTags(
   categorizedTags: DormCategorizedTags,
   maxCount = 8
 ): DormTag[] {
-  const HERO_PRIORITY_CUTOFF = 7;
+  const HERO_PRIORITY_CUTOFF = 7
   return getAllTagsSorted(categorizedTags)
     .filter((tag) => (TAG_REGISTRY[tag]?.priority ?? 99) < HERO_PRIORITY_CUTOFF)
-    .slice(0, maxCount);
+    .slice(0, maxCount)
 }

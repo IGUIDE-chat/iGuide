@@ -1,8 +1,8 @@
-import  {
+import {
   type RequestContext,
   type ToolDefinition,
   type ToolResult,
-} from '../../tools/types.ts'
+} from "../../tools/types.ts"
 
 export interface StubToolOptions {
   name?: string
@@ -16,10 +16,10 @@ export interface StubToolOptions {
 
 export function createStubTool(options: StubToolOptions = {}): ToolDefinition {
   return {
-    name: options.name ?? 'stub_tool',
-    description: options.description ?? 'Deterministic test stub tool',
+    name: options.name ?? "stub_tool",
+    description: options.description ?? "Deterministic test stub tool",
     parameters: {
-      type: 'object',
+      type: "object",
       additionalProperties: true,
     },
     async execute(args, ctx): Promise<ToolResult> {
@@ -28,7 +28,7 @@ export function createStubTool(options: StubToolOptions = {}): ToolDefinition {
       }
 
       const content =
-        typeof options.content === 'function'
+        typeof options.content === "function"
           ? options.content(args, ctx)
           : (options.content ?? JSON.stringify(args))
 
@@ -36,7 +36,7 @@ export function createStubTool(options: StubToolOptions = {}): ToolDefinition {
         content,
         metadata: {
           stub: true,
-          tool: options.name ?? 'stub_tool',
+          tool: options.name ?? "stub_tool",
           ...options.metadata,
         },
       }
@@ -44,18 +44,18 @@ export function createStubTool(options: StubToolOptions = {}): ToolDefinition {
   }
 }
 
-export function createEchoTool(name = 'stub_echo'): ToolDefinition {
+export function createEchoTool(name = "stub_echo"): ToolDefinition {
   return createStubTool({
     name,
-    description: 'Echoes test arguments as JSON',
+    description: "Echoes test arguments as JSON",
     content: (args) => JSON.stringify(args),
   })
 }
 
-export function createFailingTool(name = 'stub_fail'): ToolDefinition {
+export function createFailingTool(name = "stub_fail"): ToolDefinition {
   return createStubTool({
     name,
-    description: 'Throws a deterministic test error',
-    throws: 'stub tool failure',
+    description: "Throws a deterministic test error",
+    throws: "stub tool failure",
   })
 }

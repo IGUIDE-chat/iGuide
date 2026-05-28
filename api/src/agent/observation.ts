@@ -1,5 +1,5 @@
-import { type ProviderMessage, buildToolResultContent } from './messages.ts'
-import  { type ToolResult } from '../tools/types.ts'
+import { type ProviderMessage, buildToolResultContent } from "./messages.ts"
+import { type ToolResult } from "../tools/types.ts"
 
 export interface ObservationError {
   code: string
@@ -7,14 +7,14 @@ export interface ObservationError {
   type?: string
 }
 
-export const Observation = Symbol('Observation')
+export const Observation = Symbol("Observation")
 
 export interface Observation {
   toolCallId: string
   toolName: string
   input: Record<string, unknown>
   output: unknown
-  status: 'success' | 'error'
+  status: "success" | "error"
   summary: string
   raw: string
   truncated: boolean
@@ -41,7 +41,7 @@ export function buildObservation(
 ): Observation {
   const parsedContent = parseJsonObject(options.result.content)
   const hasError = options.result.metadata?.error === true
-  const status = hasError ? 'error' : 'success'
+  const status = hasError ? "error" : "success"
   const truncated = options.result.truncated === true
   const byteCount = byteLength(options.result.content)
   const originalByteCount = numberMetadata(
@@ -69,7 +69,7 @@ export function buildObservation(
     originalByteCount,
     truncatedByteCount,
     providerMessage: {
-      role: 'tool',
+      role: "tool",
       tool_call_id: options.toolCallId,
       content: buildToolResultContent(options.result),
     },
@@ -81,14 +81,14 @@ function byteLength(value: string): number {
 }
 
 function numberMetadata(value: unknown, fallback: number): number {
-  return typeof value === 'number' ? value : fallback
+  return typeof value === "number" ? value : fallback
 }
 
 function parseJsonObject(value: string): Record<string, unknown> | null {
   try {
     const parsed = JSON.parse(value) as unknown
     return parsed !== null &&
-      typeof parsed === 'object' &&
+      typeof parsed === "object" &&
       !Array.isArray(parsed)
       ? (parsed as Record<string, unknown>)
       : null
@@ -102,15 +102,15 @@ function buildSummary(
   parsedContent: Record<string, unknown> | null,
   hasError: boolean
 ): string {
-  if (hasError && typeof parsedContent?.message === 'string') {
+  if (hasError && typeof parsedContent?.message === "string") {
     return parsedContent.message
   }
 
-  if (hasError && typeof parsedContent?.error === 'string') {
+  if (hasError && typeof parsedContent?.error === "string") {
     return parsedContent.error
   }
 
-  return content.split(/\r?\n/, 1)[0] ?? ''
+  return content.split(/\r?\n/, 1)[0] ?? ""
 }
 
 function buildObservationError(
@@ -118,9 +118,9 @@ function buildObservationError(
   summary: string
 ): ObservationError {
   const code =
-    typeof parsedContent?.error === 'string'
+    typeof parsedContent?.error === "string"
       ? parsedContent.error
-      : 'tool_error'
+      : "tool_error"
 
   return {
     code,

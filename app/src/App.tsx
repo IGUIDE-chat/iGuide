@@ -5,97 +5,87 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import * as React from "react";
-import { useCallback, useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { LoginScreen } from "./components/auth/LoginScreen";
-import { Layout } from "./components/layout/Layout";
-import { AppRoutes } from "./app/routes";
-import { useAuth } from "./contexts/AuthContext";
-import { HousingProvider } from "./components/housing/store/HousingContext";
-import { HousingDataProvider } from "./components/housing/store/HousingDataContext";
-import { DormUserInteractionProvider } from "./components/housing/store/DormUserInteractionContext";
-import { CompareProvider } from "./components/housing/store/CompareContext";
-import { type Language } from "./types";
+import * as React from "react"
+import { useCallback, useEffect, useState } from "react"
+import { AnimatePresence, motion } from "framer-motion"
+import { LoginScreen } from "./components/auth/LoginScreen"
+import { Layout } from "./components/layout/Layout"
+import { AppRoutes } from "./app/routes"
+import { useAuth } from "./contexts/AuthContext"
+import { HousingProvider } from "./components/housing/store/HousingContext"
+import { HousingDataProvider } from "./components/housing/store/HousingDataContext"
+import { DormUserInteractionProvider } from "./components/housing/store/DormUserInteractionContext"
+import { CompareProvider } from "./components/housing/store/CompareContext"
+import { type Language } from "./types"
 
 export default function App() {
-  const { user, isLoading, isGuest, setIsGuest } = useAuth();
+  const { user, isLoading, isGuest, setIsGuest } = useAuth()
   const [language, setLanguage] = useState<Language>(() => {
     if (typeof navigator !== "undefined") {
-      const browserLang = navigator.language.toLowerCase();
-      return browserLang.startsWith("zh") ? "zh" : "en";
+      const browserLang = navigator.language.toLowerCase()
+      return browserLang.startsWith("zh") ? "zh" : "en"
     }
-    return "zh";
-  });
+    return "zh"
+  })
 
   // Load last conversation from localStorage on mount
   const [currentConversationId, setCurrentConversationId] = useState<
     string | null
   >(() => {
-    return null;
-  });
+    return null
+  })
 
   // Sync to localStorage when conversation changes
   useEffect(() => {
     if (currentConversationId && !isGuest) {
-      localStorage.setItem("lastConversationId", currentConversationId);
+      localStorage.setItem("lastConversationId", currentConversationId)
     }
-  }, [currentConversationId, isGuest]);
+  }, [currentConversationId, isGuest])
 
   const clearConversation = useCallback(() => {
-    setCurrentConversationId(null);
-    localStorage.removeItem("lastConversationId");
-  }, []);
+    setCurrentConversationId(null)
+    localStorage.removeItem("lastConversationId")
+  }, [])
 
   useEffect(() => {
     if (isGuest) {
-      queueMicrotask(() => clearConversation());
+      queueMicrotask(() => clearConversation())
     }
-  }, [isGuest, clearConversation]);
+  }, [isGuest, clearConversation])
 
   useEffect(() => {
     if (user) {
-      setIsGuest(false);
+      setIsGuest(false)
     }
-  }, [user, setIsGuest]);
+  }, [user, setIsGuest])
 
   const handleSelectConversation = (conversationId: string | null) => {
-    setCurrentConversationId(conversationId);
+    setCurrentConversationId(conversationId)
     if (conversationId) {
-      localStorage.setItem("lastConversationId", conversationId);
+      localStorage.setItem("lastConversationId", conversationId)
     } else {
-      localStorage.removeItem("lastConversationId");
+      localStorage.removeItem("lastConversationId")
     }
-  };
+  }
 
   const handleNewConversation = () => {
-    setCurrentConversationId(null);
-  };
+    setCurrentConversationId(null)
+  }
 
   if (isLoading) {
     return (
-      <div
-        className="
-          flex min-h-screen items-center justify-center bg-linear-to-br
-          from-illini-blue/10 via-white to-illini-orange/10
-        "
-      >
+      <div className="from-illini-blue/10 to-illini-orange/10 flex min-h-screen items-center justify-center bg-linear-to-br via-white">
         <div className="text-center">
-          <div
-            className="
-              mx-auto mb-4 size-16 animate-spin rounded-full border-4
-              border-illini-orange border-t-transparent
-            "
-          />
+          <div className="border-illini-orange mx-auto mb-4 size-16 animate-spin rounded-full border-4 border-t-transparent" />
           <p className="text-slate-600">
             {language === "zh" ? "加载中..." : "Loading..."}
           </p>
         </div>
       </div>
-    );
+    )
   }
 
-  const showLogin = !user && !isGuest;
+  const showLogin = !user && !isGuest
 
   return (
     <AnimatePresence mode="wait">
@@ -149,5 +139,5 @@ export default function App() {
         </motion.div>
       )}
     </AnimatePresence>
-  );
+  )
 }

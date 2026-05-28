@@ -5,76 +5,76 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { type Language } from "../types";
+import { type Language } from "../types"
 
 export type UITextEntry = {
-  appTitle: string;
-  chatTab: string;
-  libraryTab: string;
-  welcomeTitle: string;
-  welcomeSubtitle: string;
-  suggestions: Array<{ icon: string; text: string }>;
-  inputPlaceholder: string;
-  searchPlaceholder: string;
-  searchTitle: string;
-  clear: string;
-  noResults: string;
-  backToCategories: string;
-  backToBrowse: string;
-  readGuide: string;
-  relatedTopics: string;
-  updated: string;
-  knowledgeBaseTitle: string;
-  knowledgeBaseSubtitle: string;
-  emptyCategory: string;
-  highTraffic: string;
-  highTrafficMsg: string;
-  goToLibrary: string;
-  botName: string;
-  userRole: string;
-  aiError: string;
-  providerCloud: string;
-  providerLocal: string;
-  providerCoze: string;
-  localModelDesc: string;
-  downloadingModel: string;
-  modelReady: string;
-  webGpuError: string;
-  initLocal: string;
-  loginTitle: string;
-  loginSubtitle: string;
-  loginSwitch: string;
-  registerSwitch: string;
-  googleLogin: string;
-  microsoftLogin: string;
-  orEmail: string;
-  emailLabel: string;
-  passwordLabel: string;
-  loginAction: string;
-  registerAction: string;
-  processing: string;
-  noAccount: string;
-  hasAccount: string;
-  registerNow: string;
-  loginNow: string;
-  guestMode: string;
-  loginError: string;
-  registerError: string;
-  genericError: string;
-  coursesTab: string;
-  dormsTab: string;
-  resumeTab: string;
-  comingSoon: string;
-  notifyMe: string;
-  emailPlaceholder: string;
-  emailSuccess: string;
-  coursesTitle: string;
-  coursesDesc: string;
-  dormsTitle: string;
-  dormsDesc: string;
-  resumeTitle: string;
-  resumeDesc: string;
-};
+  appTitle: string
+  chatTab: string
+  libraryTab: string
+  welcomeTitle: string
+  welcomeSubtitle: string
+  suggestions: Array<{ icon: string; text: string }>
+  inputPlaceholder: string
+  searchPlaceholder: string
+  searchTitle: string
+  clear: string
+  noResults: string
+  backToCategories: string
+  backToBrowse: string
+  readGuide: string
+  relatedTopics: string
+  updated: string
+  knowledgeBaseTitle: string
+  knowledgeBaseSubtitle: string
+  emptyCategory: string
+  highTraffic: string
+  highTrafficMsg: string
+  goToLibrary: string
+  botName: string
+  userRole: string
+  aiError: string
+  providerCloud: string
+  providerLocal: string
+  providerCoze: string
+  localModelDesc: string
+  downloadingModel: string
+  modelReady: string
+  webGpuError: string
+  initLocal: string
+  loginTitle: string
+  loginSubtitle: string
+  loginSwitch: string
+  registerSwitch: string
+  googleLogin: string
+  microsoftLogin: string
+  orEmail: string
+  emailLabel: string
+  passwordLabel: string
+  loginAction: string
+  registerAction: string
+  processing: string
+  noAccount: string
+  hasAccount: string
+  registerNow: string
+  loginNow: string
+  guestMode: string
+  loginError: string
+  registerError: string
+  genericError: string
+  coursesTab: string
+  dormsTab: string
+  resumeTab: string
+  comingSoon: string
+  notifyMe: string
+  emailPlaceholder: string
+  emailSuccess: string
+  coursesTitle: string
+  coursesDesc: string
+  dormsTitle: string
+  dormsDesc: string
+  resumeTitle: string
+  resumeDesc: string
+}
 
 export const UI_TEXT: Record<Language, UITextEntry> = {
   en: {
@@ -234,4 +234,4 @@ export const UI_TEXT: Record<Language, UITextEntry> = {
     resumeTitle: "简历助手",
     resumeDesc: "快速生成用于实习和求职的简历，并获得可执行的优化建议。",
   },
-};
+}

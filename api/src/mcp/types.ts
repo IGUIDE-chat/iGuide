@@ -12,13 +12,13 @@ export type MCPTimestamp = Date | string
  */
 export type MCPToolInputSchema = Record<string, unknown>
 
-export type MCPConnectionOwnerType = 'platform' | 'user'
+export type MCPConnectionOwnerType = "platform" | "user"
 
-export type MCPConnectionVisibility = 'global' | 'owner_only' | 'institution'
+export type MCPConnectionVisibility = "global" | "owner_only" | "institution"
 
-export type MCPConnectionTransport = 'streamable_http'
+export type MCPConnectionTransport = "streamable_http"
 
-export type MCPConnectionTestStatus = 'ok' | 'failed' | null
+export type MCPConnectionTestStatus = "ok" | "failed" | null
 
 /**
  * Persisted product-facing model for a registered MCP server.

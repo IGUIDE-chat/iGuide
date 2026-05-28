@@ -5,9 +5,12 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { type Dorm } from "../types/index";
-import { type Landmark } from "../constants/mapData";
-import { type DormFeatureProperties, type LandmarkFeatureProperties } from "./types";
+import { type Dorm } from "../types/index"
+import { type Landmark } from "../constants/mapData"
+import {
+  type DormFeatureProperties,
+  type LandmarkFeatureProperties,
+} from "./types"
 
 export const buildLandmarkFeatureCollection = (landmarks: Landmark[]) => ({
   type: "FeatureCollection" as const,
@@ -24,7 +27,7 @@ export const buildLandmarkFeatureCollection = (landmarks: Landmark[]) => ({
       coordinates: [landmark.lng, landmark.lat] as [number, number],
     },
   })),
-});
+})
 
 export const buildDormFeatureCollection = (
   dorms: Dorm[],
@@ -45,4 +48,4 @@ export const buildDormFeatureCollection = (
       coordinates: [dorm.lng, dorm.lat] as [number, number],
     },
   })),
-});
+})

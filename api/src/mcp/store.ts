@@ -1,5 +1,5 @@
 export interface KVNamespaceLike {
-  get(key: string, type: 'text'): Promise<string | null>
+  get(key: string, type: "text"): Promise<string | null>
   put(key: string, value: string): Promise<void>
   delete(key: string): Promise<void>
   list(options?: {
@@ -32,8 +32,8 @@ export interface MCPStoreOptions {
   namespace?: string
 }
 
-const DEFAULT_NAMESPACE = 'mcp'
-const DEFAULT_BINDING_NAME = 'MCP_TOOLS_KV'
+const DEFAULT_NAMESPACE = "mcp"
+const DEFAULT_BINDING_NAME = "MCP_TOOLS_KV"
 
 const globalScope = globalThis as typeof globalThis & {
   __mcpStoreMap__?: Map<string, string>
@@ -115,7 +115,7 @@ class KVMCPStore implements MCPStore {
   }
 
   async get<T>(key: string): Promise<T | null> {
-    const value = await this.kv.get(buildKey(this.namespace, key), 'text')
+    const value = await this.kv.get(buildKey(this.namespace, key), "text")
     return deserialize<T>(value)
   }
 
@@ -148,7 +148,7 @@ class KVMCPStore implements MCPStore {
 
     const records = await Promise.all(
       keys.toSorted().map(async (qualifiedKey) => {
-        const value = await this.kv.get(qualifiedKey, 'text')
+        const value = await this.kv.get(qualifiedKey, "text")
         if (value === null) {
           return null
         }
@@ -174,7 +174,7 @@ function resolveKV(options?: MCPStoreOptions): KVNamespaceLike | null {
   const bindingName = options?.bindingName ?? DEFAULT_BINDING_NAME
   const maybeKV = options?.env?.[bindingName]
 
-  if (!maybeKV || typeof maybeKV !== 'object') {
+  if (!maybeKV || typeof maybeKV !== "object") {
     return null
   }
 

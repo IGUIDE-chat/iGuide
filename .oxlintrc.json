@@ -88,24 +88,33 @@
     "max-depth": ["warn", { "max": 5 }],
     "no-negated-condition": "off",
 
-    "typescript/ban-ts-comment": ["warn", {
-      "ts-expect-error": "allow-with-description",
-      "ts-ignore": "true",
-      "ts-nocheck": "true"
-    }],
+    "typescript/ban-ts-comment": [
+      "warn",
+      {
+        "ts-expect-error": "allow-with-description",
+        "ts-ignore": "true",
+        "ts-nocheck": "true"
+      }
+    ],
     "typescript/no-non-null-assertion": "warn",
     "typescript/array-type": ["warn", { "default": "array-simple" }],
-    "typescript/consistent-type-imports": ["warn", {
-      "prefer": "type-imports",
-      "fixStyle": "inline-type-imports"
-    }],
+    "typescript/consistent-type-imports": [
+      "warn",
+      {
+        "prefer": "type-imports",
+        "fixStyle": "inline-type-imports"
+      }
+    ],
     "typescript/no-explicit-any": "warn",
 
     "react/exhaustive-deps": "warn",
     "react/no-unstable-nested-components": "error",
     "react/self-closing-comp": "warn",
     "react/button-has-type": "warn",
-    "react/jsx-curly-brace-presence": ["warn", { "props": "never", "children": "never" }],
+    "react/jsx-curly-brace-presence": [
+      "warn",
+      { "props": "never", "children": "never" }
+    ],
     "react/jsx-fragments": ["warn", "syntax"],
     "react/no-danger": "warn",
     "react/react-in-jsx-scope": "off",
@@ -198,9 +207,7 @@
       }
     },
     {
-      "files": [
-        "app/src/**/*.ts"
-      ],
+      "files": ["app/src/**/*.ts"],
       "rules": {
         "import/exports-last": "warn",
         "import/no-default-export": "warn",
@@ -227,10 +234,13 @@
         "react-perf/jsx-no-new-array-as-prop": "off",
         "react-perf/jsx-no-jsx-as-prop": "off",
         "import/no-nodejs-modules": "off",
-        "vitest/prefer-expect-assertions": ["warn", {
-          "onlyFunctionsWithAsyncKeyword": true,
-          "onlyFunctionsWithExpectInCallback": true
-        }],
+        "vitest/prefer-expect-assertions": [
+          "warn",
+          {
+            "onlyFunctionsWithAsyncKeyword": true,
+            "onlyFunctionsWithExpectInCallback": true
+          }
+        ],
         "vitest/no-commented-out-tests": "warn",
         "vitest/no-identical-title": "error",
         "vitest/prefer-to-be": "warn",

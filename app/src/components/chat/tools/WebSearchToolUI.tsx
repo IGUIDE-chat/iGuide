@@ -1,24 +1,24 @@
-import  { type ToolCallPart, type ToolResultPart } from "ai";
+import { type ToolCallPart, type ToolResultPart } from "ai"
 import {
   ToolCard,
   extractToolArgs,
   extractToolResult,
   getResultMetric,
   getStringArg,
-} from "./toolUiHelpers";
+} from "./toolUiHelpers"
 
 interface WebSearchToolUIProps {
-  toolCall: ToolCallPart;
-  toolResult?: ToolResultPart;
+  toolCall: ToolCallPart
+  toolResult?: ToolResultPart
 }
 
 export function WebSearchToolUI({
   toolCall,
   toolResult,
 }: WebSearchToolUIProps) {
-  const isLoading = !toolResult;
-  const args = extractToolArgs(toolCall);
-  const result = extractToolResult(toolResult);
+  const isLoading = !toolResult
+  const args = extractToolArgs(toolCall)
+  const result = extractToolResult(toolResult)
   return (
     <ToolCard
       icon="🌐"
@@ -34,5 +34,5 @@ export function WebSearchToolUI({
       )}
       isLoading={isLoading}
     />
-  );
+  )
 }

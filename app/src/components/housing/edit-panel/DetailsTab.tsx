@@ -5,23 +5,23 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from "react";
-import { type BathroomType, type DiningType, type Dorm } from "../types/index";
+import React from "react"
+import { type BathroomType, type DiningType, type Dorm } from "../types/index"
 import {
   BATHROOM_TYPE_OPTIONS,
   DINING_OPTIONS,
   HOUSING_TYPE_OPTIONS,
   getLocalizedLabel,
-} from "../constants/metadata";
-import { type DormEditFormState } from "./useDormEditForm";
-import { Field, Toggle, inputCls } from "./EditPanelFields";
+} from "../constants/metadata"
+import { type DormEditFormState } from "./useDormEditForm"
+import { Field, Toggle, inputCls } from "./EditPanelFields"
 
 interface DetailsTabProps {
-  form: DormEditFormState;
+  form: DormEditFormState
 }
 
 export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
-  const { t } = form;
+  const { t } = form
 
   return (
     <>
@@ -140,10 +140,7 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
             form.derivedRoomOptions.map((option) => (
               <span
                 key={`${option.labelCode ?? "custom"}-${option.bedCount ?? "na"}-${option.bathroomCount ?? "na"}-${option.bathroomScope}`}
-                className="
-                  inline-block rounded-md border border-gray-300 bg-white px-2
-                  py-0.5 text-xs text-gray-600
-                "
+                className="inline-block rounded-md border border-gray-300 bg-white px-2 py-0.5 text-xs text-gray-600"
               >
                 {form.getRoomDisplayLabel(option, form.language)}
               </span>
@@ -156,5 +153,5 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
         </div>
       </div>
     </>
-  );
-};
+  )
+}

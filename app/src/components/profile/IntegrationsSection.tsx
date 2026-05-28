@@ -4,51 +4,51 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { useEffect, useState } from "react";
-import { type Language } from "../../types";
-import { supabase } from "../../services/supabase";
+import React, { useEffect, useState } from "react"
+import { type Language } from "../../types"
+import { supabase } from "../../services/supabase"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface DiscoveredTool {
-  name: string;
-  description: string;
-  enabled: boolean;
+  name: string
+  description: string
+  enabled: boolean
 }
 
 interface PlatformConnection {
-  id: string;
-  name: string;
-  status: "ok" | "error" | "unknown";
-  toolCount: number;
-  url: string;
+  id: string
+  name: string
+  status: "ok" | "error" | "unknown"
+  toolCount: number
+  url: string
 }
 
 interface UserConnection {
-  id: string;
-  name: string;
-  description: string;
-  status: "ok" | "error" | "unknown";
-  url: string;
-  is_enabled: boolean;
-  tools: DiscoveredTool[];
+  id: string
+  name: string
+  description: string
+  status: "ok" | "error" | "unknown"
+  url: string
+  is_enabled: boolean
+  tools: DiscoveredTool[]
 }
 
 interface ApiConnection {
-  id: string;
-  display_name: string;
-  description?: string;
-  endpoint_url: string;
-  last_test_status?: string | null;
-  is_enabled: boolean;
-  tools?: Array<{ name: string; description?: string }>;
+  id: string
+  display_name: string
+  description?: string
+  endpoint_url: string
+  last_test_status?: string | null
+  is_enabled: boolean
+  tools?: Array<{ name: string; description?: string }>
 }
 
 type TestResult =
   | { state: "idle" }
   | { state: "loading" }
   | { state: "success"; tools: Array<{ name: string; description: string }> }
-  | { state: "failure"; reason: MockFailureReason };
+  | { state: "failure"; reason: MockFailureReason }
 
 type MockFailureReason =
   | "unreachable"
@@ -57,26 +57,26 @@ type MockFailureReason =
   | "no_tools_discovered"
   | "timeout"
   | "unsupported_transport"
-  | "unknown";
+  | "unknown"
 
 // ─── API helpers ──────────────────────────────────────────────────────────────
 
 const API_BASE =
   (import.meta as { env: Record<string, string> }).env.VITE_API_URL ||
-  "http://localhost:8787";
+  "http://localhost:8787"
 
 async function getAuthToken(): Promise<string | null> {
   const {
     data: { session },
-  } = await supabase.auth.getSession();
-  return session?.access_token ?? null;
+  } = await supabase.auth.getSession()
+  return session?.access_token ?? null
 }
 
 async function apiFetch(
   path: string,
   options: RequestInit = {}
 ): Promise<Response> {
-  const token = await getAuthToken();
+  const token = await getAuthToken()
   return fetch(`${API_BASE}${path}`, {
     ...options,
     headers: {
@@ -84,19 +84,21 @@ async function apiFetch(
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...((options.headers as Record<string, string>) || {}),
     },
-  });
+  })
 }
 
 async function fetchConnectionsFromApi(): Promise<{
-  platform: PlatformConnection[];
-  user: UserConnection[];
+  platform: PlatformConnection[]
+  user: UserConnection[]
 }> {
-  const res = await apiFetch("/integrations");
-  if (!res.ok) {throw new Error(`Failed to load integrations: ${res.status}`);}
+  const res = await apiFetch("/integrations")
+  if (!res.ok) {
+    throw new Error(`Failed to load integrations: ${res.status}`)
+  }
   const data = (await res.json()) as {
-    platform?: ApiConnection[];
-    user?: ApiConnection[];
-  };
+    platform?: ApiConnection[]
+    user?: ApiConnection[]
+  }
   return {
     platform: (data.platform || []).map((c) => ({
       id: c.id,
@@ -128,13 +130,13 @@ async function fetchConnectionsFromApi(): Promise<{
         enabled: true,
       })),
     })),
-  };
+  }
 }
 
 async function saveConnectionToApi(data: {
-  name: string;
-  url: string;
-  description: string;
+  name: string
+  url: string
+  description: string
 }): Promise<UserConnection> {
   const res = await apiFetch("/integrations", {
     method: "POST",
@@ -144,14 +146,14 @@ async function saveConnectionToApi(data: {
       transport: "streamable_http",
       description: data.description || undefined,
     }),
-  });
+  })
   if (!res.ok) {
     const err = (await res
       .json()
-      .catch(() => ({ error: "Unknown error" }))) as { error?: string };
-    throw new Error(err.error || `Failed to save: ${res.status}`);
+      .catch(() => ({ error: "Unknown error" }))) as { error?: string }
+    throw new Error(err.error || `Failed to save: ${res.status}`)
   }
-  const conn = (await res.json()) as ApiConnection;
+  const conn = (await res.json()) as ApiConnection
   return {
     id: conn.id,
     name: conn.display_name,
@@ -169,43 +171,43 @@ async function saveConnectionToApi(data: {
       description: t.description || "",
       enabled: true,
     })),
-  };
+  }
 }
 
 async function deleteConnectionFromApi(id: string): Promise<void> {
-  const res = await apiFetch(`/integrations/${id}`, { method: "DELETE" });
+  const res = await apiFetch(`/integrations/${id}`, { method: "DELETE" })
   if (!res.ok) {
     const err = (await res
       .json()
-      .catch(() => ({ error: "Unknown error" }))) as { error?: string };
-    throw new Error(err.error || `Failed to delete: ${res.status}`);
+      .catch(() => ({ error: "Unknown error" }))) as { error?: string }
+    throw new Error(err.error || `Failed to delete: ${res.status}`)
   }
 }
 
 async function mockTestConnection(url: string): Promise<{
-  ok: boolean;
-  tools?: Array<{ name: string; description: string }>;
-  reason?: MockFailureReason;
+  ok: boolean
+  tools?: Array<{ name: string; description: string }>
+  reason?: MockFailureReason
 }> {
-  await new Promise((r) => setTimeout(r, 1500));
-  const normalizedUrl = url.toLowerCase();
+  await new Promise((r) => setTimeout(r, 1500))
+  const normalizedUrl = url.toLowerCase()
   if (normalizedUrl.includes("auth") || normalizedUrl.includes("private")) {
-    return { ok: false, reason: "auth_required" };
+    return { ok: false, reason: "auth_required" }
   }
   if (normalizedUrl.includes("invalid") || normalizedUrl.includes("broken")) {
-    return { ok: false, reason: "invalid_mcp_response" };
+    return { ok: false, reason: "invalid_mcp_response" }
   }
   if (normalizedUrl.includes("empty") || normalizedUrl.includes("notools")) {
-    return { ok: false, reason: "no_tools_discovered" };
+    return { ok: false, reason: "no_tools_discovered" }
   }
   if (normalizedUrl.includes("timeout") || normalizedUrl.includes("slow")) {
-    return { ok: false, reason: "timeout" };
+    return { ok: false, reason: "timeout" }
   }
   if (normalizedUrl.includes("sse") || normalizedUrl.includes("stdio")) {
-    return { ok: false, reason: "unsupported_transport" };
+    return { ok: false, reason: "unsupported_transport" }
   }
   if (normalizedUrl.includes("fail") || normalizedUrl.includes("down")) {
-    return { ok: false, reason: "unreachable" };
+    return { ok: false, reason: "unreachable" }
   }
   return {
     ok: true,
@@ -213,13 +215,13 @@ async function mockTestConnection(url: string): Promise<{
       { name: "search_campus", description: "Search campus info" },
       { name: "get_events", description: "Get campus events" },
     ],
-  };
+  }
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
 interface IntegrationsSectionProps {
-  language: Language;
+  language: Language
 }
 
 export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
@@ -228,37 +230,37 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
   // ── State ──────────────────────────────────────────────────────────────────
   const [platformConnections, setPlatformConnections] = useState<
     PlatformConnection[]
-  >([]);
-  const [userConnections, setUserConnections] = useState<UserConnection[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  >([])
+  const [userConnections, setUserConnections] = useState<UserConnection[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
 
   useEffect(() => {
-    setIsLoading(true);
-    setLoadError(null);
+    setIsLoading(true)
+    setLoadError(null)
     fetchConnectionsFromApi()
       .then(({ platform, user }) => {
-        setPlatformConnections(platform);
-        setUserConnections(user);
+        setPlatformConnections(platform)
+        setUserConnections(user)
       })
       .catch((err: unknown) =>
         setLoadError(
           err instanceof Error ? err.message : "Failed to load integrations"
         )
       )
-      .finally(() => setIsLoading(false));
-  }, []);
+      .finally(() => setIsLoading(false))
+  }, [])
 
   // Add form
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [addName, setAddName] = useState("");
-  const [addUrl, setAddUrl] = useState("");
-  const [addDesc, setAddDesc] = useState("");
-  const [testResult, setTestResult] = useState<TestResult>({ state: "idle" });
-  const [isSaving, setIsSaving] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [addName, setAddName] = useState("")
+  const [addUrl, setAddUrl] = useState("")
+  const [addDesc, setAddDesc] = useState("")
+  const [testResult, setTestResult] = useState<TestResult>({ state: "idle" })
+  const [isSaving, setIsSaving] = useState(false)
 
   // Details panel
-  const [detailsId, setDetailsId] = useState<string | null>(null);
+  const [detailsId, setDetailsId] = useState<string | null>(null)
 
   // ── i18n ───────────────────────────────────────────────────────────────────
   const t = {
@@ -404,108 +406,103 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
       enabled: "已启用",
       disabled: "已禁用",
     },
-  }[language];
+  }[language]
 
   // ── Helpers ────────────────────────────────────────────────────────────────
 
   const statusDot = (status: "ok" | "error" | "unknown", dimmed = false) => {
-    const base = "size-2 rounded-full inline-block";
-    if (status === "ok")
-      {return (
+    const base = "size-2 rounded-full inline-block"
+    if (status === "ok") {
+      return (
         <span
-          className={`
-            ${base}
-            ${dimmed ? "bg-emerald-300" : "bg-emerald-400"}
-          `}
+          className={` ${base} ${dimmed ? "bg-emerald-300" : "bg-emerald-400"} `}
         />
-      );}
-    if (status === "error")
-      {return (
-        <span
-          className={`
-            ${base}
-            ${dimmed ? "bg-red-300" : "bg-red-400"}
-          `}
-        />
-      );}
-    return (
-      <span
-        className={`
-          ${base}
-          bg-slate-300
-        `}
-      />
-    );
-  };
+      )
+    }
+    if (status === "error") {
+      return (
+        <span className={` ${base} ${dimmed ? "bg-red-300" : "bg-red-400"} `} />
+      )
+    }
+    return <span className={` ${base} bg-slate-300`} />
+  }
 
   const statusLabel = (status: "ok" | "error" | "unknown") => {
-    if (status === "ok") {return t.statusOk;}
-    if (status === "error") {return t.statusError;}
-    return t.statusUnknown;
-  };
+    if (status === "ok") {
+      return t.statusOk
+    }
+    if (status === "error") {
+      return t.statusError
+    }
+    return t.statusUnknown
+  }
 
-  const toolCount = (conn: UserConnection) => conn.tools.length;
+  const toolCount = (conn: UserConnection) => conn.tools.length
 
   const getFailureReasonDescription = (reason: MockFailureReason) =>
-    t.failureReasonDescriptions[reason] ?? t.failureReasonDescriptions.unknown;
+    t.failureReasonDescriptions[reason] ?? t.failureReasonDescriptions.unknown
 
   // ── Add form handlers ──────────────────────────────────────────────────────
 
   const handleOpenAdd = () => {
-    setShowAddForm(true);
-    setAddName("");
-    setAddUrl("");
-    setAddDesc("");
-    setTestResult({ state: "idle" });
-  };
+    setShowAddForm(true)
+    setAddName("")
+    setAddUrl("")
+    setAddDesc("")
+    setTestResult({ state: "idle" })
+  }
 
   const handleCancelAdd = () => {
-    setShowAddForm(false);
-    setTestResult({ state: "idle" });
-  };
+    setShowAddForm(false)
+    setTestResult({ state: "idle" })
+  }
 
   const handleTest = async () => {
-    if (!addUrl.trim()) {return;}
-    setTestResult({ state: "loading" });
-    const result = await mockTestConnection(addUrl.trim());
-    if (result.ok && result.tools) {
-      setTestResult({ state: "success", tools: result.tools });
-    } else {
-      setTestResult({ state: "failure", reason: result.reason ?? "unknown" });
+    if (!addUrl.trim()) {
+      return
     }
-  };
+    setTestResult({ state: "loading" })
+    const result = await mockTestConnection(addUrl.trim())
+    if (result.ok && result.tools) {
+      setTestResult({ state: "success", tools: result.tools })
+    } else {
+      setTestResult({ state: "failure", reason: result.reason ?? "unknown" })
+    }
+  }
 
   const handleSave = async () => {
-    if (testResult.state !== "success") {return;}
-    setIsSaving(true);
+    if (testResult.state !== "success") {
+      return
+    }
+    setIsSaving(true)
     try {
       await saveConnectionToApi({
         name: addName.trim(),
         url: addUrl.trim(),
         description: addDesc.trim(),
-      });
-      const { platform, user } = await fetchConnectionsFromApi();
-      setPlatformConnections(platform);
-      setUserConnections(user);
-      setIsSaving(false);
-      setShowAddForm(false);
-      setTestResult({ state: "idle" });
+      })
+      const { platform, user } = await fetchConnectionsFromApi()
+      setPlatformConnections(platform)
+      setUserConnections(user)
+      setIsSaving(false)
+      setShowAddForm(false)
+      setTestResult({ state: "idle" })
     } catch (err) {
-      console.error("Failed to save connection:", err);
-      setIsSaving(false);
-      alert(err instanceof Error ? err.message : "Failed to save connection");
+      console.error("Failed to save connection:", err)
+      setIsSaving(false)
+      alert(err instanceof Error ? err.message : "Failed to save connection")
     }
-  };
+  }
 
   // ── Details panel handlers ─────────────────────────────────────────────────
 
-  const _detailsConn = userConnections.find((c) => c.id === detailsId) ?? null;
+  const _detailsConn = userConnections.find((c) => c.id === detailsId) ?? null
 
   const handleToggleConnection = (id: string) => {
     setUserConnections((prev) =>
       prev.map((c) => (c.id === id ? { ...c, is_enabled: !c.is_enabled } : c))
-    );
-  };
+    )
+  }
 
   const handleToggleTool = (connId: string, toolName: string) => {
     setUserConnections((prev) =>
@@ -519,27 +516,31 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
             }
           : c
       )
-    );
-  };
+    )
+  }
 
   const handleTestAgain = async (id: string) => {
-    const conn = userConnections.find((c) => c.id === id);
-    if (!conn) {return;}
+    const conn = userConnections.find((c) => c.id === id)
+    if (!conn) {
+      return
+    }
     setUserConnections((prev) =>
       prev.map((c) => (c.id === id ? { ...c, status: "unknown" } : c))
-    );
-    const result = await mockTestConnection(conn.url);
+    )
+    const result = await mockTestConnection(conn.url)
     setUserConnections((prev) =>
       prev.map((c) =>
         c.id === id ? { ...c, status: result.ok ? "ok" : "error" } : c
       )
-    );
-  };
+    )
+  }
 
   const handleRefreshDiscovery = async (id: string) => {
-    const conn = userConnections.find((c) => c.id === id);
-    if (!conn) {return;}
-    const result = await mockTestConnection(conn.url);
+    const conn = userConnections.find((c) => c.id === id)
+    if (!conn) {
+      return
+    }
+    const result = await mockTestConnection(conn.url)
     if (result.ok && result.tools) {
       setUserConnections((prev) =>
         prev.map((c) =>
@@ -551,37 +552,33 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
               }
             : c
         )
-      );
+      )
     }
-  };
+  }
 
   const handleDelete = async (id: string) => {
-    if (!confirm(t.confirmDelete)) {return;}
-    try {
-      await deleteConnectionFromApi(id);
-      const { platform, user } = await fetchConnectionsFromApi();
-      setPlatformConnections(platform);
-      setUserConnections(user);
-      if (detailsId === id) {setDetailsId(null);}
-    } catch (err) {
-      console.error("Failed to delete connection:", err);
-      alert(err instanceof Error ? err.message : "Failed to delete connection");
+    if (!confirm(t.confirmDelete)) {
+      return
     }
-  };
+    try {
+      await deleteConnectionFromApi(id)
+      const { platform, user } = await fetchConnectionsFromApi()
+      setPlatformConnections(platform)
+      setUserConnections(user)
+      if (detailsId === id) {
+        setDetailsId(null)
+      }
+    } catch (err) {
+      console.error("Failed to delete connection:", err)
+      alert(err instanceof Error ? err.message : "Failed to delete connection")
+    }
+  }
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
-    <div
-      className="
-        mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm
-      "
-    >
-      <h3
-        className="
-          mb-4 flex items-center gap-2 text-base font-bold text-slate-900
-        "
-      >
+    <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <h3 className="mb-4 flex items-center gap-2 text-base font-bold text-slate-900">
         <span>🔌</span> {t.title}
       </h3>
 
@@ -617,12 +614,12 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
               <p className="text-xs text-red-600">{loadError}</p>
               <button
                 onClick={() => {
-                  setIsLoading(true);
-                  setLoadError(null);
+                  setIsLoading(true)
+                  setLoadError(null)
                   fetchConnectionsFromApi()
                     .then(({ platform, user }) => {
-                      setPlatformConnections(platform);
-                      setUserConnections(user);
+                      setPlatformConnections(platform)
+                      setUserConnections(user)
                     })
                     .catch((err: unknown) =>
                       setLoadError(
@@ -631,7 +628,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                           : "Failed to load integrations"
                       )
                     )
-                    .finally(() => setIsLoading(false));
+                    .finally(() => setIsLoading(false))
                 }}
                 className="mt-1 text-xs font-medium text-red-500 hover:text-red-700"
               >
@@ -644,10 +641,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
             platformConnections.map((conn) => (
               <div
                 key={conn.id}
-                className="
-                flex items-center justify-between rounded-lg border
-                border-slate-100 bg-slate-50 px-3 py-2.5
-              "
+                className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-3 py-2.5"
               >
                 <div className="flex min-w-0 items-center gap-2.5">
                   {statusDot(conn.status)}
@@ -683,10 +677,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
           {!showAddForm && (
             <button
               onClick={handleOpenAdd}
-              className="
-                text-xs font-medium text-illini-orange transition-colors
-                hover:text-illini-blue
-              "
+              className="text-illini-orange hover:text-illini-blue text-xs font-medium transition-colors"
             >
               {t.add}
             </button>
@@ -710,12 +701,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                 value={addName}
                 onChange={(e) => setAddName(e.target.value)}
                 placeholder={t.displayNamePlaceholder}
-                className="
-                  w-full rounded-lg border border-slate-200 bg-white px-3 py-2
-                  text-sm text-slate-700 placeholder-slate-300
-                  focus:border-illini-orange focus:ring-2
-                  focus:ring-illini-orange/30 focus:outline-none
-                "
+                className="focus:border-illini-orange focus:ring-illini-orange/30 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder-slate-300 focus:ring-2 focus:outline-none"
               />
             </div>
 
@@ -728,16 +714,11 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                 type="url"
                 value={addUrl}
                 onChange={(e) => {
-                  setAddUrl(e.target.value);
-                  setTestResult({ state: "idle" });
+                  setAddUrl(e.target.value)
+                  setTestResult({ state: "idle" })
                 }}
                 placeholder={t.endpointUrlPlaceholder}
-                className="
-                  w-full rounded-lg border border-slate-200 bg-white px-3 py-2
-                  text-sm text-slate-700 placeholder-slate-300
-                  focus:border-illini-orange focus:ring-2
-                  focus:ring-illini-orange/30 focus:outline-none
-                "
+                className="focus:border-illini-orange focus:ring-illini-orange/30 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder-slate-300 focus:ring-2 focus:outline-none"
               />
             </div>
 
@@ -751,12 +732,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                 value={addDesc}
                 onChange={(e) => setAddDesc(e.target.value)}
                 placeholder={t.descriptionPlaceholder}
-                className="
-                  w-full rounded-lg border border-slate-200 bg-white px-3 py-2
-                  text-sm text-slate-700 placeholder-slate-300
-                  focus:border-illini-orange focus:ring-2
-                  focus:ring-illini-orange/30 focus:outline-none
-                "
+                className="focus:border-illini-orange focus:ring-illini-orange/30 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder-slate-300 focus:ring-2 focus:outline-none"
               />
             </div>
 
@@ -765,12 +741,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
               <label className="mb-1 block text-xs font-medium text-slate-500">
                 {t.transport}
               </label>
-              <div
-                className="
-                  rounded-lg border border-slate-100 bg-white px-3 py-2 text-sm
-                  text-slate-400
-                "
-              >
+              <div className="rounded-lg border border-slate-100 bg-white px-3 py-2 text-sm text-slate-400">
                 {t.transportValue}
               </div>
               <p className="mt-1 text-[11px] text-slate-400">
@@ -780,12 +751,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
 
             {/* Test result message */}
             {testResult.state === "success" && (
-              <div
-                className="
-                  mb-3 flex items-start gap-2 rounded-lg border
-                  border-emerald-200 bg-emerald-50 px-3 py-2
-                "
-              >
+              <div className="mb-3 flex items-start gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2">
                 <span className="mt-0.5 text-emerald-500">✓</span>
                 <div>
                   <p className="text-xs font-medium text-emerald-700">
@@ -806,12 +772,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
               </div>
             )}
             {testResult.state === "failure" && (
-              <div
-                className="
-                  mb-3 flex items-start gap-2 rounded-lg border border-red-200
-                  bg-red-50 px-3 py-2
-                "
-              >
+              <div className="mb-3 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2">
                 <span className="mt-0.5 text-red-500">✕</span>
                 <div>
                   <p className="text-xs font-medium text-red-700">
@@ -831,23 +792,14 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
             <div className="flex items-center gap-2">
               <button
                 onClick={handleCancelAdd}
-                className="
-                  rounded-full bg-slate-100 px-3 py-1 text-xs font-medium
-                  text-slate-500 transition-colors
-                  hover:bg-slate-200
-                "
+                className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-200"
               >
                 {t.cancel}
               </button>
               <button
                 onClick={handleTest}
                 disabled={!addUrl.trim() || testResult.state === "loading"}
-                className="
-                  rounded-full bg-slate-100 px-3 py-1 text-xs font-medium
-                  text-slate-600 transition-colors
-                  hover:bg-slate-200
-                  disabled:opacity-40
-                "
+                className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-200 disabled:opacity-40"
               >
                 {testResult.state === "loading" ? t.testing : t.testConnection}
               </button>
@@ -855,12 +807,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                 <button
                   onClick={handleSave}
                   disabled={!addName.trim() || isSaving}
-                  className="
-                    rounded-full bg-illini-orange px-3 py-1 text-xs font-medium
-                    text-white transition-colors
-                    hover:bg-illini-blue
-                    disabled:opacity-40
-                  "
+                  className="bg-illini-orange hover:bg-illini-blue rounded-full px-3 py-1 text-xs font-medium text-white transition-colors disabled:opacity-40"
                 >
                   {isSaving ? t.saving : t.saveConnection}
                 </button>
@@ -871,12 +818,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
 
         {/* Empty state */}
         {!isLoading && userConnections.length === 0 && !showAddForm && (
-          <div
-            className="
-              rounded-lg border border-dashed border-slate-200 bg-slate-50 px-4
-              py-5 text-center
-            "
-          >
+          <div className="rounded-lg border border-dashed border-slate-200 bg-slate-50 px-4 py-5 text-center">
             <p className="text-sm text-slate-500">{t.emptyState}</p>
             <p className="mt-0.5 text-xs text-slate-400">{t.emptyHint}</p>
           </div>
@@ -892,20 +834,13 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                   onClick={() =>
                     setDetailsId(detailsId === conn.id ? null : conn.id)
                   }
-                  className="
-                    flex w-full items-center justify-between rounded-lg border
-                    border-slate-100 bg-slate-50 px-3 py-2.5 text-left
-                    transition-colors
-                    hover:bg-slate-100
-                  "
+                  className="flex w-full items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-3 py-2.5 text-left transition-colors hover:bg-slate-100"
                 >
                   <div className="flex min-w-0 items-center gap-2.5">
                     {statusDot(conn.status, !conn.is_enabled)}
                     <div className="min-w-0">
                       <p
-                        className={`
-                          truncate text-sm font-medium
-                          ${conn.is_enabled ? "text-slate-800" : "text-slate-400"}`}
+                        className={`truncate text-sm font-medium ${conn.is_enabled ? "text-slate-800" : "text-slate-400"}`}
                       >
                         {conn.name}
                       </p>
@@ -921,9 +856,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                         {toolCount(conn) === 1 ? t.tool : t.tools}
                       </span>
                       <p
-                        className={`
-                          text-xs font-medium
-                          ${conn.is_enabled ? "text-emerald-600" : "text-slate-400"}`}
+                        className={`text-xs font-medium ${conn.is_enabled ? "text-emerald-600" : "text-slate-400"}`}
                       >
                         {conn.is_enabled
                           ? statusLabel(conn.status)
@@ -938,33 +871,21 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
 
                 {/* Details panel (inline expansion) */}
                 {detailsId === conn.id && (
-                  <div
-                    className="
-                      mt-1 rounded-lg border border-slate-200 bg-white p-4
-                    "
-                  >
+                  <div className="mt-1 rounded-lg border border-slate-200 bg-white p-4">
                     <div className="mb-3 flex items-center justify-between">
                       <p className="text-sm font-semibold text-slate-700">
                         {t.detailsTitle}
                       </p>
                       <button
                         onClick={() => setDetailsId(null)}
-                        className="
-                          text-xs text-slate-400
-                          hover:text-slate-600
-                        "
+                        className="text-xs text-slate-400 hover:text-slate-600"
                       >
                         {t.close}
                       </button>
                     </div>
 
                     {/* Meta */}
-                    <div
-                      className="
-                        mb-3 space-y-1.5 rounded-lg border border-slate-100
-                        bg-slate-50 px-3 py-2.5
-                      "
-                    >
+                    <div className="mb-3 space-y-1.5 rounded-lg border border-slate-100 bg-slate-50 px-3 py-2.5">
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-slate-400">
                           {t.connectionName}
@@ -977,11 +898,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                         <span className="text-xs text-slate-400">
                           {t.connectionUrl}
                         </span>
-                        <span
-                          className="
-                            max-w-[180px] truncate text-xs text-slate-500
-                          "
-                        >
+                        <span className="max-w-[180px] truncate text-xs text-slate-500">
                           {conn.url}
                         </span>
                       </div>
@@ -989,12 +906,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                         <span className="text-xs text-slate-400">
                           {t.connectionStatus}
                         </span>
-                        <span
-                          className="
-                            flex items-center gap-1.5 text-xs font-medium
-                            text-slate-700
-                          "
-                        >
+                        <span className="flex items-center gap-1.5 text-xs font-medium text-slate-700">
                           {statusDot(conn.status)}
                           {statusLabel(conn.status)}
                         </span>
@@ -1002,29 +914,18 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                     </div>
 
                     {/* Enable/disable toggle */}
-                    <div
-                      className="
-                        mb-3 flex items-center justify-between rounded-lg border
-                        border-slate-100 bg-slate-50 px-3 py-2.5
-                      "
-                    >
+                    <div className="mb-3 flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-3 py-2.5">
                       <span className="text-xs font-medium text-slate-600">
                         {t.enableConnection}
                       </span>
                       <button
                         onClick={() => handleToggleConnection(conn.id)}
-                        className={`
-                          relative inline-flex h-5 w-9 items-center rounded-full
-                          transition-colors
-                          ${conn.is_enabled ? "bg-illini-orange" : "bg-slate-200"}`}
+                        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${conn.is_enabled ? "bg-illini-orange" : "bg-slate-200"}`}
                         role="switch"
                         aria-checked={conn.is_enabled}
                       >
                         <span
-                          className={`
-                            inline-block size-3.5 rounded-full bg-white
-                            shadow-sm transition-transform
-                            ${conn.is_enabled ? "translate-x-4" : "translate-x-1"}`}
+                          className={`inline-block size-3.5 rounded-full bg-white shadow-sm transition-transform ${conn.is_enabled ? "translate-x-4" : "translate-x-1"}`}
                         />
                       </button>
                     </div>
@@ -1038,16 +939,11 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                         {conn.tools.map((tool) => (
                           <div
                             key={tool.name}
-                            className="
-                              flex items-center justify-between rounded-lg
-                              border border-slate-100 bg-slate-50 px-3 py-2
-                            "
+                            className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-3 py-2"
                           >
                             <div className="min-w-0">
                               <p
-                                className={`
-                                  text-xs font-medium
-                                  ${tool.enabled ? "text-slate-700" : "text-slate-400 line-through"}`}
+                                className={`text-xs font-medium ${tool.enabled ? "text-slate-700" : "text-slate-400 line-through"}`}
                               >
                                 {tool.name}
                               </p>
@@ -1059,18 +955,12 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                               onClick={() =>
                                 handleToggleTool(conn.id, tool.name)
                               }
-                              className={`
-                                relative ml-3 inline-flex h-5 w-9 shrink-0
-                                items-center rounded-full transition-colors
-                                ${tool.enabled ? "bg-illini-orange" : "bg-slate-200"}`}
+                              className={`relative ml-3 inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${tool.enabled ? "bg-illini-orange" : "bg-slate-200"}`}
                               role="switch"
                               aria-checked={tool.enabled}
                             >
                               <span
-                                className={`
-                                  inline-block size-3.5 rounded-full bg-white
-                                  shadow-sm transition-transform
-                                  ${tool.enabled ? "translate-x-4" : "translate-x-1"}`}
+                                className={`inline-block size-3.5 rounded-full bg-white shadow-sm transition-transform ${tool.enabled ? "translate-x-4" : "translate-x-1"}`}
                               />
                             </button>
                           </div>
@@ -1082,31 +972,19 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                     <div className="flex flex-wrap gap-2">
                       <button
                         onClick={() => void handleTestAgain(conn.id)}
-                        className="
-                          rounded-full bg-slate-100 px-3 py-1 text-xs
-                          font-medium text-slate-500 transition-colors
-                          hover:bg-slate-200
-                        "
+                        className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-200"
                       >
                         {t.testAgain}
                       </button>
                       <button
                         onClick={() => void handleRefreshDiscovery(conn.id)}
-                        className="
-                          rounded-full bg-slate-100 px-3 py-1 text-xs
-                          font-medium text-slate-500 transition-colors
-                          hover:bg-slate-200
-                        "
+                        className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-200"
                       >
                         {t.refreshDiscovery}
                       </button>
                       <button
                         onClick={() => void handleDelete(conn.id)}
-                        className="
-                          rounded-full bg-red-50 px-3 py-1 text-xs font-medium
-                          text-red-500 transition-colors
-                          hover:bg-red-100
-                        "
+                        className="rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-500 transition-colors hover:bg-red-100"
                       >
                         {t.deleteConnection}
                       </button>
@@ -1119,5 +997,5 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
         )}
       </div>
     </div>
-  );
-};
+  )
+}

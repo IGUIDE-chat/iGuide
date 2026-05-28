@@ -1,4 +1,4 @@
-import  { type ToolDefinition, type ToolResult } from '../tools/types'
+import { type ToolDefinition, type ToolResult } from "../tools/types"
 
 /**
  * Thin adapter boundary for exposing remote MCP tools through the existing
@@ -7,13 +7,13 @@ import  { type ToolDefinition, type ToolResult } from '../tools/types'
  * semantics.
  */
 export type MCPFailureReason =
-  | 'unreachable'
-  | 'invalid_mcp_response'
-  | 'unsupported_transport'
-  | 'auth_required'
-  | 'no_tools_discovered'
-  | 'timeout'
-  | 'unknown'
+  | "unreachable"
+  | "invalid_mcp_response"
+  | "unsupported_transport"
+  | "auth_required"
+  | "no_tools_discovered"
+  | "timeout"
+  | "unknown"
 
 export interface MCPTestResult {
   success: boolean
@@ -69,7 +69,7 @@ export function createMCPToolWrapper(
 
       return {
         content: JSON.stringify({
-          error: 'mcp_call_failed',
+          error: "mcp_call_failed",
           tool: tool.name,
           url: tool.url,
           failure_reason: callResult.failure_reason,
@@ -77,8 +77,8 @@ export function createMCPToolWrapper(
         }),
         metadata: {
           error: true,
-          adapter: 'mcp',
-          transport: 'streamable_http',
+          adapter: "mcp",
+          transport: "streamable_http",
         },
       }
     },

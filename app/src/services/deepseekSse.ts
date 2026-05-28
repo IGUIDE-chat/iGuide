@@ -1,29 +1,29 @@
-import  { type StreamChunk } from "./ai/types";
+import { type StreamChunk } from "./ai/types"
 
-type StreamLanguage = "en" | "zh";
+type StreamLanguage = "en" | "zh"
 
 interface WorkerToolStartPayload {
-  name?: string;
-  tool?: string;
-  args?: unknown;
+  name?: string
+  tool?: string
+  args?: unknown
 }
 
 interface WorkerToolResultPayload {
-  name?: string;
-  tool?: string;
-  status?: string;
-  summary?: string;
+  name?: string
+  tool?: string
+  status?: string
+  summary?: string
 }
 
 interface WorkerContentPayload {
-  delta?: string;
-  content?: string;
+  delta?: string
+  content?: string
 }
 
 export interface SSEParserState {
-  currentEvent: string;
-  reasoningBuffer: string;
-  isInReasoning: boolean;
+  currentEvent: string
+  reasoningBuffer: string
+  isInReasoning: boolean
 }
 
 export function createSSEParserState(): SSEParserState {
@@ -31,28 +31,32 @@ export function createSSEParserState(): SSEParserState {
     currentEvent: "",
     reasoningBuffer: "",
     isInReasoning: false,
-  };
+  }
 }
 
 function getReasoningLabel(lang: StreamLanguage): string {
-  return lang === "zh" ? "正在思考..." : "Thinking...";
+  return lang === "zh" ? "正在思考..." : "Thinking..."
 }
 
 function stringifyDetail(value: unknown): string | undefined {
-  if (value == null) {return undefined;}
-  if (typeof value === "string") {return value;}
+  if (value == null) {
+    return undefined
+  }
+  if (typeof value === "string") {
+    return value
+  }
 
   try {
-    return JSON.stringify(value);
+    return JSON.stringify(value)
   } catch {
-    return undefined;
+    return undefined
   }
 }
 
 function getWorkerToolName(
   payload: WorkerToolStartPayload | WorkerToolResultPayload
 ) {
-  return payload.name ?? payload.tool ?? "unknown";
+  return payload.name ?? payload.tool ?? "unknown"
 }
 
 function parseLegacyDelta(
@@ -62,17 +66,19 @@ function parseLegacyDelta(
 ): StreamChunk[] {
   const delta = (
     payload as { choices?: Array<{ delta?: Record<string, unknown> }> }
-  ).choices?.[0]?.delta;
+  ).choices?.[0]?.delta
 
-  if (!delta) {return [];}
+  if (!delta) {
+    return []
+  }
 
   if (typeof delta.reasoning_content === "string" && delta.reasoning_content) {
     if (!state.isInReasoning) {
-      state.isInReasoning = true;
-      state.reasoningBuffer = "";
+      state.isInReasoning = true
+      state.reasoningBuffer = ""
     }
 
-    state.reasoningBuffer += delta.reasoning_content;
+    state.reasoningBuffer += delta.reasoning_content
 
     return [
       {
@@ -83,17 +89,17 @@ function parseLegacyDelta(
           detail: state.reasoningBuffer,
         },
       },
-    ];
+    ]
   }
 
   if (typeof delta.content === "string" && delta.content) {
-    state.isInReasoning = false;
-    state.reasoningBuffer = "";
+    state.isInReasoning = false
+    state.reasoningBuffer = ""
 
-    return [{ text: delta.content }];
+    return [{ text: delta.content }]
   }
 
-  return [];
+  return []
 }
 
 function parseWorkerEvent(
@@ -102,8 +108,8 @@ function parseWorkerEvent(
   lang: StreamLanguage
 ): StreamChunk[] {
   if (eventName === "tool_start") {
-    const data = payload as WorkerToolStartPayload;
-    const toolName = getWorkerToolName(data);
+    const data = payload as WorkerToolStartPayload
+    const toolName = getWorkerToolName(data)
     return [
       {
         text: "",
@@ -116,13 +122,13 @@ function parseWorkerEvent(
           detail: stringifyDetail(data.args),
         },
       },
-    ];
+    ]
   }
 
   if (eventName === "tool_result") {
-    const data = payload as WorkerToolResultPayload;
-    const toolName = getWorkerToolName(data);
-    const detail = [data.status, data.summary].filter(Boolean).join(" — ");
+    const data = payload as WorkerToolResultPayload
+    const toolName = getWorkerToolName(data)
+    const detail = [data.status, data.summary].filter(Boolean).join(" — ")
 
     return [
       {
@@ -136,16 +142,16 @@ function parseWorkerEvent(
           detail: detail || undefined,
         },
       },
-    ];
+    ]
   }
 
   if (eventName === "content") {
-    const data = payload as WorkerContentPayload;
-    const text = data.delta ?? data.content ?? "";
-    return text ? [{ text }] : [];
+    const data = payload as WorkerContentPayload
+    const text = data.delta ?? data.content ?? ""
+    return text ? [{ text }] : []
   }
 
-  return [];
+  return []
 }
 
 export function parseDeepSeekSSELine(
@@ -153,33 +159,39 @@ export function parseDeepSeekSSELine(
   state: SSEParserState,
   lang: StreamLanguage
 ): StreamChunk[] {
-  const trimmed = line.trim();
+  const trimmed = line.trim()
 
-  if (!trimmed || trimmed === "data: [DONE]") {return [];}
-
-  if (trimmed.startsWith("event:")) {
-    state.currentEvent = trimmed.slice(6).trim();
-    return [];
+  if (!trimmed || trimmed === "data: [DONE]") {
+    return []
   }
 
-  if (!trimmed.startsWith("data:")) {return [];}
+  if (trimmed.startsWith("event:")) {
+    state.currentEvent = trimmed.slice(6).trim()
+    return []
+  }
 
-  const jsonStr = trimmed.slice(5).trim();
-  if (!jsonStr || jsonStr === "[DONE]" || jsonStr === '"[DONE]"') {return [];}
+  if (!trimmed.startsWith("data:")) {
+    return []
+  }
+
+  const jsonStr = trimmed.slice(5).trim()
+  if (!jsonStr || jsonStr === "[DONE]" || jsonStr === '"[DONE]"') {
+    return []
+  }
 
   try {
-    const payload = JSON.parse(jsonStr);
+    const payload = JSON.parse(jsonStr)
 
     if (state.currentEvent) {
-      const workerChunks = parseWorkerEvent(state.currentEvent, payload, lang);
+      const workerChunks = parseWorkerEvent(state.currentEvent, payload, lang)
       if (workerChunks.length > 0 || state.currentEvent === "done") {
-        return workerChunks;
+        return workerChunks
       }
     }
 
-    return parseLegacyDelta(payload, state, lang);
+    return parseLegacyDelta(payload, state, lang)
   } catch {
-    return [];
+    return []
   }
 }
 
@@ -187,29 +199,29 @@ export async function* parseDeepSeekSSEStream(
   reader: ReadableStreamDefaultReader<Uint8Array>,
   lang: StreamLanguage
 ): AsyncGenerator<StreamChunk> {
-  const decoder = new TextDecoder("utf-8");
-  const state = createSSEParserState();
-  let buffer = "";
+  const decoder = new TextDecoder("utf-8")
+  const state = createSSEParserState()
+  let buffer = ""
 
   while (true) {
-    const { done, value } = await reader.read();
+    const { done, value } = await reader.read()
 
     if (done) {
       if (buffer.trim()) {
         for (const chunk of parseDeepSeekSSELine(buffer, state, lang)) {
-          yield chunk;
+          yield chunk
         }
       }
-      break;
+      break
     }
 
-    buffer += decoder.decode(value, { stream: true });
-    const lines = buffer.split("\n");
-    buffer = lines.pop() || "";
+    buffer += decoder.decode(value, { stream: true })
+    const lines = buffer.split("\n")
+    buffer = lines.pop() || ""
 
     for (const line of lines) {
       for (const chunk of parseDeepSeekSSELine(line, state, lang)) {
-        yield chunk;
+        yield chunk
       }
     }
   }

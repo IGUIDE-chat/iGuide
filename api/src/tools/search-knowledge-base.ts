@@ -1,8 +1,12 @@
-import { getEmbeddingConfig } from '../lib/embedding-config'
-import { EmbeddingClient } from '../lib/embeddings'
-import { callSupabaseRpc } from '../lib/supabase-rpc'
-import { type ToolRegistry } from './registry'
-import  { type RequestContext, type ToolDefinition, type ToolResult } from './types'
+import { getEmbeddingConfig } from "../lib/embedding-config"
+import { EmbeddingClient } from "../lib/embeddings"
+import { callSupabaseRpc } from "../lib/supabase-rpc"
+import { type ToolRegistry } from "./registry"
+import {
+  type RequestContext,
+  type ToolDefinition,
+  type ToolResult,
+} from "./types"
 
 interface SearchKnowledgeBaseArgs {
   query: string
@@ -28,7 +32,7 @@ interface KeywordSearchResult {
 }
 
 function normalizeLimit(value: unknown): number {
-  if (typeof value !== 'number' || !Number.isFinite(value)) {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
     return 5
   }
 
@@ -41,7 +45,7 @@ function buildSnippet(content: string): string {
 
 function formatHybridResults(results: HybridSearchResult[]): string {
   if (results.length === 0) {
-    return 'No knowledge base results found.'
+    return "No knowledge base results found."
   }
 
   return results
@@ -49,12 +53,12 @@ function formatHybridResults(results: HybridSearchResult[]): string {
       (result) =>
         `## ${result.title}\nScore: ${result.rrf_score.toFixed(4)}\nURL: ${result.url}\n\n${buildSnippet(result.chunk_text)}\n---`
     )
-    .join('\n')
+    .join("\n")
 }
 
 function formatKeywordResults(results: KeywordSearchResult[]): string {
   if (results.length === 0) {
-    return 'No knowledge base results found.'
+    return "No knowledge base results found."
   }
 
   return results
@@ -62,7 +66,7 @@ function formatKeywordResults(results: KeywordSearchResult[]): string {
       (result) =>
         `## ${result.title}\nScore: ${result.fts_score.toFixed(4)}\nURL: ${result.url}\n\n${buildSnippet(result.chunk_text)}\n---`
     )
-    .join('\n')
+    .join("\n")
 }
 
 function parseArgs(
@@ -70,10 +74,10 @@ function parseArgs(
 ): SearchKnowledgeBaseArgs | ToolResult {
   const { query, limit } = args
 
-  if (typeof query !== 'string' || query.trim().length === 0) {
+  if (typeof query !== "string" || query.trim().length === 0) {
     return {
       content:
-        'Error: query parameter is required and must be a non-empty string',
+        "Error: query parameter is required and must be a non-empty string",
     }
   }
 
@@ -87,32 +91,32 @@ export function createSearchKnowledgeBaseTool(
   registry: ToolRegistry
 ): ToolDefinition {
   const tool: ToolDefinition = {
-    name: 'search_knowledge_base',
+    name: "search_knowledge_base",
     description:
-      'Search the UIUC knowledge base using hybrid semantic + keyword search. Use for questions about housing, courses, campus life, policies.',
+      "Search the UIUC knowledge base using hybrid semantic + keyword search. Use for questions about housing, courses, campus life, policies.",
     parameters: {
-      type: 'object',
+      type: "object",
       properties: {
         query: {
-          type: 'string',
-          description: 'Search query',
+          type: "string",
+          description: "Search query",
         },
         limit: {
-          type: 'integer',
-          description: 'Max results',
+          type: "integer",
+          description: "Max results",
           default: 5,
           minimum: 1,
           maximum: 10,
         },
       },
-      required: ['query'],
+      required: ["query"],
     },
     execute: async (
       args: Record<string, unknown>,
       ctx: RequestContext
     ): Promise<ToolResult> => {
       const parsedArgs = parseArgs(args)
-      if ('content' in parsedArgs) {
+      if ("content" in parsedArgs) {
         return parsedArgs
       }
 
@@ -126,7 +130,7 @@ export function createSearchKnowledgeBaseTool(
         try {
           const fallbackResults = await callSupabaseRpc<KeywordSearchResult[]>(
             ctx,
-            'keyword_search',
+            "keyword_search",
             {
               query_text: query,
               match_count: limit,
@@ -137,7 +141,7 @@ export function createSearchKnowledgeBaseTool(
             content: formatKeywordResults(fallbackResults.slice(0, limit)),
             metadata: {
               degraded: true,
-              reason: 'embedding_unavailable',
+              reason: "embedding_unavailable",
               embedding_error:
                 embeddingError instanceof Error
                   ? embeddingError.message
@@ -151,7 +155,7 @@ export function createSearchKnowledgeBaseTool(
             content: `Error: ${message}`,
             metadata: {
               degraded: true,
-              reason: 'embedding_unavailable',
+              reason: "embedding_unavailable",
             },
           }
         }
@@ -160,10 +164,10 @@ export function createSearchKnowledgeBaseTool(
       try {
         const results = await callSupabaseRpc<HybridSearchResult[]>(
           ctx,
-          'hybrid_search',
+          "hybrid_search",
           {
             query_text: query,
-            query_embedding: `[${queryEmbedding.join(',')}]`,
+            query_embedding: `[${queryEmbedding.join(",")}]`,
             match_count: limit,
           }
         )

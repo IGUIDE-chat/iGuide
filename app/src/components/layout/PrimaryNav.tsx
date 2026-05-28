@@ -5,23 +5,23 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { BrandMark } from "../ui/branding/BrandMark";
+import React from "react"
+import { AnimatePresence, motion } from "framer-motion"
+import { BrandMark } from "../ui/branding/BrandMark"
 
 interface NavItem {
-  key: string;
-  label: string;
-  icon: React.ReactNode;
-  onClick: () => void;
+  key: string
+  label: string
+  icon: React.ReactNode
+  onClick: () => void
 }
 
 interface PrimaryNavProps {
-  appTitle: string;
-  activeTab: string;
-  isSidebarOpen: boolean;
-  navItems: NavItem[];
-  onCloseSidebar: () => void;
+  appTitle: string
+  activeTab: string
+  isSidebarOpen: boolean
+  navItems: NavItem[]
+  onCloseSidebar: () => void
 }
 
 const AnimatedText = ({ children }: { children: React.ReactNode }) => (
@@ -37,16 +37,16 @@ const AnimatedText = ({ children }: { children: React.ReactNode }) => (
       {children}
     </motion.span>
   </AnimatePresence>
-);
+)
 
 const SidebarLabel = ({
   isOpen,
   children,
   className = "",
 }: {
-  isOpen: boolean;
-  children: React.ReactNode;
-  className?: string;
+  isOpen: boolean
+  children: React.ReactNode
+  className?: string
 }) => (
   <motion.span
     initial={false}
@@ -56,14 +56,11 @@ const SidebarLabel = ({
         : { opacity: 0, x: -6, maxWidth: 0 }
     }
     transition={{ duration: 0.2, ease: "easeOut" }}
-    className={`
-      inline-block overflow-hidden whitespace-nowrap
-      ${className}
-    `}
+    className={`inline-block overflow-hidden whitespace-nowrap ${className} `}
   >
     {children}
   </motion.span>
-);
+)
 
 export const PrimaryNav: React.FC<PrimaryNavProps> = ({
   appTitle,
@@ -75,13 +72,7 @@ export const PrimaryNav: React.FC<PrimaryNavProps> = ({
   return (
     <>
       <div className="mb-2 flex items-center justify-between p-3">
-        <div
-          className="
-            flex w-full cursor-pointer items-center gap-2 rounded-md p-2
-            transition-colors
-            hover:bg-white/5
-          "
-        >
+        <div className="flex w-full cursor-pointer items-center gap-2 rounded-md p-2 transition-colors hover:bg-white/5">
           <BrandMark
             className="size-[26px] rounded-md"
             iconClassName="text-[10px]"
@@ -95,11 +86,7 @@ export const PrimaryNav: React.FC<PrimaryNavProps> = ({
         </div>
         <button
           onClick={onCloseSidebar}
-          className="
-            p-2 text-slate-400
-            hover:text-white
-            md:hidden
-          "
+          className="p-2 text-slate-400 hover:text-white md:hidden"
         >
           ×
         </button>
@@ -110,18 +97,11 @@ export const PrimaryNav: React.FC<PrimaryNavProps> = ({
           <button
             key={item.key}
             onClick={item.onClick}
-            className={`
-              flex w-full items-center gap-3 rounded-md p-3 text-sm
-              transition-colors
-              ${
-                activeTab === item.key
-                  ? "bg-[#212121] text-white"
-                  : `
-                    text-slate-300
-                    hover:bg-[#212121]
-                  `
-              }
-            `}
+            className={`flex w-full items-center gap-3 rounded-md p-3 text-sm transition-colors ${
+              activeTab === item.key
+                ? "bg-[#212121] text-white"
+                : `text-slate-300 hover:bg-[#212121]`
+            } `}
           >
             <span>{item.icon}</span>
             <SidebarLabel isOpen={isSidebarOpen}>
@@ -131,5 +111,5 @@ export const PrimaryNav: React.FC<PrimaryNavProps> = ({
         ))}
       </nav>
     </>
-  );
-};
+  )
+}

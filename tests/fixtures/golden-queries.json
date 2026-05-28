@@ -17,7 +17,12 @@
     "query": "Fall 2025 ECE offerings",
     "expected_domain": "course",
     "expected_object_types": ["course", "course_offering"],
-    "expected_keywords": ["ECE", "Fall 2025", "electrical", "computer engineering"],
+    "expected_keywords": [
+      "ECE",
+      "Fall 2025",
+      "electrical",
+      "computer engineering"
+    ],
     "freshness_class": "semi_volatile"
   },
   {
@@ -66,7 +71,13 @@
     "query": "CPT application process",
     "expected_domain": "general",
     "expected_object_types": [],
-    "expected_keywords": ["CPT", "application", "process", "OPT", "work authorization"],
+    "expected_keywords": [
+      "CPT",
+      "application",
+      "process",
+      "OPT",
+      "work authorization"
+    ],
     "freshness_class": "stable"
   },
   {

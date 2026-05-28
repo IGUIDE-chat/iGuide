@@ -1,9 +1,9 @@
-import  { type Observation } from './observation.ts'
-import  { type ToolResult } from '../tools/types.ts'
+import { type Observation } from "./observation.ts"
+import { type ToolResult } from "../tools/types.ts"
 
 export interface ProviderToolCall {
   id: string
-  type: 'function'
+  type: "function"
   function: {
     name: string
     arguments: string
@@ -11,7 +11,7 @@ export interface ProviderToolCall {
 }
 
 export interface ProviderMessage {
-  role: 'system' | 'user' | 'assistant' | 'tool'
+  role: "system" | "user" | "assistant" | "tool"
   content: string | null
   tool_call_id?: string
   tool_calls?: ProviderToolCall[]
@@ -24,16 +24,16 @@ export type RuntimeMessage = {
   tool_calls?: ProviderToolCall[]
 }
 
-export function normalizeHistoryRole(role: string): ProviderMessage['role'] {
-  if (role === 'assistant' || role === 'system' || role === 'tool') {
+export function normalizeHistoryRole(role: string): ProviderMessage["role"] {
+  if (role === "assistant" || role === "system" || role === "tool") {
     return role
   }
 
-  if (role === 'model') {
-    return 'assistant'
+  if (role === "model") {
+    return "assistant"
   }
 
-  return 'user'
+  return "user"
 }
 
 export function normalizeMessages(options: {
@@ -48,7 +48,7 @@ export function normalizeMessages(options: {
       ...(entry.tool_calls ? { tool_calls: entry.tool_calls } : {}),
     })),
     {
-      role: 'user' as const,
+      role: "user" as const,
       content: options.message,
     },
   ]
@@ -61,7 +61,7 @@ export function buildProviderMessages(options: {
 }): ProviderMessage[] {
   return [
     {
-      role: 'system',
+      role: "system",
       content: options.systemPrompt,
     },
     ...normalizeMessages({
@@ -91,7 +91,7 @@ export function convertObservationToMessage(
   }
 
   return {
-    role: 'tool',
+    role: "tool",
     tool_call_id: observation.toolCallId,
     content: observation.raw,
   }
@@ -102,7 +102,7 @@ export function convertToolResultToMessage(options: {
   result: ToolResult
 }): ProviderMessage {
   return {
-    role: 'tool',
+    role: "tool",
     tool_call_id: options.toolCall.id,
     content: buildToolResultContent(options.result),
   }

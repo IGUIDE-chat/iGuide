@@ -5,7 +5,7 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, { useLayoutEffect, useMemo, useRef, useState } from "react"
 import {
   Bath,
   BedSingle,
@@ -15,32 +15,29 @@ import {
   ThumbsUp,
   Utensils,
   Wind,
-} from "lucide-react";
-import { formatPrice } from "./constants/pricing";
-import { type Dorm } from "./types/index";
-import { type Language } from "../../types";
-import {
-  deriveRoomOptions,
-  getRoomRangeSummary,
-} from "../../utils/roomOptions";
-import { type CardTagItem, getCardTagCandidates } from "../../utils/tagLabels";
+} from "lucide-react"
+import { formatPrice } from "./constants/pricing"
+import { type Dorm } from "./types/index"
+import { type Language } from "../../types"
+import { deriveRoomOptions, getRoomRangeSummary } from "../../utils/roomOptions"
+import { type CardTagItem, getCardTagCandidates } from "../../utils/tagLabels"
 
 interface DormCardProps {
-  dorm: Dorm;
-  onViewDetails: (dorm: Dorm) => void;
-  isFavorite?: boolean;
-  onToggleFavorite?: (dorm: Dorm, e?: React.MouseEvent) => void;
-  isCompared?: boolean;
-  onToggleCompare?: (dorm: Dorm) => void;
-  onHoverDorm?: (dormId: string | null) => void;
-  onRatingClick?: (dorm: Dorm, e: React.MouseEvent) => void;
-  language?: Language;
-  positivePercent?: number | null;
-  totalReviews?: number;
+  dorm: Dorm
+  onViewDetails: (dorm: Dorm) => void
+  isFavorite?: boolean
+  onToggleFavorite?: (dorm: Dorm, e?: React.MouseEvent) => void
+  isCompared?: boolean
+  onToggleCompare?: (dorm: Dorm) => void
+  onHoverDorm?: (dormId: string | null) => void
+  onRatingClick?: (dorm: Dorm, e: React.MouseEvent) => void
+  language?: Language
+  positivePercent?: number | null
+  totalReviews?: number
 }
 
-const CARD_TAG_GAP_PX = 6;
-const MAX_VISIBLE_CARD_TAGS = 8;
+const CARD_TAG_GAP_PX = 6
+const MAX_VISIBLE_CARD_TAGS = 8
 
 const TEXT = {
   en: {
@@ -65,10 +62,10 @@ const TEXT = {
     save: "收藏宿舍",
     moreTags: (count: number) => `+${count}`,
   },
-};
+}
 
 function normalizeCopy(value: string) {
-  return value.toLowerCase().replaceAll(/\s+/g, " ").trim();
+  return value.toLowerCase().replaceAll(/\s+/g, " ").trim()
 }
 
 function isRedundantCardCopy(
@@ -76,11 +73,11 @@ function isRedundantCardCopy(
   locationLabel: string,
   language: Language
 ) {
-  const normalizedCopy = normalizeCopy(copy);
-  const normalizedLocation = normalizeCopy(locationLabel);
+  const normalizedCopy = normalizeCopy(copy)
+  const normalizedLocation = normalizeCopy(locationLabel)
 
   if (normalizedLocation && normalizedCopy.includes(normalizedLocation)) {
-    return true;
+    return true
   }
 
   if (language === "zh") {
@@ -88,14 +85,14 @@ function isRedundantCardCopy(
       normalizedCopy.includes("位于") ||
       normalizedCopy.includes("在 main quad") ||
       normalizedCopy.includes("近 main quad")
-    );
+    )
   }
 
   return (
     normalizedCopy.includes("located in") ||
     normalizedCopy.includes("located on") ||
     normalizedCopy.includes("near ")
-  );
+  )
 }
 
 function getSignalDrivenSummary(dorm: Dorm, language: Language) {
@@ -103,8 +100,8 @@ function getSignalDrivenSummary(dorm: Dorm, language: Language) {
     livingConditions: [],
     facilities: [],
     lifestyle: [],
-  };
-  const llcName = tags.llcNames?.[0];
+  }
+  const llcName = tags.llcNames?.[0]
 
   if (
     llcName &&
@@ -113,13 +110,13 @@ function getSignalDrivenSummary(dorm: Dorm, language: Language) {
   ) {
     return language === "zh"
       ? `设有 ${llcName} 社群项目，艺术氛围浓，且配有琴房。`
-      : `Home to ${llcName}, with a creative community and dedicated music rooms.`;
+      : `Home to ${llcName}, with a creative community and dedicated music rooms.`
   }
 
   if (llcName) {
     return language === "zh"
       ? `设有 ${llcName} 社群项目，社区活动和归属感更强。`
-      : `Home to ${llcName}, a distinct living-learning community.`;
+      : `Home to ${llcName}, a distinct living-learning community.`
   }
 
   if (
@@ -128,52 +125,52 @@ function getSignalDrivenSummary(dorm: Dorm, language: Language) {
   ) {
     return language === "zh"
       ? "艺术氛围浓，适合重视创作与音乐练习的学生。"
-      : "A creative community with dedicated music rooms.";
+      : "A creative community with dedicated music rooms."
   }
 
   if (tags.livingConditions.includes("newlyRenovated")) {
     return language === "zh"
       ? "居住空间较新，整体设施状态更好。"
-      : "Recently renovated living spaces with a fresher feel.";
+      : "Recently renovated living spaces with a fresher feel."
   }
 
   if (tags.lifestyle.includes("quiet")) {
     return language === "zh"
       ? "整体氛围更安静，适合规律作息和专注学习。"
-      : "Known for a quieter community atmosphere.";
+      : "Known for a quieter community atmosphere."
   }
 
   if (tags.lifestyle.includes("internationalFriendly")) {
     return language === "zh"
       ? "国际生社群更活跃，社区包容度较高。"
-      : "Popular with international students and a more globally mixed community.";
+      : "Popular with international students and a more globally mixed community."
   }
 
   if (tags.lifestyle.includes("socialParty")) {
     return language === "zh"
       ? "社交氛围更活跃，更适合喜欢热闹社区的学生。"
-      : "A more social community for students who want an active dorm scene.";
+      : "A more social community for students who want an active dorm scene."
   }
 
   if (tags.facilities.includes("musicRooms")) {
     return language === "zh"
       ? "配有琴房，对音乐练习更友好。"
-      : "Includes dedicated music rooms for regular practice.";
+      : "Includes dedicated music rooms for regular practice."
   }
 
   if (tags.facilities.includes("convenienceStore")) {
     return language === "zh"
       ? "日常补给更方便，买东西不用专门绕路。"
-      : "Convenience-store access makes daily basics easier.";
+      : "Convenience-store access makes daily basics easier."
   }
 
   if (tags.facilities.includes("busStop")) {
     return language === "zh"
       ? "靠近公交站，日常往返校园更方便。"
-      : "Easy bus access helps with daily campus travel.";
+      : "Easy bus access helps with daily campus travel."
   }
 
-  return null;
+  return null
 }
 
 function getCardSummary(
@@ -182,40 +179,40 @@ function getCardSummary(
   locationLabel: string,
   language: Language
 ) {
-  const signalSummary = getSignalDrivenSummary(dorm, language);
+  const signalSummary = getSignalDrivenSummary(dorm, language)
   if (signalSummary) {
-    return signalSummary;
+    return signalSummary
   }
 
   const localizedPros =
-    language === "zh" && dorm.pros_zh?.length ? dorm.pros_zh : dorm.pros;
+    language === "zh" && dorm.pros_zh?.length ? dorm.pros_zh : dorm.pros
   const fallbackPro = localizedPros.find(
     (item) => !isRedundantCardCopy(item, locationLabel, language)
-  );
+  )
   if (fallbackPro) {
-    return fallbackPro;
+    return fallbackPro
   }
 
   if (
     description &&
     !isRedundantCardCopy(description, locationLabel, language)
   ) {
-    return description;
+    return description
   }
 
-  return null;
+  return null
 }
 
 function getDiningLabel(dorm: Dorm, language: Language) {
-  const t = TEXT[language];
+  const t = TEXT[language]
   if (dorm.dining === "inside") {
-    return t.diningInside;
+    return t.diningInside
   }
   if (dorm.dining === "nearby") {
-    return t.diningNearby;
+    return t.diningNearby
   }
 
-  return t.diningNone;
+  return t.diningNone
 }
 
 function getCardTagClasses(tag: CardTagItem) {
@@ -224,113 +221,113 @@ function getCardTagClasses(tag: CardTagItem) {
       ? "border-gray-200/70 bg-gray-100/70 text-gray-400"
       : tag.tone === "positive"
         ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-        : "border-slate-200 bg-slate-50 text-slate-700";
+        : "border-slate-200 bg-slate-50 text-slate-700"
 
-  return `inline-flex min-w-0 shrink-0 items-center overflow-hidden text-ellipsis whitespace-nowrap rounded-full border px-2 py-1 text-[11px] font-medium max-w-[8.5rem] ${toneClasses}`;
+  return `inline-flex min-w-0 shrink-0 items-center overflow-hidden text-ellipsis whitespace-nowrap rounded-full border px-2 py-1 text-[11px] font-medium max-w-[8.5rem] ${toneClasses}`
 }
 
 function getOverflowTagClasses() {
-  return "inline-flex shrink-0 items-center rounded-full border border-dashed border-gray-300 px-2 py-1 text-[11px] font-medium text-gray-500";
+  return "inline-flex shrink-0 items-center rounded-full border border-dashed border-gray-300 px-2 py-1 text-[11px] font-medium text-gray-500"
 }
 
 function useResponsiveCardTags(
   allTags: CardTagItem[],
   moreTagsLabel: (count: number) => string
 ) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const tagRefs = useRef<Record<string, HTMLSpanElement | null>>({});
-  const overflowRefs = useRef<Record<number, HTMLSpanElement | null>>({});
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const tagRefs = useRef<Record<string, HTMLSpanElement | null>>({})
+  const overflowRefs = useRef<Record<number, HTMLSpanElement | null>>({})
   const [layout, setLayout] = useState(() => {
-    const initialVisibleCount = Math.min(allTags.length, MAX_VISIBLE_CARD_TAGS);
+    const initialVisibleCount = Math.min(allTags.length, MAX_VISIBLE_CARD_TAGS)
 
     return {
       visibleCount: initialVisibleCount,
       overflowCount: Math.max(allTags.length - initialVisibleCount, 0),
-    };
-  });
+    }
+  })
 
   const tagSignature = useMemo(
     () => allTags.map((tag) => tag.id).join("|"),
     [allTags]
-  );
+  )
 
   useLayoutEffect(() => {
-    const container = containerRef.current;
+    const container = containerRef.current
     if (!container) {
-      return;
+      return
     }
 
-    let frame = 0;
+    let frame = 0
 
     const measure = () => {
-      const availableWidth = container.clientWidth;
+      const availableWidth = container.clientWidth
       if (!availableWidth) {
-        return;
+        return
       }
 
-      const maxVisibleCount = Math.min(allTags.length, MAX_VISIBLE_CARD_TAGS);
-      let nextVisibleCount = maxVisibleCount;
+      const maxVisibleCount = Math.min(allTags.length, MAX_VISIBLE_CARD_TAGS)
+      let nextVisibleCount = maxVisibleCount
 
       for (let count = maxVisibleCount; count >= 1; count -= 1) {
-        const overflowCount = allTags.length - count;
+        const overflowCount = allTags.length - count
         const tagWidths = allTags
           .slice(0, count)
           .reduce(
             (total, tag) => total + (tagRefs.current[tag.id]?.offsetWidth ?? 0),
             0
-          );
-        const tagGapWidth = count > 1 ? (count - 1) * CARD_TAG_GAP_PX : 0;
+          )
+        const tagGapWidth = count > 1 ? (count - 1) * CARD_TAG_GAP_PX : 0
         const overflowWidth =
           overflowCount > 0
             ? (overflowRefs.current[overflowCount]?.offsetWidth ?? 0)
-            : 0;
+            : 0
         const overflowGapWidth =
-          overflowCount > 0 && count > 0 ? CARD_TAG_GAP_PX : 0;
+          overflowCount > 0 && count > 0 ? CARD_TAG_GAP_PX : 0
 
         if (
           tagWidths + tagGapWidth + overflowGapWidth + overflowWidth <=
           availableWidth
         ) {
-          nextVisibleCount = count;
-          break;
+          nextVisibleCount = count
+          break
         }
 
-        nextVisibleCount = 1;
+        nextVisibleCount = 1
       }
 
-      const nextOverflowCount = Math.max(allTags.length - nextVisibleCount, 0);
+      const nextOverflowCount = Math.max(allTags.length - nextVisibleCount, 0)
       setLayout((current) => {
         if (
           current.visibleCount === nextVisibleCount &&
           current.overflowCount === nextOverflowCount
         ) {
-          return current;
+          return current
         }
 
         return {
           visibleCount: nextVisibleCount,
           overflowCount: nextOverflowCount,
-        };
-      });
-    };
+        }
+      })
+    }
 
     const scheduleMeasure = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(measure);
-    };
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(measure)
+    }
 
-    scheduleMeasure();
+    scheduleMeasure()
 
-    const resizeObserver = new ResizeObserver(scheduleMeasure);
-    resizeObserver.observe(container);
+    const resizeObserver = new ResizeObserver(scheduleMeasure)
+    resizeObserver.observe(container)
 
     return () => {
-      cancelAnimationFrame(frame);
-      resizeObserver.disconnect();
-    };
-  }, [allTags, moreTagsLabel, tagSignature]);
+      cancelAnimationFrame(frame)
+      resizeObserver.disconnect()
+    }
+  }, [allTags, moreTagsLabel, tagSignature])
 
-  const visibleItems = allTags.slice(0, layout.visibleCount);
+  const visibleItems = allTags.slice(0, layout.visibleCount)
 
   return {
     containerRef,
@@ -338,7 +335,7 @@ function useResponsiveCardTags(
     overflowRefs,
     tagRefs,
     visibleItems,
-  };
+  }
 }
 
 const DormCard: React.FC<DormCardProps> = ({
@@ -354,18 +351,18 @@ const DormCard: React.FC<DormCardProps> = ({
   positivePercent,
   totalReviews,
 }) => {
-  const t = TEXT[language];
-  const dormName = language === "zh" && dorm.name_zh ? dorm.name_zh : dorm.name;
+  const t = TEXT[language]
+  const dormName = language === "zh" && dorm.name_zh ? dorm.name_zh : dorm.name
   const description =
     language === "zh" && dorm.description_zh
       ? dorm.description_zh
-      : dorm.description;
+      : dorm.description
   const locationLabel =
-    language === "zh" && dorm.location_zh ? dorm.location_zh : dorm.location;
+    language === "zh" && dorm.location_zh ? dorm.location_zh : dorm.location
   const roomOptions =
     dorm.roomOptions ??
-    deriveRoomOptions(dorm.floorPlans, dorm.bathroomType).roomOptions;
-  const roomRangeSummary = getRoomRangeSummary(roomOptions, language);
+    deriveRoomOptions(dorm.floorPlans, dorm.bathroomType).roomOptions
+  const roomRangeSummary = getRoomRangeSummary(roomOptions, language)
   const cardTagCandidates = getCardTagCandidates(
     dorm.categorizedTags ?? {
       livingConditions: [],
@@ -373,26 +370,16 @@ const DormCard: React.FC<DormCardProps> = ({
       lifestyle: [],
     },
     language
-  );
-  const cardTags = useResponsiveCardTags(cardTagCandidates, t.moreTags);
-  const cardSummary = getCardSummary(
-    dorm,
-    description,
-    locationLabel,
-    language
-  );
+  )
+  const cardTags = useResponsiveCardTags(cardTagCandidates, t.moreTags)
+  const cardSummary = getCardSummary(dorm, description, locationLabel, language)
 
   return (
     <div
       onClick={() => onViewDetails(dorm)}
       onMouseEnter={() => onHoverDorm?.(dorm.id)}
       onMouseLeave={() => onHoverDorm?.(null)}
-      className="
-        dorm-card group relative flex size-full cursor-pointer flex-col
-        overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm
-        transition-shadow duration-300
-        hover:shadow-md
-      "
+      className="dorm-card group relative flex size-full cursor-pointer flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-shadow duration-300 hover:shadow-md"
     >
       <div className="relative h-48 overflow-hidden">
         <img
@@ -400,10 +387,7 @@ const DormCard: React.FC<DormCardProps> = ({
           alt={dormName}
           loading="lazy"
           decoding="async"
-          className="
-            size-full object-cover transition-transform duration-500
-            group-hover:scale-105
-          "
+          className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
         {positivePercent != null &&
           totalReviews != null &&
@@ -411,16 +395,10 @@ const DormCard: React.FC<DormCardProps> = ({
             <button
               type="button"
               onClick={(e) => {
-                e.stopPropagation();
-                onRatingClick?.(dorm, e);
+                e.stopPropagation()
+                onRatingClick?.(dorm, e)
               }}
-              className="
-                absolute top-3 right-3 flex items-center gap-1 rounded-md border
-                border-transparent bg-white px-2 py-1 text-xs font-bold
-                text-slate-800 shadow-sm transition-all duration-200
-                group-hover:scale-105
-                hover:border-illini-orange/30 hover:bg-illini-orange/10
-              "
+              className="hover:border-illini-orange/30 hover:bg-illini-orange/10 absolute top-3 right-3 flex items-center gap-1 rounded-md border border-transparent bg-white px-2 py-1 text-xs font-bold text-slate-800 shadow-sm transition-all duration-200 group-hover:scale-105"
             >
               <ThumbsUp size={11} className="text-slate-500" />
               {positivePercent}% ({totalReviews})
@@ -430,22 +408,15 @@ const DormCard: React.FC<DormCardProps> = ({
         {onToggleCompare && (
           <button
             onClick={(e) => {
-              e.stopPropagation();
-              onToggleCompare(dorm);
+              e.stopPropagation()
+              onToggleCompare(dorm)
             }}
             type="button"
-            className={`
-              absolute right-3 bottom-3 rounded-full p-1.5 shadow-sm
-              transition-all duration-200
-              ${
-                isCompared
-                  ? "scale-105 bg-illini-blue text-white"
-                  : `
-                    bg-white/90 text-gray-400
-                    hover:bg-white hover:text-illini-blue
-                  `
-              }
-            `}
+            className={`absolute right-3 bottom-3 rounded-full p-1.5 shadow-sm transition-all duration-200 ${
+              isCompared
+                ? "bg-illini-blue scale-105 text-white"
+                : `hover:text-illini-blue bg-white/90 text-gray-400 hover:bg-white`
+            } `}
             aria-label={isCompared ? "Remove from compare" : "Add to compare"}
           >
             {isCompared ? (
@@ -459,15 +430,11 @@ const DormCard: React.FC<DormCardProps> = ({
         {onToggleFavorite && (
           <button
             onClick={(e) => {
-              e.stopPropagation();
-              onToggleFavorite(dorm, e);
+              e.stopPropagation()
+              onToggleFavorite(dorm, e)
             }}
             type="button"
-            className="
-              absolute top-3 left-3 rounded-full bg-white p-2 text-gray-400
-              shadow-sm transition-colors
-              hover:bg-gray-50 hover:text-red-500
-            "
+            className="absolute top-3 left-3 rounded-full bg-white p-2 text-gray-400 shadow-sm transition-colors hover:bg-gray-50 hover:text-red-500"
             aria-label={isFavorite ? t.unsave : t.save}
           >
             <svg
@@ -475,10 +442,7 @@ const DormCard: React.FC<DormCardProps> = ({
               viewBox="0 0 24 24"
               fill={isFavorite ? "currentColor" : "none"}
               stroke="currentColor"
-              className={`
-                size-5
-                ${isFavorite ? "text-red-500" : ""}
-              `}
+              className={`size-5 ${isFavorite ? "text-red-500" : ""} `}
               strokeWidth="2"
             >
               <path
@@ -492,36 +456,21 @@ const DormCard: React.FC<DormCardProps> = ({
       </div>
 
       <div className="flex grow flex-col p-4">
-        <h3
-          className="
-            mb-1.5 line-clamp-2 text-xl leading-[1.15] font-bold text-gray-900
-            antialiased
-          "
-        >
+        <h3 className="mb-1.5 line-clamp-2 text-xl leading-[1.15] font-bold text-gray-900 antialiased">
           {dormName}
         </h3>
 
-        <div
-          className="
-            mb-3 grid grid-cols-[minmax(0,1.3fr)_minmax(0,0.9fr)] gap-x-6
-            text-[12px] text-gray-500
-          "
-        >
+        <div className="mb-3 grid grid-cols-[minmax(0,1.3fr)_minmax(0,0.9fr)] gap-x-6 text-[12px] text-gray-500">
           <div className="inline-flex min-w-0 items-center gap-1">
-            <MapPin size={13} className="shrink-0 text-illini-orange" />
+            <MapPin size={13} className="text-illini-orange shrink-0" />
             <span className="line-clamp-1">{locationLabel}</span>
           </div>
-          <span className="text-[12px] font-bold text-illini-blue">
+          <span className="text-illini-blue text-[12px] font-bold">
             {formatPrice(dorm.price)}
           </span>
         </div>
 
-        <div
-          className="
-            mb-3 grid grid-cols-[minmax(0,1.3fr)_minmax(0,0.9fr)] gap-x-6
-            gap-y-2 text-[13px] text-slate-700
-          "
-        >
+        <div className="mb-3 grid grid-cols-[minmax(0,1.3fr)_minmax(0,0.9fr)] gap-x-6 gap-y-2 text-[13px] text-slate-700">
           <div className="inline-flex min-w-0 items-center gap-1.5">
             <BedSingle size={14} className="shrink-0 text-slate-400" />
             <span className="line-clamp-2 leading-5">
@@ -577,17 +526,14 @@ const DormCard: React.FC<DormCardProps> = ({
         {cardTagCandidates.length > 0 && (
           <div
             aria-hidden="true"
-            className="
-              pointer-events-none absolute top-4 left-4 -z-10 h-0
-              overflow-hidden opacity-0
-            "
+            className="pointer-events-none absolute top-4 left-4 -z-10 h-0 overflow-hidden opacity-0"
           >
             <div className="flex items-center gap-1.5">
               {cardTagCandidates.map((tag) => (
                 <span
                   key={`measure-${tag.id}`}
                   ref={(element) => {
-                    cardTags.tagRefs.current[tag.id] = element;
+                    cardTags.tagRefs.current[tag.id] = element
                   }}
                   className={getCardTagClasses(tag)}
                 >
@@ -601,7 +547,7 @@ const DormCard: React.FC<DormCardProps> = ({
                 <span
                   key={`measure-overflow-${count}`}
                   ref={(element) => {
-                    cardTags.overflowRefs.current[count] = element;
+                    cardTags.overflowRefs.current[count] = element
                   }}
                   className={getOverflowTagClasses()}
                 >
@@ -613,7 +559,7 @@ const DormCard: React.FC<DormCardProps> = ({
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default DormCard;
+export default DormCard

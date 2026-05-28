@@ -7,23 +7,23 @@
 
 // [COMPONENT] Entry point for the admin edit panel — wires form hook + shell + tab components.
 // [组件] 管理员编辑面板入口，将表单 hook、外壳和各 Tab 组件组合在一起。
-import React from "react";
-import { FileText, History, Image, Info, Tag } from "lucide-react";
-import { type Dorm } from "./types/index";
-import { type Language } from "../../types";
-import { useDormEditForm } from "./edit-panel/useDormEditForm";
-import { DormEditPanelShell } from "./edit-panel/DormEditPanelShell";
-import { ContentTab } from "./edit-panel/ContentTab";
-import { DetailsTab } from "./edit-panel/DetailsTab";
-import { TagsTab } from "./edit-panel/TagsTab";
-import { MediaTab } from "./edit-panel/MediaTab";
-import { HistoryTab } from "./edit-panel/HistoryTab";
+import React from "react"
+import { FileText, History, Image, Info, Tag } from "lucide-react"
+import { type Dorm } from "./types/index"
+import { type Language } from "../../types"
+import { useDormEditForm } from "./edit-panel/useDormEditForm"
+import { DormEditPanelShell } from "./edit-panel/DormEditPanelShell"
+import { ContentTab } from "./edit-panel/ContentTab"
+import { DetailsTab } from "./edit-panel/DetailsTab"
+import { TagsTab } from "./edit-panel/TagsTab"
+import { MediaTab } from "./edit-panel/MediaTab"
+import { HistoryTab } from "./edit-panel/HistoryTab"
 
 interface DormEditPanelProps {
-  dorm: Dorm;
-  language: Language;
-  onClose: () => void;
-  onSaved: (updated: Dorm) => void;
+  dorm: Dorm
+  language: Language
+  onClose: () => void
+  onSaved: (updated: Dorm) => void
 }
 
 const DormEditPanel: React.FC<DormEditPanelProps> = ({
@@ -32,8 +32,8 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({
   onClose,
   onSaved,
 }) => {
-  const form = useDormEditForm({ dorm, language, onClose, onSaved });
-  const { t } = form;
+  const form = useDormEditForm({ dorm, language, onClose, onSaved })
+  const { t } = form
 
   const tabs = [
     {
@@ -49,7 +49,7 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({
       icon: <History size={14} />,
       label: t.tabs.history,
     },
-  ];
+  ]
 
   return (
     <DormEditPanelShell
@@ -73,7 +73,7 @@ const DormEditPanel: React.FC<DormEditPanelProps> = ({
       {form.activeTab === "media" && <MediaTab form={form} />}
       {form.activeTab === "history" && <HistoryTab form={form} />}
     </DormEditPanelShell>
-  );
-};
+  )
+}
 
-export default DormEditPanel;
+export default DormEditPanel

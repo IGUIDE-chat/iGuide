@@ -7,7 +7,7 @@
 
 // [DATA] Article content for Course Registration guide.
 // [数据] 选课入门（Registration 101）指南的文章内容。
-import { type Article } from "../../types";
+import { type Article } from "../../types"
 
 export const registration101: Article = {
   id: "registration-101",
@@ -44,4 +44,4 @@ export const registration101: Article = {
   `,
   tags_zh: ["选课", "课程", "学术", "Course Explorer", "Enterprise"],
   lastUpdated: "2024-01-10",
-};
+}

@@ -14,27 +14,31 @@ import React, {
   useMemo,
   useRef,
   useState,
-} from "react";
-import { type Dorm } from "./types/index";
-import { useHousingMapUi } from "./store/HousingContext";
-import { CAMPUS_LANDMARKS, CAMPUS_ZONES, type Landmark } from "./constants/mapData";
-import { type Language } from "../../types";
+} from "react"
+import { type Dorm } from "./types/index"
+import { useHousingMapUi } from "./store/HousingContext"
+import {
+  CAMPUS_LANDMARKS,
+  CAMPUS_ZONES,
+  type Landmark,
+} from "./constants/mapData"
+import { type Language } from "../../types"
 import Map, {
   Layer,
   type MapRef,
   NavigationControl,
   Popup,
   Source,
-} from "react-map-gl/mapbox";
-import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+} from "react-map-gl/mapbox"
+import mapboxgl from "mapbox-gl"
+import "mapbox-gl/dist/mapbox-gl.css"
 import {
   buildDormFeatureCollection,
   buildLandmarkFeatureCollection,
-} from "./dorm-map/mapFeatureBuilders";
-import { DEFAULT_CENTER, DEFAULT_ZOOM } from "./dorm-map/mapConstants";
-import { registerMapAssets } from "./dorm-map/mapAssets";
-import { getHousingTypeMeta } from "./constants/metadata";
+} from "./dorm-map/mapFeatureBuilders"
+import { DEFAULT_CENTER, DEFAULT_ZOOM } from "./dorm-map/mapConstants"
+import { registerMapAssets } from "./dorm-map/mapAssets"
+import { getHousingTypeMeta } from "./constants/metadata"
 import {
   CLUSTERS_LAYER,
   CLUSTER_COUNT_LAYER,
@@ -42,18 +46,18 @@ import {
   buildLandmarksLayer,
   buildZonesFillLayer,
   buildZonesLabelLayer,
-} from "./dorm-map/layers";
+} from "./dorm-map/layers"
 
-const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || "";
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || ""
 
 interface MapErrorBoundaryState {
-  hasError: boolean;
-  error: Error | null;
+  hasError: boolean
+  error: Error | null
 }
 
 interface MapErrorBoundaryProps {
-  children: ReactNode;
-  language?: Language;
+  children: ReactNode
+  language?: Language
 }
 
 class MapErrorBoundary extends Component<
@@ -61,41 +65,27 @@ class MapErrorBoundary extends Component<
   MapErrorBoundaryState
 > {
   constructor(props: MapErrorBoundaryProps) {
-    super(props);
-    this.state = { hasError: false, error: null };
+    super(props)
+    this.state = { hasError: false, error: null }
   }
 
   static getDerivedStateFromError(error: Error) {
-    return { hasError: true, error };
+    return { hasError: true, error }
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error("[DormMap] Map Error:", error, errorInfo);
+    console.error("[DormMap] Map Error:", error, errorInfo)
   }
 
   render() {
-    const { hasError, error } = this.state;
-    const { children } = this.props;
+    const { hasError, error } = this.state
+    const { children } = this.props
 
     if (hasError) {
       return (
-        <div
-          className="
-            flex size-full items-center justify-center bg-linear-to-br
-            from-gray-50 to-gray-100
-          "
-        >
-          <div
-            className="
-              mx-4 max-w-md rounded-2xl bg-white p-8 text-center shadow-xl
-            "
-          >
-            <div
-              className="
-                mx-auto mb-4 flex size-16 items-center justify-center
-                rounded-full bg-red-100
-              "
-            >
+        <div className="flex size-full items-center justify-center bg-linear-to-br from-gray-50 to-gray-100">
+          <div className="mx-4 max-w-md rounded-2xl bg-white p-8 text-center shadow-xl">
+            <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-red-100">
               <svg
                 className="size-8 text-red-500"
                 fill="none"
@@ -122,31 +112,27 @@ class MapErrorBoundary extends Component<
             <button
               onClick={() => window.location.reload()}
               type="button"
-              className="
-                rounded-xl bg-illini-blue px-6 py-2 font-semibold text-white
-                transition-colors
-                hover:bg-illini-blue/90
-              "
+              className="bg-illini-blue hover:bg-illini-blue/90 rounded-xl px-6 py-2 font-semibold text-white transition-colors"
             >
               Reload page
             </button>
           </div>
         </div>
-      );
+      )
     }
 
-    return children;
+    return children
   }
 }
 
 interface DormMapProps {
-  dorms: Dorm[];
-  onSelectDorm: (dorm: Dorm) => void;
-  language?: Language;
-  isVisible?: boolean;
-  highlightedDormId?: string | null;
-  onVisibleDormsChange?: (dorms: Dorm[]) => void;
-  disableScrollZoom?: boolean;
+  dorms: Dorm[]
+  onSelectDorm: (dorm: Dorm) => void
+  language?: Language
+  isVisible?: boolean
+  highlightedDormId?: string | null
+  onVisibleDormsChange?: (dorms: Dorm[]) => void
+  disableScrollZoom?: boolean
 }
 
 const DormMap: React.FC<DormMapProps> = ({
@@ -164,18 +150,18 @@ const DormMap: React.FC<DormMapProps> = ({
     showZoneLabels,
     showLandmarks,
     setShowLandmarks,
-  } = useHousingMapUi();
+  } = useHousingMapUi()
 
-  const [hoveredDorm, setHoveredDorm] = useState<Dorm | null>(null);
+  const [hoveredDorm, setHoveredDorm] = useState<Dorm | null>(null)
   const [hoveredCoords, setHoveredCoords] = useState<[number, number] | null>(
     null
-  );
-  const [isMapReady, setIsMapReady] = useState(false);
-  const [areMapImagesReady, setAreMapImagesReady] = useState(false);
-  const [visibleDorms, setVisibleDorms] = useState<Dorm[]>([]);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<MapRef>(null);
-  const fitBoundsTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  )
+  const [isMapReady, setIsMapReady] = useState(false)
+  const [areMapImagesReady, setAreMapImagesReady] = useState(false)
+  const [visibleDorms, setVisibleDorms] = useState<Dorm[]>([])
+  const containerRef = useRef<HTMLDivElement>(null)
+  const mapRef = useRef<MapRef>(null)
+  const fitBoundsTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const safeDorms = useMemo(
     () =>
@@ -183,7 +169,7 @@ const DormMap: React.FC<DormMapProps> = ({
         (dorm) => Number.isFinite(dorm.lat) && Number.isFinite(dorm.lng)
       ),
     [dorms]
-  );
+  )
   const safeLandmarks = useMemo(
     () =>
       CAMPUS_LANDMARKS.filter(
@@ -191,286 +177,318 @@ const DormMap: React.FC<DormMapProps> = ({
           Number.isFinite(landmark.lat) && Number.isFinite(landmark.lng)
       ),
     []
-  );
+  )
 
   const visibleLandmarks = useMemo(() => {
-    if (!showLandmarks) {return [];}
-    return safeLandmarks;
-  }, [showLandmarks, safeLandmarks]);
+    if (!showLandmarks) {
+      return []
+    }
+    return safeLandmarks
+  }, [showLandmarks, safeLandmarks])
 
   const handleViewportChange = useCallback(() => {
-    if (!mapRef.current) {return;}
+    if (!mapRef.current) {
+      return
+    }
     if (safeDorms.length === 0) {
-      setVisibleDorms([]);
-      return;
+      setVisibleDorms([])
+      return
     }
 
-    const bounds = mapRef.current.getBounds();
+    const bounds = mapRef.current.getBounds()
     if (!bounds) {
-      setVisibleDorms([]);
-      return [];
+      setVisibleDorms([])
+      return []
     }
     const visible = safeDorms.filter((dorm) => {
-      const point = new mapboxgl.LngLat(dorm.lng, dorm.lat);
-      return bounds.contains(point);
-    });
+      const point = new mapboxgl.LngLat(dorm.lng, dorm.lat)
+      return bounds.contains(point)
+    })
 
-    return visible;
-  }, [safeDorms]);
+    return visible
+  }, [safeDorms])
 
   useEffect(() => {
-    onVisibleDormsChange?.(visibleDorms);
-  }, [visibleDorms, onVisibleDormsChange]);
+    onVisibleDormsChange?.(visibleDorms)
+  }, [visibleDorms, onVisibleDormsChange])
 
   useLayoutEffect(() => {
-    if (!isMapReady || !isVisible) {return;}
-    const visible = handleViewportChange();
-    if (visible) {
-      setVisibleDorms(visible);
+    if (!isMapReady || !isVisible) {
+      return
     }
-  }, [isMapReady, isVisible, handleViewportChange]);
+    const visible = handleViewportChange()
+    if (visible) {
+      setVisibleDorms(visible)
+    }
+  }, [isMapReady, isVisible, handleViewportChange])
 
   useEffect(() => {
-    if (!isVisible || !isMapReady || !mapRef.current) {return;}
+    if (!isVisible || !isMapReady || !mapRef.current) {
+      return
+    }
 
     if (fitBoundsTimerRef.current) {
-      clearTimeout(fitBoundsTimerRef.current);
+      clearTimeout(fitBoundsTimerRef.current)
     }
 
     fitBoundsTimerRef.current = setTimeout(() => {
-      const map = mapRef.current;
-      if (!map) {return;}
-      if (safeDorms.length === 0) {return;}
+      const map = mapRef.current
+      if (!map) {
+        return
+      }
+      if (safeDorms.length === 0) {
+        return
+      }
 
       try {
         const coordinates = safeDorms.map(
           (dorm) => [dorm.lng, dorm.lat] as [number, number]
-        );
+        )
         const bounds = coordinates.reduce(
           (accBounds, coord) => accBounds.extend(coord),
           new mapboxgl.LngLatBounds()
-        );
+        )
 
         if (!bounds.isEmpty()) {
-          map.fitBounds(bounds, { padding: 90, maxZoom: 16, duration: 0 });
+          map.fitBounds(bounds, { padding: 90, maxZoom: 16, duration: 0 })
           // fitBounds does not synchronously update getBounds(), so we
           // directly set all dorms as visible — fitBounds was called with
           // exactly these dorms, so they are all within the new viewport.
-          setVisibleDorms(safeDorms);
+          setVisibleDorms(safeDorms)
         }
       } catch (error) {
-        console.error("[DormMap] Failed to fit bounds safely:", error);
+        console.error("[DormMap] Failed to fit bounds safely:", error)
       }
-    }, 140);
+    }, 140)
 
     return () => {
       if (fitBoundsTimerRef.current) {
-        clearTimeout(fitBoundsTimerRef.current);
-        fitBoundsTimerRef.current = null;
+        clearTimeout(fitBoundsTimerRef.current)
+        fitBoundsTimerRef.current = null
       }
-    };
-  }, [safeDorms, isVisible, isMapReady]);
+    }
+  }, [safeDorms, isVisible, isMapReady])
 
   useEffect(() => {
-    if (!isVisible || !isMapReady || !mapRef.current || !containerRef.current)
-      {return;}
+    if (!isVisible || !isMapReady || !mapRef.current || !containerRef.current) {
+      return
+    }
 
-    const map = mapRef.current;
-    const container = containerRef.current;
-    const transitionTarget = container.parentElement;
-    let rafOne = 0;
-    let rafTwo = 0;
-    let retryTimer: number | null = null;
-    const timeouts: number[] = [];
+    const map = mapRef.current
+    const container = containerRef.current
+    const transitionTarget = container.parentElement
+    let rafOne = 0
+    let rafTwo = 0
+    let retryTimer: number | null = null
+    const timeouts: number[] = []
 
     const resizeIfSized = () => {
-      if (!map || !container.isConnected) {return false;}
-      if (container.clientWidth === 0 || container.clientHeight === 0)
-        {return false;}
-      map.resize();
-      return true;
-    };
+      if (!map || !container.isConnected) {
+        return false
+      }
+      if (container.clientWidth === 0 || container.clientHeight === 0) {
+        return false
+      }
+      map.resize()
+      return true
+    }
 
     const runStabilizedResize = () => {
-      if (!resizeIfSized()) {return false;}
+      if (!resizeIfSized()) {
+        return false
+      }
 
       rafOne = window.requestAnimationFrame(() => {
-        resizeIfSized();
+        resizeIfSized()
         rafTwo = window.requestAnimationFrame(() => {
-          resizeIfSized();
-        });
-      });
+          resizeIfSized()
+        })
+      })
 
-      timeouts.push(window.setTimeout(() => resizeIfSized(), 120));
-      timeouts.push(window.setTimeout(() => resizeIfSized(), 320));
-      return true;
-    };
+      timeouts.push(window.setTimeout(() => resizeIfSized(), 120))
+      timeouts.push(window.setTimeout(() => resizeIfSized(), 320))
+      return true
+    }
 
     const queueRetry = () => {
-      if (retryTimer) {return;}
+      if (retryTimer) {
+        return
+      }
       retryTimer = window.setTimeout(() => {
-        retryTimer = null;
-        runStabilizedResize();
-      }, 80);
-    };
+        retryTimer = null
+        runStabilizedResize()
+      }, 80)
+    }
 
     if (!runStabilizedResize()) {
-      queueRetry();
+      queueRetry()
     }
 
     const observer = new ResizeObserver(() => {
       if (!runStabilizedResize()) {
-        queueRetry();
+        queueRetry()
       }
-    });
-    observer.observe(container);
+    })
+    observer.observe(container)
 
     const handleTransitionEnd = () => {
-      runStabilizedResize();
-    };
-    transitionTarget?.addEventListener("transitionend", handleTransitionEnd);
-    window.addEventListener("resize", handleTransitionEnd);
+      runStabilizedResize()
+    }
+    transitionTarget?.addEventListener("transitionend", handleTransitionEnd)
+    window.addEventListener("resize", handleTransitionEnd)
 
     return () => {
-      window.cancelAnimationFrame(rafOne);
-      window.cancelAnimationFrame(rafTwo);
+      window.cancelAnimationFrame(rafOne)
+      window.cancelAnimationFrame(rafTwo)
       if (retryTimer) {
-        window.clearTimeout(retryTimer);
+        window.clearTimeout(retryTimer)
       }
-      timeouts.forEach((timeoutId) => window.clearTimeout(timeoutId));
-      observer.disconnect();
+      timeouts.forEach((timeoutId) => window.clearTimeout(timeoutId))
+      observer.disconnect()
       transitionTarget?.removeEventListener(
         "transitionend",
         handleTransitionEnd
-      );
-      window.removeEventListener("resize", handleTransitionEnd);
-    };
-  }, [isVisible, isMapReady, safeDorms.length]);
+      )
+      window.removeEventListener("resize", handleTransitionEnd)
+    }
+  }, [isVisible, isMapReady, safeDorms.length])
 
   useLayoutEffect(() => {
     if (hoveredDorm && !safeDorms.some((dorm) => dorm.id === hoveredDorm.id)) {
-      setHoveredDorm(null);
+      setHoveredDorm(null)
     }
-  }, [safeDorms, hoveredDorm]);
+  }, [safeDorms, hoveredDorm])
 
   useEffect(() => {
-    if (!isMapReady || !mapRef.current) {return;}
-    const map = mapRef.current.getMap();
-    if (disableScrollZoom) {
-      map.scrollZoom.disable();
-      return;
+    if (!isMapReady || !mapRef.current) {
+      return
     }
-    map.scrollZoom.enable();
-  }, [disableScrollZoom, isMapReady]);
+    const map = mapRef.current.getMap()
+    if (disableScrollZoom) {
+      map.scrollZoom.disable()
+      return
+    }
+    map.scrollZoom.enable()
+  }, [disableScrollZoom, isMapReady])
 
   useEffect(() => {
     return () => {
       if (fitBoundsTimerRef.current) {
-        clearTimeout(fitBoundsTimerRef.current);
+        clearTimeout(fitBoundsTimerRef.current)
       }
-      const map = mapRef.current;
+      const map = mapRef.current
       if (map) {
-        map.getMap().scrollZoom.enable();
+        map.getMap().scrollZoom.enable()
       }
-    };
-  }, []);
+    }
+  }, [])
 
   const onMapLoad = useCallback((event: mapboxgl.MapboxEvent) => {
-    setIsMapReady(true);
-    const map = event.target as mapboxgl.Map;
-    setAreMapImagesReady(registerMapAssets(map));
-  }, []);
+    setIsMapReady(true)
+    const map = event.target as mapboxgl.Map
+    setAreMapImagesReady(registerMapAssets(map))
+  }, [])
 
   useEffect(() => {
-    if (!isMapReady || !mapRef.current) {return;}
+    if (!isMapReady || !mapRef.current) {
+      return
+    }
 
-    const map = mapRef.current.getMap();
-    const ensureAssets = () => setAreMapImagesReady(registerMapAssets(map));
+    const map = mapRef.current.getMap()
+    const ensureAssets = () => setAreMapImagesReady(registerMapAssets(map))
     const handleStyleImageMissing = (event: { id: string }) => {
       if (
         event.id === "pill" ||
         event.id === "pill-active" ||
         event.id.startsWith("landmark-")
       ) {
-        setAreMapImagesReady(registerMapAssets(map));
+        setAreMapImagesReady(registerMapAssets(map))
       }
-    };
+    }
 
-    map.on("styleimagemissing", handleStyleImageMissing);
-    map.on("styledata", ensureAssets);
-    ensureAssets();
+    map.on("styleimagemissing", handleStyleImageMissing)
+    map.on("styledata", ensureAssets)
+    ensureAssets()
 
     return () => {
-      map.off("styleimagemissing", handleStyleImageMissing);
-      map.off("styledata", ensureAssets);
-    };
-  }, [isMapReady]);
+      map.off("styleimagemissing", handleStyleImageMissing)
+      map.off("styledata", ensureAssets)
+    }
+  }, [isMapReady])
 
   const onMapClick = useCallback(
     (event: mapboxgl.MapLayerMouseEvent) => {
-      const feature = event.features?.[0];
-      if (!feature) {return;}
+      const feature = event.features?.[0]
+      if (!feature) {
+        return
+      }
 
-      const clusterId = feature.properties?.cluster_id;
-      const map = mapRef.current?.getMap();
+      const clusterId = feature.properties?.cluster_id
+      const map = mapRef.current?.getMap()
 
       if (clusterId && map) {
-        (map.getSource("dorms") as any).getClusterExpansionZoom(
+        ;(map.getSource("dorms") as any).getClusterExpansionZoom(
           clusterId,
           (error: unknown, zoom: number) => {
-            if (error) {return;}
+            if (error) {
+              return
+            }
             map.easeTo({
               center: (feature.geometry as any).coordinates,
               zoom,
               duration: 500,
-            });
+            })
           }
-        );
-        return;
+        )
+        return
       }
 
       if (feature.properties?.id) {
-        const dormId = feature.properties.id;
-        const dorm = dorms.find((item) => item.id === dormId);
+        const dormId = feature.properties.id
+        const dorm = dorms.find((item) => item.id === dormId)
         if (dorm) {
-          setHoveredDorm(null);
-          onSelectDorm(dorm);
+          setHoveredDorm(null)
+          onSelectDorm(dorm)
         }
       }
     },
     [dorms, onSelectDorm]
-  );
+  )
 
   const onMouseEnter = useCallback(
     (event: mapboxgl.MapLayerMouseEvent) => {
       if (mapRef.current) {
-        mapRef.current.getCanvas().style.cursor = "pointer";
+        mapRef.current.getCanvas().style.cursor = "pointer"
       }
-      const feature = event.features?.[0];
-      if (!feature || feature.properties?.cluster_id) {return;}
-      const dormId = feature.properties?.id;
-      if (!dormId) {return;}
+      const feature = event.features?.[0]
+      if (!feature || feature.properties?.cluster_id) {
+        return
+      }
+      const dormId = feature.properties?.id
+      if (!dormId) {
+        return
+      }
 
-      const dorm = dorms.find((item) => item.id === dormId);
+      const dorm = dorms.find((item) => item.id === dormId)
       if (dorm) {
         const coords = (feature.geometry as any).coordinates.slice() as [
           number,
           number,
-        ];
-        setHoveredDorm(dorm);
-        setHoveredCoords(coords);
+        ]
+        setHoveredDorm(dorm)
+        setHoveredCoords(coords)
       }
     },
     [dorms]
-  );
+  )
 
   const onMouseLeave = useCallback(() => {
     if (mapRef.current) {
-      mapRef.current.getCanvas().style.cursor = "";
+      mapRef.current.getCanvas().style.cursor = ""
     }
-    setHoveredDorm(null);
-    setHoveredCoords(null);
-  }, []);
+    setHoveredDorm(null)
+    setHoveredCoords(null)
+  }, [])
 
   const popupT =
     language === "zh"
@@ -480,23 +498,14 @@ const DormMap: React.FC<DormMapProps> = ({
           viewDetails: "Details →",
           ac: "AC",
           dining: "Dining",
-        };
-  const isChinese = language === "zh";
-  const formatPopupPrice = (price: number) => `$${(price / 1000).toFixed(1)}k`;
+        }
+  const isChinese = language === "zh"
+  const formatPopupPrice = (price: number) => `$${(price / 1000).toFixed(1)}k`
 
   if (!MAPBOX_TOKEN) {
     return (
-      <div
-        className="
-          flex size-full items-center justify-center bg-linear-to-br
-          from-gray-50 to-gray-100
-        "
-      >
-        <div
-          className="
-            mx-4 max-w-md rounded-2xl bg-white p-8 text-center shadow-xl
-          "
-        >
+      <div className="flex size-full items-center justify-center bg-linear-to-br from-gray-50 to-gray-100">
+        <div className="mx-4 max-w-md rounded-2xl bg-white p-8 text-center shadow-xl">
           <h3 className="mb-2 text-lg font-bold text-gray-900">
             {language === "zh" ? "地图不可用" : "Map unavailable"}
           </h3>
@@ -507,7 +516,7 @@ const DormMap: React.FC<DormMapProps> = ({
           </p>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -591,28 +600,13 @@ const DormMap: React.FC<DormMapProps> = ({
           {areMapImagesReady && <Layer {...(UNCLUSTERED_LAYER as any)} />}
         </Source>
 
-        <div
-          className="
-            absolute top-4 left-4 z-10 flex min-w-[140px] flex-col gap-2
-            rounded-lg border border-slate-200/50 bg-white/90 p-3 shadow-lg
-            backdrop-blur-sm
-          "
-        >
-          <div
-            className="
-              mb-1 text-xs font-semibold tracking-wider text-slate-500 uppercase
-            "
-          >
+        <div className="absolute top-4 left-4 z-10 flex min-w-[140px] flex-col gap-2 rounded-lg border border-slate-200/50 bg-white/90 p-3 shadow-lg backdrop-blur-sm">
+          <div className="mb-1 text-xs font-semibold tracking-wider text-slate-500 uppercase">
             {language === "zh" ? "地图图层" : "Map Layers"}
           </div>
 
           <label className="group flex cursor-pointer items-center justify-between">
-            <span
-              className="
-                text-sm font-medium text-slate-700 transition-colors
-                group-hover:text-illini-blue
-              "
-            >
+            <span className="group-hover:text-illini-blue text-sm font-medium text-slate-700 transition-colors">
               {language === "zh" ? "区域" : "Zones"}
             </span>
             <div className="relative inline-flex cursor-pointer items-center">
@@ -622,28 +616,12 @@ const DormMap: React.FC<DormMapProps> = ({
                 checked={showZones}
                 onChange={(e) => setShowZones(e.target.checked)}
               />
-              <div
-                className="
-                  peer h-4 w-7 rounded-full bg-slate-300
-                  peer-checked:bg-illini-orange
-                  peer-focus:outline-none
-                  after:absolute after:top-[2px] after:left-[2px] after:size-3
-                  after:rounded-full after:border after:border-gray-300
-                  after:bg-white after:transition-all after:content-['']
-                  peer-checked:after:translate-x-full
-                  peer-checked:after:border-white
-                "
-              />
+              <div className="peer peer-checked:bg-illini-orange h-4 w-7 rounded-full bg-slate-300 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:size-3 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white" />
             </div>
           </label>
 
           <label className="group flex cursor-pointer items-center justify-between">
-            <span
-              className="
-                text-sm font-medium text-slate-700 transition-colors
-                group-hover:text-illini-blue
-              "
-            >
+            <span className="group-hover:text-illini-blue text-sm font-medium text-slate-700 transition-colors">
               {language === "zh" ? "地标" : "Landmarks"}
             </span>
             <div className="relative inline-flex cursor-pointer items-center">
@@ -653,18 +631,7 @@ const DormMap: React.FC<DormMapProps> = ({
                 checked={showLandmarks}
                 onChange={(e) => setShowLandmarks(e.target.checked)}
               />
-              <div
-                className="
-                  peer h-4 w-7 rounded-full bg-slate-300
-                  peer-checked:bg-illini-orange
-                  peer-focus:outline-none
-                  after:absolute after:top-[2px] after:left-[2px] after:size-3
-                  after:rounded-full after:border after:border-gray-300
-                  after:bg-white after:transition-all after:content-['']
-                  peer-checked:after:translate-x-full
-                  peer-checked:after:border-white
-                "
-              />
+              <div className="peer peer-checked:bg-illini-orange h-4 w-7 rounded-full bg-slate-300 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:size-3 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white" />
             </div>
           </label>
         </div>
@@ -685,37 +652,41 @@ const DormMap: React.FC<DormMapProps> = ({
               isChinese={isChinese}
               formatPopupPrice={formatPopupPrice}
               onOpenDetails={() => {
-                setHoveredDorm(null);
-                onSelectDorm(hoveredDorm);
+                setHoveredDorm(null)
+                onSelectDorm(hoveredDorm)
               }}
             />
           </Popup>
         )}
       </Map>
     </div>
-  );
-};
+  )
+}
 
 /** Pointer-friendly preview (tap opens details; works when `click` is not synthesized on touch). */
-const POPUP_TAP_PX = 14;
+const POPUP_TAP_PX = 14
 
 const PopupDormPreview: React.FC<{
-  dorm: Dorm;
-  popupT: { perSem: string; viewDetails: string; ac: string; dining: string };
-  isChinese: boolean;
-  formatPopupPrice: (price: number) => string;
-  onOpenDetails: () => void;
+  dorm: Dorm
+  popupT: { perSem: string; viewDetails: string; ac: string; dining: string }
+  isChinese: boolean
+  formatPopupPrice: (price: number) => string
+  onOpenDetails: () => void
 }> = ({ dorm, popupT, isChinese, formatPopupPrice, onOpenDetails }) => {
-  const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
+  const pointerStartRef = useRef<{ x: number; y: number } | null>(null)
 
   const tryOpen = (e: React.PointerEvent) => {
-    if (!pointerStartRef.current) {return;}
-    const dx = e.clientX - pointerStartRef.current.x;
-    const dy = e.clientY - pointerStartRef.current.y;
-    pointerStartRef.current = null;
-    if (Math.hypot(dx, dy) > POPUP_TAP_PX) {return;}
-    onOpenDetails();
-  };
+    if (!pointerStartRef.current) {
+      return
+    }
+    const dx = e.clientX - pointerStartRef.current.x
+    const dy = e.clientY - pointerStartRef.current.y
+    pointerStartRef.current = null
+    if (Math.hypot(dx, dy) > POPUP_TAP_PX) {
+      return
+    }
+    onOpenDetails()
+  }
 
   return (
     <div
@@ -724,19 +695,21 @@ const PopupDormPreview: React.FC<{
       tabIndex={0}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          onOpenDetails();
+          e.preventDefault()
+          onOpenDetails()
         }
       }}
       onPointerDown={(e) => {
-        if (e.pointerType === "mouse" && e.button !== 0) {return;}
-        pointerStartRef.current = { x: e.clientX, y: e.clientY };
+        if (e.pointerType === "mouse" && e.button !== 0) {
+          return
+        }
+        pointerStartRef.current = { x: e.clientX, y: e.clientY }
       }}
       onPointerUp={(e) => {
-        tryOpen(e);
+        tryOpen(e)
       }}
       onPointerCancel={() => {
-        pointerStartRef.current = null;
+        pointerStartRef.current = null
       }}
     >
       <div className="h-28 overflow-hidden">
@@ -746,7 +719,7 @@ const PopupDormPreview: React.FC<{
           className="size-full object-cover"
           onError={(e) => {
             e.currentTarget.src =
-              "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400";
+              "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400"
           }}
         />
       </div>
@@ -756,18 +729,14 @@ const PopupDormPreview: React.FC<{
             {isChinese && dorm.name_zh ? dorm.name_zh : dorm.name}
           </h4>
           {(() => {
-            const housingTypeMeta = getHousingTypeMeta(dorm.housingType);
+            const housingTypeMeta = getHousingTypeMeta(dorm.housingType)
             return (
               <span
-                className={`
-                  ml-2 shrink-0 rounded-full px-1.5 py-0.5 text-[10px]
-                  font-semibold
-                  ${housingTypeMeta.badgeClassName}
-                `}
+                className={`ml-2 shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${housingTypeMeta.badgeClassName} `}
               >
                 {housingTypeMeta.shortLabel}
               </span>
-            );
+            )
           })()}
         </div>
         <div className="mb-2 flex items-center gap-2 text-[11px] text-gray-500">
@@ -787,13 +756,13 @@ const PopupDormPreview: React.FC<{
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
 const DormMapWithErrorBoundary: React.FC<DormMapProps> = (props) => (
   <MapErrorBoundary language={props.language}>
     <DormMap {...props} />
   </MapErrorBoundary>
-);
+)
 
-export default DormMapWithErrorBoundary;
+export default DormMapWithErrorBoundary

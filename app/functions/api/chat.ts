@@ -2,21 +2,21 @@
 // [函数] 处理聊天请求和 API 代理的无服务器函数。
 // Shim for Cloudflare Pages Functions type
 type PagesFunction<T = unknown> = (context: {
-  request: Request;
-  env: T;
-  params: Record<string, string>;
-  waitUntil: (promise: Promise<any>) => void;
-  next: () => Promise<Response>;
-  data: Record<string, unknown>;
-}) => Promise<Response>;
+  request: Request
+  env: T
+  params: Record<string, string>
+  waitUntil: (promise: Promise<any>) => void
+  next: () => Promise<Response>
+  data: Record<string, unknown>
+}) => Promise<Response>
 
 interface Env {
-  COZE_CLIENT_ID: string;
-  COZE_PRIVATE_KEY: string; // The private key PEM content
-  COZE_BOT_ID: string;
-  COZE_API_TOKEN?: string;
-  VITE_COZE_API_KEY?: string;
-  VITE_COZE_BOT_ID?: string;
+  COZE_CLIENT_ID: string
+  COZE_PRIVATE_KEY: string // The private key PEM content
+  COZE_BOT_ID: string
+  COZE_API_TOKEN?: string
+  VITE_COZE_API_KEY?: string
+  VITE_COZE_BOT_ID?: string
 }
 
 // Helper to generate JWT (Minimal implementation or import remote library if needed)
@@ -38,32 +38,28 @@ interface Env {
 // Assuming S2S for a chatbot.
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
-  const { request, env } = context;
+  const { request, env } = context
 
   try {
-    const body = (await request.json()) as any;
-    const { message, conversationId, history, userId, lang = "en" } = body;
+    const body = (await request.json()) as any
+    const { message, conversationId, history, userId, lang = "en" } = body
 
     // Prefer server-only secrets first to avoid accidentally using stale public vars.
-    const API_TOKEN = (
-      env.COZE_API_TOKEN ||
-      env.VITE_COZE_API_KEY ||
-      ""
-    ).trim();
-    const BOT_ID = (env.COZE_BOT_ID || env.VITE_COZE_BOT_ID || "").trim();
+    const API_TOKEN = (env.COZE_API_TOKEN || env.VITE_COZE_API_KEY || "").trim()
+    const BOT_ID = (env.COZE_BOT_ID || env.VITE_COZE_BOT_ID || "").trim()
 
     if (!API_TOKEN) {
       return new Response(
         JSON.stringify({ error: "Missing Coze API token in environment." }),
         { status: 500, headers: { "Content-Type": "application/json" } }
-      );
+      )
     }
 
     if (!BOT_ID) {
       return new Response(
         JSON.stringify({ error: "Missing Coze bot id in environment." }),
         { status: 500, headers: { "Content-Type": "application/json" } }
-      );
+      )
     }
 
     // Call Coze API
@@ -92,11 +88,11 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         },
         ...(conversationId && { conversation_id: conversationId }),
       }),
-    });
+    })
 
     // Stream back
-    const { readable, writable } = new TransformStream();
-    cozeRes.body?.pipeTo(writable);
+    const { readable, writable } = new TransformStream()
+    cozeRes.body?.pipeTo(writable)
 
     return new Response(readable, {
       headers: {
@@ -104,9 +100,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         "Cache-Control": "no-cache",
         Connection: "keep-alive",
       },
-    });
+    })
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return new Response(JSON.stringify({ error: message }), { status: 500 });
+    const message = err instanceof Error ? err.message : "Unknown error"
+    return new Response(JSON.stringify({ error: message }), { status: 500 })
   }
-};
+}

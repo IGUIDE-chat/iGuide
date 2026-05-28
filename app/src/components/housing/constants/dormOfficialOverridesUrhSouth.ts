@@ -11,10 +11,10 @@ import {
   plan,
   urhPage,
   urls,
-} from "./dormOfficialOverrideUtils";
+} from "./dormOfficialOverrideUtils"
 
 const twinXl = (value: Parameters<typeof plan>[0]) =>
-  plan({ bedSize: "Twin XL", ...value });
+  plan({ bedSize: "Twin XL", ...value })
 
 export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
   snyder: {
@@ -707,4 +707,4 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
       }),
     ],
   },
-};
+}

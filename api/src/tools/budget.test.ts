@@ -1,24 +1,24 @@
-import assert from 'node:assert/strict'
-import test from 'node:test'
+import assert from "node:assert/strict"
+import test from "node:test"
 
-import { tool } from 'ai'
-import { z } from 'zod'
+import { tool } from "ai"
+import { z } from "zod"
 
 import {
   ToolBudgetExceededError,
   ToolTimeoutError,
   withGuards,
-} from './budget.ts'
+} from "./budget.ts"
 
-test('under budget passes through (9 of 10 succeeds)', async () => {
+test("under budget passes through (9 of 10 succeeds)", async () => {
   let callCount = 0
   const tools = {
     test_tool: tool({
-      description: 'test',
+      description: "test",
       parameters: z.object({}),
       execute: async () => {
         callCount++
-        return 'ok'
+        return "ok"
       },
     }),
   }
@@ -27,17 +27,17 @@ test('under budget passes through (9 of 10 succeeds)', async () => {
 
   for (let i = 0; i < 9; i++) {
     const result = await guarded.test_tool.execute!({})
-    assert.equal(result, 'ok')
+    assert.equal(result, "ok")
   }
   assert.equal(callCount, 9)
 })
 
-test('over budget rejects 11th call when maxCalls=10', async () => {
+test("over budget rejects 11th call when maxCalls=10", async () => {
   const tools = {
     test_tool: tool({
-      description: 'test',
+      description: "test",
       parameters: z.object({}),
-      execute: async () => 'ok',
+      execute: async () => "ok",
     }),
   }
 
@@ -53,14 +53,14 @@ test('over budget rejects 11th call when maxCalls=10', async () => {
   )
 })
 
-test('timeout rejects after timeoutMs', async () => {
+test("timeout rejects after timeoutMs", async () => {
   const tools = {
     slow_tool: tool({
-      description: 'slow',
+      description: "slow",
       parameters: z.object({}),
       execute: async () => {
         await new Promise((r) => setTimeout(r, 200))
-        return 'too late'
+        return "too late"
       },
     }),
   }
@@ -70,19 +70,19 @@ test('timeout rejects after timeoutMs', async () => {
   await assert.rejects(() => guarded.slow_tool.execute!({}), ToolTimeoutError)
 })
 
-test('truncation kicks in past maxResultBytes', async () => {
+test("truncation kicks in past maxResultBytes", async () => {
   const tools = {
     big_tool: tool({
-      description: 'big',
+      description: "big",
       parameters: z.object({}),
-      execute: async () => 'x'.repeat(500),
+      execute: async () => "x".repeat(500),
     }),
   }
 
   const guarded = withGuards(tools, { maxResultBytes: 100, maxCalls: 10 })
 
   const result = await guarded.big_tool.execute!({})
-  assert.equal(typeof result, 'string')
-  assert.ok(result.includes('[truncated]'))
+  assert.equal(typeof result, "string")
+  assert.ok(result.includes("[truncated]"))
   assert.ok(result.length < 500)
 })

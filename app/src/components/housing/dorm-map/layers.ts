@@ -15,7 +15,7 @@ export const buildZonesFillLayer = (showZones: boolean) => ({
   layout: {
     visibility: showZones ? "visible" : "none",
   },
-});
+})
 
 export const buildZonesLabelLayer = (
   showZones: boolean,
@@ -46,7 +46,7 @@ export const buildZonesLabelLayer = (
     "text-halo-width": 3,
     "text-opacity": 0.9,
   },
-});
+})
 
 export const buildLandmarksLayer = (
   showLandmarks: boolean,
@@ -99,7 +99,7 @@ export const buildLandmarksLayer = (
     "icon-opacity": 1,
     "text-opacity": 1,
   },
-});
+})
 
 export const CLUSTERS_LAYER = {
   id: "clusters",
@@ -112,7 +112,7 @@ export const CLUSTERS_LAYER = {
     "circle-stroke-color": "#dddddd",
     "circle-pitch-alignment": "map",
   },
-};
+}
 
 export const CLUSTER_COUNT_LAYER = {
   id: "cluster-count",
@@ -125,7 +125,7 @@ export const CLUSTER_COUNT_LAYER = {
     "text-allow-overlap": true,
   },
   paint: { "text-color": "#222222" },
-};
+}
 
 export const UNCLUSTERED_LAYER = {
   id: "unclustered-point",
@@ -150,4 +150,4 @@ export const UNCLUSTERED_LAYER = {
     "text-color": ["case", ["get", "isActive"], "#ffffff", "#222222"],
     "icon-opacity": 1,
   },
-};
+}

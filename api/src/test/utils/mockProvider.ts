@@ -36,11 +36,11 @@ function normalizeToolCall(
 ): Record<string, unknown> {
   return {
     id: toolCall.id ?? `call_${index + 1}`,
-    type: 'function',
+    type: "function",
     function: {
       name: toolCall.name,
       arguments:
-        typeof toolCall.arguments === 'string'
+        typeof toolCall.arguments === "string"
           ? toolCall.arguments
           : JSON.stringify(toolCall.arguments ?? {}),
     },
@@ -50,17 +50,17 @@ function normalizeToolCall(
 function buildJsonBody(
   response: MockProviderResponseInput
 ): Record<string, unknown> {
-  const content = response.content ?? ''
+  const content = response.content ?? ""
   const toolCalls = response.toolCalls?.map(normalizeToolCall)
 
   return {
-    id: 'chatcmpl_mock',
-    object: 'chat.completion',
+    id: "chatcmpl_mock",
+    object: "chat.completion",
     choices: [
       {
         index: 0,
         message: {
-          role: 'assistant',
+          role: "assistant",
           content,
           ...(response.reasoningContent
             ? { reasoning_content: response.reasoningContent }
@@ -70,7 +70,7 @@ function buildJsonBody(
             : {}),
         },
         finish_reason:
-          toolCalls && toolCalls.length > 0 ? 'tool_calls' : 'stop',
+          toolCalls && toolCalls.length > 0 ? "tool_calls" : "stop",
       },
     ],
     usage: response.usage ?? {
@@ -87,14 +87,14 @@ function createJsonResponse(response: MockProviderResponseInput): Response {
       JSON.stringify({ error: { message: response.error } }),
       {
         status: response.status ?? 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       }
     )
   }
 
   return new Response(JSON.stringify(buildJsonBody(response)), {
     status: response.status ?? 200,
-    headers: { 'Content-Type': 'application/json' },
+    headers: { "Content-Type": "application/json" },
   })
 }
 
@@ -109,7 +109,7 @@ function createStreamResponse(response: MockProviderResponseInput): Response {
   if (response.content) {
     chunks.push(
       `data: ${JSON.stringify({
-        choices: [{ delta: { role: 'assistant', content: response.content } }],
+        choices: [{ delta: { role: "assistant", content: response.content } }],
       })}\n\n`
     )
   }
@@ -124,7 +124,7 @@ function createStreamResponse(response: MockProviderResponseInput): Response {
                 {
                   index,
                   id: toolCall.id,
-                  type: 'function',
+                  type: "function",
                   function: toolCall.function,
                 },
               ],
@@ -140,7 +140,7 @@ function createStreamResponse(response: MockProviderResponseInput): Response {
       choices: [
         {
           delta: {},
-          finish_reason: toolCalls.length > 0 ? 'tool_calls' : 'stop',
+          finish_reason: toolCalls.length > 0 ? "tool_calls" : "stop",
         },
       ],
       usage: response.usage ?? {
@@ -150,7 +150,7 @@ function createStreamResponse(response: MockProviderResponseInput): Response {
       },
     })}\n\n`
   )
-  chunks.push('data: [DONE]\n\n')
+  chunks.push("data: [DONE]\n\n")
 
   return new Response(
     new ReadableStream<Uint8Array>({
@@ -163,13 +163,13 @@ function createStreamResponse(response: MockProviderResponseInput): Response {
     }),
     {
       status: response.status ?? 200,
-      headers: { 'Content-Type': 'text/event-stream' },
+      headers: { "Content-Type": "text/event-stream" },
     }
   )
 }
 
 function shouldStream(init: RequestInit | undefined): boolean {
-  if (!init?.body || typeof init.body !== 'string') {
+  if (!init?.body || typeof init.body !== "string") {
     return false
   }
 
@@ -182,7 +182,7 @@ function shouldStream(init: RequestInit | undefined): boolean {
 }
 
 function parseRequestBody(init: RequestInit | undefined): unknown {
-  if (!init?.body || typeof init.body !== 'string') {
+  if (!init?.body || typeof init.body !== "string") {
     return null
   }
 
@@ -194,7 +194,7 @@ function parseRequestBody(init: RequestInit | undefined): unknown {
 }
 
 export function createMockProviderFetch(
-  responses: MockProviderResponseInput[] = [{ content: 'mock response' }]
+  responses: MockProviderResponseInput[] = [{ content: "mock response" }]
 ): MockProviderFetch {
   const queue = [...responses]
   const requests: RecordedProviderRequest[] = []
@@ -203,7 +203,7 @@ export function createMockProviderFetch(
     requests.push({ input, init, body: parseRequestBody(init) })
     const response = queue.shift() ??
       responses.at(-1) ?? {
-        content: 'mock response',
+        content: "mock response",
       }
 
     if (response.stream ?? shouldStream(init)) {
@@ -213,7 +213,7 @@ export function createMockProviderFetch(
     return createJsonResponse(response)
   }) as MockProviderFetch
 
-  Object.defineProperty(mockFetch, 'requests', {
+  Object.defineProperty(mockFetch, "requests", {
     value: requests,
   })
 

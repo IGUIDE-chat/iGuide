@@ -5,12 +5,12 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from "react";
-import { BlockIIcon } from "./BlockIIcon";
+import React from "react"
+import { BlockIIcon } from "./BlockIIcon"
 
 interface BrandMarkProps {
-  className?: string;
-  iconClassName?: string;
+  className?: string
+  iconClassName?: string
 }
 
 export const BrandMark: React.FC<BrandMarkProps> = ({
@@ -18,12 +18,9 @@ export const BrandMark: React.FC<BrandMarkProps> = ({
   iconClassName = "text-lg",
 }) => (
   <div
-    className={`
-      flex items-center justify-center bg-illini-orange text-white shadow-sm
-      ${className}
-    `}
+    className={`bg-illini-orange flex items-center justify-center text-white shadow-sm ${className} `}
     aria-hidden="true"
   >
     <BlockIIcon className={iconClassName} />
   </div>
-);
+)

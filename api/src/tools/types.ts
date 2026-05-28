@@ -21,7 +21,7 @@ export interface ToolResult {
 }
 
 export interface OpenAITool {
-  type: 'function'
+  type: "function"
   function: {
     name: string
     description: string

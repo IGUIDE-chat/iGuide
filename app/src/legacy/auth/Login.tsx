@@ -7,57 +7,42 @@
 
 // [LEGACY/UNUSED] Old login component. Replaced by LoginScreen.tsx.
 // [遗留/未使用] 旧的登录组件。已被 LoginScreen.tsx 取代。
-import * as React from "react";
-import { useState } from "react";
-import { useAuth } from "./AuthContext";
+import * as React from "react"
+import { useState } from "react"
+import { useAuth } from "./AuthContext"
 
 interface LoginProps {
-  onSwitchToRegister: () => void;
+  onSwitchToRegister: () => void
 }
 
 export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
-  const { login, isLoading } = useAuth();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
-  const [error, setError] = useState("");
+  const { login, isLoading } = useAuth()
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [rememberMe, setRememberMe] = useState(false)
+  const [error, setError] = useState("")
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
+    e.preventDefault()
+    setError("")
 
     if (!email || !password) {
-      setError("Please fill in all fields");
-      return;
+      setError("Please fill in all fields")
+      return
     }
 
-    const success = await login(email, password);
+    const success = await login(email, password)
     if (!success) {
-      setError("Invalid email or password");
+      setError("Invalid email or password")
     }
-  };
+  }
 
   return (
-    <div
-      className="
-        flex min-h-screen items-center justify-center bg-linear-to-br
-        from-illini-blue via-slate-800 to-illini-orange/20 p-4
-      "
-    >
+    <div className="from-illini-blue to-illini-orange/20 flex min-h-screen items-center justify-center bg-linear-to-br via-slate-800 p-4">
       {/* Background decoration */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div
-          className="
-            absolute top-1/4 -left-20 size-96 rounded-full bg-illini-orange/10
-            blur-3xl
-          "
-        ></div>
-        <div
-          className="
-            absolute -right-20 bottom-1/4 size-96 rounded-full bg-illini-blue/10
-            blur-3xl
-          "
-        ></div>
+        <div className="bg-illini-orange/10 absolute top-1/4 -left-20 size-96 rounded-full blur-3xl"></div>
+        <div className="bg-illini-blue/10 absolute -right-20 bottom-1/4 size-96 rounded-full blur-3xl"></div>
       </div>
 
       <div className="relative w-full max-w-md">
@@ -68,12 +53,7 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
         </div>
 
         {/* Login Card */}
-        <div
-          className="
-            rounded-2xl border border-white/20 bg-white/95 p-8 shadow-2xl
-            backdrop-blur-sm
-          "
-        >
+        <div className="rounded-2xl border border-white/20 bg-white/95 p-8 shadow-2xl backdrop-blur-sm">
           <h2 className="mb-6 text-2xl font-bold text-slate-900">
             Welcome Back
           </h2>
@@ -92,12 +72,7 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="
-                  w-full rounded-lg border border-slate-200 bg-slate-50 px-4
-                  py-3 text-slate-900 placeholder-slate-400 transition-all
-                  focus:border-illini-blue focus:ring-2
-                  focus:ring-illini-blue/50 focus:outline-none
-                "
+                className="focus:border-illini-blue focus:ring-illini-blue/50 w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 placeholder-slate-400 transition-all focus:ring-2 focus:outline-none"
                 placeholder="your.email@illinois.edu"
                 autoFocus
               />
@@ -116,12 +91,7 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="
-                  w-full rounded-lg border border-slate-200 bg-slate-50 px-4
-                  py-3 text-slate-900 placeholder-slate-400 transition-all
-                  focus:border-illini-blue focus:ring-2
-                  focus:ring-illini-blue/50 focus:outline-none
-                "
+                className="focus:border-illini-blue focus:ring-illini-blue/50 w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 placeholder-slate-400 transition-all focus:ring-2 focus:outline-none"
                 placeholder="••••••••"
               />
             </div>
@@ -133,11 +103,7 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="
-                  size-4 rounded-sm border-slate-300 bg-slate-50
-                  text-illini-blue
-                  focus:ring-illini-blue/50
-                "
+                className="text-illini-blue focus:ring-illini-blue/50 size-4 rounded-sm border-slate-300 bg-slate-50"
               />
               <label htmlFor="remember" className="ml-2 text-sm text-slate-600">
                 Remember me
@@ -146,12 +112,7 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
 
             {/* Error Message */}
             {error && (
-              <div
-                className="
-                  rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm
-                  text-red-700
-                "
-              >
+              <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                 {error}
               </div>
             )}
@@ -160,12 +121,7 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
             <button
               type="submit"
               disabled={isLoading}
-              className="
-                w-full rounded-lg bg-illini-blue px-4 py-3 font-semibold
-                text-white shadow-lg transition-all duration-200
-                hover:bg-illini-blue/90 hover:shadow-xl
-                disabled:cursor-not-allowed disabled:opacity-50
-              "
+              className="bg-illini-blue hover:bg-illini-blue/90 w-full rounded-lg px-4 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isLoading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -199,10 +155,7 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
               Don&apos;t have an account?{" "}
               <button
                 onClick={onSwitchToRegister}
-                className="
-                  font-semibold text-illini-orange transition-colors
-                  hover:text-illini-orange/80
-                "
+                className="text-illini-orange hover:text-illini-orange/80 font-semibold transition-colors"
               >
                 Create Account
               </button>
@@ -218,5 +171,5 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}

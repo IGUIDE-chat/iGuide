@@ -11,11 +11,11 @@ const CONVERSATIONAL_PATTERNS = [
 
 function normalizeTurn(message: string): string {
   return message
-    .normalize('NFKC')
+    .normalize("NFKC")
     .toLowerCase()
-    .replaceAll(/[\s\u3000]+/g, ' ')
+    .replaceAll(/[\s\u3000]+/g, " ")
     .trim()
-    .replaceAll(/^[\p{P}\p{S}]+|[\p{P}\p{S}]+$/gu, '')
+    .replaceAll(/^[\p{P}\p{S}]+|[\p{P}\p{S}]+$/gu, "")
     .trim()
 }
 
