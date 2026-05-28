@@ -11,7 +11,7 @@ A three-layer UIUC knowledge platform split across the app, API gateway, and cra
 ## Monorepo Map
 
 | Path | Role |
-|:-----|:-----|
+| ---- | ---- |
 | `app/` | React app, Cloudflare Pages functions, docs, migrations, and active UI runtime. |
 | `api/` | Cloudflare Worker gateway for JWT auth, geo routing, proxying, CORS, and health checks. |
 | `data_collection/` | Python crawler/ETL pipeline for harvesting, cleaning, and incrementally updating UIUC sources. |
@@ -99,6 +99,7 @@ The gateway verifies Supabase JWTs, routes by Geo-IP, hosts the server-side tool
 ## Architecture Overview
 
 ### One-liner
+
 A serverless-first stack uses Cloudflare Worker as the agent runtime, Supabase as the unified knowledge and user-data layer, and managed APIs for model inference, web search, and embeddings.
 
 ### Runtime Split

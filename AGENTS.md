@@ -23,7 +23,7 @@ This project is indexed by GitNexus as **iGuide** (6048 symbols, 9993 relationsh
 ## Resources
 
 | Resource | Use for |
-|----------|---------|
+| -------- | ------- |
 | `gitnexus://repo/iGuide/context` | Codebase overview, check index freshness |
 | `gitnexus://repo/iGuide/clusters` | All functional areas |
 | `gitnexus://repo/iGuide/processes` | All execution flows |
@@ -32,7 +32,7 @@ This project is indexed by GitNexus as **iGuide** (6048 symbols, 9993 relationsh
 ## CLI
 
 | Task | Read this skill file |
-|------|---------------------|
+| ---- | ------------------- |
 | Understand architecture / "How does X work?" | `.claude/skills/gitnexus/gitnexus-exploring/SKILL.md` |
 | Blast radius / "What breaks if I change X?" | `.claude/skills/gitnexus/gitnexus-impact-analysis/SKILL.md` |
 | Trace bugs / "Why is X failing?" | `.claude/skills/gitnexus/gitnexus-debugging/SKILL.md` |
