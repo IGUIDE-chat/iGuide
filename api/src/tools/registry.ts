@@ -3,7 +3,7 @@ import {
   type RequestContext,
   type ToolDefinition,
   type ToolResult,
-} from "./types"
+} from "./types.ts"
 
 interface ToolRegistryOptions {
   maxCalls?: number

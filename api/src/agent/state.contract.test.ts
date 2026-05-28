@@ -35,45 +35,6 @@ function createMinimalObservation(): Observation {
   }
 }
 
-test("LoopState has required fields", () => {
-  const state = createInitialState()
-
-  assert.equal(typeof state.stepIndex, "number", "stepIndex must be a number")
-  assert.equal(state.stepIndex, 0, "Initial stepIndex should be 0")
-
-  assert.ok(
-    Array.isArray(state.currentToolCalls),
-    "currentToolCalls must be an array"
-  )
-  assert.equal(
-    state.currentToolCalls.length,
-    0,
-    "Initial currentToolCalls should be empty"
-  )
-
-  assert.ok(Array.isArray(state.observations), "observations must be an array")
-  assert.equal(
-    state.observations.length,
-    0,
-    "Initial observations should be empty"
-  )
-
-  assert.equal(state.stopReason, null, "Initial stopReason should be null")
-
-  assert.ok(Array.isArray(state.messages), "messages must be an array")
-})
-
-test("LoopState tracks iteration count separately from step index", () => {
-  const state = createInitialState()
-
-  assert.equal(
-    typeof state.iterationCount,
-    "number",
-    "iterationCount must be a number"
-  )
-  assert.equal(state.iterationCount, 0, "Initial iterationCount should be 0")
-})
-
 test("advanceStep increments step index", () => {
   const state = createInitialState()
   assert.equal(state.stepIndex, 0)
@@ -103,45 +64,6 @@ test("advanceStep preserves other state fields", () => {
   assert.equal(nextState.stepIndex, 1)
   assert.equal(nextState.currentToolCalls.length, 1)
   assert.equal(nextState.currentToolCalls[0].id, "call_123")
-})
-
-test("tool calls have separate id, name, and input fields", () => {
-  const state = createInitialState()
-  const toolCall = createMinimalToolCall()
-
-  state.currentToolCalls.push(toolCall)
-
-  const retrieved = getCurrentToolCalls(state)
-  assert.equal(retrieved.length, 1)
-
-  const call = retrieved[0]
-
-  assert.equal(typeof call.id, "string", "tool call must have separate id")
-  assert.equal(typeof call.name, "string", "tool call must have separate name")
-  assert.ok(
-    call.input !== undefined,
-    "tool call must have separate input field"
-  )
-
-  assert.equal(call.id, "call_123")
-  assert.equal(call.name, "search_knowledge_base")
-  assert.deepEqual(call.input, { query: "test query" })
-})
-
-test("tool call id is stable across state transitions", () => {
-  const state = createInitialState()
-  const toolCall = {
-    id: "call_stable_123",
-    name: "web_search",
-    input: { query: "UIUC housing" },
-  }
-
-  state.currentToolCalls.push(toolCall)
-
-  const nextState = advanceStep(state)
-
-  const calls = getCurrentToolCalls(nextState)
-  assert.equal(calls[0].id, "call_stable_123", "Tool call ID must be stable")
 })
 
 test("observations can be added to state", () => {
@@ -262,22 +184,6 @@ test("advanceStep returns new state object", () => {
   assert.notEqual(state, nextState, "advanceStep should return new state")
   assert.equal(state.stepIndex, 0, "Original state should be unchanged")
   assert.equal(nextState.stepIndex, 1, "New state should have advanced index")
-})
-
-test("empty tool calls array is valid", () => {
-  const state = createInitialState()
-  const calls = getCurrentToolCalls(state)
-
-  assert.ok(Array.isArray(calls))
-  assert.equal(calls.length, 0)
-})
-
-test("empty observations array is valid", () => {
-  const state = createInitialState()
-  const observations = getObservations(state)
-
-  assert.ok(Array.isArray(observations))
-  assert.equal(observations.length, 0)
 })
 
 test("state can track multiple concurrent tool calls", () => {

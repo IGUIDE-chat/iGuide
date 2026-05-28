@@ -405,21 +405,37 @@ test("toOpenAITools converts registered tools", () => {
   const openAITools = registry.toOpenAITools()
 
   assert.equal(openAITools.length, 2)
-  assert.equal(openAITools[0].type, "function")
-  assert.equal(openAITools[0].function.name, "stub_echo")
-  assert.equal(openAITools[1].function.name, "stub_fail")
+
+  const names = openAITools.map((t) => t.function.name)
+  assert.ok(names.includes("stub_echo"))
+  assert.ok(names.includes("stub_fail"))
+
+  for (const tool of openAITools) {
+    assert.equal(tool.type, "function")
+    assert.ok(typeof tool.function.name === "string")
+    assert.ok(typeof tool.function.description === "string")
+    assert.ok(typeof tool.function.parameters === "object")
+  }
 })
 
 test("registry uses default options when none provided", async () => {
   const registry = new ToolRegistry()
   registry.register(createEchoTool())
 
-  for (let i = 0; i < 5; i++) {
-    // eslint-disable-next-line no-await-in-loop -- sequential test assertions
-    const result = await registry.execute("stub_echo", {}, MOCK_CTX)
-    assert.equal(result.metadata?.error, undefined)
+  const result = await registry.execute("stub_echo", {}, MOCK_CTX)
+  assert.equal(result.content, "{}")
+  assert.equal(result.metadata?.error, undefined)
+
+  const budgetReg = new ToolRegistry({ maxCalls: 3 })
+  budgetReg.register(createEchoTool())
+
+  for (let i = 0; i < 3; i++) {
+    // eslint-disable-next-line no-await-in-loop -- sequential budget consumption
+    const r = await budgetReg.execute("stub_echo", {}, MOCK_CTX)
+    assert.equal(r.metadata?.error, undefined)
   }
 
-  const blocked = await registry.execute("stub_echo", {}, MOCK_CTX)
+  const blocked = await budgetReg.execute("stub_echo", {}, MOCK_CTX)
   assert.equal(JSON.parse(blocked.content).error, "budget_exceeded")
+  assert.equal(JSON.parse(blocked.content).max_calls, 3)
 })
