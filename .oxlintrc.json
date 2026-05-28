@@ -189,7 +189,11 @@
       "files": ["**/*.tsx"],
       "rules": {
         "react/jsx-max-depth": ["warn", { "max": 8 }],
-        "react/display-name": "warn"
+        "react/display-name": "warn",
+        "react-perf/jsx-no-new-function-as-prop": "off",
+        "react-perf/jsx-no-new-object-as-prop": "off",
+        "react-perf/jsx-no-new-array-as-prop": "off",
+        "react-perf/jsx-no-jsx-as-prop": "off"
       }
     },
     {
