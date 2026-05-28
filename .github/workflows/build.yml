@@ -21,9 +21,6 @@ jobs:
   check:
     name: Lint, TypeCheck & Build
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: app
 
     steps:
       - uses: actions/checkout@v6
@@ -53,13 +50,21 @@ jobs:
         run: pnpm install
 
       - name: Lint
-        run: pnpm run lint
+        run: pnpm lint
+
+      - name: Style
+        run: pnpm style
+
+      - name: Style (Markdown)
+        run: pnpm style:md
 
       - name: TypeCheck
         run: pnpm run typecheck
+        working-directory: app
 
       - name: Build
         run: pnpm run build
+        working-directory: app
         env:
           VITE_SUPABASE_URL: ${{ secrets.vite_supabase_url }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.vite_supabase_anon_key }}
