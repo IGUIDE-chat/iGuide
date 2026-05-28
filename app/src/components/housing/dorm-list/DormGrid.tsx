@@ -6,9 +6,9 @@
  */
 
 import React from "react";
-import { Dorm } from "../types/index";
-import { Language } from "../../../types";
-import { DormCommentStats } from "../../../services/dormCommentsService";
+import { type Dorm } from "../types/index";
+import { type Language } from "../../../types";
+import { type DormCommentStats } from "../../../services/dormCommentsService";
 import DormCard from "../DormCard";
 
 interface DormGridProps {

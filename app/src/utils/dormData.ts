@@ -6,13 +6,13 @@
  */
 
 import {
-  Dorm,
-  DormCategorizedTags,
-  DormTags,
-  FacilityTag,
-  FloorPlan,
-  LifestyleTag,
-  LivingConditionTag,
+  type Dorm,
+  type DormCategorizedTags,
+  type DormTags,
+  type FacilityTag,
+  type FloorPlan,
+  type LifestyleTag,
+  type LivingConditionTag,
 } from "../components/housing/types/index";
 import { deriveRoomOptions } from "./roomOptions";
 
@@ -97,9 +97,9 @@ function sanitizeUrlList(urls: Array<string | undefined | null>) {
 }
 
 export function getDormPriceRange(price: number): Dorm["priceRange"] {
-  if (price < 9000) return "$";
-  if (price < 14500) return "$$";
-  if (price < 17500) return "$$$";
+  if (price < 9000) {return "$";}
+  if (price < 14500) {return "$$";}
+  if (price < 17500) {return "$$$";}
   return "$$$$";
 }
 
@@ -303,8 +303,8 @@ export function sanitizeFloorPlanForStorage(plan: FloorPlan): FloorPlan {
     ...(sanitizeOptionalString(description)
       ? { description: sanitizeOptionalString(description) }
       : {}),
-    ...(normalizedImageUrls.length ? { imageUrls: normalizedImageUrls } : {}),
-    ...(normalizedPhotoUrls.length ? { photoUrls: normalizedPhotoUrls } : {}),
+    ...(normalizedImageUrls.length > 0 ? { imageUrls: normalizedImageUrls } : {}),
+    ...(normalizedPhotoUrls.length > 0 ? { photoUrls: normalizedPhotoUrls } : {}),
   };
 }
 

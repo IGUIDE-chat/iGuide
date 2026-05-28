@@ -22,7 +22,7 @@ export interface MCPStore {
   get<T>(key: string): Promise<T | null>
   put<T>(key: string, value: T): Promise<void>
   delete(key: string): Promise<void>
-  list<T>(prefix: string): Promise<MCPStoreRecord<T>[]>
+  list<T>(prefix: string): Promise<Array<MCPStoreRecord<T>>>
 }
 
 export interface MCPStoreOptions {
@@ -86,9 +86,9 @@ class MapMCPStore implements MCPStore {
     this.storage.delete(buildKey(this.namespace, key))
   }
 
-  async list<T>(prefix: string): Promise<MCPStoreRecord<T>[]> {
+  async list<T>(prefix: string): Promise<Array<MCPStoreRecord<T>>> {
     const qualifiedPrefix = buildKey(this.namespace, prefix)
-    const matches: MCPStoreRecord<T>[] = []
+    const matches: Array<MCPStoreRecord<T>> = []
 
     for (const [qualifiedKey, rawValue] of this.storage.entries()) {
       if (!qualifiedKey.startsWith(qualifiedPrefix)) {
@@ -101,7 +101,7 @@ class MapMCPStore implements MCPStore {
       })
     }
 
-    return matches.sort((left, right) => left.key.localeCompare(right.key))
+    return matches.toSorted((left, right) => left.key.localeCompare(right.key))
   }
 }
 
@@ -127,7 +127,7 @@ class KVMCPStore implements MCPStore {
     await this.kv.delete(buildKey(this.namespace, key))
   }
 
-  async list<T>(prefix: string): Promise<MCPStoreRecord<T>[]> {
+  async list<T>(prefix: string): Promise<Array<MCPStoreRecord<T>>> {
     const qualifiedPrefix = buildKey(this.namespace, prefix)
     const keys: string[] = []
     let cursor: string | undefined
@@ -147,7 +147,7 @@ class KVMCPStore implements MCPStore {
     }
 
     const records = await Promise.all(
-      keys.sort().map(async (qualifiedKey) => {
+      keys.toSorted().map(async (qualifiedKey) => {
         const value = await this.kv.get(qualifiedKey, 'text')
         if (value === null) {
           return null

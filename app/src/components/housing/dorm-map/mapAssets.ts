@@ -5,7 +5,7 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import mapboxgl from "mapbox-gl";
+import type mapboxgl from "mapbox-gl";
 import { LANDMARK_ICON_TYPES } from "./mapConstants";
 
 const createPillImage = () => {
@@ -13,7 +13,7 @@ const createPillImage = () => {
   canvas.width = 120;
   canvas.height = 60;
   const ctx = canvas.getContext("2d");
-  if (!ctx) return null;
+  if (!ctx) {return null;}
 
   ctx.fillStyle = "#ffffff";
   ctx.shadowColor = "rgba(0, 0, 0, 0.15)";
@@ -52,7 +52,7 @@ const createActivePillImage = () => {
   canvas.width = 120;
   canvas.height = 60;
   const ctx = canvas.getContext("2d");
-  if (!ctx) return null;
+  if (!ctx) {return null;}
 
   ctx.fillStyle = "#13294B";
   ctx.shadowColor = "rgba(19, 41, 75, 0.4)";
@@ -92,7 +92,7 @@ const createLandmarkIcon = (type: string) => {
   canvas.width = size;
   canvas.height = size;
   const ctx = canvas.getContext("2d");
-  if (!ctx) return null;
+  if (!ctx) {return null;}
 
   const cx = size / 2;
   const cy = size / 2;
@@ -277,7 +277,7 @@ export const registerMapAssets = (map: mapboxgl.Map) => {
     const key = `landmark-${type}`;
     if (!map.hasImage(key)) {
       const image = createLandmarkIcon(type);
-      if (image) map.addImage(key, image, { pixelRatio: 2 });
+      if (image) {map.addImage(key, image, { pixelRatio: 2 });}
     }
   }
 

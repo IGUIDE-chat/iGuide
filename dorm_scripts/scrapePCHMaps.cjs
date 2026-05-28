@@ -25,7 +25,7 @@ async function scrapeDorm(page, dormId, query) {
 
   const tabs = await page.$$('button[role="tab"]');
   let clicked = false;
-  for (let tab of tabs) {
+  for (const tab of tabs) {
     const text = await page.evaluate((el) => el.innerText, tab);
     if (
       text &&
@@ -46,7 +46,7 @@ async function scrapeDorm(page, dormId, query) {
       await firstResult.click();
       await wait(3000);
       const internalTabs = await page.$$('button[role="tab"]');
-      for (let tab of internalTabs) {
+      for (const tab of internalTabs) {
         const text = await page.evaluate((el) => el.innerText, tab);
         if (
           text &&
@@ -84,14 +84,14 @@ async function scrapeDorm(page, dormId, query) {
         await page.evaluate(() => {
           const divs = document.querySelectorAll("div");
           divs.forEach((d) => {
-            if (d.scrollHeight > 1000) d.scrollBy(0, 10000);
+            if (d.scrollHeight > 1000) {d.scrollBy(0, 10000);}
           });
         });
       }
       await wait(1000);
 
       const moreButtons = await page.$$("button.w8nwRe.kyuRq");
-      for (let btn of moreButtons) {
+      for (const btn of moreButtons) {
         try {
           await btn.click();
         } catch (e) {}
@@ -103,20 +103,20 @@ async function scrapeDorm(page, dormId, query) {
   const reviews = await page.evaluate(() => {
     const results = [];
     const cards = document.querySelectorAll(".jftiEf");
-    for (let card of cards) {
+    for (const card of cards) {
       const authorEl = card.querySelector(".d4r55");
       const author = authorEl ? authorEl.innerText : "Google User";
 
       const textEl = card.querySelector(".wiI7pd");
       const text = textEl ? textEl.innerText : "";
-      if (!text || text.length < 15) continue;
+      if (!text || text.length < 15) {continue;}
 
       const starEl = card.querySelector("span.kvMYJc");
       let stars = 3;
       if (starEl) {
         const parts = starEl.getAttribute("aria-label") || "";
         const match = parts.match(/\d/);
-        if (match) stars = parseInt(match[0]);
+        if (match) {stars = parseInt(match[0]);}
       }
       results.push({ author, text, stars });
     }
@@ -134,7 +134,7 @@ async function main() {
     args: ["--no-sandbox", "--disable-setuid-sandbox", "--lang=en-US"],
   });
 
-  let allCollected = [];
+  const allCollected = [];
   const page = await browser.newPage();
   await page.setExtraHTTPHeaders({
     "Accept-Language": "en-US,en;q=0.9",
@@ -158,8 +158,8 @@ async function main() {
       allCollected.push({
         id: `gm-real-${dormId}-${idx}`,
         dormId: dormId,
-        displayName: r.author.replace(/['`]/g, ""),
-        content: r.text.replace(/['`]/g, ""),
+        displayName: r.author.replaceAll(/['`]/g, ""),
+        content: r.text.replaceAll(/['`]/g, ""),
         vote: r.stars >= 3 ? 1 : -1,
         daysAgo: Math.floor(Math.random() * 300) + 1,
         upvotes: Math.floor(Math.random() * 20),
@@ -178,7 +178,7 @@ async function main() {
 
   const lines = allCollected.map(
     (r) =>
-      `    generateComment('${r.id}', '${r.dormId}', '${r.displayName}', \`${r.content.replace(/\n/g, "\\n")}\`, ${r.vote}, ${r.daysAgo}, ${r.upvotes})`
+      `    generateComment('${r.id}', '${r.dormId}', '${r.displayName}', \`${r.content.replaceAll('\n', "\\n")}\`, ${r.vote}, ${r.daysAgo}, ${r.upvotes})`
   );
 
   // Insert before the last array bracket

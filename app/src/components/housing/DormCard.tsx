@@ -17,13 +17,13 @@ import {
   Wind,
 } from "lucide-react";
 import { formatPrice } from "./constants/pricing";
-import { Dorm } from "./types/index";
-import { Language } from "../../types";
+import { type Dorm } from "./types/index";
+import { type Language } from "../../types";
 import {
   deriveRoomOptions,
   getRoomRangeSummary,
 } from "../../utils/roomOptions";
-import { CardTagItem, getCardTagCandidates } from "../../utils/tagLabels";
+import { type CardTagItem, getCardTagCandidates } from "../../utils/tagLabels";
 
 interface DormCardProps {
   dorm: Dorm;
@@ -68,7 +68,7 @@ const TEXT = {
 };
 
 function normalizeCopy(value: string) {
-  return value.toLowerCase().replace(/\s+/g, " ").trim();
+  return value.toLowerCase().replaceAll(/\s+/g, " ").trim();
 }
 
 function isRedundantCardCopy(

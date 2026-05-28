@@ -1,6 +1,6 @@
 import { tool } from 'ai'
 import { z } from 'zod'
-import type { RequestContext } from './types.ts'
+import  { type RequestContext } from './types.ts'
 
 interface TavilyResponse {
   results?: Array<{
@@ -93,7 +93,7 @@ export function createWebSearchTool(ctx: RequestContext) {
       const data = (await response.json()) as TavilyResponse
       const results = data.results || []
 
-      const sorted = results.sort(
+      const sorted = results.toSorted(
         (a, b) =>
           getResultPriority(b.url, b.score) - getResultPriority(a.url, a.score)
       )

@@ -1,4 +1,4 @@
-import type { ToolCallPart, ToolResultPart } from "ai";
+import  { type ToolCallPart, type ToolResultPart } from "ai";
 import {
   ToolCard,
   extractToolArgs,

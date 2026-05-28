@@ -1,5 +1,5 @@
 import { createDeepSeek } from '@ai-sdk/deepseek'
-import type { DeepSeekProvider } from '@ai-sdk/deepseek'
+import  { type DeepSeekProvider } from '@ai-sdk/deepseek'
 
 export interface ProviderConfig {
   env: Record<string, string | undefined>

@@ -7,7 +7,7 @@
 
 import React from "react";
 import { BookOpen, GraduationCap, Hash } from "lucide-react";
-import { Course } from "../../services/courseService";
+import { type Course } from "../../services/courseService";
 
 interface CourseCardProps {
   course: Course;

@@ -8,7 +8,7 @@
 // [SERVICE] Read dorms from Supabase `dorms` table with static fallback.
 // [服务] 从 Supabase `dorms` 表读取宿舍数据，静态数据作为 fallback。
 import { supabase } from "./supabase";
-import { Dorm } from "../components/housing/types/index";
+import { type Dorm } from "../components/housing/types/index";
 import { normalizeDorm } from "../utils/roomOptions";
 import {
   finalizeDormRecord,

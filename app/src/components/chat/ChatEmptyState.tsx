@@ -6,7 +6,7 @@
  */
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Language } from "../../types";
+import { type Language } from "../../types";
 import { BrandMark } from "../ui/branding/BrandMark";
 
 interface Suggestion {

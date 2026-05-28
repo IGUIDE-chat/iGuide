@@ -7,7 +7,7 @@
 
 // [DATA] Article content for Dorm Selection guide.
 // [数据] 宿舍选择指南的文章内容。
-import { Article } from "../../types";
+import { type Article } from "../../types";
 
 export const dormSelection: Article = {
   id: "dorm-selection",

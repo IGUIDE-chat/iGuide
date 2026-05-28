@@ -9,7 +9,7 @@ import React, { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArticleView } from "../../components/library/ArticleView";
 import { ARTICLES } from "../../constants";
-import { Language } from "../../types";
+import { type Language } from "../../types";
 import { libraryService } from "../../services/libraryService";
 
 interface LibraryArticlePageProps {

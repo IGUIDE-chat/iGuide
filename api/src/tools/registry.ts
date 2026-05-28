@@ -1,8 +1,8 @@
-import type {
-  OpenAITool,
-  RequestContext,
-  ToolDefinition,
-  ToolResult,
+import  {
+  type OpenAITool,
+  type RequestContext,
+  type ToolDefinition,
+  type ToolResult,
 } from './types'
 
 interface ToolRegistryOptions {

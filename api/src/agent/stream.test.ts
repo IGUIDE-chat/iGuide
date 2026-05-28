@@ -3,15 +3,15 @@ import test from 'node:test'
 
 import {
   createSSEStream,
-  sendToolStart,
-  sendToolResult,
-  sendContent,
-  sendFallback,
-  sendDone,
   emitAgentStep,
-  emitToolDecision,
-  emitObservation,
   emitFinalizing,
+  emitObservation,
+  emitToolDecision,
+  sendContent,
+  sendDone,
+  sendFallback,
+  sendToolResult,
+  sendToolStart,
 } from './stream.ts'
 
 interface ParsedSSEEvent {
@@ -30,7 +30,7 @@ async function collectSSEEvents(
 
   while (true) {
     const { done, value } = await reader.read()
-    if (done) break
+    if (done) {break}
 
     buffer += decoder.decode(value, { stream: true })
     const lines = buffer.split('\n')
@@ -38,7 +38,7 @@ async function collectSSEEvents(
 
     for (const line of lines) {
       const trimmed = line.trim()
-      if (!trimmed) continue
+      if (!trimmed) {continue}
 
       if (trimmed.startsWith('event:')) {
         currentEvent = trimmed.slice(6).trim()

@@ -61,7 +61,7 @@ async function scrapeDorm(page, dormId, mapUrl) {
   // Method 1: Look for reviews tab directly on the place page
   let clicked = false;
   let tabs = await page.$$('button[role="tab"]');
-  for (let tab of tabs) {
+  for (const tab of tabs) {
     const text = await page.evaluate((el) => el.innerText, tab);
     if (
       text &&
@@ -84,7 +84,7 @@ async function scrapeDorm(page, dormId, mapUrl) {
       await firstResult.click();
       await wait(4000);
       tabs = await page.$$('button[role="tab"]');
-      for (let tab of tabs) {
+      for (const tab of tabs) {
         const text = await page.evaluate((el) => el.innerText, tab);
         if (
           text &&
@@ -104,7 +104,7 @@ async function scrapeDorm(page, dormId, mapUrl) {
   // Method 3: Try clicking on a review summary / review count link
   if (!clicked) {
     const reviewLinks = await page.$$('button[jsaction*="review"]');
-    for (let rl of reviewLinks) {
+    for (const rl of reviewLinks) {
       try {
         await rl.click();
         clicked = true;
@@ -172,7 +172,7 @@ async function scrapeDorm(page, dormId, mapUrl) {
 
       // Click "More" buttons to expand review text
       const moreButtons = await page.$$("button.w8nwRe.kyuRq");
-      for (let btn of moreButtons) {
+      for (const btn of moreButtons) {
         try {
           await btn.click();
         } catch (e) {}
@@ -195,14 +195,14 @@ async function scrapeDorm(page, dormId, mapUrl) {
 
       const textEl = card.querySelector(".wiI7pd");
       const text = textEl ? textEl.innerText.trim() : "";
-      if (!text || text.length < 15) continue;
+      if (!text || text.length < 15) {continue;}
 
       const starEl = card.querySelector("span.kvMYJc");
       let stars = 3;
       if (starEl) {
         const label = starEl.getAttribute("aria-label") || "";
         const match = label.match(/(\d)/);
-        if (match) stars = parseInt(match[1]);
+        if (match) {stars = parseInt(match[1]);}
       }
       results.push({ author, text, stars });
     }
@@ -220,7 +220,7 @@ async function scrapeDorm(page, dormId, mapUrl) {
           '[class*="review-text"], .Jtu6Td, .review-full-text'
         );
         const text = textEl ? textEl.innerText.trim() : "";
-        if (!text || text.length < 15) continue;
+        if (!text || text.length < 15) {continue;}
 
         const starEl = card.querySelector(
           '[aria-label*="star"], [aria-label*="Star"]'
@@ -229,7 +229,7 @@ async function scrapeDorm(page, dormId, mapUrl) {
         if (starEl) {
           const label = starEl.getAttribute("aria-label") || "";
           const match = label.match(/(\d)/);
-          if (match) stars = parseInt(match[1]);
+          if (match) {stars = parseInt(match[1]);}
         }
         results.push({ author, text, stars });
       }
@@ -244,7 +244,7 @@ async function scrapeDorm(page, dormId, mapUrl) {
   const pageTitle = await page.title();
   const pageUrl = page.url();
   console.log(
-    `[${dormId}] Page: "${pageTitle}" @ ${pageUrl.substring(0, 80)}...`
+    `[${dormId}] Page: "${pageTitle}" @ ${pageUrl.slice(0, 80)}...`
   );
 
   return reviews;
@@ -262,7 +262,7 @@ async function main() {
     ],
   });
 
-  let allCollected = [];
+  const allCollected = [];
   const page = await browser.newPage();
   await page.setViewport({ width: 1920, height: 1080 });
   await page.setExtraHTTPHeaders({ "Accept-Language": "en-US,en;q=0.9" });
@@ -280,7 +280,7 @@ async function main() {
       }
       if (data.length === 0 && attempt === 0) {
         console.log(`[${dormId}] Retrying with search query...`);
-        const searchUrl = `https://www.google.com/maps/search/${dormId.replace(/-/g, "+")}+hall+UIUC+Champaign`;
+        const searchUrl = `https://www.google.com/maps/search/${dormId.replaceAll('-', "+")}+hall+UIUC+Champaign`;
         try {
           data = await scrapeDorm(page, dormId, searchUrl);
         } catch (err) {
@@ -293,8 +293,8 @@ async function main() {
       allCollected.push({
         id: `gm-real-${dormId}-${idx}`,
         dormId,
-        displayName: r.author.replace(/['`]/g, ""),
-        content: r.text.replace(/['`]/g, ""),
+        displayName: r.author.replaceAll(/['`]/g, ""),
+        content: r.text.replaceAll(/['`]/g, ""),
         vote: r.stars >= 3 ? 1 : -1,
         daysAgo: Math.floor(Math.random() * 300) + 1,
         upvotes: Math.floor(Math.random() * 20),
@@ -317,7 +317,7 @@ async function main() {
 
   const lines = allCollected.map(
     (r) =>
-      `    generateComment('${r.id}', '${r.dormId}', '${r.displayName}', \`${r.content.replace(/\n/g, "\\n")}\`, ${r.vote}, ${r.daysAgo}, ${r.upvotes})`
+      `    generateComment('${r.id}', '${r.dormId}', '${r.displayName}', \`${r.content.replaceAll('\n', "\\n")}\`, ${r.vote}, ${r.daysAgo}, ${r.upvotes})`
   );
 
   // Find the closing bracket and insert before it

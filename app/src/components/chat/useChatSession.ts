@@ -6,7 +6,7 @@
  */
 
 import { useCallback, useEffect, useReducer, useState } from "react";
-import { Language, ChatMessage, ThinkingStep } from "../../types";
+import { type ChatMessage, type Language, type ThinkingStep } from "../../types";
 import { streamChatResponse } from "../../services/ai";
 import { conversationService } from "../../services/conversationService";
 import { localConversationService } from "../../services/localConversationService";
@@ -81,7 +81,7 @@ const generateSmartTitle = (text: string, language: Language): string => {
   }
 
   if (title.length > 30) {
-    title = `${title.substring(0, 27)}...`;
+    title = `${title.slice(0, 27)}...`;
   }
 
   return title || NEW_CHAT_TITLE[language];
@@ -249,7 +249,7 @@ export const useChatSession = ({
         for await (const chunk of stream) {
           if (chunk.thinkingStep) {
             if (thinkingSteps.length > 0) {
-              thinkingSteps[thinkingSteps.length - 1].done = true;
+              thinkingSteps.at(-1).done = true;
             }
             const step: ThinkingStep = {
               id: `step-${Date.now()}-${thinkingSteps.length}`,
@@ -338,9 +338,9 @@ export const useChatSession = ({
             /<conv_memory>([\s\S]*?)<\/conv_memory>/
           );
           fullText = fullText
-            .replace(/<user_soul>[\s\S]*?<\/user_soul>/g, "")
-            .replace(/<user_memory>[\s\S]*?<\/user_memory>/g, "")
-            .replace(/<conv_memory>[\s\S]*?<\/conv_memory>/g, "")
+            .replaceAll(/<user_soul>[\s\S]*?<\/user_soul>/g, "")
+            .replaceAll(/<user_memory>[\s\S]*?<\/user_memory>/g, "")
+            .replaceAll(/<conv_memory>[\s\S]*?<\/conv_memory>/g, "")
             .trim();
         } catch {
           // Regex failed — skip memory extraction, keep fullText as-is
@@ -348,9 +348,9 @@ export const useChatSession = ({
 
         // Clean up unclosed/partial tags that would leak into visible text
         fullText = fullText
-          .replace(/<user_soul>[\s\S]*/g, "")
-          .replace(/<user_memory>[\s\S]*/g, "")
-          .replace(/<conv_memory>[\s\S]*/g, "")
+          .replaceAll(/<user_soul>[\s\S]*/g, "")
+          .replaceAll(/<user_memory>[\s\S]*/g, "")
+          .replaceAll(/<conv_memory>[\s\S]*/g, "")
           .trim();
 
         // If all content was stripped, ensure clean empty string

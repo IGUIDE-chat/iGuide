@@ -4,9 +4,9 @@ import test from 'node:test'
 import { runStreamingAgentLoop } from './loop.ts'
 import { ToolRegistry } from '../tools/registry.ts'
 import {
-  createMockProviderFetch,
   type MockProviderResponseInput,
   type RecordedProviderRequest,
+  createMockProviderFetch,
 } from '../test/utils/mockProvider.ts'
 import { createStubTool } from '../test/utils/stubTools.ts'
 
@@ -83,7 +83,7 @@ async function collectSSEEvents(
 
   while (true) {
     const { done, value } = await reader.read()
-    if (done) break
+    if (done) {break}
 
     buffer += decoder.decode(value, { stream: true })
     const lines = buffer.split('\n')
@@ -91,7 +91,7 @@ async function collectSSEEvents(
 
     for (const line of lines) {
       const trimmed = line.trim()
-      if (!trimmed) continue
+      if (!trimmed) {continue}
 
       if (trimmed.startsWith('event:')) {
         currentEvent = trimmed.slice(6).trim()
@@ -179,7 +179,7 @@ test('streaming no-tool final answer emits content then done', async () => {
     const doneEvents = parsed.filter((e) => e.event === 'done')
 
     assert.equal(
-      contentEvents.length >= 1,
+      contentEvents.length > 0,
       true,
       'Should have at least one content event'
     )
@@ -234,14 +234,14 @@ test('streaming one tool then final answer completes act-observe loop', async ()
     const parsed = await events
 
     // Verify event sequence
-    const eventNames = parsed.map((e) => e.event)
-    assert.ok(eventNames.includes('tool_start'), 'Should have tool_start event')
+    const eventNames = new Set(parsed.map((e) => e.event))
+    assert.ok(eventNames.has('tool_start'), 'Should have tool_start event')
     assert.ok(
-      eventNames.includes('tool_result'),
+      eventNames.has('tool_result'),
       'Should have tool_result event'
     )
-    assert.ok(eventNames.includes('content'), 'Should have content event')
-    assert.ok(eventNames.includes('done'), 'Should have done event')
+    assert.ok(eventNames.has('content'), 'Should have content event')
+    assert.ok(eventNames.has('done'), 'Should have done event')
 
     // Verify tool_start payload
     const toolStartEvent = parsed.find((e) => e.event === 'tool_start')
@@ -462,7 +462,7 @@ test('streaming max iterations triggers fallback with bounded stop', async () =>
     assert.equal(result.iterations, 3, 'Should stop at max iterations')
 
     const fallbackEvents = parsed.filter((e) => e.event === 'fallback')
-    assert.ok(fallbackEvents.length >= 1, 'Should have fallback event')
+    assert.ok(fallbackEvents.length > 0, 'Should have fallback event')
 
     const doneEvents = parsed.filter((e) => e.event === 'done')
     assert.equal(doneEvents.length, 1, 'Should have done event')
@@ -566,17 +566,17 @@ test('streaming trace events are emitted at key points', async () => {
     const parsed = await events
 
     // Check for trace events
-    const eventNames = parsed.map((e) => e.event)
+    const eventNames = new Set(parsed.map((e) => e.event))
 
     // Should have agent_step event
     assert.ok(
-      eventNames.includes('agent_step'),
+      eventNames.has('agent_step'),
       'Should have agent_step trace event'
     )
 
     // Should have observation event
     assert.ok(
-      eventNames.includes('observation'),
+      eventNames.has('observation'),
       'Should have observation trace event'
     )
 
@@ -632,13 +632,13 @@ test('streaming preserves SSE backward compatibility', async () => {
     const parsed = await events
 
     // Verify all legacy events exist
-    const eventNames = parsed.map((e) => e.event)
+    const eventNames = new Set(parsed.map((e) => e.event))
 
     // Core events must exist
-    assert.ok(eventNames.includes('tool_start'), 'Must have tool_start')
-    assert.ok(eventNames.includes('tool_result'), 'Must have tool_result')
-    assert.ok(eventNames.includes('content'), 'Must have content')
-    assert.ok(eventNames.includes('done'), 'Must have done')
+    assert.ok(eventNames.has('tool_start'), 'Must have tool_start')
+    assert.ok(eventNames.has('tool_result'), 'Must have tool_result')
+    assert.ok(eventNames.has('content'), 'Must have content')
+    assert.ok(eventNames.has('done'), 'Must have done')
 
     // Verify tool_start uses 'name' not 'tool'
     const toolStartEvent = parsed.find((e) => e.event === 'tool_start')

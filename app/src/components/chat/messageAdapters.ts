@@ -9,8 +9,8 @@
  * NOT for use with @assistant-ui/react (see adapters/messageAdapter.ts for that).
  */
 
-import type { UIDataTypes, UITools, UIMessage, UIMessagePart } from "ai";
-import type { ChatMessage } from "../../types";
+import  { type UIDataTypes, type UIMessage, type UIMessagePart, type UITools } from "ai";
+import  { type ChatMessage } from "../../types";
 
 /**
  * Convert one or more legacy ChatMessages to AI SDK UIMessages.
@@ -24,7 +24,7 @@ import type { ChatMessage } from "../../types";
 export function chatMessagesToUIMessages(legacy: ChatMessage[]): UIMessage[] {
   return legacy.map((msg) => {
     let role: "user" | "assistant" | "tool";
-    const parts: UIMessagePart<UIDataTypes, UITools>[] = [];
+    const parts: Array<UIMessagePart<UIDataTypes, UITools>> = [];
 
     if (msg.role === "user") {
       role = "user";
@@ -84,7 +84,7 @@ export function chatMessagesToUIMessages(legacy: ChatMessage[]): UIMessage[] {
  * source-document) are silently skipped.
  */
 export function extractAssistantText(
-  parts: UIMessagePart<UIDataTypes, UITools>[]
+  parts: Array<UIMessagePart<UIDataTypes, UITools>>
 ): string {
   return parts
     .filter(

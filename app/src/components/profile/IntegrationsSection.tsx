@@ -4,8 +4,8 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { useState, useEffect } from "react";
-import { Language } from "../../types";
+import React, { useEffect, useState } from "react";
+import { type Language } from "../../types";
 import { supabase } from "../../services/supabase";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -92,7 +92,7 @@ async function fetchConnectionsFromApi(): Promise<{
   user: UserConnection[];
 }> {
   const res = await apiFetch("/integrations");
-  if (!res.ok) throw new Error(`Failed to load integrations: ${res.status}`);
+  if (!res.ok) {throw new Error(`Failed to load integrations: ${res.status}`);}
   const data = (await res.json()) as {
     platform?: ApiConnection[];
     user?: ApiConnection[];
@@ -411,23 +411,23 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
   const statusDot = (status: "ok" | "error" | "unknown", dimmed = false) => {
     const base = "size-2 rounded-full inline-block";
     if (status === "ok")
-      return (
+      {return (
         <span
           className={`
             ${base}
             ${dimmed ? "bg-emerald-300" : "bg-emerald-400"}
           `}
         />
-      );
+      );}
     if (status === "error")
-      return (
+      {return (
         <span
           className={`
             ${base}
             ${dimmed ? "bg-red-300" : "bg-red-400"}
           `}
         />
-      );
+      );}
     return (
       <span
         className={`
@@ -439,8 +439,8 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
   };
 
   const statusLabel = (status: "ok" | "error" | "unknown") => {
-    if (status === "ok") return t.statusOk;
-    if (status === "error") return t.statusError;
+    if (status === "ok") {return t.statusOk;}
+    if (status === "error") {return t.statusError;}
     return t.statusUnknown;
   };
 
@@ -465,7 +465,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
   };
 
   const handleTest = async () => {
-    if (!addUrl.trim()) return;
+    if (!addUrl.trim()) {return;}
     setTestResult({ state: "loading" });
     const result = await mockTestConnection(addUrl.trim());
     if (result.ok && result.tools) {
@@ -476,7 +476,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
   };
 
   const handleSave = async () => {
-    if (testResult.state !== "success") return;
+    if (testResult.state !== "success") {return;}
     setIsSaving(true);
     try {
       await saveConnectionToApi({
@@ -524,7 +524,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
 
   const handleTestAgain = async (id: string) => {
     const conn = userConnections.find((c) => c.id === id);
-    if (!conn) return;
+    if (!conn) {return;}
     setUserConnections((prev) =>
       prev.map((c) => (c.id === id ? { ...c, status: "unknown" } : c))
     );
@@ -538,7 +538,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
 
   const handleRefreshDiscovery = async (id: string) => {
     const conn = userConnections.find((c) => c.id === id);
-    if (!conn) return;
+    if (!conn) {return;}
     const result = await mockTestConnection(conn.url);
     if (result.ok && result.tools) {
       setUserConnections((prev) =>
@@ -556,13 +556,13 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm(t.confirmDelete)) return;
+    if (!confirm(t.confirmDelete)) {return;}
     try {
       await deleteConnectionFromApi(id);
       const { platform, user } = await fetchConnectionsFromApi();
       setPlatformConnections(platform);
       setUserConnections(user);
-      if (detailsId === id) setDetailsId(null);
+      if (detailsId === id) {setDetailsId(null);}
     } catch (err) {
       console.error("Failed to delete connection:", err);
       alert(err instanceof Error ? err.message : "Failed to delete connection");

@@ -17,7 +17,7 @@ if (import.meta.env.DEV) {
   console.log("[Supabase Setup] Key defined:", !!supabaseAnonKey);
   console.log(
     "[Supabase Setup] URL value (first 10 chars):",
-    supabaseUrl ? supabaseUrl.substring(0, 10) + "..." : "undefined"
+    supabaseUrl ? supabaseUrl.slice(0, 10) + "..." : "undefined"
   );
   console.log(
     "[Supabase Setup] Env Keys:",

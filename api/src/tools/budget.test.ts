@@ -5,9 +5,9 @@ import { tool } from 'ai'
 import { z } from 'zod'
 
 import {
-  withGuards,
   ToolBudgetExceededError,
   ToolTimeoutError,
+  withGuards,
 } from './budget.ts'
 
 test('under budget passes through (9 of 10 succeeds)', async () => {

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 
 import { persistTurn } from './persist.ts'
-import type { PersistEnv, ResponseMessage, UserMessage } from './persist.ts'
+import  { type PersistEnv, type ResponseMessage, type UserMessage } from './persist.ts'
 
 interface CapturedRequest {
   url: string

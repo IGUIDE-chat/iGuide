@@ -5,12 +5,12 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { Dorm } from "../types/index";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { type Dorm } from "../types/index";
 import { dormViewingService } from "../../../services/dormViewingService";
 import {
-  dormFavoritesService,
   type DormFavorite,
+  dormFavoritesService,
 } from "../../../services/dormFavoritesService";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useDormData } from "../store/HousingDataContext";
@@ -76,7 +76,7 @@ export const useDormUserInteraction = () => {
 
   // Load cloud data when user is authenticated
   const loadCloudData = useCallback(async () => {
-    if (!user) return;
+    if (!user) {return;}
 
     setIsLoading(true);
     try {
@@ -175,9 +175,9 @@ export const useDormUserInteraction = () => {
         setLocalFavorites((prev) => {
           if (prev.includes(dormId)) {
             return prev.filter((id) => id !== dormId);
-          } else {
-            return [...prev, dormId];
           }
+            return [...prev, dormId];
+          
         });
         return !localFavorites.includes(dormId);
       }
@@ -230,9 +230,9 @@ export const useDormUserInteraction = () => {
     (dormId: string): boolean => {
       if (user) {
         return favoriteStatusMap[dormId] || false;
-      } else {
-        return localFavorites.includes(dormId);
       }
+        return localFavorites.includes(dormId);
+      
     },
     [user, localFavorites, favoriteStatusMap]
   );

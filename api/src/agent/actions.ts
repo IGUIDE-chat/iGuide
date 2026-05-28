@@ -1,7 +1,7 @@
-import type { ProviderToolCall } from './messages.ts'
-import { buildObservation, type Observation } from './observation.ts'
-import type { ToolRegistry } from '../tools/registry.ts'
-import type { RequestContext, ToolResult } from '../tools/types.ts'
+import  { type ProviderToolCall } from './messages.ts'
+import { type Observation, buildObservation } from './observation.ts'
+import  { type ToolRegistry } from '../tools/registry.ts'
+import  { type RequestContext, type ToolResult } from '../tools/types.ts'
 
 export interface ExecuteToolActionOptions {
   toolCall: ProviderToolCall

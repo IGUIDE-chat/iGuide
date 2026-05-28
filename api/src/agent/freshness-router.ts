@@ -95,7 +95,7 @@ function detectDomain(message: string): string | null {
 }
 
 function buildGuidance(sources: Source[]): string {
-  if (sources.length === 0) return ''
+  if (sources.length === 0) {return ''}
 
   const lines: string[] = []
   for (const source of sources) {
@@ -127,7 +127,7 @@ export async function analyzeFreshness(
   env: Record<string, string>
 ): Promise<string> {
   const domain = detectDomain(message)
-  if (!domain) return ''
+  if (!domain) {return ''}
 
   const supabaseUrl = env.SUPABASE_URL
   const serviceRoleKey = env.SUPABASE_SERVICE_ROLE_KEY

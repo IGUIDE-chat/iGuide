@@ -7,7 +7,7 @@
 
 import React from "react";
 import { ProfileScreen } from "../../components/profile/ProfileScreen";
-import { Language } from "../../types";
+import { type Language } from "../../types";
 
 interface ProfilePageProps {
   language: Language;

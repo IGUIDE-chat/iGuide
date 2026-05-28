@@ -5,7 +5,7 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { Dorm } from "../types/index";
+import { type Dorm } from "../types/index";
 import { normalizeDorm } from "../../../utils/roomOptions";
 import { finalizeDormRecord } from "../../../utils/dormData";
 import { applyDormOfficialOverride } from "./dormOfficialOverrides";

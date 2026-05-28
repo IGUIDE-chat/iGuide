@@ -55,7 +55,7 @@ export const ChatRuntimeProvider = ({
   const [followUps, setFollowUps] = React.useState<string[] | null>(null);
   const [initialMessages, setInitialMessages] = React.useState<
     UIMessage[] | undefined
-  >(undefined);
+  >();
 
   const conversationIdRef = React.useRef(currentConversationId);
   conversationIdRef.current = currentConversationId;
@@ -72,7 +72,7 @@ export const ChatRuntimeProvider = ({
     let cancelled = false;
     void (async () => {
       const { data } = await service.getConversation(currentConversationId);
-      if (cancelled) return;
+      if (cancelled) {return;}
       if (data?.messages) {
         const chatMessages = service.convertToChatMessages(
           data.messages as never
@@ -129,18 +129,18 @@ export const ChatRuntimeProvider = ({
         (memoryTags.userSoul || memoryTags.userMemory || memoryTags.convMemory)
       ) {
         if (memoryTags.userSoul)
-          void memoryService.appendSoul(user.id, memoryTags.userSoul);
+          {void memoryService.appendSoul(user.id, memoryTags.userSoul);}
         if (memoryTags.userMemory)
-          void memoryService.appendUserMemory(user.id, memoryTags.userMemory);
+          {void memoryService.appendUserMemory(user.id, memoryTags.userMemory);}
         if (memoryTags.convMemory && conversationIdRef.current)
-          void memoryService.updateConversationMemory(
+          {void memoryService.updateConversationMemory(
             conversationIdRef.current,
             memoryTags.convMemory
-          );
+          );}
       }
 
       const fu = extractFollowUps(text);
-      if (fu) setFollowUps(fu);
+      if (fu) {setFollowUps(fu);}
     },
     onError: (err) => console.error("[useChat]", err),
   });
@@ -168,7 +168,7 @@ export const ChatRuntimeProvider = ({
   const handleSubmit = React.useCallback(
     (e?: React.FormEvent) => {
       e?.preventDefault();
-      if (!input.trim() || isLoading) return;
+      if (!input.trim() || isLoading) {return;}
       void append(input);
       setInput("");
     },
@@ -178,9 +178,9 @@ export const ChatRuntimeProvider = ({
   const editAndRegenerate = React.useCallback(
     async (messageId: string, newText: string) => {
       const idx = chat.messages.findIndex((m) => m.id === messageId);
-      if (idx === -1) return;
+      if (idx === -1) {return;}
       const msg = chat.messages[idx];
-      if (msg.role !== "user") return;
+      if (msg.role !== "user") {return;}
 
       const edited: UIMessage = {
         ...msg,

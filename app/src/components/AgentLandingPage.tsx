@@ -9,12 +9,12 @@
 // [页面] 用于特定智能体（课程、宿舍、简历）的着陆页模板。
 import * as React from "react";
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Language } from "../types";
+import { AnimatePresence, motion } from "framer-motion";
+import { type Language } from "../types";
 import { UI_TEXT } from "../i18n/uiText";
 import {
+  type MailingListTopic,
   mailingListService,
-  MailingListTopic,
 } from "../services/mailingListService";
 
 interface AgentLandingPageProps {
@@ -105,7 +105,7 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
+    if (!email) {return;}
     setSubmitting(true);
     setError(null);
 

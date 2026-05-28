@@ -4,9 +4,9 @@ import test from 'node:test'
 import { runAgentLoop, runStreamingAgentLoop } from './loop.ts'
 import { ToolRegistry } from '../tools/registry.ts'
 import {
-  createMockProviderFetch,
   type MockProviderResponseInput,
   type RecordedProviderRequest,
+  createMockProviderFetch,
 } from '../test/utils/mockProvider.ts'
 import { createStubTool } from '../test/utils/stubTools.ts'
 
@@ -199,16 +199,16 @@ test('substantive UIUC query exposes all registered tools', async () => {
       'First request should have non-empty tools array'
     )
 
-    const toolNames = firstRequest.tools!.map((t) => t.function.name)
+    const toolNames = new Set(firstRequest.tools!.map((t) => t.function.name))
     assert.ok(
-      toolNames.includes('search_knowledge_base'),
+      toolNames.has('search_knowledge_base'),
       'Should include search_knowledge_base tool'
     )
     assert.ok(
-      toolNames.includes('web_search'),
+      toolNames.has('web_search'),
       'Should include web_search tool'
     )
-    assert.ok(toolNames.includes('grep_docs'), 'Should include grep_docs tool')
+    assert.ok(toolNames.has('grep_docs'), 'Should include grep_docs tool')
 
     assert.equal(result.toolCalls.length, 1, 'One tool call should be made')
     assert.equal(result.toolCalls[0].name, 'search_knowledge_base')

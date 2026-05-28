@@ -7,9 +7,9 @@
 
 import React, { memo } from "react";
 import { Check } from "lucide-react";
-import { RoomType } from "../types/index";
+import { type RoomType } from "../types/index";
 import { ROOM_TYPES } from "../constants/filters";
-import { FilterLanguage } from "./modalText";
+import { type FilterLanguage } from "./modalText";
 
 interface RoomTypeSectionProps {
   title: string;

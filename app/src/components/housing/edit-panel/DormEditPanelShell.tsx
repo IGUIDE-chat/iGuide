@@ -7,7 +7,7 @@
 
 import React from "react";
 import { X } from "lucide-react";
-import { ActiveTab } from "./useDormEditForm";
+import { type ActiveTab } from "./useDormEditForm";
 
 interface TabConfig {
   id: ActiveTab;

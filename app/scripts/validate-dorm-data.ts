@@ -2,8 +2,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { UIUC_DORMS } from "../src/components/housing/constants/dormData";
 import {
-  TAGS_BY_CATEGORY,
   LLC_OPTIONS,
+  TAGS_BY_CATEGORY,
 } from "../src/components/housing/constants/metadata";
 import {
   hasPeopleishFilename,
@@ -35,7 +35,7 @@ const EXPECTED_IDS = [
   "van-doren",
   "wassaja",
   "weston",
-].sort();
+].toSorted();
 
 const VALID_TAGS = new Set([
   ...TAGS_BY_CATEGORY.livingConditions,
@@ -158,8 +158,8 @@ function checkDormBathroomScopes(
   expectedScopes: string[],
   message: string
 ) {
-  const actualScopes = Array.from(getDormBathroomScopes(dormId)).sort();
-  const expected = [...expectedScopes].sort();
+  const actualScopes = Array.from(getDormBathroomScopes(dormId)).toSorted();
+  const expected = [...expectedScopes].toSorted();
   check(
     JSON.stringify(actualScopes) === JSON.stringify(expected),
     `${message}. Expected ${expected.join(", ")}, got ${actualScopes.join(", ") || "none"}.`
@@ -177,7 +177,7 @@ function checkMediaUrl(dormId: string, slot: string, url: string) {
   );
 }
 
-const actualIds = UIUC_DORMS.map((dorm) => dorm.id).sort();
+const actualIds = UIUC_DORMS.map((dorm) => dorm.id).toSorted();
 check(
   UIUC_DORMS.length === 23,
   `Expected 23 dorms but found ${UIUC_DORMS.length}.`

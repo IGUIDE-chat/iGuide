@@ -6,14 +6,14 @@
  */
 
 import React from "react";
-import { BathroomType, DiningType, Dorm } from "../types/index";
+import { type BathroomType, type DiningType, type Dorm } from "../types/index";
 import {
   BATHROOM_TYPE_OPTIONS,
   DINING_OPTIONS,
-  getLocalizedLabel,
   HOUSING_TYPE_OPTIONS,
+  getLocalizedLabel,
 } from "../constants/metadata";
-import { DormEditFormState } from "./useDormEditForm";
+import { type DormEditFormState } from "./useDormEditForm";
 import { Field, Toggle, inputCls } from "./EditPanelFields";
 
 interface DetailsTabProps {

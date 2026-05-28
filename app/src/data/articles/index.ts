@@ -7,7 +7,7 @@
 
 // [DATA] Exports all articles as a single collection.
 // [数据] 导出所有文章为单一集合。
-import { Article } from "../../types";
+import { type Article } from "../../types";
 import { dormSelection } from "./dormSelection";
 import { mtdGuide } from "./mtdGuide";
 import { veoRide } from "./veoRide";

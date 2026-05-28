@@ -5,7 +5,7 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { Dorm } from "../types/index";
+import { type Dorm } from "../types/index";
 
 // Price tier definitions with approximate dollar amounts
 export const PRICE_TIERS = {
@@ -26,7 +26,7 @@ export type PriceTier = keyof typeof PRICE_TIERS;
 // Calculate dynamic min/max from actual data
 export const getPriceRangeFromData = (dorms: Dorm[] = []): [number, number] => {
   const prices = dorms.map((d) => d.price).filter((p) => p != null && p > 0);
-  if (prices.length === 0) return [0, 20000];
+  if (prices.length === 0) {return [0, 20000];}
   return [Math.min(...prices), Math.max(...prices)];
 };
 

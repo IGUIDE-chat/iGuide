@@ -1,4 +1,4 @@
-import type { Observation } from './observation.ts'
+import  { type Observation } from './observation.ts'
 
 export const LoopState = Symbol('LoopState')
 

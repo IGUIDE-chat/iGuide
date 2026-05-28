@@ -1,5 +1,5 @@
-import type { ReactNode } from "react";
-import type { ToolCallPart, ToolResultPart } from "ai";
+import  { type ReactNode } from "react";
+import  { type ToolCallPart, type ToolResultPart } from "ai";
 
 export type SearchToolArgs = {
   query?: string;
@@ -18,15 +18,15 @@ export function extractToolArgs(toolCall: ToolCallPart): SearchToolArgs {
 export function extractToolResult(
   toolResult: ToolResultPart | undefined
 ): ToolSummaryResult | undefined {
-  if (!toolResult) return undefined;
+  if (!toolResult) {return undefined;}
   const output = toolResult.output;
-  if (!output) return undefined;
+  if (!output) {return undefined;}
   if (output.type === "text" || output.type === "error-text") {
     return output.value;
   }
   if (output.type === "json" || output.type === "error-json") {
     const value = output.value;
-    if (typeof value === "string") return value;
+    if (typeof value === "string") {return value;}
     if (value && typeof value === "object" && !Array.isArray(value)) {
       return value as ToolSummaryResult;
     }
@@ -68,15 +68,15 @@ export function getStringArg(
 ) {
   for (const key of keys) {
     const value = args[key];
-    if (typeof value === "string" && value.trim()) return value;
+    if (typeof value === "string" && value.trim()) {return value;}
   }
 
   return fallback;
 }
 
 export function getResultSummary(result: ToolSummaryResult | undefined) {
-  if (!result) return "";
-  if (typeof result === "string") return result;
+  if (!result) {return "";}
+  if (typeof result === "string") {return result;}
   return result.summary ?? "";
 }
 
@@ -86,15 +86,15 @@ export function getResultMetric(
   fallbackWhenLoading: string,
   fallbackWhenComplete: string
 ) {
-  if (!result) return fallbackWhenLoading;
+  if (!result) {return fallbackWhenLoading;}
   if (typeof result === "string") {
     return getFirstCount(result)?.toString() ?? fallbackWhenComplete;
   }
 
   for (const key of keys) {
     const value = result[key];
-    if (typeof value === "number") return value.toString();
-    if (Array.isArray(value)) return value.length.toString();
+    if (typeof value === "number") {return value.toString();}
+    if (Array.isArray(value)) {return value.length.toString();}
   }
 
   return getFirstCount(result.summary)?.toString() ?? fallbackWhenComplete;

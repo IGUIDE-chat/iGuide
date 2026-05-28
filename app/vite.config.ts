@@ -1,10 +1,10 @@
 // [CONFIG] Vite build configuration and plugin setup.
 // [配置] Vite 构建配置和插件设置。
 import { mkdir, writeFile } from "node:fs/promises";
-import type {
-  ClientRequest,
-  IncomingMessage,
-  OutgoingHttpHeaders,
+import  {
+  type ClientRequest,
+  type IncomingMessage,
+  type OutgoingHttpHeaders,
 } from "node:http";
 import path from "path";
 import { defineConfig, loadEnv } from "vite";
@@ -44,7 +44,7 @@ function isTruthyEnv(value: string | undefined) {
 }
 
 function redactHeaders(headers: OutgoingHttpHeaders, includeSecrets: boolean) {
-  if (includeSecrets) return headers;
+  if (includeSecrets) {return headers;}
 
   return Object.fromEntries(
     Object.entries(headers).map(([key, value]) => [
@@ -55,7 +55,7 @@ function redactHeaders(headers: OutgoingHttpHeaders, includeSecrets: boolean) {
 }
 
 function redactUrl(rawUrl: string, includeSecrets: boolean) {
-  if (includeSecrets) return rawUrl;
+  if (includeSecrets) {return rawUrl;}
 
   try {
     const url = new URL(rawUrl);
@@ -71,7 +71,7 @@ function redactUrl(rawUrl: string, includeSecrets: boolean) {
 }
 
 function parseJsonBody(body: string) {
-  if (!body.trim()) return null;
+  if (!body.trim()) {return null;}
 
   try {
     return JSON.parse(body) as unknown;
@@ -88,11 +88,11 @@ async function dumpLlmRequest({
   proxyReq,
   body,
 }: LlmRequestDumpInput) {
-  if (!isTruthyEnv(env.LLM_REQUEST_DUMP)) return;
+  if (!isTruthyEnv(env.LLM_REQUEST_DUMP)) {return;}
 
   const includeSecrets = isTruthyEnv(env.LLM_REQUEST_DUMP_INCLUDE_SECRETS);
   const timestamp = new Date().toISOString();
-  const requestId = `${timestamp.replace(/[:.]/g, "-")}-${String(++llmDumpCounter).padStart(4, "0")}`;
+  const requestId = `${timestamp.replaceAll(/[:.]/g, "-")}-${String(++llmDumpCounter).padStart(4, "0")}`;
   const dumpDir = path.resolve(
     env.LLM_REQUEST_DUMP_DIR || ".debug/llm-requests"
   );
@@ -203,7 +203,7 @@ export default defineConfig(({ mode }) => {
           configure: (proxy) => {
             proxy.on("proxyReq", (proxyReq, req) => {
               const apiKey = env.GOOGLE_API_KEY;
-              if (!apiKey) return;
+              if (!apiKey) {return;}
               let body = "";
               req.on("data", (chunk: Buffer) => {
                 body += chunk.toString();
@@ -252,7 +252,7 @@ export default defineConfig(({ mode }) => {
             proxy.on("proxyReq", (proxyReq, req) => {
               // Inject API key into the forwarded request body
               const apiKey = env.TAVILY_API_KEY;
-              if (!apiKey) return;
+              if (!apiKey) {return;}
               let body = "";
               req.on("data", (chunk: Buffer) => {
                 body += chunk.toString();
@@ -260,7 +260,7 @@ export default defineConfig(({ mode }) => {
               req.on("end", () => {
                 try {
                   const parsed = JSON.parse(body);
-                  if (!parsed.api_key) parsed.api_key = apiKey;
+                  if (!parsed.api_key) {parsed.api_key = apiKey;}
                   const newBody = JSON.stringify(parsed);
                   proxyReq.setHeader(
                     "Content-Length",

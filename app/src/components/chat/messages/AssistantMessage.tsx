@@ -4,7 +4,7 @@
  */
 
 import * as React from "react";
-import type { UIMessage } from "ai";
+import  { type UIMessage } from "ai";
 import { Typewriter } from "../../ui/Typewriter";
 import { ToolStatus } from "../ToolStatus";
 import { ChatSessionContext } from "../ChatRuntimeProvider";
@@ -24,7 +24,7 @@ const extractAssistantText = (message: UIMessage): string =>
     .join("");
 
 const summarizeToolResult = (result: unknown): string | undefined => {
-  if (result == null) return undefined;
+  if (result == null) {return undefined;}
   if (typeof result === "string") {
     return result.length > 80 ? `${result.slice(0, 77)}...` : result;
   }
@@ -302,7 +302,7 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
               {followUps.slice(0, 3).map((question) => {
                 const displayText =
                   question.length > 50
-                    ? `${question.substring(0, 47)}...`
+                    ? `${question.slice(0, 47)}...`
                     : question;
                 return (
                   <button

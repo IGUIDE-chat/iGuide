@@ -7,7 +7,7 @@
 
 // [DATA] Article content for MTD Bus System guide.
 // [数据] MTD 公交系统指南的文章内容。
-import { Article } from "../../types";
+import { type Article } from "../../types";
 
 export const mtdGuide: Article = {
   id: "mtd-guide",

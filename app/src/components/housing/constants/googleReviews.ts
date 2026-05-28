@@ -1,4 +1,4 @@
-import { DormComment } from "../../../services/dormCommentsService";
+import { type DormComment } from "../../../services/dormCommentsService";
 
 const generateComment = (
   id: string,

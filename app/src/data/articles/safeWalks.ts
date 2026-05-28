@@ -7,7 +7,7 @@
 
 // [DATA] Article content for SafeWalks & SafeRides guide.
 // [数据] 安全行走（SafeWalks）与安全乘车（SafeRides）指南的文章内容。
-import { Article } from "../../types";
+import { type Article } from "../../types";
 
 export const safeWalks: Article = {
   id: "safe-walks",

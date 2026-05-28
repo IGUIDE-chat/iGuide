@@ -32,7 +32,7 @@ export interface StreamResponse {
  * Stream Chat Response from Coze API
  */
 export const streamChatResponse = async function* (
-  history: { role: "user" | "model"; text: string }[],
+  history: Array<{ role: "user" | "model"; text: string }>,
   newMessage: string,
   lang: string = "en",
   conversationId?: string, // Optional Coze conversation ID
@@ -55,7 +55,7 @@ export const streamChatResponse = async function* (
     let guestId = localStorage.getItem(STORAGE_KEY);
     if (!guestId) {
       // Simple random ID generator (sufficient for guest isolation)
-      guestId = "guest_" + Math.random().toString(36).substring(2, 15);
+      guestId = "guest_" + Math.random().toString(36).slice(2, 15);
       localStorage.setItem(STORAGE_KEY, guestId);
     }
     cozeUserId = guestId;
@@ -131,11 +131,11 @@ export const streamChatResponse = async function* (
     if (responseContentType.includes("text/html")) {
       const htmlText = await response.text();
       throw new Error(
-        `Unexpected HTML response from chat endpoint: ${htmlText.substring(0, 200)}`
+        `Unexpected HTML response from chat endpoint: ${htmlText.slice(0, 200)}`
       );
     }
 
-    if (!response.body) throw new Error("No response body");
+    if (!response.body) {throw new Error("No response body");}
 
     // 3. Process Stream
     const reader = response.body.getReader();
@@ -155,7 +155,7 @@ export const streamChatResponse = async function* (
 
       // SSE format: "event: <event_type>" followed by "data: <json>"
       if (trimmedLine.startsWith("event:")) {
-        currentEvent = trimmedLine.substring(6).trim();
+        currentEvent = trimmedLine.slice(6).trim();
         return { outputs, abort };
       }
 
@@ -183,7 +183,7 @@ export const streamChatResponse = async function* (
       }
 
       try {
-        const jsonStr = trimmedLine.substring(5).trim();
+        const jsonStr = trimmedLine.slice(5).trim();
         if (!jsonStr || jsonStr === '"[DONE]"' || jsonStr === "[DONE]") {
           console.log("[Coze] Received [DONE] signal");
           return { outputs, abort };
@@ -232,7 +232,7 @@ export const streamChatResponse = async function* (
                       ? `调用工具: ${callInfo.name || "插件"}`
                       : `Calling tool: ${callInfo.name || "plugin"}`,
                   detail: callInfo.arguments
-                    ? JSON.stringify(callInfo.arguments).substring(0, 120)
+                    ? JSON.stringify(callInfo.arguments).slice(0, 120)
                     : undefined,
                 },
               });
@@ -242,7 +242,7 @@ export const streamChatResponse = async function* (
                 thinkingStep: {
                   type: "tool_call",
                   label: lang === "zh" ? "调用工具..." : "Calling tool...",
-                  detail: data.content.substring(0, 120),
+                  detail: data.content.slice(0, 120),
                 },
               });
             }
@@ -257,7 +257,7 @@ export const streamChatResponse = async function* (
             thinkingStep: {
               type: "searching",
               label: lang === "zh" ? "获取结果..." : "Fetching results...",
-              detail: data.content ? data.content.substring(0, 120) : undefined,
+              detail: data.content ? data.content.slice(0, 120) : undefined,
             },
           });
         } else if (

@@ -7,19 +7,19 @@
 
 import React, { useEffect, useState } from "react";
 import { Typewriter } from "../ui/Typewriter";
-import { LibraryHistoryItem } from "../../types";
+import { type LibraryHistoryItem } from "../../types";
 import { libraryService } from "../../services/libraryService";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../services/supabase";
 import {
   BaseSidebar,
-  SidebarItem,
-  PinButton,
   DeleteButton,
+  PinButton,
   SidebarEmptyState,
-  groupByCategory,
+  SidebarItem,
+  type TimeCategoryLabels,
   getCategoryOrder,
-  TimeCategoryLabels,
+  groupByCategory,
 } from "./BaseSidebar";
 
 interface LibrarySidebarProps {

@@ -8,7 +8,7 @@
 // [SERVICE] Admin-only operations for the `dorms` table.
 // [服务] 管理员专用——直接操作 `dorms` 表（替代旧的 override 模式）。
 import { supabase } from "./supabase";
-import { Dorm } from "../components/housing/types/index";
+import { type Dorm } from "../components/housing/types/index";
 import {
   getDormPriceRange,
   sanitizeFloorPlansForStorage,
@@ -105,24 +105,24 @@ const KNOWN_DB_COLUMNS = new Set([
 export function buildSummary(dorm: Dorm, updates: DormUpdate): string {
   const parts: string[] = [];
   if (updates.name !== undefined && updates.name !== dorm.name)
-    parts.push("名称");
+    {parts.push("名称");}
   if (updates.price !== undefined && updates.price !== dorm.price)
-    parts.push(`价格: $${dorm.price} → $${updates.price}`);
+    {parts.push(`价格: $${dorm.price} → $${updates.price}`);}
   if (updates.ac !== undefined && updates.ac !== dorm.ac)
-    parts.push(`空调: ${dorm.ac ? "有" : "无"} → ${updates.ac ? "有" : "无"}`);
+    {parts.push(`空调: ${dorm.ac ? "有" : "无"} → ${updates.ac ? "有" : "无"}`);}
   if (updates.dining !== undefined && updates.dining !== dorm.dining)
-    parts.push("食堂");
+    {parts.push("食堂");}
   if (
     updates.description !== undefined &&
     updates.description !== dorm.description
   )
-    parts.push("描述");
-  if (updates.pros !== undefined) parts.push("优点");
-  if (updates.cons !== undefined) parts.push("缺点");
-  if (updates.categorized_tags !== undefined) parts.push("标签");
-  if (updates.floor_plans !== undefined) parts.push("户型图");
-  if (updates.gallery_images !== undefined) parts.push("图库");
-  if (updates.address !== undefined) parts.push("地址");
+    {parts.push("描述");}
+  if (updates.pros !== undefined) {parts.push("优点");}
+  if (updates.cons !== undefined) {parts.push("缺点");}
+  if (updates.categorized_tags !== undefined) {parts.push("标签");}
+  if (updates.floor_plans !== undefined) {parts.push("户型图");}
+  if (updates.gallery_images !== undefined) {parts.push("图库");}
+  if (updates.address !== undefined) {parts.push("地址");}
   return parts.length > 0 ? `修改: ${parts.join(", ")}` : "保存";
 }
 
@@ -325,7 +325,7 @@ async function uploadDormImage(file: File): Promise<DormImageUploadResult> {
   }
 
   const fileExt = file.name.split(".").pop();
-  const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
+  const fileName = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}.${fileExt}`;
   const filePath = `user_uploads/${fileName}`;
 
   const { error: uploadError } = await supabase.storage

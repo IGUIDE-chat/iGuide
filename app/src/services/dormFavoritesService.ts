@@ -33,7 +33,7 @@ export const dormFavoritesService = {
     dormNameZh?: string
   ): Promise<{ added: boolean; favorite?: DormFavorite }> {
     const user = await authService.getCurrentUser();
-    if (!user) throw new Error("User not authenticated");
+    if (!user) {throw new Error("User not authenticated");}
 
     // First check if already favorited
     const { data: existing } = await supabase
@@ -55,7 +55,7 @@ export const dormFavoritesService = {
         throw error;
       }
       return { added: false };
-    } else {
+    }
       // Add to favorites
       const { data, error } = await supabase
         .from(TABLE_NAME)
@@ -73,7 +73,7 @@ export const dormFavoritesService = {
         throw error;
       }
       return { added: true, favorite: data };
-    }
+    
   },
 
   /**
@@ -81,7 +81,7 @@ export const dormFavoritesService = {
    */
   async getFavorites(): Promise<DormFavorite[]> {
     const user = await authService.getCurrentUser();
-    if (!user) return [];
+    if (!user) {return [];}
 
     const { data, error } = await supabase
       .from(TABLE_NAME)
@@ -102,7 +102,7 @@ export const dormFavoritesService = {
    */
   async isFavorited(dormId: string): Promise<boolean> {
     const user = await authService.getCurrentUser();
-    if (!user) return false;
+    if (!user) {return false;}
 
     const { data, error } = await supabase
       .from(TABLE_NAME)
@@ -124,7 +124,7 @@ export const dormFavoritesService = {
    */
   async updateNotes(favoriteId: string, notes: string): Promise<void> {
     const user = await authService.getCurrentUser();
-    if (!user) return;
+    if (!user) {return;}
 
     const { error } = await supabase
       .from(TABLE_NAME)
@@ -143,7 +143,7 @@ export const dormFavoritesService = {
    */
   async removeFavorite(favoriteId: string): Promise<void> {
     const user = await authService.getCurrentUser();
-    if (!user) return;
+    if (!user) {return;}
 
     const { error } = await supabase
       .from(TABLE_NAME)
@@ -162,7 +162,7 @@ export const dormFavoritesService = {
    */
   async removeFavoriteByDormId(dormId: string): Promise<void> {
     const user = await authService.getCurrentUser();
-    if (!user) return;
+    if (!user) {return;}
 
     const { error } = await supabase
       .from(TABLE_NAME)
@@ -181,7 +181,7 @@ export const dormFavoritesService = {
    */
   async clearFavorites(): Promise<void> {
     const user = await authService.getCurrentUser();
-    if (!user) return;
+    if (!user) {return;}
 
     const { error } = await supabase
       .from(TABLE_NAME)

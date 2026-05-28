@@ -7,8 +7,8 @@
 
 import React, { useRef } from "react";
 import { Heart } from "lucide-react";
-import { Dorm } from "../types/index";
-import { Language } from "../../../types";
+import { type Dorm } from "../types/index";
+import { type Language } from "../../../types";
 import { formatPrice } from "../constants/pricing";
 
 /** Max movement (px) between pointer down/up to count as a tap, not a scroll drag. */
@@ -38,7 +38,7 @@ const MapCarouselCard: React.FC<MapCarouselCardProps> = ({
   const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
 
   const activateIfTap = (e: React.PointerEvent) => {
-    if (!pointerStartRef.current) return;
+    if (!pointerStartRef.current) {return;}
     if ((e.target as HTMLElement).closest("button")) {
       pointerStartRef.current = null;
       return;
@@ -46,7 +46,7 @@ const MapCarouselCard: React.FC<MapCarouselCardProps> = ({
     const dx = e.clientX - pointerStartRef.current.x;
     const dy = e.clientY - pointerStartRef.current.y;
     pointerStartRef.current = null;
-    if (Math.hypot(dx, dy) > TAP_MOVE_THRESHOLD_PX) return;
+    if (Math.hypot(dx, dy) > TAP_MOVE_THRESHOLD_PX) {return;}
     onViewDetails(dorm);
   };
 
@@ -61,7 +61,7 @@ const MapCarouselCard: React.FC<MapCarouselCardProps> = ({
         }
       }}
       onPointerDown={(e) => {
-        if (e.pointerType === "mouse" && e.button !== 0) return;
+        if (e.pointerType === "mouse" && e.button !== 0) {return;}
         pointerStartRef.current = { x: e.clientX, y: e.clientY };
       }}
       onPointerUp={(e) => {

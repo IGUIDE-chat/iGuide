@@ -20,10 +20,10 @@ import { createClient } from "@supabase/supabase-js";
 
 // We import directly from the source; tsx handles TS resolution.
 import { UIUC_DORMS } from "../src/components/housing/constants/dormData";
-import type {
-  BathroomScope,
-  Dorm,
-  DormCategorizedTags,
+import  {
+  type BathroomScope,
+  type Dorm,
+  type DormCategorizedTags,
 } from "../src/components/housing/types/index";
 import {
   finalizeDormRecord,
@@ -203,7 +203,7 @@ function mergeFloorPlans(
     )
   );
 
-  if (!nextExistingPlans.length) {
+  if (nextExistingPlans.length === 0) {
     return nextSourcePlans;
   }
 

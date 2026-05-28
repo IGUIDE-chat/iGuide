@@ -1,8 +1,8 @@
-import type { SearchResult } from "../types";
+import  { type SearchResult } from "../types";
 import { quickSearch } from "./searchService";
 import {
-  isUiucOfficialUrl,
   type WebSearchResult,
+  isUiucOfficialUrl,
   webSearchWithOfficialPriority,
 } from "./webSearchService";
 import rewriteSystemPrompt from "./prompts/chat-rag-query-rewrite-system.md?raw";
@@ -141,11 +141,11 @@ export function isToolUseRagEnabled(): boolean {
 }
 
 function containsChinese(text: string): boolean {
-  return /[\u3400-\u9fff]/.test(text);
+  return /[\u3400-\u9FFF]/.test(text);
 }
 
 function normalizeWhitespace(text: string): string {
-  return text.replace(/\s+/g, " ").trim();
+  return text.replaceAll(/\s+/g, " ").trim();
 }
 
 function dedupeStrings(values: string[]): string[] {
@@ -154,9 +154,9 @@ function dedupeStrings(values: string[]): string[] {
 
   for (const value of values) {
     const normalized = normalizeWhitespace(value);
-    if (!normalized) continue;
+    if (!normalized) {continue;}
     const key = normalized.toLowerCase();
-    if (seen.has(key)) continue;
+    if (seen.has(key)) {continue;}
     seen.add(key);
     deduped.push(normalized);
   }
@@ -169,9 +169,9 @@ function extractAsciiKeywords(query: string): string[] {
 
   return matches.filter((token) => {
     const normalized = token.toLowerCase();
-    if (ASCII_STOPWORDS.has(normalized)) return false;
-    if (token.length === 1) return false;
-    if (token.length === 2 && token === token.toLowerCase()) return false;
+    if (ASCII_STOPWORDS.has(normalized)) {return false;}
+    if (token.length === 1) {return false;}
+    if (token.length === 2 && token === token.toLowerCase()) {return false;}
     return true;
   });
 }
@@ -188,7 +188,7 @@ function buildStaticEnglishQuery(query: string): string | null {
   terms.push(...extractAsciiKeywords(query));
 
   const deduped = dedupeStrings(terms);
-  if (!deduped.length) return null;
+  if (deduped.length === 0) {return null;}
 
   if (!deduped.some((term) => GENERIC_QUERY_TOKENS.has(term.toLowerCase()))) {
     deduped.unshift("UIUC");
@@ -198,7 +198,7 @@ function buildStaticEnglishQuery(query: string): string | null {
 }
 
 function isUsableEnglishQuery(query: string | null): query is string {
-  if (!query) return false;
+  if (!query) {return false;}
 
   const meaningfulTokens = query
     .toLowerCase()
@@ -212,16 +212,16 @@ function mergeEnglishQueries(
   staticQuery: string | null,
   rewrittenQuery: string | null
 ): string | null {
-  if (!staticQuery && !rewrittenQuery) return null;
-  if (!rewrittenQuery) return staticQuery;
-  if (!staticQuery) return rewrittenQuery;
+  if (!staticQuery && !rewrittenQuery) {return null;}
+  if (!rewrittenQuery) {return staticQuery;}
+  if (!staticQuery) {return rewrittenQuery;}
 
   const merged = dedupeStrings([
     ...rewrittenQuery.split(/\s+/),
     ...staticQuery.split(/\s+/),
   ]);
 
-  return merged.length ? normalizeWhitespace(merged.join(" ")) : null;
+  return merged.length > 0 ? normalizeWhitespace(merged.join(" ")) : null;
 }
 
 function parseDeepSeekReply(data: unknown): string | null {
@@ -249,8 +249,8 @@ async function rewriteQueryToEnglish(
     {
       role: "user",
       content: rewriteUserPrompt
-        .replace(/\{\{\s*query\s*\}\}/g, query)
-        .replace(
+        .replaceAll(/\{\{\s*query\s*\}\}/g, query)
+        .replaceAll(
           /\{\{\s*hintLine\s*\}\}/g,
           staticQuery ? `Known UIUC hints: ${staticQuery}` : ""
         ),
@@ -285,9 +285,9 @@ async function rewriteQueryToEnglish(
 
     const data = await response.json();
     const rewritten = parseDeepSeekReply(data);
-    if (!rewritten) return null;
+    if (!rewritten) {return null;}
 
-    return rewritten.replace(/^["']|["']$/g, "");
+    return rewritten.replaceAll(/^["']|["']$/g, "");
   } catch (error) {
     console.warn("[RAG] Query rewrite exception:", error);
     return null;
@@ -299,11 +299,11 @@ async function buildSearchQueries(
   lang: string
 ): Promise<string[]> {
   const normalizedQuery = normalizeWhitespace(query);
-  if (!normalizedQuery) return [];
+  if (!normalizedQuery) {return [];}
 
   const queries = [normalizedQuery];
   const shouldExpandEnglish = lang === "zh" || containsChinese(normalizedQuery);
-  if (!shouldExpandEnglish) return queries;
+  if (!shouldExpandEnglish) {return queries;}
 
   const staticQuery = buildStaticEnglishQuery(normalizedQuery);
   let englishQuery = staticQuery;
@@ -334,7 +334,7 @@ function getResultKey(result: SearchResult): string {
 
 function readMetadataUrl(result: SearchResult): string | null {
   const metadata = result.metadata as Record<string, unknown> | undefined;
-  if (!metadata) return null;
+  if (!metadata) {return null;}
 
   const candidates = [metadata.url, metadata.doc_url, metadata.canonical_url];
 
@@ -393,7 +393,7 @@ function mergeQmdResults(results: SearchResult[]): SearchResult[] {
     }
   }
 
-  return [...merged.values()].sort(
+  return [...merged.values()].toSorted(
     (a, b) => getQmdPriority(b) - getQmdPriority(a)
   );
 }
@@ -470,7 +470,7 @@ function getWebPriority(result: WebSearchResult): number {
 
 function buildWebBlocks(results: WebSearchResult[]): RankedContextBlock[] {
   return mergeWebResults(results)
-    .sort((a, b) => getWebPriority(b) - getWebPriority(a))
+    .toSorted((a, b) => getWebPriority(b) - getWebPriority(a))
     .slice(0, WEB_RESULT_LIMIT)
     .map((result) => ({
       text: `[Web] ${result.title}\nURL: ${result.url}\n${result.content.slice(0, 300)}`,
@@ -535,9 +535,9 @@ export async function fetchChatRAGContext(
   const rankedBlocks = [
     ...buildQmdBlocks(qmdResults),
     ...buildWebBlocks(webResults),
-  ].sort((a, b) => b.priority - a.priority);
+  ].toSorted((a, b) => b.priority - a.priority);
 
-  if (!rankedBlocks.length) {
+  if (rankedBlocks.length === 0) {
     return { context: "", hasQMD: false, hasWeb: false };
   }
 

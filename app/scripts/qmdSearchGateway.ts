@@ -1,10 +1,10 @@
 import { execFile, execFileSync } from "node:child_process";
 import fs from "node:fs";
-import type { IncomingMessage, ServerResponse } from "node:http";
+import  { type IncomingMessage, type ServerResponse } from "node:http";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
-import type { Plugin } from "vite";
+import  { type Plugin } from "vite";
 
 type SearchMode = "bm25" | "vector" | "hybrid";
 
@@ -25,7 +25,7 @@ type QmdSearchResult = {
 };
 
 const execFileAsync = promisify(execFile);
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __dirname = import.meta.dirname;
 const PROJECT_ROOT = path.resolve(__dirname, "..");
 const QMD_CONTENT = path.resolve(PROJECT_ROOT, "../qmd-content");
 const NPM_BIN = process.platform === "win32" ? "npm.cmd" : "npm";
@@ -144,7 +144,7 @@ function commandForMode(mode: SearchMode) {
 }
 
 function matchesLang(filePath: string, lang: "en" | "zh") {
-  const normalized = filePath.replace(/\\/g, "/").toLowerCase();
+  const normalized = filePath.replaceAll('\\', "/").toLowerCase();
 
   if (normalized.includes("/articles/")) {
     return normalized.includes(`/articles/${lang}/`);

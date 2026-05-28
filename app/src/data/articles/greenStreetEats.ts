@@ -7,7 +7,7 @@
 
 // [DATA] Article content for Green Street Eats guide.
 // [数据] 绿街美食指南的文章内容。
-import { Article } from "../../types";
+import { type Article } from "../../types";
 
 export const greenStreetEats: Article = {
   id: "green-street-eats",

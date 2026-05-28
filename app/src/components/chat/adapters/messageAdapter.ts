@@ -1,5 +1,5 @@
-import type { ThreadMessageLike } from "@assistant-ui/react";
-import type { ChatMessage, ThinkingStep } from "../../../types";
+import  { type ThreadMessageLike } from "@assistant-ui/react";
+import  { type ChatMessage, type ThinkingStep } from "../../../types";
 
 export function toThreadMessage(msg: ChatMessage): ThreadMessageLike {
   return {

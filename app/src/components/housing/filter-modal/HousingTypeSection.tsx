@@ -7,11 +7,11 @@
 
 import React, { memo } from "react";
 import {
+  HOUSING_TYPE_OPTIONS,
   getHousingTypeMeta,
   getLocalizedLabel,
-  HOUSING_TYPE_OPTIONS,
 } from "../constants/metadata";
-import { FilterLanguage } from "./modalText";
+import { type FilterLanguage } from "./modalText";
 
 interface HousingTypeSectionProps {
   title: string;

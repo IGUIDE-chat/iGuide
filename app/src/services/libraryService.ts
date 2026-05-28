@@ -7,7 +7,7 @@
 
 // [SERVICE] Manages reading history, pinned articles, and library interactions.
 // [服务] 管理阅读历史、置顶文章以及知识库交互功能。
-import { Article, LibraryHistoryItem } from "../types";
+import { type Article, type LibraryHistoryItem } from "../types";
 import { supabase } from "./supabase";
 import { authService } from "./authService";
 
@@ -17,7 +17,7 @@ export const libraryService = {
    */
   async getHistory(): Promise<LibraryHistoryItem[]> {
     const user = await authService.getCurrentUser();
-    if (!user) return [];
+    if (!user) {return [];}
 
     const { data, error } = await supabase
       .from("reading_history")
@@ -46,7 +46,7 @@ export const libraryService = {
    */
   async togglePin(id: string, isPinned: boolean) {
     const user = await authService.getCurrentUser();
-    if (!user) return;
+    if (!user) {return;}
 
     const { error } = await supabase
       .from("reading_history")
@@ -65,7 +65,7 @@ export const libraryService = {
    */
   async removeFromHistory(id: string) {
     const user = await authService.getCurrentUser();
-    if (!user) return;
+    if (!user) {return;}
 
     const { error } = await supabase
       .from("reading_history")
@@ -84,7 +84,7 @@ export const libraryService = {
    */
   async addToHistory(article: Article) {
     const user = await authService.getCurrentUser();
-    if (!user) return;
+    if (!user) {return;}
 
     // Upsert logic: insert or update timestamps if exists
     // Since we have a UNIQUE constraint on (user_id, article_id),
@@ -113,7 +113,7 @@ export const libraryService = {
    */
   async clearHistory() {
     const user = await authService.getCurrentUser();
-    if (!user) return;
+    if (!user) {return;}
 
     const { error } = await supabase
       .from("reading_history")

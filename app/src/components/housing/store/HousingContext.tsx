@@ -6,19 +6,19 @@
  */
 
 import React, {
+  type ReactNode,
   createContext,
+  useCallback,
   useContext,
   useMemo,
   useState,
-  ReactNode,
-  useCallback,
 } from "react";
 import {
-  BathroomCountFilter,
-  BathroomScope,
-  BedCountFilter,
-  DormTag,
-  FilterOption,
+  type BathroomCountFilter,
+  type BathroomScope,
+  type BedCountFilter,
+  type DormTag,
+  type FilterOption,
 } from "../types/index";
 import { getPriceRangeFromData } from "../constants/pricing";
 import { useDormData } from "./HousingDataContext";

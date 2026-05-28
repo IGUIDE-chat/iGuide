@@ -1,4 +1,4 @@
-import type { ToolCallPart, ToolResultPart } from "ai";
+import  { type ToolCallPart, type ToolResultPart } from "ai";
 import {
   ToolCard,
   extractToolArgs,
@@ -16,7 +16,7 @@ function humanizeMCPName(toolName: string): string {
   const stripped = toolName.startsWith("mcp_")
     ? toolName.slice("mcp_".length)
     : toolName;
-  return stripped.replace(/[_-]+/g, " ").trim() || toolName;
+  return stripped.replaceAll(/[_-]+/g, " ").trim() || toolName;
 }
 
 export function MCPToolUI({ toolCall, toolResult }: MCPToolUIProps) {

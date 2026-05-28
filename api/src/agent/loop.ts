@@ -1,33 +1,33 @@
 import {
-  logFallbackEvent,
-  withFallback,
   type FallbackEvent,
   type FallbackReason,
+  logFallbackEvent,
+  withFallback,
 } from './fallback.ts'
 import { DEFAULT_MAX_ITERATIONS, evaluateStopCondition } from './bounds.ts'
 import {
+  emitAgentStep,
+  emitFinalizing,
+  emitObservation,
   sendContent,
   sendDone,
   sendFallback,
   sendToolResult,
   sendToolStart,
-  emitAgentStep,
-  emitObservation,
-  emitFinalizing,
 } from './stream.ts'
 import { buildSystemPrompt } from './prompts.ts'
 import { shouldEnableRetrievalTools } from './retrieval-policy.ts'
 import { analyzeFreshness } from './freshness-router.ts'
 import {
-  buildProviderMessages,
-  convertObservationToMessage,
   type ProviderMessage,
   type ProviderToolCall,
+  buildProviderMessages,
+  convertObservationToMessage,
 } from './messages.ts'
 import { executeToolAction } from './actions.ts'
-import type { Observation } from './observation.ts'
-import type { ToolRegistry } from '../tools/registry.ts'
-import type { OpenAITool, RequestContext, ToolResult } from '../tools/types.ts'
+import  { type Observation } from './observation.ts'
+import  { type ToolRegistry } from '../tools/registry.ts'
+import  { type OpenAITool, type RequestContext, type ToolResult } from '../tools/types.ts'
 
 export interface AgentLoopOptions {
   message: string
@@ -429,7 +429,7 @@ function finalizeStreamingToolCalls(
   accumulators: Map<number, StreamingToolCallAccumulator>
 ): DeepSeekToolCall[] {
   return Array.from(accumulators.values())
-    .sort((a, b) => a.index - b.index)
+    .toSorted((a, b) => a.index - b.index)
     .map((toolCall) => ({
       id: toolCall.id,
       type: toolCall.type,
@@ -845,7 +845,7 @@ export async function runAgentLoop(
     }
   }
 
-  let messages = buildProviderMessages({
+  const messages = buildProviderMessages({
     systemPrompt,
     history: options.history,
     message: options.message,
@@ -1062,7 +1062,7 @@ export async function runStreamingAgentLoop(
           retryOnce: (reason, previousResult) => {
             const simplifiedTools = (previousResult?.nextMessages ?? [])
               .slice()
-              .reverse()
+              .toReversed()
               .flatMap((message) => message.tool_calls ?? [])
               .slice(0, 1)
               .map((toolCall) => toolCall.function.name)

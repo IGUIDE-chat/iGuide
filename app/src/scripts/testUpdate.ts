@@ -7,6 +7,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import dotenv from "dotenv";
+
 dotenv.config({ path: ".env.local" });
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL!,
@@ -33,7 +34,7 @@ async function testUpdate() {
     .from("dorms")
     .update({ categorized_tags: ct })
     .eq("id", id);
-  if (error) console.error("Error:", error);
+  if (error) {console.error("Error:", error);}
   else {
     const { data: after } = await supabase
       .from("dorms")

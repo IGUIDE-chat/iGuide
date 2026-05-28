@@ -1,11 +1,11 @@
 #!/usr/bin/env npx tsx
 
 import { readFileSync, readdirSync } from "node:fs";
-import { join, dirname } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __filename = import.meta.filename;
+const __dirname = import.meta.dirname;
 const projectRoot = join(__dirname, "..");
 
 const EXPECTED_DIMENSION = 384;

@@ -6,7 +6,7 @@
  */
 
 import React, { useEffect, useState } from "react";
-import { Course, courseService } from "../../services/courseService";
+import { type Course, courseService } from "../../services/courseService";
 import CourseCard from "./CourseCard";
 
 interface CourseListProps {

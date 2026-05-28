@@ -5,7 +5,7 @@ function walk(dir: string): string[] {
   const list = fs.readdirSync(dir);
   list.forEach(function (file) {
     let p = dir + "/" + file;
-    p = p.replace(/\/\//g, "/");
+    p = p.replaceAll('//', "/");
     const stat = fs.statSync(p);
     if (stat && stat.isDirectory()) {
       results = results.concat(walk(p));

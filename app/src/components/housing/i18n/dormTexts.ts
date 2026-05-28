@@ -5,7 +5,7 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { Language } from "../../../types";
+import { type Language } from "../../../types";
 
 export interface DormDetailText {
   dormNotFound: string;

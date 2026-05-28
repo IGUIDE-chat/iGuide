@@ -3,11 +3,11 @@ import test from 'node:test'
 
 import { ToolRegistry } from './registry.ts'
 import {
-  createStubTool,
   createEchoTool,
   createFailingTool,
+  createStubTool,
 } from '../test/utils/stubTools.ts'
-import type { RequestContext, ToolDefinition, ToolResult } from './types.ts'
+import  { type RequestContext, type ToolDefinition, type ToolResult } from './types.ts'
 
 const MOCK_CTX: RequestContext = {
   env: {},

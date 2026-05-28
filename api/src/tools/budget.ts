@@ -1,4 +1,4 @@
-import type { Tool } from 'ai'
+import  { type Tool } from 'ai'
 
 /**
  * Thrown when the tool call budget (maxCalls) is exceeded.
@@ -38,17 +38,17 @@ const DEFAULTS = {
 const TRUNCATION_SUFFIX = '\n...[truncated]'
 
 function truncateResult(result: string, maxBytes: number): string {
-  if (maxBytes <= 0) return TRUNCATION_SUFFIX
+  if (maxBytes <= 0) {return TRUNCATION_SUFFIX}
 
   const encoder = new TextEncoder()
   const bytes = encoder.encode(result)
 
-  if (bytes.length <= maxBytes) return result
+  if (bytes.length <= maxBytes) {return result}
 
   const suffixBytes = encoder.encode(TRUNCATION_SUFFIX).length
   const contentLimit = Math.max(0, maxBytes - suffixBytes)
 
-  if (contentLimit <= 0) return TRUNCATION_SUFFIX
+  if (contentLimit <= 0) {return TRUNCATION_SUFFIX}
 
   // Decode from bytes to maintain UTF-8 character boundaries
   const decoder = new TextDecoder('utf-8', { fatal: false, ignoreBOM: true })

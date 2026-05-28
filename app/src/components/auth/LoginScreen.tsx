@@ -12,7 +12,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "../../contexts/AuthContext";
 import { UI_TEXT } from "../../i18n/uiText";
-import { Language } from "../../types";
+import { type Language } from "../../types";
 
 interface LoginScreenProps {
   onGuestLogin?: () => void;
@@ -62,7 +62,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
   return (
     <div
       onClick={(e) => {
-        if (e.target === e.currentTarget) onGuestLogin?.();
+        if (e.target === e.currentTarget) {onGuestLogin?.();}
       }}
       className="
         relative flex min-h-screen cursor-default items-start justify-center
@@ -218,7 +218,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
 
         <div className="relative mb-6">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-slate-100"></div>
+            <div className="w-full border-t border-slate-100" />
           </div>
           <div className="relative flex justify-center text-sm">
             <span className="bg-white px-2 text-slate-400">{t.orEmail}</span>

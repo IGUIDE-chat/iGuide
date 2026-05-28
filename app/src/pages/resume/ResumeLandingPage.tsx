@@ -7,7 +7,7 @@
 
 import React from "react";
 import { AgentLandingPage } from "../../components/AgentLandingPage";
-import { Language } from "../../types";
+import { type Language } from "../../types";
 
 interface ResumeLandingPageProps {
   language: Language;

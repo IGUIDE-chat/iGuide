@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquare, ThumbsUp, User, X, Globe } from "lucide-react";
-import { Language } from "../../types";
+import { AnimatePresence, motion } from "framer-motion";
+import { Globe, MessageSquare, ThumbsUp, User, X } from "lucide-react";
+import { type Language } from "../../types";
 import { dormDetailTexts } from "./i18n/dormTexts";
 
 interface Comment {
@@ -27,7 +27,7 @@ interface DormDetailReviewsProps {
   onVoteOnComment: (commentId: string, vote: 1 | -1 | null) => void;
 }
 
-const isChinese = (text: string) => /[\u4e00-\u9fff]/.test(text);
+const isChinese = (text: string) => /[\u4E00-\u9FFF]/.test(text);
 const detectLang = (text: string): "zh" | "en" =>
   isChinese(text) ? "zh" : "en";
 
@@ -60,7 +60,7 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
   const displayedComments = showAllReviews ? comments : comments.slice(0, 3);
 
   const handleSubmit = async () => {
-    if (!commentContent.trim()) return;
+    if (!commentContent.trim()) {return;}
     setSubmitting(true);
     try {
       await onSaveComment(commentContent.trim(), commentVote);
@@ -74,7 +74,7 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
   const handleDeleteComment = (commentId: string) => {
     const msg =
       language === "zh" ? "确定要删除这条评论吗？" : "Delete this comment?";
-    if (!window.confirm(msg)) return;
+    if (!window.confirm(msg)) {return;}
     onDeleteComment(commentId);
   };
 

@@ -8,7 +8,7 @@
 // [SERVICE] Authentication service utilities for checking user status.
 // [服务] 用于检查用户状态的身份验证服务工具类。
 import { supabase } from "./supabase";
-import type { User } from "@supabase/supabase-js";
+import  { type User } from "@supabase/supabase-js";
 
 export const authService = {
   /**

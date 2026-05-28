@@ -7,7 +7,7 @@
 
 import * as React from "react";
 import { motion } from "framer-motion";
-import ReactMarkdown, { Components } from "react-markdown";
+import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 export type TypewriterMode = "animate" | "stream" | "static";

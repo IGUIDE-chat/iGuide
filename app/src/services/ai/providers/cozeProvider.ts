@@ -6,7 +6,7 @@
  */
 
 import { streamChatResponse as cozeStreamChatResponse } from "../../cozeService";
-import { AIProvider } from "../types";
+import { type AIProvider } from "../types";
 
 export const cozeProvider: AIProvider = {
   id: "coze",

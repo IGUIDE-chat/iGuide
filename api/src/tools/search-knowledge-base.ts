@@ -1,8 +1,8 @@
 import { getEmbeddingConfig } from '../lib/embedding-config'
 import { EmbeddingClient } from '../lib/embeddings'
 import { callSupabaseRpc } from '../lib/supabase-rpc'
-import { ToolRegistry } from './registry'
-import type { RequestContext, ToolDefinition, ToolResult } from './types'
+import { type ToolRegistry } from './registry'
+import  { type RequestContext, type ToolDefinition, type ToolResult } from './types'
 
 interface SearchKnowledgeBaseArgs {
   query: string

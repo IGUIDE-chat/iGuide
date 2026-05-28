@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 
 export const sidebarItemAnimation = {
   layout: true,
@@ -36,9 +36,9 @@ export const getTimeCategory = (
   const diffMs = now.getTime() - date.getTime();
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-  if (diffDays === 0) return labels.today;
-  if (diffDays === 1) return labels.yesterday;
-  if (diffDays <= 7) return labels.thisWeek;
+  if (diffDays === 0) {return labels.today;}
+  if (diffDays === 1) {return labels.yesterday;}
+  if (diffDays <= 7) {return labels.thisWeek;}
   return labels.older;
 };
 
@@ -61,7 +61,7 @@ export const groupByCategory = <T extends { isPinned: boolean }>(
         ? labels.pinned
         : getTimeCategory(getDate(item), labels);
 
-      if (!groups[category]) groups[category] = [];
+      if (!groups[category]) {groups[category] = [];}
       groups[category].push(item);
       return groups;
     },
@@ -112,7 +112,7 @@ export const BaseSidebar: React.FC<BaseSidebarProps> = ({
           <div className="space-y-3">
             {categoryOrder.map((category) => {
               const items = groupedItems[category];
-              if (!items || items.length === 0) return null;
+              if (!items || items.length === 0) {return null;}
 
               return (
                 <div key={category}>

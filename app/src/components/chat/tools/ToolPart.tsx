@@ -1,4 +1,4 @@
-import type { ToolCallPart, ToolResultPart } from "ai";
+import  { type ToolCallPart, type ToolResultPart } from "ai";
 import { CustomSkillsToolUI } from "./CustomSkillsToolUI";
 import { GrepDocsToolUI } from "./GrepDocsToolUI";
 import { MCPToolUI } from "./MCPToolUI";
@@ -12,8 +12,8 @@ interface ToolPartProps {
 }
 
 function stringifyArgs(input: unknown): string {
-  if (input == null) return "";
-  if (typeof input === "string") return input;
+  if (input == null) {return "";}
+  if (typeof input === "string") {return input;}
   try {
     const json = JSON.stringify(input);
     return json.length > 80 ? `${json.slice(0, 77)}...` : json;

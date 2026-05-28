@@ -36,12 +36,12 @@ function mergeSoul(existing: string, incoming: string): string {
           line.substring(0, lineColonIdx).trim().toLowerCase() === key
         );
       });
-      if (idx !== -1) existingLines.splice(idx, 1);
+      if (idx !== -1) {existingLines.splice(idx, 1);}
     } else {
       const idx = existingLines.findIndex(
         (line) => line.toLowerCase() === entry.toLowerCase()
       );
-      if (idx !== -1) existingLines.splice(idx, 1);
+      if (idx !== -1) {existingLines.splice(idx, 1);}
     }
     existingLines.push(entry);
   }
@@ -80,7 +80,7 @@ function mergeUserMemory(existing: string, incoming: string): string {
           line.substring(0, lineColonIdx).trim().toLowerCase() === key
         );
       });
-      if (idx !== -1) existingLines.splice(idx, 1);
+      if (idx !== -1) {existingLines.splice(idx, 1);}
     }
     existingLines.push(entry);
   }
@@ -120,7 +120,7 @@ export const memoryService = {
       },
       { onConflict: "user_id" }
     );
-    if (error) console.error("[memoryService] Failed to update soul:", error);
+    if (error) {console.error("[memoryService] Failed to update soul:", error);}
   },
 
   // ── User Memory ──────────────────────────────────────────────
@@ -161,7 +161,7 @@ export const memoryService = {
       { onConflict: "user_id" }
     );
     if (error)
-      console.error("[memoryService] Failed to update user memory:", error);
+      {console.error("[memoryService] Failed to update user memory:", error);}
   },
 
   /**
@@ -205,10 +205,10 @@ export const memoryService = {
       { onConflict: "conversation_id" }
     );
     if (error)
-      console.error(
+      {console.error(
         "[memoryService] Failed to update conversation memory:",
         error
-      );
+      );}
   },
 
   // ── Composite fetch (parallel) ──────────────────────────────

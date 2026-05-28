@@ -18,7 +18,7 @@ import { fileURLToPath } from "node:url";
 
 import { generateQmdMarkdown } from "./generate-qmd-markdown.ts";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __dirname = import.meta.dirname;
 const PROJECT_ROOT = path.resolve(__dirname, "..");
 const QMD_CONTENT = path.resolve(PROJECT_ROOT, "../qmd-content");
 const DEFAULT_GLOB = "**/*.md";
@@ -63,7 +63,7 @@ const STALE_COLLECTION_NAMES = [
 ];
 
 function normalizePath(value: string) {
-  return path.resolve(value).replace(/\\/g, "/").toLowerCase();
+  return path.resolve(value).replaceAll('\\', "/").toLowerCase();
 }
 
 function run(command: string, args: string[], cwd = PROJECT_ROOT) {

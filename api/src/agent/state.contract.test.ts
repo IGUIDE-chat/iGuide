@@ -2,8 +2,8 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 
 import {
-  createInitialState,
   advanceStep,
+  createInitialState,
   getCurrentToolCalls,
   getObservations,
   getStopReason,
@@ -11,7 +11,7 @@ import {
   isReplayTurn,
 } from './state.ts'
 
-import type { Observation } from './observation.ts'
+import  { type Observation } from './observation.ts'
 
 function createMinimalToolCall() {
   return {

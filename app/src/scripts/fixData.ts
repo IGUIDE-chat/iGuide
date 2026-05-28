@@ -7,6 +7,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import dotenv from "dotenv";
+
 dotenv.config({ path: ".env.local" });
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL!,
@@ -32,7 +33,7 @@ async function fixAll() {
       .select("categorized_tags")
       .eq("id", id)
       .single();
-    if (!dorm) continue;
+    if (!dorm) {continue;}
 
     const ct = (dorm.categorized_tags as any) || {
       lifestyle: [],
@@ -40,13 +41,13 @@ async function fixAll() {
       livingConditions: [],
     };
     ct.llcNames = names;
-    if (!ct.lifestyle.includes("llc")) ct.lifestyle.push("llc");
+    if (!ct.lifestyle.includes("llc")) {ct.lifestyle.push("llc");}
 
     const { error } = await supabase
       .from("dorms")
       .update({ categorized_tags: ct })
       .eq("id", id);
-    if (error) console.error(`Error ${id}:`, error);
+    if (error) {console.error(`Error ${id}:`, error);}
     else {
       // Verify immediately
       const { data: verified } = await supabase

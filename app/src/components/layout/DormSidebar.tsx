@@ -11,8 +11,8 @@ import { Clock, Heart, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useSharedDormInteraction } from "../housing/store/DormUserInteractionContext";
 import { useDormData } from "../housing/store/HousingDataContext";
-import { Language } from "../../types";
-import { Dorm } from "../housing/types/index";
+import { type Language } from "../../types";
+import { type Dorm } from "../housing/types/index";
 import { Typewriter } from "../ui/Typewriter";
 
 interface DormSidebarProps {
@@ -88,7 +88,7 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
         const cloudFavorite = cloudFavorites.find(
           (favorite) => favorite.dorm_id === favoriteId
         );
-        if (!cloudFavorite) return null;
+        if (!cloudFavorite) {return null;}
 
         return {
           id: cloudFavorite.dorm_id,

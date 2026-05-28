@@ -8,7 +8,7 @@
 import { cozeProvider } from "./providers/cozeProvider";
 import { geminiProvider } from "./providers/geminiProvider";
 import { deepseekProvider } from "./providers/deepseekProvider";
-import { StreamChatResponseFn } from "./types";
+import { type StreamChatResponseFn } from "./types";
 
 // Force deepseek to ensure the transition from Coze takes effect regardless of Cloudflare env vars
 const providerKey = "deepseek";

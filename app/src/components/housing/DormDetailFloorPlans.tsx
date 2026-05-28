@@ -1,17 +1,17 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowRightLeft,
-  Check,
-  ChevronDown,
   Bath,
   BedSingle,
-  SquareDashed,
+  Check,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
+  SquareDashed,
 } from "lucide-react";
-import { FloorPlan, BathroomScope } from "./types/index";
-import { Language } from "../../types";
+import { type BathroomScope, type FloorPlan } from "./types/index";
+import { type Language } from "../../types";
 import { formatPrice } from "./constants/pricing";
 import { dormDetailTexts } from "./i18n/dormTexts";
 import {
@@ -67,7 +67,7 @@ export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
       prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
     );
 
-  if (sortedPlans.length === 0) return null;
+  if (sortedPlans.length === 0) {return null;}
 
   return (
     <motion.section
@@ -190,7 +190,7 @@ export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
           const hasThumb =
             Boolean(thumbSrc) && !imageErrors[`${planKey}-thumb`];
 
-          const planImages: { src: string; alt?: string; label?: string }[] =
+          const planImages: Array<{ src: string; alt?: string; label?: string }> =
             [];
           photos.forEach((src, i) =>
             planImages.push({

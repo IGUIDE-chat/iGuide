@@ -5,7 +5,7 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import type { StreamChunk, ChatHistoryItem } from "./ai/types";
+import  { type ChatHistoryItem, type StreamChunk } from "./ai/types";
 import { fetchChatRAGContext, isToolUseRagEnabled } from "./chatRagService";
 import { parseDeepSeekSSEStream } from "./deepseekSse";
 import { quickSearch } from "./searchService";

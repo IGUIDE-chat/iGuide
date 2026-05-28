@@ -9,13 +9,13 @@ import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
+  ArrowUpDown,
+  List,
+  Map as MapIcon,
   Search,
   SlidersHorizontal,
-  Map as MapIcon,
-  List,
-  ArrowUpDown,
 } from "lucide-react";
-import { Language } from "../../types";
+import { type Language } from "../../types";
 import { UI_TEXT } from "../../i18n/uiText";
 import { useAuth } from "../../contexts/AuthContext";
 import { useHousingFilters } from "../housing/store/HousingContext";
@@ -44,7 +44,7 @@ const SortDropdownMobile: React.FC<{
   React.useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node))
-        setOpen(false);
+        {setOpen(false);}
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -150,10 +150,10 @@ export const Layout: React.FC<LayoutProps> = ({
     if (propActiveTab) {
       return propActiveTab;
     }
-    if (location.pathname.startsWith("/library")) return "library";
-    if (location.pathname.startsWith("/courses")) return "courses";
-    if (location.pathname.startsWith("/dorms")) return "dorms";
-    if (location.pathname.startsWith("/resume")) return "resume";
+    if (location.pathname.startsWith("/library")) {return "library";}
+    if (location.pathname.startsWith("/courses")) {return "courses";}
+    if (location.pathname.startsWith("/dorms")) {return "dorms";}
+    if (location.pathname.startsWith("/resume")) {return "resume";}
     return "chat";
   }, [location.pathname, propActiveTab]);
 

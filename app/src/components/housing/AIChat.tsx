@@ -5,11 +5,11 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { useState, useRef, useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircle, X, Send, Sparkles, Loader2 } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Loader2, MessageCircle, Send, Sparkles, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useChat } from "@ai-sdk/react";
 import {
@@ -19,9 +19,9 @@ import {
   type UIMessagePart,
   type UITools,
 } from "ai";
-import { isDormMention, findMentionedDorms } from "../../utils/housingUtils";
+import { findMentionedDorms, isDormMention } from "../../utils/housingUtils";
 import { Typewriter } from "../ui/Typewriter";
-import { Language } from "../../types";
+import { type Language } from "../../types";
 import { aiChatTexts } from "./i18n/dormTexts";
 import { ImeSafeTextarea } from "../chat/ImeSafeTextarea";
 import { supabase } from "../../services/supabase";
@@ -30,7 +30,7 @@ interface AIChatProps {
   language: Language;
 }
 
-const extractText = (parts: UIMessagePart<UIDataTypes, UITools>[]): string =>
+const extractText = (parts: Array<UIMessagePart<UIDataTypes, UITools>>): string =>
   parts
     .filter((p): p is { type: "text"; text: string } => p.type === "text")
     .map((p) => p.text)
@@ -89,13 +89,13 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
   const isLoading = chat.status === "submitted" || chat.status === "streaming";
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {return;}
     messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
   }, [isOpen]);
 
   const handleSend = () => {
     const trimmed = inputText.trim();
-    if (!trimmed || isLoading) return;
+    if (!trimmed || isLoading) {return;}
     void chat.sendMessage({ text: trimmed });
     setInputText("");
   };

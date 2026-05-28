@@ -7,7 +7,7 @@
 
 // [SERVICE] Manages local storage for guest mode conversations.
 // [服务] 管理访客模式下的本地会话存储。
-import { ChatMessage } from "../types";
+import { type ChatMessage } from "../types";
 
 const STORAGE_KEY = "guest_conversations";
 
@@ -74,8 +74,8 @@ export const localConversationService = {
 
   async getUserConversations() {
     const conversations = getStorage();
-    const list = Object.values(conversations).sort((a, b) => {
-      if (a.is_pinned !== b.is_pinned) return a.is_pinned ? -1 : 1;
+    const list = Object.values(conversations).toSorted((a, b) => {
+      if (a.is_pinned !== b.is_pinned) {return a.is_pinned ? -1 : 1;}
       return (
         new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
       );

@@ -7,7 +7,7 @@
 
 // [DATA] Article content for VeoRide guide.
 // [数据] VeoRide 共享单车指南的文章内容。
-import { Article } from "../../types";
+import { type Article } from "../../types";
 
 export const veoRide: Article = {
   id: "veoride-rules",

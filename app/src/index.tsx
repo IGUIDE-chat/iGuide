@@ -15,7 +15,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 
 import { BrowserRouter } from "react-router-dom";
 
-const rootElement = document.getElementById("root");
+const rootElement = document.querySelector("#root");
 if (!rootElement) {
   throw new Error("Could not find root element to mount to");
 }

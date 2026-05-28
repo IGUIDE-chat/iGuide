@@ -7,9 +7,9 @@
 
 import React, { memo } from "react";
 import { Check } from "lucide-react";
-import { DormTag } from "../types/index";
+import { type DormTag } from "../types/index";
 import { getTagDisplay } from "../constants/metadata";
-import { FilterLanguage } from "./modalText";
+import { type FilterLanguage } from "./modalText";
 
 interface TagFilterSectionProps {
   title: string;

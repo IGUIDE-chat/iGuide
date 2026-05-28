@@ -4,14 +4,14 @@
  */
 
 import React, {
+  type ReactNode,
   createContext,
   useCallback,
   useContext,
   useMemo,
   useState,
-  ReactNode,
 } from "react";
-import { Dorm } from "../types/index";
+import { type Dorm } from "../types/index";
 import { useDormData } from "./HousingDataContext";
 
 const MAX_COMPARE = 4;
@@ -40,7 +40,7 @@ export const CompareProvider: React.FC<{ children: ReactNode }> = ({
       if (prev.includes(dormId)) {
         return prev.filter((id) => id !== dormId);
       }
-      if (prev.length >= MAX_COMPARE) return prev;
+      if (prev.length >= MAX_COMPARE) {return prev;}
       return [...prev, dormId];
     });
   }, []);
@@ -86,6 +86,6 @@ export const CompareProvider: React.FC<{ children: ReactNode }> = ({
 
 export const useCompare = (): CompareContextType => {
   const ctx = useContext(CompareContext);
-  if (!ctx) throw new Error("useCompare must be used within CompareProvider");
+  if (!ctx) {throw new Error("useCompare must be used within CompareProvider");}
   return ctx;
 };

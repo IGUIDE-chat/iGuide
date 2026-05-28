@@ -5,7 +5,7 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import type { SearchResult, SearchResponse, SearchMode } from "../types";
+import  { type SearchMode, type SearchResponse, type SearchResult } from "../types";
 
 const SEARCH_ENDPOINT = import.meta.env.PROD
   ? (import.meta.env.VITE_API_GATEWAY_URL || "https://api.iguide.chat") +
@@ -18,7 +18,7 @@ const SESSION_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 function getSessionCache(key: string): SearchResponse | null {
   const entry = sessionCache.get(key);
-  if (!entry) return null;
+  if (!entry) {return null;}
   if (Date.now() - entry.ts > SESSION_CACHE_TTL) {
     sessionCache.delete(key);
     return null;
@@ -47,7 +47,7 @@ export async function searchKnowledgeBase(
     mode,
   });
   const cached = getSessionCache(cacheKey);
-  if (cached) return cached;
+  if (cached) {return cached;}
 
   const response = await fetch(SEARCH_ENDPOINT, {
     method: "POST",
@@ -99,10 +99,10 @@ export async function quickSearch(
 // ── Helpers ──────────────────────────────────────────────────────
 
 function parseResultType(filePath: string): SearchResult["type"] {
-  if (/\/dorms[-/]/.test(filePath) || /\/dorms\//.test(filePath)) return "dorm";
+  if (/\/dorms[-/]/.test(filePath) || /\/dorms\//.test(filePath)) {return "dorm";}
   if (/\/articles[-/]/.test(filePath) || /\/articles\//.test(filePath))
-    return "article";
-  if (/\/crawled\//.test(filePath)) return "crawled";
+    {return "article";}
+  if (/\/crawled\//.test(filePath)) {return "crawled";}
   return undefined;
 }
 

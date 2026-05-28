@@ -7,14 +7,14 @@
 
 // [UTILITY] Tag label i18n and hero tag selection utilities.
 // [工具] 标签国际化和 Hero 标签选择工具。
-import { Language } from "../types";
+import { type Language } from "../types";
 import {
-  DormCategorizedTags,
-  DormTag,
+  type DormCategorizedTags,
+  type DormTag,
 } from "../components/housing/types/index";
 import {
-  getTagDisplay,
   TAG_REGISTRY,
+  getTagDisplay,
 } from "../components/housing/constants/metadata";
 
 // ── Legacy tag map (kept for backward compat during migration) ──────────────
@@ -83,7 +83,7 @@ const TAG_ZH_MAP: Record<string, string> = {
   Premium: "高端",
 };
 
-export const KNOWN_TAGS: string[] = Object.keys(TAG_ZH_MAP).sort();
+export const KNOWN_TAGS: string[] = Object.keys(TAG_ZH_MAP).toSorted();
 
 /** Legacy: Return the localised label for an old-style string tag. */
 export function getTagLabel(tag: string, language: Language): string {
@@ -106,7 +106,7 @@ export function getAllTagsSorted(
   ];
   return all
     .filter((tag) => Object.prototype.hasOwnProperty.call(TAG_REGISTRY, tag))
-    .sort((a, b) => {
+    .toSorted((a, b) => {
       const pa = TAG_REGISTRY[a]?.priority ?? 99;
       const pb = TAG_REGISTRY[b]?.priority ?? 99;
       return pa - pb;
@@ -160,7 +160,7 @@ export function getCardTagCandidates(
 ): CardTagItem[] {
   const rankedTags = getAllTagsSorted(categorizedTags)
     .filter((tag) => TAG_REGISTRY[tag]?.cardLayer !== "hidden")
-    .sort((a, b) => {
+    .toSorted((a, b) => {
       const toneWeight = (tag: DormTag) => {
         switch (TAG_REGISTRY[tag]?.cardTone) {
           case "muted":

@@ -7,7 +7,7 @@
 
 import React from "react";
 import { Search } from "lucide-react";
-import { DormListText } from "./types";
+import { type DormListText } from "./types";
 
 interface ListEmptyStateProps {
   t: DormListText;

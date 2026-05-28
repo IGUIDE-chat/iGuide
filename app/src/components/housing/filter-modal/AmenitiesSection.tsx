@@ -14,7 +14,7 @@ import {
   Utensils,
 } from "lucide-react";
 import { FilterOption } from "../types/index";
-import { FilterLanguage } from "./modalText";
+import { type FilterLanguage } from "./modalText";
 
 const DISPLAY_AMENITIES = [
   {

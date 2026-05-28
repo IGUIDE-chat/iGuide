@@ -4,7 +4,7 @@
  */
 
 import * as React from "react";
-import type { UIMessage } from "ai";
+import  { type UIMessage } from "ai";
 import { Pencil } from "lucide-react";
 import { ImeSafeTextarea } from "../ImeSafeTextarea";
 import { ChatSessionContext } from "../ChatRuntimeProvider";

@@ -7,7 +7,7 @@
 
 // [DATA] Article content for ARC vs CRCE guide.
 // [数据] ARC 与 CRCE 指南的文章内容。
-import { Article } from "../../types";
+import { type Article } from "../../types";
 
 export const arcVsCrce: Article = {
   id: "arc-vs-crce",

@@ -7,26 +7,26 @@
 
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
-  BathroomType,
-  DiningType,
-  Dorm,
-  DormCategorizedTags,
-  FloorPlan,
+  type BathroomType,
+  type DiningType,
+  type Dorm,
+  type DormCategorizedTags,
+  type FloorPlan,
 } from "../types/index";
-import { Language } from "../../../types";
+import { type Language } from "../../../types";
 import {
+  type DormUpdate,
+  type EditHistoryEntry,
   buildSummary,
-  DormUpdate,
   dormAdminService,
-  EditHistoryEntry,
 } from "../../../services/dormAdminService";
 import { useAuth } from "../../../contexts/AuthContext";
 import { dormService } from "../../../services/dormService";
 import {
   deriveRoomOptions,
   getPersistedBathroomType,
-  getStorageBathroomScope,
   getRoomDisplayLabel,
+  getStorageBathroomScope,
   normalizeFloorPlan,
 } from "../../../utils/roomOptions";
 import {
@@ -219,7 +219,7 @@ export const useDormEditForm = ({
   }, []);
 
   useLayoutEffect(() => {
-    if (activeTab !== "history") return;
+    if (activeTab !== "history") {return;}
     setHistoryLoading(true);
     dormAdminService
       .getEditHistory(dorm.id)
@@ -311,12 +311,12 @@ export const useDormEditForm = ({
       location,
       location_zh: locationZh || null,
       housing_type: housingType,
-      room_types: derived.roomTypes.length ? derived.roomTypes : null,
-      room_options: derived.roomOptions.length ? derived.roomOptions : null,
-      tags: syncedTags.length ? syncedTags : null,
+      room_types: derived.roomTypes.length > 0 ? derived.roomTypes : null,
+      room_options: derived.roomOptions.length > 0 ? derived.roomOptions : null,
+      tags: syncedTags.length > 0 ? syncedTags : null,
       categorized_tags: finalCategorized as unknown as Record<string, unknown>,
-      floor_plans: normalizedFloorPlans.length ? normalizedFloorPlans : null,
-      gallery_images: galleryImages.length ? galleryImages : null,
+      floor_plans: normalizedFloorPlans.length > 0 ? normalizedFloorPlans : null,
+      gallery_images: galleryImages.length > 0 ? galleryImages : null,
       ac,
       dining,
       dining_nearby_detail: diningNearbyDetail || null,
@@ -325,9 +325,9 @@ export const useDormEditForm = ({
         derived.roomOptions
       ),
       pros,
-      pros_zh: prosZh.length ? prosZh : null,
+      pros_zh: prosZh.length > 0 ? prosZh : null,
       cons,
-      cons_zh: consZh.length ? consZh : null,
+      cons_zh: consZh.length > 0 ? consZh : null,
       address: address || null,
       address_zh: addressZh || null,
       website: website || null,
@@ -417,7 +417,7 @@ export const useDormEditForm = ({
   };
 
   const handleRestore = async (entry: EditHistoryEntry) => {
-    if (!window.confirm(t.alerts.restoreConfirm)) return;
+    if (!window.confirm(t.alerts.restoreConfirm)) {return;}
     setRestoringId(entry.id);
     const ok = await dormAdminService.restoreSnapshot(dorm.id, entry);
     setRestoringId(null);

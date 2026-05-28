@@ -6,7 +6,7 @@
  */
 
 import React from "react";
-import { Language } from "../../types";
+import { type Language } from "../../types";
 import CourseListPage from "./CourseListPage";
 
 interface CoursesLandingPageProps {

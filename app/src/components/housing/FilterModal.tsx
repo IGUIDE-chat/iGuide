@@ -21,25 +21,25 @@ import { useHousingFilters } from "./store/HousingContext";
 import { getPriceRangeFromData } from "./constants/pricing";
 import { useDormData } from "./store/HousingDataContext";
 import {
-  BathroomCountFilter,
-  BathroomScope,
-  BedCountFilter,
-  DormTag,
-  FilterOption,
+  type BathroomCountFilter,
+  type BathroomScope,
+  type BedCountFilter,
+  type DormTag,
+  type FilterOption,
 } from "./types/index";
 import {
   BATHROOM_SCOPE_OPTIONS,
   FILTERABLE_LIVING_CONDITION_TAGS,
+  TAGS_BY_CATEGORY,
   getLocalizedLabel,
   getTagDisplay,
   mergeLocationOptions,
-  TAGS_BY_CATEGORY,
 } from "./constants/metadata";
 import PriceSection from "./filter-modal/PriceSection";
 import HousingTypeSection from "./filter-modal/HousingTypeSection";
 import ChipSection from "./filter-modal/ChipSection";
 import TagFilterSection from "./filter-modal/TagFilterSection";
-import { FilterLanguage, MODAL_TEXT } from "./filter-modal/modalText";
+import { type FilterLanguage, MODAL_TEXT } from "./filter-modal/modalText";
 
 interface FilterModalProps {
   isOpen: boolean;
@@ -47,7 +47,7 @@ interface FilterModalProps {
   language: FilterLanguage;
 }
 
-const BED_COUNT_OPTIONS: { value: BedCountFilter; label: string }[] = [
+const BED_COUNT_OPTIONS: Array<{ value: BedCountFilter; label: string }> = [
   { value: 1, label: "1+" },
   { value: 2, label: "2+" },
   { value: 3, label: "3+" },
@@ -56,7 +56,7 @@ const BED_COUNT_OPTIONS: { value: BedCountFilter; label: string }[] = [
 
 const buildBathroomCountOptions = (
   t: typeof MODAL_TEXT.en
-): { value: BathroomCountFilter; label: string }[] => [
+): Array<{ value: BathroomCountFilter; label: string }> => [
   { value: 0, label: t.zeroBathrooms },
   { value: 1, label: t.onePlusBathrooms },
   { value: 2, label: t.twoPlusBathrooms },
@@ -69,7 +69,7 @@ function ToggleButtonSection<T extends string | number>({
   onToggle,
 }: {
   title: string;
-  options: { value: T; label: string }[];
+  options: Array<{ value: T; label: string }>;
   selectedValues: T[];
   onToggle: (value: T) => void;
 }) {
@@ -163,7 +163,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
 
       min = Math.max(minLimit, Math.min(maxLimit, min));
       max = Math.max(minLimit, Math.min(maxLimit, max));
-      if (min > max) [min, max] = [max, min];
+      if (min > max) {[min, max] = [max, min];}
 
       if (minGap > 0 && max - min < minGap) {
         min = Math.max(minLimit, Math.min(min, maxLimit - minGap));
@@ -201,7 +201,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
     useState<BathroomScope[]>(bathroomTypeFilters);
 
   useLayoutEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {return;}
     setLocalPriceRange(normalizeRange(priceRange));
     setLocalHousingType(housingTypeDetails);
     setLocalBedCounts(bedCountFilters);
@@ -362,7 +362,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const handleScroll = useCallback(() => {
-    if (!scrollContainerRef.current) return;
+    if (!scrollContainerRef.current) {return;}
     const { scrollTop, scrollHeight, clientHeight } =
       scrollContainerRef.current;
     setShowFooterShadow(scrollHeight - scrollTop - clientHeight > 2);

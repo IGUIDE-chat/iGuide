@@ -5,30 +5,30 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { useState, useMemo, useEffect } from "react";
-import { Dorm, FloorPlan } from "./types/index";
+import React, { useEffect, useMemo, useState } from "react";
+import { type Dorm, type FloorPlan } from "./types/index";
 import { formatPrice } from "./constants/pricing";
 import { getHousingTypeMeta, getLocalizedLabel } from "./constants/metadata";
-import { Language } from "../../types";
+import { type Language } from "../../types";
 import {
-  X,
-  Check,
   AlertCircle,
+  Bath,
+  BedSingle,
+  Check,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  BedSingle,
-  Bath,
   SquareDashed,
+  X,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   deriveRoomOptions,
-  getRoomRangeSummary,
-  normalizeFloorPlan,
   getBathroomScopeLabel,
   getRoomOptionLabels,
+  getRoomRangeSummary,
   getStorageBathroomScope,
+  normalizeFloorPlan,
 } from "../../utils/roomOptions";
 
 interface DormComparisonProps {
@@ -236,7 +236,7 @@ const DormComparison: React.FC<DormComparisonProps> = ({
   // Mobile: track which dorm card is active (for swipe navigation)
   const [mobileActiveIdx, setMobileActiveIdx] = useState(0);
   const [isMobile, setIsMobile] = useState(() => {
-    if (typeof window === "undefined") return false;
+    if (typeof window === "undefined") {return false;}
     return window.matchMedia("(max-width: 767px)").matches;
   });
 
@@ -255,15 +255,15 @@ const DormComparison: React.FC<DormComparisonProps> = ({
       return plans[idx] ?? null;
     });
 
-    const planRows: {
+    const planRows: Array<{
       label: string;
       icon?: React.ReactNode;
       values: React.ReactNode[];
-    }[] = [
+    }> = [
       {
         label: language === "zh" ? "房型" : "Room Type",
         values: selectedPlans.map((plan, i) => {
-          if (!plan) return <React.Fragment key={i}>—</React.Fragment>;
+          if (!plan) {return <React.Fragment key={i}>—</React.Fragment>;}
           const opt = {
             bedCount: plan.bedCount ?? null,
             bathroomCount: plan.bathroomCount ?? null,
@@ -282,10 +282,10 @@ const DormComparison: React.FC<DormComparisonProps> = ({
         label: language === "zh" ? "床位" : "Beds",
         icon: <BedSingle className="size-3.5 text-gray-400" />,
         values: selectedPlans.map((plan) => {
-          if (!plan) return "—";
-          if (plan.bedSize) return plan.bedSize;
+          if (!plan) {return "—";}
+          if (plan.bedSize) {return plan.bedSize;}
           if (plan.bedCount != null)
-            return `${plan.bedCount} ${language === "zh" ? "张床" : plan.bedCount === 1 ? "Bed" : "Beds"}`;
+            {return `${plan.bedCount} ${language === "zh" ? "张床" : plan.bedCount === 1 ? "Bed" : "Beds"}`;}
           return "—";
         }),
       },
@@ -293,7 +293,7 @@ const DormComparison: React.FC<DormComparisonProps> = ({
         label: language === "zh" ? "卫浴" : "Bathroom",
         icon: <Bath className="size-3.5 text-gray-400" />,
         values: selectedPlans.map((plan) => {
-          if (!plan) return "—";
+          if (!plan) {return "—";}
           const scope = plan.bathroomScope ?? "communal";
           const scopeLabel = getBathroomScopeLabel(scope, language);
           if (plan.bathroomCount != null && plan.bathroomCount > 0) {
@@ -306,34 +306,34 @@ const DormComparison: React.FC<DormComparisonProps> = ({
         label: language === "zh" ? "面积" : "Area",
         icon: <SquareDashed className="size-3.5 text-gray-400" />,
         values: selectedPlans.map((plan) => {
-          if (!plan?.sqft) return "—";
+          if (!plan?.sqft) {return "—";}
           return `${plan.sqft} sqft (~${Math.round(plan.sqft * 0.092903)}㎡)`;
         }),
       },
       {
         label: language === "zh" ? "年租金" : "Annual Price",
         values: selectedPlans.map((plan, i) => {
-          if (!plan) return <React.Fragment key={i}>—</React.Fragment>;
+          if (!plan) {return <React.Fragment key={i}>—</React.Fragment>;}
           const p = hasPublishedPrice(plan.price) ? plan.price : null;
           if (p != null)
-            return (
+            {return (
               <span key={i} className="font-bold text-illini-orange">
                 {formatPrice(p)}
               </span>
-            );
+            );}
           if (plan.available === false)
-            return (
+            {return (
               <span key={i} className="text-[13px] text-red-500">
                 {language === "zh" ? "暂不可订" : "Sold out"}
               </span>
-            );
+            );}
           return <React.Fragment key={i}>—</React.Fragment>;
         }),
       },
       {
         label: language === "zh" ? "月租金" : "Monthly",
         values: selectedPlans.map((plan, i) => {
-          if (!plan) return <React.Fragment key={i}>—</React.Fragment>;
+          if (!plan) {return <React.Fragment key={i}>—</React.Fragment>;}
           const p = hasPublishedPrice(plan.price) ? plan.price : null;
           return p != null ? (
             <span key={i} className="font-semibold text-gray-700">
@@ -355,7 +355,7 @@ const DormComparison: React.FC<DormComparisonProps> = ({
     return { planRows, prices, minPrice, validPrices };
   };
 
-  if (dorms.length < 2) return null;
+  if (dorms.length < 2) {return null;}
 
   // ── Mobile: stacked card layout with swipe navigation ──
   const renderMobileView = () => {

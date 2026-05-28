@@ -32,7 +32,7 @@ export const dormViewingService = {
     dormNameZh?: string
   ): Promise<void> {
     const user = await authService.getCurrentUser();
-    if (!user) return;
+    if (!user) {return;}
 
     const { error } = await supabase.from(TABLE_NAME).upsert(
       {
@@ -56,7 +56,7 @@ export const dormViewingService = {
    */
   async getHistory(limit: number = 20): Promise<DormViewingHistory[]> {
     const user = await authService.getCurrentUser();
-    if (!user) return [];
+    if (!user) {return [];}
 
     const { data, error } = await supabase
       .from(TABLE_NAME)
@@ -78,7 +78,7 @@ export const dormViewingService = {
    */
   async removeFromHistory(id: string): Promise<void> {
     const user = await authService.getCurrentUser();
-    if (!user) return;
+    if (!user) {return;}
 
     const { error } = await supabase
       .from(TABLE_NAME)
@@ -97,7 +97,7 @@ export const dormViewingService = {
    */
   async removeFromHistoryByDormId(dormId: string): Promise<void> {
     const user = await authService.getCurrentUser();
-    if (!user) return;
+    if (!user) {return;}
 
     const { error } = await supabase
       .from(TABLE_NAME)
@@ -116,7 +116,7 @@ export const dormViewingService = {
    */
   async clearHistory(): Promise<void> {
     const user = await authService.getCurrentUser();
-    if (!user) return;
+    if (!user) {return;}
 
     const { error } = await supabase
       .from(TABLE_NAME)

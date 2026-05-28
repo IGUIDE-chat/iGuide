@@ -51,7 +51,7 @@ interface ImportUnit {
 	artifactType: ArtifactType;
 	contentText: string;
 	cleanedContent: string;
-	contentJson: Record<string, unknown>[] | null;
+	contentJson: Array<Record<string, unknown>> | null;
 	title: string;
 	canonicalUrl: string | null;
 	mimeType: string;
@@ -120,7 +120,7 @@ interface ArtifactPayload {
 	language: "en";
 	title: string;
 	content_text: string;
-	content_json: Record<string, unknown>[] | null;
+	content_json: Array<Record<string, unknown>> | null;
 	canonical_url: string | null;
 	is_searchable: boolean;
 	is_primary: boolean;
@@ -186,11 +186,11 @@ export function parseArgs(argv: string[]): CliOptions {
 
 export function cleanText(input: string): string {
 	return decodeHtmlEntities(input)
-		.replace(/<script[\s\S]*?<\/script>/gi, " ")
-		.replace(/<style[\s\S]*?<\/style>/gi, " ")
-		.replace(/<[^>]+>/g, " ")
-		.replace(/\r\n/g, "\n")
-		.replace(/\s+/g, " ")
+		.replaceAll(/<script[\s\S]*?<\/script>/gi, " ")
+		.replaceAll(/<style[\s\S]*?<\/style>/gi, " ")
+		.replaceAll(/<[^>]+>/g, " ")
+		.replaceAll('\r\n', "\n")
+		.replaceAll(/\s+/g, " ")
 		.trim();
 }
 
@@ -258,7 +258,7 @@ function decodeHtmlEntities(input: string): string {
 		"&#39;": "'",
 	};
 
-	return input.replace(/&nbsp;|&amp;|&lt;|&gt;|&quot;|&#39;/g, (match) => {
+	return input.replaceAll(/&nbsp;|&amp;|&lt;|&gt;|&quot;|&#39;/g, (match) => {
 		return entityMap[match] ?? match;
 	});
 }
@@ -550,7 +550,7 @@ async function resolveInputFiles(
 	const files = await walkDirectory(absoluteSource);
 	const supportedFiles = files
 		.filter((filePath) => isSupportedFile(filePath))
-		.sort((left, right) => left.localeCompare(right));
+		.toSorted((left, right) => left.localeCompare(right));
 
 	return typeof limit === "number" ? supportedFiles.slice(0, limit) : supportedFiles;
 }
@@ -686,7 +686,7 @@ function parseJsonlRecords(contents: string, filePath: string): JsonlLineRecord[
 			parsed = JSON.parse(line) as Record<string, unknown>;
 		} catch (error) {
 			throw new Error(
-				`Invalid JSONL at ${filePath}:${index + 1}: ${String(error)}`,
+				`Invalid JSONL at ${filePath}:${index + 1}: ${String(error)}`, { cause: error },
 			);
 		}
 
@@ -769,7 +769,7 @@ function findMarkdownHeading(contents: string): string | null {
 }
 
 function normalizeMultilineText(input: string): string {
-	return decodeHtmlEntities(input).replace(/\r\n/g, "\n").trim();
+	return decodeHtmlEntities(input).replaceAll('\r\n', "\n").trim();
 }
 
 function deriveNameFromReference(reference: string): string {
@@ -783,8 +783,8 @@ function deriveNameFromReference(reference: string): string {
 function deriveSourceKey(reference: string): string {
 	const name = deriveNameFromReference(reference)
 		.toLowerCase()
-		.replace(/[^a-z0-9]+/g, "-")
-		.replace(/^-+|-+$/g, "");
+		.replaceAll(/[^a-z0-9]+/g, "-")
+		.replaceAll(/^-+|-+$/g, "");
 
 	return name || "import-source";
 }
@@ -946,7 +946,7 @@ export class SupabaseRestClient {
 					apikey: this.env.supabaseServiceKey || "",
 					Authorization: `Bearer ${this.env.supabaseServiceKey || ""}`,
 					"Content-Type": "application/json",
-					...(init?.headers || {}),
+					...init?.headers,
 				},
 			},
 		);
@@ -967,7 +967,7 @@ function isExecutedDirectly() {
 		return false;
 	}
 
-	return path.resolve(entryPath) === path.resolve(fileURLToPath(import.meta.url));
+	return path.resolve(entryPath) === path.resolve(import.meta.filename);
 }
 
 if (isExecutedDirectly()) {

@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { DormTag } from "./types/index";
-import { Language } from "../../types";
+import { type DormTag } from "./types/index";
+import { type Language } from "../../types";
 import { TAG_REGISTRY } from "./constants/metadata";
 import { getDetailTagDisplay } from "../../utils/tagLabels";
 import { dormDetailTexts } from "./i18n/dormTexts";

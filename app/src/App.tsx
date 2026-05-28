@@ -16,7 +16,7 @@ import { HousingProvider } from "./components/housing/store/HousingContext";
 import { HousingDataProvider } from "./components/housing/store/HousingDataContext";
 import { DormUserInteractionProvider } from "./components/housing/store/DormUserInteractionContext";
 import { CompareProvider } from "./components/housing/store/CompareContext";
-import { Language } from "./types";
+import { type Language } from "./types";
 
 export default function App() {
   const { user, isLoading, isGuest, setIsGuest } = useAuth();

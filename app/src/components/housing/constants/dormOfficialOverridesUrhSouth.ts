@@ -6,7 +6,7 @@
  */
 
 import {
-  DormOverride,
+  type DormOverride,
   clean,
   plan,
   urhPage,

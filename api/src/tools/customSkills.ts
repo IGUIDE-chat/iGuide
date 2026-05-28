@@ -3,7 +3,7 @@ import { z } from 'zod'
 import campusNavigationSkill from '../skills/campus_navigation.json'
 import compareDormsSkill from '../skills/compare_dorms.json'
 import findByCriteriaSkill from '../skills/find_by_criteria.json'
-import type { RequestContext } from './types.ts'
+import  { type RequestContext } from './types.ts'
 
 type SkillParameterType = 'string' | 'number' | 'boolean'
 
@@ -128,7 +128,7 @@ function expandPromptTemplate(
   template: string,
   parameters: Record<string, unknown>
 ): string {
-  return template.replace(/{{\s*([a-zA-Z0-9_]+)\s*}}/g, (match, key) => {
+  return template.replaceAll(/{{\s*([a-zA-Z0-9_]+)\s*}}/g, (match, key) => {
     if (!(key in parameters)) {
       return match
     }

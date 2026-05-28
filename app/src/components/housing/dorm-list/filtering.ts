@@ -5,8 +5,8 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { Dorm, DormTag, FilterOption } from "../types/index";
-import { DormFilterState } from "./types";
+import { type Dorm, type DormTag, FilterOption } from "../types/index";
+import { type DormFilterState } from "./types";
 import { deriveRoomOptions } from "../../../utils/roomOptions";
 
 // ── Categorized tag matchers ─────────────────────────────────────────────
@@ -16,22 +16,22 @@ const matchesCategorizedTagFilters = (
   dorm: Dorm,
   filters: DormTag[]
 ): boolean => {
-  if (filters.length === 0) return true;
-  if (!dorm.categorizedTags) return false;
+  if (filters.length === 0) {return true;}
+  if (!dorm.categorizedTags) {return false;}
 
-  const allDormTags: DormTag[] = [
+  const allDormTags: DormTag[] = new Set([
     ...(dorm.categorizedTags.livingConditions ?? []),
     ...(dorm.categorizedTags.facilities ?? []),
     ...(dorm.categorizedTags.lifestyle ?? []),
-  ];
+  ]);
 
-  return filters.every((tag) => allDormTags.includes(tag));
+  return filters.every((tag) => allDormTags.has(tag));
 };
 
 // ── Sort ────────────────────────────────────────────────────────────────────
 
 const sortDorms = (dorms: Dorm[], sortBy: string) => {
-  return [...dorms].sort((a, b) => {
+  return [...dorms].toSorted((a, b) => {
     switch (sortBy) {
       case "name-asc":
         return a.name.localeCompare(b.name);
@@ -89,7 +89,7 @@ export const filterAndSortDorms = (dorms: Dorm[], filters: DormFilterState) => {
     const searchMatch =
       dorm.name.toLowerCase().includes(lowerSearchTerm) ||
       dorm.tags.some((tag) => tag.toLowerCase().includes(lowerSearchTerm));
-    if (!searchMatch) return false;
+    if (!searchMatch) {return false;}
 
     if (
       dorm.price < filters.normalizedPriceRange[0] ||
@@ -138,10 +138,10 @@ export const filterAndSortDorms = (dorms: Dorm[], filters: DormFilterState) => {
       ...(filters.facilityFilters ?? []),
       ...(filters.lifestyleFilters ?? []),
     ];
-    if (!matchesCategorizedTagFilters(dorm, allCategoryFilters)) return false;
+    if (!matchesCategorizedTagFilters(dorm, allCategoryFilters)) {return false;}
 
     // AC filter
-    if (filters.requireAc && !dorm.ac) return false;
+    if (filters.requireAc && !dorm.ac) {return false;}
 
     // Bathroom type filter
     if (
@@ -154,7 +154,7 @@ export const filterAndSortDorms = (dorms: Dorm[], filters: DormFilterState) => {
     }
 
     // Legacy FilterOption filters
-    if (filters.activeFilters.length === 0) return true;
+    if (filters.activeFilters.length === 0) {return true;}
 
     const matchesAC = filters.activeFilters.includes(FilterOption.AC)
       ? dorm.ac

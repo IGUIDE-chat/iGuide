@@ -24,12 +24,12 @@ import { execFile } from "node:child_process";
 import {
   existsSync,
   readFileSync,
-  writeFileSync,
   readdirSync,
   statSync,
+  writeFileSync,
 } from "node:fs";
 import { createServer } from "node:http";
-import { join, resolve, relative } from "node:path";
+import { join, relative, resolve } from "node:path";
 import { promisify } from "node:util";
 import { freemem, totalmem } from "node:os";
 
@@ -63,7 +63,7 @@ function acquireSlot() {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
       const idx = queue.findIndex((e) => e.resolve === resolve);
-      if (idx !== -1) queue.splice(idx, 1);
+      if (idx !== -1) {queue.splice(idx, 1);}
       reject(new Error("queue_timeout"));
     }, QUEUE_TIMEOUT_MS);
     queue.push({ resolve, timer });
@@ -135,7 +135,7 @@ let QMD_IS_SCRIPT = false;
 function resolveQmdCli() {
   if (process.env.QMD_CLI_PATH) {
     const p = resolve(process.env.QMD_CLI_PATH);
-    if (existsSync(p)) return p;
+    if (existsSync(p)) {return p;}
   }
   const candidates = [
     "/usr/bin/qmd",
@@ -155,7 +155,7 @@ function resolveQmdCli() {
     );
   }
   for (const c of candidates) {
-    if (existsSync(c)) return c;
+    if (existsSync(c)) {return c;}
   }
   throw new Error(
     "Cannot find qmd CLI. Install @tobilu/qmd or set QMD_CLI_PATH.\nSearched:\n" +
@@ -201,7 +201,7 @@ function parseMarkdownFile(filePath) {
     title = fmMatch[1];
   } else {
     const headingMatch = raw.match(/^#\s+(.+)/m);
-    if (headingMatch) title = headingMatch[1];
+    if (headingMatch) {title = headingMatch[1];}
   }
   // Strip frontmatter for content
   const content = raw.replace(/^---[\s\S]*?---\s*/, "").trim();
@@ -261,11 +261,11 @@ async function buildDocEmbeddings() {
   console.log(`[Vector] Found ${mdFiles.length} markdown files.`);
 
   // Try to load cached embeddings
-  let cached = {};
+  const cached = {};
   if (existsSync(EMBEDDINGS_PATH)) {
     try {
       const raw = JSON.parse(readFileSync(EMBEDDINGS_PATH, "utf8"));
-      for (const doc of raw) cached[doc.file] = doc;
+      for (const doc of raw) {cached[doc.file] = doc;}
       console.log(`[Vector] Loaded ${raw.length} cached embeddings from disk.`);
     } catch {
       /* ignore corrupt file */
@@ -276,7 +276,7 @@ async function buildDocEmbeddings() {
   let computed = 0;
 
   for (const fullPath of mdFiles) {
-    const relPath = relative(QMD_CONTENT, fullPath).replace(/\\/g, "/");
+    const relPath = relative(QMD_CONTENT, fullPath).replaceAll('\\', "/");
     const { title, snippet, content } = parseMarkdownFile(fullPath);
     const mtime = statSync(fullPath).mtimeMs;
 
@@ -298,7 +298,7 @@ async function buildDocEmbeddings() {
     results.push({ file: relPath, title, snippet, vector, mtime });
     computed++;
     if (computed % 10 === 0)
-      console.log(`[Vector] Embedded ${computed} documents...`);
+      {console.log(`[Vector] Embedded ${computed} documents...`);}
   }
 
   if (computed > 0) {
@@ -313,7 +313,7 @@ async function buildDocEmbeddings() {
 
 /** Vector search: embed query, compute cosine similarity against all docs */
 async function vectorSearch(query, lang, limit) {
-  if (!vectorReady || !embedder) return [];
+  if (!vectorReady || !embedder) {return [];}
 
   // e5 models expect "query: " prefix for queries
   const output = await embedder(`query: ${query}`, {
@@ -331,21 +331,21 @@ async function vectorSearch(query, lang, limit) {
       snippet: doc.snippet,
     }))
     .filter((d) => matchesLang(d.file, lang))
-    .sort((a, b) => b.score - a.score)
+    .toSorted((a, b) => b.score - a.score)
     .slice(0, limit);
 }
 
 function matchesLang(filePath, lang) {
   // Normalize: strip qmd:// prefix, ensure leading slash for consistent matching
   let norm = filePath
-    .replace(/\\/g, "/")
+    .replaceAll('\\', "/")
     .replace(/^qmd:\/\/[^/]+\//, "")
     .toLowerCase();
-  if (!norm.startsWith("/")) norm = "/" + norm;
-  if (norm.includes("/articles/")) return norm.includes(`/articles/${lang}/`);
-  if (norm.includes("/dorms/")) return norm.includes(`/dorms/${lang}/`);
+  if (!norm.startsWith("/")) {norm = "/" + norm;}
+  if (norm.includes("/articles/")) {return norm.includes(`/articles/${lang}/`);}
+  if (norm.includes("/dorms/")) {return norm.includes(`/dorms/${lang}/`);}
   if (norm.includes("/handbook/"))
-    return lang === "zh" && norm.includes("/handbook/zh/");
+    {return lang === "zh" && norm.includes("/handbook/zh/");}
   return true;
 }
 
@@ -362,7 +362,7 @@ async function runBm25Search(query, candidateLimit) {
     maxBuffer: 4 * 1024 * 1024,
   });
   const trimmed = stdout.trim();
-  if (!trimmed || !trimmed.startsWith("[")) return [];
+  if (!trimmed || !trimmed.startsWith("[")) {return [];}
   try {
     return JSON.parse(trimmed);
   } catch {
@@ -376,7 +376,7 @@ async function runBm25Search(query, candidateLimit) {
  */
 /** Normalize file path: strip qmd:// prefix for consistent dedup */
 function normalizeFilePath(fp) {
-  return (fp || "").replace(/\\/g, "/").replace(/^qmd:\/\/[^/]+\//, "");
+  return (fp || "").replaceAll('\\', "/").replace(/^qmd:\/\/[^/]+\//, "");
 }
 
 function rrfFuse(listA, listB, k = 60) {
@@ -404,7 +404,7 @@ function rrfFuse(listA, listB, k = 60) {
   }
 
   return [...scores.values()]
-    .sort((a, b) => b.score - a.score)
+    .toSorted((a, b) => b.score - a.score)
     .map(({ score, item }) => ({ ...item, score }));
 }
 
@@ -430,15 +430,15 @@ async function queryQmd({ query, lang = "en", limit = 10, mode = "fusion" }) {
     limit: safeLimit,
   });
   const cached = cacheGet(key);
-  if (cached) return cached;
+  if (cached) {return cached;}
 
   // Acquire concurrency slot (only needed for BM25 which spawns child process)
   const needsSlot = safeMode !== "vector";
 
-  if (needsSlot) await acquireSlot();
+  if (needsSlot) {await acquireSlot();}
   try {
     const cached2 = cacheGet(key);
-    if (cached2) return cached2;
+    if (cached2) {return cached2;}
 
     let results;
 
@@ -472,7 +472,7 @@ async function queryQmd({ query, lang = "en", limit = 10, mode = "fusion" }) {
     cacheSet(key, results);
     return results;
   } finally {
-    if (needsSlot) releaseSlot();
+    if (needsSlot) {releaseSlot();}
   }
 }
 

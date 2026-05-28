@@ -6,12 +6,12 @@
  */
 
 import React, {
+  type ReactNode,
+  type RefObject,
   createContext,
-  useContext,
-  ReactNode,
-  RefObject,
-  useState,
   useCallback,
+  useContext,
+  useState,
 } from "react";
 
 interface LayoutContextType {

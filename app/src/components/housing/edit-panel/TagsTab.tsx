@@ -8,11 +8,11 @@
 import React from "react";
 import {
   CATEGORY_LABELS,
-  getTagDisplay,
   LLC_OPTIONS,
   TAGS_BY_CATEGORY,
+  getTagDisplay,
 } from "../constants/metadata";
-import { DormEditFormState } from "./useDormEditForm";
+import { type DormEditFormState } from "./useDormEditForm";
 
 interface TagsTabProps {
   form: DormEditFormState;

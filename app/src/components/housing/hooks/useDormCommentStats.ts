@@ -7,8 +7,8 @@
 
 import { useEffect, useState } from "react";
 import {
+  type DormCommentStats,
   dormCommentsService,
-  DormCommentStats,
 } from "../../../services/dormCommentsService";
 import { SHOW_GOOGLE_REVIEWS } from "../constants/featureFlags";
 
@@ -36,7 +36,7 @@ export function useDormCommentStats() {
           }
           const st = updatedStats[dormId];
           st.totalComments += 1;
-          if (review.dorm_vote === 1) st.thumbsUp += 1;
+          if (review.dorm_vote === 1) {st.thumbsUp += 1;}
           st.positivePercent =
             st.totalComments > 0
               ? Math.round((st.thumbsUp / st.totalComments) * 100)

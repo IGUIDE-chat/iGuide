@@ -34,7 +34,7 @@ export const ToolStatus: React.FC<ToolStatusProps> = ({
   useEffect(() => {
     if (status === "searching") {
       setVisible(true);
-      if (fadeTimer.current) clearTimeout(fadeTimer.current);
+      if (fadeTimer.current) {clearTimeout(fadeTimer.current);}
     } else if (status === "done") {
       fadeTimer.current = setTimeout(() => setVisible(false), 1800);
     } else {
@@ -42,7 +42,7 @@ export const ToolStatus: React.FC<ToolStatusProps> = ({
     }
 
     return () => {
-      if (fadeTimer.current) clearTimeout(fadeTimer.current);
+      if (fadeTimer.current) {clearTimeout(fadeTimer.current);}
     };
   }, [status]);
 

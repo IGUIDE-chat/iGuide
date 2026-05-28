@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-import { streamText, convertToModelMessages, stepCountIs } from 'ai'
+import { convertToModelMessages, stepCountIs, streamText } from 'ai'
 import { verifyAndCacheJwt } from './auth/jwtCache.ts'
 import { ipRateLimit, userRateLimit } from './middleware/ratelimit.ts'
 import { createSearchKnowledgeBaseTool } from './tools/searchKnowledgeBase.ts'
@@ -8,7 +8,7 @@ import { createWebSearchTool } from './tools/webSearch.ts'
 import { createGrepDocsTool } from './tools/grepDocs.ts'
 import { createCustomSkillsTool } from './tools/customSkills.ts'
 import { toolDefToAISDK } from './tools/mcpAdapter.ts'
-import type { RequestContext } from './tools/types.ts'
+import  { type RequestContext } from './tools/types.ts'
 import { resolveProvider } from './agent/provider.ts'
 import { persistTurn } from './agent/persist.ts'
 
@@ -102,20 +102,20 @@ const stripDsmlTransform = () => {
   })
 }
 
-const ALLOWED_ORIGINS = [
+const ALLOWED_ORIGINS = new Set([
   'https://iguide.chat',
   'https://app.iguide.chat',
   'http://localhost:5173',
   'http://localhost:3000',
-]
+])
 
 const PREVIEW_ORIGIN_PATTERNS: RegExp[] = [
   /^https:\/\/[a-z0-9-]+\.iguide-6d0\.pages\.dev$/i,
 ]
 
 function isAllowedOrigin(origin: string | undefined): origin is string {
-  if (!origin) return false
-  if (ALLOWED_ORIGINS.includes(origin)) return true
+  if (!origin) {return false}
+  if (ALLOWED_ORIGINS.has(origin)) {return true}
   return PREVIEW_ORIGIN_PATTERNS.some((re) => re.test(origin))
 }
 
@@ -207,7 +207,7 @@ app.post(
     }
 
     // Build tools only if user query is substantive
-    const lastMessage = messages[messages.length - 1]
+    const lastMessage = messages.at(-1)
     const lastContent = lastMessage?.content
     const userText =
       typeof lastContent === 'string'
@@ -331,7 +331,7 @@ app.post('/api/search', async (c) => {
   if (primaryUrl) {
     try {
       res = await fetchQmd(primaryUrl, body, c.env.QMD_API_KEY || '', 15000)
-      if (!res.ok) res = null
+      if (!res.ok) {res = null}
     } catch {
       console.warn(`[QMD] Primary node (${qmdRegion}) failed`)
       res = null

@@ -7,7 +7,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ThinkingStep } from "../../types";
+import { type ThinkingStep } from "../../types";
 
 interface ThinkingProcessProps {
   steps: ThinkingStep[];
@@ -52,9 +52,9 @@ export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({
     wasThinking.current = isThinking;
   }, [isThinking]);
 
-  if (steps.length === 0 && !isThinking) return null;
+  if (steps.length === 0 && !isThinking) {return null;}
 
-  const latestStep = steps[steps.length - 1];
+  const latestStep = steps.at(-1);
 
   return (
     <div className="mb-2">

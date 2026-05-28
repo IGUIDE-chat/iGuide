@@ -8,7 +8,7 @@
 import React from "react";
 import DormList from "../../components/housing/DormList";
 import AIChat from "../../components/housing/AIChat";
-import { Language } from "../../types";
+import { type Language } from "../../types";
 
 interface DormListPageProps {
   language: Language;

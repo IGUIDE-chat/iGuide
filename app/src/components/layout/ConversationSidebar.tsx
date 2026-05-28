@@ -8,20 +8,20 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { Typewriter } from "../ui/Typewriter";
-import { ConversationSummary } from "../../types";
+import { type ConversationSummary } from "../../types";
 import { conversationService } from "../../services/conversationService";
 import { localConversationService } from "../../services/localConversationService";
 import { useAuth } from "../../contexts/AuthContext";
 import {
   BaseSidebar,
-  SidebarItem,
-  PinButton,
   DeleteButton,
-  SidebarLoadingSpinner,
+  PinButton,
   SidebarEmptyState,
-  groupByCategory,
+  SidebarItem,
+  SidebarLoadingSpinner,
+  type TimeCategoryLabels,
   getCategoryOrder,
-  TimeCategoryLabels,
+  groupByCategory,
 } from "./BaseSidebar";
 
 interface ConversationSidebarProps {
@@ -87,7 +87,7 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
       const service = user ? conversationService : localConversationService;
       const { data, error } = await service.getUserConversations();
 
-      if (error) throw error;
+      if (error) {throw error;}
 
       if (data) {
         const summaries: ConversationSummary[] = data.map((conv) => ({
@@ -124,7 +124,7 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
         conversationId,
         !isPinned
       );
-      if (error) throw error;
+      if (error) {throw error;}
 
       // Reload conversations
       loadConversations();
@@ -143,12 +143,12 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
   };
 
   const confirmDelete = async () => {
-    if (!showDeleteConfirm) return;
+    if (!showDeleteConfirm) {return;}
 
     try {
       const service = user ? conversationService : localConversationService;
       const { error } = await service.deleteConversation(showDeleteConfirm);
-      if (error) throw error;
+      if (error) {throw error;}
 
       if (showDeleteConfirm === currentConversationId) {
         onNewConversation();

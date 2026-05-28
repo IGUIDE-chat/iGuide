@@ -5,36 +5,36 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { Language } from "../../../types";
+import { type Language } from "../../../types";
 import {
-  BathroomScope,
-  BathroomType,
-  DiningType,
-  Dorm,
-  DormTag,
-  TagCategory,
+  type BathroomScope,
+  type BathroomType,
+  type DiningType,
+  type Dorm,
+  type DormTag,
+  type TagCategory,
 } from "../types/index";
 import {
-  Snowflake,
-  Hammer,
-  Building2,
-  Dumbbell,
-  Music,
-  Store,
   BookOpen,
-  WashingMachine,
-  CookingPot,
+  Building2,
   Bus,
-  Monitor,
-  LibraryBig,
-  Volume2,
-  PartyPopper,
+  CookingPot,
+  Dumbbell,
   Globe,
   GraduationCap,
+  Hammer,
+  LibraryBig,
+  Monitor,
+  Music,
   Palette,
+  PartyPopper,
+  Snowflake,
+  Store,
   UsersRound,
+  Volume2,
+  WashingMachine,
 } from "lucide-react";
-import { ComponentType } from "react";
+import { type ComponentType } from "react";
 
 export interface LocalizedCopy {
   en: string;
@@ -306,7 +306,7 @@ export const HOUSING_TYPE_OPTIONS: HousingTypeOption[] = [
   },
 ];
 
-export const LOCATION_PRESETS: LocalizedOption<string>[] = [
+export const LOCATION_PRESETS: Array<LocalizedOption<string>> = [
   { value: "Ikenberry", en: "Ikenberry", zh: "Ikenberry" },
   { value: "Main Quad", en: "Main Quad", zh: "Main Quad" },
   { value: "PAR/FAR", en: "PAR/FAR", zh: "PAR/FAR" },
@@ -314,20 +314,20 @@ export const LOCATION_PRESETS: LocalizedOption<string>[] = [
   { value: "South Campus", en: "South Campus", zh: "South Campus" },
 ];
 
-export const DINING_OPTIONS: LocalizedOption<DiningType>[] = [
+export const DINING_OPTIONS: Array<LocalizedOption<DiningType>> = [
   { value: "inside", en: "On-site", zh: "楼内" },
   { value: "nearby", en: "Nearby", zh: "附近" },
   { value: "none", en: "None", zh: "无" },
 ];
 
-export const BATHROOM_SCOPE_OPTIONS: LocalizedOption<BathroomScope>[] = [
+export const BATHROOM_SCOPE_OPTIONS: Array<LocalizedOption<BathroomScope>> = [
   { value: "communal", en: "Communal", zh: "公共卫浴" },
   { value: "individual-use", en: "Communal Single-Use", zh: "公共单人卫浴" },
   { value: "semi-private", en: "Semi-Private", zh: "半独立卫浴" },
   { value: "private", en: "Private", zh: "独立卫浴" },
 ];
 
-export const BATHROOM_TYPE_OPTIONS: LocalizedOption<BathroomType>[] = [
+export const BATHROOM_TYPE_OPTIONS: Array<LocalizedOption<BathroomType>> = [
   ...BATHROOM_SCOPE_OPTIONS,
   { value: "mixed", en: "Mixed", zh: "混合卫浴" },
 ];
@@ -375,7 +375,7 @@ export function getDimensionOptionLabel<T extends string>(
 
 export function mergeLocationOptions(locationsFromData: string[]) {
   const seen = new Set<string>();
-  const merged: LocalizedOption<string>[] = [];
+  const merged: Array<LocalizedOption<string>> = [];
 
   for (const preset of LOCATION_PRESETS) {
     if (locationsFromData.includes(preset.value)) {

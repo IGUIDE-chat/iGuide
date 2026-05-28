@@ -7,7 +7,7 @@
 
 import React, { Suspense } from "react";
 import { Navigate, Route, Routes, useParams } from "react-router-dom";
-import { Language } from "../types";
+import { type Language } from "../types";
 
 const ChatPage = React.lazy(() => import("../pages/chat/ChatPage"));
 const LibraryHomePage = React.lazy(

@@ -7,15 +7,15 @@
 
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Dorm } from "../types/index";
+import { type Dorm } from "../types/index";
 import { getPriceRangeFromData } from "../constants/pricing";
 import { useDormData } from "../store/HousingDataContext";
 import { useHousingFilters } from "../store/HousingContext";
 import { useSharedDormInteraction } from "../store/DormUserInteractionContext";
 import { useLayout } from "../../../contexts/LayoutContext";
-import { Language } from "../../../types";
+import { type Language } from "../../../types";
 import { filterAndSortDorms, normalizePriceRange } from "./filtering";
-import { DormListText } from "./types";
+import { type DormListText } from "./types";
 import {
   DEFAULT_FAVORITES_TARGET,
   DEFAULT_TOGGLE_TARGET,

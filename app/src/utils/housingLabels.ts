@@ -5,7 +5,7 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { RoomType } from "../components/housing/types/index";
+import { type RoomType } from "../components/housing/types/index";
 import { getRoomCodeLabel } from "./roomOptions";
 
 export const getRoomTypeLabel = (

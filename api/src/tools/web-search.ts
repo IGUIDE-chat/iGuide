@@ -1,5 +1,5 @@
-import type { ToolRegistry } from './registry'
-import { ToolDefinition, ToolResult, RequestContext } from './types'
+import  { type ToolRegistry } from './registry'
+import { type RequestContext, type ToolDefinition, type ToolResult } from './types'
 
 interface TavilyResponse {
   results?: Array<{
@@ -117,7 +117,7 @@ export function createWebSearchTool(registry: ToolRegistry): ToolDefinition {
         const results = data.results || []
 
         // Sort by priority (UIUC official first)
-        const sorted = results.sort(
+        const sorted = results.toSorted(
           (a, b) =>
             getResultPriority(b.url, b.score) -
             getResultPriority(a.url, a.score)

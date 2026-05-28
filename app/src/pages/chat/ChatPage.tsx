@@ -8,7 +8,7 @@
 import React from "react";
 import { ChatRuntimeProvider } from "../../components/chat/ChatRuntimeProvider";
 import { ChatThread } from "../../components/chat/ChatThread";
-import { Language } from "../../types";
+import { type Language } from "../../types";
 
 interface ChatPageProps {
   language: Language;

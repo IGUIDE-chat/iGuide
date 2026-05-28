@@ -7,7 +7,7 @@
 
 import React from "react";
 import { History, Loader2 } from "lucide-react";
-import { DormEditFormState } from "./useDormEditForm";
+import { type DormEditFormState } from "./useDormEditForm";
 
 interface HistoryTabProps {
   form: DormEditFormState;

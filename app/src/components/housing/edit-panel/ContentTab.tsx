@@ -8,7 +8,7 @@
 import React from "react";
 import { RotateCcw } from "lucide-react";
 import { LOCATION_PRESETS } from "../constants/metadata";
-import { DormEditFormState } from "./useDormEditForm";
+import { type DormEditFormState } from "./useDormEditForm";
 import { EditableList, Field, inputCls } from "./EditPanelFields";
 
 interface ContentTabProps {

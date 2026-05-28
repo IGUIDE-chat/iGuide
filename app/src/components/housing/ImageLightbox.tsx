@@ -6,8 +6,8 @@
  */
 
 import React, { useCallback, useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { X, ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronLeft, ChevronRight, X, ZoomIn, ZoomOut } from "lucide-react";
 
 interface LightboxImage {
   src: string;
@@ -47,9 +47,9 @@ const ImageLightbox: React.FC<ImageLightboxProps> = ({
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-      if (e.key === "ArrowRight" && hasMultiple) goNext();
-      if (e.key === "ArrowLeft" && hasMultiple) goPrev();
+      if (e.key === "Escape") {onClose();}
+      if (e.key === "ArrowRight" && hasMultiple) {goNext();}
+      if (e.key === "ArrowLeft" && hasMultiple) {goPrev();}
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);

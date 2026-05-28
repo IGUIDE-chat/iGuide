@@ -7,11 +7,11 @@
 
 // [HOOK] Local state management for dorm comments and votes.
 // [钩子] 管理宿舍评论和投票的本地状态。
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "../../../contexts/AuthContext";
 import {
+  type DormComment,
   dormCommentsService,
-  DormComment,
 } from "../../../services/dormCommentsService";
 import { SHOW_GOOGLE_REVIEWS } from "../constants/featureFlags";
 
@@ -61,7 +61,7 @@ export function useDormComments(dormId: string) {
       const guestVotes = getGuestVotes();
       const merged = data.map((c) => {
         const gv = guestVotes[c.id];
-        if (gv == null) return c;
+        if (gv == null) {return c;}
         return {
           ...c,
           myVote: gv,
@@ -100,7 +100,7 @@ export function useDormComments(dormId: string) {
   const voteOnComment = async (commentId: string, vote: 1 | -1 | null) => {
     // Google Reviews 模拟评论不写 Supabase（防御性守卫）
     if (commentId.startsWith("gm-")) {
-      if (!user) setGuestVote(commentId, vote);
+      if (!user) {setGuestVote(commentId, vote);}
     } else if (user) {
       await dormCommentsService.voteOnComment(commentId, vote);
     } else {
@@ -111,13 +111,13 @@ export function useDormComments(dormId: string) {
     // Optimistic UI update (works for both guest and logged-in)
     setComments((prev) =>
       prev.map((c) => {
-        if (c.id !== commentId) return c;
+        if (c.id !== commentId) {return c;}
         const prevVote = c.myVote;
         let { upvotes, downvotes } = c;
-        if (prevVote === 1) upvotes--;
-        if (prevVote === -1) downvotes--;
-        if (vote === 1) upvotes++;
-        if (vote === -1) downvotes++;
+        if (prevVote === 1) {upvotes--;}
+        if (prevVote === -1) {downvotes--;}
+        if (vote === 1) {upvotes++;}
+        if (vote === -1) {downvotes++;}
         return { ...c, upvotes, downvotes, myVote: vote };
       })
     );

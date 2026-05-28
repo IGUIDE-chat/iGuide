@@ -5,9 +5,9 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { MapPin, Snowflake, Utensils, Bath } from "lucide-react";
-import { Dorm, DormTag } from "./types/index";
-import { Language } from "../../types";
+import { Bath, MapPin, Snowflake, Utensils } from "lucide-react";
+import { type Dorm, type DormTag } from "./types/index";
+import { type Language } from "../../types";
 import {
   TAG_REGISTRY,
   getHousingTypeMeta,

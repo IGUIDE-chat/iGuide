@@ -7,7 +7,7 @@
 
 import React, {
   Component,
-  ReactNode,
+  type ReactNode,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -15,13 +15,13 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { Dorm } from "./types/index";
+import { type Dorm } from "./types/index";
 import { useHousingMapUi } from "./store/HousingContext";
-import { CAMPUS_LANDMARKS, CAMPUS_ZONES, Landmark } from "./constants/mapData";
-import { Language } from "../../types";
+import { CAMPUS_LANDMARKS, CAMPUS_ZONES, type Landmark } from "./constants/mapData";
+import { type Language } from "../../types";
 import Map, {
   Layer,
-  MapRef,
+  type MapRef,
   NavigationControl,
   Popup,
   Source,
@@ -36,12 +36,12 @@ import { DEFAULT_CENTER, DEFAULT_ZOOM } from "./dorm-map/mapConstants";
 import { registerMapAssets } from "./dorm-map/mapAssets";
 import { getHousingTypeMeta } from "./constants/metadata";
 import {
-  buildLandmarksLayer,
-  buildZonesFillLayer,
-  buildZonesLabelLayer,
   CLUSTERS_LAYER,
   CLUSTER_COUNT_LAYER,
   UNCLUSTERED_LAYER,
+  buildLandmarksLayer,
+  buildZonesFillLayer,
+  buildZonesLabelLayer,
 } from "./dorm-map/layers";
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || "";
@@ -194,12 +194,12 @@ const DormMap: React.FC<DormMapProps> = ({
   );
 
   const visibleLandmarks = useMemo(() => {
-    if (!showLandmarks) return [];
+    if (!showLandmarks) {return [];}
     return safeLandmarks;
   }, [showLandmarks, safeLandmarks]);
 
   const handleViewportChange = useCallback(() => {
-    if (!mapRef.current) return;
+    if (!mapRef.current) {return;}
     if (safeDorms.length === 0) {
       setVisibleDorms([]);
       return;
@@ -223,7 +223,7 @@ const DormMap: React.FC<DormMapProps> = ({
   }, [visibleDorms, onVisibleDormsChange]);
 
   useLayoutEffect(() => {
-    if (!isMapReady || !isVisible) return;
+    if (!isMapReady || !isVisible) {return;}
     const visible = handleViewportChange();
     if (visible) {
       setVisibleDorms(visible);
@@ -231,7 +231,7 @@ const DormMap: React.FC<DormMapProps> = ({
   }, [isMapReady, isVisible, handleViewportChange]);
 
   useEffect(() => {
-    if (!isVisible || !isMapReady || !mapRef.current) return;
+    if (!isVisible || !isMapReady || !mapRef.current) {return;}
 
     if (fitBoundsTimerRef.current) {
       clearTimeout(fitBoundsTimerRef.current);
@@ -239,8 +239,8 @@ const DormMap: React.FC<DormMapProps> = ({
 
     fitBoundsTimerRef.current = setTimeout(() => {
       const map = mapRef.current;
-      if (!map) return;
-      if (safeDorms.length === 0) return;
+      if (!map) {return;}
+      if (safeDorms.length === 0) {return;}
 
       try {
         const coordinates = safeDorms.map(
@@ -273,7 +273,7 @@ const DormMap: React.FC<DormMapProps> = ({
 
   useEffect(() => {
     if (!isVisible || !isMapReady || !mapRef.current || !containerRef.current)
-      return;
+      {return;}
 
     const map = mapRef.current;
     const container = containerRef.current;
@@ -284,15 +284,15 @@ const DormMap: React.FC<DormMapProps> = ({
     const timeouts: number[] = [];
 
     const resizeIfSized = () => {
-      if (!map || !container.isConnected) return false;
+      if (!map || !container.isConnected) {return false;}
       if (container.clientWidth === 0 || container.clientHeight === 0)
-        return false;
+        {return false;}
       map.resize();
       return true;
     };
 
     const runStabilizedResize = () => {
-      if (!resizeIfSized()) return false;
+      if (!resizeIfSized()) {return false;}
 
       rafOne = window.requestAnimationFrame(() => {
         resizeIfSized();
@@ -307,7 +307,7 @@ const DormMap: React.FC<DormMapProps> = ({
     };
 
     const queueRetry = () => {
-      if (retryTimer) return;
+      if (retryTimer) {return;}
       retryTimer = window.setTimeout(() => {
         retryTimer = null;
         runStabilizedResize();
@@ -354,7 +354,7 @@ const DormMap: React.FC<DormMapProps> = ({
   }, [safeDorms, hoveredDorm]);
 
   useEffect(() => {
-    if (!isMapReady || !mapRef.current) return;
+    if (!isMapReady || !mapRef.current) {return;}
     const map = mapRef.current.getMap();
     if (disableScrollZoom) {
       map.scrollZoom.disable();
@@ -382,7 +382,7 @@ const DormMap: React.FC<DormMapProps> = ({
   }, []);
 
   useEffect(() => {
-    if (!isMapReady || !mapRef.current) return;
+    if (!isMapReady || !mapRef.current) {return;}
 
     const map = mapRef.current.getMap();
     const ensureAssets = () => setAreMapImagesReady(registerMapAssets(map));
@@ -409,7 +409,7 @@ const DormMap: React.FC<DormMapProps> = ({
   const onMapClick = useCallback(
     (event: mapboxgl.MapLayerMouseEvent) => {
       const feature = event.features?.[0];
-      if (!feature) return;
+      if (!feature) {return;}
 
       const clusterId = feature.properties?.cluster_id;
       const map = mapRef.current?.getMap();
@@ -418,7 +418,7 @@ const DormMap: React.FC<DormMapProps> = ({
         (map.getSource("dorms") as any).getClusterExpansionZoom(
           clusterId,
           (error: unknown, zoom: number) => {
-            if (error) return;
+            if (error) {return;}
             map.easeTo({
               center: (feature.geometry as any).coordinates,
               zoom,
@@ -447,9 +447,9 @@ const DormMap: React.FC<DormMapProps> = ({
         mapRef.current.getCanvas().style.cursor = "pointer";
       }
       const feature = event.features?.[0];
-      if (!feature || feature.properties?.cluster_id) return;
+      if (!feature || feature.properties?.cluster_id) {return;}
       const dormId = feature.properties?.id;
-      if (!dormId) return;
+      if (!dormId) {return;}
 
       const dorm = dorms.find((item) => item.id === dormId);
       if (dorm) {
@@ -709,11 +709,11 @@ const PopupDormPreview: React.FC<{
   const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
 
   const tryOpen = (e: React.PointerEvent) => {
-    if (!pointerStartRef.current) return;
+    if (!pointerStartRef.current) {return;}
     const dx = e.clientX - pointerStartRef.current.x;
     const dy = e.clientY - pointerStartRef.current.y;
     pointerStartRef.current = null;
-    if (Math.hypot(dx, dy) > POPUP_TAP_PX) return;
+    if (Math.hypot(dx, dy) > POPUP_TAP_PX) {return;}
     onOpenDetails();
   };
 
@@ -729,7 +729,7 @@ const PopupDormPreview: React.FC<{
         }
       }}
       onPointerDown={(e) => {
-        if (e.pointerType === "mouse" && e.button !== 0) return;
+        if (e.pointerType === "mouse" && e.button !== 0) {return;}
         pointerStartRef.current = { x: e.clientX, y: e.clientY };
       }}
       onPointerUp={(e) => {

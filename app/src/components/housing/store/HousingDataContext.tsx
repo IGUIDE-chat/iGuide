@@ -6,15 +6,15 @@
  */
 
 import React, {
+  type ReactNode,
   createContext,
-  useContext,
-  useState,
-  useEffect,
   useCallback,
+  useContext,
+  useEffect,
   useMemo,
-  ReactNode,
+  useState,
 } from "react";
-import { Dorm } from "../types/index";
+import { type Dorm } from "../types/index";
 import { housingService } from "../../../services/housingService";
 
 interface HousingDataContextType {

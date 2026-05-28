@@ -49,8 +49,8 @@ function aggregateComment(
   let myVote: 1 | -1 | null = null;
 
   for (const v of raw.dorm_comment_votes) {
-    if (v.vote === 1) upvotes++;
-    else if (v.vote === -1) downvotes++;
+    if (v.vote === 1) {upvotes++;}
+    else if (v.vote === -1) {downvotes++;}
     if (currentUserId && v.user_id === currentUserId) {
       myVote = v.vote as 1 | -1;
     }
@@ -94,9 +94,9 @@ export const dormCommentsService = {
     const statsMap: Record<string, { total: number; up: number }> = {};
     for (const row of data ?? []) {
       const id = row.dorm_id as string;
-      if (!statsMap[id]) statsMap[id] = { total: 0, up: 0 };
+      if (!statsMap[id]) {statsMap[id] = { total: 0, up: 0 };}
       statsMap[id].total++;
-      if (row.dorm_vote === 1) statsMap[id].up++;
+      if (row.dorm_vote === 1) {statsMap[id].up++;}
     }
 
     const result: Record<string, DormCommentStats> = {};
@@ -144,7 +144,7 @@ export const dormCommentsService = {
     dormVote: 1 | -1 | null
   ): Promise<DormComment> {
     const user = await authService.getCurrentUser();
-    if (!user) throw new Error("User not authenticated");
+    if (!user) {throw new Error("User not authenticated");}
 
     const display_name = user.email?.split("@")[0] ?? "Anonymous";
 
@@ -176,7 +176,7 @@ export const dormCommentsService = {
    */
   async deleteComment(commentId: string): Promise<void> {
     const user = await authService.getCurrentUser();
-    if (!user) throw new Error("User not authenticated");
+    if (!user) {throw new Error("User not authenticated");}
 
     const { error } = await supabase
       .from("dorm_comments")
@@ -195,7 +195,7 @@ export const dormCommentsService = {
    */
   async voteOnComment(commentId: string, vote: 1 | -1 | null): Promise<void> {
     const user = await authService.getCurrentUser();
-    if (!user) throw new Error("User not authenticated");
+    if (!user) {throw new Error("User not authenticated");}
 
     if (vote === null) {
       const { error } = await supabase

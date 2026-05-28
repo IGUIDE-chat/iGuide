@@ -6,7 +6,7 @@
  */
 
 // [ROOT] Global constants and static library metadata.
-import { Article, Category, Language } from "./types";
+import { type Article, type Category, type Language } from "./types";
 import { UI_TEXT as I18N_UI_TEXT } from "./i18n/uiText";
 
 /** @deprecated Use UI_TEXT from './i18n/uiText' directly. */

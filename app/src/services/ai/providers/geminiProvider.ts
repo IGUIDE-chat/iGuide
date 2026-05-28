@@ -5,7 +5,7 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { AIProvider, ChatHistoryItem } from "../types";
+import { type AIProvider, type ChatHistoryItem } from "../types";
 
 // Security: API key is NEVER in the frontend bundle.
 // All Gemini calls go through CF Pages Function /api/gemini which injects GOOGLE_API_KEY server-side.

@@ -1,8 +1,8 @@
-import type {
-  MCPAdapterClient,
-  MCPDiscoveryResult,
-  MCPFailureReason,
-  MCPTestResult,
+import  {
+  type MCPAdapterClient,
+  type MCPDiscoveryResult,
+  type MCPFailureReason,
+  type MCPTestResult,
 } from './adapter.ts'
 import {
   MCPConnectionService,
@@ -10,11 +10,11 @@ import {
   MCPToolOverrideService,
 } from './service.ts'
 import { StreamableHttpMCPClient } from './streamable-http-client.ts'
-import type {
-  MCPConnection,
-  MCPConnectionTransport,
-  MCPDiscoveredTool,
-  MCPToolOverride,
+import  {
+  type MCPConnection,
+  type MCPConnectionTransport,
+  type MCPDiscoveredTool,
+  type MCPToolOverride,
 } from './types.ts'
 
 const INTEGRATIONS_LIMITATIONS = [

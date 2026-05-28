@@ -5,7 +5,7 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { ChatMessage } from "../types/index";
+import { type ChatMessage } from "../types/index";
 
 export const INITIAL_CHAT_MESSAGE: ChatMessage = {
   id: "welcome",

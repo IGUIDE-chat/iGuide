@@ -6,12 +6,12 @@
  */
 
 import {
-  BathroomScope,
-  BathroomType,
-  Dorm,
-  FloorPlan,
-  RoomOption,
-  RoomType,
+  type BathroomScope,
+  type BathroomType,
+  type Dorm,
+  type FloorPlan,
+  type RoomOption,
+  type RoomType,
 } from "../components/housing/types/index";
 
 const LEGACY_CODE_RE = /^(\d)B(\d)B$/;
@@ -159,7 +159,7 @@ function inferScopeFromDescription(
   fallback: BathroomScope
 ): BathroomScope {
   const text = description?.toLowerCase() ?? "";
-  if (!text) return fallback;
+  if (!text) {return fallback;}
 
   if (
     text.includes("community bathroom") ||
@@ -239,13 +239,13 @@ export function buildRoomLabelCode(
     return specialType;
   }
   if (option.bedCount == null) {
-    return undefined;
+    return;
   }
   if (option.bathroomScope === "communal") {
     return `${option.bedCount}B0B`;
   }
   if (option.bathroomCount == null) {
-    return undefined;
+    return;
   }
 
   return `${option.bedCount}B${option.bathroomCount}B`;
@@ -341,7 +341,7 @@ function getEnglishStandardOccupancyLabel(bedCounts: number[]) {
     (count, index) => index === 0 || count - bedCounts[index - 1] === 1
   );
   if (isContiguous && labels.length >= 3) {
-    return `${labels[0]}-${labels[labels.length - 1]}`;
+    return `${labels[0]}-${labels.at(-1)}`;
   }
 
   return labels.join("/");
@@ -356,7 +356,7 @@ function getChineseStandardOccupancyLabel(bedCounts: number[]) {
     (count, index) => index === 0 || count - bedCounts[index - 1] === 1
   );
   if (isContiguous && bedCounts.length >= 4) {
-    return `${getChineseBedStem(bedCounts[0])}-${getBedCountLabel(bedCounts[bedCounts.length - 1], "zh")}`;
+    return `${getChineseBedStem(bedCounts[0])}-${getBedCountLabel(bedCounts.at(-1), "zh")}`;
   }
 
   return `${bedCounts.map((count) => getChineseBedStem(count)).join("/")}人间`;
@@ -429,7 +429,7 @@ export function getRoomRangeSummary(
   roomOptions: RoomOption[],
   language: "en" | "zh"
 ): RoomRangeSummary {
-  if (!roomOptions.length) {
+  if (roomOptions.length === 0) {
     const fallback = language === "zh" ? "房型多样" : "Multiple layouts";
     return {
       occupancyLabel: fallback,
@@ -452,7 +452,7 @@ export function getRoomRangeSummary(
         )
         .map((option) => option.bedCount as number)
     )
-  ).sort((a, b) => a - b);
+  ).toSorted((a, b) => a - b);
   const specialLabels = Array.from(
     new Set(
       uniqueOptions
@@ -463,10 +463,10 @@ export function getRoomRangeSummary(
 
   const occupancyParts: string[] = [];
 
-  if (specialLabels.length) {
+  if (specialLabels.length > 0) {
     occupancyParts.push(getSpecialOccupancyLabel(specialLabels, language));
   }
-  if (standardBedCounts.length) {
+  if (standardBedCounts.length > 0) {
     occupancyParts.push(getStandardOccupancyLabel(standardBedCounts, language));
   }
 

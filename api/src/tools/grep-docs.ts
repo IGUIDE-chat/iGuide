@@ -1,6 +1,6 @@
 import { callSupabaseRpc } from '../lib/supabase-rpc'
-import type { ToolRegistry } from './registry'
-import { ToolDefinition, ToolResult, RequestContext } from './types'
+import  { type ToolRegistry } from './registry'
+import { type RequestContext, type ToolDefinition, type ToolResult } from './types'
 
 interface KeywordSearchArgs {
   pattern: string
@@ -24,7 +24,7 @@ function formatResults(results: KeywordSearchResult[]): string {
 
   return results
     .map((result) => {
-      const snippet = result.content.substring(0, 300)
+      const snippet = result.content.slice(0, 300)
       return `## ${result.title}\nURL: ${result.url}\nRelevance: ${result.fts_rank.toFixed(2)}\n\n${snippet}\n---`
     })
     .join('\n')

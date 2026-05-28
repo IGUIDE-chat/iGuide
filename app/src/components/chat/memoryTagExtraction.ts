@@ -27,14 +27,14 @@ export function extractMemoryTags(
       /<conv_memory>([\s\S]*?)<\/conv_memory>/
     );
 
-    if (userSoulMatch) userSoul = userSoulMatch[1].trim();
-    if (userMemoryMatch) userMemory = userMemoryMatch[1].trim();
-    if (convMemoryMatch) convMemory = convMemoryMatch[1].trim();
+    if (userSoulMatch) {userSoul = userSoulMatch[1].trim();}
+    if (userMemoryMatch) {userMemory = userMemoryMatch[1].trim();}
+    if (convMemoryMatch) {convMemory = convMemoryMatch[1].trim();}
 
     cleaned = cleaned
-      .replace(/<user_soul>[\s\S]*?<\/user_soul>/g, "")
-      .replace(/<user_memory>[\s\S]*?<\/user_memory>/g, "")
-      .replace(/<conv_memory>[\s\S]*?<\/conv_memory>/g, "")
+      .replaceAll(/<user_soul>[\s\S]*?<\/user_soul>/g, "")
+      .replaceAll(/<user_memory>[\s\S]*?<\/user_memory>/g, "")
+      .replaceAll(/<conv_memory>[\s\S]*?<\/conv_memory>/g, "")
       .trim();
   } catch {
     // Regex failed — return original text uncleaned
@@ -43,9 +43,9 @@ export function extractMemoryTags(
 
   // Clean up unclosed/partial tags that would leak into visible text
   cleaned = cleaned
-    .replace(/<user_soul>[\s\S]*/g, "")
-    .replace(/<user_memory>[\s\S]*/g, "")
-    .replace(/<conv_memory>[\s\S]*/g, "")
+    .replaceAll(/<user_soul>[\s\S]*/g, "")
+    .replaceAll(/<user_memory>[\s\S]*/g, "")
+    .replaceAll(/<conv_memory>[\s\S]*/g, "")
     .trim();
 
   return { userSoul, userMemory, convMemory, cleaned };

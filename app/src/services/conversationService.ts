@@ -5,9 +5,9 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { supabase, type Message } from "./supabase";
+import { type Message, supabase } from "./supabase";
 import { authService } from "./authService";
-import { ChatMessage } from "../types";
+import { type ChatMessage } from "../types";
 
 export const conversationService = {
   /**
@@ -18,7 +18,7 @@ export const conversationService = {
     title: string = "新对话"
   ) {
     const user = await authService.getCurrentUser();
-    if (!user) throw new Error("User not authenticated");
+    if (!user) {throw new Error("User not authenticated");}
 
     const { data, error } = await supabase
       .from("conversations")
@@ -38,7 +38,7 @@ export const conversationService = {
    */
   async getUserConversations() {
     const user = await authService.getCurrentUser();
-    if (!user) throw new Error("User not authenticated");
+    if (!user) {throw new Error("User not authenticated");}
 
     const { data, error } = await supabase
       .from("conversations")
@@ -70,7 +70,7 @@ export const conversationService = {
    */
   async getConversation(conversationId: string) {
     const user = await authService.getCurrentUser();
-    if (!user) throw new Error("User not authenticated");
+    if (!user) {throw new Error("User not authenticated");}
 
     // Validate UUID format to prevent "invalid input syntax" errors
     const uuidRegex =
@@ -99,7 +99,7 @@ export const conversationService = {
       .update({ last_viewed_at: new Date().toISOString() })
       .eq("id", conversationId)
       .then(({ error }) => {
-        if (error) console.error("Failed to update last_viewed_at:", error);
+        if (error) {console.error("Failed to update last_viewed_at:", error);}
       });
 
     const { data: messages, error: msgError } = await supabase

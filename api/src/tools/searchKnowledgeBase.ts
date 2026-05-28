@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { getEmbeddingConfig } from '../lib/embedding-config.ts'
 import { EmbeddingClient } from '../lib/embeddings.ts'
 import { callSupabaseRpc } from '../lib/supabase-rpc.ts'
-import type { RequestContext } from './types.ts'
+import  { type RequestContext } from './types.ts'
 
 interface HybridSearchResult {
   chunk_id: string
@@ -91,7 +91,7 @@ export function createSearchKnowledgeBaseTool(ctx: RequestContext) {
         } catch (rpcError) {
           const message =
             rpcError instanceof Error ? rpcError.message : String(rpcError)
-          throw new Error(`Search failed: ${message}`)
+          throw new Error(`Search failed: ${message}`, { cause: rpcError })
         }
       }
 
@@ -110,7 +110,7 @@ export function createSearchKnowledgeBaseTool(ctx: RequestContext) {
       } catch (rpcError) {
         const message =
           rpcError instanceof Error ? rpcError.message : String(rpcError)
-        throw new Error(`Search failed: ${message}`)
+        throw new Error(`Search failed: ${message}`, { cause: rpcError })
       }
     },
   })

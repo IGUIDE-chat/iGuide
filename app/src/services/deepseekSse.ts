@@ -1,4 +1,4 @@
-import type { StreamChunk } from "./ai/types";
+import  { type StreamChunk } from "./ai/types";
 
 type StreamLanguage = "en" | "zh";
 
@@ -39,8 +39,8 @@ function getReasoningLabel(lang: StreamLanguage): string {
 }
 
 function stringifyDetail(value: unknown): string | undefined {
-  if (value == null) return undefined;
-  if (typeof value === "string") return value;
+  if (value == null) {return undefined;}
+  if (typeof value === "string") {return value;}
 
   try {
     return JSON.stringify(value);
@@ -64,7 +64,7 @@ function parseLegacyDelta(
     payload as { choices?: Array<{ delta?: Record<string, unknown> }> }
   ).choices?.[0]?.delta;
 
-  if (!delta) return [];
+  if (!delta) {return [];}
 
   if (typeof delta.reasoning_content === "string" && delta.reasoning_content) {
     if (!state.isInReasoning) {
@@ -155,24 +155,24 @@ export function parseDeepSeekSSELine(
 ): StreamChunk[] {
   const trimmed = line.trim();
 
-  if (!trimmed || trimmed === "data: [DONE]") return [];
+  if (!trimmed || trimmed === "data: [DONE]") {return [];}
 
   if (trimmed.startsWith("event:")) {
     state.currentEvent = trimmed.slice(6).trim();
     return [];
   }
 
-  if (!trimmed.startsWith("data:")) return [];
+  if (!trimmed.startsWith("data:")) {return [];}
 
   const jsonStr = trimmed.slice(5).trim();
-  if (!jsonStr || jsonStr === "[DONE]" || jsonStr === '"[DONE]"') return [];
+  if (!jsonStr || jsonStr === "[DONE]" || jsonStr === '"[DONE]"') {return [];}
 
   try {
     const payload = JSON.parse(jsonStr);
 
     if (state.currentEvent) {
       const workerChunks = parseWorkerEvent(state.currentEvent, payload, lang);
-      if (workerChunks.length || state.currentEvent === "done") {
+      if (workerChunks.length > 0 || state.currentEvent === "done") {
         return workerChunks;
       }
     }

@@ -2,8 +2,8 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 
 import { DEFAULT_MAX_ITERATIONS, evaluateStopCondition } from './bounds.ts'
-import type { Observation } from './observation.ts'
-import type { ProviderToolCall } from './messages.ts'
+import  { type Observation } from './observation.ts'
+import  { type ProviderToolCall } from './messages.ts'
 
 function toolCall(name = 'web_search'): ProviderToolCall {
   return {

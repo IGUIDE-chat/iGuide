@@ -10,7 +10,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import { Language } from "../../types";
+import { type Language } from "../../types";
 import { memoryService } from "../../services/memoryService";
 import { IntegrationsSection } from "./IntegrationsSection";
 
@@ -41,13 +41,13 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
   // Load soul and memory on mount
   useEffect(() => {
-    if (!user) return;
+    if (!user) {return;}
     void memoryService.getSoul(user.id).then(setSoul);
     void memoryService.getUserMemory(user.id).then(setUserMemory);
   }, [user]);
 
   const handleSaveSoul = async () => {
-    if (!user) return;
+    if (!user) {return;}
     setIsSoulSaving(true);
     await memoryService.updateSoul(user.id, soul);
     setIsSoulSaving(false);
@@ -55,7 +55,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   };
 
   const handleSaveMemory = async () => {
-    if (!user) return;
+    if (!user) {return;}
     setIsMemorySaving(true);
     await memoryService.updateUserMemory(user.id, userMemory);
     setIsMemorySaving(false);
@@ -71,7 +71,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           : "Clear all AI memory about you?"
       )
     )
-      return;
+      {return;}
     setUserMemory("");
     await memoryService.updateUserMemory(user.id, "");
   };
@@ -145,7 +145,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     }
   };
 
-  if (!user) return null;
+  if (!user) {return null;}
 
   return (
     <div className="size-full overflow-y-auto bg-white">

@@ -14,7 +14,7 @@ import {
   getCategoryText,
 } from "../../constants";
 import { UI_TEXT } from "../../i18n/uiText";
-import { Language } from "../../types";
+import { type Language } from "../../types";
 
 interface LibraryHomePageProps {
   language: Language;
@@ -33,7 +33,7 @@ const LibraryHomePage: React.FC<LibraryHomePageProps> = ({ language }) => {
   }, [language]);
 
   const filteredArticles = useMemo(() => {
-    if (!localQuery) return [];
+    if (!localQuery) {return [];}
     const query = localQuery.toLowerCase();
     return localizedArticles.filter(
       (article) =>

@@ -5,9 +5,9 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { Dorm } from "../types/index";
-import { Landmark } from "../constants/mapData";
-import { DormFeatureProperties, LandmarkFeatureProperties } from "./types";
+import { type Dorm } from "../types/index";
+import { type Landmark } from "../constants/mapData";
+import { type DormFeatureProperties, type LandmarkFeatureProperties } from "./types";
 
 export const buildLandmarkFeatureCollection = (landmarks: Landmark[]) => ({
   type: "FeatureCollection" as const,

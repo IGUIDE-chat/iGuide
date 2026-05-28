@@ -14,7 +14,7 @@ import {
   getCategoryText,
 } from "../../constants";
 import { UI_TEXT } from "../../i18n/uiText";
-import { Language } from "../../types";
+import { type Language } from "../../types";
 
 interface LibraryCategoryPageProps {
   language: Language;

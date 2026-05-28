@@ -3,10 +3,10 @@ import { motion } from "framer-motion";
 import {
   ChevronLeft,
   ChevronRight,
-  ThumbsUp,
   ExternalLink,
+  ThumbsUp,
 } from "lucide-react";
-import { Language } from "../../types";
+import { type Language } from "../../types";
 import { dormDetailTexts } from "./i18n/dormTexts";
 
 interface DormDetailGalleryProps {

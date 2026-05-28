@@ -7,7 +7,7 @@
 
 // [DATA] Article content for Grainger Library guide.
 // [数据] 格兰杰图书馆指南的文章内容。
-import { Article } from "../../types";
+import { type Article } from "../../types";
 
 export const graingerLibrary: Article = {
   id: "grainger-library",

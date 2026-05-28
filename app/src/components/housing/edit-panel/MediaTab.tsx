@@ -15,7 +15,7 @@ import {
   Upload,
   X,
 } from "lucide-react";
-import { BathroomScope, BedSize, FloorPlan } from "../types/index";
+import { type BathroomScope, type BedSize, type FloorPlan } from "../types/index";
 import {
   BATHROOM_SCOPE_OPTIONS,
   getLocalizedLabel,
@@ -26,8 +26,8 @@ import {
 } from "../../../utils/roomOptions";
 import { EditableList, Field, Toggle, inputCls } from "./EditPanelFields";
 import {
+  type DormEditFormState,
   createFloorPlan,
-  DormEditFormState,
   getLayoutKind,
 } from "./useDormEditForm";
 
@@ -281,7 +281,7 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                     <button
                       type="button"
                       onClick={() => {
-                        if (index > 0) moveFloorPlan(index, index - 1);
+                        if (index > 0) {moveFloorPlan(index, index - 1);}
                       }}
                       disabled={index === 0}
                       className="
@@ -298,7 +298,7 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                       type="button"
                       onClick={() => {
                         if (index < form.normalizedFloorPlans.length - 1)
-                          moveFloorPlan(index, index + 1);
+                          {moveFloorPlan(index, index + 1);}
                       }}
                       disabled={index === form.normalizedFloorPlans.length - 1}
                       className="
@@ -352,12 +352,12 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                         form.setFloorPlans((current) =>
                           current.filter((_, i) => i !== index)
                         );
-                        if (expandedIndex === index) setExpandedIndex(null);
+                        if (expandedIndex === index) {setExpandedIndex(null);}
                         else if (
                           expandedIndex !== null &&
                           expandedIndex > index
                         )
-                          setExpandedIndex(expandedIndex - 1);
+                          {setExpandedIndex(expandedIndex - 1);}
                       }}
                       className="
                         shrink-0 text-red-400
@@ -579,7 +579,7 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                       onChange={(urls) =>
                         update(
                           {
-                            photoUrls: urls.length ? urls : undefined,
+                            photoUrls: urls.length > 0 ? urls : undefined,
                             photoUrl: undefined,
                           },
                           false
@@ -597,7 +597,7 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                       onChange={(urls) =>
                         update(
                           {
-                            imageUrls: urls.length ? urls : undefined,
+                            imageUrls: urls.length > 0 ? urls : undefined,
                             imageUrl: undefined,
                           },
                           false

@@ -1,6 +1,6 @@
 import { tool } from 'ai'
 import { z } from 'zod'
-import type { ToolDefinition, RequestContext } from './types.ts'
+import  { type RequestContext, type ToolDefinition } from './types.ts'
 
 /**
  * Convert a ToolDefinition (JSON Schema-based) into an AI SDK tool() object.

@@ -1,12 +1,12 @@
-import type {
-  MCPAdapterClient,
-  MCPCallResult,
-  MCPDiscoveredTool,
-  MCPDiscoveryResult,
-  MCPFailureReason,
-  MCPTestResult,
+import  {
+  type MCPAdapterClient,
+  type MCPCallResult,
+  type MCPDiscoveredTool,
+  type MCPDiscoveryResult,
+  type MCPFailureReason,
+  type MCPTestResult,
 } from './adapter'
-import type { ToolResult } from '../tools/types'
+import  { type ToolResult } from '../tools/types'
 
 const JSON_RPC_VERSION = '2.0'
 const PROTOCOL_VERSION = '2024-11-05'

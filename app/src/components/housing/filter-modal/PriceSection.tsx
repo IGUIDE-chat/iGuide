@@ -14,7 +14,7 @@ import React, {
   useState,
 } from "react";
 import Slider from "rc-slider";
-import { HISTOGRAM_DATA, ModalText } from "./modalText";
+import { HISTOGRAM_DATA, type ModalText } from "./modalText";
 
 interface PriceSectionProps {
   t: ModalText;
@@ -41,7 +41,7 @@ const PriceSection: React.FC<PriceSectionProps> = ({
   const flushPending = useCallback(() => {
     frameRef.current = null;
     const pending = pendingRangeRef.current;
-    if (!pending) return;
+    if (!pending) {return;}
     pendingRangeRef.current = null;
     onChange(pending);
   }, [onChange]);
@@ -49,7 +49,7 @@ const PriceSection: React.FC<PriceSectionProps> = ({
   const queueRangeChange = useCallback(
     (nextRange: [number, number]) => {
       pendingRangeRef.current = nextRange;
-      if (frameRef.current !== null) return;
+      if (frameRef.current !== null) {return;}
       frameRef.current = window.requestAnimationFrame(flushPending);
     },
     [flushPending]
@@ -131,12 +131,12 @@ const PriceSection: React.FC<PriceSectionProps> = ({
           step={100}
           value={value}
           onChange={(val) => {
-            if (!Array.isArray(val) || val.length !== 2) return;
+            if (!Array.isArray(val) || val.length !== 2) {return;}
             const next = normalizeRange([Number(val[0]), Number(val[1])]);
             queueRangeChange(next);
           }}
           onChangeComplete={(val) => {
-            if (!Array.isArray(val) || val.length !== 2) return;
+            if (!Array.isArray(val) || val.length !== 2) {return;}
             const next = normalizeRange([Number(val[0]), Number(val[1])]);
             commitRangeChange(next);
           }}
@@ -192,7 +192,7 @@ const PriceSection: React.FC<PriceSectionProps> = ({
                 commitMinInput(e.target.value);
               }}
               onKeyDown={(e) => {
-                if (e.key !== "Enter") return;
+                if (e.key !== "Enter") {return;}
                 commitMinInput((e.currentTarget as HTMLInputElement).value);
                 e.currentTarget.blur();
               }}
@@ -227,7 +227,7 @@ const PriceSection: React.FC<PriceSectionProps> = ({
                 commitMaxInput(e.target.value);
               }}
               onKeyDown={(e) => {
-                if (e.key !== "Enter") return;
+                if (e.key !== "Enter") {return;}
                 commitMaxInput((e.currentTarget as HTMLInputElement).value);
                 e.currentTarget.blur();
               }}

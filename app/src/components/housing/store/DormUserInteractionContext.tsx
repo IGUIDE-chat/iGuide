@@ -5,10 +5,10 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { createContext, useContext, ReactNode } from "react";
+import React, { type ReactNode, createContext, useContext } from "react";
 import { useDormUserInteraction } from "../hooks/useDormUserInteraction";
-import { Dorm } from "../types/index";
-import { DormFavorite } from "../../../services/dormFavoritesService";
+import { type Dorm } from "../types/index";
+import { type DormFavorite } from "../../../services/dormFavoritesService";
 
 interface DormUserInteractionContextType {
   favorites: string[];

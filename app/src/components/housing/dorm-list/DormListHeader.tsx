@@ -6,10 +6,10 @@
  */
 
 import React from "react";
-import { Search, Map as MapIcon, List, SlidersHorizontal } from "lucide-react";
+import { List, Map as MapIcon, Search, SlidersHorizontal } from "lucide-react";
 import { motion } from "framer-motion";
 import SortingDropdown from "../SortingDropdown";
-import { DormListText } from "./types";
+import { type DormListText } from "./types";
 
 interface DormListHeaderProps {
   t: DormListText;

@@ -1,12 +1,12 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import {
-  toThreadMessage,
   fromThreadMessage,
   isChatMessage,
   isThreadMessageLike,
+  toThreadMessage,
 } from "../messageAdapter";
-import type { ChatMessage, ThinkingStep } from "../../../../types";
+import  { type ChatMessage, type ThinkingStep } from "../../../../types";
 
 describe("messageAdapter", () => {
   const mockThinkingStep: ThinkingStep = {

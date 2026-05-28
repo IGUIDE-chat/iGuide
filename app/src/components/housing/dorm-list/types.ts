@@ -6,11 +6,11 @@
  */
 
 import {
-  BathroomCountFilter,
-  BathroomScope,
-  BedCountFilter,
-  DormTag,
-  FilterOption,
+  type BathroomCountFilter,
+  type BathroomScope,
+  type BedCountFilter,
+  type DormTag,
+  type FilterOption,
 } from "../types/index";
 
 export interface DormListText {

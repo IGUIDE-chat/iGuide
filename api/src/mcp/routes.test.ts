@@ -1,12 +1,12 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
-import type {
-  MCPConnection,
-  MCPDiscoveredTool,
-  MCPToolOverride,
+import  {
+  type MCPConnection,
+  type MCPDiscoveredTool,
+  type MCPToolOverride,
 } from './types.ts'
-import type { MCPDiscoveryResult, MCPTestResult } from './adapter.ts'
+import  { type MCPDiscoveryResult, type MCPTestResult } from './adapter.ts'
 import { maybeHandleIntegrationsRoute } from './routes.ts'
 
 interface MockServices {
@@ -107,8 +107,8 @@ function createServices(overrides: Partial<MockServices> = {}): MockServices {
             }
           : null,
       deleteUserConnection: async (id) => id === baseConnection.id,
-      recordTestResult: async () => undefined,
-      recordDiscoveryResult: async () => undefined,
+      recordTestResult: async () => {},
+      recordDiscoveryResult: async () => {},
     },
     tools: {
       listByConnectionIds: async () => ({
@@ -123,7 +123,7 @@ function createServices(overrides: Partial<MockServices> = {}): MockServices {
           },
         ],
       }),
-      replaceDiscoveredTools: async () => undefined,
+      replaceDiscoveredTools: async () => {},
     },
     overrides: {
       disableTool: async (connectionId, toolName, viewerId) => ({

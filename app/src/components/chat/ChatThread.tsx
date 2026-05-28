@@ -4,7 +4,7 @@
  */
 
 import * as React from "react";
-import { Language } from "../../types";
+import { type Language } from "../../types";
 import { UI_TEXT } from "../../i18n/uiText";
 import { ChatEmptyState } from "./ChatEmptyState";
 import { UserMessage } from "./messages/UserMessage";
@@ -27,7 +27,7 @@ export const ChatThread = ({ language }: ChatThreadProps) => {
 
   React.useEffect(() => {
     const node = viewportRef.current;
-    if (!node) return;
+    if (!node) {return;}
     node.scrollTop = node.scrollHeight;
   }, [messageCount, ctx?.isLoading]);
 

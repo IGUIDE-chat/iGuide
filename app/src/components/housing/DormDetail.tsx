@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { motion, AnimatePresence, Variants } from "framer-motion";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { AnimatePresence, type Variants, motion } from "framer-motion";
 import { ArrowLeft, Heart, Pencil } from "lucide-react";
 import { TAG_REGISTRY } from "./constants/metadata";
 import { useSharedDormInteraction } from "./store/DormUserInteractionContext";
@@ -8,8 +8,8 @@ import { useDormData } from "./store/HousingDataContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { dormService } from "../../services/dormService";
 import { useDormComments } from "./hooks/useDormComments";
-import { Dorm, DormTag } from "./types/index";
-import { Language } from "../../types";
+import { type Dorm, type DormTag } from "./types/index";
+import { type Language } from "../../types";
 import DormEditPanel from "./DormEditPanel";
 import ImageLightbox from "./ImageLightbox";
 import { dormDetailTexts } from "./i18n/dormTexts";
@@ -85,23 +85,23 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
   const [editOpen, setEditOpen] = useState(false);
   const [heroImageIndex, setHeroImageIndex] = useState(0);
   const [lightbox, setLightbox] = useState<{
-    images: { src: string; alt?: string; label?: string }[];
+    images: Array<{ src: string; alt?: string; label?: string }>;
     index: number;
   } | null>(null);
 
   const t = dormDetailTexts[language];
 
   useEffect(() => {
-    if (!id) return;
+    if (!id) {return;}
     const fromCtx = getFromContext(id);
-    if (fromCtx) setDorm(fromCtx);
+    if (fromCtx) {setDorm(fromCtx);}
     dormService.getDormById(id).then((d) => {
-      if (d) setDorm(d);
+      if (d) {setDorm(d);}
     });
   }, [id, getFromContext]);
 
   useEffect(() => {
-    if (dorm) addToHistory(dorm);
+    if (dorm) {addToHistory(dorm);}
   }, [dorm?.id, addToHistory]);
 
   useEffect(() => {
@@ -110,7 +110,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
 
   useEffect(() => {
     if (location.hash === "#reviews" && dorm) {
-      const el = document.getElementById("reviews");
+      const el = document.querySelector("#reviews");
       if (el) {
         setTimeout(
           () => el.scrollIntoView({ behavior: "smooth", block: "start" }),
@@ -248,13 +248,13 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
 
   const sortedPlans = (dorm.floorPlans ?? [])
     .map((p) => normalizeFloorPlan(p, p.bathroomScope ?? defaultPlanScope))
-    .sort((a, b) => {
+    .toSorted((a, b) => {
       const bedDelta = (a.bedCount ?? 99) - (b.bedCount ?? 99);
-      if (bedDelta !== 0) return bedDelta;
+      if (bedDelta !== 0) {return bedDelta;}
       const priceDelta =
         (getPublishedPlanPrice(a) ?? Number.POSITIVE_INFINITY) -
         (getPublishedPlanPrice(b) ?? Number.POSITIVE_INFINITY);
-      if (priceDelta !== 0) return priceDelta;
+      if (priceDelta !== 0) {return priceDelta;}
       return (a.officialName ?? a.labelCode ?? "").localeCompare(
         b.officialName ?? b.labelCode ?? ""
       );
@@ -263,12 +263,12 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
   const pricedPlans = sortedPlans.filter(
     (plan) => getPublishedPlanPrice(plan) != null
   );
-  const minPrice = pricedPlans.length
+  const minPrice = pricedPlans.length > 0
     ? Math.min(
         ...pricedPlans.map((plan) => getPublishedPlanPrice(plan) as number)
       )
     : null;
-  const maxPrice = pricedPlans.length
+  const maxPrice = pricedPlans.length > 0
     ? Math.max(
         ...pricedPlans.map((plan) => getPublishedPlanPrice(plan) as number)
       )
@@ -409,7 +409,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
               }}
               onReviewClick={() => {
                 document
-                  .getElementById("reviews")
+                  .querySelector("#reviews")
                   ?.scrollIntoView({ behavior: "smooth", block: "start" });
               }}
             />

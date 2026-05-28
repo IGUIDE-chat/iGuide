@@ -9,7 +9,7 @@ import React, { Suspense, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { GitCompareArrows, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Language } from "../../types";
+import { type Language } from "../../types";
 import { useAuth } from "../../contexts/AuthContext";
 import { FilterModal } from "./FilterModal";
 import DormListHeader from "./dorm-list/DormListHeader";

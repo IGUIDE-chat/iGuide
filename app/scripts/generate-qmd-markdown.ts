@@ -11,11 +11,11 @@ import dotenv from "dotenv";
 import { createClient } from "@supabase/supabase-js";
 
 import { ARTICLES } from "../src/data/articles/index";
-import type { Article } from "../src/types";
+import  { type Article } from "../src/types";
 import { UIUC_DORMS } from "../src/components/housing/constants/dormData";
-import type {
-  Dorm,
-  BathroomScope,
+import  {
+  type BathroomScope,
+  type Dorm,
 } from "../src/components/housing/types/index";
 import {
   finalizeDormRecord,
@@ -26,7 +26,7 @@ import {
   normalizeDorm,
 } from "../src/utils/roomOptions";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __dirname = import.meta.dirname;
 const PROJECT_ROOT = path.resolve(__dirname, "..");
 const QMD_ROOT = path.resolve(PROJECT_ROOT, "../qmd-content");
 const HANDBOOK_OCR_SCRIPT = path.resolve(
@@ -58,11 +58,11 @@ interface Frontmatter {
 }
 
 function sanitizeLine(value: string | undefined | null) {
-  return (value ?? "").replace(/\r\n/g, "\n").trim();
+  return (value ?? "").replaceAll('\r\n', "\n").trim();
 }
 
 function sanitizeParagraph(value: string | undefined | null) {
-  return sanitizeLine(value).replace(/\n{3,}/g, "\n\n");
+  return sanitizeLine(value).replaceAll(/\n{3,}/g, "\n\n");
 }
 
 function yamlString(value: string) {
@@ -95,7 +95,7 @@ function renderFrontmatter(frontmatter: Frontmatter) {
 function renderBulletList(items: Array<string | undefined>, emptyText: string) {
   const normalized = items.map((item) => sanitizeLine(item)).filter(Boolean);
 
-  if (!normalized.length) {
+  if (normalized.length === 0) {
     return `- ${emptyText}`;
   }
 
@@ -629,7 +629,7 @@ export async function generateQmdMarkdown() {
 
 const isDirectRun =
   typeof process.argv[1] === "string" &&
-  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+  path.resolve(process.argv[1]) === import.meta.filename;
 
 if (isDirectRun) {
   generateQmdMarkdown().catch((error) => {

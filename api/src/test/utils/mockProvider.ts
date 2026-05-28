@@ -202,7 +202,7 @@ export function createMockProviderFetch(
   const mockFetch = (async (input, init) => {
     requests.push({ input, init, body: parseRequestBody(init) })
     const response = queue.shift() ??
-      responses[responses.length - 1] ?? {
+      responses.at(-1) ?? {
         content: 'mock response',
       }
 

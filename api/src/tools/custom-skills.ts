@@ -1,8 +1,8 @@
 import campusNavigationSkill from '../skills/campus_navigation.json'
 import compareDormsSkill from '../skills/compare_dorms.json'
 import findByCriteriaSkill from '../skills/find_by_criteria.json'
-import { ToolRegistry } from './registry'
-import type { ToolDefinition, ToolResult } from './types'
+import { type ToolRegistry } from './registry'
+import  { type ToolDefinition, type ToolResult } from './types'
 
 type SkillParameterType = 'string' | 'number' | 'boolean'
 
@@ -175,7 +175,7 @@ function expandPromptTemplate(
   template: string,
   parameters: Record<string, unknown>
 ): string {
-  return template.replace(/{{\s*([a-zA-Z0-9_]+)\s*}}/g, (match, key) => {
+  return template.replaceAll(/{{\s*([a-zA-Z0-9_]+)\s*}}/g, (match, key) => {
     if (!(key in parameters)) {
       return match
     }

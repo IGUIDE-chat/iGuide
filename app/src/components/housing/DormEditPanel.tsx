@@ -9,8 +9,8 @@
 // [组件] 管理员编辑面板入口，将表单 hook、外壳和各 Tab 组件组合在一起。
 import React from "react";
 import { FileText, History, Image, Info, Tag } from "lucide-react";
-import { Dorm } from "./types/index";
-import { Language } from "../../types";
+import { type Dorm } from "./types/index";
+import { type Language } from "../../types";
 import { useDormEditForm } from "./edit-panel/useDormEditForm";
 import { DormEditPanelShell } from "./edit-panel/DormEditPanelShell";
 import { ContentTab } from "./edit-panel/ContentTab";

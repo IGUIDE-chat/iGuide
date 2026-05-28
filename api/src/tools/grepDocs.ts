@@ -1,7 +1,7 @@
 import { tool } from 'ai'
 import { z } from 'zod'
 import { callSupabaseRpc } from '../lib/supabase-rpc.ts'
-import type { RequestContext } from './types.ts'
+import  { type RequestContext } from './types.ts'
 
 interface KeywordSearchResult {
   id: string
@@ -19,7 +19,7 @@ function formatResults(results: KeywordSearchResult[]): string {
 
   return results
     .map((result) => {
-      const snippet = result.content.substring(0, 300)
+      const snippet = result.content.slice(0, 300)
       return `## ${result.title}\nURL: ${result.url}\nRelevance: ${result.fts_rank.toFixed(2)}\n\n${snippet}\n---`
     })
     .join('\n')

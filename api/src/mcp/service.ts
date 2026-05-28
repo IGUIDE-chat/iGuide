@@ -1,14 +1,14 @@
-import type {
-  MCPConnection,
-  MCPDiscoveredTool,
-  MCPToolOverride,
+import  {
+  type MCPConnection,
+  type MCPDiscoveredTool,
+  type MCPToolOverride,
 } from './types.ts'
-import type {
-  MCPAdapterClient,
-  MCPDiscoveryResult,
-  MCPTestResult,
+import  {
+  type MCPAdapterClient,
+  type MCPDiscoveryResult,
+  type MCPTestResult,
 } from './adapter.ts'
-import { createMCPStore, type MCPStore } from './store.ts'
+import { type MCPStore, createMCPStore } from './store.ts'
 import { StreamableHttpMCPClient } from './streamable-http-client.ts'
 import { tool } from 'ai'
 import { z } from 'zod'
@@ -402,10 +402,10 @@ export interface RegisterRuntimeMCPToolsOptions {
 function jsonSchemaToZod(schema: Record<string, unknown>): z.ZodTypeAny {
   const type = schema.type as string | undefined
 
-  if (type === 'string') return z.string()
-  if (type === 'number') return z.number()
-  if (type === 'integer') return z.number().int()
-  if (type === 'boolean') return z.boolean()
+  if (type === 'string') {return z.string()}
+  if (type === 'number') {return z.number()}
+  if (type === 'integer') {return z.number().int()}
+  if (type === 'boolean') {return z.boolean()}
   if (type === 'array') {
     const items = schema.items as Record<string, unknown> | undefined
     return items ? z.array(jsonSchemaToZod(items)) : z.array(z.any())
@@ -462,7 +462,7 @@ export async function registerRuntimeMCPTools({
           continue
         }
 
-        const sanitizedConnectionId = connection.id.replace(/-/g, '_')
+        const sanitizedConnectionId = connection.id.replaceAll('-', '_')
         const toolKey = `mcp_${sanitizedConnectionId}_${mcpTool.name}`
         const zodSchema = jsonSchemaToZod(mcpTool.input_schema)
 

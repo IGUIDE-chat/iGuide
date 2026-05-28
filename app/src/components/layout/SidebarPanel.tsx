@@ -6,7 +6,7 @@
  */
 
 import React from "react";
-import { Language } from "../../types";
+import { type Language } from "../../types";
 import { ConversationSidebar } from "./ConversationSidebar";
 import { LibrarySidebar } from "./LibrarySidebar";
 import { DormSidebar } from "./DormSidebar";

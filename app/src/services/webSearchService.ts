@@ -101,7 +101,7 @@ async function runTavilySearch(
     search_depth: searchDepth,
     max_results: maxResults,
   };
-  if (includeDomains?.length) body.include_domains = includeDomains;
+  if (includeDomains?.length) {body.include_domains = includeDomains;}
 
   const response = await fetch(TAVILY_PROXY_URL, {
     method: "POST",
@@ -162,7 +162,7 @@ export async function webSearchWithOfficialPriority(
   const uniqueQueries = [
     ...new Set(queries.map((query) => query.trim()).filter(Boolean)),
   ];
-  if (!uniqueQueries.length) return [];
+  if (uniqueQueries.length === 0) {return [];}
 
   try {
     const officialResults = (
@@ -178,7 +178,7 @@ export async function webSearchWithOfficialPriority(
     ).flat();
 
     const mergedOfficialResults = mergeWebResults(officialResults)
-      .sort((a, b) => getResultPriority(b) - getResultPriority(a))
+      .toSorted((a, b) => getResultPriority(b) - getResultPriority(a))
       .slice(0, maxResults);
 
     const hasEnoughOfficialResults =
@@ -196,7 +196,7 @@ export async function webSearchWithOfficialPriority(
     ).flat();
 
     return mergeWebResults([...mergedOfficialResults, ...fallbackResults])
-      .sort((a, b) => getResultPriority(b) - getResultPriority(a))
+      .toSorted((a, b) => getResultPriority(b) - getResultPriority(a))
       .slice(0, maxResults);
   } catch (err) {
     console.warn("[WebSearch] Official-priority search failed:", err);

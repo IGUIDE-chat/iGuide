@@ -5,7 +5,7 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { Dorm, DormCategorizedTags, FloorPlan } from "../types/index";
+import { type Dorm, type DormCategorizedTags, type FloorPlan } from "../types/index";
 
 export type DormOverride = Partial<
   Omit<
@@ -27,7 +27,7 @@ const DRUPAL_STYLE_RE = /\/sites\/default\/files\/styles\/[^/]+\/public\//;
 const PEOPLE_FILENAME_RE = /(students?|group|parent|famil)/i;
 
 export function normalizeOfficialMediaUrl(url: string) {
-  let next = url.replace(/&amp;/g, "&").trim();
+  let next = url.replaceAll('&amp;', "&").trim();
 
   if (DRUPAL_STYLE_RE.test(next)) {
     next = next.replace(DRUPAL_STYLE_RE, "/sites/default/files/");
@@ -41,7 +41,7 @@ export function normalizeOfficialMediaUrl(url: string) {
 }
 
 export function isLikelyLowQualityMediaUrl(url: string) {
-  const trimmed = url.replace(/&amp;/g, "&").trim();
+  const trimmed = url.replaceAll('&amp;', "&").trim();
   return normalizeOfficialMediaUrl(trimmed) !== trimmed;
 }
 

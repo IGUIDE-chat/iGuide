@@ -5,9 +5,9 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { Dorm } from "../types/index";
+import { type Dorm } from "../types/index";
 import {
-  DormOverride,
+  type DormOverride,
   normalizeOverrideMedia,
 } from "./dormOfficialOverrideUtils";
 import { PCH_OFFICIAL_OVERRIDES } from "./dormOfficialOverridesPch";
