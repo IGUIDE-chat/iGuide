@@ -70,7 +70,7 @@
     "no-shadow": "warn",
     "no-duplicate-imports": "off",
     "no-nested-ternary": "warn",
-    "sort-imports": "warn",
+    "sort-imports": ["warn", { "ignoreDeclarationSort": true, "allowSeparatedGroups": true }],
     "max-params": ["warn", { "max": 4 }],
     "no-underscore-dangle": "off",
     "no-template-curly-in-string": "warn",
@@ -265,7 +265,14 @@
       "rules": {
         "no-console": "off",
         "node/no-path-concat": "warn",
-        "node/no-new-require": "warn"
+        "node/no-new-require": "warn",
+        "oxc/no-async-endpoint-handlers": "off"
+      }
+    },
+    {
+      "files": ["**/*.cjs"],
+      "rules": {
+        "unicorn/prefer-top-level-await": "off"
       }
     }
   ]
