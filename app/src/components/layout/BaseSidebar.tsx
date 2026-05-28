@@ -107,9 +107,9 @@ export const BaseSidebar: React.FC<BaseSidebarProps> = ({
       {header}
 
       <div className="no-scrollbar flex-1 overflow-y-auto px-2">
-        {isLoading ? (
-          loadingState
-        ) : hasItems ? (
+        {isLoading && loadingState}
+        {!isLoading && !hasItems && emptyState}
+        {!isLoading && hasItems && (
           <div className="space-y-3">
             {categoryOrder.map((category) => {
               const items = groupedItems[category]
@@ -131,8 +131,6 @@ export const BaseSidebar: React.FC<BaseSidebarProps> = ({
               )
             })}
           </div>
-        ) : (
-          emptyState
         )}
       </div>
     </div>

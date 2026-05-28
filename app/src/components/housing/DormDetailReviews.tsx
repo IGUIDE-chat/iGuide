@@ -130,6 +130,8 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
     }
   }
 
+  const showLessLabel = language === "zh" ? "收起" : "Show less"
+
   return (
     <motion.section
       id="reviews"
@@ -155,7 +157,13 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
             {t.shareExp}
           </h4>
           <div className="mb-3 flex gap-2">
-            {([1, -1] as const).map((vote) => (
+            {([1, -1] as const).map((vote) => {
+              let voteClasses: string
+              if (commentVote === vote && vote === 1) {voteClasses = `border-illini-orange/30 bg-illini-orange/10 text-illini-orange`}
+              else if (commentVote === vote && vote === -1) {voteClasses = "border-red-200 bg-red-50 text-red-600"}
+              else {voteClasses = `border-slate-200 bg-white text-slate-500 hover:border-slate-300`}
+
+              return (
               <motion.button
                 key={vote}
                 type="button"
@@ -164,20 +172,14 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
                 onClick={() =>
                   setCommentVote(commentVote === vote ? null : vote)
                 }
-                className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[12px] font-semibold transition-colors ${
-                  commentVote === vote && vote === 1
-                    ? `border-illini-orange/30 bg-illini-orange/10 text-illini-orange`
-                    : commentVote === vote && vote === -1
-                      ? "border-red-200 bg-red-50 text-red-600"
-                      : `border-slate-200 bg-white text-slate-500 hover:border-slate-300`
-                } `}
+                className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[12px] font-semibold transition-colors ${voteClasses} `}
               >
                 <ThumbsUp
                   className={`size-3.5 ${vote === -1 ? "rotate-180" : ""} ${commentVote === vote && vote === 1 ? "fill-illini-orange/20" : ""}`}
                 />
                 {vote === 1 ? t.thumbsUpDorm : t.thumbsDownDorm}
               </motion.button>
-            ))}
+            )})}
           </div>
           <textarea aria-label="Text input"
             value={commentContent}
@@ -229,15 +231,17 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
         </motion.div>
       )}
 
-      {commentsLoading ? (
+      {commentsLoading && (
         <div className="py-6 text-center text-[13px] text-slate-400">
           {language === "zh" ? "加载中..." : "Loading..."}
         </div>
-      ) : comments.length === 0 ? (
+      )}
+      {!commentsLoading && comments.length === 0 && (
         <p className="py-6 text-center text-[13px] text-slate-400">
           {t.noComments}
         </p>
-      ) : (
+      )}
+      {!commentsLoading && comments.length > 0 && (
         <>
           <div className="mt-4 space-y-3">
             <AnimatePresence>
@@ -351,17 +355,11 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
                         className="hover:text-illini-blue flex items-center gap-1 text-[12px] font-semibold text-slate-400 transition-colors disabled:opacity-50"
                       >
                         <Globe className="size-3.5" />
-                        {translating[comment.id]
-                          ? language === "zh"
-                            ? "翻译中..."
-                            : "Translating..."
-                          : translations[comment.id]
-                            ? language === "zh"
-                              ? "显示原文"
-                              : "Original"
-                            : language === "zh"
-                              ? "翻译"
-                              : "Translate"}
+                        {(() => {
+                          if (translating[comment.id]) {return language === "zh" ? "翻译中..." : "Translating..."}
+                          if (translations[comment.id]) {return language === "zh" ? "显示原文" : "Original"}
+                          return language === "zh" ? "翻译" : "Translate"
+                        })()}
                       </button>
                     )}
                   </div>
@@ -379,9 +377,7 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
               className="w-full rounded-xl border border-white/50 bg-white/40 py-3 text-[13px] font-semibold text-slate-500 backdrop-blur-md transition-colors hover:bg-white/60 hover:text-slate-800 md:text-[14px]"
             >
               {showAllReviews
-                ? language === "zh"
-                  ? "收起"
-                  : "Show less"
+                ? showLessLabel
                 : `${t.viewAllReviews} (${comments.length})`}
             </motion.button>
           )}

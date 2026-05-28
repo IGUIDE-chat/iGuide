@@ -59,6 +59,49 @@ const extractText = (
     .map((p) => p.text)
     .join("")
 
+function DormCardButton({
+  dorm,
+  dormName,
+  onNavigate,
+}: {
+  dorm: { id: string; imageUrl: string; tags: string[] }
+  dormName: string
+  onNavigate: () => void
+}) {
+  return (
+    <button
+      onClick={onNavigate}
+      type="button"
+      className="group hover:border-illini-orange/30 flex w-full items-center gap-3 rounded-xl border border-gray-100/80 bg-linear-to-br from-white/95 to-gray-50/95 p-3 text-left shadow-sm backdrop-blur-md transition-all hover:shadow-md"
+    >
+      <div className="size-16 shrink-0 overflow-hidden rounded-lg bg-gray-100">
+        <img
+          src={dorm.imageUrl}
+          alt={dormName}
+          className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+      </div>
+      <div className="min-w-0 grow">
+        <div className="flex items-start justify-between">
+          <h4 className="group-hover:text-illini-orange truncate text-base font-bold text-gray-900 transition-colors">
+            {dormName}
+          </h4>
+        </div>
+        <div className="mt-1.5 flex flex-wrap gap-1">
+          {dorm.tags.slice(0, 2).map((tag) => (
+            <span
+              key={tag}
+              className="rounded-md border border-gray-100 bg-gray-50 px-1.5 py-0.5 text-[10px] text-gray-500 transition-colors duration-150 hover:border-gray-200 hover:bg-gray-100 hover:text-gray-700"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      </div>
+    </button>
+  )
+}
+
 const AIChat: React.FC<AIChatProps> = ({ language }) => {
   const navigate = useNavigate()
   const [isOpen, setIsOpen] = useState(false)
@@ -196,72 +239,53 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                         : `max-w-full rounded-bl-none border border-gray-100 bg-white text-gray-800`
                     } `}
                   >
-                    {isAssistant && isRecent ? (
-                      <Typewriter
-                        text={text}
-                        mode="stream"
-                        markdown
-                        markdownComponents={dormMarkdownComponents}
-                      />
-                    ) : (isUser ? (
-                      <span className="font-medium whitespace-pre-wrap text-white">
-                        {text}
-                      </span>
-                    ) : (
-                      <div className="prose prose-sm prose-p:leading-relaxed prose-pre:bg-gray-100 prose-pre:overflow-x-auto overflow-wrap-anywhere max-w-none wrap-break-word text-gray-800">
-                        <ReactMarkdown
-                          remarkPlugins={[remarkGfm]}
-                          components={dormMarkdownComponents}
-                        >
-                          {text}
-                        </ReactMarkdown>
-                      </div>
-                    ))}
+                    {(() => {
+                      if (isAssistant && isRecent) {
+                        return (
+                          <Typewriter
+                            text={text}
+                            mode="stream"
+                            markdown
+                            markdownComponents={dormMarkdownComponents}
+                          />
+                        )
+                      }
+                      if (isUser) {
+                        return (
+                          <span className="font-medium whitespace-pre-wrap text-white">
+                            {text}
+                          </span>
+                        )
+                      }
+                      return (
+                        <div className="prose prose-sm prose-p:leading-relaxed prose-pre:bg-gray-100 prose-pre:overflow-x-auto overflow-wrap-anywhere max-w-none wrap-break-word text-gray-800">
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            components={dormMarkdownComponents}
+                          >
+                            {text}
+                          </ReactMarkdown>
+                        </div>
+                      )
+                    })()}
                   </div>
 
                   {isAssistant && mentionedDorms.length > 0 && (
                     <div className="mt-3 ml-2 flex w-full flex-col gap-3">
-                      {mentionedDorms.map((dorm) =>
-                        (() => {
-                          const dormName =
-                            language === "zh" && dorm.name_zh
-                              ? dorm.name_zh
-                              : dorm.name
-                          return (
-                            <button
-                              key={dorm.id}
-                              onClick={() => navigate(`/dorms/${dorm.id}`)}
-                              type="button"
-                              className="group hover:border-illini-orange/30 flex w-full items-center gap-3 rounded-xl border border-gray-100/80 bg-linear-to-br from-white/95 to-gray-50/95 p-3 text-left shadow-sm backdrop-blur-md transition-all hover:shadow-md"
-                            >
-                              <div className="size-16 shrink-0 overflow-hidden rounded-lg bg-gray-100">
-                                <img
-                                  src={dorm.imageUrl}
-                                  alt={dormName}
-                                  className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                />
-                              </div>
-                              <div className="min-w-0 grow">
-                                <div className="flex items-start justify-between">
-                                  <h4 className="group-hover:text-illini-orange truncate text-base font-bold text-gray-900 transition-colors">
-                                    {dormName}
-                                  </h4>
-                                </div>
-                                <div className="mt-1.5 flex flex-wrap gap-1">
-                                  {dorm.tags.slice(0, 2).map((tag) => (
-                                    <span
-                                      key={tag}
-                                      className="rounded-md border border-gray-100 bg-gray-50 px-1.5 py-0.5 text-[10px] text-gray-500 transition-colors duration-150 hover:border-gray-200 hover:bg-gray-100 hover:text-gray-700"
-                                    >
-                                      {tag}
-                                    </span>
-                                  ))}
-                                </div>
-                              </div>
-                            </button>
-                          )
-                        })()
-                      )}
+                      {mentionedDorms.map((dorm) => {
+                        const dormName =
+                          language === "zh" && dorm.name_zh
+                            ? dorm.name_zh
+                            : dorm.name
+                        return (
+                          <DormCardButton
+                            key={dorm.id}
+                            dorm={dorm}
+                            dormName={dormName}
+                            onNavigate={() => navigate(`/dorms/${dorm.id}`)}
+                          />
+                        )
+                      })}
                     </div>
                   )}
                 </motion.div>

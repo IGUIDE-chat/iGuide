@@ -44,6 +44,164 @@ const hasPublishedPlanPrice = (price: FloorPlan["price"]): price is number =>
 const getPublishedPlanPrice = (plan: FloorPlan) =>
   hasPublishedPlanPrice(plan.price) ? plan.price : null
 
+const PlanTitleRow: React.FC<{
+  planDisplayTitle: string
+  normalizedSummary: string | null
+  availabilityBadgeClass: string
+  showCheck: boolean
+  availabilityLabel: string
+  isExpanded: boolean
+}> = ({
+  planDisplayTitle,
+  normalizedSummary,
+  availabilityBadgeClass,
+  showCheck,
+  availabilityLabel,
+  isExpanded,
+}) => (
+  <div className="flex w-full items-center justify-between gap-2 md:justify-start">
+    <div className="flex min-w-0 flex-wrap items-center gap-1.5 md:gap-3">
+      <h4 className="truncate text-[15px] font-extrabold text-slate-900 md:text-[18px]">
+        {planDisplayTitle}
+      </h4>
+      {normalizedSummary && (
+        <span className="text-[12px] font-medium text-slate-500 md:text-[14px]">
+          {normalizedSummary}
+        </span>
+      )}
+      <span
+        className={`flex items-center gap-0.5 rounded-md border px-1.5 py-0.5 text-[10px] font-bold whitespace-nowrap md:gap-1 md:rounded-xl md:px-2.5 md:py-1 md:text-[13px] ${availabilityBadgeClass} `}
+      >
+        {showCheck && (
+          <Check className="size-2.5 md:size-3.5" strokeWidth={3} />
+        )}
+        {availabilityLabel}
+      </span>
+    </div>
+    <motion.div
+      animate={{ rotate: isExpanded ? 180 : 0 }}
+      transition={{ duration: 0.25 }}
+      className="-mr-1 flex shrink-0 items-center justify-center text-slate-400 md:hidden"
+    >
+      <ChevronDown className="size-5" />
+    </motion.div>
+  </div>
+)
+
+const PlanRoomDetails: React.FC<{
+  bedCount: number | null
+  bedLabel: string
+  bathLabel: string
+  sqft: number | null | undefined
+  sqftLabel: string
+}> = ({ bedCount, bedLabel, bathLabel, sqft, sqftLabel }) => (
+  <div className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-slate-600 md:mt-0 md:gap-4">
+    {bedCount !== null && (
+      <>
+        <div className="flex items-center gap-1 md:gap-1.5">
+          <BedSingle className="size-3.5 text-slate-400 md:size-4" />
+          <span className="text-[12px] font-semibold md:text-[14px]">
+            {bedLabel}
+          </span>
+        </div>
+        <div className="size-0.5 rounded-full bg-slate-300 md:size-1" />
+      </>
+    )}
+    <div className="flex items-center gap-1 md:gap-1.5">
+      <Bath className="size-3.5 text-slate-400 md:size-4" />
+      <span className="text-[12px] font-semibold md:text-[14px]">
+        {bathLabel}
+      </span>
+    </div>
+    {sqft && (
+      <>
+        <div className="size-0.5 rounded-full bg-slate-300 md:size-1" />
+        <div className="flex items-center gap-1 md:gap-1.5">
+          <SquareDashed className="size-3.5 text-slate-400 md:size-4" />
+          <span className="text-[12px] font-semibold tabular-nums md:text-[14px]">
+            {sqft} {sqftLabel}
+            <span className="ml-1 font-medium text-slate-400">
+              (~{Math.round(sqft * 0.092903)}㎡)
+            </span>
+          </span>
+        </div>
+      </>
+    )}
+  </div>
+)
+
+const PlanCompareCheckbox: React.FC<{
+  isCompared: boolean
+  label: string
+  onToggle: (e: React.MouseEvent) => void
+}> = ({ isCompared, label, onToggle }) => (
+  <motion.button
+    type="button"
+    initial={{ opacity: 0, scale: 0.9 }}
+    animate={{ opacity: 1, scale: 1 }}
+    whileHover={{ scale: 1.04 }}
+    whileTap={{ scale: 0.96 }}
+    onClick={onToggle}
+    className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[12px] font-semibold transition-colors ${
+      isCompared
+        ? `border-illini-blue/30 bg-illini-blue/5 text-illini-blue`
+        : `border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:text-slate-700`
+    } `}
+  >
+    <div
+      className={`flex size-3.5 items-center justify-center rounded-[4px] border transition-colors ${
+        isCompared
+          ? `border-illini-blue bg-illini-blue text-white`
+          : "border-slate-300"
+      } `}
+    >
+      <AnimatePresence>
+        {isCompared && (
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0 }}
+            transition={{ type: "spring", stiffness: 400, damping: 15 }}
+          >
+            <Check className="size-2.5" strokeWidth={3} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+    {label}
+  </motion.button>
+)
+
+const ExpandedImageNav: React.FC<{
+  language: Language
+  onPrev: (e: React.MouseEvent) => void
+  onNext: (e: React.MouseEvent) => void
+  currentIndex: number
+  totalCount: number
+}> = ({ language, onPrev, onNext, currentIndex, totalCount }) => (
+  <>
+    <button
+      type="button"
+      aria-label={language === "zh" ? "上一张户型图" : "Previous floor plan image"}
+      onClick={onPrev}
+      className="absolute top-1/2 left-3 z-10 flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/35 text-white backdrop-blur-sm transition-colors hover:bg-black/55"
+    >
+      <ChevronLeft className="size-5" />
+    </button>
+    <button
+      type="button"
+      aria-label={language === "zh" ? "下一张户型图" : "Next floor plan image"}
+      onClick={onNext}
+      className="absolute top-1/2 right-3 z-10 flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/35 text-white backdrop-blur-sm transition-colors hover:bg-black/55"
+    >
+      <ChevronRight className="size-5" />
+    </button>
+    <div className="absolute right-3 bottom-3 rounded-full bg-black/40 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
+      {currentIndex + 1} / {totalCount}
+    </div>
+  </>
+)
+
 export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
   sortedPlans,
   defaultPlanScope,
@@ -54,6 +212,7 @@ export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
   onLightboxOpen,
 }) => {
   const t = dormDetailTexts[language]
+  const exitCompareLabel = language === "zh" ? "退出对比" : "Exit Compare"
   const [expandedPlanId, setExpandedPlanId] = useState<string | null>(null)
   const [compareIds, setCompareIds] = useState<string[]>([])
   const [showPlanCompare, setShowPlanCompare] = useState(false)
@@ -94,11 +253,7 @@ export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
           } `}
         >
           <ArrowRightLeft className="size-3.5 md:size-4" />
-          {showPlanCompare
-            ? language === "zh"
-              ? "退出对比"
-              : "Exit Compare"
-            : t.comparePlans}
+          {showPlanCompare ? exitCompareLabel : t.comparePlans}
         </motion.button>
       </div>
 
@@ -127,27 +282,43 @@ export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
                   .filter(Boolean)
                   .join(" · ")
               : labels.secondaryLabel
-          const availabilityLabel =
-            plan.available === false
-              ? language === "zh"
-                ? "暂不可订"
-                : "Sold out"
-              : planPrice === null
-                ? language === "zh"
-                  ? "价格待公布"
-                  : "Price unavailable"
-                : t.available
+          let availabilityLabel: string
+          if (plan.available === false) {
+            availabilityLabel = language === "zh" ? "暂不可订" : "Sold out"
+          } else if (planPrice === null) {
+            availabilityLabel =
+              language === "zh" ? "价格待公布" : "Price unavailable"
+          } else {
+            availabilityLabel = t.available
+          }
 
-          const photos = plan.photoUrls?.length
-            ? plan.photoUrls
-            : plan.photoUrl
-              ? [plan.photoUrl]
-              : []
-          const layouts = plan.imageUrls?.length
-            ? plan.imageUrls
-            : plan.imageUrl
-              ? [plan.imageUrl]
-              : []
+          let availabilityBadgeClass: string
+          if (plan.available === false) {
+            availabilityBadgeClass = "border-red-200 bg-red-50 text-red-600"
+          } else if (planPrice === null) {
+            availabilityBadgeClass =
+              "border-amber-200 bg-amber-50 text-amber-700"
+          } else {
+            availabilityBadgeClass =
+              "border-[#D1FAE5] bg-[#ECFDF5] text-[#059669]"
+          }
+
+          let photos: string[]
+          if (plan.photoUrls?.length) {
+            photos = plan.photoUrls
+          } else if (plan.photoUrl) {
+            photos = [plan.photoUrl]
+          } else {
+            photos = []
+          }
+          let layouts: string[]
+          if (plan.imageUrls?.length) {
+            layouts = plan.imageUrls
+          } else if (plan.imageUrl) {
+            layouts = [plan.imageUrl]
+          } else {
+            layouts = []
+          }
           const thumbSrc = photos[0] || layouts[0]
           const hasThumb = Boolean(thumbSrc) && !imageErrors[`${planKey}-thumb`]
 
@@ -186,6 +357,32 @@ export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
             layouts.length > 0
               ? photos.length + safeExpandedIndex
               : safeExpandedIndex
+
+          let bedLabel: string
+          if (plan.bedSize) {
+            bedLabel = plan.bedSize
+          } else {
+            let bedUnit: string
+            if (language === "zh") {
+              bedUnit = "张床"
+            } else {
+              bedUnit = plan.bedCount === 1 ? "Bed" : "Beds"
+            }
+            bedLabel = `${plan.bedCount} ${bedUnit}`
+          }
+
+          let bathLabel: string
+          if (plan.bathroomCount !== null && plan.bathroomCount > 0) {
+            let bathUnit: string
+            if (language === "zh") {
+              bathUnit = "卫"
+            } else {
+              bathUnit = plan.bathroomCount === 1 ? "Bath" : "Baths"
+            }
+            bathLabel = `${plan.bathroomCount} ${bathUnit}`
+          } else {
+            bathLabel = planBathroomLabel
+          }
 
           return (
             <motion.div
@@ -228,82 +425,22 @@ export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
 
                 <div className="flex min-w-0 flex-1 flex-col justify-between gap-1 md:h-28 md:flex-row md:gap-0">
                   <div className="flex h-full min-w-0 flex-col justify-center gap-1.5 py-0.5 md:gap-3">
-                    <div className="flex w-full items-center justify-between gap-2 md:justify-start">
-                      <div className="flex min-w-0 flex-wrap items-center gap-1.5 md:gap-3">
-                        <h4 className="truncate text-[15px] font-extrabold text-slate-900 md:text-[18px]">
-                          {planDisplayTitle}
-                        </h4>
-                        {normalizedSummary && (
-                          <span className="text-[12px] font-medium text-slate-500 md:text-[14px]">
-                            {normalizedSummary}
-                          </span>
-                        )}
-                        <span
-                          className={`flex items-center gap-0.5 rounded-md border px-1.5 py-0.5 text-[10px] font-bold whitespace-nowrap md:gap-1 md:rounded-xl md:px-2.5 md:py-1 md:text-[13px] ${
-                            plan.available === false
-                              ? "border-red-200 bg-red-50 text-red-600"
-                              : planPrice === null
-                                ? `border-amber-200 bg-amber-50 text-amber-700`
-                                : `border-[#D1FAE5] bg-[#ECFDF5] text-[#059669]`
-                          } `}
-                        >
-                          {plan.available !== false && planPrice !== null && (
-                            <Check
-                              className="size-2.5 md:size-3.5"
-                              strokeWidth={3}
-                            />
-                          )}
-                          {availabilityLabel}
-                        </span>
-                      </div>
-                      <motion.div
-                        animate={{ rotate: isExpanded ? 180 : 0 }}
-                        transition={{ duration: 0.25 }}
-                        className="-mr-1 flex shrink-0 items-center justify-center text-slate-400 md:hidden"
-                      >
-                        <ChevronDown className="size-5" />
-                      </motion.div>
-                    </div>
+                    <PlanTitleRow
+                      planDisplayTitle={planDisplayTitle}
+                      normalizedSummary={normalizedSummary}
+                      availabilityBadgeClass={availabilityBadgeClass}
+                      showCheck={plan.available !== false && planPrice !== null}
+                      availabilityLabel={availabilityLabel}
+                      isExpanded={isExpanded}
+                    />
 
-                    <div className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-slate-600 md:mt-0 md:gap-4">
-                      {plan.bedCount !== null && (
-                        <>
-                          <div className="flex items-center gap-1 md:gap-1.5">
-                            <BedSingle className="size-3.5 text-slate-400 md:size-4" />
-                            <span className="text-[12px] font-semibold md:text-[14px]">
-                              {plan.bedSize
-                                ? plan.bedSize
-                                : `${plan.bedCount} ${language === "zh" ? "张床" : plan.bedCount === 1 ? "Bed" : "Beds"}`}
-                            </span>
-                          </div>
-                          <div className="size-0.5 rounded-full bg-slate-300 md:size-1" />
-                        </>
-                      )}
-                      <div className="flex items-center gap-1 md:gap-1.5">
-                        <Bath className="size-3.5 text-slate-400 md:size-4" />
-                        <span className="text-[12px] font-semibold md:text-[14px]">
-                          {plan.bathroomCount !== null && plan.bathroomCount > 0
-                            ? `${plan.bathroomCount} ${language === "zh" ? "卫" : plan.bathroomCount === 1 ? "Bath" : "Baths"}`
-                            : planBathroomLabel}
-                        </span>
-                      </div>
-                      {plan.sqft && (
-                        <>
-                          <div className="size-0.5 rounded-full bg-slate-300 md:size-1" />
-                          <div className="flex items-center gap-1 md:gap-1.5">
-                            <SquareDashed className="size-3.5 text-slate-400 md:size-4" />
-                            <span className="text-[12px] font-semibold tabular-nums md:text-[14px]">
-                              {plan.sqft}{" "}
-                              {t.sqft ||
-                                (language === "zh" ? "平方英尺" : "sqft")}
-                              <span className="ml-1 font-medium text-slate-400">
-                                (~{Math.round(plan.sqft * 0.092903)}㎡)
-                              </span>
-                            </span>
-                          </div>
-                        </>
-                      )}
-                    </div>
+                    <PlanRoomDetails
+                      bedCount={plan.bedCount}
+                      bedLabel={bedLabel}
+                      bathLabel={bathLabel}
+                      sqft={plan.sqft}
+                      sqftLabel={t.sqft || (language === "zh" ? "平方英尺" : "sqft")}
+                    />
 
                     {planPrice === null ? (
                       <div
@@ -390,48 +527,14 @@ export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
 
                     <div className="flex items-center gap-3">
                       {showPlanCompare && (
-                        <motion.button
-                          type="button"
-                          initial={{ opacity: 0, scale: 0.9 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          whileHover={{ scale: 1.04 }}
-                          whileTap={{ scale: 0.96 }}
-                          onClick={(e) => {
+                        <PlanCompareCheckbox
+                          isCompared={isCompared}
+                          label={t.compareAdd}
+                          onToggle={(e) => {
                             e.stopPropagation()
                             toggleCompare(planKey)
                           }}
-                          className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[12px] font-semibold transition-colors ${
-                            isCompared
-                              ? `border-illini-blue/30 bg-illini-blue/5 text-illini-blue`
-                              : `border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:text-slate-700`
-                          } `}
-                        >
-                          <div
-                            className={`flex size-3.5 items-center justify-center rounded-[4px] border transition-colors ${
-                              isCompared
-                                ? `border-illini-blue bg-illini-blue text-white`
-                                : "border-slate-300"
-                            } `}
-                          >
-                            <AnimatePresence>
-                              {isCompared && (
-                                <motion.div
-                                  initial={{ scale: 0 }}
-                                  animate={{ scale: 1 }}
-                                  exit={{ scale: 0 }}
-                                  transition={{
-                                    type: "spring",
-                                    stiffness: 400,
-                                    damping: 15,
-                                  }}
-                                >
-                                  <Check className="size-2.5" strokeWidth={3} />
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
-                          </div>
-                          {t.compareAdd}
-                        </motion.button>
+                        />
                       )}
                       <motion.div
                         animate={{ rotate: isExpanded ? 180 : 0 }}
@@ -478,54 +581,31 @@ export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
                             />
                           </button>
                           {allExpandedImages.length > 1 && (
-                            <>
-                              <button
-                                type="button"
-                                aria-label={
-                                  language === "zh"
-                                    ? "上一张户型图"
-                                    : "Previous floor plan image"
-                                }
-                                onClick={(event) => {
-                                  event.stopPropagation()
-                                  setPlanImageIndices((prev) => ({
-                                    ...prev,
-                                    [planKey]:
-                                      (safeExpandedIndex -
-                                        1 +
-                                        allExpandedImages.length) %
-                                      allExpandedImages.length,
-                                  }))
-                                }}
-                                className="absolute top-1/2 left-3 z-10 flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/35 text-white backdrop-blur-sm transition-colors hover:bg-black/55"
-                              >
-                                <ChevronLeft className="size-5" />
-                              </button>
-                              <button
-                                type="button"
-                                aria-label={
-                                  language === "zh"
-                                    ? "下一张户型图"
-                                    : "Next floor plan image"
-                                }
-                                onClick={(event) => {
-                                  event.stopPropagation()
-                                  setPlanImageIndices((prev) => ({
-                                    ...prev,
-                                    [planKey]:
-                                      (safeExpandedIndex + 1) %
-                                      allExpandedImages.length,
-                                  }))
-                                }}
-                                className="absolute top-1/2 right-3 z-10 flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/35 text-white backdrop-blur-sm transition-colors hover:bg-black/55"
-                              >
-                                <ChevronRight className="size-5" />
-                              </button>
-                              <div className="absolute right-3 bottom-3 rounded-full bg-black/40 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
-                                {safeExpandedIndex + 1} /{" "}
-                                {allExpandedImages.length}
-                              </div>
-                            </>
+                            <ExpandedImageNav
+                              language={language}
+                              onPrev={(event) => {
+                                event.stopPropagation()
+                                setPlanImageIndices((prev) => ({
+                                  ...prev,
+                                  [planKey]:
+                                    (safeExpandedIndex -
+                                      1 +
+                                      allExpandedImages.length) %
+                                    allExpandedImages.length,
+                                }))
+                              }}
+                              onNext={(event) => {
+                                event.stopPropagation()
+                                setPlanImageIndices((prev) => ({
+                                  ...prev,
+                                  [planKey]:
+                                    (safeExpandedIndex + 1) %
+                                    allExpandedImages.length,
+                                }))
+                              }}
+                              currentIndex={safeExpandedIndex}
+                              totalCount={allExpandedImages.length}
+                            />
                           )}
                         </div>
                       ) : (

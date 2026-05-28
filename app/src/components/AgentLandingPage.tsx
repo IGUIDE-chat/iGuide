@@ -90,18 +90,15 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
   const [error, setError] = useState<string | null>(null)
   const config = AGENT_CONFIG[type]
 
-  const title =
-    type === "courses"
-      ? t.coursesTitle
-      : type === "dorms"
-        ? t.dormsTitle
-        : t.resumeTitle
-  const desc =
-    type === "courses"
-      ? t.coursesDesc
-      : type === "dorms"
-        ? t.dormsDesc
-        : t.resumeDesc
+  let title: string
+  if (type === "courses") {title = t.coursesTitle}
+  else if (type === "dorms") {title = t.dormsTitle}
+  else {title = t.resumeTitle}
+
+  let desc: string
+  if (type === "courses") {desc = t.coursesDesc}
+  else if (type === "dorms") {desc = t.dormsDesc}
+  else {desc = t.resumeDesc}
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -127,6 +124,8 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
       )
     }
   }
+
+  const submittingLabel = language === "zh" ? "提交中…" : "Submitting…"
 
   return (
     <div className="flex size-full items-center justify-center overflow-auto bg-white p-4 md:p-8">
@@ -193,11 +192,7 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
                 transition={{ duration: 0.15 }}
                 className="bg-illini-orange hover:bg-illini-orange/90 w-full rounded-full py-3 text-sm font-semibold text-white shadow-md transition-colors active:scale-[0.98] disabled:opacity-60"
               >
-                {submitting
-                  ? language === "zh"
-                    ? "提交中…"
-                    : "Submitting…"
-                  : t.notifyMe}
+                {submitting ? submittingLabel : t.notifyMe}
               </motion.button>
             </AnimatePresence>
             {error && (

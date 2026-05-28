@@ -87,6 +87,12 @@ async function apiFetch(
   })
 }
 
+function deriveConnectionStatus(lastTestStatus: string | null | undefined): "ok" | "error" | "unknown" {
+  if (lastTestStatus === "ok") {return "ok"}
+  if (lastTestStatus) {return "error"}
+  return "unknown"
+}
+
 async function fetchConnectionsFromApi(): Promise<{
   platform: PlatformConnection[]
   user: UserConnection[]
@@ -103,12 +109,7 @@ async function fetchConnectionsFromApi(): Promise<{
     platform: (data.platform || []).map((c) => ({
       id: c.id,
       name: c.display_name,
-      status:
-        c.last_test_status === "ok"
-          ? "ok"
-          : c.last_test_status
-            ? "error"
-            : "unknown",
+      status: deriveConnectionStatus(c.last_test_status),
       toolCount: (c.tools || []).length,
       url: c.endpoint_url,
     })),
@@ -116,12 +117,7 @@ async function fetchConnectionsFromApi(): Promise<{
       id: c.id,
       name: c.display_name,
       description: c.description || "",
-      status:
-        c.last_test_status === "ok"
-          ? "ok"
-          : c.last_test_status
-            ? "error"
-            : "unknown",
+      status: deriveConnectionStatus(c.last_test_status),
       url: c.endpoint_url,
       is_enabled: c.is_enabled,
       tools: (c.tools || []).map((t) => ({
@@ -158,12 +154,7 @@ async function saveConnectionToApi(data: {
     id: conn.id,
     name: conn.display_name,
     description: conn.description || "",
-    status:
-      conn.last_test_status === "ok"
-        ? "ok"
-        : conn.last_test_status
-          ? "error"
-          : "unknown",
+    status: deriveConnectionStatus(conn.last_test_status),
     url: conn.endpoint_url,
     is_enabled: conn.is_enabled,
     tools: (conn.tools || []).map((t) => ({
@@ -238,6 +229,39 @@ const statusDot = (status: "ok" | "error" | "unknown", dimmed = false) => {
 }
 
 const toolCount = (conn: UserConnection) => conn.tools.length
+
+function ToolRowItem({
+  tool,
+  onToggle,
+}: {
+  tool: DiscoveredTool
+  onToggle: () => void
+}) {
+  return (
+    <div className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-3 py-2">
+      <div className="min-w-0">
+        <p
+          className={`text-xs font-medium ${tool.enabled ? "text-slate-700" : "text-slate-400 line-through"}`}
+        >
+          {tool.name}
+        </p>
+        <p className="truncate text-xs text-slate-400">{tool.description}</p>
+      </div>
+      <button
+        type="button"
+        aria-label="Toggle tool"
+        onClick={onToggle}
+        className={`relative ml-3 inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${tool.enabled ? "bg-illini-orange" : "bg-slate-200"}`}
+        role="switch"
+        aria-checked={tool.enabled}
+      >
+        <span
+          className={`inline-block size-3.5 rounded-full bg-white shadow-sm transition-transform ${tool.enabled ? "translate-x-4" : "translate-x-1"}`}
+        />
+      </button>
+    </div>
+  )
+}
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -951,35 +975,13 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                       </p>
                       <div className="space-y-1.5">
                         {conn.tools.map((tool) => (
-                          <div
+                          <ToolRowItem
                             key={tool.name}
-                            className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-3 py-2"
-                          >
-                            <div className="min-w-0">
-                              <p
-                                className={`text-xs font-medium ${tool.enabled ? "text-slate-700" : "text-slate-400 line-through"}`}
-                              >
-                                {tool.name}
-                              </p>
-                              <p className="truncate text-xs text-slate-400">
-                                {tool.description}
-                              </p>
-                            </div>
-                            <button
-            type="button"
-                              aria-label="Toggle tool"
-                              onClick={() =>
-                                handleToggleTool(conn.id, tool.name)
-                              }
-                              className={`relative ml-3 inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${tool.enabled ? "bg-illini-orange" : "bg-slate-200"}`}
-                              role="switch"
-                              aria-checked={tool.enabled}
-                            >
-                              <span
-                                className={`inline-block size-3.5 rounded-full bg-white shadow-sm transition-transform ${tool.enabled ? "translate-x-4" : "translate-x-1"}`}
-                              />
-                            </button>
-                          </div>
+                            tool={tool}
+                            onToggle={() =>
+                              handleToggleTool(conn.id, tool.name)
+                            }
+                          />
                         ))}
                       </div>
                     </div>

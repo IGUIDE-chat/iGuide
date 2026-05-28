@@ -57,6 +57,8 @@ export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({
   }
 
   const latestStep = steps.at(-1)
+  const thinkingLabel = language === "zh" ? "思考中" : "Thinking"
+  const doneLabel = language === "zh" ? "思考完成" : "Done thinking"
 
   return (
     <div className="mb-2">
@@ -86,9 +88,7 @@ export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({
           </svg>
         )}
         <span className="font-medium">
-          {isThinking
-            ? (language === "zh" ? "思考中" : "Thinking")
-            : (language === "zh" ? "思考完成" : "Done thinking")}
+          {isThinking ? thinkingLabel : doneLabel}
         </span>
         {isThinking && latestStep && (
           <span className="text-slate-400">

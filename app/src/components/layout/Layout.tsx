@@ -293,6 +293,18 @@ export const Layout: React.FC<LayoutProps> = ({
     },
   ]
 
+  const mapLabel = language === "zh" ? "地图" : "Map"
+  const listLabel = language === "zh" ? "列表" : "List"
+  const viewModeAriaLabel = viewMode === "list" ? mapLabel : listLabel
+
+  let mobileHeaderTitle: string
+  if (activeTab === "chat") {mobileHeaderTitle = t.chatTab}
+  else if (activeTab === "library") {mobileHeaderTitle = t.libraryTab}
+  else if (activeTab === "courses") {mobileHeaderTitle = t.coursesTab}
+  else if (activeTab === "dorms") {mobileHeaderTitle = t.dormsTab}
+  else if (activeTab === "resume") {mobileHeaderTitle = t.resumeTab}
+  else {mobileHeaderTitle = t.chatTab}
+
   const mobileHeader = isHousingMobileHeader ? (
     <div className="flex min-w-0 flex-1 items-center gap-2">
       <div className="relative min-w-0 flex-1">
@@ -329,15 +341,7 @@ export const Layout: React.FC<LayoutProps> = ({
       <SortDropdownMobile sortBy={sortBy} onSortChange={setSortBy} />
       <button
         type="button"
-        aria-label={
-          viewMode === "list"
-            ? language === "zh"
-              ? "地图"
-              : "Map"
-            : language === "zh"
-              ? "列表"
-              : "List"
-        }
+        aria-label={viewModeAriaLabel}
         onClick={() => setViewMode(viewMode === "list" ? "map" : "list")}
         className="flex size-10 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 transition-all duration-200 active:scale-95"
       >
@@ -350,17 +354,7 @@ export const Layout: React.FC<LayoutProps> = ({
     </div>
   ) : (
     <span className="text-sm font-semibold text-slate-700">
-      {activeTab === "chat"
-        ? t.chatTab
-        : activeTab === "library"
-          ? t.libraryTab
-          : activeTab === "courses"
-            ? t.coursesTab
-            : activeTab === "dorms"
-              ? t.dormsTab
-              : activeTab === "resume"
-                ? t.resumeTab
-                : t.chatTab}
+      {mobileHeaderTitle}
     </span>
   )
 

@@ -99,6 +99,62 @@ function ToggleButtonSection<T extends string | number>({
   )
 }
 
+function LivingConditionsSection({
+  title,
+  acLabel,
+  localRequireAc,
+  onToggleAc,
+  tags,
+  selectedTags,
+  onToggleTag,
+  language,
+}: {
+  title: string
+  acLabel: string
+  localRequireAc: boolean
+  onToggleAc: () => void
+  tags: readonly DormTag[]
+  selectedTags: DormTag[]
+  onToggleTag: (tag: DormTag) => void
+  language: FilterLanguage
+}) {
+  return (
+    <section className="mb-8">
+      <h3 className="mb-6 text-xl font-bold">{title}</h3>
+      <div className="flex flex-wrap gap-3">
+        <button
+          type="button"
+          onClick={onToggleAc}
+          className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
+            localRequireAc
+              ? "border-illini-blue bg-illini-blue text-white"
+              : `hover:border-illini-blue border-gray-300 text-gray-700`
+          } `}
+        >
+          {acLabel}
+        </button>
+        {tags.map((tag) => {
+          const selected = selectedTags.includes(tag)
+          return (
+            <button
+              key={tag}
+              type="button"
+              onClick={() => onToggleTag(tag)}
+              className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
+                selected
+                  ? `border-illini-blue bg-illini-blue text-white`
+                  : `hover:border-illini-blue border-gray-300 text-gray-700`
+              } `}
+            >
+              {getTagDisplay(tag, language)}
+            </button>
+          )
+        })}
+      </div>
+    </section>
+  )
+}
+
 export const FilterModal: React.FC<FilterModalProps> = ({
   isOpen,
   onClose,
@@ -508,47 +564,22 @@ export const FilterModal: React.FC<FilterModalProps> = ({
 
                   <hr className="my-8 border-gray-100" />
 
-                  <section className="mb-8">
-                    <h3 className="mb-6 text-xl font-bold">
-                      {t.livingConditions}
-                    </h3>
-                    <div className="flex flex-wrap gap-3">
-                      <button
-                        type="button"
-                        onClick={() => setLocalRequireAc((prev) => !prev)}
-                        className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
-                          localRequireAc
-                            ? "border-illini-blue bg-illini-blue text-white"
-                            : `hover:border-illini-blue border-gray-300 text-gray-700`
-                        } `}
-                      >
-                        {t.airConditioning}
-                      </button>
-                      {FILTERABLE_LIVING_CONDITION_TAGS.map((tag) => {
-                        const selected = localLivingConditions.includes(tag)
-                        return (
-                          <button
-                            key={tag}
-                            type="button"
-                            onClick={() =>
-                              toggleDormTag(
-                                tag,
-                                localLivingConditions,
-                                setLocalLivingConditions
-                              )
-                            }
-                            className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
-                              selected
-                                ? `border-illini-blue bg-illini-blue text-white`
-                                : `hover:border-illini-blue border-gray-300 text-gray-700`
-                            } `}
-                          >
-                            {getTagDisplay(tag, language)}
-                          </button>
-                        )
-                      })}
-                    </div>
-                  </section>
+                  <LivingConditionsSection
+                    title={t.livingConditions}
+                    acLabel={t.airConditioning}
+                    localRequireAc={localRequireAc}
+                    onToggleAc={() => setLocalRequireAc((prev) => !prev)}
+                    tags={FILTERABLE_LIVING_CONDITION_TAGS}
+                    selectedTags={localLivingConditions}
+                    onToggleTag={(tag) =>
+                      toggleDormTag(
+                        tag,
+                        localLivingConditions,
+                        setLocalLivingConditions
+                      )
+                    }
+                    language={language}
+                  />
 
                   <hr className="my-8 border-gray-100" />
 

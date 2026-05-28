@@ -216,12 +216,10 @@ function getDiningLabel(dorm: Dorm, language: Language) {
 }
 
 function getCardTagClasses(tag: CardTagItem) {
-  const toneClasses =
-    tag.tone === "muted"
-      ? "border-gray-200/70 bg-gray-100/70 text-gray-400"
-      : tag.tone === "positive"
-        ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-        : "border-slate-200 bg-slate-50 text-slate-700"
+  let toneClasses: string
+  if (tag.tone === "muted") {toneClasses = "border-gray-200/70 bg-gray-100/70 text-gray-400"}
+  else if (tag.tone === "positive") {toneClasses = "border-emerald-200 bg-emerald-50 text-emerald-700"}
+  else {toneClasses = "border-slate-200 bg-slate-50 text-slate-700"}
 
   return `inline-flex min-w-0 shrink-0 items-center overflow-hidden text-ellipsis whitespace-nowrap rounded-full border px-2 py-1 text-[11px] font-medium max-w-[8.5rem] ${toneClasses}`
 }

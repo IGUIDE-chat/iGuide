@@ -37,18 +37,13 @@ export const DormDetailHeader: React.FC<DormDetailHeaderProps> = ({
 }) => {
   const housingMeta = getHousingTypeMeta(dorm.housingType)
   const bathroomLabel = getDormBathroomSummary(dorm, language)
-  const diningLabel =
-    dorm.dining === "inside"
-      ? language === "zh"
-        ? "自带食堂"
-        : "Dining Hall"
-      : dorm.dining === "nearby"
-        ? language === "zh"
-          ? "附近食堂"
-          : "Dining Nearby"
-        : language === "zh"
-          ? "无食堂"
-          : "No Dining"
+  let diningLabel: string
+  if (dorm.dining === "inside") {diningLabel = language === "zh" ? "自带食堂" : "Dining Hall"}
+  else if (dorm.dining === "nearby") {diningLabel = language === "zh" ? "附近食堂" : "Dining Nearby"}
+  else {diningLabel = language === "zh" ? "无食堂" : "No Dining"}
+  const acZh = dorm.ac ? "有空调" : "无空调"
+  const acEn = dorm.ac ? "A/C" : "No A/C"
+  const acLabel = language === "zh" ? acZh : acEn
 
   return (
     <motion.div
@@ -140,13 +135,7 @@ export const DormDetailHeader: React.FC<DormDetailHeaderProps> = ({
           <span
             className={`text-center text-[11px] leading-tight font-bold md:text-[12px] ${dorm.ac ? "text-slate-700" : "text-amber-700"} `}
           >
-            {dorm.ac
-              ? language === "zh"
-                ? "有空调"
-                : "A/C"
-              : language === "zh"
-                ? "无空调"
-                : "No A/C"}
+            {acLabel}
           </span>
           {!dorm.ac && (
             <span className="mt-1 rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] leading-none font-semibold text-amber-500 md:text-[10px]">

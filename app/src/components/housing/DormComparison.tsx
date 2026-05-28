@@ -86,14 +86,155 @@ const TEXT = {
 const hasPublishedPrice = (price: FloorPlan["price"]): price is number =>
   typeof price === "number" && Number.isFinite(price) && price > 0
 
+interface CellProps {
+  dorm: Dorm
+  language: Language
+}
+
+interface BooleanCellProps {
+  value: boolean
+  yesLabel: string
+  noLabel: string
+}
+
+const NameCell: React.FC<CellProps> = ({ dorm, language }) => {
+  const dormName = language === "zh" && dorm.name_zh ? dorm.name_zh : dorm.name
+  return (
+    <div className="flex items-center gap-2">
+      <img
+        src={dorm.imageUrl}
+        alt={dormName}
+        className="size-10 rounded-lg object-cover"
+      />
+      <span className="text-base font-medium">{dormName}</span>
+    </div>
+  )
+}
+
+const LocationCell: React.FC<CellProps> = ({ dorm, language }) => {
+  const locationLabel =
+    language === "zh" && dorm.location_zh ? dorm.location_zh : dorm.location
+  return <span className="text-sm text-gray-600">{locationLabel}</span>
+}
+
+const HousingTypeCell: React.FC<CellProps> = ({ dorm, language }) => {
+  const housingTypeMeta = getHousingTypeMeta(dorm.housingType)
+  return (
+    <span
+      className={`rounded-full px-2 py-1 text-xs ${housingTypeMeta.badgeClassName} `}
+    >
+      {getLocalizedLabel(housingTypeMeta, language)}
+    </span>
+  )
+}
+
+const PriceCell: React.FC<{ dorm: Dorm }> = ({ dorm }) => (
+  <span className="text-illini-orange font-bold">
+    {formatPrice(dorm.price)}
+  </span>
+)
+
+const BooleanCell: React.FC<BooleanCellProps> = ({
+  value,
+  yesLabel,
+  noLabel,
+}) =>
+  value ? (
+    <span className="flex items-center gap-1 text-sm text-green-600">
+      <Check size={16} /> {yesLabel}
+    </span>
+  ) : (
+    <span className="flex items-center gap-1 text-sm text-red-500">
+      <AlertCircle size={16} /> {noLabel}
+    </span>
+  )
+
+const RoomOptionsCell: React.FC<CellProps> = ({ dorm, language }) => {
+  const roomOptions =
+    dorm.roomOptions ??
+    deriveRoomOptions(dorm.floorPlans, dorm.bathroomType).roomOptions
+  const roomSummary = getRoomRangeSummary(roomOptions, language)
+  return (
+    <span className="text-sm text-gray-700">
+      {roomSummary.occupancyLabel}
+    </span>
+  )
+}
+
+const BathroomCell: React.FC<CellProps> = ({ dorm, language }) => {
+  const roomOptions =
+    dorm.roomOptions ??
+    deriveRoomOptions(dorm.floorPlans, dorm.bathroomType).roomOptions
+  const roomSummary = getRoomRangeSummary(roomOptions, language)
+  return (
+    <span className="text-sm text-gray-600">
+      {roomSummary.bathroomLabel}
+    </span>
+  )
+}
+
+function buildComparisonRows(
+  language: Language,
+  t: (typeof TEXT)["en"]
+): ComparisonRow[] {
+  return [
+    {
+      label: t.name,
+      getValue: (dorm) => <NameCell dorm={dorm} language={language} />,
+    },
+    {
+      label: t.location,
+      getValue: (dorm) => <LocationCell dorm={dorm} language={language} />,
+    },
+    {
+      label: t.housingType,
+      getValue: (dorm) => <HousingTypeCell dorm={dorm} language={language} />,
+    },
+    {
+      label: t.price,
+      getValue: (dorm) => <PriceCell dorm={dorm} />,
+      highlightBest: true,
+      bestCondition: (dorm) => dorm.price <= 10000,
+    },
+    {
+      label: t.ac,
+      getValue: (dorm) => (
+        <BooleanCell value={dorm.ac} yesLabel={t.yes} noLabel={t.no} />
+      ),
+      highlightBest: true,
+      bestCondition: (dorm) => dorm.ac,
+    },
+    {
+      label: t.dining,
+      getValue: (dorm) => (
+        <BooleanCell
+          value={dorm.dining === "inside"}
+          yesLabel={t.yes}
+          noLabel={t.no}
+        />
+      ),
+      highlightBest: true,
+      bestCondition: (dorm) => dorm.dining === "inside",
+    },
+    {
+      label: t.roomOptions,
+      getValue: (dorm) => <RoomOptionsCell dorm={dorm} language={language} />,
+    },
+    {
+      label: t.bathroom,
+      getValue: (dorm) => <BathroomCell dorm={dorm} language={language} />,
+    },
+  ]
+}
+
 const DormComparison: React.FC<DormComparisonProps> = ({
   dorms,
   onClose,
   language = "en",
 }) => {
   const t = TEXT[language]
+  const comparisonRows = buildComparisonRows(language, t)
 
-  // Per-dorm selected floor plan index
   const [selectedPlanIdx, setSelectedPlanIdx] = useState<
     Record<string, number>
   >(() => {
@@ -104,7 +245,6 @@ const DormComparison: React.FC<DormComparisonProps> = ({
     return init
   })
 
-  // Normalized floor plans per dorm
   const dormPlans = useMemo(() => {
     const map: Record<string, FloorPlan[]> = {}
     dorms.forEach((dorm) => {
@@ -118,117 +258,6 @@ const DormComparison: React.FC<DormComparisonProps> = ({
     })
     return map
   }, [dorms])
-
-  const comparisonRows: ComparisonRow[] = [
-    {
-      label: t.name,
-      getValue: (dorm) => {
-        const dormName =
-          language === "zh" && dorm.name_zh ? dorm.name_zh : dorm.name
-        return (
-          <div className="flex items-center gap-2">
-            <img
-              src={dorm.imageUrl}
-              alt={dormName}
-              className="size-10 rounded-lg object-cover"
-            />
-            <span className="text-base font-medium">{dormName}</span>
-          </div>
-        )
-      },
-    },
-    {
-      label: t.location,
-      getValue: (dorm) => {
-        const locationLabel =
-          language === "zh" && dorm.location_zh
-            ? dorm.location_zh
-            : dorm.location
-        return <span className="text-sm text-gray-600">{locationLabel}</span>
-      },
-    },
-    {
-      label: t.housingType,
-      getValue: (dorm) => {
-        const housingTypeMeta = getHousingTypeMeta(dorm.housingType)
-        return (
-          <span
-            className={`rounded-full px-2 py-1 text-xs ${housingTypeMeta.badgeClassName} `}
-          >
-            {getLocalizedLabel(housingTypeMeta, language)}
-          </span>
-        )
-      },
-    },
-    {
-      label: t.price,
-      getValue: (dorm) => (
-        <span className="text-illini-orange font-bold">
-          {formatPrice(dorm.price)}
-        </span>
-      ),
-      highlightBest: true,
-      bestCondition: (dorm) => dorm.price <= 10000,
-    },
-    {
-      label: t.ac,
-      getValue: (dorm) =>
-        dorm.ac ? (
-          <span className="flex items-center gap-1 text-sm text-green-600">
-            <Check size={16} /> {t.yes}
-          </span>
-        ) : (
-          <span className="flex items-center gap-1 text-sm text-red-500">
-            <AlertCircle size={16} /> {t.no}
-          </span>
-        ),
-      highlightBest: true,
-      bestCondition: (dorm) => dorm.ac,
-    },
-    {
-      label: t.dining,
-      getValue: (dorm) =>
-        dorm.dining === "inside" ? (
-          <span className="flex items-center gap-1 text-sm text-green-600">
-            <Check size={16} /> {t.yes}
-          </span>
-        ) : (
-          <span className="flex items-center gap-1 text-sm text-red-500">
-            <AlertCircle size={16} /> {t.no}
-          </span>
-        ),
-      highlightBest: true,
-      bestCondition: (dorm) => dorm.dining === "inside",
-    },
-    {
-      label: t.roomOptions,
-      getValue: (dorm) => {
-        const roomOptions =
-          dorm.roomOptions ??
-          deriveRoomOptions(dorm.floorPlans, dorm.bathroomType).roomOptions
-        const roomSummary = getRoomRangeSummary(roomOptions, language)
-        return (
-          <span className="text-sm text-gray-700">
-            {roomSummary.occupancyLabel}
-          </span>
-        )
-      },
-    },
-    {
-      label: t.bathroom,
-      getValue: (dorm) => {
-        const roomOptions =
-          dorm.roomOptions ??
-          deriveRoomOptions(dorm.floorPlans, dorm.bathroomType).roomOptions
-        const roomSummary = getRoomRangeSummary(roomOptions, language)
-        return (
-          <span className="text-sm text-gray-600">
-            {roomSummary.bathroomLabel}
-          </span>
-        )
-      },
-    },
-  ]
 
   // Mobile: track which dorm card is active (for swipe navigation)
   const [mobileActiveIdx, setMobileActiveIdx] = useState(0)
@@ -290,7 +319,15 @@ const DormComparison: React.FC<DormComparisonProps> = ({
             return plan.bedSize
           }
           if (plan.bedCount !== null) {
-            return `${plan.bedCount} ${language === "zh" ? "张床" : plan.bedCount === 1 ? "Bed" : "Beds"}`
+            let bedUnit: string
+            if (language === "zh") {
+              bedUnit = "张床"
+            } else if (plan.bedCount === 1) {
+              bedUnit = "Bed"
+            } else {
+              bedUnit = "Beds"
+            }
+            return `${plan.bedCount} ${bedUnit}`
           }
           return "—"
         }),
@@ -304,8 +341,16 @@ const DormComparison: React.FC<DormComparisonProps> = ({
           }
           const scope = plan.bathroomScope ?? "communal"
           const scopeLabel = getBathroomScopeLabel(scope, language)
-          if (plan.bathroomCount !== null && plan.bathroomCount > 0) {
-            return `${plan.bathroomCount} ${language === "zh" ? "卫" : plan.bathroomCount === 1 ? "Bath" : "Baths"} · ${scopeLabel}`
+          if (plan.bathroomCount !== null && plan.bathroomCount !== undefined && plan.bathroomCount > 0) {
+            let bathUnit: string
+            if (language === "zh") {
+              bathUnit = "卫"
+            } else if (plan.bathroomCount === 1) {
+              bathUnit = "Bath"
+            } else {
+              bathUnit = "Baths"
+            }
+            return `${plan.bathroomCount} ${bathUnit} · ${scopeLabel}`
           }
           return scopeLabel
         }),

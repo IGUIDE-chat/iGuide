@@ -59,6 +59,11 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
     }
   }
 
+  let submitLabel: string
+  if (loading) {submitLabel = t.processing}
+  else if (isLogin) {submitLabel = t.loginAction}
+  else {submitLabel = t.registerAction}
+
   return (
     <button
       type="button"
@@ -223,9 +228,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
             disabled={loading}
             className="bg-illini-blue shadow-illini-blue/20 hover:bg-illini-blue/90 hover:shadow-illini-blue/30 w-full rounded-xl py-3.5 text-lg font-bold text-white shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
           >
-            {loading
-              ? t.processing
-              : (isLogin ? t.loginAction : t.registerAction)}
+            {submitLabel}
           </button>
         </form>
 
