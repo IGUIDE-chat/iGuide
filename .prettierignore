@@ -4,3 +4,4 @@ pnpm-lock.yaml
 build
 dist
 *.env.*
+*.jsonc
