@@ -10,7 +10,7 @@
 import { supabase } from "./supabase"
 import { authService } from "./authService"
 
-export interface DormViewingHistory {
+interface DormViewingHistory {
   id: string
   user_id: string
   dorm_id: string
@@ -22,7 +22,7 @@ export interface DormViewingHistory {
 
 const TABLE_NAME = "dorm_viewing_history"
 
-export const dormViewingService = {
+const dormViewingService = {
   /**
    * Add a dorm to viewing history
    */
@@ -139,3 +139,5 @@ export const dormViewingService = {
     }
   },
 }
+
+export { type DormViewingHistory, dormViewingService }

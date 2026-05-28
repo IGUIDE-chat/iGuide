@@ -5,7 +5,7 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { useMemo } from "react"
+import React, { useCallback, useMemo } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import {
   ARTICLES,
@@ -29,11 +29,26 @@ const LibraryCategoryPage: React.FC<LibraryCategoryPageProps> = ({
 
   const category = CATEGORIES.find((item) => item.id === categoryId)
   const localizedArticles = useMemo(() => {
-    return ARTICLES.map((article) => ({
-      ...article,
-      ...getArticleText(article, language),
-    }))
+    return ARTICLES.map((article) => {
+      const text = getArticleText(article, language)
+      return Object.assign({}, article, text)
+    })
   }, [language])
+
+  const handleBackClick = useCallback(
+    () => navigate("/library"),
+    [navigate]
+  )
+
+  const handleArticleClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      const articleId = e.currentTarget.dataset.articleId
+      if (articleId) {
+        navigate(`/library/article/${articleId}`)
+      }
+    },
+    [navigate]
+  )
 
   if (!category) {
     return (
@@ -51,7 +66,7 @@ const LibraryCategoryPage: React.FC<LibraryCategoryPageProps> = ({
       <div className="mx-auto max-w-3xl min-w-0 px-4 py-8 pb-24">
         <button
           type="button"
-          onClick={() => navigate("/library")}
+          onClick={handleBackClick}
           className="group hover:text-illini-blue mb-8 flex items-center gap-2 text-sm font-semibold text-slate-500 transition-colors"
         >
           <span className="group-hover:border-illini-blue group-hover:bg-illini-blue flex size-8 items-center justify-center rounded-full border border-slate-200 bg-white transition-all group-hover:text-white">
@@ -90,10 +105,12 @@ const LibraryCategoryPage: React.FC<LibraryCategoryPageProps> = ({
 
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           {categoryArticles.map((article) => (
-            <div
+            <button
+              type="button"
               key={article.id}
-              onClick={() => navigate(`/library/article/${article.id}`)}
-              className="group hover:border-illini-orange/30 cursor-pointer rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:shadow-slate-200/50"
+              data-article-id={article.id}
+              onClick={handleArticleClick}
+              className="group hover:border-illini-orange/30 cursor-pointer rounded-2xl border border-slate-100 bg-white p-6 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:shadow-slate-200/50"
             >
               <h3 className="group-hover:text-illini-orange mb-3 text-lg font-bold text-slate-800 transition-colors">
                 {article.title}
@@ -104,7 +121,7 @@ const LibraryCategoryPage: React.FC<LibraryCategoryPageProps> = ({
               <div className="text-illini-blue mt-4 flex translate-y-2 transform items-center text-sm font-semibold opacity-0 transition-opacity group-hover:translate-y-0 group-hover:opacity-100">
                 {t.readGuide}
               </div>
-            </div>
+            </button>
           ))}
           {categoryArticles.length === 0 && (
             <p className="text-slate-500 italic">{t.emptyCategory}</p>

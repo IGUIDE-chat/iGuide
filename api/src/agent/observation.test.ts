@@ -69,6 +69,7 @@ test("buildObservation preserves error result diagnostics", () => {
     '{"error":"execution_failed","tool":"grep_docs","message":"permission denied"}'
   )
   assert.equal(observation.providerMessage.tool_call_id, "call_error")
+  // eslint-disable-next-line vitest/no-conditional-in-test -- nullish coalescing for safe JSON parse
   assert.deepEqual(JSON.parse(observation.providerMessage.content ?? ""), {
     content: observation.raw,
     metadata: { error: true },
@@ -128,6 +129,7 @@ test("buildObservation records truncation byte counts and keeps provider content
     type: "tool_error",
   })
 
+  // eslint-disable-next-line vitest/no-conditional-in-test -- nullish coalescing for safe JSON parse
   const content = observation.providerMessage.content ?? ""
   assert.deepEqual(JSON.parse(content), {
     content: "x".repeat(20) + "\n...[truncated]",

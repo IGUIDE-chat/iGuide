@@ -151,9 +151,9 @@ export class MCPConnectionService {
       display_name: input.display_name,
       endpoint_url: input.endpoint_url,
       transport: input.transport,
-      ...(input.description !== undefined
-        ? { description: input.description }
-        : {}),
+      ...(input.description === undefined
+        ? {}
+        : { description: input.description }),
       is_enabled: true,
       last_test_status: null,
       created_at: timestamp,
@@ -294,14 +294,14 @@ export class MCPDiscoveredToolService {
 
     const discoveredAt = new Date().toISOString()
     await Promise.all(
-      tools.map((tool) => {
-        const key = toolKey(connectionId, tool.name)
+      tools.map((mcpToolDef) => {
+        const key = toolKey(connectionId, mcpToolDef.name)
         const record: MCPDiscoveredTool = {
           id: key,
           connection_id: connectionId,
-          name: tool.name,
-          ...(tool.description ? { description: tool.description } : {}),
-          input_schema: tool.parameters,
+          name: mcpToolDef.name,
+          ...(mcpToolDef.description ? { description: mcpToolDef.description } : {}),
+          input_schema: mcpToolDef.parameters,
           discovered_at: discoveredAt,
         }
 
@@ -441,6 +441,7 @@ export async function registerRuntimeMCPTools({
   store,
   client = new StreamableHttpMCPClient(),
   logger = console,
+  // eslint-disable-next-line typescript/no-explicit-any -- AI SDK ToolSet requires Record<string, any>
 }: RegisterRuntimeMCPToolsOptions): Promise<Record<string, any>> {
   const resolvedStore = store ?? createMCPStore({ env: asEnvRecord(env) })
   const connections = new MCPConnectionService(resolvedStore)
@@ -448,6 +449,7 @@ export async function registerRuntimeMCPTools({
   const overrides = new MCPToolOverrideService(resolvedStore)
   const visibleConnections = await connections.listForViewer(viewerId)
 
+  // eslint-disable-next-line typescript/no-explicit-any -- AI SDK ToolSet requires Record<string, any>
   const result: Record<string, any> = {}
 
   for (const connection of [
@@ -459,6 +461,7 @@ export async function registerRuntimeMCPTools({
     }
 
     try {
+      // eslint-disable-next-line no-await-in-loop -- connections must be processed sequentially for deterministic key ordering
       const [discoveredTools, disabledToolNames] = await Promise.all([
         tools.listTools(connection.id),
         overrides.getDisabledToolNames(connection.id, viewerId),
@@ -471,14 +474,14 @@ export async function registerRuntimeMCPTools({
         }
 
         const sanitizedConnectionId = connection.id.replaceAll("-", "_")
-        const toolKey = `mcp_${sanitizedConnectionId}_${mcpTool.name}`
+        const registryKey = `mcp_${sanitizedConnectionId}_${mcpTool.name}`
         const zodSchema = jsonSchemaToZod(mcpTool.input_schema)
 
-        result[toolKey] = tool({
+        result[registryKey] = tool({
           description: mcpTool.description ?? `MCP tool ${mcpTool.name}`,
           parameters: zodSchema,
-          // @ts-expect-error - AI SDK tool() execute signature inference issue
-          execute: async (args: any) => {
+          // @ts-expect-error - AI SDK tool() execute signature inference issue with dynamic schemas
+          execute: async (args) => {
             const callResult = await client.call(
               connection.endpoint_url,
               mcpTool.name,

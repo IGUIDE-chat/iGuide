@@ -43,7 +43,7 @@ interface UseDormEditFormOptions {
   onSaved: (updated: Dorm) => void
 }
 
-export type ActiveTab = "content" | "details" | "tags" | "media" | "history"
+type ActiveTab = "content" | "details" | "tags" | "media" | "history"
 type LayoutKind = "standard" | "Studio" | "Suite" | "Cluster"
 
 const emptyCategorized: DormCategorizedTags = {
@@ -58,16 +58,20 @@ const getBathroomScopeFallback = (
   floorPlans?: FloorPlan[]
 ) => getStorageBathroomScope(bathroomType, floorPlans)
 
-export const getLayoutKind = (plan: FloorPlan): LayoutKind =>
-  plan.type === "Studio" || plan.labelCode === "Studio"
-    ? "Studio"
-    : plan.type === "Suite" || plan.labelCode === "Suite"
-      ? "Suite"
-      : plan.type === "Cluster" || plan.labelCode === "Cluster"
-        ? "Cluster"
-        : "standard"
+const getLayoutKind = (plan: FloorPlan): LayoutKind => {
+  if (plan.type === "Studio" || plan.labelCode === "Studio") {
+    return "Studio"
+  }
+  if (plan.type === "Suite" || plan.labelCode === "Suite") {
+    return "Suite"
+  }
+  if (plan.type === "Cluster" || plan.labelCode === "Cluster") {
+    return "Cluster"
+  }
+  return "standard"
+}
 
-export const createFloorPlan = (): FloorPlan => ({
+const createFloorPlan = (): FloorPlan => ({
   bedCount: 1,
   bathroomCount: 0,
   bathroomScope: "communal",
@@ -223,10 +227,15 @@ export const useDormEditForm = ({
       return
     }
     setHistoryLoading(true)
-    dormAdminService
-      .getEditHistory(dorm.id)
-      .then((entries) => setHistoryEntries(entries))
-      .finally(() => setHistoryLoading(false))
+    const loadHistory = async () => {
+      try {
+        const entries = await dormAdminService.getEditHistory(dorm.id)
+        setHistoryEntries(entries)
+      } finally {
+        setHistoryLoading(false)
+      }
+    }
+    loadHistory()
   }, [activeTab, dorm.id])
 
   const normalizedFloorPlans = useMemo(
@@ -267,7 +276,7 @@ export const useDormEditForm = ({
           ? categorizedTags.llcNames
           : undefined,
     }
-    const numericPrice = price !== "" ? Number(price) : null
+    const numericPrice = price === "" ? null : Number(price)
     const nextDormLike: Dorm = {
       ...dorm,
       name,
@@ -293,7 +302,7 @@ export const useDormEditForm = ({
       cons,
       cons_zh: consZh,
       applicationFee:
-        applicationFee !== "" ? Number(applicationFee) : undefined,
+        applicationFee === "" ? undefined : Number(applicationFee),
       address: address || undefined,
       address_zh: addressZh || undefined,
       website: website || undefined,
@@ -308,8 +317,8 @@ export const useDormEditForm = ({
       image_url: imageUrl || null,
       price: numericPrice,
       price_range:
-        numericPrice != null ? getDormPriceRange(numericPrice) : null,
-      application_fee: applicationFee !== "" ? Number(applicationFee) : null,
+        numericPrice === null ? null : getDormPriceRange(numericPrice),
+      application_fee: applicationFee === "" ? null : Number(applicationFee),
       location,
       location_zh: locationZh || null,
       housing_type: housingType,
@@ -530,4 +539,6 @@ export const useDormEditForm = ({
   }
 }
 
+export type { ActiveTab }
+export { getLayoutKind, createFloorPlan }
 export type DormEditFormState = ReturnType<typeof useDormEditForm>

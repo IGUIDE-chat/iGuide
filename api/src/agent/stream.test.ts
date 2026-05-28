@@ -29,6 +29,7 @@ async function collectSSEEvents(
   let currentEvent = ""
 
   while (true) {
+    // eslint-disable-next-line no-await-in-loop -- streaming read requires sequential consumption
     const { done, value } = await reader.read()
     if (done) {
       break

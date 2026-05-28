@@ -1,16 +1,16 @@
-import { Hono } from "hono"
+import { type Context, Hono, type Next } from "hono"
 import { cors } from "hono/cors"
 import { convertToModelMessages, stepCountIs, streamText } from "ai"
 import { verifyAndCacheJwt } from "./auth/jwtCache.ts"
-import { ipRateLimit, userRateLimit } from "./middleware/ratelimit.ts"
+import { type RateLimitBinding, ipRateLimit, userRateLimit } from "./middleware/ratelimit.ts"
 import { createSearchKnowledgeBaseTool } from "./tools/searchKnowledgeBase.ts"
 import { createWebSearchTool } from "./tools/webSearch.ts"
 import { createGrepDocsTool } from "./tools/grepDocs.ts"
 import { createCustomSkillsTool } from "./tools/customSkills.ts"
-import { toolDefToAISDK } from "./tools/mcpAdapter.ts"
+
 import { type RequestContext } from "./tools/types.ts"
 import { resolveProvider } from "./agent/provider.ts"
-import { persistTurn } from "./agent/persist.ts"
+import { type PersistEnv, type ResponseMessage, persistTurn } from "./agent/persist.ts"
 
 interface Env {
   SUPABASE_URL: string
@@ -28,8 +28,8 @@ interface Env {
   QMD_CN_URL?: string
   QMD_US_URL?: string
   QMD_API_KEY?: string
-  CHAT_IP_LIMITER: any
-  CHAT_USER_LIMITER: any
+  CHAT_IP_LIMITER: RateLimitBinding
+  CHAT_USER_LIMITER: RateLimitBinding
 }
 
 type Variables = {
@@ -39,6 +39,7 @@ type Variables = {
 
 async function registerMCPTools(
   ctx: RequestContext
+  // eslint-disable-next-line typescript/no-explicit-any -- AI SDK ToolSet requires Record<string, any>
 ): Promise<Record<string, any>> {
   if (!ctx.userId) {
     return {}
@@ -61,7 +62,7 @@ function cleanDsml(text: string): string {
 
 const stripDsmlTransform = () => {
   let buffer = ""
-  return new TransformStream<any, any>({
+  return new TransformStream({
     transform(part, controller) {
       if (part.type !== "text-delta" || typeof part.text !== "string") {
         if (
@@ -147,7 +148,7 @@ app.use(
 
 // Region detection middleware
 app.use("*", async (c, next) => {
-  const country = (c.req.raw as any).cf?.country || "US"
+  const country = (c.req.raw as unknown as { cf?: { country?: string } }).cf?.country || "US"
   const region = country === "CN" ? "CN" : "Global"
   c.set("region", region)
   await next()
@@ -173,7 +174,7 @@ async function guestUserIdForIp(ip: string): Promise<string> {
   return `guest_${hex}`
 }
 
-const resolveUser = async (c: any, next: any) => {
+const resolveUser = async (c: Context<{ Bindings: Env; Variables: Variables }>, next: Next) => {
   const authHeader = c.req.header("Authorization")
   const token =
     authHeader && authHeader.startsWith("Bearer ")
@@ -215,7 +216,7 @@ app.post(
     const region = c.get("region")
 
     const ctx: RequestContext = {
-      env: c.env as any,
+      env: c.env as unknown as Record<string, string>,
       userId,
       region,
     }
@@ -223,17 +224,18 @@ app.post(
     // Build tools only if user query is substantive
     const lastMessage = messages.at(-1)
     const lastContent = lastMessage?.content
-    const userText =
-      typeof lastContent === "string"
-        ? lastContent
-        : Array.isArray(lastContent)
-          ? lastContent
-              .filter((p: any) => p.type === "text")
-              .map((p: any) => p.text)
-              .join("")
-          : ""
+    let userText = ""
+    if (typeof lastContent === "string") {
+      userText = lastContent
+    } else if (Array.isArray(lastContent)) {
+      userText = lastContent
+        .filter((p: { type: string }) => p.type === "text")
+        .map((p: { type: string; text?: string }) => p.text ?? "")
+        .join("")
+    }
     const shouldUseTool = userText.length > 3
 
+    // eslint-disable-next-line typescript/no-explicit-any -- AI SDK ToolSet requires Record<string, any>
     let tools: Record<string, any> = {}
     if (shouldUseTool) {
       tools = {
@@ -288,11 +290,11 @@ app.post(
         }
         c.executionCtx.waitUntil(
           persistTurn({
-            env: c.env as any,
+            env: c.env as unknown as PersistEnv,
             userId,
             conversationId,
             userMessage: { role: "user", content: userText },
-            responseMessages: response.messages as any[],
+            responseMessages: response.messages as ResponseMessage[],
           })
         )
       },

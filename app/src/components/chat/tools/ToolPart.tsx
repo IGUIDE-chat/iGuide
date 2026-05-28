@@ -12,7 +12,7 @@ interface ToolPartProps {
 }
 
 function stringifyArgs(input: unknown): string {
-  if (input == null) {
+  if (input === null || input === undefined) {
     return ""
   }
   if (typeof input === "string") {

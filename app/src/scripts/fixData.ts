@@ -10,8 +10,8 @@ import dotenv from "dotenv"
 
 dotenv.config({ path: ".env.local" })
 const supabase = createClient(
-  process.env.VITE_SUPABASE_URL!,
-  process.env.VITE_SUPABASE_ANON_KEY!
+  process.env.VITE_SUPABASE_URL ?? "",
+  process.env.VITE_SUPABASE_ANON_KEY ?? ""
 )
 
 const MAPPING: Record<string, string[]> = {
@@ -27,44 +27,46 @@ const MAPPING: Record<string, string[]> = {
 }
 
 async function fixAll() {
-  for (const [id, names] of Object.entries(MAPPING)) {
-    const { data: dorm } = await supabase
-      .from("dorms")
-      .select("categorized_tags")
-      .eq("id", id)
-      .single()
-    if (!dorm) {
-      continue
-    }
-
-    const ct = (dorm.categorized_tags as any) || {
-      lifestyle: [],
-      facilities: [],
-      livingConditions: [],
-    }
-    ct.llcNames = names
-    if (!ct.lifestyle.includes("llc")) {
-      ct.lifestyle.push("llc")
-    }
-
-    const { error } = await supabase
-      .from("dorms")
-      .update({ categorized_tags: ct })
-      .eq("id", id)
-    if (error) {
-      console.error(`Error ${id}:`, error)
-    } else {
-      // Verify immediately
-      const { data: verified } = await supabase
+  await Promise.all(
+    Object.entries(MAPPING).map(async ([id, names]) => {
+      const { data: dorm } = await supabase
         .from("dorms")
         .select("categorized_tags")
         .eq("id", id)
         .single()
-      console.log(
-        `Updated ${id}:`,
-        JSON.stringify(verified?.categorized_tags?.llcNames)
-      )
-    }
-  }
+      if (!dorm) {
+        return
+      }
+
+      const ct = (dorm.categorized_tags as Record<string, string[]>) || {
+        lifestyle: [],
+        facilities: [],
+        livingConditions: [],
+      }
+      ct.llcNames = names
+      if (!ct.lifestyle.includes("llc")) {
+        ct.lifestyle.push("llc")
+      }
+
+      const { error } = await supabase
+        .from("dorms")
+        .update({ categorized_tags: ct })
+        .eq("id", id)
+      if (error) {
+        console.error(`Error ${id}:`, error)
+      } else {
+        // Verify immediately
+        const { data: verified } = await supabase
+          .from("dorms")
+          .select("categorized_tags")
+          .eq("id", id)
+          .single()
+        console.log(
+          `Updated ${id}:`,
+          JSON.stringify(verified?.categorized_tags?.llcNames)
+        )
+      }
+    })
+  )
 }
-fixAll()
+await fixAll()

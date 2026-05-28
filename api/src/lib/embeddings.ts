@@ -2,6 +2,13 @@ import {
   type EmbeddingConfig,
   MAX_EMBEDDING_BATCH_SIZE,
 } from "./embedding-config"
+import {
+  EmbeddingConfigError,
+  EmbeddingDimensionError,
+  EmbeddingProviderError,
+} from "./embedding-errors"
+
+export { EmbeddingConfigError, EmbeddingDimensionError, EmbeddingProviderError }
 
 export interface EmbeddingResult {
   embeddings: number[][]
@@ -13,47 +20,6 @@ interface EmbeddingResponse {
   data?: Array<{
     embedding?: number[]
   }>
-}
-
-interface EmbeddingProviderErrorDetails {
-  provider: string
-  url: string
-  status?: number
-  body?: string
-  cause?: unknown
-}
-
-export class EmbeddingConfigError extends Error {
-  constructor(message: string) {
-    super(message)
-    this.name = "EmbeddingConfigError"
-  }
-}
-
-export class EmbeddingDimensionError extends Error {
-  readonly expected: number
-  readonly actual: number
-  readonly provider: string
-
-  constructor(expected: number, actual: number, provider: string) {
-    super(
-      `Embedding provider returned ${actual} dimensions, expected ${expected}`
-    )
-    this.name = "EmbeddingDimensionError"
-    this.expected = expected
-    this.actual = actual
-    this.provider = provider
-  }
-}
-
-export class EmbeddingProviderError extends Error {
-  readonly details: EmbeddingProviderErrorDetails
-
-  constructor(message: string, details: EmbeddingProviderErrorDetails) {
-    super(message)
-    this.name = "EmbeddingProviderError"
-    this.details = details
-  }
 }
 
 export class EmbeddingClient {
@@ -93,6 +59,7 @@ export class EmbeddingClient {
         index,
         index + MAX_EMBEDDING_BATCH_SIZE
       )
+      // eslint-disable-next-line no-await-in-loop -- sequential batching required by API rate limits
       const batchResult = await this.embedBatch(batch)
       embeddings.push(...batchResult.embeddings)
       provider = batchResult.provider

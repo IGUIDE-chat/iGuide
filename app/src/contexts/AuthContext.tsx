@@ -12,6 +12,7 @@ import React, {
   createContext,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from "react"
 import { authService } from "../services/authService"
@@ -30,6 +31,46 @@ export const useAuth = () => {
 
 interface AuthProviderProps {
   children: ReactNode
+}
+
+function convertSupabaseUser(supabaseUser: SupabaseUser): User {
+  return {
+    id: supabaseUser.id,
+    name:
+      supabaseUser.user_metadata?.display_name ||
+      supabaseUser.email?.split("@")[0] ||
+      "User",
+    email: supabaseUser.email || "",
+    isAdmin: supabaseUser.user_metadata?.is_admin === true,
+  }
+}
+
+async function loginWithGoogle() {
+  try {
+    const { error } = await authService.signInWithGoogle()
+    if (error) {
+      console.error("Google login error:", error)
+      return false
+    }
+    return true
+  } catch (error) {
+    console.error("Google login exception:", error)
+    return false
+  }
+}
+
+async function loginWithMicrosoft() {
+  try {
+    const { error } = await authService.signInWithMicrosoft()
+    if (error) {
+      console.error("Microsoft login error:", error)
+      return false
+    }
+    return true
+  } catch (error) {
+    console.error("Microsoft login exception:", error)
+    return false
+  }
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
@@ -84,18 +125,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       subscription.unsubscribe()
     }
   }, [])
-
-  const convertSupabaseUser = (supabaseUser: SupabaseUser): User => {
-    return {
-      id: supabaseUser.id,
-      name:
-        supabaseUser.user_metadata?.display_name ||
-        supabaseUser.email?.split("@")[0] ||
-        "User",
-      email: supabaseUser.email || "",
-      isAdmin: supabaseUser.user_metadata?.is_admin === true,
-    }
-  }
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
@@ -166,49 +195,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }
 
-  const loginWithGoogle = async () => {
-    try {
-      const { error } = await authService.signInWithGoogle()
-      if (error) {
-        console.error("Google login error:", error)
-        return false
-      }
-      return true
-    } catch (error) {
-      console.error("Google login exception:", error)
-      return false
-    }
-  }
-
-  const loginWithMicrosoft = async () => {
-    try {
-      const { error } = await authService.signInWithMicrosoft()
-      if (error) {
-        console.error("Microsoft login error:", error)
-        return false
-      }
-      return true
-    } catch (error) {
-      console.error("Microsoft login exception:", error)
-      return false
-    }
-  }
-
   const requestLogin = () => setIsGuest(false)
 
-  const value: AuthContextType = {
-    user,
-    login,
-    register,
-    loginWithGoogle,
-    loginWithMicrosoft,
-    logout,
-    updateName,
-    isLoading,
-    isGuest,
-    setIsGuest,
-    requestLogin,
-  }
+  const value: AuthContextType = useMemo(
+    () => ({
+      user,
+      login,
+      register,
+      loginWithGoogle,
+      loginWithMicrosoft,
+      logout,
+      updateName,
+      isLoading,
+      isGuest,
+      setIsGuest,
+      requestLogin,
+    }),
+    [user, isLoading, isGuest, setIsGuest]
+  )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

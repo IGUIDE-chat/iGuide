@@ -10,8 +10,8 @@ import dotenv from "dotenv"
 
 dotenv.config({ path: ".env.local" })
 const supabase = createClient(
-  process.env.VITE_SUPABASE_URL!,
-  process.env.VITE_SUPABASE_ANON_KEY!
+  process.env.VITE_SUPABASE_URL ?? "",
+  process.env.VITE_SUPABASE_ANON_KEY ?? ""
 )
 
 async function checkDorm(id: string) {
@@ -26,4 +26,4 @@ async function checkDorm(id: string) {
     console.log(JSON.stringify(data, null, 2))
   }
 }
-checkDorm("allen")
+await checkDorm("allen")

@@ -52,9 +52,10 @@ export const ChatEmptyState: React.FC<ChatEmptyStateProps> = ({
 
           <div className={containerClass}>
             <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-              {suggestions.map((suggestion, index) => (
+              {suggestions.map((suggestion) => (
                 <button
-                  key={`${suggestion.text}-${index}`}
+            type="button"
+                  key={suggestion.text}
                   onClick={() => onSuggestionClick(suggestion.text)}
                   className="rounded-2xl border border-slate-200 p-3 text-left text-sm text-slate-600 shadow-sm transition-colors hover:bg-slate-50 hover:shadow-md"
                 >

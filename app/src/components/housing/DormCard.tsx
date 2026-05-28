@@ -375,8 +375,11 @@ const DormCard: React.FC<DormCardProps> = ({
   const cardSummary = getCardSummary(dorm, description, locationLabel, language)
 
   return (
-    <div
+    <button
+      type="button"
+      tabIndex={0}
       onClick={() => onViewDetails(dorm)}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); (e.currentTarget as HTMLElement).click() } }}
       onMouseEnter={() => onHoverDorm?.(dorm.id)}
       onMouseLeave={() => onHoverDorm?.(null)}
       className="dorm-card group relative flex size-full cursor-pointer flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-shadow duration-300 hover:shadow-md"
@@ -389,8 +392,8 @@ const DormCard: React.FC<DormCardProps> = ({
           decoding="async"
           className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
-        {positivePercent != null &&
-          totalReviews != null &&
+        {positivePercent !== null &&
+          totalReviews !== null &&
           totalReviews > 0 && (
             <button
               type="button"
@@ -558,7 +561,7 @@ const DormCard: React.FC<DormCardProps> = ({
           </div>
         )}
       </div>
-    </div>
+    </button>
   )
 }
 

@@ -60,17 +60,21 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
   }
 
   return (
-    <div
+    <button
+      type="button"
+      tabIndex={0}
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           onGuestLogin?.()
         }
       }}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); (e.currentTarget as HTMLElement).click() } }}
       className="from-illini-blue/10 to-illini-orange/10 relative flex min-h-screen cursor-default items-start justify-center overflow-y-auto bg-linear-to-br via-white px-4 pt-16 md:pt-32"
     >
       {/* Language Switcher - Responsive Position */}
       <div className="absolute top-4 right-4 z-50 md:top-8 md:right-8">
         <button
+            type="button"
           onClick={() => onLanguageChange(language === "en" ? "zh" : "en")}
           className="hover:border-illini-blue/30 hover:text-illini-blue flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-3 py-2 text-sm font-semibold text-slate-600 shadow-sm backdrop-blur-md transition-all md:px-4 md:py-2.5"
         >
@@ -94,6 +98,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
         {/* Toggle */}
         <div className="relative isolate mb-6 flex gap-2 rounded-full bg-slate-100 p-1">
           <button
+            type="button"
             onClick={() => setIsLogin(true)}
             className={`relative z-10 flex-1 rounded-full px-4 py-2 font-medium transition-colors ${
               isLogin
@@ -111,11 +116,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
             {t.loginSwitch}
           </button>
           <button
+            type="button"
             onClick={() => setIsLogin(false)}
             className={`relative z-10 flex-1 rounded-full px-4 py-2 font-medium transition-colors ${
-              !isLogin
-                ? "text-illini-blue"
-                : `text-slate-500 hover:text-slate-900`
+              isLogin
+                ? `text-slate-500 hover:text-slate-900`
+                : "text-illini-blue"
             } `}
           >
             {!isLogin && (
@@ -131,6 +137,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
 
         {/* Google Login */}
         <button
+            type="button"
           onClick={() => loginWithGoogle()}
           className="group mb-3 flex w-full items-center justify-center gap-3 rounded-xl border border-slate-200 px-4 py-3 font-medium text-slate-700 transition-all hover:border-slate-300 hover:bg-slate-50"
         >
@@ -144,6 +151,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
 
         {/* Microsoft Login */}
         <button
+            type="button"
           onClick={() => loginWithMicrosoft()}
           className="group mb-6 flex w-full items-center justify-center gap-3 rounded-xl border border-slate-200 px-4 py-3 font-medium text-slate-700 transition-all hover:border-slate-300 hover:bg-slate-50"
         >
@@ -172,10 +180,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-2 ml-1 block text-sm font-bold text-slate-700">
+            <label htmlFor="login-email" className="mb-2 ml-1 block text-sm font-bold text-slate-700">
               {t.emailLabel}
             </label>
             <input
+              id="login-email"
+              aria-label={t.emailLabel}
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -186,10 +196,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
           </div>
 
           <div>
-            <label className="mb-2 ml-1 block text-sm font-bold text-slate-700">
+            <label htmlFor="login-password" className="mb-2 ml-1 block text-sm font-bold text-slate-700">
               {t.passwordLabel}
             </label>
             <input
+              id="login-password"
+              aria-label={t.passwordLabel}
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -213,15 +225,14 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
           >
             {loading
               ? t.processing
-              : isLogin
-                ? t.loginAction
-                : t.registerAction}
+              : (isLogin ? t.loginAction : t.registerAction)}
           </button>
         </form>
 
         <div className="mt-6 text-center text-sm text-slate-500">
           {isLogin ? t.noAccount : t.hasAccount}
           <button
+            type="button"
             onClick={() => {
               setIsLogin(!isLogin)
               setError("")
@@ -235,6 +246,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
         {/* Guest Mode Link */}
         <div className="mt-4 border-t border-slate-100/80 pt-4 text-center">
           <button
+            type="button"
             onClick={onGuestLogin}
             className="text-xs text-slate-400 transition-colors hover:text-slate-600 hover:underline"
           >
@@ -242,6 +254,6 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
           </button>
         </div>
       </motion.div>
-    </div>
+    </button>
   )
 }

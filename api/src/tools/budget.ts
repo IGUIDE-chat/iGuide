@@ -77,7 +77,7 @@ export function withGuards<T extends Record<string, Tool>>(
   const maxResultBytes = opts.maxResultBytes ?? DEFAULTS.maxResultBytes
 
   // Per-request closure counter (NOT global): each withGuards call is fresh
-  let callCount = 0
+  const budget = { callCount: 0 }
 
   const guarded: Record<string, Tool> = {}
 
@@ -93,43 +93,52 @@ export function withGuards<T extends Record<string, Tool>>(
 
     guarded[name] = {
       ...rawTool,
-      execute: async (input: unknown, options?: unknown) => {
-        callCount++
-        if (callCount > maxCalls) {
-          throw new ToolBudgetExceededError()
-        }
-
-        // Promise.race with proper timer cleanup to avoid unhandled rejections
-        const result = await new Promise<unknown>((resolve, reject) => {
-          const timer = setTimeout(() => {
-            reject(new ToolTimeoutError())
-          }, timeoutMs)
-
-          try {
-            const returned = rawExecute(input, options)
-            Promise.resolve(returned)
-              .then((value) => {
-                clearTimeout(timer)
-                resolve(value)
-              })
-              .catch((err: unknown) => {
-                clearTimeout(timer)
-                reject(err)
-              })
-          } catch (err) {
-            clearTimeout(timer)
-            reject(err)
-          }
-        })
-
-        if (typeof result === "string" && maxResultBytes > 0) {
-          return truncateResult(result, maxResultBytes)
-        }
-
-        return result
-      },
+      execute: createGuardedExecute(rawExecute, { budget, maxCalls, timeoutMs, maxResultBytes }),
     }
   }
 
   return guarded as T
+}
+
+function createGuardedExecute(
+  rawExecute: (input: unknown, options?: unknown) => unknown,
+  opts: { budget: { callCount: number }; maxCalls: number; timeoutMs: number; maxResultBytes: number },
+) {
+  const { budget, maxCalls, timeoutMs, maxResultBytes } = opts
+  return async (input: unknown, options?: unknown) => {
+    budget.callCount++
+    if (budget.callCount > maxCalls) {
+      throw new ToolBudgetExceededError()
+    }
+
+    // Promise.race with proper timer cleanup to avoid unhandled rejections
+    const result = await new Promise<unknown>((resolve, reject) => {
+      const timer = setTimeout(() => {
+        reject(new ToolTimeoutError())
+      }, timeoutMs)
+
+      try {
+        const returned = rawExecute(input, options)
+        Promise.resolve(returned)
+          .then((value) => {
+            clearTimeout(timer)
+            resolve(value)
+            return null
+          })
+          .catch((err: unknown) => {
+            clearTimeout(timer)
+            reject(err)
+          })
+      } catch (err) {
+        clearTimeout(timer)
+        reject(err)
+      }
+    })
+
+    if (typeof result === "string" && maxResultBytes > 0) {
+      return truncateResult(result, maxResultBytes)
+    }
+
+    return result
+  }
 }

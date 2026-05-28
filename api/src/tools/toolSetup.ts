@@ -8,13 +8,14 @@ export interface ToolBudget {
 
 export interface ToolContext {
   kv?: KVNamespace
-  env: Record<string, any>
+  env: Record<string, string | undefined>
 }
 
 export interface CustomTool {
   description: string
   parameters: z.ZodTypeAny
-  execute: (args: any, context: ToolContext) => Promise<any>
+  // eslint-disable-next-line typescript/no-explicit-any -- AI SDK tool execute requires flexible types
+  execute: (args: any, context: ToolContext) => Promise<unknown>
 }
 
 /**
@@ -24,15 +25,17 @@ export interface CustomTool {
 export function wrapTools(
   tools: Record<string, CustomTool>,
   context: ToolContext,
-  budget?: ToolBudget
-): Record<string, ReturnType<typeof tool>> {
+  _budget?: ToolBudget
+  // eslint-disable-next-line typescript/no-explicit-any -- AI SDK ToolSet requires Record<string, any>
+): Record<string, any> {
+  // eslint-disable-next-line typescript/no-explicit-any -- AI SDK ToolSet requires Record<string, any>
   const result: Record<string, any> = {}
 
   for (const [name, customTool] of Object.entries(tools)) {
     result[name] = tool({
       description: customTool.description,
       inputSchema: customTool.parameters,
-      execute: async (args: any, options: any) => {
+      execute: async (args) => {
         return customTool.execute(args, context)
       },
     })

@@ -60,7 +60,7 @@ function asStringArray(value: unknown): string[] {
     return []
   }
 
-  return value.filter(hasNonEmptyString)
+  return value.filter((item) => hasNonEmptyString(item))
 }
 
 function unionStringArrays(existing: string[], source: string[]): string[] {
@@ -163,7 +163,7 @@ function getFloorPlanGroupKey(
 ) {
   const fallbackScope = getStorageBathroomScope(fallbackType, [plan])
   const normalized = normalizeFloorPlan(plan, fallbackScope)
-  const specialType = normalized.bedCount == null ? (normalized.type ?? "") : ""
+  const specialType = normalized.bedCount === null || normalized.bedCount === undefined ? (normalized.type ?? "") : ""
   return [
     normalized.officialName?.trim().toLowerCase() ?? "",
     normalized.bedCount ?? "na",
@@ -224,15 +224,16 @@ function mergeFloorPlans(
       return plan
     }
 
-    return {
-      ...plan,
-      ...(hasNonEmptyArray(existingPlan.imageUrls)
+    return Object.assign(
+      {},
+      plan,
+      hasNonEmptyArray(existingPlan.imageUrls)
         ? { imageUrls: existingPlan.imageUrls }
-        : {}),
-      ...(hasNonEmptyArray(existingPlan.photoUrls)
+        : {},
+      hasNonEmptyArray(existingPlan.photoUrls)
         ? { photoUrls: existingPlan.photoUrls }
-        : {}),
-    }
+        : {}
+    )
   })
 
   const appendedExistingPlans = Array.from(existingByKey.entries()).flatMap(
@@ -388,7 +389,9 @@ async function main() {
   console.log(`Verification: dorms table now has ${count} row(s).`)
 }
 
-main().catch((err) => {
+try {
+  await main()
+} catch (err) {
   console.error("Seed script failed:", err)
   process.exit(1)
-})
+}

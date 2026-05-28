@@ -1,8 +1,7 @@
 #!/usr/bin/env npx tsx
 
 import { readFileSync, readdirSync } from "node:fs"
-import { dirname, join } from "node:path"
-import { fileURLToPath } from "node:url"
+import { join } from "node:path"
 
 const __filename = import.meta.filename
 const __dirname = import.meta.dirname
@@ -84,12 +83,12 @@ function checkMigrationFiles(): void {
       while ((match = vectorRegex.exec(content)) !== null) {
         foundVector = true
         const dimensions = parseInt(match[1], 10)
-        if (dimensions !== EXPECTED_DIMENSION) {
+        if (dimensions === EXPECTED_DIMENSION) {
+          success(`${file}: vector(${dimensions})`)
+        } else {
           error(
             `${file}: vector(${dimensions}) found, expected vector(${EXPECTED_DIMENSION})`
           )
-        } else {
-          success(`${file}: vector(${dimensions})`)
         }
       }
     }

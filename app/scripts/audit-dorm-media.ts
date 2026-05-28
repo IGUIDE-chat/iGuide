@@ -62,39 +62,42 @@ async function main() {
     return
   }
 
-  const checked = []
-  for (const entry of suspicious) {
-    let headStatus: number | "ERR" | undefined
-    if (entry.lowQuality && entry.candidate !== entry.url) {
-      try {
-        const response = await fetch(entry.candidate, {
-          method: "HEAD",
-          redirect: "follow",
-        })
-        headStatus = response.status
-      } catch {
-        headStatus = "ERR"
+  const checked = await Promise.all(
+    suspicious.map(async (entry) => {
+      let headStatus: number | "ERR" | undefined
+      if (entry.lowQuality && entry.candidate !== entry.url) {
+        try {
+          const response = await fetch(entry.candidate, {
+            method: "HEAD",
+            redirect: "follow",
+          })
+          headStatus = response.status
+        } catch {
+          headStatus = "ERR"
+        }
       }
-    }
 
-    checked.push({
-      dormId: entry.dormId,
-      slot: entry.slot,
-      original: entry.url,
-      candidate: entry.candidate !== entry.url ? entry.candidate : undefined,
-      headStatus,
-      reasons: [
-        ...(entry.lowQuality ? ["low-quality-pattern"] : []),
-        ...(entry.peopleCue ? ["people-filename-cue"] : []),
-      ],
+      return {
+        dormId: entry.dormId,
+        slot: entry.slot,
+        original: entry.url,
+        candidate: entry.candidate === entry.url ? undefined : entry.candidate,
+        headStatus,
+        reasons: [
+          ...(entry.lowQuality ? ["low-quality-pattern"] : []),
+          ...(entry.peopleCue ? ["people-filename-cue"] : []),
+        ],
+      }
     })
-  }
+  )
 
   console.error(JSON.stringify(checked, null, 2))
   process.exit(1)
 }
 
-main().catch((error) => {
+try {
+  await main()
+} catch (error) {
   console.error(error)
   process.exit(1)
-})
+}

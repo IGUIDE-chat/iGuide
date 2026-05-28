@@ -154,10 +154,9 @@ export function ToolCard({
 
 function Spinner() {
   return (
-    <span
+    <output
       className="border-illini-orange size-3.5 animate-spin rounded-full border-2 border-t-transparent"
       aria-label="Loading"
-      role="img"
     />
   )
 }

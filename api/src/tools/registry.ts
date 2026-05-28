@@ -112,7 +112,7 @@ export class ToolRegistry {
     try {
       return await Promise.race([
         execution,
-        new Promise<never>((_, reject) => {
+        new Promise<never>((_resolve, reject) => {
           timeoutHandle = setTimeout(() => {
             reject(new ToolExecutionTimeoutError(toolName, this.timeoutMs))
           }, this.timeoutMs)

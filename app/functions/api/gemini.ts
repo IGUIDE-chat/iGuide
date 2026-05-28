@@ -4,7 +4,7 @@ type PagesFunction<T = unknown> = (context: {
   request: Request
   env: T
   params: Record<string, string>
-  waitUntil: (promise: Promise<any>) => void
+  waitUntil: (promise: Promise<unknown>) => void
   next: () => Promise<Response>
   data: Record<string, unknown>
 }) => Promise<Response>
@@ -85,9 +85,10 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unexpected server error."
     return new Response(
-      JSON.stringify({ error: error?.message || "Unexpected server error." }),
+      JSON.stringify({ error: message }),
       {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

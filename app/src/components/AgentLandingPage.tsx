@@ -165,9 +165,16 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
         </AnimatePresence>
 
         {/* Email Form - partially animated */}
-        {!submitted ? (
+        {submitted ? (
+          <div className="mx-auto max-w-xs rounded-2xl border border-slate-100 bg-slate-50 p-5">
+            <span className="mb-2 block text-2xl">✅</span>
+            <p className="text-sm font-medium text-slate-600">
+              {t.emailSuccess}
+            </p>
+          </div>
+        ) : (
           <form onSubmit={handleSubmit} className="mx-auto max-w-xs space-y-3">
-            <input
+            <input aria-label="Input field"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -197,13 +204,6 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
               <p className="text-center text-xs text-red-500">{error}</p>
             )}
           </form>
-        ) : (
-          <div className="mx-auto max-w-xs rounded-2xl border border-slate-100 bg-slate-50 p-5">
-            <span className="mb-2 block text-2xl">✅</span>
-            <p className="text-sm font-medium text-slate-600">
-              {t.emailSuccess}
-            </p>
-          </div>
         )}
       </div>
     </div>

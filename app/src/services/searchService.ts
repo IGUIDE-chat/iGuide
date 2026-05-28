@@ -40,7 +40,7 @@ function getSessionCache(key: string): SearchResponse | null {
  * In production, the API gateway is expected to route the request
  * to the appropriate QMD backend.
  */
-export async function searchKnowledgeBase(
+async function searchKnowledgeBase(
   query: string,
   lang: "en" | "zh" = "en",
   limit = 10,
@@ -79,11 +79,10 @@ export async function searchKnowledgeBase(
     : (((data as Record<string, unknown>).results as unknown[]) ?? [])
   const results: SearchResult[] = raw.map((r: unknown) => {
     const item = r as SearchResult
-    return {
-      ...item,
+    return Object.assign({}, item, {
       type: parseResultType(item.file),
       id: parseResultId(item.file),
-    }
+    })
   })
 
   const result: SearchResponse = {
@@ -95,8 +94,7 @@ export async function searchKnowledgeBase(
   return result
 }
 
-/** Quick BM25-only search (no LLM, faster). */
-export async function quickSearch(
+async function quickSearch(
   query: string,
   lang: "en" | "zh" = "en",
   limit = 5
@@ -124,3 +122,5 @@ function parseResultId(filePath: string): string | undefined {
   const match = filePath.match(/\/([^/]+)\.md$/i)
   return match?.[1]
 }
+
+export { searchKnowledgeBase, quickSearch }

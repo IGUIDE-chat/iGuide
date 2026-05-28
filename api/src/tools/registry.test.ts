@@ -161,7 +161,7 @@ test("execute returns timeout error when tool exceeds timeoutMs", async () => {
     description: "Takes too long",
     parameters: {},
     async execute(): Promise<ToolResult> {
-      await new Promise((resolve) => setTimeout(resolve, 200))
+      await new Promise<void>((resolve) => { setTimeout(resolve, 200) })
       return { content: "should not reach" }
     },
   }
@@ -184,7 +184,7 @@ test("fast tool completes before timeout", async () => {
     description: "Completes quickly",
     parameters: {},
     async execute(): Promise<ToolResult> {
-      await new Promise((resolve) => setTimeout(resolve, 10))
+      await new Promise<void>((resolve) => { setTimeout(resolve, 10) })
       return { content: "fast result" }
     },
   }
@@ -289,6 +289,7 @@ test("execute handles non-Error throws", async () => {
     description: "Throws a string",
     parameters: {},
     async execute(): Promise<ToolResult> {
+      // eslint-disable-next-line no-throw-literal -- intentionally testing non-Error throw handling
       throw "string error"
     },
   })
@@ -309,6 +310,7 @@ test("execute handles null throw", async () => {
     description: "Throws null",
     parameters: {},
     async execute(): Promise<ToolResult> {
+      // eslint-disable-next-line no-throw-literal -- intentionally testing non-Error throw handling
       throw null
     },
   })
@@ -409,6 +411,7 @@ test("registry uses default options when none provided", async () => {
   registry.register(createEchoTool())
 
   for (let i = 0; i < 5; i++) {
+    // eslint-disable-next-line no-await-in-loop -- sequential test assertions
     const result = await registry.execute("stub_echo", {}, MOCK_CTX)
     assert.equal(result.metadata?.error, undefined)
   }

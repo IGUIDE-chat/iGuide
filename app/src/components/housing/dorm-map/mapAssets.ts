@@ -233,7 +233,6 @@ const createLandmarkIcon = (type: string) => {
       ctx.arc(cx + 4, cy + 7, 2, 0, 2 * Math.PI)
       ctx.fill()
       break
-    case "school":
     default:
       ctx.beginPath()
       ctx.moveTo(cx - 9, cy - 2)

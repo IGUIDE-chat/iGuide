@@ -11,7 +11,7 @@ import { supabase } from "./supabase"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-export interface Course {
+interface Course {
   id: string
   school_id: string
   subject: string
@@ -37,7 +37,7 @@ export interface Course {
   updated_at: string
 }
 
-export interface CourseOffering {
+interface CourseOffering {
   id: string
   course_id: string
   school_id: string
@@ -134,8 +134,10 @@ async function getCourseOfferings(courseId: string): Promise<CourseOffering[]> {
   }
 }
 
-export const courseService = {
+const courseService = {
   getCourses,
   getCourseByCode,
   getCourseOfferings,
 }
+
+export { type Course, type CourseOffering, courseService }

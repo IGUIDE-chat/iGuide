@@ -48,7 +48,7 @@ const HousingTypeSection: React.FC<HousingTypeSectionProps> = ({
             key={option.value}
             className={`flex cursor-pointer items-center gap-4 rounded-xl border-2 p-4 transition-colors duration-200 ${selected ? accentClass : hoverClass} `}
           >
-            <input
+            <input aria-label="Toggle option"
               type="checkbox"
               className={`size-5 rounded-md ${checkboxClass} `}
               checked={selected}

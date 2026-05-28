@@ -57,23 +57,22 @@ export function useDormComments(dormId: string) {
     }
 
     // Merge guest votes from localStorage when not logged in
-    if (!user) {
+    if (user) {
+      setComments(data)
+    } else {
       const guestVotes = getGuestVotes()
       const merged = data.map((c) => {
         const gv = guestVotes[c.id]
-        if (gv == null) {
+        if (gv === null || gv === undefined) {
           return c
         }
-        return {
-          ...c,
+        return Object.assign({}, c, {
           myVote: gv,
           upvotes: c.upvotes + (gv === 1 ? 1 : 0),
           downvotes: c.downvotes + (gv === -1 ? 1 : 0),
-        }
+        })
       })
       setComments(merged)
-    } else {
-      setComments(data)
     }
     setLoading(false)
   }, [dormId, user])

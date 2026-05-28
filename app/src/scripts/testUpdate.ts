@@ -10,8 +10,8 @@ import dotenv from "dotenv"
 
 dotenv.config({ path: ".env.local" })
 const supabase = createClient(
-  process.env.VITE_SUPABASE_URL!,
-  process.env.VITE_SUPABASE_ANON_KEY!
+  process.env.VITE_SUPABASE_URL ?? "",
+  process.env.VITE_SUPABASE_ANON_KEY ?? ""
 )
 
 async function testUpdate() {
@@ -26,8 +26,7 @@ async function testUpdate() {
     .single()
   console.log("Current:", JSON.stringify(dorm?.categorized_tags))
 
-  const ct = { ...dorm?.categorized_tags } as any
-  ct.llcNames = newLlcNames
+  const ct = { ...dorm?.categorized_tags, llcNames: newLlcNames } as Record<string, unknown>
 
   console.log("Updating with:", JSON.stringify(ct))
   const { error } = await supabase
@@ -45,4 +44,4 @@ async function testUpdate() {
     console.log("After update:", JSON.stringify(after?.categorized_tags))
   }
 }
-testUpdate()
+await testUpdate()

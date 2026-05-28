@@ -13,7 +13,7 @@ export function toolDefToAISDK(td: ToolDefinition, ctx: RequestContext) {
   return tool({
     description: td.description,
     inputSchema: z.object({}).passthrough(),
-    execute: async (args: any, _options: any) => {
+    execute: async (args) => {
       const result = await td.execute(args, ctx)
       return result.content
     },
@@ -28,7 +28,9 @@ export function toolDefToAISDK(td: ToolDefinition, ctx: RequestContext) {
 export function mcpToolsToAISDK(
   tools: ToolDefinition[],
   ctx: RequestContext
+  // eslint-disable-next-line typescript/no-explicit-any -- AI SDK ToolSet requires Record<string, any>
 ): Record<string, any> {
+  // eslint-disable-next-line typescript/no-explicit-any -- AI SDK ToolSet requires Record<string, any>
   const result: Record<string, any> = {}
   for (const td of tools) {
     result[td.name] = toolDefToAISDK(td, ctx)

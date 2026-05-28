@@ -135,6 +135,8 @@ interface DormMapProps {
   disableScrollZoom?: boolean
 }
 
+const formatPopupPrice = (price: number) => `$${(price / 1000).toFixed(1)}k`
+
 const DormMap: React.FC<DormMapProps> = ({
   dorms,
   onSelectDorm,
@@ -372,11 +374,12 @@ const DormMap: React.FC<DormMapProps> = ({
   }, [disableScrollZoom, isMapReady])
 
   useEffect(() => {
+    const fitBoundsTimer = fitBoundsTimerRef.current
+    const map = mapRef.current
     return () => {
-      if (fitBoundsTimerRef.current) {
-        clearTimeout(fitBoundsTimerRef.current)
+      if (fitBoundsTimer) {
+        clearTimeout(fitBoundsTimer)
       }
-      const map = mapRef.current
       if (map) {
         map.getMap().scrollZoom.enable()
       }
@@ -427,14 +430,14 @@ const DormMap: React.FC<DormMapProps> = ({
       const map = mapRef.current?.getMap()
 
       if (clusterId && map) {
-        ;(map.getSource("dorms") as any).getClusterExpansionZoom(
+        ;(map.getSource("dorms") as never).getClusterExpansionZoom(
           clusterId,
           (error: unknown, zoom: number) => {
             if (error) {
               return
             }
             map.easeTo({
-              center: (feature.geometry as any).coordinates,
+              center: (feature.geometry as never).coordinates,
               zoom,
               duration: 500,
             })
@@ -471,7 +474,7 @@ const DormMap: React.FC<DormMapProps> = ({
 
       const dorm = dorms.find((item) => item.id === dormId)
       if (dorm) {
-        const coords = (feature.geometry as any).coordinates.slice() as [
+        const coords = (feature.geometry as never).coordinates.slice() as [
           number,
           number,
         ]
@@ -500,7 +503,6 @@ const DormMap: React.FC<DormMapProps> = ({
           dining: "Dining",
         }
   const isChinese = language === "zh"
-  const formatPopupPrice = (price: number) => `$${(price / 1000).toFixed(1)}k`
 
   if (!MAPBOX_TOKEN) {
     return (
@@ -559,14 +561,14 @@ const DormMap: React.FC<DormMapProps> = ({
 
         <NavigationControl position="bottom-right" showCompass={false} />
 
-        <Source id="zones" type="geojson" data={CAMPUS_ZONES as any}>
-          <Layer {...(buildZonesFillLayer(showZones) as any)} />
+        <Source id="zones" type="geojson" data={CAMPUS_ZONES as never}>
+          <Layer {...(buildZonesFillLayer(showZones) as never)} />
           <Layer
             {...(buildZonesLabelLayer(
               showZones,
               showZoneLabels,
               isChinese
-            ) as any)}
+            ) as never)}
           />
         </Source>
 
@@ -577,7 +579,7 @@ const DormMap: React.FC<DormMapProps> = ({
         >
           {areMapImagesReady && (
             <Layer
-              {...(buildLandmarksLayer(showLandmarks, isChinese) as any)}
+              {...(buildLandmarksLayer(showLandmarks, isChinese) as never)}
             />
           )}
         </Source>
@@ -594,10 +596,10 @@ const DormMap: React.FC<DormMapProps> = ({
           clusterMaxZoom={16}
           clusterRadius={50}
         >
-          <Layer {...(CLUSTERS_LAYER as any)} />
-          <Layer {...(CLUSTER_COUNT_LAYER as any)} />
+          <Layer {...(CLUSTERS_LAYER as never)} />
+          <Layer {...(CLUSTER_COUNT_LAYER as never)} />
 
-          {areMapImagesReady && <Layer {...(UNCLUSTERED_LAYER as any)} />}
+          {areMapImagesReady && <Layer {...(UNCLUSTERED_LAYER as never)} />}
         </Source>
 
         <div className="absolute top-4 left-4 z-10 flex min-w-[140px] flex-col gap-2 rounded-lg border border-slate-200/50 bg-white/90 p-3 shadow-lg backdrop-blur-sm">
@@ -610,7 +612,7 @@ const DormMap: React.FC<DormMapProps> = ({
               {language === "zh" ? "区域" : "Zones"}
             </span>
             <div className="relative inline-flex cursor-pointer items-center">
-              <input
+              <input aria-label="Toggle option"
                 type="checkbox"
                 className="peer sr-only"
                 checked={showZones}
@@ -625,7 +627,7 @@ const DormMap: React.FC<DormMapProps> = ({
               {language === "zh" ? "地标" : "Landmarks"}
             </span>
             <div className="relative inline-flex cursor-pointer items-center">
-              <input
+              <input aria-label="Toggle option"
                 type="checkbox"
                 className="peer sr-only"
                 checked={showLandmarks}
@@ -641,7 +643,7 @@ const DormMap: React.FC<DormMapProps> = ({
             longitude={hoveredCoords[0]}
             latitude={hoveredCoords[1]}
             anchor="bottom"
-            offset={[0, -14] as any}
+            offset={[0, -14] as never}
             closeButton={false}
             closeOnClick={false}
             className="dorm-hover-popup"
@@ -650,7 +652,7 @@ const DormMap: React.FC<DormMapProps> = ({
               dorm={hoveredDorm}
               popupT={popupT}
               isChinese={isChinese}
-              formatPopupPrice={formatPopupPrice}
+              priceFormatter={formatPopupPrice}
               onOpenDetails={() => {
                 setHoveredDorm(null)
                 onSelectDorm(hoveredDorm)
@@ -670,9 +672,9 @@ const PopupDormPreview: React.FC<{
   dorm: Dorm
   popupT: { perSem: string; viewDetails: string; ac: string; dining: string }
   isChinese: boolean
-  formatPopupPrice: (price: number) => string
+  priceFormatter: (price: number) => string
   onOpenDetails: () => void
-}> = ({ dorm, popupT, isChinese, formatPopupPrice, onOpenDetails }) => {
+}> = ({ dorm, popupT, isChinese, priceFormatter, onOpenDetails }) => {
   const pointerStartRef = useRef<{ x: number; y: number } | null>(null)
 
   const tryOpen = (e: React.PointerEvent) => {
@@ -689,9 +691,9 @@ const PopupDormPreview: React.FC<{
   }
 
   return (
-    <div
-      className="w-56 cursor-pointer touch-manipulation"
-      role="button"
+    <button
+      type="button"
+      className="w-56 cursor-pointer touch-manipulation text-left"
       tabIndex={0}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -745,7 +747,7 @@ const PopupDormPreview: React.FC<{
         </div>
         <div className="flex items-center justify-between">
           <span className="text-base font-bold text-gray-900">
-            {formatPopupPrice(dorm.price)}
+            {priceFormatter(dorm.price)}
             <span className="ml-0.5 text-[10px] font-normal text-gray-400">
               {popupT.perSem}
             </span>
@@ -755,7 +757,7 @@ const PopupDormPreview: React.FC<{
           </span>
         </div>
       </div>
-    </div>
+    </button>
   )
 }
 

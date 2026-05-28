@@ -114,7 +114,7 @@ const PriceSection: React.FC<PriceSectionProps> = ({
       <div className="mb-2 flex h-16 items-end gap-1 px-4">
         {HISTOGRAM_DATA.map((height, i) => (
           <div
-            key={i}
+            key={`item-${String(i)}`}
             className="flex-1 rounded-t-sm bg-gray-200 transition-colors duration-200"
             style={{
               height: `${height}%`,
@@ -176,7 +176,7 @@ const PriceSection: React.FC<PriceSectionProps> = ({
           <div className="text-xs text-gray-500">{t.minPrice}</div>
           <div className="flex items-center">
             <span className="text-lg">$</span>
-            <input
+            <input aria-label="Number input"
               type="number"
               step={100}
               value={minInput}
@@ -206,7 +206,7 @@ const PriceSection: React.FC<PriceSectionProps> = ({
           <div className="text-xs text-gray-500">{t.maxPrice}</div>
           <div className="flex items-center">
             <span className="text-lg">$</span>
-            <input
+            <input aria-label="Number input"
               type="number"
               step={100}
               value={maxInput}

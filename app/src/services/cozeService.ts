@@ -18,7 +18,7 @@
 // In development, use proxy - keys are handled by vite.config.ts proxy
 const COZE_BOT_ID = import.meta.env.VITE_COZE_BOT_ID
 
-export interface StreamResponse {
+interface StreamResponse {
   text: string
   followUpQuestions?: string[]
   thinkingStep?: {
@@ -28,16 +28,21 @@ export interface StreamResponse {
   }
 }
 
+interface StreamChatParams {
+  history: Array<{ role: "user" | "model"; text: string }>
+  newMessage: string
+  lang?: string
+  conversationId?: string
+  userId?: string
+}
+
 /**
  * Stream Chat Response from Coze API
  */
-export const streamChatResponse = async function* (
-  history: Array<{ role: "user" | "model"; text: string }>,
-  newMessage: string,
-  lang: string = "en",
-  conversationId?: string, // Optional Coze conversation ID
-  userId?: string // Optional: Pass Supabase User ID or Guest ID
+const streamChatResponse = async function* (
+  params: StreamChatParams
 ): AsyncGenerator<StreamResponse> {
+  const { history, newMessage, lang = "en", conversationId, userId } = params
   // Configuration check for DEV mode
   if (import.meta.env.DEV && !COZE_BOT_ID) {
     yield {
@@ -324,22 +329,33 @@ export const streamChatResponse = async function* (
       return { outputs, abort }
     }
 
+    const yieldLines = (lines: string[]): { outputs: StreamResponse[]; abort: boolean } => {
+      const allOutputs: StreamResponse[] = []
+      for (const line of lines) {
+        const { outputs, abort } = handleLine(line.trim())
+        allOutputs.push(...outputs)
+        if (abort) {
+          return { outputs: allOutputs, abort: true }
+        }
+      }
+      return { outputs: allOutputs, abort: false }
+    }
+
     console.log("[Coze] Starting to read stream...")
 
     while (true) {
+      // eslint-disable-next-line no-await-in-loop -- sequential stream reading is intentional
       const { done, value } = await reader.read()
       if (done) {
         // Flush decoder and process any remaining buffered line.
         buffer += decoder.decode()
-        if (buffer.trim()) {
-          for (const tailLine of buffer.split("\n")) {
-            const { outputs, abort } = handleLine(tailLine.trim())
-            for (const output of outputs) {
-              yield output
-            }
-            if (abort) {
-              return
-            }
+        const remaining = buffer.trim()
+        if (remaining) {
+          const tailLines = remaining.split("\n")
+          const flushResult = yieldLines(tailLines)
+          yield* flushResult.outputs
+          if (flushResult.abort) {
+            return
           }
         }
         console.log("[Coze] Stream completed")
@@ -352,20 +368,19 @@ export const streamChatResponse = async function* (
       // Keep the last incomplete line in the buffer
       buffer = lines.pop() || ""
 
-      for (const line of lines) {
-        const { outputs, abort } = handleLine(line.trim())
-        for (const output of outputs) {
-          yield output
-        }
-        if (abort) {
-          return
-        }
+      const lineResult = yieldLines(lines)
+      yield* lineResult.outputs
+      if (lineResult.abort) {
+        return
       }
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Stream Error:", error)
+    const message = error instanceof Error ? error.message : "Failed to reach Coze API"
     yield {
-      text: `\n(Connection Error: ${error.message || "Failed to reach Coze API"}. Please check your internet or CORS settings.)`,
+      text: `\n(Connection Error: ${message}. Please check your internet or CORS settings.)`,
     }
   }
 }
+
+export { type StreamResponse, streamChatResponse }

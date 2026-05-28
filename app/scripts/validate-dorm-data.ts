@@ -250,22 +250,22 @@ for (const dorm of UIUC_DORMS) {
     check(!plan.imageUrl, `${dorm.id} still uses legacy floorPlans.imageUrl.`)
     check(!plan.photoUrl, `${dorm.id} still uses legacy floorPlans.photoUrl.`)
     check(
-      plan.bathroomScope != null,
+      plan.bathroomScope !== null && plan.bathroomScope !== undefined,
       `${dorm.id} has a floor plan without bathroomScope.`
     )
-    if (plan.bathroomScope != null) {
+    if (plan.bathroomScope !== null && plan.bathroomScope !== undefined) {
       check(
         VALID_BATHROOM_SCOPES.has(plan.bathroomScope),
         `${dorm.id} uses invalid bathroomScope "${plan.bathroomScope}".`
       )
     }
-    if (plan.price != null) {
+    if (plan.price !== null && plan.price !== undefined) {
       check(
         Number.isFinite(plan.price) && plan.price > 0,
         `${dorm.id} has an invalid floor plan price value.`
       )
     }
-    if (plan.sqft != null) {
+    if (plan.sqft !== null && plan.sqft !== undefined) {
       check(
         Number.isFinite(plan.sqft) && plan.sqft > 0,
         `${dorm.id} has an invalid floor plan sqft value.`
@@ -284,7 +284,7 @@ for (const dorm of UIUC_DORMS) {
         `${dorm.id} has a floor plan without bedSize.`
       )
     }
-    if (plan.bedSize != null) {
+    if (plan.bedSize !== null && plan.bedSize !== undefined) {
       check(
         VALID_BED_SIZES.has(plan.bedSize),
         `${dorm.id} uses invalid bedSize "${plan.bedSize}".`
@@ -296,7 +296,7 @@ for (const dorm of UIUC_DORMS) {
     for (const [index, url] of (plan.imageUrls ?? []).entries()) {
       checkMediaUrl(dorm.id, `floorPlans.imageUrls[${index}]`, url)
     }
-    if (plan.labelCode == null) {
+    if (plan.labelCode === null || plan.labelCode === undefined) {
       console.warn(`Warning: ${dorm.id} has a floor plan without labelCode.`)
     }
   }
@@ -310,33 +310,33 @@ const presby = UIUC_DORMS.find((dorm) => dorm.id === "presby")
 check(Boolean(allen), "allen dorm is missing from static data.")
 check(
   Boolean(allen) &&
-    allen!.categorizedTags.lifestyle.includes("genderInclusive") &&
-    allen!.categorizedTags.facilities.includes("computerLab") &&
-    !allen!.categorizedTags.facilities.includes("library"),
+    allen?.categorizedTags.lifestyle.includes("genderInclusive") &&
+    allen?.categorizedTags.facilities.includes("computerLab") &&
+    !allen?.categorizedTags.facilities.includes("library"),
   "allen should have genderInclusive and computerLab, but not library."
 )
 check(Boolean(weston), "weston dorm is missing from static data.")
 check(
   Boolean(weston) &&
-    weston!.categorizedTags.lifestyle.includes("genderInclusive") &&
-    weston!.categorizedTags.facilities.includes("computerLab") &&
-    weston!.categorizedTags.facilities.includes("library"),
+    weston?.categorizedTags.lifestyle.includes("genderInclusive") &&
+    weston?.categorizedTags.facilities.includes("computerLab") &&
+    weston?.categorizedTags.facilities.includes("library"),
   "weston should have genderInclusive, computerLab, and library."
 )
 check(Boolean(newman), "newman dorm is missing from static data.")
 check(
   Boolean(newman) &&
-    !newman!.categorizedTags.lifestyle.includes("genderInclusive") &&
-    newman!.categorizedTags.facilities.includes("computerLab") &&
-    newman!.categorizedTags.facilities.includes("library"),
+    !newman?.categorizedTags.lifestyle.includes("genderInclusive") &&
+    newman?.categorizedTags.facilities.includes("computerLab") &&
+    newman?.categorizedTags.facilities.includes("library"),
   "newman should have computerLab and library, but not genderInclusive."
 )
 check(Boolean(presby), "presby dorm is missing from static data.")
 check(
   Boolean(presby) &&
-    !presby!.categorizedTags.lifestyle.includes("genderInclusive") &&
-    !presby!.categorizedTags.facilities.includes("computerLab") &&
-    !presby!.categorizedTags.facilities.includes("library"),
+    !presby?.categorizedTags.lifestyle.includes("genderInclusive") &&
+    !presby?.categorizedTags.facilities.includes("computerLab") &&
+    !presby?.categorizedTags.facilities.includes("library"),
   "presby should not have genderInclusive, computerLab, or library."
 )
 checkDormBathroomScopes(

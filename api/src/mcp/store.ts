@@ -133,6 +133,7 @@ class KVMCPStore implements MCPStore {
     let cursor: string | undefined
 
     while (true) {
+      // eslint-disable-next-line no-await-in-loop -- KV pagination requires sequential cursor-based fetching
       const page = await this.kv.list({
         prefix: qualifiedPrefix,
         cursor,

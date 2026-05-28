@@ -46,12 +46,14 @@ async function _fetchQMDContext(
     return results
       .filter((r) => r.score > 0.3)
       .map((r) => {
-        const typeLabel =
-          r.type === "dorm"
-            ? "🏠 Dorm"
-            : r.type === "article"
-              ? "📄 Article"
-              : "🌐 Web"
+        let typeLabel: string
+        if (r.type === "dorm") {
+          typeLabel = "🏠 Dorm"
+        } else if (r.type === "article") {
+          typeLabel = "📄 Article"
+        } else {
+          typeLabel = "🌐 Web"
+        }
         const url = r.id
           ? `/${r.type === "dorm" ? "housing" : "article"}/${r.id}`
           : "N/A"
@@ -153,9 +155,10 @@ export const streamDeepSeekChat = async function* (
   history: ChatHistoryItem[],
   newMessage: string,
   lang: string = "en",
-  _conversationId?: string,
-  _userId?: string
+  options?: { conversationId?: string; userId?: string }
 ): AsyncGenerator<StreamChunk> {
+  const conversationId = options?.conversationId
+  const userId = options?.userId
   try {
     const useToolUseRag = isToolUseRagEnabled()
 
@@ -166,8 +169,8 @@ export const streamDeepSeekChat = async function* (
         body: JSON.stringify({
           message: newMessage,
           history,
-          conversationId: _conversationId,
-          userId: _userId,
+          conversationId,
+          userId,
           lang,
         }),
       })

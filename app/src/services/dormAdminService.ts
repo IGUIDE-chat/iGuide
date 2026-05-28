@@ -18,7 +18,7 @@ import { getPersistedBathroomType } from "../utils/roomOptions"
 const TABLE = "dorms"
 
 /** Partial update payload — camelCase fields mapped to snake_case for DB. */
-export interface DormUpdate {
+interface DormUpdate {
   name?: string
   name_zh?: string | null
   description?: string
@@ -50,12 +50,12 @@ export interface DormUpdate {
   website?: string | null
 }
 
-export interface DormMutationResult {
+interface DormMutationResult {
   ok: boolean
   errorMessage?: string
 }
 
-export interface EditHistoryEntry {
+interface EditHistoryEntry {
   id: string
   dorm_id: string
   dorm_name: string
@@ -102,7 +102,7 @@ const KNOWN_DB_COLUMNS = new Set([
 ])
 
 /** Build a human-readable summary of what changed between dorm and updates. */
-export function buildSummary(dorm: Dorm, updates: DormUpdate): string {
+function buildSummary(dorm: Dorm, updates: DormUpdate): string {
   const parts: string[] = []
   if (updates.name !== undefined && updates.name !== dorm.name) {
     parts.push("名称")
@@ -163,13 +163,16 @@ async function getEditHistory(dormId: string): Promise<EditHistoryEntry[]> {
 /**
  * Fire-and-forget: insert a history entry for an edit. Errors are non-blocking.
  */
-async function logEdit(
-  dormId: string,
-  dormName: string,
-  changedBy: string,
-  summary: string,
+interface LogEditParams {
+  dormId: string
+  dormName: string
+  changedBy: string
+  summary: string
   snapshotBefore: Record<string, unknown>
-): Promise<void> {
+}
+
+async function logEdit(params: LogEditParams): Promise<void> {
+  const { dormId, dormName, changedBy, summary, snapshotBefore } = params
   const { error } = await supabase.from("dorm_edit_history").insert({
     dorm_id: dormId,
     dorm_name: dormName,
@@ -206,13 +209,13 @@ async function restoreSnapshot(
     console.error("[dormAdminService] restoreSnapshot error:", error)
     return false
   }
-  await logEdit(
+  await logEdit({
     dormId,
-    entry.dorm_name,
-    entry.changed_by,
-    `由管理员还原至 ${entry.changed_at} 版本`,
-    entry.snapshot
-  )
+    dormName: entry.dorm_name,
+    changedBy: entry.changed_by,
+    summary: `由管理员还原至 ${entry.changed_at} 版本`,
+    snapshotBefore: entry.snapshot,
+  })
   return true
 }
 
@@ -236,7 +239,7 @@ async function updateDorm(
   }
 
   // Auto-recalculate price_range when price changes
-  if (safeUpdates.price != null && typeof safeUpdates.price === "number") {
+  if (safeUpdates.price !== null && safeUpdates.price !== undefined && typeof safeUpdates.price === "number") {
     safeUpdates.price_range = getDormPriceRange(safeUpdates.price as number)
   }
 
@@ -313,7 +316,7 @@ async function resetDormToStatic(dormId: string): Promise<DormMutationResult> {
   return updateDorm(dormId, row)
 }
 
-export interface DormImageUploadResult {
+interface DormImageUploadResult {
   publicUrl: string | null
   errorMessage?: string
 }
@@ -380,3 +383,5 @@ export const dormAdminService = {
   logEdit,
   restoreSnapshot,
 }
+
+export { type DormUpdate, type DormMutationResult, type EditHistoryEntry, type DormImageUploadResult, buildSummary }

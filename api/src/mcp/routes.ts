@@ -131,7 +131,7 @@ function assertNoCredentialedEndpoint(url: URL) {
 
 function hasCredentialFields(value: unknown): boolean {
   if (Array.isArray(value)) {
-    return value.some(hasCredentialFields)
+    return value.some((item) => hasCredentialFields(item))
   }
 
   if (value && typeof value === "object") {
@@ -562,16 +562,15 @@ export async function maybeHandleIntegrationsRoute(
       )
     }
 
-    if (error instanceof Error) {
-      if (
-        error.message.includes("required") ||
+    if (
+      error instanceof Error &&
+      (error.message.includes("required") ||
         error.message.includes("must be") ||
         error.message.includes("At least one") ||
         error.message.includes("Request body") ||
-        error.message.includes("Invalid JSON")
-      ) {
-        return jsonResponse({ error: error.message }, 400, responseHeaders)
-      }
+        error.message.includes("Invalid JSON"))
+    ) {
+      return jsonResponse({ error: error.message }, 400, responseHeaders)
     }
 
     console.error("Integrations route error:", error)

@@ -26,6 +26,7 @@ test("under budget passes through (9 of 10 succeeds)", async () => {
   const guarded = withGuards(tools, { maxCalls: 10 })
 
   for (let i = 0; i < 9; i++) {
+    // eslint-disable-next-line no-await-in-loop -- sequential test assertions
     const result = await guarded.test_tool.execute!({})
     assert.equal(result, "ok")
   }
@@ -44,6 +45,7 @@ test("over budget rejects 11th call when maxCalls=10", async () => {
   const guarded = withGuards(tools, { maxCalls: 10 })
 
   for (let i = 0; i < 10; i++) {
+    // eslint-disable-next-line no-await-in-loop -- sequential test assertions
     await guarded.test_tool.execute!({})
   }
 
@@ -59,7 +61,7 @@ test("timeout rejects after timeoutMs", async () => {
       description: "slow",
       parameters: z.object({}),
       execute: async () => {
-        await new Promise((r) => setTimeout(r, 200))
+        await new Promise<void>((resolve) => { setTimeout(resolve, 200) })
         return "too late"
       },
     }),

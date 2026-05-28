@@ -1,30 +1,40 @@
 import { type DormComment } from "../../../services/dormCommentsService"
 
+interface GenerateCommentOptions {
+  id: string
+  dorm_id: string
+  display_name: string
+  content: string
+  dorm_vote: 1 | -1 | null
+  daysAgo: number
+  upvotes: number
+}
+
+const generateCommentFromOptions = (opts: GenerateCommentOptions): DormComment => {
+  const date = new Date(Date.now() - opts.daysAgo * 24 * 60 * 60 * 1000)
+
+  return {
+    id: opts.id,
+    dorm_id: opts.dorm_id,
+    user_id: `${opts.id}-user`,
+    display_name: opts.display_name,
+    content: `${opts.content}\n\n(数据由系统爬取自真实 Google Maps / Scraped from real Google Maps)`,
+    dorm_vote: opts.dorm_vote,
+    created_at: date.toISOString(),
+    upvotes: opts.upvotes,
+    downvotes: 0,
+    myVote: null,
+  }
+}
+
 const generateComment = (
   id: string,
   dorm_id: string,
   display_name: string,
   content: string,
-  dorm_vote: 1 | -1 | null,
-  daysAgo: number,
-  upvotes: number
-): DormComment => {
-  const date = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000)
-
-  return {
-    id: id,
-    dorm_id,
-    user_id: `${id}-user`,
-    display_name,
-    // Using real internet data from automated stealth scraping
-    content: `${content}\n\n(数据由系统爬取自真实 Google Maps / Scraped from real Google Maps)`,
-    dorm_vote,
-    created_at: date.toISOString(),
-    upvotes,
-    downvotes: 0,
-    myVote: null,
-  }
-}
+  ...rest: [1 | -1 | null, number, number]
+): DormComment =>
+  generateCommentFromOptions({ id, dorm_id, display_name, content, dorm_vote: rest[0], daysAgo: rest[1], upvotes: rest[2] })
 
 export const GOOGLE_REVIEWS: DormComment[] = [
   generateComment(

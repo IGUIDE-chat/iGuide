@@ -20,7 +20,8 @@ export function useDormCommentStats() {
   const [stats, setStats] = useState<Record<string, DormCommentStats>>({})
 
   useEffect(() => {
-    dormCommentsService.getAllDormStats().then(async (data) => {
+    const loadStats = async () => {
+      const data = await dormCommentsService.getAllDormStats()
       const updatedStats = { ...data }
       if (SHOW_GOOGLE_REVIEWS) {
         const { GOOGLE_REVIEWS } = await import("../constants/googleReviews")
@@ -46,7 +47,8 @@ export function useDormCommentStats() {
         })
       }
       setStats(updatedStats)
-    })
+    }
+    loadStats()
   }, [])
 
   return stats

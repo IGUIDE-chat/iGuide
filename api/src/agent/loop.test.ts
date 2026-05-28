@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop -- streaming reads require sequential consumption */
 import assert from "node:assert/strict"
 import test from "node:test"
 
@@ -469,6 +470,7 @@ test("streaming max iterations triggers fallback with bounded stop", async () =>
     assert.equal(doneEvents.length, 1, "Should have done event")
 
     assert.ok(
+      // eslint-disable-next-line vitest/no-conditional-in-test -- defensive assertion on optional result fields
       result.content.includes("maximum") ||
         result.content.includes("incomplete") ||
         result.metadata?.stopReason === "max_iterations" ||
@@ -583,6 +585,7 @@ test("streaming trace events are emitted at key points", async () => {
 
     // Verify observation event structure
     const observationEvent = parsed.find((e) => e.event === "observation")
+    // eslint-disable-next-line vitest/no-conditional-in-test -- defensive check on optional event
     if (observationEvent) {
       const payload = observationEvent.data as {
         name: string
@@ -749,6 +752,7 @@ test("streaming allows tools for substantive query", async () => {
     // Verify request had tools
     const requestBody = parseRequestBody(mockFetch.requests[0])
     assert.ok(
+      // eslint-disable-next-line vitest/no-conditional-in-test -- checking optional field existence
       requestBody.tools && requestBody.tools.length > 0,
       "Should have tools"
     )

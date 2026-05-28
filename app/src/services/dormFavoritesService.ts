@@ -10,7 +10,7 @@
 import { supabase } from "./supabase"
 import { authService } from "./authService"
 
-export interface DormFavorite {
+interface DormFavorite {
   id: string
   user_id: string
   dorm_id: string
@@ -23,7 +23,7 @@ export interface DormFavorite {
 
 const TABLE_NAME = "dorm_favorites"
 
-export const dormFavoritesService = {
+const dormFavoritesService = {
   /**
    * Toggle favorite status (add if not exists, remove if exists)
    */
@@ -207,3 +207,5 @@ export const dormFavoritesService = {
     }
   },
 }
+
+export { type DormFavorite, dormFavoritesService }

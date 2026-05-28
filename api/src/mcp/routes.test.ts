@@ -299,6 +299,7 @@ test("PUT on a platform-owned connection returns 403", async () => {
     connections: {
       ...createServices().connections,
       getByIdForViewer: async (id) =>
+        // eslint-disable-next-line vitest/no-conditional-in-test -- mock implementation requires conditional
         id === platformConnection.id ? platformConnection : null,
     },
   })

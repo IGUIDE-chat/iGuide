@@ -143,7 +143,7 @@ export const useDormListController = (language: Language) => {
   const activeFilterCount = useMemo(
     () =>
       (hasPriceFilter ? 1 : 0) +
-      (housingTypeDetails !== "ALL" ? 1 : 0) +
+      (housingTypeDetails === "ALL" ? 0 : 1) +
       locationFilters.length +
       bedCountFilters.length +
       bathroomCountFilters.length +

@@ -11,7 +11,7 @@ import { supabase } from "./supabase"
 
 const TABLE = "mailing_list"
 
-export type MailingListTopic = "courses" | "resume" | "dorms"
+type MailingListTopic = "courses" | "resume" | "dorms"
 
 interface SubscribeResult {
   success: boolean
@@ -23,7 +23,7 @@ interface SubscribeResult {
  * Subscribe an email to a specific topic's mailing list.
  * Prevents duplicate subscriptions for the same email + topic.
  */
-export async function subscribe(
+async function subscribe(
   email: string,
   topic: MailingListTopic
 ): Promise<SubscribeResult> {
@@ -52,4 +52,6 @@ export async function subscribe(
   return { success: true }
 }
 
-export const mailingListService = { subscribe }
+const mailingListService = { subscribe }
+
+export { type MailingListTopic, subscribe, mailingListService }

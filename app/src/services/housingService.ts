@@ -68,7 +68,7 @@ async function getHousing(schoolId?: string): Promise<Housing[]> {
       return []
     }
 
-    return data.map(rowToHousing)
+    return data.map((row) => rowToHousing(row))
   } catch (err) {
     console.error("[housingService] getHousing exception:", err)
     return []

@@ -20,13 +20,13 @@ interface WorkerContentPayload {
   content?: string
 }
 
-export interface SSEParserState {
+interface SSEParserState {
   currentEvent: string
   reasoningBuffer: string
   isInReasoning: boolean
 }
 
-export function createSSEParserState(): SSEParserState {
+function createSSEParserState(): SSEParserState {
   return {
     currentEvent: "",
     reasoningBuffer: "",
@@ -39,7 +39,7 @@ function getReasoningLabel(lang: StreamLanguage): string {
 }
 
 function stringifyDetail(value: unknown): string | undefined {
-  if (value == null) {
+  if (value === null || value === undefined) {
     return undefined
   }
   if (typeof value === "string") {
@@ -154,7 +154,7 @@ function parseWorkerEvent(
   return []
 }
 
-export function parseDeepSeekSSELine(
+function parseDeepSeekSSELine(
   line: string,
   state: SSEParserState,
   lang: StreamLanguage
@@ -195,7 +195,7 @@ export function parseDeepSeekSSELine(
   }
 }
 
-export async function* parseDeepSeekSSEStream(
+async function* parseDeepSeekSSEStream(
   reader: ReadableStreamDefaultReader<Uint8Array>,
   lang: StreamLanguage
 ): AsyncGenerator<StreamChunk> {
@@ -204,6 +204,7 @@ export async function* parseDeepSeekSSEStream(
   let buffer = ""
 
   while (true) {
+    // eslint-disable-next-line no-await-in-loop -- sequential stream reading is intentional
     const { done, value } = await reader.read()
 
     if (done) {
@@ -226,3 +227,5 @@ export async function* parseDeepSeekSSEStream(
     }
   }
 }
+
+export { type SSEParserState, createSSEParserState, parseDeepSeekSSELine, parseDeepSeekSSEStream }

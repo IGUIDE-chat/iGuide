@@ -3,7 +3,7 @@ type PagesFunction<T = unknown> = (context: {
   request: Request
   env: T
   params: Record<string, string>
-  waitUntil: (promise: Promise<any>) => void
+  waitUntil: (promise: Promise<unknown>) => void
   next: () => Promise<Response>
   data: Record<string, unknown>
 }) => Promise<Response>
@@ -62,9 +62,10 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         "X-QMD-Region": res.headers.get("X-QMD-Region") || "unknown",
       },
     })
-  } catch (e: any) {
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : undefined
     return new Response(
-      JSON.stringify({ error: "QMD search unavailable", detail: e?.message }),
+      JSON.stringify({ error: "QMD search unavailable", detail: message }),
       {
         status: 503,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

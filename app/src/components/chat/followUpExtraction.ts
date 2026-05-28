@@ -17,8 +17,8 @@ export function extractFollowUps(text: string): string[] | null {
     return null
   }
 
-  const splitIndex = followUpHeaderMatch.index!
-  const followUpText = text.substring(
+  const splitIndex = followUpHeaderMatch.index ?? 0
+  const followUpText = text.slice(
     splitIndex + followUpHeaderMatch[0].length
   )
 

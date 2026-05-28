@@ -44,8 +44,15 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     if (!user) {
       return
     }
-    void memoryService.getSoul(user.id).then(setSoul)
-    void memoryService.getUserMemory(user.id).then(setUserMemory)
+    const loadData = async () => {
+      const [soulData, memoryData] = await Promise.all([
+        memoryService.getSoul(user.id),
+        memoryService.getUserMemory(user.id),
+      ])
+      setSoul(soulData)
+      setUserMemory(memoryData)
+    }
+    loadData()
   }, [user])
 
   const handleSaveSoul = async () => {
@@ -162,6 +169,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         {/* Header */}
         <div className="mb-8 flex items-center gap-4">
           <button
+            type="button"
+            aria-label="Go back"
             onClick={onBack}
             className="-ml-2 rounded-full p-2 text-slate-500 transition-colors hover:bg-slate-100"
           >
@@ -193,16 +202,19 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               <div className="mb-2 flex w-full max-w-[200px] items-center gap-2">
                 <input
                   type="text"
+                  aria-label="Edit name"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                   className="border-illini-orange w-full border-b-2 bg-transparent px-3 py-1 text-center font-bold text-slate-900 focus:outline-none"
-                  autoFocus
+                  ref={(el) => { el?.focus() }}
                 />
               </div>
             ) : (
               <h2 className="mb-1 flex items-center gap-2 text-xl font-bold text-slate-900">
                 {user.name || "User"}
                 <button
+            type="button"
+                  aria-label="Edit name"
                   onClick={() => {
                     setIsEditing(true)
                     setNewName(user.name)
@@ -231,12 +243,14 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             {isEditing && (
               <div className="mt-4 flex gap-2">
                 <button
+            type="button"
                   onClick={() => setIsEditing(false)}
                   className="rounded-full bg-slate-100 px-4 py-1.5 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-200"
                 >
                   {t.cancel}
                 </button>
                 <button
+            type="button"
                   onClick={handleUpdateName}
                   disabled={isLoading}
                   className="bg-illini-orange hover:bg-illini-blue rounded-full px-4 py-1.5 text-xs font-medium text-white transition-colors disabled:opacity-50"
@@ -270,6 +284,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             </div>
             {!isSoulEditing && (
               <button
+            type="button"
                 onClick={() => setIsSoulEditing(true)}
                 className="text-illini-orange hover:text-illini-blue text-xs font-medium transition-colors"
               >
@@ -280,6 +295,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           {isSoulEditing ? (
             <>
               <textarea
+                aria-label="Soul prompt"
                 value={soul}
                 onChange={(e) => setSoul(e.target.value)}
                 maxLength={500}
@@ -293,12 +309,14 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 </span>
                 <div className="flex gap-2">
                   <button
+            type="button"
                     onClick={() => setIsSoulEditing(false)}
                     className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-200"
                   >
                     {t.cancel}
                   </button>
                   <button
+            type="button"
                     onClick={handleSaveSoul}
                     disabled={isSoulSaving}
                     className="bg-illini-orange hover:bg-illini-blue rounded-full px-3 py-1 text-xs font-medium text-white transition-colors disabled:opacity-50"
@@ -331,6 +349,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             <div className="flex gap-2">
               {!isMemoryEditing && userMemory && (
                 <button
+            type="button"
                   onClick={handleClearMemory}
                   className="text-xs font-medium text-red-400 transition-colors hover:text-red-600"
                 >
@@ -339,6 +358,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               )}
               {!isMemoryEditing && (
                 <button
+            type="button"
                   onClick={() => setIsMemoryEditing(true)}
                   className="text-illini-orange hover:text-illini-blue text-xs font-medium transition-colors"
                 >
@@ -350,6 +370,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           {isMemoryEditing ? (
             <>
               <textarea
+                aria-label="Memory notes"
                 value={userMemory}
                 onChange={(e) => setUserMemory(e.target.value)}
                 maxLength={1500}
@@ -363,12 +384,14 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 </span>
                 <div className="flex gap-2">
                   <button
+            type="button"
                     onClick={() => setIsMemoryEditing(false)}
                     className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-200"
                   >
                     {t.cancel}
                   </button>
                   <button
+            type="button"
                     onClick={handleSaveMemory}
                     disabled={isMemorySaving}
                     className="bg-illini-orange hover:bg-illini-blue rounded-full px-3 py-1 text-xs font-medium text-white transition-colors disabled:opacity-50"
@@ -393,6 +416,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
         {/* Actions */}
         <button
+            type="button"
           onClick={handleSignOut}
           className="group flex w-full items-center justify-center gap-2 rounded-xl bg-red-50 py-3.5 font-semibold text-red-600 transition-colors hover:bg-red-100"
         >

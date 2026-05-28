@@ -109,9 +109,7 @@ export const BaseSidebar: React.FC<BaseSidebarProps> = ({
       <div className="no-scrollbar flex-1 overflow-y-auto px-2">
         {isLoading ? (
           loadingState
-        ) : !hasItems ? (
-          emptyState
-        ) : (
+        ) : hasItems ? (
           <div className="space-y-3">
             {categoryOrder.map((category) => {
               const items = groupedItems[category]
@@ -133,6 +131,8 @@ export const BaseSidebar: React.FC<BaseSidebarProps> = ({
               )
             })}
           </div>
+        ) : (
+          emptyState
         )}
       </div>
     </div>
@@ -175,7 +175,8 @@ export const PinButton: React.FC<PinButtonProps> = ({
   onClick,
   label,
 }) => (
-  <button
+  <button aria-label="Action"
+            type="button"
     onClick={onClick}
     className="rounded-md p-1 transition-colors hover:bg-white/10"
     title={label}
@@ -205,7 +206,8 @@ export const DeleteButton: React.FC<DeleteButtonProps> = ({
   onClick,
   label,
 }) => (
-  <button
+  <button aria-label="Action"
+            type="button"
     onClick={onClick}
     className="rounded-md p-1 transition-colors hover:bg-red-500/20"
     title={label}

@@ -10,7 +10,7 @@
 const TAVILY_PROXY_URL = "/api/tavily" // CF Pages Function (prod) or Vite proxy (dev)
 const UIUC_OFFICIAL_HOST = "illinois.edu"
 
-export interface WebSearchResult {
+interface WebSearchResult {
   title: string
   url: string
   content: string
@@ -34,7 +34,7 @@ function normalizeUrlKey(url: string): string {
   }
 }
 
-export function isUiucOfficialUrl(url: string): boolean {
+function isUiucOfficialUrl(url: string): boolean {
   try {
     const hostname = new URL(url).hostname.toLowerCase()
     return (
@@ -137,7 +137,7 @@ async function runTavilySearch(
  * Search the web via Tavily API.
  * Scoped to UIUC-related queries by default.
  */
-export async function webSearch(
+async function webSearch(
   query: string,
   options: {
     maxResults?: number
@@ -153,7 +153,7 @@ export async function webSearch(
   }
 }
 
-export async function webSearchWithOfficialPriority(
+async function webSearchWithOfficialPriority(
   queries: string[],
   options: {
     maxResults?: number
@@ -207,3 +207,5 @@ export async function webSearchWithOfficialPriority(
     return []
   }
 }
+
+export { type WebSearchResult, isUiucOfficialUrl, webSearch, webSearchWithOfficialPriority }

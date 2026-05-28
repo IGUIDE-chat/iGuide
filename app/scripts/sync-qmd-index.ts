@@ -14,7 +14,6 @@
 import { execFileSync } from "node:child_process"
 import fs from "node:fs"
 import path from "node:path"
-import { fileURLToPath } from "node:url"
 
 import { generateQmdMarkdown } from "./generate-qmd-markdown.ts"
 
@@ -241,7 +240,9 @@ async function main() {
   console.log("\nQMD index sync complete.")
 }
 
-main().catch((err) => {
+try {
+  await main()
+} catch (err) {
   console.error("Sync failed:", err)
   process.exit(1)
-})
+}

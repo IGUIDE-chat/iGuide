@@ -19,20 +19,10 @@ const providers = {
 }
 const activeProvider = providers[providerKey]
 
-export const getActiveAIProvider = () => activeProvider.id
+const getActiveAIProvider = () => activeProvider.id
 
-export const streamChatResponse: StreamChatResponseFn = (
-  history,
-  newMessage,
-  lang,
-  conversationId,
-  userId
-) => {
-  return activeProvider.streamChatResponse(
-    history,
-    newMessage,
-    lang,
-    conversationId,
-    userId
-  )
+const streamChatResponse: StreamChatResponseFn = (params) => {
+  return activeProvider.streamChatResponse(params)
 }
+
+export { getActiveAIProvider, streamChatResponse }

@@ -61,6 +61,7 @@ export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({
   return (
     <div className="mb-2">
       <button
+            type="button"
         onClick={() => setIsExpanded(!isExpanded)}
         aria-expanded={isExpanded}
         className="group flex items-center gap-1.5 text-xs text-slate-500 transition-colors hover:text-slate-700"
@@ -86,12 +87,8 @@ export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({
         )}
         <span className="font-medium">
           {isThinking
-            ? language === "zh"
-              ? "思考中"
-              : "Thinking"
-            : language === "zh"
-              ? "思考完成"
-              : "Done thinking"}
+            ? (language === "zh" ? "思考中" : "Thinking")
+            : (language === "zh" ? "思考完成" : "Done thinking")}
         </span>
         {isThinking && latestStep && (
           <span className="text-slate-400">

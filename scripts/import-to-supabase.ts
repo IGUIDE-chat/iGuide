@@ -1,7 +1,6 @@
 import crypto from "node:crypto"
 import fs from "node:fs/promises"
 import path from "node:path"
-import { fileURLToPath } from "node:url"
 
 const DEFAULT_EMBEDDING_MODEL = "multilingual-e5-small"
 const DEFAULT_EMBEDDING_DIMENSIONS = 384
@@ -329,97 +328,92 @@ async function main() {
 
   const supabaseClient = new SupabaseRestClient(env)
   const embeddingClient = new EmbeddingApiClient(env)
-  let source: SourceRecord | null = null
-  let snapshot: SourceSnapshotRecord | null = null
 
-  for (const [index, unit] of importPlan.units.entries()) {
-    try {
-      if (!source) {
-        source = await supabaseClient.upsertSource(sourcePayload)
-      }
+  const source = await supabaseClient.upsertSource(sourcePayload)
+  await supabaseClient.markSnapshotsNotCurrent(source.id)
+  const snapshot = await supabaseClient.insertSourceSnapshot({
+    source_id: source.id,
+    snapshot_key: snapshotKey,
+    capture_mode: "manual_import",
+    capture_status: "success",
+    captured_at: new Date().toISOString(),
+    is_current: true,
+    content_hash: importPlan.snapshotContentHash,
+    raw_metadata: snapshotMetadata,
+  })
 
-      if (!snapshot) {
-        await supabaseClient.markSnapshotsNotCurrent(source.id)
-        snapshot = await supabaseClient.insertSourceSnapshot({
-          source_id: source.id,
-          snapshot_key: snapshotKey,
-          capture_mode: "manual_import",
-          capture_status: "success",
-          captured_at: new Date().toISOString(),
-          is_current: true,
-          content_hash: importPlan.snapshotContentHash,
-          raw_metadata: snapshotMetadata,
+  await Promise.all(
+    importPlan.units.map(async (unit, index) => {
+      try {
+        if (unit.chunks.length === 0) {
+          stats.skipped += 1
+          console.warn(
+            JSON.stringify({
+              event: "skip_file",
+              file: unit.relativePath,
+              reason: "No importable chunks produced",
+            })
+          )
+          return
+        }
+
+        const chunkEmbeddings = await embeddingClient.embedDocuments(unit.chunks)
+        const artifact = await supabaseClient.insertArtifact({
+          source_snapshot_id: snapshot.id,
+          artifact_type: unit.artifactType,
+          artifact_role: "primary",
+          mime_type: unit.mimeType,
+          language: "en",
+          title: unit.title,
+          content_text: unit.contentText,
+          content_json: unit.contentJson,
+          canonical_url: unit.canonicalUrl,
+          is_searchable: true,
+          is_primary: true,
+          metadata: unit.metadata,
+          parser_name: "manual_import_pipeline",
+          parser_version: "a1",
+          normalization_status: "success",
         })
-      }
 
-      if (unit.chunks.length === 0) {
-        stats.skipped += 1
-        console.warn(
-          JSON.stringify({
-            event: "skip_file",
-            file: unit.relativePath,
-            reason: "No importable chunks produced",
+        const chunkPayloads: ChunkPayload[] = unit.chunks.map(
+          (chunk, chunkIndex) => ({
+            artifact_id: artifact.id,
+            chunk_index: chunkIndex,
+            chunk_text: chunk,
+            search_text: chunk,
+            token_count: approximateTokenCount(chunk),
+            embedding: chunkEmbeddings[chunkIndex] ?? null,
+            is_active: true,
+            embedding_model: env.embeddingModel,
+            metadata: {
+              source_path: unit.relativePath,
+              artifact_type: unit.artifactType,
+            },
+            chunk_hash: hashContent(
+              `${unit.relativePath}:${chunkIndex}:${chunk}`
+            ),
+            language: "en",
           })
         )
-        continue
+
+        await supabaseClient.insertChunks(chunkPayloads)
+        stats.processed += 1
+        stats.total_chunks += unit.chunks.length
+      } catch (error) {
+        stats.failed += 1
+        console.error(
+          JSON.stringify({
+            event: "file_import_failed",
+            file: unit.relativePath,
+            error: error instanceof Error ? error.message : String(error),
+          })
+        )
       }
 
-      const chunkEmbeddings = await embeddingClient.embedDocuments(unit.chunks)
-      const artifact = await supabaseClient.insertArtifact({
-        source_snapshot_id: snapshot.id,
-        artifact_type: unit.artifactType,
-        artifact_role: "primary",
-        mime_type: unit.mimeType,
-        language: "en",
-        title: unit.title,
-        content_text: unit.contentText,
-        content_json: unit.contentJson,
-        canonical_url: unit.canonicalUrl,
-        is_searchable: true,
-        is_primary: true,
-        metadata: unit.metadata,
-        parser_name: "manual_import_pipeline",
-        parser_version: "a1",
-        normalization_status: "success",
-      })
-
-      const chunkPayloads: ChunkPayload[] = unit.chunks.map(
-        (chunk, chunkIndex) => ({
-          artifact_id: artifact.id,
-          chunk_index: chunkIndex,
-          chunk_text: chunk,
-          search_text: chunk,
-          token_count: approximateTokenCount(chunk),
-          embedding: chunkEmbeddings[chunkIndex] ?? null,
-          is_active: true,
-          embedding_model: env.embeddingModel,
-          metadata: {
-            source_path: unit.relativePath,
-            artifact_type: unit.artifactType,
-          },
-          chunk_hash: hashContent(
-            `${unit.relativePath}:${chunkIndex}:${chunk}`
-          ),
-          language: "en",
-        })
-      )
-
-      await supabaseClient.insertChunks(chunkPayloads)
-      stats.processed += 1
-      stats.total_chunks += unit.chunks.length
-    } catch (error) {
-      stats.failed += 1
-      console.error(
-        JSON.stringify({
-          event: "file_import_failed",
-          file: unit.relativePath,
-          error: error instanceof Error ? error.message : String(error),
-        })
-      )
-    }
-
-    logProgress(index + 1, stats)
-  }
+      logProgress(index + 1, stats)
+    })
+  )
 
   console.log(JSON.stringify(stats, null, 2))
 }
@@ -843,60 +837,65 @@ export class EmbeddingApiClient {
   constructor(private readonly env: RuntimeEnv) {}
 
   async embedDocuments(texts: string[]): Promise<number[][]> {
-    const results: number[][] = []
+    const batches: Array<{ texts: string[] }> = []
 
     for (let index = 0; index < texts.length; index += EMBEDDING_BATCH_SIZE) {
       const batch = texts.slice(index, index + EMBEDDING_BATCH_SIZE)
       if (batch.length === 0) {
         continue
       }
-
-      const response = await fetch(
-        `${this.env.embeddingApiBaseUrl?.replace(/\/+$/, "")}/v1/embeddings`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${this.env.embeddingApiKey}`,
-          },
-          body: JSON.stringify({
-            model: this.env.embeddingModel,
-            input: batch.map((text) => `passage: ${text}`),
-          }),
-        }
-      )
-
-      if (!response.ok) {
-        throw new Error(
-          `Embedding API returned ${response.status}: ${await response.text()}`
-        )
-      }
-
-      const payload = (await response.json()) as {
-        data?: Array<{ embedding?: number[] }>
-      }
-
-      const embeddings = (payload.data || []).map(
-        (item) => item.embedding || []
-      )
-      if (embeddings.length !== batch.length) {
-        throw new Error(
-          `Embedding API returned ${embeddings.length} embeddings for ${batch.length} inputs`
-        )
-      }
-
-      for (const embedding of embeddings) {
-        if (embedding.length !== this.env.embeddingDimensions) {
-          throw new Error(
-            `Embedding dimensions mismatch: expected ${this.env.embeddingDimensions}, received ${embedding.length}`
-          )
-        }
-      }
-
-      results.push(...embeddings)
+      batches.push({ texts: batch })
     }
 
-    return results
+    const batchResults = await Promise.all(
+      batches.map(async ({ texts: batch }) => {
+        const response = await fetch(
+          `${this.env.embeddingApiBaseUrl?.replace(/\/+$/, "")}/v1/embeddings`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${this.env.embeddingApiKey}`,
+            },
+            body: JSON.stringify({
+              model: this.env.embeddingModel,
+              input: batch.map((text) => `passage: ${text}`),
+            }),
+          }
+        )
+
+        if (!response.ok) {
+          throw new Error(
+            `Embedding API returned ${response.status}: ${await response.text()}`
+          )
+        }
+
+        const payload = (await response.json()) as {
+          data?: Array<{ embedding?: number[] }>
+        }
+
+        const embeddings = (payload.data || []).map(
+          (item) => item.embedding || []
+        )
+        if (embeddings.length !== batch.length) {
+          throw new Error(
+            `Embedding API returned ${embeddings.length} embeddings for ${batch.length} inputs`
+          )
+        }
+
+        for (const embedding of embeddings) {
+          if (embedding.length !== this.env.embeddingDimensions) {
+            throw new Error(
+              `Embedding dimensions mismatch: expected ${this.env.embeddingDimensions}, received ${embedding.length}`
+            )
+          }
+        }
+
+        return embeddings
+      })
+    )
+
+    return batchResults.flat()
   }
 }
 
@@ -1014,8 +1013,10 @@ function isExecutedDirectly() {
 }
 
 if (isExecutedDirectly()) {
-  main().catch((error) => {
+  try {
+    await main()
+  } catch (error) {
     console.error(error instanceof Error ? error.message : error)
     process.exitCode = 1
-  })
+  }
 }

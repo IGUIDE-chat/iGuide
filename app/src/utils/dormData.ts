@@ -83,7 +83,7 @@ function uniqueStrings<T extends string>(
   items: Array<T | undefined | null>
 ): T[] {
   return Array.from(
-    new Set(items.filter((value): value is T => Boolean(value)))
+    new Set(items.filter((value): value is T => value !== null && value !== undefined && value !== ""))
   )
 }
 
@@ -96,7 +96,7 @@ function sanitizeUrlList(urls: Array<string | undefined | null>) {
   return uniqueStrings(urls.map((url) => sanitizeOptionalString(url)))
 }
 
-export function getDormPriceRange(price: number): Dorm["priceRange"] {
+function getDormPriceRange(price: number): Dorm["priceRange"] {
   if (price < 9000) {
     return "$"
   }
@@ -109,7 +109,7 @@ export function getDormPriceRange(price: number): Dorm["priceRange"] {
   return "$$$$"
 }
 
-export function normalizeCategorizedTags(
+function normalizeCategorizedTags(
   categorizedTags: DormCategorizedTags
 ): DormCategorizedTags {
   const lifestyle = uniqueStrings(categorizedTags.lifestyle)
@@ -153,7 +153,7 @@ function syncStructuredTags(
   }
 }
 
-export function buildLegacyDormTags(
+function buildLegacyDormTags(
   dorm: Pick<
     Dorm,
     | "housingType"
@@ -234,7 +234,7 @@ export function buildLegacyDormTags(
   return uniqueStrings(tags)
 }
 
-export function finalizeDormRecord(dorm: Dorm): Dorm {
+function finalizeDormRecord(dorm: Dorm): Dorm {
   const categorizedTags = normalizeCategorizedTags(dorm.categorizedTags)
   const structuredTags = syncStructuredTags(
     dorm.structuredTags,
@@ -242,7 +242,7 @@ export function finalizeDormRecord(dorm: Dorm): Dorm {
   )
   const allowedSqftPlans = OFFICIAL_SQFT_ALLOWLIST[dorm.id] ?? new Set<string>()
   const floorPlans = dorm.floorPlans?.map((plan) => {
-    if (plan.sqft == null) {
+    if (plan.sqft === null || plan.sqft === undefined) {
       return plan
     }
 
@@ -273,7 +273,7 @@ export function finalizeDormRecord(dorm: Dorm): Dorm {
   }
 }
 
-export function sanitizeFloorPlanForStorage(plan: FloorPlan): FloorPlan {
+function sanitizeFloorPlanForStorage(plan: FloorPlan): FloorPlan {
   const {
     imageUrl: legacyImageUrl,
     photoUrl: legacyPhotoUrl,
@@ -317,7 +317,7 @@ export function sanitizeFloorPlanForStorage(plan: FloorPlan): FloorPlan {
   }
 }
 
-export function sanitizeFloorPlansForStorage(
+function sanitizeFloorPlansForStorage(
   floorPlans?: FloorPlan[] | null
 ): FloorPlan[] | undefined {
   if (!floorPlans?.length) {
@@ -326,3 +326,5 @@ export function sanitizeFloorPlansForStorage(
 
   return floorPlans.map((plan) => sanitizeFloorPlanForStorage(plan))
 }
+
+export { getDormPriceRange, normalizeCategorizedTags, buildLegacyDormTags, finalizeDormRecord, sanitizeFloorPlanForStorage, sanitizeFloorPlansForStorage }

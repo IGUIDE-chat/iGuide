@@ -93,9 +93,11 @@ test("replay-turn provider messages preserve assistant tool call and linked tool
   assert.equal(replayToolMessage.tool_call_id, "call_search_1")
   assert.equal(replayToolMessage.role, "tool")
   assert.match(
+    // eslint-disable-next-line vitest/no-conditional-in-test -- nullish coalescing for safe assertion
     replayToolMessage.content ?? "",
     /PAR has multiple dining options/
   )
+  // eslint-disable-next-line vitest/no-conditional-in-test -- nullish coalescing for safe assertion
   assert.match(replayToolMessage.content ?? "", /knowledge_base/)
   assert.equal(messages.at(-1)?.content, "Use that result to answer.")
 })

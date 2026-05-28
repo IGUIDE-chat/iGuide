@@ -5,7 +5,7 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from "react"
+import React, { useCallback } from "react"
 import { ProfileScreen } from "../../components/profile/ProfileScreen"
 import { type Language } from "../../types"
 
@@ -14,9 +14,9 @@ interface ProfilePageProps {
 }
 
 const ProfilePage: React.FC<ProfilePageProps> = ({ language }) => {
-  return (
-    <ProfileScreen language={language} onBack={() => window.history.back()} />
-  )
+  const handleBack = useCallback(() => window.history.back(), [])
+
+  return <ProfileScreen language={language} onBack={handleBack} />
 }
 
 export default ProfilePage

@@ -303,8 +303,8 @@ export const useChatSession = ({
           followUpHeaderMatch &&
           (!followUpQuestions || followUpQuestions.length === 0)
         ) {
-          const splitIndex = followUpHeaderMatch.index!
-          const followUpText = fullText.substring(
+          const splitIndex = followUpHeaderMatch.index ?? 0
+          const followUpText = fullText.slice(
             splitIndex + followUpHeaderMatch[0].length
           )
 
@@ -320,7 +320,7 @@ export const useChatSession = ({
 
           if (questions.length > 0) {
             followUpQuestions = questions
-            fullText = fullText.substring(0, splitIndex).trim()
+            fullText = fullText.slice(0, splitIndex).trim()
           }
         }
 

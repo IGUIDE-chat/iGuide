@@ -158,12 +158,12 @@ export default defineConfig(({ mode }) => {
         "/api/chat": {
           target: "http://localhost:8787/chat",
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/chat/, ""),
+          rewrite: (p) => p.replace(/^\/api\/chat/, ""),
         },
         "/api/coze": {
           target: "https://api.coze.com",
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/coze/, ""),
+          rewrite: (p) => p.replace(/^\/api\/coze/, ""),
           secure: false,
           configure: (proxy) => {
             proxy.on("proxyReq", (proxyReq, req) => {

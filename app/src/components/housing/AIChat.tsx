@@ -26,6 +26,27 @@ import { aiChatTexts } from "./i18n/dormTexts"
 import { ImeSafeTextarea } from "../chat/ImeSafeTextarea"
 import { supabase } from "../../services/supabase"
 
+const DormMentionStrong = ({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) => {
+  const content = String(children)
+  const isDorm = isDormMention(content)
+  return (
+    <span
+      className={
+        isDorm
+          ? "text-illini-orange font-extrabold"
+          : "font-bold text-gray-900"
+      }
+      {...props}
+    >
+      {children}
+    </span>
+  )
+}
+
+const dormMarkdownComponents = {
+  strong: DormMentionStrong,
+} as const
+
 interface AIChatProps {
   language: Language
 }
@@ -180,24 +201,9 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                         text={text}
                         mode="stream"
                         markdown
-                        markdownComponents={{
-                          strong: ({ ...props }) => {
-                            const content = String(props.children)
-                            const isDorm = isDormMention(content)
-                            return (
-                              <span
-                                className={
-                                  isDorm
-                                    ? "text-illini-orange font-extrabold"
-                                    : "font-bold text-gray-900"
-                                }
-                                {...props}
-                              />
-                            )
-                          },
-                        }}
+                        markdownComponents={dormMarkdownComponents}
                       />
-                    ) : isUser ? (
+                    ) : (isUser ? (
                       <span className="font-medium whitespace-pre-wrap text-white">
                         {text}
                       </span>
@@ -205,27 +211,12 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
                       <div className="prose prose-sm prose-p:leading-relaxed prose-pre:bg-gray-100 prose-pre:overflow-x-auto overflow-wrap-anywhere max-w-none wrap-break-word text-gray-800">
                         <ReactMarkdown
                           remarkPlugins={[remarkGfm]}
-                          components={{
-                            strong: ({ ...props }) => {
-                              const content = String(props.children)
-                              const isDorm = isDormMention(content)
-                              return (
-                                <span
-                                  className={
-                                    isDorm
-                                      ? "text-illini-orange font-extrabold"
-                                      : "font-bold text-gray-900"
-                                  }
-                                  {...props}
-                                />
-                              )
-                            },
-                          }}
+                          components={dormMarkdownComponents}
                         >
                           {text}
                         </ReactMarkdown>
                       </div>
-                    )}
+                    ))}
                   </div>
 
                   {isAssistant && mentionedDorms.length > 0 && (

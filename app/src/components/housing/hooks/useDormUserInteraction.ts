@@ -91,7 +91,7 @@ export const useDormUserInteraction = () => {
 
       const historyDorms: Dorm[] = historyData
         .map((item) => dormById.get(item.dorm_id))
-        .filter((dorm): dorm is Dorm => Boolean(dorm))
+        .filter((dorm): dorm is Dorm => dorm !== undefined)
       setRecentlyViewed(historyDorms)
 
       const statusMap: Record<string, boolean> = {}
@@ -154,8 +154,9 @@ export const useDormUserInteraction = () => {
           )
 
           if (result.added && result.favorite) {
+            const addedFavorite = result.favorite
             setCloudFavorites((prev) => [
-              result.favorite!,
+              addedFavorite,
               ...prev.filter((favorite) => favorite.dorm_id !== dormId),
             ])
             setFavoriteStatusMap((prev) => ({ ...prev, [dormId]: true }))

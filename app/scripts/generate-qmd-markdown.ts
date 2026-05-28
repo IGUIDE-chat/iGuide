@@ -6,7 +6,7 @@
 import fs from "node:fs/promises"
 import path from "node:path"
 import { execFileSync } from "node:child_process"
-import { fileURLToPath } from "node:url"
+
 import dotenv from "dotenv"
 import { createClient } from "@supabase/supabase-js"
 
@@ -70,7 +70,7 @@ function renderFrontmatter(frontmatter: Frontmatter) {
   const lines = ["---"]
 
   for (const [key, value] of Object.entries(frontmatter)) {
-    if (value == null) {
+    if (value === null || value === undefined) {
       continue
     }
 
@@ -262,7 +262,7 @@ function buildRoomOptionLine(
   if (option.labelCode) {
     parts.push(option.labelCode)
   }
-  if (option.bedCount != null) {
+  if (option.bedCount !== null && option.bedCount !== undefined) {
     parts.push(
       lang === "zh" ? `${option.bedCount}人` : `${option.bedCount} bed`
     )
@@ -272,7 +272,7 @@ function buildRoomOptionLine(
     option.bathroomScope === "individual-use"
   ) {
     parts.push(getBathroomScopeLabel(option.bathroomScope, lang))
-  } else if (option.bathroomCount != null && option.bathroomCount > 0) {
+  } else if (option.bathroomCount !== null && option.bathroomCount !== undefined && option.bathroomCount > 0) {
     parts.push(
       lang === "zh"
         ? `${option.bathroomCount}卫`
@@ -441,7 +441,7 @@ function mapDormRow(row: Record<string, unknown>): DormDocumentRecord {
         (row.housing_type as Dorm["housingType"]) ??
         fallbackDorm?.housingType ??
         "URH",
-      ac: row.ac != null ? Boolean(row.ac) : (fallbackDorm?.ac ?? false),
+      ac: row.ac === null || row.ac === undefined ? (fallbackDorm?.ac ?? false) : Boolean(row.ac),
       dining:
         (row.dining as Dorm["dining"]) ?? fallbackDorm?.dining ?? "nearby",
       diningNearbyDetail:
@@ -479,9 +479,9 @@ function mapDormRow(row: Record<string, unknown>): DormDocumentRecord {
       cons: (row.cons as string[]) ?? fallbackDorm?.cons ?? [],
       cons_zh: (row.cons_zh as string[]) ?? fallbackDorm?.cons_zh,
       applicationFee:
-        row.application_fee != null
-          ? Number(row.application_fee)
-          : fallbackDorm?.applicationFee,
+        row.application_fee === null || row.application_fee === undefined
+          ? fallbackDorm?.applicationFee
+          : Number(row.application_fee),
       address: (row.address as string) ?? fallbackDorm?.address,
       address_zh: (row.address_zh as string) ?? fallbackDorm?.address_zh,
       website: (row.website as string) ?? fallbackDorm?.website,
@@ -564,17 +564,24 @@ async function writeFile(filePath: string, content: string) {
 }
 
 async function generateArticleCorpus() {
+  const writes: Array<Promise<void>> = []
   for (const lang of ["en", "zh"] as const) {
     const outputDir = path.join(QMD_ROOT, "articles", lang)
-    await ensureDir(outputDir)
-
-    for (const article of ARTICLES) {
-      await writeFile(
-        path.join(outputDir, `${article.id}.md`),
-        buildArticleMarkdown(article, lang)
-      )
-    }
+    writes.push(
+      (async () => {
+        await ensureDir(outputDir)
+        await Promise.all(
+          ARTICLES.map((article) =>
+            writeFile(
+              path.join(outputDir, `${article.id}.md`),
+              buildArticleMarkdown(article, lang)
+            )
+          )
+        )
+      })()
+    )
   }
+  await Promise.all(writes)
 
   console.log(`[qmd] Wrote ${ARTICLES.length * 2} article documents.`)
 }
@@ -582,17 +589,24 @@ async function generateArticleCorpus() {
 async function generateDormCorpus() {
   const records = await fetchDormRecords()
 
+  const writes: Array<Promise<void>> = []
   for (const lang of ["en", "zh"] as const) {
     const outputDir = path.join(QMD_ROOT, "dorms", lang)
-    await ensureDir(outputDir)
-
-    for (const record of records) {
-      await writeFile(
-        path.join(outputDir, `${record.dorm.id}.md`),
-        buildDormMarkdown(record, lang)
-      )
-    }
+    writes.push(
+      (async () => {
+        await ensureDir(outputDir)
+        await Promise.all(
+          records.map((record) =>
+            writeFile(
+              path.join(outputDir, `${record.dorm.id}.md`),
+              buildDormMarkdown(record, lang)
+            )
+          )
+        )
+      })()
+    )
   }
+  await Promise.all(writes)
 
   console.log(`[qmd] Wrote ${records.length * 2} dorm documents.`)
 }
@@ -629,8 +643,10 @@ const isDirectRun =
   path.resolve(process.argv[1]) === import.meta.filename
 
 if (isDirectRun) {
-  generateQmdMarkdown().catch((error) => {
+  try {
+    await generateQmdMarkdown()
+  } catch (error) {
     console.error("[qmd] Markdown generation failed:", error)
     process.exit(1)
-  })
+  }
 }

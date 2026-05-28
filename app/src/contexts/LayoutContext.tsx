@@ -11,6 +11,7 @@ import React, {
   createContext,
   useCallback,
   useContext,
+  useMemo,
   useState,
 } from "react"
 
@@ -48,39 +49,54 @@ export const LayoutProvider: React.FC<{
     (node: ReactNode | null) => setMobileHeaderSlotState(node),
     []
   )
+  const value = useMemo(
+    () => ({
+      isSidebarOpen,
+      favoritesIconRef,
+      sidebarToggleButtonRef,
+      mobileSidebarButtonRef,
+      mobileHeaderSlot,
+      setMobileHeaderSlot,
+    }),
+    [
+      isSidebarOpen,
+      favoritesIconRef,
+      sidebarToggleButtonRef,
+      mobileSidebarButtonRef,
+      mobileHeaderSlot,
+      setMobileHeaderSlot,
+    ]
+  )
   return (
-    <LayoutContext.Provider
-      value={{
-        isSidebarOpen,
-        favoritesIconRef,
-        sidebarToggleButtonRef,
-        mobileSidebarButtonRef,
-        mobileHeaderSlot,
-        setMobileHeaderSlot,
-      }}
-    >
+    <LayoutContext.Provider value={value}>
       {children}
     </LayoutContext.Provider>
   )
 }
 
+const NOOP = () => {
+  /* intentional no-op for fallback context */
+}
+
+const FALLBACK_LAYOUT: LayoutContextType = {
+  isSidebarOpen: true,
+  favoritesIconRef: {
+    current: null,
+  } as React.RefObject<SVGSVGElement | null>,
+  sidebarToggleButtonRef: {
+    current: null,
+  } as React.RefObject<HTMLButtonElement | null>,
+  mobileSidebarButtonRef: {
+    current: null,
+  } as React.RefObject<HTMLButtonElement | null>,
+  mobileHeaderSlot: null,
+  setMobileHeaderSlot: NOOP,
+}
+
 export const useLayout = (): LayoutContextType => {
   const ctx = useContext(LayoutContext)
   if (!ctx) {
-    return {
-      isSidebarOpen: true,
-      favoritesIconRef: {
-        current: null,
-      } as React.RefObject<SVGSVGElement | null>,
-      sidebarToggleButtonRef: {
-        current: null,
-      } as React.RefObject<HTMLButtonElement | null>,
-      mobileSidebarButtonRef: {
-        current: null,
-      } as React.RefObject<HTMLButtonElement | null>,
-      mobileHeaderSlot: null,
-      setMobileHeaderSlot: () => {},
-    }
+    return FALLBACK_LAYOUT
   }
   return ctx
 }

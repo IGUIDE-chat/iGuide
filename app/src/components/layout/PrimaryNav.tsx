@@ -85,6 +85,7 @@ export const PrimaryNav: React.FC<PrimaryNavProps> = ({
           </SidebarLabel>
         </div>
         <button
+            type="button"
           onClick={onCloseSidebar}
           className="p-2 text-slate-400 hover:text-white md:hidden"
         >
@@ -95,6 +96,7 @@ export const PrimaryNav: React.FC<PrimaryNavProps> = ({
       <nav className="mb-2 space-y-1 px-3">
         {navItems.map((item) => (
           <button
+            type="button"
             key={item.key}
             onClick={item.onClick}
             className={`flex w-full items-center gap-3 rounded-md p-3 text-sm transition-colors ${

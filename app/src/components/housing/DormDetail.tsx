@@ -48,9 +48,9 @@ const fadeUp: Variants = {
   },
 }
 
-const hasPublishedPlanPrice = (price: any): price is number =>
+const hasPublishedPlanPrice = (price: unknown): price is number =>
   typeof price === "number" && Number.isFinite(price) && price > 0
-const getPublishedPlanPrice = (plan: any) =>
+const getPublishedPlanPrice = (plan: unknown) =>
   hasPublishedPlanPrice(plan.price) ? plan.price : null
 
 interface DormDetailProps {
@@ -99,18 +99,20 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
     if (fromCtx) {
       setDorm(fromCtx)
     }
-    dormService.getDormById(id).then((d) => {
+    const loadDorm = async () => {
+      const d = await dormService.getDormById(id)
       if (d) {
         setDorm(d)
       }
-    })
+    }
+    loadDorm()
   }, [id, getFromContext])
 
   useEffect(() => {
     if (dorm) {
       addToHistory(dorm)
     }
-  }, [dorm?.id, addToHistory])
+  }, [dorm, addToHistory])
 
   useEffect(() => {
     setHeroImageIndex(0)
@@ -126,7 +128,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
         )
       }
     }
-  }, [location.hash, dorm?.id])
+  }, [location.hash, dorm])
 
   useEffect(() => {
     if (!dorm) {
@@ -215,7 +217,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
       : (dorm.address ?? null)
   const heroImages = (
     dorm.galleryImages?.length ? dorm.galleryImages : [dorm.imageUrl]
-  ).filter((src): src is string => Boolean(src))
+  ).filter((src): src is string => !!src)
   const safeHeroImageIndex =
     heroImages.length > 0 ? Math.min(heroImageIndex, heroImages.length - 1) : 0
   const heroImage = heroImages[safeHeroImageIndex]
@@ -226,12 +228,12 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
     ...(dorm.categorizedTags?.lifestyle ?? []),
   ]
   const positiveTags = allTags.filter(
-    (t) => TAG_REGISTRY[t]?.cardTone === "positive"
+    (tag) => TAG_REGISTRY[tag]?.cardTone === "positive"
   )
   const neutralTags = allTags.filter(
-    (t) => TAG_REGISTRY[t]?.cardTone === "neutral"
+    (tag) => TAG_REGISTRY[tag]?.cardTone === "neutral"
   )
-  const mutedTags = allTags.filter((t) => TAG_REGISTRY[t]?.cardTone === "muted")
+  const mutedTags = allTags.filter((tag) => TAG_REGISTRY[tag]?.cardTone === "muted")
 
   const defaultPlanScope = getStorageBathroomScope(
     dorm.bathroomType,
@@ -257,7 +259,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
     })
 
   const pricedPlans = sortedPlans.filter(
-    (plan) => getPublishedPlanPrice(plan) != null
+    (plan) => getPublishedPlanPrice(plan) !== null
   )
   const minPrice =
     pricedPlans.length > 0

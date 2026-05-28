@@ -23,20 +23,21 @@ const CourseList: React.FC<CourseListProps> = ({ schoolId }) => {
     setLoading(true)
     setError(null)
 
-    courseService
-      .getCourses(schoolId)
-      .then((data) => {
+    const loadCourses = async () => {
+      try {
+        const data = await courseService.getCourses(schoolId)
         if (!cancelled) {
           setCourses(data)
           setLoading(false)
         }
-      })
-      .catch(() => {
+      } catch {
         if (!cancelled) {
           setError("Failed to load courses.")
           setLoading(false)
         }
-      })
+      }
+    }
+    loadCourses()
 
     return () => {
       cancelled = true

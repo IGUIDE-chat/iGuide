@@ -61,9 +61,12 @@ export const DormDetailGallery: React.FC<DormDetailGalleryProps> = ({
   return (
     <div className="space-y-5 md:space-y-6">
       {heroImage && (
-        <div
+        <button
+          type="button"
+          tabIndex={0}
           className="relative aspect-4/3 w-full cursor-zoom-in overflow-hidden bg-slate-100 shadow-sm sm:aspect-video md:aspect-21/9 md:rounded-2xl md:rounded-3xl md:border md:border-white/60"
           onClick={onImageClick}
+          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); (e.currentTarget as HTMLElement).click() } }}
         >
           <motion.img
             src={heroImage}
@@ -122,7 +125,7 @@ export const DormDetailGallery: React.FC<DormDetailGalleryProps> = ({
               </div>
             </>
           )}
-        </div>
+        </button>
       )}
 
       <div className="space-y-3 pt-2">

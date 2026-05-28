@@ -18,9 +18,9 @@ interface Comment {
 interface DormDetailReviewsProps {
   comments: Comment[]
   commentsLoading: boolean
-  user: any
+  user: unknown
   language: Language
-  fadeUp: any
+  fadeUp: unknown
   onRequestLogin: () => void
   onSaveComment: (content: string, vote: 1 | -1 | null) => Promise<void>
   onDeleteComment: (commentId: string) => void
@@ -149,35 +149,7 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
         )}
       </div>
 
-      {!user ? (
-        <motion.div
-          whileHover={{ scale: 1.005 }}
-          className="border-illini-blue/10 flex flex-col items-center justify-between gap-4 rounded-xl border bg-white/60 p-5 shadow-[0_4px_20px_rgba(0,0,0,0.02)] backdrop-blur-md sm:flex-row md:rounded-2xl md:p-6"
-        >
-          <div className="flex w-full items-center gap-3 sm:w-auto">
-            <div className="bg-illini-blue/5 flex size-10 shrink-0 items-center justify-center rounded-full md:size-12">
-              <MessageSquare className="text-illini-blue size-5 md:size-6" />
-            </div>
-            <div>
-              <h4 className="text-[14px] font-bold text-slate-900 md:text-[15px]">
-                {t.shareExp}
-              </h4>
-              <p className="mt-0.5 text-[12px] font-medium text-slate-500 md:text-[13px]">
-                {t.loginPrompt}
-              </p>
-            </div>
-          </div>
-          <motion.button
-            type="button"
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={onRequestLogin}
-            className="bg-illini-blue hover:bg-illini-blue/90 w-full rounded-xl px-5 py-2.5 text-[13px] font-bold text-white shadow-sm transition-colors sm:w-auto md:text-[14px]"
-          >
-            {t.loginBtn}
-          </motion.button>
-        </motion.div>
-      ) : (
+      {user ? (
         <div className="rounded-xl border border-white/60 bg-white/80 p-4 shadow-[0_4px_20px_rgba(0,0,0,0.02)] backdrop-blur-md md:rounded-2xl md:p-5">
           <h4 className="mb-3 text-[14px] font-bold text-slate-900 md:text-[15px]">
             {t.shareExp}
@@ -207,7 +179,7 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
               </motion.button>
             ))}
           </div>
-          <textarea
+          <textarea aria-label="Text input"
             value={commentContent}
             onChange={(e) => setCommentContent(e.target.value)}
             placeholder={t.leaveComment}
@@ -227,6 +199,34 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
             </motion.button>
           </div>
         </div>
+      ) : (
+        <motion.div
+          whileHover={{ scale: 1.005 }}
+          className="border-illini-blue/10 flex flex-col items-center justify-between gap-4 rounded-xl border bg-white/60 p-5 shadow-[0_4px_20px_rgba(0,0,0,0.02)] backdrop-blur-md sm:flex-row md:rounded-2xl md:p-6"
+        >
+          <div className="flex w-full items-center gap-3 sm:w-auto">
+            <div className="bg-illini-blue/5 flex size-10 shrink-0 items-center justify-center rounded-full md:size-12">
+              <MessageSquare className="text-illini-blue size-5 md:size-6" />
+            </div>
+            <div>
+              <h4 className="text-[14px] font-bold text-slate-900 md:text-[15px]">
+                {t.shareExp}
+              </h4>
+              <p className="mt-0.5 text-[12px] font-medium text-slate-500 md:text-[13px]">
+                {t.loginPrompt}
+              </p>
+            </div>
+          </div>
+          <motion.button
+            type="button"
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={onRequestLogin}
+            className="bg-illini-blue hover:bg-illini-blue/90 w-full rounded-xl px-5 py-2.5 text-[13px] font-bold text-white shadow-sm transition-colors sm:w-auto md:text-[14px]"
+          >
+            {t.loginBtn}
+          </motion.button>
+        </motion.div>
       )}
 
       {commentsLoading ? (

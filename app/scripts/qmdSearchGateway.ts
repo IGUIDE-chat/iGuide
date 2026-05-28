@@ -2,7 +2,6 @@ import { execFile, execFileSync } from "node:child_process"
 import fs from "node:fs"
 import { type IncomingMessage, type ServerResponse } from "node:http"
 import path from "node:path"
-import { fileURLToPath } from "node:url"
 import { promisify } from "node:util"
 import { type Plugin } from "vite"
 
@@ -137,7 +136,6 @@ function commandForMode(mode: SearchMode) {
       return "search"
     case "vector":
       return "vsearch"
-    case "hybrid":
     default:
       return "query"
   }

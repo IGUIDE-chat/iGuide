@@ -6,7 +6,7 @@
  */
 
 import * as React from "react"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { Typewriter } from "../ui/Typewriter"
 import { type ConversationSummary } from "../../types"
 import { conversationService } from "../../services/conversationService"
@@ -80,7 +80,7 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
 
   // ... (keep loadConversations and other handlers)
 
-  const loadConversations = async () => {
+  const loadConversations = useCallback(async () => {
     setIsLoading(true)
     try {
       // Use local service if not logged in
@@ -106,12 +106,12 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [user])
 
   // Reload conversations when user changes OR when a new conversation is created/selected
   useEffect(() => {
     loadConversations()
-  }, [user, currentConversationId])
+  }, [user, currentConversationId, loadConversations])
 
   const handleTogglePin = async (
     conversationId: string,
@@ -269,12 +269,14 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
               </p>
               <div className="flex gap-3">
                 <button
+            type="button"
                   onClick={() => setShowDeleteConfirm(null)}
                   className="flex-1 rounded-lg bg-white/5 px-4 py-2 text-sm font-medium text-slate-300 transition-colors hover:bg-white/10"
                 >
                   {language === "zh" ? "取消" : "Cancel"}
                 </button>
                 <button
+            type="button"
                   onClick={confirmDelete}
                   className="flex-1 rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-600"
                 >

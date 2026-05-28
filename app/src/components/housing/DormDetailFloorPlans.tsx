@@ -25,8 +25,8 @@ interface DormDetailFloorPlansProps {
   minPrice: number | null
   maxPrice: number | null
   language: Language
-  fadeUp: any
-  onLightboxOpen: (images: any[], index: number) => void
+  fadeUp: unknown
+  onLightboxOpen: (images: unknown[], index: number) => void
 }
 
 const getPlanKey = (plan: FloorPlan, idx: number) =>
@@ -132,7 +132,7 @@ export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
               ? language === "zh"
                 ? "暂不可订"
                 : "Sold out"
-              : planPrice == null
+              : planPrice === null
                 ? language === "zh"
                   ? "价格待公布"
                   : "Price unavailable"
@@ -197,14 +197,15 @@ export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
               className="group cursor-pointer overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm transition-shadow duration-150 hover:-translate-y-px hover:shadow-[0_6px_20px_rgba(0,0,0,0.08)] md:rounded-2xl"
             >
               <div className="flex flex-row items-center gap-4 p-3 md:items-start md:gap-6 md:p-5">
-                <div
+                <button
+                  type="button"
+                  tabIndex={0}
                   className="relative size-20 shrink-0 overflow-hidden rounded-lg border border-slate-200/60 bg-slate-50 transition-colors group-hover:border-slate-300 md:h-28 md:w-36 md:rounded-xl"
                   onClick={(e) => {
-                    if (planImages.length > 0) {
-                      e.stopPropagation()
-                      onLightboxOpen(planImages, 0)
-                    }
+                    e.stopPropagation()
+                    onLightboxOpen(planImages, 0)
                   }}
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); (e.currentTarget as HTMLElement).click() } }}
                 >
                   {hasThumb ? (
                     <img
@@ -223,7 +224,7 @@ export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
                       <SquareDashed className="size-8" strokeWidth={1} />
                     </div>
                   )}
-                </div>
+                </button>
 
                 <div className="flex min-w-0 flex-1 flex-col justify-between gap-1 md:h-28 md:flex-row md:gap-0">
                   <div className="flex h-full min-w-0 flex-col justify-center gap-1.5 py-0.5 md:gap-3">
@@ -241,12 +242,12 @@ export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
                           className={`flex items-center gap-0.5 rounded-md border px-1.5 py-0.5 text-[10px] font-bold whitespace-nowrap md:gap-1 md:rounded-xl md:px-2.5 md:py-1 md:text-[13px] ${
                             plan.available === false
                               ? "border-red-200 bg-red-50 text-red-600"
-                              : planPrice == null
+                              : planPrice === null
                                 ? `border-amber-200 bg-amber-50 text-amber-700`
                                 : `border-[#D1FAE5] bg-[#ECFDF5] text-[#059669]`
                           } `}
                         >
-                          {plan.available !== false && planPrice != null && (
+                          {plan.available !== false && planPrice !== null && (
                             <Check
                               className="size-2.5 md:size-3.5"
                               strokeWidth={3}
@@ -265,7 +266,7 @@ export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
                     </div>
 
                     <div className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-slate-600 md:mt-0 md:gap-4">
-                      {plan.bedCount != null && (
+                      {plan.bedCount !== null && (
                         <>
                           <div className="flex items-center gap-1 md:gap-1.5">
                             <BedSingle className="size-3.5 text-slate-400 md:size-4" />
@@ -281,7 +282,7 @@ export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
                       <div className="flex items-center gap-1 md:gap-1.5">
                         <Bath className="size-3.5 text-slate-400 md:size-4" />
                         <span className="text-[12px] font-semibold md:text-[14px]">
-                          {plan.bathroomCount != null && plan.bathroomCount > 0
+                          {plan.bathroomCount !== null && plan.bathroomCount > 0
                             ? `${plan.bathroomCount} ${language === "zh" ? "卫" : plan.bathroomCount === 1 ? "Bath" : "Baths"}`
                             : planBathroomLabel}
                         </span>
@@ -304,7 +305,17 @@ export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
                       )}
                     </div>
 
-                    {planPrice != null ? (
+                    {planPrice === null ? (
+                      <div
+                        className={`mt-0.5 text-[12px] font-semibold md:hidden ${
+                          plan.available === false
+                            ? "text-red-500"
+                            : "text-amber-600"
+                        } `}
+                      >
+                        {availabilityLabel}
+                      </div>
+                    ) : (
                       <div className="mt-0.5 flex items-baseline gap-1 md:hidden">
                         <span className="text-[16px] font-extrabold tracking-tight text-slate-900 tabular-nums">
                           {formatPrice(planPrice)}
@@ -316,16 +327,6 @@ export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
                           (~{formatPrice(Math.round(planPrice / 12))}
                           {t.mo})
                         </span>
-                      </div>
-                    ) : (
-                      <div
-                        className={`mt-0.5 text-[12px] font-semibold md:hidden ${
-                          plan.available === false
-                            ? "text-red-500"
-                            : "text-amber-600"
-                        } `}
-                      >
-                        {availabilityLabel}
                       </div>
                     )}
 
@@ -360,7 +361,17 @@ export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
                   </div>
 
                   <div className="hidden h-full shrink-0 flex-col items-end justify-between gap-2 py-0.5 md:flex">
-                    {planPrice != null ? (
+                    {planPrice === null ? (
+                      <div
+                        className={`text-[13px] font-semibold ${
+                          plan.available === false
+                            ? "text-red-500"
+                            : "text-amber-600"
+                        } `}
+                      >
+                        {availabilityLabel}
+                      </div>
+                    ) : (
                       <div className="flex flex-col items-end">
                         <div className="flex items-baseline gap-0.5">
                           <span className="text-[24px] font-extrabold tracking-tight text-slate-900 tabular-nums">
@@ -374,16 +385,6 @@ export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
                           ~{formatPrice(Math.round(planPrice / 12))}
                           {t.mo}
                         </div>
-                      </div>
-                    ) : (
-                      <div
-                        className={`text-[13px] font-semibold ${
-                          plan.available === false
-                            ? "text-red-500"
-                            : "text-amber-600"
-                        } `}
-                      >
-                        {availabilityLabel}
                       </div>
                     )}
 
@@ -456,21 +457,26 @@ export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
                     <div className="mx-4 mt-2 border-t border-slate-100/50 p-4 pt-0 md:mx-5 md:p-5">
                       {hasExpandedImage ? (
                         <div className="relative mt-3 md:mt-4">
-                          <img
-                            src={expandedSrc}
-                            alt={`${labels.primaryLabel} floor plan`}
-                            className="h-auto w-full cursor-zoom-in rounded-xl border border-slate-200/50 bg-slate-50 transition-opacity hover:opacity-90"
+                          <button
+                            type="button"
+                            className="w-full cursor-zoom-in"
                             onClick={(e) => {
                               e.stopPropagation()
                               onLightboxOpen(planImages, expandedLightboxIndex)
                             }}
-                            onError={() =>
-                              setImageErrors((prev) => ({
-                                ...prev,
-                                [`${planKey}-layout`]: true,
-                              }))
-                            }
-                          />
+                          >
+                            <img
+                              src={expandedSrc}
+                              alt={`${labels.primaryLabel} floor plan`}
+                              className="h-auto w-full rounded-xl border border-slate-200/50 bg-slate-50 transition-opacity hover:opacity-90"
+                              onError={() =>
+                                setImageErrors((prev) => ({
+                                  ...prev,
+                                  [`${planKey}-layout`]: true,
+                                }))
+                              }
+                            />
+                          </button>
                           {allExpandedImages.length > 1 && (
                             <>
                               <button
@@ -550,7 +556,7 @@ export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
           </span>
           <span className="text-[16px] font-extrabold text-slate-900 md:text-[18px]">
             {formatPrice(minPrice)}
-            {minPrice !== maxPrice ? ` – ${formatPrice(maxPrice)}` : ""}
+            {minPrice === maxPrice ? "" : ` – ${formatPrice(maxPrice)}`}
           </span>
         </motion.div>
       )}

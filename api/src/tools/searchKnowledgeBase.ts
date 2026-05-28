@@ -65,18 +65,15 @@ export function createSearchKnowledgeBaseTool(ctx: RequestContext) {
     description:
       "Search the UIUC knowledge base using hybrid semantic + keyword search. Use for questions about housing, courses, campus life, policies.",
     inputSchema: searchKnowledgeBaseSchema,
-    execute: async (args: any, options: any) => {
-      const { query, limit: rawLimit } = args as z.infer<
-        typeof searchKnowledgeBaseSchema
-      >
+    execute: async (args) => {
+      const { query, limit: rawLimit } = args
       const limit = rawLimit ?? 5
-      const { abortSignal } = options as { abortSignal?: AbortSignal }
       let queryEmbedding: number[]
 
       try {
         const embeddingClient = new EmbeddingClient(getEmbeddingConfig(ctx.env))
         queryEmbedding = await embeddingClient.embedQuery(query)
-      } catch (embeddingError) {
+      } catch {
         try {
           const fallbackResults = await callSupabaseRpc<KeywordSearchResult[]>(
             ctx,

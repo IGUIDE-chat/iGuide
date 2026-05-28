@@ -5,7 +5,7 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { useEffect } from "react"
+import React, { useCallback, useEffect } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { ArticleView } from "../../components/library/ArticleView"
 import { ARTICLES } from "../../constants"
@@ -30,6 +30,14 @@ const LibraryArticlePage: React.FC<LibraryArticlePageProps> = ({
     }
   }, [article])
 
+  const handleBack = useCallback(() => navigate("/library"), [navigate])
+  const handleSearch = useCallback(
+    (query: string) => {
+      navigate(`/library?q=${encodeURIComponent(query)}`)
+    },
+    [navigate]
+  )
+
   if (!article) {
     return (
       <div className="p-8 text-center text-slate-500">Article not found</div>
@@ -41,10 +49,8 @@ const LibraryArticlePage: React.FC<LibraryArticlePageProps> = ({
       <div className="mx-auto max-w-3xl px-4 py-8 pb-24">
         <ArticleView
           article={article}
-          onBack={() => navigate("/library")}
-          onSearch={(query) => {
-            navigate(`/library?q=${encodeURIComponent(query)}`)
-          }}
+          onBack={handleBack}
+          onSearch={handleSearch}
           language={language}
         />
       </div>

@@ -163,6 +163,7 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
           </h3>
           {history.length > 0 && (
             <button
+            type="button"
               onClick={handleClearHistory}
               className="text-[10px] text-slate-500 transition-colors hover:text-white"
             >

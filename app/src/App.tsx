@@ -6,7 +6,7 @@
  */
 
 import * as React from "react"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { LoginScreen } from "./components/auth/LoginScreen"
 import { Layout } from "./components/layout/Layout"
@@ -59,18 +59,36 @@ export default function App() {
     }
   }, [user, setIsGuest])
 
-  const handleSelectConversation = (conversationId: string | null) => {
-    setCurrentConversationId(conversationId)
-    if (conversationId) {
-      localStorage.setItem("lastConversationId", conversationId)
-    } else {
-      localStorage.removeItem("lastConversationId")
-    }
-  }
+  const handleGuestLogin = useCallback(() => setIsGuest(true), [setIsGuest])
+  const handleExitGuest = useCallback(() => setIsGuest(false), [setIsGuest])
 
-  const handleNewConversation = () => {
+  const handleSelectConversation = useCallback(
+    (conversationId: string | null) => {
+      setCurrentConversationId(conversationId)
+      if (conversationId) {
+        localStorage.setItem("lastConversationId", conversationId)
+      } else {
+        localStorage.removeItem("lastConversationId")
+      }
+    },
+    []
+  )
+
+  const handleNewConversation = useCallback(() => {
     setCurrentConversationId(null)
-  }
+  }, [])
+
+  const loginInitial = useMemo(() => ({ opacity: 0, y: 20 }), [])
+  const loginAnimate = useMemo(() => ({ opacity: 1, y: 0 }), [])
+  const loginExit = useMemo(() => ({ opacity: 0, y: -20 }), [])
+  const loginTransition = useMemo(() => ({ duration: 0.3 }), [])
+  const appInitial = useMemo(() => ({ opacity: 0, scale: 0.98 }), [])
+  const appAnimate = useMemo(() => ({ opacity: 1, scale: 1 }), [])
+  const appExit = useMemo(() => ({ opacity: 0, scale: 0.95 }), [])
+  const appTransition = useMemo(
+    () => ({ duration: 0.4, ease: "easeOut" as const }),
+    []
+  )
 
   if (isLoading) {
     return (
@@ -92,14 +110,14 @@ export default function App() {
       {showLogin ? (
         <motion.div
           key="login"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.3 }}
+          initial={loginInitial}
+          animate={loginAnimate}
+          exit={loginExit}
+          transition={loginTransition}
           className="size-full"
         >
           <LoginScreen
-            onGuestLogin={() => setIsGuest(true)}
+            onGuestLogin={handleGuestLogin}
             language={language}
             onLanguageChange={setLanguage}
           />
@@ -107,10 +125,10 @@ export default function App() {
       ) : (
         <motion.div
           key="app"
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
+          initial={appInitial}
+          animate={appAnimate}
+          exit={appExit}
+          transition={appTransition}
           className="size-full"
         >
           <HousingDataProvider>
@@ -121,7 +139,7 @@ export default function App() {
                     language={language}
                     onLanguageChange={setLanguage}
                     isGuest={isGuest}
-                    onExitGuest={() => setIsGuest(false)}
+                    onExitGuest={handleExitGuest}
                     currentConversationId={currentConversationId}
                     onNewConversation={handleNewConversation}
                     onSelectConversation={handleSelectConversation}

@@ -9,9 +9,9 @@ import { dormDetailTexts } from "./i18n/dormTexts"
 interface DormDetailInfoProps {
   neutralTags: DormTag[]
   mutedTags: DormTag[]
-  categorizedTags: any
+  categorizedTags: unknown
   language: Language
-  fadeUp: any
+  fadeUp: unknown
 }
 
 export const DormDetailInfo: React.FC<DormDetailInfoProps> = ({

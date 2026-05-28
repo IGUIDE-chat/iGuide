@@ -23,7 +23,7 @@ interface DormDetailHeaderProps {
   dormAddress: string | null
   dormLocation: string
   positiveTags: DormTag[]
-  fadeUp: any
+  fadeUp: unknown
 }
 
 export const DormDetailHeader: React.FC<DormDetailHeaderProps> = ({
@@ -86,9 +86,9 @@ export const DormDetailHeader: React.FC<DormDetailHeaderProps> = ({
                 tag === "llc" &&
                 (dorm.categorizedTags?.llcNames?.length ?? 0) > 1
               ) {
-                return dorm.categorizedTags.llcNames!.map((llcName, j) => (
+                return (dorm.categorizedTags?.llcNames ?? []).map((llcName, j) => (
                   <motion.span
-                    key={`llc-${j}`}
+                    key={`llc-${llcName}`}
                     initial={{ opacity: 0, scale: 0.85 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.3 + (i + j) * 0.06 }}

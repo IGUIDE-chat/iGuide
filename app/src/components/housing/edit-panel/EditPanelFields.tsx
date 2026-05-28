@@ -38,8 +38,8 @@ export function EditableList({
   return (
     <div className="space-y-2">
       {items.map((item, index) => (
-        <div key={index} className="flex items-center gap-2">
-          <input
+        <div key={item || `empty-${String(index)}`} className="flex items-center gap-2">
+          <input aria-label="Input field"
             className="focus:ring-illini-blue flex-1 rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:outline-none"
             value={item}
             onChange={(event) => {
@@ -83,14 +83,18 @@ export function Toggle({
 }) {
   return (
     <label className="flex cursor-pointer items-center gap-2 select-none">
-      <div
+      <button
+        type="button"
+        aria-label={label}
+        tabIndex={0}
         onClick={() => onChange(!checked)}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); (e.currentTarget as HTMLElement).click() } }}
         className={`flex h-5 w-9 items-center rounded-full px-0.5 transition-colors ${checked ? "bg-illini-orange" : "bg-gray-300"} `}
       >
         <div
           className={`size-4 rounded-full bg-white shadow-sm transition-transform ${checked ? "translate-x-4" : "translate-x-0"} `}
         />
-      </div>
+      </button>
       <span className="text-gray-700">{label}</span>
     </label>
   )

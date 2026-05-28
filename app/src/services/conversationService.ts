@@ -100,15 +100,15 @@ export const conversationService = {
     }
 
     // Update last_viewed_at asynchronously (no need to await)
-    supabase
-      .from("conversations")
-      .update({ last_viewed_at: new Date().toISOString() })
-      .eq("id", conversationId)
-      .then(({ error }) => {
-        if (error) {
-          console.error("Failed to update last_viewed_at:", error)
-        }
-      })
+    void (async () => {
+      const { error } = await supabase
+        .from("conversations")
+        .update({ last_viewed_at: new Date().toISOString() })
+        .eq("id", conversationId)
+      if (error) {
+        console.error("Failed to update last_viewed_at:", error)
+      }
+    })()
 
     const { data: messages, error: msgError } = await supabase
       .from("messages")

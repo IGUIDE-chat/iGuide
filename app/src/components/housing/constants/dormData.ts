@@ -2273,10 +2273,10 @@ const enrichDormZhContent = (dorm: Dorm): Dorm => {
   }
 }
 
-export const UIUC_DORMS: Dorm[] = RAW_UIUC_DORMS.map(applyDormOfficialOverride)
-  .map(finalizeDormRecord)
-  .map(enrichDormZhContent)
-  .map(normalizeDorm)
+export const UIUC_DORMS: Dorm[] = RAW_UIUC_DORMS.map((d) => applyDormOfficialOverride(d))
+  .map((d) => finalizeDormRecord(d))
+  .map((d) => enrichDormZhContent(d))
+  .map((d) => normalizeDorm(d))
 
 // Export dorm IDs for individual routes
 export const DORM_IDS = UIUC_DORMS.map((dorm) => dorm.id)

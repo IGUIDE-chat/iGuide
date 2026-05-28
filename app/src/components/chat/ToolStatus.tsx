@@ -50,13 +50,14 @@ export const ToolStatus: React.FC<ToolStatusProps> = ({
     }
   }, [status])
 
-  const label =
-    status === "done"
-      ? (summary ??
-        (toolName ? `Done: ${TOOL_LABELS[toolName] ?? toolName}` : "Done"))
-      : toolName
-        ? getToolLabel(toolName)
-        : "Working..."
+  let label: string
+  if (status === "done") {
+    label = summary ?? (toolName ? `Done: ${TOOL_LABELS[toolName] ?? toolName}` : "Done")
+  } else if (toolName) {
+    label = getToolLabel(toolName)
+  } else {
+    label = "Working..."
+  }
 
   return (
     <div aria-live="polite" data-testid="tool-status">

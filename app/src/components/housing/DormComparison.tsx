@@ -263,7 +263,7 @@ const DormComparison: React.FC<DormComparisonProps> = ({
         label: language === "zh" ? "房型" : "Room Type",
         values: selectedPlans.map((plan, i) => {
           if (!plan) {
-            return <React.Fragment key={i}>—</React.Fragment>
+            return <React.Fragment key={`item-${String(i)}`}>—</React.Fragment>
           }
           const opt = {
             bedCount: plan.bedCount ?? null,
@@ -272,7 +272,7 @@ const DormComparison: React.FC<DormComparisonProps> = ({
             labelCode: plan.labelCode,
           }
           return (
-            <span key={i} className="font-semibold text-gray-800">
+            <span key={`item-${String(i)}`} className="font-semibold text-gray-800">
               {plan.officialName ||
                 getRoomOptionLabels(opt, language).primaryLabel}
             </span>
@@ -289,7 +289,7 @@ const DormComparison: React.FC<DormComparisonProps> = ({
           if (plan.bedSize) {
             return plan.bedSize
           }
-          if (plan.bedCount != null) {
+          if (plan.bedCount !== null) {
             return `${plan.bedCount} ${language === "zh" ? "张床" : plan.bedCount === 1 ? "Bed" : "Beds"}`
           }
           return "—"
@@ -304,7 +304,7 @@ const DormComparison: React.FC<DormComparisonProps> = ({
           }
           const scope = plan.bathroomScope ?? "communal"
           const scopeLabel = getBathroomScopeLabel(scope, language)
-          if (plan.bathroomCount != null && plan.bathroomCount > 0) {
+          if (plan.bathroomCount !== null && plan.bathroomCount > 0) {
             return `${plan.bathroomCount} ${language === "zh" ? "卫" : plan.bathroomCount === 1 ? "Bath" : "Baths"} · ${scopeLabel}`
           }
           return scopeLabel
@@ -324,39 +324,39 @@ const DormComparison: React.FC<DormComparisonProps> = ({
         label: language === "zh" ? "年租金" : "Annual Price",
         values: selectedPlans.map((plan, i) => {
           if (!plan) {
-            return <React.Fragment key={i}>—</React.Fragment>
+            return <React.Fragment key={`item-${String(i)}`}>—</React.Fragment>
           }
           const p = hasPublishedPrice(plan.price) ? plan.price : null
-          if (p != null) {
+          if (p !== null) {
             return (
-              <span key={i} className="text-illini-orange font-bold">
+              <span key={`item-${String(i)}`} className="text-illini-orange font-bold">
                 {formatPrice(p)}
               </span>
             )
           }
           if (plan.available === false) {
             return (
-              <span key={i} className="text-[13px] text-red-500">
+              <span key={`item-${String(i)}`} className="text-[13px] text-red-500">
                 {language === "zh" ? "暂不可订" : "Sold out"}
               </span>
             )
           }
-          return <React.Fragment key={i}>—</React.Fragment>
+          return <React.Fragment key={`item-${String(i)}`}>—</React.Fragment>
         }),
       },
       {
         label: language === "zh" ? "月租金" : "Monthly",
         values: selectedPlans.map((plan, i) => {
           if (!plan) {
-            return <React.Fragment key={i}>—</React.Fragment>
+            return <React.Fragment key={`item-${String(i)}`}>—</React.Fragment>
           }
           const p = hasPublishedPrice(plan.price) ? plan.price : null
-          return p != null ? (
-            <span key={i} className="font-semibold text-gray-700">
+          return p === null ? (
+            <React.Fragment key={`item-${String(i)}`}>—</React.Fragment>
+          ) : (
+            <span key={`item-${String(i)}`} className="font-semibold text-gray-700">
               ~{formatPrice(Math.round(p / 12))}
             </span>
-          ) : (
-            <React.Fragment key={i}>—</React.Fragment>
           )
         }),
       },
@@ -432,7 +432,7 @@ const DormComparison: React.FC<DormComparisonProps> = ({
         <div className="flex justify-center gap-1.5 pb-3">
           {dorms.map((_, i) => (
             <div
-              key={i}
+              key={`item-${String(i)}`}
               className={`size-1.5 rounded-full transition-colors ${i === mobileActiveIdx ? `bg-illini-blue` : `bg-gray-300`} `}
             />
           ))}
@@ -504,7 +504,7 @@ const DormComparison: React.FC<DormComparisonProps> = ({
                     </div>
                     <div className="border-b border-gray-100 px-4 py-3">
                       <div className="relative">
-                        <select
+                        <select aria-label="Select option"
                           value={currentIdx}
                           onChange={(e) =>
                             setSelectedPlanIdx((prev) => ({
@@ -529,7 +529,7 @@ const DormComparison: React.FC<DormComparisonProps> = ({
                               ? ` · ${formatPrice(plan.price)}`
                               : ""
                             return (
-                              <option key={i} value={i}>
+                              <option key={`item-${String(i)}`} value={i}>
                                 {label}
                                 {price}
                               </option>
@@ -551,7 +551,7 @@ const DormComparison: React.FC<DormComparisonProps> = ({
                           validPrices.length > 1
                         return (
                           <div
-                            key={ri}
+                            key={`row-${String(ri)}`}
                             className={`flex items-center justify-between px-4 py-3 ${isCheapest ? `bg-emerald-50/60` : ""} `}
                           >
                             <div className="flex shrink-0 items-center gap-1.5 text-sm text-gray-600">
@@ -687,7 +687,7 @@ const DormComparison: React.FC<DormComparisonProps> = ({
                     className="border-r border-gray-200 p-3 last:border-r-0"
                   >
                     <div className="relative">
-                      <select
+                      <select aria-label="Select option"
                         value={currentIdx}
                         onChange={(e) =>
                           setSelectedPlanIdx((prev) => ({
@@ -712,7 +712,7 @@ const DormComparison: React.FC<DormComparisonProps> = ({
                             ? ` · ${formatPrice(plan.price)}`
                             : ""
                           return (
-                            <option key={i} value={i}>
+                            <option key={`item-${String(i)}`} value={i}>
                               {label}
                               {price}
                             </option>
@@ -731,7 +731,7 @@ const DormComparison: React.FC<DormComparisonProps> = ({
               <tbody>
                 {planRows.map((row, ri) => (
                   <tr
-                    key={ri}
+                    key={`planrow-${String(ri)}`}
                     className={ri % 2 === 0 ? "bg-white" : "bg-gray-50"}
                   >
                     <td className="sticky left-0 z-10 w-[140px] border-r border-b border-gray-200 bg-inherit px-4 py-3 text-sm font-medium text-gray-600">
@@ -751,7 +751,7 @@ const DormComparison: React.FC<DormComparisonProps> = ({
                         validPrices.length > 1
                       return (
                         <td
-                          key={ci}
+                          key={`plancell-${String(ci)}`}
                           className={`border-b border-gray-200 px-4 py-3 text-sm ${isCheapest ? `bg-emerald-50/60` : ""} `}
                         >
                           {val}

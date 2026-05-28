@@ -95,7 +95,7 @@ export function UserMessage({ message, userRole = "You" }: UserMessageProps) {
           {isEditing ? (
             <div className="flex w-full flex-col items-stretch gap-2">
               <ImeSafeTextarea
-                autoFocus
+                ref={(el) => { el?.focus() }}
                 value={draft}
                 onChange={(e) => setDraft(e.currentTarget.value)}
                 onKeyDown={handleKeyDown}

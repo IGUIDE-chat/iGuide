@@ -5,7 +5,7 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-export interface StreamChunk {
+interface StreamChunk {
   text: string
   followUpQuestions?: string[]
   thinkingStep?: {
@@ -15,20 +15,26 @@ export interface StreamChunk {
   }
 }
 
-export interface ChatHistoryItem {
+interface ChatHistoryItem {
   role: "user" | "model"
   text: string
 }
 
-export type StreamChatResponseFn = (
-  history: ChatHistoryItem[],
-  newMessage: string,
-  lang?: string,
-  conversationId?: string,
+interface StreamChatResponseParams {
+  history: ChatHistoryItem[]
+  newMessage: string
+  lang?: string
+  conversationId?: string
   userId?: string
+}
+
+type StreamChatResponseFn = (
+  params: StreamChatResponseParams
 ) => AsyncGenerator<StreamChunk>
 
-export interface AIProvider {
+interface AIProvider {
   id: "coze" | "gemini" | "deepseek"
   streamChatResponse: StreamChatResponseFn
 }
+
+export { type StreamChunk, type ChatHistoryItem, type StreamChatResponseParams, type StreamChatResponseFn, type AIProvider }

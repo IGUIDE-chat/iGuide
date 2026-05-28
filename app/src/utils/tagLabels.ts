@@ -83,10 +83,10 @@ const TAG_ZH_MAP: Record<string, string> = {
   Premium: "高端",
 }
 
-export const KNOWN_TAGS: string[] = Object.keys(TAG_ZH_MAP).toSorted()
+const KNOWN_TAGS: string[] = Object.keys(TAG_ZH_MAP).toSorted()
 
 /** Legacy: Return the localised label for an old-style string tag. */
-export function getTagLabel(tag: string, language: Language): string {
+function getTagLabel(tag: string, language: Language): string {
   if (language === "zh") {
     return TAG_ZH_MAP[tag] ?? tag
   }
@@ -96,7 +96,7 @@ export function getTagLabel(tag: string, language: Language): string {
 // ── New categorized tag utilities ───────────────────────────────────────────
 
 /** Collect all tags from categorized tags, sorted by priority (ascending = more important first). */
-export function getAllTagsSorted(
+function getAllTagsSorted(
   categorizedTags: DormCategorizedTags
 ): DormTag[] {
   const all: DormTag[] = [
@@ -113,7 +113,7 @@ export function getAllTagsSorted(
     })
 }
 
-export interface CardTagItem {
+interface CardTagItem {
   id: string
   label: string
   layer: "secondary" | "vibe"
@@ -136,7 +136,7 @@ function getCardTagDisplay(
   return getTagDisplay(tag, language)
 }
 
-export function getDetailTagDisplay(
+function getDetailTagDisplay(
   tag: DormTag,
   categorizedTags: DormCategorizedTags,
   language: Language
@@ -154,25 +154,26 @@ export function getDetailTagDisplay(
   return getTagDisplay(tag, language)
 }
 
-export function getCardTagCandidates(
+function toneWeight(tag: DormTag) {
+  switch (TAG_REGISTRY[tag]?.cardTone) {
+    case "muted":
+      return 0
+    case "neutral":
+      return 1
+    case "positive":
+      return 2
+    default:
+      return 3
+  }
+}
+
+function getCardTagCandidates(
   categorizedTags: DormCategorizedTags,
   language: Language
 ): CardTagItem[] {
   const rankedTags = getAllTagsSorted(categorizedTags)
     .filter((tag) => TAG_REGISTRY[tag]?.cardLayer !== "hidden")
     .toSorted((a, b) => {
-      const toneWeight = (tag: DormTag) => {
-        switch (TAG_REGISTRY[tag]?.cardTone) {
-          case "muted":
-            return 0
-          case "neutral":
-            return 1
-          case "positive":
-            return 2
-          default:
-            return 3
-        }
-      }
       const toneA = toneWeight(a)
       const toneB = toneWeight(b)
       if (toneA !== toneB) {
@@ -221,7 +222,7 @@ export function getCardTagCandidates(
   return items
 }
 
-export function getCardTagItems(
+function getCardTagItems(
   categorizedTags: DormCategorizedTags,
   language: Language,
   maxCount = 4
@@ -238,7 +239,7 @@ export function getCardTagItems(
  * Get hero tags: priority-sorted, capped at maxCount.
  * Tags with priority >= 7 (too common, like Laundry/Kitchen) are excluded.
  */
-export function getHeroTags(
+function getHeroTags(
   categorizedTags: DormCategorizedTags,
   maxCount = 8
 ): DormTag[] {
@@ -247,3 +248,5 @@ export function getHeroTags(
     .filter((tag) => (TAG_REGISTRY[tag]?.priority ?? 99) < HERO_PRIORITY_CUTOFF)
     .slice(0, maxCount)
 }
+
+export { KNOWN_TAGS, type CardTagItem, getTagLabel, getAllTagsSorted, getDetailTagDisplay, getCardTagCandidates, getCardTagItems, getHeroTags }

@@ -5,7 +5,47 @@ const fs = require("fs")
 
 puppeteer.use(StealthPlugin())
 
-const wait = (ms) => new Promise((r) => setTimeout(r, ms))
+const wait = (ms) => new Promise((resolve) => { setTimeout(resolve, ms) })
+
+async function scrollToLoadMore(page, remainingIterations) {
+  if (remainingIterations <= 0) { return }
+
+  // Try the known scrollable container
+  await page.evaluate(() => {
+    // Try multiple potential scroll containers
+    const selectors = [
+      "div.m6QErb.DxyBCb.kA9KIf.dS8AEf",
+      "div.m6QErb.DxyBCb.kA9KIf",
+      "div.m6QErb.D5yXZc.xiA65.transparentBackground",
+      "div.m6QErb",
+    ]
+    for (const sel of selectors) {
+      const el = document.querySelector(sel)
+      if (el && el.scrollHeight > el.clientHeight) {
+        el.scrollBy(0, 5000)
+        return
+      }
+    }
+    // Fallback: scroll any tall div
+    const divs = document.querySelectorAll("div")
+    for (const d of divs) {
+      if (d.scrollHeight > 2000 && d.scrollHeight > d.clientHeight * 1.5) {
+        d.scrollBy(0, 5000)
+        break
+      }
+    }
+  })
+  await wait(1500)
+
+  // Click "More" buttons to expand review text
+  const moreButtons = await page.$$("button.w8nwRe.kyuRq")
+  await Promise.all(
+    moreButtons.map((btn) => btn.click().catch(() => { /* ignore click errors */ }))
+  )
+  await wait(500)
+
+  await scrollToLoadMore(page, remainingIterations - 1)
+}
 
 // These are specific Google Maps URLs found by searching for the exact place
 const missingDorms = [
@@ -51,6 +91,47 @@ const missingDorms = [
   },
 ]
 
+async function scrapeWithRetry(page, dormId, url) {
+  try {
+    const data = await scrapeDorm(page, dormId, url)
+    if (data.length > 0) { return data }
+  } catch (err) {
+    console.log(`[${dormId}] Error attempt 1: ${err.message}`)
+  }
+
+  console.log(`[${dormId}] Retrying with search query...`)
+  const searchUrl = `https://www.google.com/maps/search/${dormId.replaceAll("-", "+")}+hall+UIUC+Champaign`
+  try {
+    const data = await scrapeDorm(page, dormId, searchUrl)
+    if (data.length > 0) { return data }
+  } catch (err) {
+    console.log(`[${dormId}] Retry error: ${err.message}`)
+  }
+
+  return []
+}
+
+async function processMissingDorms(page, dorms, allCollected, index = 0) {
+  if (index >= dorms.length) { return }
+
+  const { dormId, url } = dorms[index]
+  const data = await scrapeWithRetry(page, dormId, url)
+
+  data.forEach((r, idx) => {
+    allCollected.push({
+      id: `gm-real-${dormId}-${idx}`,
+      dormId,
+      displayName: r.author.replaceAll(/['`]/g, ""),
+      content: r.text.replaceAll(/['`]/g, ""),
+      vote: r.stars >= 3 ? 1 : -1,
+      daysAgo: Math.floor(Math.random() * 300) + 1,
+      upvotes: Math.floor(Math.random() * 20),
+    })
+  })
+
+  await processMissingDorms(page, dorms, allCollected, index + 1)
+}
+
 async function scrapeDorm(page, dormId, mapUrl) {
   console.log(`\n[${dormId}] Navigating to ${mapUrl}`)
 
@@ -61,19 +142,21 @@ async function scrapeDorm(page, dormId, mapUrl) {
   // Method 1: Look for reviews tab directly on the place page
   let clicked = false
   let tabs = await page.$$('button[role="tab"]')
-  for (const tab of tabs) {
-    const text = await page.evaluate((el) => el.innerText, tab)
-    if (
+
+  const initialTabTexts = await Promise.all(
+    tabs.map((tab) => page.evaluate((el) => el.innerText, tab))
+  )
+  const initialReviewIdx = initialTabTexts.findIndex(
+    (text) =>
       text &&
       (text.includes("Reviews") ||
         text.includes("评价") ||
         text.includes("评论"))
-    ) {
-      await tab.click()
-      clicked = true
-      console.log(`[${dormId}] Clicked Reviews tab directly.`)
-      break
-    }
+  )
+  if (initialReviewIdx !== -1) {
+    await tabs[initialReviewIdx].click()
+    clicked = true
+    console.log(`[${dormId}] Clicked Reviews tab directly.`)
   }
 
   // Method 2: If we landed on a search results page, click the first result
@@ -84,19 +167,20 @@ async function scrapeDorm(page, dormId, mapUrl) {
       await firstResult.click()
       await wait(4000)
       tabs = await page.$$('button[role="tab"]')
-      for (const tab of tabs) {
-        const text = await page.evaluate((el) => el.innerText, tab)
-        if (
+      const afterClickTabTexts = await Promise.all(
+        tabs.map((tab) => page.evaluate((el) => el.innerText, tab))
+      )
+      const afterClickReviewIdx = afterClickTabTexts.findIndex(
+        (text) =>
           text &&
           (text.includes("Reviews") ||
             text.includes("评价") ||
             text.includes("评论"))
-        ) {
-          await tab.click()
-          clicked = true
-          console.log(`[${dormId}] Clicked Reviews tab after result click.`)
-          break
-        }
+      )
+      if (afterClickReviewIdx !== -1) {
+        await tabs[afterClickReviewIdx].click()
+        clicked = true
+        console.log(`[${dormId}] Clicked Reviews tab after result click.`)
       }
     }
   }
@@ -104,14 +188,15 @@ async function scrapeDorm(page, dormId, mapUrl) {
   // Method 3: Try clicking on a review summary / review count link
   if (!clicked) {
     const reviewLinks = await page.$$('button[jsaction*="review"]')
-    for (const rl of reviewLinks) {
-      try {
-        await rl.click()
-        clicked = true
-        console.log(`[${dormId}] Clicked review action button.`)
-        break
-      } catch (e) {}
-    }
+    try {
+      await Promise.any(
+        reviewLinks.map(async (rl) => {
+          await rl.click()
+        })
+      )
+      clicked = true
+      console.log(`[${dormId}] Clicked review action button.`)
+    } catch { /* all clicks failed */ }
   }
 
   // Method 4: Look for the reviews count text and click it
@@ -142,43 +227,7 @@ async function scrapeDorm(page, dormId, mapUrl) {
 
   // Scroll to load more reviews
   try {
-    for (let i = 0; i < 6; i++) {
-      // Try the known scrollable container
-      await page.evaluate(() => {
-        // Try multiple potential scroll containers
-        const selectors = [
-          "div.m6QErb.DxyBCb.kA9KIf.dS8AEf",
-          "div.m6QErb.DxyBCb.kA9KIf",
-          "div.m6QErb.D5yXZc.xiA65.transparentBackground",
-          "div.m6QErb",
-        ]
-        for (const sel of selectors) {
-          const el = document.querySelector(sel)
-          if (el && el.scrollHeight > el.clientHeight) {
-            el.scrollBy(0, 5000)
-            return
-          }
-        }
-        // Fallback: scroll any tall div
-        const divs = document.querySelectorAll("div")
-        for (const d of divs) {
-          if (d.scrollHeight > 2000 && d.scrollHeight > d.clientHeight * 1.5) {
-            d.scrollBy(0, 5000)
-            break
-          }
-        }
-      })
-      await wait(1500)
-
-      // Click "More" buttons to expand review text
-      const moreButtons = await page.$$("button.w8nwRe.kyuRq")
-      for (const btn of moreButtons) {
-        try {
-          await btn.click()
-        } catch (e) {}
-      }
-      await wait(500)
-    }
+    await scrollToLoadMore(page, 6)
   } catch (e) {
     console.log(`[${dormId}] Scroll error: ${e.message}`)
   }
@@ -205,7 +254,7 @@ async function scrapeDorm(page, dormId, mapUrl) {
         const label = starEl.getAttribute("aria-label") || ""
         const match = label.match(/(\d)/)
         if (match) {
-          stars = parseInt(match[1])
+          stars = parseInt(match[1], 10)
         }
       }
       results.push({ author, text, stars })
@@ -236,7 +285,7 @@ async function scrapeDorm(page, dormId, mapUrl) {
           const label = starEl.getAttribute("aria-label") || ""
           const match = label.match(/(\d)/)
           if (match) {
-            stars = parseInt(match[1])
+            stars = parseInt(match[1], 10)
           }
         }
         results.push({ author, text, stars })
@@ -276,37 +325,7 @@ async function main() {
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
   )
 
-  for (const { dormId, url } of missingDorms) {
-    let data = []
-    for (let attempt = 0; attempt < 2 && data.length === 0; attempt++) {
-      try {
-        data = await scrapeDorm(page, dormId, url)
-      } catch (err) {
-        console.log(`[${dormId}] Error attempt ${attempt + 1}: ${err.message}`)
-      }
-      if (data.length === 0 && attempt === 0) {
-        console.log(`[${dormId}] Retrying with search query...`)
-        const searchUrl = `https://www.google.com/maps/search/${dormId.replaceAll("-", "+")}+hall+UIUC+Champaign`
-        try {
-          data = await scrapeDorm(page, dormId, searchUrl)
-        } catch (err) {
-          console.log(`[${dormId}] Retry error: ${err.message}`)
-        }
-      }
-    }
-
-    data.forEach((r, idx) => {
-      allCollected.push({
-        id: `gm-real-${dormId}-${idx}`,
-        dormId,
-        displayName: r.author.replaceAll(/['`]/g, ""),
-        content: r.text.replaceAll(/['`]/g, ""),
-        vote: r.stars >= 3 ? 1 : -1,
-        daysAgo: Math.floor(Math.random() * 300) + 1,
-        upvotes: Math.floor(Math.random() * 20),
-      })
-    })
-  }
+  await processMissingDorms(page, missingDorms, allCollected)
 
   await browser.close()
   console.log(`\nTotal new reviews pulled: ${allCollected.length}`)
@@ -331,8 +350,8 @@ async function main() {
 
   // Find the closing bracket and insert before it
   const lastBracketIdx = fileContent.lastIndexOf("];")
-  const before = fileContent.substring(0, lastBracketIdx).trimEnd()
-  const after = fileContent.substring(lastBracketIdx)
+  const before = fileContent.slice(0, lastBracketIdx).trimEnd()
+  const after = fileContent.slice(lastBracketIdx)
 
   // Ensure comma before new entries
   const needsComma = before.endsWith(")")
@@ -350,4 +369,10 @@ async function main() {
   console.log("Successfully appended to googleReviews.ts")
 }
 
-main().catch(console.error)
+;(async () => {
+  try {
+    await main()
+  } catch (error) {
+    console.error(error)
+  }
+})()

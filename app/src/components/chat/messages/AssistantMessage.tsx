@@ -24,7 +24,7 @@ const extractAssistantText = (message: UIMessage): string =>
     .join("")
 
 const summarizeToolResult = (result: unknown): string | undefined => {
-  if (result == null) {
+  if (result === null || result === undefined) {
     return undefined
   }
   if (typeof result === "string") {
@@ -41,6 +41,7 @@ const summarizeToolResult = (result: unknown): string | undefined => {
 const markdownComponents = {
   a: ({
     node: _node,
+    children,
     ...props
   }: { node?: unknown } & React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
     <a
@@ -48,7 +49,9 @@ const markdownComponents = {
       className="text-illini-orange hover:underline"
       target="_blank"
       rel="noopener noreferrer"
-    />
+    >
+      {children}
+    </a>
   ),
   code: ({
     node: _node,

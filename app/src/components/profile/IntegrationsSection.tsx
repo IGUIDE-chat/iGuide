@@ -82,7 +82,7 @@ async function apiFetch(
     headers: {
       "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...((options.headers as Record<string, string>) || {}),
+      ...((options.headers as Record<string, string>)),
     },
   })
 }
@@ -189,7 +189,7 @@ async function mockTestConnection(url: string): Promise<{
   tools?: Array<{ name: string; description: string }>
   reason?: MockFailureReason
 }> {
-  await new Promise((r) => setTimeout(r, 1500))
+  await new Promise((resolve) => { setTimeout(resolve, 1500) })
   const normalizedUrl = url.toLowerCase()
   if (normalizedUrl.includes("auth") || normalizedUrl.includes("private")) {
     return { ok: false, reason: "auth_required" }
@@ -218,6 +218,27 @@ async function mockTestConnection(url: string): Promise<{
   }
 }
 
+// ─── Helpers (no component scope needed) ──────────────────────────────────────
+
+const statusDot = (status: "ok" | "error" | "unknown", dimmed = false) => {
+  const base = "size-2 rounded-full inline-block"
+  if (status === "ok") {
+    return (
+      <span
+        className={` ${base} ${dimmed ? "bg-emerald-300" : "bg-emerald-400"} `}
+      />
+    )
+  }
+  if (status === "error") {
+    return (
+      <span className={` ${base} ${dimmed ? "bg-red-300" : "bg-red-400"} `} />
+    )
+  }
+  return <span className={` ${base} bg-slate-300`} />
+}
+
+const toolCount = (conn: UserConnection) => conn.tools.length
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 interface IntegrationsSectionProps {
@@ -238,17 +259,20 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
   useEffect(() => {
     setIsLoading(true)
     setLoadError(null)
-    fetchConnectionsFromApi()
-      .then(({ platform, user }) => {
+    const load = async () => {
+      try {
+        const { platform, user } = await fetchConnectionsFromApi()
         setPlatformConnections(platform)
         setUserConnections(user)
-      })
-      .catch((err: unknown) =>
+      } catch (err: unknown) {
         setLoadError(
           err instanceof Error ? err.message : "Failed to load integrations"
         )
-      )
-      .finally(() => setIsLoading(false))
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    load()
   }, [])
 
   // Add form
@@ -410,23 +434,6 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
 
   // ── Helpers ────────────────────────────────────────────────────────────────
 
-  const statusDot = (status: "ok" | "error" | "unknown", dimmed = false) => {
-    const base = "size-2 rounded-full inline-block"
-    if (status === "ok") {
-      return (
-        <span
-          className={` ${base} ${dimmed ? "bg-emerald-300" : "bg-emerald-400"} `}
-        />
-      )
-    }
-    if (status === "error") {
-      return (
-        <span className={` ${base} ${dimmed ? "bg-red-300" : "bg-red-400"} `} />
-      )
-    }
-    return <span className={` ${base} bg-slate-300`} />
-  }
-
   const statusLabel = (status: "ok" | "error" | "unknown") => {
     if (status === "ok") {
       return t.statusOk
@@ -436,8 +443,6 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
     }
     return t.statusUnknown
   }
-
-  const toolCount = (conn: UserConnection) => conn.tools.length
 
   const getFailureReasonDescription = (reason: MockFailureReason) =>
     t.failureReasonDescriptions[reason] ?? t.failureReasonDescriptions.unknown
@@ -510,8 +515,8 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
         c.id === connId
           ? {
               ...c,
-              tools: c.tools.map((t) =>
-                t.name === toolName ? { ...t, enabled: !t.enabled } : t
+              tools: c.tools.map((tool) =>
+                tool.name === toolName ? { ...tool, enabled: !tool.enabled } : tool
               ),
             }
           : c
@@ -548,7 +553,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
             ? {
                 ...c,
                 status: "ok",
-                tools: result.tools!.map((t) => ({ ...t, enabled: true })),
+                tools: (result.tools ?? []).map((tool) => Object.assign({}, tool, { enabled: true })),
               }
             : c
         )
@@ -613,22 +618,23 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
             <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2">
               <p className="text-xs text-red-600">{loadError}</p>
               <button
-                onClick={() => {
+            type="button"
+                onClick={async () => {
                   setIsLoading(true)
                   setLoadError(null)
-                  fetchConnectionsFromApi()
-                    .then(({ platform, user }) => {
-                      setPlatformConnections(platform)
-                      setUserConnections(user)
-                    })
-                    .catch((err: unknown) =>
-                      setLoadError(
-                        err instanceof Error
-                          ? err.message
-                          : "Failed to load integrations"
-                      )
+                  try {
+                    const { platform, user } = await fetchConnectionsFromApi()
+                    setPlatformConnections(platform)
+                    setUserConnections(user)
+                  } catch (err: unknown) {
+                    setLoadError(
+                      err instanceof Error
+                        ? err.message
+                        : "Failed to load integrations"
                     )
-                    .finally(() => setIsLoading(false))
+                  } finally {
+                    setIsLoading(false)
+                  }
                 }}
                 className="mt-1 text-xs font-medium text-red-500 hover:text-red-700"
               >
@@ -676,6 +682,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
           </div>
           {!showAddForm && (
             <button
+            type="button"
               onClick={handleOpenAdd}
               className="text-illini-orange hover:text-illini-blue text-xs font-medium transition-colors"
             >
@@ -696,7 +703,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
               <label className="mb-1 block text-xs font-medium text-slate-500">
                 {t.displayName}
               </label>
-              <input
+              <input aria-label="Input field"
                 type="text"
                 value={addName}
                 onChange={(e) => setAddName(e.target.value)}
@@ -710,7 +717,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
               <label className="mb-1 block text-xs font-medium text-slate-500">
                 {t.endpointUrl}
               </label>
-              <input
+              <input aria-label="Input field"
                 type="url"
                 value={addUrl}
                 onChange={(e) => {
@@ -727,7 +734,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
               <label className="mb-1 block text-xs font-medium text-slate-500">
                 {t.description}
               </label>
-              <input
+              <input aria-label="Input field"
                 type="text"
                 value={addDesc}
                 onChange={(e) => setAddDesc(e.target.value)}
@@ -766,7 +773,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                   <p className="text-xs text-emerald-600">
                     {testResult.tools.length}{" "}
                     {testResult.tools.length === 1 ? t.tool : t.tools}:{" "}
-                    {testResult.tools.map((t) => t.name).join(", ")}
+                    {testResult.tools.map((tool) => tool.name).join(", ")}
                   </p>
                 </div>
               </div>
@@ -791,12 +798,14 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
             {/* Actions */}
             <div className="flex items-center gap-2">
               <button
+            type="button"
                 onClick={handleCancelAdd}
                 className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-200"
               >
                 {t.cancel}
               </button>
               <button
+            type="button"
                 onClick={handleTest}
                 disabled={!addUrl.trim() || testResult.state === "loading"}
                 className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-200 disabled:opacity-40"
@@ -805,6 +814,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
               </button>
               {testResult.state === "success" && (
                 <button
+            type="button"
                   onClick={handleSave}
                   disabled={!addName.trim() || isSaving}
                   className="bg-illini-orange hover:bg-illini-blue rounded-full px-3 py-1 text-xs font-medium text-white transition-colors disabled:opacity-40"
@@ -831,6 +841,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
               <div key={conn.id}>
                 {/* Card row */}
                 <button
+            type="button"
                   onClick={() =>
                     setDetailsId(detailsId === conn.id ? null : conn.id)
                   }
@@ -877,6 +888,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                         {t.detailsTitle}
                       </p>
                       <button
+            type="button"
                         onClick={() => setDetailsId(null)}
                         className="text-xs text-slate-400 hover:text-slate-600"
                       >
@@ -919,6 +931,8 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                         {t.enableConnection}
                       </span>
                       <button
+            type="button"
+                        aria-label="Toggle connection"
                         onClick={() => handleToggleConnection(conn.id)}
                         className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${conn.is_enabled ? "bg-illini-orange" : "bg-slate-200"}`}
                         role="switch"
@@ -952,6 +966,8 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                               </p>
                             </div>
                             <button
+            type="button"
+                              aria-label="Toggle tool"
                               onClick={() =>
                                 handleToggleTool(conn.id, tool.name)
                               }
@@ -971,18 +987,21 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                     {/* Action buttons */}
                     <div className="flex flex-wrap gap-2">
                       <button
+            type="button"
                         onClick={() => void handleTestAgain(conn.id)}
                         className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-200"
                       >
                         {t.testAgain}
                       </button>
                       <button
+            type="button"
                         onClick={() => void handleRefreshDiscovery(conn.id)}
                         className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-200"
                       >
                         {t.refreshDiscovery}
                       </button>
                       <button
+            type="button"
                         onClick={() => void handleDelete(conn.id)}
                         className="rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-500 transition-colors hover:bg-red-100"
                       >

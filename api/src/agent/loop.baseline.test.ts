@@ -243,6 +243,7 @@ test("housing query exposes tools and can trigger search", async () => {
 
     const firstRequest = parseRequestBody(mockFetch.requests[0])
     assert.ok(
+      // eslint-disable-next-line vitest/no-conditional-in-test -- checking optional field existence
       firstRequest.tools && firstRequest.tools.length > 0,
       "Substantive query should expose tools"
     )
@@ -372,6 +373,7 @@ test("provider error triggers fallback", async () => {
       },
       (error: Error) => {
         assert.ok(
+          // eslint-disable-next-line vitest/no-conditional-in-test -- checking error message variants
           error.message.includes("500") || error.message.includes("error")
         )
         return true
@@ -490,6 +492,7 @@ test("streaming substantive query exposes tools", async () => {
 
     const requestBody = parseRequestBody(mockFetch.requests[0])
     assert.ok(
+      // eslint-disable-next-line vitest/no-conditional-in-test -- checking optional field existence
       requestBody.tools && requestBody.tools.length > 0,
       "Streaming substantive query should expose tools"
     )

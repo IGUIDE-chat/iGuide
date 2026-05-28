@@ -5,7 +5,7 @@ type PagesFunction<T = unknown> = (context: {
   request: Request
   env: T
   params: Record<string, string>
-  waitUntil: (promise: Promise<any>) => void
+  waitUntil: (promise: Promise<unknown>) => void
   next: () => Promise<Response>
   data: Record<string, unknown>
 }) => Promise<Response>
@@ -41,7 +41,13 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   const { request, env } = context
 
   try {
-    const body = (await request.json()) as any
+    const body = (await request.json()) as {
+      message?: string
+      conversationId?: string
+      history?: Array<{ role: string; text: string }>
+      userId?: string
+      lang?: string
+    }
     const { message, conversationId, history, userId, lang = "en" } = body
 
     // Prefer server-only secrets first to avoid accidentally using stale public vars.
@@ -75,7 +81,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         stream: true,
         auto_save_history: true,
         additional_messages: [
-          ...(history || []).map((h: any) => ({
+          ...(history || []).map((h: { role: string; text: string }) => ({
             role: h.role === "model" ? "assistant" : "user",
             content: h.text,
             content_type: "text",

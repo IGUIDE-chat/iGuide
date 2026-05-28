@@ -70,6 +70,8 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
   return (
     <div className="space-y-2 border-t border-white/10 p-3">
       <button
+        type="button"
+        aria-label="Toggle language"
         onClick={onToggleLanguage}
         className="flex w-full items-center gap-3 rounded-md p-3 text-sm text-slate-300 transition-colors hover:bg-[#212121]"
       >
@@ -95,6 +97,7 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
 
       {isGuest ? (
         <button
+          type="button"
           onClick={onGuestLogin}
           className="group flex w-full items-center gap-3 rounded-md p-3 text-sm text-white transition-colors hover:bg-[#212121]"
         >
@@ -111,6 +114,7 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
       ) : (
         <Link
           to="/profile"
+          href="/profile"
           className="block flex cursor-pointer items-center gap-3 rounded-md bg-white/5 px-3 py-2 transition-colors hover:bg-white/10"
         >
           <div className="bg-illini-orange flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white">

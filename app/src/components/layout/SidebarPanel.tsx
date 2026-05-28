@@ -35,8 +35,8 @@ export const SidebarPanel: React.FC<SidebarPanelProps> = ({
       {activeTab === "chat" && (
         <ConversationSidebar
           currentConversationId={currentConversationId ?? null}
-          onSelectConversation={onSelectConversation ?? (() => {})}
-          onNewConversation={onNewConversation ?? (() => {})}
+          onSelectConversation={onSelectConversation ?? ((_id: string) => { /* noop */ })}
+          onNewConversation={onNewConversation ?? (() => { /* noop */ })}
           language={language}
         />
       )}

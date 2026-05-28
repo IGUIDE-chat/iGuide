@@ -10,7 +10,7 @@
 import { supabase } from "./supabase"
 import { authService } from "./authService"
 
-export interface DormComment {
+interface DormComment {
   id: string
   dorm_id: string
   user_id: string
@@ -73,14 +73,14 @@ function aggregateComment(
   }
 }
 
-export interface DormCommentStats {
+interface DormCommentStats {
   dormId: string
   totalComments: number
   thumbsUp: number
   positivePercent: number | null
 }
 
-export const dormCommentsService = {
+const dormCommentsService = {
   /**
    * Fetch aggregate comment stats for all dorms (total count + thumbs up count).
    */
@@ -236,3 +236,5 @@ export const dormCommentsService = {
     }
   },
 }
+
+export { type DormComment, type DormCommentStats, dormCommentsService }

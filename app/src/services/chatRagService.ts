@@ -130,13 +130,13 @@ interface RankedContextBlock {
   priority: number
 }
 
-export interface ChatRAGResult {
+interface ChatRAGResult {
   context: string
   hasQMD: boolean
   hasWeb: boolean
 }
 
-export function isToolUseRagEnabled(): boolean {
+function isToolUseRagEnabled(): boolean {
   return viteEnv?.VITE_USE_TOOL_USE_RAG === "true"
 }
 
@@ -431,12 +431,14 @@ function buildQmdBlocks(results: SearchResult[]): RankedContextBlock[] {
     .filter((result) => result.score > 0.3)
     .map((result) => {
       const preferredUrl = getPreferredQmdUrl(result)
-      const typeLabel =
-        result.type === "dorm"
-          ? "Dorm"
-          : result.type === "article"
-            ? "Article"
-            : "Doc"
+      let typeLabel: string
+      if (result.type === "dorm") {
+        typeLabel = "Dorm"
+      } else if (result.type === "article") {
+        typeLabel = "Article"
+      } else {
+        typeLabel = "Doc"
+      }
 
       return {
         text: `[${typeLabel}] ${result.title} (relevance: ${result.score.toFixed(2)})\nURL: ${preferredUrl}\n${result.snippet}`,
@@ -506,7 +508,7 @@ function buildWebBlocks(results: WebSearchResult[]): RankedContextBlock[] {
     }))
 }
 
-export async function fetchChatRAGContext(
+async function fetchChatRAGContext(
   query: string,
   lang: string
 ): Promise<ChatRAGResult> {
@@ -525,39 +527,44 @@ export async function fetchChatRAGContext(
   const englishQuery =
     queries.find((candidate) => candidate !== primaryQuery) ?? null
 
+  async function safeQmdSearch(q: string, searchLang: "en" | "zh"): Promise<SearchResult[]> {
+    try {
+      const response = await quickSearch(q, searchLang, QMD_RESULT_LIMIT)
+      return response.results
+    } catch (error) {
+      console.warn("[RAG] QMD search failed:", error)
+      return []
+    }
+  }
+
   const qmdSearches = [
-    quickSearch(
-      primaryQuery,
-      (lang === "zh" ? "zh" : "en") as "en" | "zh",
-      QMD_RESULT_LIMIT
-    )
-      .then((response) => response.results)
-      .catch((error) => {
-        console.warn("[RAG] QMD search failed:", error)
-        return [] as SearchResult[]
-      }),
+    safeQmdSearch(primaryQuery, (lang === "zh" ? "zh" : "en") as "en" | "zh"),
   ]
 
   if (englishQuery) {
-    qmdSearches.push(
-      quickSearch(englishQuery, "en", QMD_RESULT_LIMIT)
-        .then((response) => response.results)
-        .catch((error) => {
-          console.warn("[RAG] English QMD search failed:", error)
-          return [] as SearchResult[]
-        })
-    )
+    qmdSearches.push(safeQmdSearch(englishQuery, "en"))
+  }
+
+  async function resolveQmdSearches(): Promise<SearchResult[]> {
+    const nested = await Promise.all(qmdSearches)
+    return mergeQmdResults(nested.flat())
+  }
+
+  async function resolveWebSearch(): Promise<WebSearchResult[]> {
+    try {
+      return await webSearchWithOfficialPriority(queries, {
+        maxResults: WEB_RESULT_LIMIT,
+        searchDepth: "basic",
+      })
+    } catch (error) {
+      console.warn("[RAG] Web search failed:", error)
+      return []
+    }
   }
 
   const [qmdResults, webResults] = await Promise.all([
-    Promise.all(qmdSearches).then((nested) => mergeQmdResults(nested.flat())),
-    webSearchWithOfficialPriority(queries, {
-      maxResults: WEB_RESULT_LIMIT,
-      searchDepth: "basic",
-    }).catch((error) => {
-      console.warn("[RAG] Web search failed:", error)
-      return [] as WebSearchResult[]
-    }),
+    resolveQmdSearches(),
+    resolveWebSearch(),
   ])
 
   const rankedBlocks = [
@@ -581,3 +588,5 @@ export async function fetchChatRAGContext(
     hasWeb: webResults.length > 0,
   }
 }
+
+export { type ChatRAGResult, isToolUseRagEnabled, fetchChatRAGContext }

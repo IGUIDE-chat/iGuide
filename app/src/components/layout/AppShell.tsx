@@ -34,22 +34,17 @@ export const AppShell: React.FC<AppShellProps> = ({
 
   return (
     <div className="flex h-dvh w-full overflow-hidden bg-white font-sans text-slate-900">
-      <div
+      <button
+        type="button"
         className={`fixed inset-0 z-40 w-64 bg-black/50 transition-opacity duration-300 md:hidden ${
           isSidebarOpen
             ? "pointer-events-auto opacity-100"
             : "pointer-events-none opacity-0"
         } `}
-        role="button"
         tabIndex={isSidebarOpen ? 0 : -1}
+        aria-label="Close sidebar"
         aria-hidden={!isSidebarOpen}
         onClick={onToggleSidebar}
-        onKeyDown={(event) => {
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault()
-            onToggleSidebar()
-          }
-        }}
       />
 
       <aside
@@ -66,7 +61,8 @@ export const AppShell: React.FC<AppShellProps> = ({
 
       <main className="relative flex size-full min-w-0 flex-1 flex-col bg-white">
         <div className="absolute top-3 left-3 z-40 hidden md:block">
-          <button
+          <button aria-label="Action"
+            type="button"
             ref={sidebarToggleButtonRef}
             onClick={onToggleSidebar}
             className="hover:bg-illini-blue/5 hover:text-illini-blue rounded-md p-2 text-slate-400 transition-colors"
@@ -90,6 +86,7 @@ export const AppShell: React.FC<AppShellProps> = ({
 
         <div className="sticky top-0 z-20 flex items-center gap-2 border-b border-slate-100 bg-white p-3 md:hidden">
           <button
+            type="button"
             ref={mobileSidebarButtonRef}
             onClick={onToggleSidebar}
             aria-label={isSidebarOpen ? "Close sidebar" : "Open sidebar"}

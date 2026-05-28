@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop -- Agent loop requires sequential streaming reads, tool execution, and SSE writes */
 import {
   type FallbackEvent,
   type FallbackReason,
@@ -171,7 +172,7 @@ function detectRegion(region?: string, env?: Record<string, string>): string {
     env?.CF_COUNTRY,
   ]
     .filter(Boolean)
-    .map((value) => value!.toUpperCase())
+    .map((value) => (value as string).toUpperCase())
 
   return candidates.some((value) => value === "CN" || value === "CHINA")
     ? "CN"
@@ -1045,6 +1046,7 @@ export async function runStreamingAgentLoop(
     for (let index = 0; index < maxIterations; index += 1) {
       iterations = index + 1
       const iterationOutcome = await withFallback(
+        // eslint-disable-next-line no-loop-func -- closures intentionally capture current iteration state
         () =>
           runStreamingIteration({
             provider,
@@ -1063,6 +1065,7 @@ export async function runStreamingAgentLoop(
             shouldFallback: Boolean(result.fallbackReason),
             reason: result.fallbackReason,
           }),
+          // eslint-disable-next-line no-loop-func -- closures intentionally capture current iteration state
           retryOnce: (reason, previousResult) => {
             const simplifiedTools = (previousResult?.nextMessages ?? [])
               .slice()
@@ -1089,6 +1092,7 @@ export async function runStreamingAgentLoop(
               tools: allowedTools,
             })
           },
+          // eslint-disable-next-line no-loop-func -- closures intentionally capture current iteration state
           directResponse: (reason) =>
             runDirectFallbackResponse({
               provider,

@@ -27,25 +27,23 @@ function mergeSoul(existing: string, incoming: string): string {
 
   for (const entry of newEntries) {
     const colonIdx = entry.indexOf(":")
+    let idx: number
     if (colonIdx > 0) {
-      const key = entry.substring(0, colonIdx).trim().toLowerCase()
-      const idx = existingLines.findIndex((line) => {
+      const key = entry.slice(0, colonIdx).trim().toLowerCase()
+      idx = existingLines.findIndex((line) => {
         const lineColonIdx = line.indexOf(":")
         return (
           lineColonIdx > 0 &&
-          line.substring(0, lineColonIdx).trim().toLowerCase() === key
+          line.slice(0, lineColonIdx).trim().toLowerCase() === key
         )
       })
-      if (idx !== -1) {
-        existingLines.splice(idx, 1)
-      }
     } else {
-      const idx = existingLines.findIndex(
+      idx = existingLines.findIndex(
         (line) => line.toLowerCase() === entry.toLowerCase()
       )
-      if (idx !== -1) {
-        existingLines.splice(idx, 1)
-      }
+    }
+    if (idx !== -1) {
+      existingLines.splice(idx, 1)
     }
     existingLines.push(entry)
   }
@@ -75,13 +73,13 @@ function mergeUserMemory(existing: string, incoming: string): string {
   for (const entry of newEntries) {
     const colonIdx = entry.indexOf(":")
     if (colonIdx > 0) {
-      const key = entry.substring(0, colonIdx).trim().toLowerCase()
+      const key = entry.slice(0, colonIdx).trim().toLowerCase()
       // Remove existing line with same key
       const idx = existingLines.findIndex((line) => {
         const lineColonIdx = line.indexOf(":")
         return (
           lineColonIdx > 0 &&
-          line.substring(0, lineColonIdx).trim().toLowerCase() === key
+          line.slice(0, lineColonIdx).trim().toLowerCase() === key
         )
       })
       if (idx !== -1) {

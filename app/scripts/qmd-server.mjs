@@ -60,15 +60,15 @@ function acquireSlot() {
   if (queue.length >= MAX_QUEUE) {
     return Promise.reject(new Error("queue_full"))
   }
-  return new Promise((resolve, reject) => {
+  return new Promise((_resolve, reject) => {
     const timer = setTimeout(() => {
-      const idx = queue.findIndex((e) => e.resolve === resolve)
+      const idx = queue.findIndex((e) => e.resolve === _resolve)
       if (idx !== -1) {
         queue.splice(idx, 1)
       }
       reject(new Error("queue_timeout"))
     }, QUEUE_TIMEOUT_MS)
-    queue.push({ resolve, timer })
+    queue.push({ resolve: _resolve, timer })
   })
 }
 
@@ -131,7 +131,6 @@ function cacheClear() {
 }
 
 // ── Resolve QMD CLI ─────────────────────────────────────────────
-let QMD_CMD
 let QMD_IS_SCRIPT = false
 
 function resolveQmdCli() {
@@ -172,7 +171,7 @@ function resolveQmdCli() {
 const QMD_CLI = resolveQmdCli()
 const firstLine = readFileSync(QMD_CLI, "utf8").split("\n")[0]
 QMD_IS_SCRIPT = firstLine.startsWith("#!")
-QMD_CMD = QMD_IS_SCRIPT ? QMD_CLI : process.execPath
+const QMD_CMD = QMD_IS_SCRIPT ? QMD_CLI : process.execPath
 
 // ── In-process Vector Search (multilingual-e5-small) ────────────
 let embedder = null // pipeline instance (loaded once)
@@ -285,7 +284,7 @@ async function buildDocEmbeddings() {
   const results = []
   let computed = 0
 
-  for (const fullPath of mdFiles) {
+  async function embedDocument(fullPath) {
     const relPath = relative(QMD_CONTENT, fullPath).replaceAll("\\", "/")
     const { title, snippet, content } = parseMarkdownFile(fullPath)
     const mtime = statSync(fullPath).mtimeMs
@@ -293,7 +292,7 @@ async function buildDocEmbeddings() {
     // Reuse cached embedding if file unchanged
     if (cached[relPath] && cached[relPath].mtime === mtime) {
       results.push(cached[relPath])
-      continue
+      return
     }
 
     // Compute new embedding
@@ -311,6 +310,12 @@ async function buildDocEmbeddings() {
       console.log(`[Vector] Embedded ${computed} documents...`)
     }
   }
+
+  // Process sequentially (model pipeline handles one input at a time)
+  await mdFiles.reduce(
+    (chain, fullPath) => chain.then(() => embedDocument(fullPath)),
+    Promise.resolve()
+  )
 
   if (computed > 0) {
     console.log(
@@ -427,7 +432,7 @@ function rrfFuse(listA, listB, k = 60) {
 
   return [...scores.values()]
     .toSorted((a, b) => b.score - a.score)
-    .map(({ score, item }) => ({ ...item, score }))
+    .map(({ score, item }) => Object.assign({}, item, { score }))
 }
 
 // ── Main Search Logic ───────────────────────────────────────────
@@ -506,10 +511,10 @@ async function queryQmd({ query, lang = "en", limit = 10, mode = "fusion" }) {
 
 // ── HTTP Server ─────────────────────────────────────────────────
 function readBody(req) {
-  return new Promise((resolve, reject) => {
+  return new Promise((_resolve, reject) => {
     const chunks = []
     req.on("data", (c) => chunks.push(c))
-    req.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")))
+    req.on("end", () => _resolve(Buffer.concat(chunks).toString("utf8")))
     req.on("error", reject)
   })
 }
@@ -646,11 +651,6 @@ server.listen(PORT, "0.0.0.0", () => {
   console.log(`[QMD Server] Ready at http://0.0.0.0:${PORT} (BM25 available)`)
 })
 
-// Load embedding model in background (non-blocking)
-initVectorSearch().catch((err) => {
-  console.error("[Vector] Init failed:", err.message)
-})
-
 // Memory watchdog
 setInterval(() => {
   const freeMB = Math.round(freemem() / 1024 / 1024)
@@ -658,3 +658,10 @@ setInterval(() => {
     console.warn(`[QMD Server] LOW MEMORY: ${freeMB}MB free`)
   }
 }, 60_000)
+
+// Load embedding model in background (non-blocking)
+try {
+  await initVectorSearch()
+} catch (err) {
+  console.error("[Vector] Init failed:", err.message)
+}

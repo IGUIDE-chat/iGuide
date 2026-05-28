@@ -55,7 +55,7 @@ const AnimateTypewriter: React.FC<{
 
         return (
           <motion.span
-            key={index}
+            key={`char-${String(index)}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{

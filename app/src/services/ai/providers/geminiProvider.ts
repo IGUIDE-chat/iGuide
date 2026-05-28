@@ -41,7 +41,7 @@ const getErrorText = (lang: string | undefined, reason: string) => {
 
 export const geminiProvider: AIProvider = {
   id: "gemini",
-  streamChatResponse: async function* (history, newMessage, lang) {
+  streamChatResponse: async function* ({ history, newMessage, lang }) {
     const payload = {
       model: GEMINI_MODEL,
       contents: [{ parts: [{ text: buildPrompt(history, newMessage) }] }],

@@ -1,6 +1,6 @@
 import { useCallback, useRef } from "react"
 
-export const useThrottle = <T extends (...args: any[]) => void>(
+export const useThrottle = <T extends (...args: unknown[]) => void>(
   callback: T,
   delay: number
 ): T => {
@@ -8,7 +8,7 @@ export const useThrottle = <T extends (...args: any[]) => void>(
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>()
 
   const throttledFn = useCallback(
-    (...args: any[]) => {
+    (...args: unknown[]) => {
       const now = Date.now()
       if (now - lastRun.current >= delay) {
         lastRun.current = now

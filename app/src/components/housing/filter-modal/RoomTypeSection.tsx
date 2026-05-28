@@ -42,7 +42,7 @@ const RoomTypeSection: React.FC<RoomTypeSectionProps> = ({
               } `}
             >
               {isSelected && <Check size={16} strokeWidth={3} />}
-              <input
+              <input aria-label="Toggle option"
                 type="checkbox"
                 className="hidden"
                 checked={isSelected}

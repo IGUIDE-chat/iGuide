@@ -45,11 +45,8 @@ export function createGrepDocsTool(ctx: RequestContext) {
     description:
       "Search documents for exact keyword or phrase matches. Use when looking for specific terms, policy numbers, dates, or exact phrases.",
     inputSchema: grepDocsSchema,
-    execute: async (args: any, options: any) => {
-      const { pattern, limit: rawLimit } = args as z.infer<
-        typeof grepDocsSchema
-      >
-      const { abortSignal } = options as { abortSignal?: AbortSignal }
+    execute: async (args) => {
+      const { pattern, limit: rawLimit } = args
       const matchCount = Math.min(Math.max(rawLimit ?? 5, 1), 50)
 
       const results = await callSupabaseRpc<KeywordSearchResult[]>(

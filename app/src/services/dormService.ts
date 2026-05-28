@@ -64,7 +64,7 @@ function rowToDorm(row: Record<string, unknown>): Dorm {
       cons: (row.cons as string[]) ?? [],
       cons_zh: (row.cons_zh as string[]) ?? undefined,
       applicationFee:
-        row.application_fee != null ? Number(row.application_fee) : undefined,
+        row.application_fee !== null && row.application_fee !== undefined ? Number(row.application_fee) : undefined,
       address: (row.address as string) ?? undefined,
       address_zh: (row.address_zh as string) ?? undefined,
       website: (row.website as string) ?? undefined,
@@ -83,7 +83,7 @@ async function getAllDorms(): Promise<Dorm[]> {
     if (!data || data.length === 0) {
       return getStaticDorms()
     }
-    return data.map(rowToDorm)
+    return data.map((row) => rowToDorm(row))
   } catch (err) {
     console.error("[dormService] getAllDorms exception:", err)
     return getStaticDorms()

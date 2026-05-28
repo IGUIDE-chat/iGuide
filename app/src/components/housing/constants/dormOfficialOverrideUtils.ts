@@ -11,7 +11,7 @@ import {
   type FloorPlan,
 } from "../types/index"
 
-export type DormOverride = Partial<
+type DormOverride = Partial<
   Omit<
     Dorm,
     "structuredTags" | "categorizedTags" | "floorPlans" | "galleryImages"
@@ -23,14 +23,14 @@ export type DormOverride = Partial<
   galleryImages?: string[]
 }
 
-export const urhPage = (slug: string) =>
+const urhPage = (slug: string) =>
   `https://www.housing.illinois.edu/living-communities/halls/${slug}`
 const WP_SIZE_SUFFIX_RE = /([_-])\d{2,4}x\d{2,4}(?=(?:-\d+)?\.[a-z0-9]+$)/i
 const DOUBLED_EXTENSION_RE = /\.(png|jpe?g)\.jpg(?=$|\?)/i
 const DRUPAL_STYLE_RE = /\/sites\/default\/files\/styles\/[^/]+\/public\//
 const PEOPLE_FILENAME_RE = /(students?|group|parent|famil)/i
 
-export function normalizeOfficialMediaUrl(url: string) {
+function normalizeOfficialMediaUrl(url: string) {
   let next = url.replaceAll("&amp;", "&").trim()
 
   if (DRUPAL_STYLE_RE.test(next)) {
@@ -44,12 +44,12 @@ export function normalizeOfficialMediaUrl(url: string) {
   return next
 }
 
-export function isLikelyLowQualityMediaUrl(url: string) {
+function isLikelyLowQualityMediaUrl(url: string) {
   const trimmed = url.replaceAll("&amp;", "&").trim()
   return normalizeOfficialMediaUrl(trimmed) !== trimmed
 }
 
-export function hasPeopleishFilename(url: string) {
+function hasPeopleishFilename(url: string) {
   return PEOPLE_FILENAME_RE.test(url)
 }
 
@@ -62,26 +62,38 @@ function normalizeFloorPlanMedia(planValue: FloorPlan): FloorPlan {
     photoUrl: planValue.photoUrl
       ? normalizeOfficialMediaUrl(planValue.photoUrl)
       : undefined,
-    imageUrls: planValue.imageUrls?.map(normalizeOfficialMediaUrl),
-    photoUrls: planValue.photoUrls?.map(normalizeOfficialMediaUrl),
+    imageUrls: planValue.imageUrls?.map((u) => normalizeOfficialMediaUrl(u)),
+    photoUrls: planValue.photoUrls?.map((u) => normalizeOfficialMediaUrl(u)),
   }
 }
 
-export function normalizeOverrideMedia<T extends DormOverride>(override: T): T {
+function normalizeOverrideMedia<T extends DormOverride>(override: T): T {
   return {
     ...override,
     imageUrl: override.imageUrl
       ? normalizeOfficialMediaUrl(override.imageUrl)
       : override.imageUrl,
-    galleryImages: override.galleryImages?.map(normalizeOfficialMediaUrl),
-    floorPlans: override.floorPlans?.map(normalizeFloorPlanMedia),
+    galleryImages: override.galleryImages?.map((u) => normalizeOfficialMediaUrl(u)),
+    floorPlans: override.floorPlans?.map((p) => normalizeFloorPlanMedia(p)),
   }
 }
 
-export const clean = normalizeOfficialMediaUrl
-export const urls = (...values: string[]) =>
-  values.map(normalizeOfficialMediaUrl)
-export const plan = (value: FloorPlan): FloorPlan => ({
+const clean = normalizeOfficialMediaUrl
+const urls = (...values: string[]) =>
+  values.map((v) => normalizeOfficialMediaUrl(v))
+const plan = (value: FloorPlan): FloorPlan => ({
   available: true,
   ...value,
 })
+
+export type { DormOverride }
+export {
+  urhPage,
+  normalizeOfficialMediaUrl,
+  isLikelyLowQualityMediaUrl,
+  hasPeopleishFilename,
+  normalizeOverrideMedia,
+  clean,
+  urls,
+  plan,
+}

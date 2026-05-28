@@ -55,8 +55,8 @@ const MapCarouselCard: React.FC<MapCarouselCardProps> = ({
   }
 
   return (
-    <div
-      role="button"
+    <button
+      type="button"
       tabIndex={0}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -143,7 +143,7 @@ const MapCarouselCard: React.FC<MapCarouselCardProps> = ({
           </div>
         </div>
       </div>
-    </div>
+    </button>
   )
 }
 

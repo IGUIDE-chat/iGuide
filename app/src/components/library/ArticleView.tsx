@@ -21,6 +21,100 @@ interface ArticleViewProps {
   language: Language
 }
 
+const MarkdownLink = ({ children, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement> & { children?: React.ReactNode }) => (
+  <a
+    {...props}
+    className="text-illini-orange hover:underline"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    {children}
+  </a>
+)
+
+const MarkdownUl = (props: React.HTMLAttributes<HTMLUListElement>) => (
+  <ul className="my-2 list-inside list-disc space-y-1" {...props} />
+)
+
+const MarkdownOl = (props: React.OlHTMLAttributes<HTMLOListElement>) => (
+  <ol className="my-2 list-inside list-decimal space-y-1" {...props} />
+)
+
+const MarkdownLi = (props: React.LiHTMLAttributes<HTMLLIElement>) => (
+  <li className="marker:text-slate-400" {...props} />
+)
+
+const MarkdownP = (props: React.HTMLAttributes<HTMLParagraphElement>) => (
+  <p className="mb-4 leading-relaxed last:mb-0" {...props} />
+)
+
+const MarkdownH1 = ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+  <h1 className="mt-6 mb-3 text-2xl font-bold text-slate-900" {...props}>
+    {children}
+  </h1>
+)
+
+const MarkdownH2 = ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+  <h2 className="mt-5 mb-2 text-xl font-bold text-slate-800" {...props}>
+    {children}
+  </h2>
+)
+
+const MarkdownH3 = ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+  <h3 className="mt-4 mb-2 text-lg font-bold text-slate-800" {...props}>
+    {children}
+  </h3>
+)
+
+const MarkdownBlockquote = (props: React.BlockquoteHTMLAttributes<HTMLQuoteElement>) => (
+  <blockquote
+    className="border-illini-blue my-4 rounded-r border-l-4 bg-slate-50 py-2 pl-4 italic"
+    {...props}
+  />
+)
+
+const MarkdownCode = ({ className, children, ...props }: React.HTMLAttributes<HTMLElement>) => {
+  const isInline = !className
+  return isInline ? (
+    <code
+      className="text-illini-blue rounded-sm bg-slate-100 px-1.5 py-0.5 font-mono text-xs"
+      {...props}
+    >
+      {children}
+    </code>
+  ) : (
+    <code
+      className="my-3 block overflow-x-auto rounded-lg border border-slate-200 bg-slate-100 p-3 font-mono text-xs"
+      {...props}
+    >
+      {children}
+    </code>
+  )
+}
+
+const MarkdownImg = (props: React.ImgHTMLAttributes<HTMLImageElement>) => (
+  <img
+    {...props}
+    alt={props.alt ?? ""}
+    className="my-4 h-auto max-w-full rounded-xl border border-slate-200 shadow-sm"
+    loading="lazy"
+  />
+)
+
+const markdownComponents = {
+  a: MarkdownLink,
+  ul: MarkdownUl,
+  ol: MarkdownOl,
+  li: MarkdownLi,
+  p: MarkdownP,
+  h1: MarkdownH1,
+  h2: MarkdownH2,
+  h3: MarkdownH3,
+  blockquote: MarkdownBlockquote,
+  code: MarkdownCode,
+  img: MarkdownImg,
+} as const
+
 export const ArticleView: React.FC<ArticleViewProps> = ({
   article,
   onBack,
@@ -37,6 +131,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
   return (
     <div className="animate-fade-in-up">
       <button
+            type="button"
         onClick={onBack}
         className="mb-6 flex items-center gap-1 text-sm text-slate-500 transition-colors hover:text-slate-900"
       >
@@ -70,83 +165,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
         <div className="prose prose-slate prose-sm sm:prose-base prose-headings:font-semibold prose-headings:text-slate-900 prose-a:text-illini-blue prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl max-w-none p-6 whitespace-pre-wrap sm:p-8">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
-            components={{
-              a: ({ ...props }) => (
-                <a
-                  {...props}
-                  className="text-illini-orange hover:underline"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                />
-              ),
-              ul: ({ ...props }) => (
-                <ul
-                  className="my-2 list-inside list-disc space-y-1"
-                  {...props}
-                />
-              ),
-              ol: ({ ...props }) => (
-                <ol
-                  className="my-2 list-inside list-decimal space-y-1"
-                  {...props}
-                />
-              ),
-              li: ({ ...props }) => (
-                <li className="marker:text-slate-400" {...props} />
-              ),
-              p: ({ ...props }) => (
-                <p className="mb-4 leading-relaxed last:mb-0" {...props} />
-              ),
-              h1: ({ ...props }) => (
-                <h1
-                  className="mt-6 mb-3 text-2xl font-bold text-slate-900"
-                  {...props}
-                />
-              ),
-              h2: ({ ...props }) => (
-                <h2
-                  className="mt-5 mb-2 text-xl font-bold text-slate-800"
-                  {...props}
-                />
-              ),
-              h3: ({ ...props }) => (
-                <h3
-                  className="mt-4 mb-2 text-lg font-bold text-slate-800"
-                  {...props}
-                />
-              ),
-              blockquote: ({ ...props }) => (
-                <blockquote
-                  className="border-illini-blue my-4 rounded-r border-l-4 bg-slate-50 py-2 pl-4 italic"
-                  {...props}
-                />
-              ),
-              code: ({ className, children, ...props }) => {
-                const isInline = !className
-                return isInline ? (
-                  <code
-                    className="text-illini-blue rounded-sm bg-slate-100 px-1.5 py-0.5 font-mono text-xs"
-                    {...props}
-                  >
-                    {children}
-                  </code>
-                ) : (
-                  <code
-                    className="my-3 block overflow-x-auto rounded-lg border border-slate-200 bg-slate-100 p-3 font-mono text-xs"
-                    {...props}
-                  >
-                    {children}
-                  </code>
-                )
-              },
-              img: ({ ...props }) => (
-                <img
-                  {...props}
-                  className="my-4 h-auto max-w-full rounded-xl border border-slate-200 shadow-sm"
-                  loading="lazy"
-                />
-              ),
-            }}
+            components={markdownComponents}
           >
             {articleText.content}
           </ReactMarkdown>
@@ -160,6 +179,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
           <div className="flex flex-wrap gap-2">
             {articleText.tags.map((tag) => (
               <button
+            type="button"
                 key={tag}
                 onClick={() => onSearch(tag)}
                 className="hover:text-illini-blue cursor-pointer text-xs text-slate-500 transition-colors hover:underline"

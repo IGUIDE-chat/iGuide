@@ -5,7 +5,7 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { memo } from "react"
+import React, { memo, useCallback } from "react"
 
 interface ChipSectionProps {
   title: string
@@ -15,6 +15,32 @@ interface ChipSectionProps {
   /** 'blue' for location section hover/active border; default 'orange' */
   accentColor?: "orange" | "blue"
 }
+
+interface ChipButtonProps {
+  value: string
+  label: string
+  isSelected: boolean
+  onToggle: (value: string) => void
+  unselectedClass: string
+}
+
+const ChipButton = memo(function ChipButton({ value, label, isSelected, onToggle, unselectedClass }: ChipButtonProps) {
+  const handleClick = useCallback(() => onToggle(value), [onToggle, value])
+  return (
+    <button
+      key={value}
+      onClick={handleClick}
+      type="button"
+      className={`rounded-full border px-4 py-2 text-sm font-medium transition-all duration-200 ${
+        isSelected
+          ? `border-illini-blue bg-illini-blue text-white active:border-[#0e2240] active:bg-[#0e2240]`
+          : unselectedClass
+      } `}
+    >
+      {label}
+    </button>
+  )
+})
 
 const ChipSection: React.FC<ChipSectionProps> = ({
   title,
@@ -34,18 +60,14 @@ const ChipSection: React.FC<ChipSectionProps> = ({
         {options.map((value) => {
           const isSelected = selectedValues.includes(value.value)
           return (
-            <button
+            <ChipButton
               key={value.value}
-              onClick={() => onToggle(value.value)}
-              type="button"
-              className={`rounded-full border px-4 py-2 text-sm font-medium transition-all duration-200 ${
-                isSelected
-                  ? `border-illini-blue bg-illini-blue text-white active:border-[#0e2240] active:bg-[#0e2240]`
-                  : unselectedClass
-              } `}
-            >
-              {value.label}
-            </button>
+              value={value.value}
+              label={value.label}
+              isSelected={isSelected}
+              onToggle={onToggle}
+              unselectedClass={unselectedClass}
+            />
           )
         })}
       </div>
