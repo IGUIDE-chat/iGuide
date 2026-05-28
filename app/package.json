@@ -27,6 +27,8 @@
     "@headlessui/react": "^2.2.10",
     "@supabase/supabase-js": "^2.106.2",
     "framer-motion": "^12.40.0",
+    "@ai-sdk/react": "^3.0.193",
+    "ai": "^6.0.191",
     "lucide-react": "^1.14.0",
     "mapbox-gl": "^3.24.0",
     "rc-slider": "^11.1.9",
@@ -35,7 +37,8 @@
     "react-map-gl": "^8.1.1",
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.15.0",
-    "remark-gfm": "^4.0.1"
+    "remark-gfm": "^4.0.1",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260527.1",
