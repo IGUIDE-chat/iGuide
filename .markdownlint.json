@@ -1,20 +1,18 @@
 {
-  "$schema": "https://raw.githubusercontent.com/DavidAnson/markdownlint-cli2/v0.20.0/schema/markdownlint-cli2-config-schema.json",
-  "config": {
-    "MD004": {
-      "style": "dash"
-    },
-    "MD049": {
-      "style": "asterisk"
-    },
-    "MD050": {
-      "style": "asterisk"
-    },
-    "MD060": {
-      "style": "compact"
-    },
-    "MD013": false,
-    "MD033": false,
-    "MD041": false
-  }
+  "$schema": "https://raw.githubusercontent.com/DavidAnson/markdownlint/main/schema/markdownlint-config-schema-strict.json",
+  "MD004": {
+    "style": "dash"
+  },
+  "MD049": {
+    "style": "asterisk"
+  },
+  "MD050": {
+    "style": "asterisk"
+  },
+  "MD060": {
+    "style": "compact"
+  },
+  "MD013": false,
+  "MD033": false,
+  "MD041": false
 }
