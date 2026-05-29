@@ -4,11 +4,12 @@ export default defineConfig({
   fmt: {
     singleQuote: false,
     semi: false,
+    sortImports: true,
     trailingComma: "es5",
     printWidth: 80,
     sortTailwindcss: {},
     ignorePatterns: [
-      "*.md",
+      "AGENTS.md",
       "node_modules",
       "pnpm-lock.yaml",
       "build",

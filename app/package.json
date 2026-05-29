@@ -4,10 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "vite build",
-    "dev": "vite",
     "postinstall": "git submodule update --init --recursive && git config --local include.path ../.gitconfig",
-    "typecheck": "tsc --noEmit"
+    "build": "vp build"
   },
   "dependencies": {
     "@ai-sdk/react": "^3.0.193",

@@ -1,31 +1,20 @@
 {
   "name": "iguide",
   "private": true,
+  "type": "module",
   "scripts": {
     "api:dev": "pnpm --filter @iguide/api dev",
-    "api:typecheck": "pnpm --filter @iguide/api typecheck",
     "app:build": "pnpm --filter @iguide/app build",
-    "app:dev": "pnpm --filter @iguide/app dev",
-    "app:typecheck": "pnpm --filter @iguide/app typecheck",
-    "lint": "oxlint .",
-    "lint:fix": "oxlint --fix .",
-    "fmt": "oxfmt --check .",
-    "fmt:fix": "oxfmt --write .",
-    "fmt:md": "markdownlint-cli2 .",
-    "fmt:md:fix": "markdownlint-cli2 --fix ."
+    "app:dev": "vp dev"
   },
   "devDependencies": {
     "@types/node": "^25.9.1",
     "@voidzero-dev/vite-plus-core": "^0.1.22",
     "markdownlint-cli2": "^0.22.1",
-    "oxfmt": "^0.52.0",
-    "oxlint": "^1.66.0",
     "supabase": "^2.101.0",
     "tsx": "^4.22.3",
     "typescript": "^6.0.3",
-    "vite": "^8.0.14",
     "vite-plus": "^0.1.22",
-    "vitest": "^4.1.7",
     "wrangler": "^4.94.0"
   },
   "packageManager": "pnpm@11.4.0+sha512.f0febc7e37552ab485494a914241b338e0b3580b93d54ce31f00933015880863129038a1b4ae4e414a0ee63ac35bf21197e990172c4a68256450b5636310968f"
