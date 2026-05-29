@@ -3,4 +3,4 @@
 	url = https://github.com/AODadbase/UIUC-Web-Crawler
 [submodule "unimcp"]
 	path = unimcp
-	url = https://github.com/iguide-chat/unimcp
+	url = ../unimcp.git
