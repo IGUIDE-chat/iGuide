@@ -154,7 +154,7 @@ export default defineConfig({
       "eslint/no-useless-computed-key": "warn",
       "eslint/object-shorthand": "warn",
       "eslint/operator-assignment": "warn",
-      "eslint/prefer-arrow-callback": "warn",
+      // "eslint/prefer-arrow-callback": "warn",
       "eslint/prefer-const": "warn",
       "eslint/prefer-exponentiation-operator": "warn",
       "eslint/prefer-object-has-own": "warn",
@@ -187,7 +187,7 @@ export default defineConfig({
       "unicorn/throw-new-error": "warn",
 
       "import/consistent-type-specifier-style": ["warn", "prefer-top-level"],
-      "import/newline-after-import": "warn",
+      // "import/newline-after-import": "warn",
       "import/no-duplicates": "warn",
       "import/no-named-default": "warn",
       "import/no-mutable-exports": "warn",
