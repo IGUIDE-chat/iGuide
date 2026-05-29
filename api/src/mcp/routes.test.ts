@@ -209,9 +209,16 @@ test("GET /integrations returns platform/user sections and phase1 disclaimers", 
     Array.isArray(body.phase1_limitations),
     "phase1_limitations must be an array"
   )
-  assert.ok(body.phase1_limitations.length > 0, "phase1_limitations must not be empty")
+  assert.ok(
+    body.phase1_limitations.length > 0,
+    "phase1_limitations must not be empty"
+  )
   for (const limitation of body.phase1_limitations) {
-    assert.equal(typeof limitation, "string", "each limitation must be a string")
+    assert.equal(
+      typeof limitation,
+      "string",
+      "each limitation must be a string"
+    )
     assert.ok(limitation.length > 0, "each limitation must be non-empty")
   }
   assert.equal(body.platform[0].owner_type, "platform")

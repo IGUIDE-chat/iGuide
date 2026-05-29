@@ -233,10 +233,7 @@ test("tool_start -> tool_result -> content -> done order is stable", async () =>
     toolStartIdx < toolResultIdx,
     "tool_start must come before tool_result"
   )
-  assert.ok(
-    toolResultIdx < contentIdx,
-    "tool_result must come before content"
-  )
+  assert.ok(toolResultIdx < contentIdx, "tool_result must come before content")
   assert.ok(contentIdx < doneIdx, "content must come before done")
 })
 
@@ -258,14 +255,8 @@ test("multiple tool calls maintain sequential order", async () => {
   const toolStarts = parsed.filter((e) => e.event === "tool_start")
   const toolResults = parsed.filter((e) => e.event === "tool_result")
 
-  assert.ok(
-    toolStarts.length >= 2,
-    "Must have at least 2 tool_start events"
-  )
-  assert.ok(
-    toolResults.length >= 2,
-    "Must have at least 2 tool_result events"
-  )
+  assert.ok(toolStarts.length >= 2, "Must have at least 2 tool_start events")
+  assert.ok(toolResults.length >= 2, "Must have at least 2 tool_result events")
 
   const firstToolStart = parsed.findIndex((e) => e.event === "tool_start")
   const secondToolStart = parsed.findIndex(
