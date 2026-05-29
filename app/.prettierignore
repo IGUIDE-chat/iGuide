@@ -1,6 +1,0 @@
-dist
-coverage
-node_modules
-tests/artifacts
-pnpm-lock.yaml
-*.md
