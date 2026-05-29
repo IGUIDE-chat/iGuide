@@ -38,7 +38,7 @@ export const libraryService = {
       articleId: item.article_id,
       articleTitle: item.article_title,
       articleTitleZh: item.article_title_zh,
-      isPinned: item.is_pinned || false,
+      isPinned: item.is_pinned ?? false,
       viewedAt: item.last_viewed_at,
     }))
   },
@@ -103,7 +103,7 @@ export const libraryService = {
         user_id: user.id,
         article_id: article.id,
         article_title: article.title,
-        article_title_zh: article.title_zh || null, // Optional for Chinese title
+        article_title_zh: article.title_zh ?? null, // Optional for Chinese title
         last_viewed_at: new Date().toISOString(),
       },
       {

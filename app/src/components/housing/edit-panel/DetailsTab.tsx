@@ -29,9 +29,9 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
         <select
           aria-label="Select option"
           value={form.housingType}
-          onChange={(event) =>
+          onChange={(event) => {
             form.setHousingType(event.target.value as Dorm["housingType"])
-          }
+          }}
           className={inputCls}
         >
           {HOUSING_TYPE_OPTIONS.map((option) => (
@@ -47,7 +47,9 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
           type="number"
           min={0}
           value={form.price}
-          onChange={(event) => form.setPrice(event.target.value)}
+          onChange={(event) => {
+            form.setPrice(event.target.value)
+          }}
           className={inputCls}
         />
       </Field>
@@ -57,7 +59,9 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
           type="number"
           min={0}
           value={form.applicationFee}
-          onChange={(event) => form.setApplicationFee(event.target.value)}
+          onChange={(event) => {
+            form.setApplicationFee(event.target.value)
+          }}
           className={inputCls}
           placeholder={t.hints.feePlaceholder}
         />
@@ -71,7 +75,9 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
         <select
           aria-label="Select option"
           value={form.dining}
-          onChange={(event) => form.setDining(event.target.value as DiningType)}
+          onChange={(event) => {
+            form.setDining(event.target.value as DiningType)
+          }}
           className={inputCls}
         >
           {DINING_OPTIONS.map((option) => (
@@ -87,7 +93,9 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
             aria-label="Input field"
             type="text"
             value={form.diningNearbyDetail}
-            onChange={(event) => form.setDiningNearbyDetail(event.target.value)}
+            onChange={(event) => {
+              form.setDiningNearbyDetail(event.target.value)
+            }}
             className={inputCls}
             placeholder={t.hints.nearbyDining}
           />
@@ -97,9 +105,9 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
         <select
           aria-label="Select option"
           value={form.bathroomType}
-          onChange={(event) =>
+          onChange={(event) => {
             form.setBathroomType(event.target.value as BathroomType)
-          }
+          }}
           className={inputCls}
         >
           {BATHROOM_TYPE_OPTIONS.map((option) => (
@@ -114,7 +122,9 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
           aria-label="Input field"
           type="text"
           value={form.address}
-          onChange={(event) => form.setAddress(event.target.value)}
+          onChange={(event) => {
+            form.setAddress(event.target.value)
+          }}
           className={inputCls}
           placeholder="e.g. 1010 W. Illinois St, Urbana, IL 61801"
         />
@@ -124,7 +134,9 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
           aria-label="Input field"
           type="text"
           value={form.addressZh}
-          onChange={(event) => form.setAddressZh(event.target.value)}
+          onChange={(event) => {
+            form.setAddressZh(event.target.value)
+          }}
           className={inputCls}
           placeholder="e.g. 伊利诺伊街1010号"
         />
@@ -134,7 +146,9 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ form }) => {
           aria-label="Input field"
           type="url"
           value={form.website}
-          onChange={(event) => form.setWebsite(event.target.value)}
+          onChange={(event) => {
+            form.setWebsite(event.target.value)
+          }}
           className={inputCls}
           placeholder="https://housing.illinois.edu/..."
         />

@@ -450,9 +450,7 @@ export async function handleIntegrationsRoute(
 
     assertMutableConnection(connection)
     assertPhase1CompatibleConnection(connection)
-    const result = (await services.client.test(
-      connection.endpoint_url
-    )) as MCPTestResult
+    const result = await services.client.test(connection.endpoint_url)
     await services.connections.recordTestResult(connectionId, viewerId, result)
     return jsonResponse(result, 200, responseHeaders)
   }
@@ -475,9 +473,7 @@ export async function handleIntegrationsRoute(
 
     assertMutableConnection(connection)
     assertPhase1CompatibleConnection(connection)
-    const result = (await services.client.discover(
-      connection.endpoint_url
-    )) as MCPDiscoveryResult
+    const result = await services.client.discover(connection.endpoint_url)
     await services.connections.recordDiscoveryResult(
       connectionId,
       viewerId,

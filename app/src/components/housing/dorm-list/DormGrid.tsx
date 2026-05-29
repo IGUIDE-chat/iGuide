@@ -54,7 +54,9 @@ const DormGrid: React.FC<DormGridProps> = ({
             dorm={dorm}
             onViewDetails={onViewDetails}
             isFavorite={favoritesSet.has(dorm.id)}
-            onToggleFavorite={(d, e) => onToggleFavorite(d, e)}
+            onToggleFavorite={(d, e) => {
+              onToggleFavorite(d, e)
+            }}
             isCompared={compareIds?.includes(dorm.id)}
             onToggleCompare={onToggleCompare}
             onHoverDorm={onHoverDorm}

@@ -116,9 +116,8 @@ async function scrapeDorm(page, dormId, query) {
   const reviewTabIndex = tabTexts.findIndex(
     (text) =>
       text &&
-      (text.includes("Reviews") ||
-        text.includes("评价") ||
-        text.includes("评论") ||
+      (((text.includes("Reviews") ?? text.includes("评价")) ||
+        text.includes("评论")) ??
         text.includes("Review"))
   )
   if (reviewTabIndex !== -1) {
@@ -138,9 +137,8 @@ async function scrapeDorm(page, dormId, query) {
       const internalReviewIndex = internalTabTexts.findIndex(
         (text) =>
           text &&
-          (text.includes("Reviews") ||
-            text.includes("评价") ||
-            text.includes("评论") ||
+          (((text.includes("Reviews") ?? text.includes("评价")) ||
+            text.includes("评论")) ??
             text.includes("Review"))
       )
       if (internalReviewIndex !== -1) {
@@ -178,7 +176,7 @@ async function scrapeDorm(page, dormId, query) {
       const starEl = card.querySelector("span.kvMYJc")
       let stars = 3
       if (starEl) {
-        const parts = starEl.getAttribute("aria-label") || ""
+        const parts = starEl.getAttribute("aria-label") ?? ""
         const match = parts.match(/\d/)
         if (match) {
           stars = parseInt(match[0], 10)

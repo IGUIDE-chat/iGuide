@@ -58,7 +58,9 @@ const ImageLightbox: React.FC<ImageLightboxProps> = ({
       }
     }
     window.addEventListener("keydown", handleKey)
-    return () => window.removeEventListener("keydown", handleKey)
+    return () => {
+      window.removeEventListener("keydown", handleKey)
+    }
   }, [onClose, goNext, goPrev, hasMultiple])
 
   return (
@@ -115,7 +117,9 @@ const ImageLightbox: React.FC<ImageLightboxProps> = ({
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
           transition={{ duration: 0.2 }}
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation()
+          }}
           className="max-h-[85vh] max-w-[90vw] cursor-zoom-in rounded-lg object-contain transition-transform duration-200 select-none"
           style={{ transform: `scale(${scale})` }}
         />

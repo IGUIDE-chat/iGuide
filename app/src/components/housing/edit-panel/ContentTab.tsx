@@ -25,7 +25,9 @@ export const ContentTab: React.FC<ContentTabProps> = ({ form }) => {
           <button
             key={lang}
             type="button"
-            onClick={() => form.setContentLang(lang)}
+            onClick={() => {
+              form.setContentLang(lang)
+            }}
             className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
               form.contentLang === lang
                 ? "text-illini-blue bg-white shadow-sm"
@@ -44,7 +46,9 @@ export const ContentTab: React.FC<ContentTabProps> = ({ form }) => {
               aria-label="Input field"
               type="text"
               value={form.name}
-              onChange={(event) => form.setName(event.target.value)}
+              onChange={(event) => {
+                form.setName(event.target.value)
+              }}
               className={inputCls}
             />
           </Field>
@@ -53,7 +57,9 @@ export const ContentTab: React.FC<ContentTabProps> = ({ form }) => {
               aria-label="Text input"
               rows={4}
               value={form.description}
-              onChange={(event) => form.setDescription(event.target.value)}
+              onChange={(event) => {
+                form.setDescription(event.target.value)
+              }}
               className={inputCls}
             />
           </Field>
@@ -82,7 +88,9 @@ export const ContentTab: React.FC<ContentTabProps> = ({ form }) => {
                 aria-label="Input field"
                 type="text"
                 value={form.location}
-                onChange={(event) => form.setLocation(event.target.value)}
+                onChange={(event) => {
+                  form.setLocation(event.target.value)
+                }}
                 className={inputCls}
                 placeholder={t.hints.customLocation}
               />
@@ -110,7 +118,9 @@ export const ContentTab: React.FC<ContentTabProps> = ({ form }) => {
               aria-label="Input field"
               type="text"
               value={form.nameZh}
-              onChange={(event) => form.setNameZh(event.target.value)}
+              onChange={(event) => {
+                form.setNameZh(event.target.value)
+              }}
               className={inputCls}
             />
           </Field>
@@ -119,7 +129,9 @@ export const ContentTab: React.FC<ContentTabProps> = ({ form }) => {
               aria-label="Text input"
               rows={4}
               value={form.descriptionZh}
-              onChange={(event) => form.setDescriptionZh(event.target.value)}
+              onChange={(event) => {
+                form.setDescriptionZh(event.target.value)
+              }}
               className={inputCls}
             />
           </Field>
@@ -148,7 +160,9 @@ export const ContentTab: React.FC<ContentTabProps> = ({ form }) => {
                 aria-label="Input field"
                 type="text"
                 value={form.locationZh}
-                onChange={(event) => form.setLocationZh(event.target.value)}
+                onChange={(event) => {
+                  form.setLocationZh(event.target.value)
+                }}
                 className={inputCls}
                 placeholder={t.hints.customLocation}
               />

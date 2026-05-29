@@ -132,7 +132,7 @@ const streamChatResponse = async function* (
       throw new Error(`Coze API returned ${response.status}: ${errText}`)
     }
 
-    const responseContentType = response.headers.get("content-type") || ""
+    const responseContentType = response.headers.get("content-type") ?? ""
     if (responseContentType.includes("text/html")) {
       const htmlText = await response.text()
       throw new Error(
@@ -173,7 +173,7 @@ const streamChatResponse = async function* (
           if (jsonBody.code && jsonBody.code !== 0) {
             console.error("Coze API Error (JSON):", jsonBody)
             outputs.push({
-              text: `\n(API Error: ${jsonBody.msg || "Unknown error"} - Code: ${jsonBody.code})`,
+              text: `\n(API Error: ${jsonBody.msg ?? "Unknown error"} - Code: ${jsonBody.code})`,
             })
             abort = true
             return { outputs, abort }
@@ -236,8 +236,8 @@ const streamChatResponse = async function* (
                   type: "tool_call",
                   label:
                     lang === "zh"
-                      ? `调用工具: ${callInfo.name || "插件"}`
-                      : `Calling tool: ${callInfo.name || "plugin"}`,
+                      ? `调用工具: ${callInfo.name ?? "插件"}`
+                      : `Calling tool: ${callInfo.name ?? "plugin"}`,
                   detail: callInfo.arguments
                     ? JSON.stringify(callInfo.arguments).slice(0, 120)
                     : undefined,
@@ -288,7 +288,7 @@ const streamChatResponse = async function* (
             typeof data.content === "string" ? data.content : ""
           console.log(
             "[Coze] Message completed, content length:",
-            completedText.length || 0
+            completedText.length ?? 0
           )
           // Some environments do not emit delta chunks; use completed content as fallback.
           if (!sawAnswerDelta && completedText) {
@@ -315,7 +315,7 @@ const streamChatResponse = async function* (
         } else if (currentEvent === "conversation.chat.failed") {
           console.error("[Coze] Chat failed:", data)
           outputs.push({
-            text: `\n[Error: Chat failed - ${data.msg || JSON.stringify(data)}]`,
+            text: `\n[Error: Chat failed - ${data.msg ?? JSON.stringify(data)}]`,
           })
         } else if (!currentEvent && data.type === "answer" && data.content) {
           // Fallback: if event name is missing, still accept answer payload.
@@ -368,7 +368,7 @@ const streamChatResponse = async function* (
       const lines = buffer.split("\n")
 
       // Keep the last incomplete line in the buffer
-      buffer = lines.pop() || ""
+      buffer = lines.pop() ?? ""
 
       const lineResult = yieldLines(lines)
       yield* lineResult.outputs

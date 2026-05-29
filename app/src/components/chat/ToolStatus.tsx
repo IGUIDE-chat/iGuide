@@ -38,7 +38,9 @@ export const ToolStatus: React.FC<ToolStatusProps> = ({
         clearTimeout(fadeTimer.current)
       }
     } else if (status === "done") {
-      fadeTimer.current = setTimeout(() => setVisible(false), 1800)
+      fadeTimer.current = setTimeout(() => {
+        setVisible(false)
+      }, 1800)
     } else {
       setVisible(false)
     }

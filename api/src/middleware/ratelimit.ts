@@ -29,7 +29,7 @@ export interface RateLimitBinding {
  */
 export function ipRateLimit(binding: RateLimitBinding): MiddlewareHandler {
   return async (c, next) => {
-    const ip = c.req.header("cf-connecting-ip") || "unknown"
+    const ip = c.req.header("cf-connecting-ip") ?? "unknown"
     const { success } = await binding.limit({ key: `chat:ip:${ip}` })
     if (!success) {
       return c.json({ error: "rate_limited" }, 429 as const, {

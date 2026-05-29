@@ -82,7 +82,9 @@ const useStreamText = (
 
   React.useEffect(() => {
     if (text.length > 0 && currentIndex === 0) {
-      queueMicrotask(() => setDisplayedText(""))
+      queueMicrotask(() => {
+        setDisplayedText("")
+      })
     }
   }, [text, currentIndex])
 
@@ -98,7 +100,9 @@ const useStreamText = (
         setCurrentIndex(nextIndex)
       }, renderSpeed)
 
-      return () => clearTimeout(timeout)
+      return () => {
+        clearTimeout(timeout)
+      }
     } else if (currentIndex >= text.length && onComplete) {
       onComplete()
     }

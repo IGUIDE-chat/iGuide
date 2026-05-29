@@ -139,7 +139,7 @@ export class EmbeddingClient {
     }
 
     const json = (await response.json()) as EmbeddingResponse
-    const embeddings = (json.data || []).map((item) => item.embedding || [])
+    const embeddings = (json.data ?? []).map((item) => item.embedding ?? [])
 
     if (embeddings.length !== texts.length) {
       throw new EmbeddingProviderError(

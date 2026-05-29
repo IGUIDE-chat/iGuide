@@ -14,7 +14,9 @@ interface ProfilePageProps {
 }
 
 const ProfilePage: React.FC<ProfilePageProps> = ({ language }) => {
-  const handleBack = useCallback(() => window.history.back(), [])
+  const handleBack = useCallback(() => {
+    window.history.back()
+  }, [])
 
   return <ProfileScreen language={language} onBack={handleBack} />
 }

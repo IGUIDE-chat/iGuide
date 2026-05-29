@@ -223,10 +223,11 @@ export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
     Record<string, number>
   >({})
 
-  const toggleCompare = (key: string) =>
+  const toggleCompare = (key: string) => {
     setCompareIds((prev) =>
       prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
     )
+  }
 
   if (sortedPlans.length === 0) {
     return null
@@ -247,7 +248,9 @@ export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
           type="button"
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
-          onClick={() => setShowPlanCompare(!showPlanCompare)}
+          onClick={() => {
+            setShowPlanCompare(!showPlanCompare)
+          }}
           className={`flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-[12px] font-bold shadow-[0_2px_10px_rgba(0,0,0,0.02)] backdrop-blur-md transition-all md:px-4 md:py-2 md:text-[13px] ${
             showPlanCompare
               ? "border-illini-blue bg-illini-blue text-white"
@@ -277,7 +280,7 @@ export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
           )
           const isExpanded = expandedPlanId === planKey
           const isCompared = compareIds.includes(planKey)
-          const planDisplayTitle = plan.officialName || labels.primaryLabel
+          const planDisplayTitle = plan.officialName ?? labels.primaryLabel
           const normalizedSummary =
             plan.officialName && plan.officialName !== labels.primaryLabel
               ? [labels.primaryLabel, labels.secondaryLabel]
@@ -392,7 +395,9 @@ export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.07, duration: 0.35 }}
-              onClick={() => setExpandedPlanId(isExpanded ? null : planKey)}
+              onClick={() => {
+                setExpandedPlanId(isExpanded ? null : planKey)
+              }}
               className="group cursor-pointer overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm transition-shadow duration-150 hover:-translate-y-px hover:shadow-[0_6px_20px_rgba(0,0,0,0.08)] md:rounded-2xl"
             >
               <div className="flex flex-row items-center gap-4 p-3 md:items-start md:gap-6 md:p-5">
@@ -416,12 +421,12 @@ export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
                       src={thumbSrc}
                       alt={planDisplayTitle}
                       className="size-full object-cover transition-transform duration-200 group-hover:scale-105"
-                      onError={() =>
+                      onError={() => {
                         setImageErrors((prev) => ({
                           ...prev,
                           [`${planKey}-thumb`]: true,
                         }))
-                      }
+                      }}
                     />
                   ) : (
                     <div className="flex size-full items-center justify-center text-slate-300">
@@ -581,12 +586,12 @@ export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
                               src={expandedSrc}
                               alt={`${labels.primaryLabel} floor plan`}
                               className="h-auto w-full rounded-xl border border-slate-200/50 bg-slate-50 transition-opacity hover:opacity-90"
-                              onError={() =>
+                              onError={() => {
                                 setImageErrors((prev) => ({
                                   ...prev,
                                   [`${planKey}-layout`]: true,
                                 }))
-                              }
+                              }}
                             />
                           </button>
                           {allExpandedImages.length > 1 && (

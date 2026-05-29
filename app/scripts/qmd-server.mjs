@@ -37,12 +37,12 @@ const execFileAsync = promisify(execFile)
 
 // ── Config ──────────────────────────────────────────────────────
 const PORT = Number(process.env.QMD_PORT) || 3001
-const API_KEY = process.env.QMD_API_KEY || ""
-const QMD_CONTENT = resolve(process.env.QMD_CONTENT || "./qmd-content")
-const REGION = process.env.QMD_REGION || "unknown"
+const API_KEY = process.env.QMD_API_KEY ?? ""
+const QMD_CONTENT = resolve(process.env.QMD_CONTENT ?? "./qmd-content")
+const REGION = process.env.QMD_REGION ?? "unknown"
 const EMBEDDINGS_PATH = join(QMD_CONTENT, "embeddings.json")
 const EMBEDDING_MODEL =
-  process.env.EMBEDDING_MODEL || "Xenova/multilingual-e5-small"
+  process.env.EMBEDDING_MODEL ?? "Xenova/multilingual-e5-small"
 
 // ── Concurrency Control ─────────────────────────────────────────
 const MAX_CONCURRENT = Number(process.env.QMD_MAX_CONCURRENT) || 3
@@ -92,7 +92,7 @@ let cacheMisses = 0
 
 function makeCacheKey({ query, lang, mode, limit }) {
   return JSON.stringify({
-    query: (query || "").trim().toLowerCase(),
+    query: (query ?? "").trim().toLowerCase(),
     lang,
     mode,
     limit,
@@ -151,7 +151,7 @@ function resolveQmdCli() {
       join(process.env.APPDATA, "npm/node_modules/@tobilu/qmd/dist/cli/qmd.js")
     )
   }
-  const home = process.env.HOME || process.env.USERPROFILE
+  const home = process.env.HOME ?? process.env.USERPROFILE
   if (home) {
     candidates.push(
       join(home, ".npm-global/lib/node_modules/@tobilu/qmd/dist/cli/qmd.js")
@@ -403,14 +403,14 @@ async function runBm25Search(query, candidateLimit) {
  */
 /** Normalize file path: strip qmd:// prefix for consistent dedup */
 function normalizeFilePath(fp) {
-  return (fp || "").replaceAll("\\", "/").replace(/^qmd:\/\/[^/]+\//, "")
+  return (fp ?? "").replaceAll("\\", "/").replace(/^qmd:\/\/[^/]+\//, "")
 }
 
 function rrfFuse(listA, listB, k = 60) {
   const scores = new Map()
 
   for (const [rank, item] of listA.entries()) {
-    const id = normalizeFilePath(item.file || item.docid)
+    const id = normalizeFilePath(item.file ?? item.docid)
     const prev = scores.get(id)
     const s = 1 / (k + rank + 1)
     if (prev) {
@@ -420,7 +420,7 @@ function rrfFuse(listA, listB, k = 60) {
     }
   }
   for (const [rank, item] of listB.entries()) {
-    const id = normalizeFilePath(item.file || item.docid)
+    const id = normalizeFilePath(item.file ?? item.docid)
     const prev = scores.get(id)
     const s = 1 / (k + rank + 1)
     if (prev) {
@@ -514,7 +514,9 @@ function readBody(req) {
   return new Promise((_resolve, reject) => {
     const chunks = []
     req.on("data", (c) => chunks.push(c))
-    req.on("end", () => _resolve(Buffer.concat(chunks).toString("utf8")))
+    req.on("end", () => {
+      _resolve(Buffer.concat(chunks).toString("utf8"))
+    })
     req.on("error", reject)
   })
 }
@@ -608,7 +610,7 @@ const server = createServer(async (req, res) => {
       const results = await queryQmd(body)
       const elapsed = Date.now() - start
       console.log(
-        `[QMD] q="${(body.query || "").slice(0, 50)}" mode=${body.mode || "fusion"} lang=${body.lang || "en"} n=${results.length} ${elapsed}ms ${elapsed < 5 ? "cache" : ""}`
+        `[QMD] q="${(body.query ?? "").slice(0, 50)}" mode=${body.mode ?? "fusion"} lang=${body.lang ?? "en"} n=${results.length} ${elapsed}ms ${elapsed < 5 ? "cache" : ""}`
       )
       sendJson(res, 200, results)
     } catch (err) {

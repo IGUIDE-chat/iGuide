@@ -118,7 +118,7 @@ export function createWebSearchTool(registry: ToolRegistry): ToolDefinition {
         }
 
         const data = (await response.json()) as TavilyResponse
-        const results = data.results || []
+        const results = data.results ?? []
 
         // Sort by priority (UIUC official first)
         const sorted = results.toSorted(

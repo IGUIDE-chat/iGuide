@@ -45,11 +45,15 @@ const LibraryHomePage: React.FC<LibraryHomePageProps> = ({ language }) => {
   }, [localQuery, localizedArticles])
 
   const handleSearchChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => setLocalQuery(e.target.value),
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setLocalQuery(e.target.value)
+    },
     []
   )
 
-  const handleClearSearch = useCallback(() => setLocalQuery(""), [])
+  const handleClearSearch = useCallback(() => {
+    setLocalQuery("")
+  }, [])
 
   const handleArticleClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {

@@ -41,18 +41,12 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   const { request, env } = context
 
   try {
-    const body = (await request.json()) as {
-      message?: string
-      conversationId?: string
-      history?: Array<{ role: string; text: string }>
-      userId?: string
-      lang?: string
-    }
+    const body = (await request.json())
     const { message, conversationId, history, userId, lang = "en" } = body
 
     // Prefer server-only secrets first to avoid accidentally using stale public vars.
-    const API_TOKEN = (env.COZE_API_TOKEN || env.VITE_COZE_API_KEY || "").trim()
-    const BOT_ID = (env.COZE_BOT_ID || env.VITE_COZE_BOT_ID || "").trim()
+    const API_TOKEN = ((env.COZE_API_TOKEN ?? env.VITE_COZE_API_KEY) ?? "").trim()
+    const BOT_ID = (env.COZE_BOT_ID || env.VITE_COZE_BOT_ID ?? "").trim()
 
     if (!API_TOKEN) {
       return new Response(
@@ -77,11 +71,11 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       },
       body: JSON.stringify({
         bot_id: BOT_ID,
-        user_id: userId || "user_123",
+        user_id: userId ?? "user_123",
         stream: true,
         auto_save_history: true,
         additional_messages: [
-          ...(history || []).map((h: { role: string; text: string }) => ({
+          ...(history ?? []).map((h: { role: string; text: string }) => ({
             role: h.role === "model" ? "assistant" : "user",
             content: h.text,
             content_type: "text",

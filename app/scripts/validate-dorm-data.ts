@@ -162,7 +162,7 @@ function checkDormBathroomScopes(
   const expected = [...expectedScopes].toSorted()
   check(
     JSON.stringify(actualScopes) === JSON.stringify(expected),
-    `${message}. Expected ${expected.join(", ")}, got ${actualScopes.join(", ") || "none"}.`
+    `${message}. Expected ${expected.join(", ")}, got ${actualScopes.join(", ") ?? "none"}.`
   )
 }
 

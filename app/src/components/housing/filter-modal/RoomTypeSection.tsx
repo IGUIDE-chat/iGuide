@@ -47,7 +47,9 @@ const RoomTypeSection: React.FC<RoomTypeSectionProps> = ({
                 type="checkbox"
                 className="hidden"
                 checked={isSelected}
-                onChange={() => onToggle(type.id)}
+                onChange={() => {
+                  onToggle(type.id)
+                }}
               />
             </div>
             <span className="group-hover:text-illini-blue relative -top-0.5 text-gray-700 transition-colors">

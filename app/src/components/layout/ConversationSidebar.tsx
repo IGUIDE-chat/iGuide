@@ -97,7 +97,7 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
           title: conv.title,
           updatedAt: conv.updated_at,
           isPinned: conv.is_pinned,
-          messageCount: conv.messages?.length || 0,
+          messageCount: conv.messages?.length ?? 0,
         }))
         setConversations(summaries)
       }
@@ -194,7 +194,9 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
               key={conv.id}
               id={conv.id}
               isActive={conv.id === currentConversationId}
-              onClick={() => onSelectConversation(conv.id)}
+              onClick={() => {
+                onSelectConversation(conv.id)
+              }}
               activeBgClass="bg-white/20 text-white"
               inactiveBgClass="text-slate-300 hover:bg-white/10"
             >
@@ -229,7 +231,9 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                     label={conv.isPinned ? t.unpin : t.pin}
                   />
                   <DeleteButton
-                    onClick={(e) => handleDeleteClick(conv.id, e)}
+                    onClick={(e) => {
+                      handleDeleteClick(conv.id, e)
+                    }}
                     label={t.delete}
                   />
                 </div>
@@ -270,7 +274,9 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
               <div className="flex gap-3">
                 <button
                   type="button"
-                  onClick={() => setShowDeleteConfirm(null)}
+                  onClick={() => {
+                    setShowDeleteConfirm(null)
+                  }}
                   className="flex-1 rounded-lg bg-white/5 px-4 py-2 text-sm font-medium text-slate-300 transition-colors hover:bg-white/10"
                 >
                   {language === "zh" ? "取消" : "Cancel"}

@@ -48,14 +48,18 @@ const SortDropdownMobile: React.FC<{
       }
     }
     document.addEventListener("mousedown", handler)
-    return () => document.removeEventListener("mousedown", handler)
+    return () => {
+      document.removeEventListener("mousedown", handler)
+    }
   }, [])
 
   return (
     <div className="relative shrink-0" ref={ref}>
       <button
         type="button"
-        onClick={() => setOpen(!open)}
+        onClick={() => {
+          setOpen(!open)
+        }}
         className={`flex size-10 items-center justify-center rounded-full border transition-all duration-200 ${
           open
             ? "border-illini-blue/50 bg-illini-blue/10 text-illini-blue"
@@ -324,14 +328,18 @@ export const Layout: React.FC<LayoutProps> = ({
             language === "zh" ? "输入搜索宿舍..." : "Type to search dorms..."
           }
           value={searchTerm}
-          onChange={(event) => setSearchTerm(event.target.value)}
+          onChange={(event) => {
+            setSearchTerm(event.target.value)
+          }}
         />
       </div>
       <div className="relative shrink-0">
         <button
           type="button"
           aria-label={language === "zh" ? "筛选" : "Filters"}
-          onClick={() => setIsFilterModalOpen(true)}
+          onClick={() => {
+            setIsFilterModalOpen(true)
+          }}
           className={`focus:ring-illini-orange/20 flex size-10 items-center justify-center rounded-full border transition-all duration-200 focus:ring-2 focus:outline-none ${
             hasActiveDormFilters
               ? `border-illini-orange/40 bg-illini-orange/10 text-illini-orange`
@@ -350,7 +358,9 @@ export const Layout: React.FC<LayoutProps> = ({
       <button
         type="button"
         aria-label={viewModeAriaLabel}
-        onClick={() => setViewMode(viewMode === "list" ? "map" : "list")}
+        onClick={() => {
+          setViewMode(viewMode === "list" ? "map" : "list")
+        }}
         className="flex size-10 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 transition-all duration-200 active:scale-95"
       >
         {viewMode === "list" ? (
@@ -366,7 +376,7 @@ export const Layout: React.FC<LayoutProps> = ({
     </span>
   )
 
-  const profileName = user?.name || user?.email || "User"
+  const profileName = user?.name ?? user?.email ?? "User"
 
   return (
     <LayoutProvider
@@ -379,9 +389,15 @@ export const Layout: React.FC<LayoutProps> = ({
         isSidebarOpen={isSidebarOpen}
         sidebarToggleButtonRef={sidebarToggleButtonRef}
         mobileSidebarButtonRef={mobileSidebarButtonRef}
-        onToggleSidebar={() => setIsSidebarOpen((current) => !current)}
-        onCloseSidebar={() => setIsSidebarOpen(false)}
-        onOpenSidebar={() => setIsSidebarOpen(true)}
+        onToggleSidebar={() => {
+          setIsSidebarOpen((current) => !current)
+        }}
+        onCloseSidebar={() => {
+          setIsSidebarOpen(false)
+        }}
+        onOpenSidebar={() => {
+          setIsSidebarOpen(true)
+        }}
         mobileHeader={mobileHeader}
         sidebar={
           <>
@@ -390,7 +406,9 @@ export const Layout: React.FC<LayoutProps> = ({
               activeTab={activeTab}
               isSidebarOpen={isSidebarOpen}
               navItems={navItems}
-              onCloseSidebar={() => setIsSidebarOpen(false)}
+              onCloseSidebar={() => {
+                setIsSidebarOpen(false)
+              }}
             />
             <SidebarPanel
               activeTab={activeTab}
@@ -408,9 +426,9 @@ export const Layout: React.FC<LayoutProps> = ({
               guestLabel={language === "zh" ? "登录" : "Login"}
               signedInLabel={language === "zh" ? "当前账号" : "Signed in as"}
               profileName={profileName}
-              onToggleLanguage={() =>
+              onToggleLanguage={() => {
                 onLanguageChange(language === "zh" ? "en" : "zh")
-              }
+              }}
               onGuestLogin={onExitGuest}
             />
           </>

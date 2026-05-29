@@ -34,7 +34,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   const { request, env } = context
 
   try {
-    const apiKey = (env.GOOGLE_API_KEY || "").trim()
+    const apiKey = (env.GOOGLE_API_KEY ?? "").trim()
     if (!apiKey) {
       return new Response(
         JSON.stringify({

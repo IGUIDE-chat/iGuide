@@ -96,7 +96,7 @@ export const conversationService = {
       .single()
 
     if (convError || !conversation) {
-      return { data: null, error: convError || new Error("Access denied") }
+      return { data: null, error: convError ?? new Error("Access denied") }
     }
 
     // Update last_viewed_at asynchronously (no need to await)
@@ -119,7 +119,7 @@ export const conversationService = {
       .order("created_at", { ascending: true })
 
     return {
-      data: { conversation, messages: messages || [] },
+      data: { conversation, messages: messages ?? [] },
       error: msgError,
     }
   },
@@ -134,7 +134,7 @@ export const conversationService = {
         conversation_id: conversationId,
         role: message.role,
         content: message.text,
-        follow_up_questions: message.followUpQuestions || null,
+        follow_up_questions: message.followUpQuestions ?? null,
       })
       .select()
       .single()
@@ -247,7 +247,7 @@ export const conversationService = {
         role,
         text: msg.content,
         content: msg.content,
-        followUpQuestions: msg.follow_up_questions || undefined,
+        followUpQuestions: msg.follow_up_questions ?? undefined,
       }
 
       // Pass through tool_call_id for tool messages

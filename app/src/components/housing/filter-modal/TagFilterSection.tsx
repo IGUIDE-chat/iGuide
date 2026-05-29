@@ -49,7 +49,9 @@ const TagFilterSection: React.FC<TagFilterSectionProps> = ({
                 type="checkbox"
                 className="hidden"
                 checked={isSelected}
-                onChange={() => onToggle(tag)}
+                onChange={() => {
+                  onToggle(tag)
+                }}
               />
             </div>
             <span className="group-hover:text-illini-blue text-gray-700 transition-colors">

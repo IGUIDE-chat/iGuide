@@ -67,7 +67,9 @@ export const DormEditPanelShell: React.FC<DormEditPanelShellProps> = ({
             <button
               key={tab.id}
               type="button"
-              onClick={() => onTabChange(tab.id)}
+              onClick={() => {
+                onTabChange(tab.id)
+              }}
               className={`flex flex-1 items-center justify-center gap-1.5 py-2.5 text-xs font-medium transition-colors ${
                 activeTab === tab.id
                   ? "border-illini-orange text-illini-blue border-b-2"

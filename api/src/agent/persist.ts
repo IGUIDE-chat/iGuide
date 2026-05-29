@@ -85,7 +85,7 @@ function buildUserRow(conversationId: string, msg: UserMessage): MessageRow {
   const content =
     typeof msg.content === "string"
       ? msg.content
-      : extractTextContent(msg.content as UIMessagePart[])
+      : extractTextContent(msg.content)
 
   return { conversation_id: conversationId, role: "user", content }
 }

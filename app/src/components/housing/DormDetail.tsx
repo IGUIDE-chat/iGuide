@@ -122,10 +122,9 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
     if (location.hash === "#reviews" && dorm) {
       const el = document.querySelector("#reviews")
       if (el) {
-        setTimeout(
-          () => el.scrollIntoView({ behavior: "smooth", block: "start" }),
-          300
-        )
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: "smooth", block: "start" })
+        }, 300)
       }
     }
   }, [location.hash, dorm])
@@ -154,7 +153,9 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
           {user?.isAdmin && (
             <button
               type="button"
-              onClick={() => setEditOpen(true)}
+              onClick={() => {
+                setEditOpen(true)
+              }}
               className="hover:text-illini-blue rounded-full p-1.5 text-slate-400 transition-colors"
               aria-label="Edit"
             >
@@ -302,7 +303,9 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
             {user?.isAdmin && (
               <button
                 type="button"
-                onClick={() => setEditOpen(true)}
+                onClick={() => {
+                  setEditOpen(true)
+                }}
                 className="hover:text-illini-blue rounded-full p-2 text-slate-400 transition-colors hover:bg-slate-100/50"
                 aria-label="Edit"
               >
@@ -397,7 +400,9 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
             maxPrice={maxPrice}
             language={language}
             fadeUp={fadeUp}
-            onLightboxOpen={(images, index) => setLightbox({ images, index })}
+            onLightboxOpen={(images, index) => {
+              setLightbox({ images, index })
+            }}
           />
 
           <DormDetailReviews
@@ -419,7 +424,9 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
           <ImageLightbox
             images={lightbox.images}
             initialIndex={Math.max(lightbox.index, 0)}
-            onClose={() => setLightbox(null)}
+            onClose={() => {
+              setLightbox(null)
+            }}
           />
         )}
       </AnimatePresence>
@@ -428,7 +435,9 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
         <DormEditPanel
           dorm={dorm}
           language={language}
-          onClose={() => setEditOpen(false)}
+          onClose={() => {
+            setEditOpen(false)
+          }}
           onSaved={(updated) => {
             setDorm(updated)
             setEditOpen(false)
@@ -442,7 +451,9 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
           type="button"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => setEditOpen(true)}
+          onClick={() => {
+            setEditOpen(true)
+          }}
           className="bg-illini-blue hover:bg-illini-blue/90 fixed right-6 bottom-20 z-50 flex items-center gap-2 rounded-full px-4 py-2.5 text-[13px] font-bold text-white shadow-lg transition-colors"
         >
           <Pencil className="size-3.5" />

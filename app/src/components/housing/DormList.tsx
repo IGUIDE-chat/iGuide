@@ -75,7 +75,9 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
         setSearchTerm={controller.setSearchTerm}
         hasActiveFilters={controller.hasActiveFilters}
         activeFilterCount={controller.activeFilterCount}
-        onOpenFilters={() => controller.setIsFilterModalOpen(true)}
+        onOpenFilters={() => {
+          controller.setIsFilterModalOpen(true)
+        }}
         sortBy={controller.sortBy}
         setSortBy={controller.setSortBy}
         viewMode={controller.viewMode}
@@ -100,7 +102,9 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
               onHoverDorm={controller.setHoveredDormId}
               onRatingClick={handleRatingClick}
               compareIds={compareIds}
-              onToggleCompare={(dorm) => toggleCompare(dorm.id)}
+              onToggleCompare={(dorm) => {
+                toggleCompare(dorm.id)
+              }}
               language={language}
               commentStats={commentStats}
             />
@@ -134,7 +138,9 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
 
       <FilterModal
         isOpen={controller.isFilterModalOpen}
-        onClose={() => controller.setIsFilterModalOpen(false)}
+        onClose={() => {
+          controller.setIsFilterModalOpen(false)
+        }}
         language={language === "zh" ? "zh" : "en"}
       />
 
@@ -144,7 +150,9 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
           startY={controller.flyingHeart.y}
           targetX={controller.flyingHeart.targetX}
           targetY={controller.flyingHeart.targetY}
-          onComplete={() => controller.setFlyingHeart(null)}
+          onComplete={() => {
+            controller.setFlyingHeart(null)
+          }}
         />
       )}
 

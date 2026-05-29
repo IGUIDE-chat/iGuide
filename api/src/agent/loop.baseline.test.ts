@@ -195,11 +195,11 @@ test("substantive UIUC query exposes all registered tools", async () => {
     const firstRequest = parseRequestBody(mockFetch.requests[0])
     assert.ok(firstRequest.tools, "First request should have tools defined")
     assert.ok(
-      firstRequest.tools!.length > 0,
+      firstRequest.tools.length > 0,
       "First request should have non-empty tools array"
     )
 
-    const toolNames = new Set(firstRequest.tools!.map((t) => t.function.name))
+    const toolNames = new Set(firstRequest.tools.map((t) => t.function.name))
     assert.ok(
       toolNames.has("search_knowledge_base"),
       "Should include search_knowledge_base tool"

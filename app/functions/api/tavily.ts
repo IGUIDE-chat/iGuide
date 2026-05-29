@@ -35,7 +35,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   const { request, env } = context
 
   try {
-    const apiKey = (env.TAVILY_API_KEY || "").trim()
+    const apiKey = (env.TAVILY_API_KEY ?? "").trim()
     if (!apiKey) {
       return new Response(
         JSON.stringify({
@@ -48,7 +48,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       )
     }
 
-    const body = (await request.json()) as TavilyRequestBody
+    const body = await request.json()
 
     if (!body.query || typeof body.query !== "string") {
       return new Response(

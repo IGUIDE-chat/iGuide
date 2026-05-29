@@ -21,7 +21,7 @@ export function resolveProvider(config: ProviderConfig): DeepSeekProvider {
 
   if (deepSeekKey) {
     return createDeepSeek({
-      baseURL: env.DEEPSEEK_ENDPOINT || "https://api.deepseek.com",
+      baseURL: env.DEEPSEEK_ENDPOINT ?? "https://api.deepseek.com",
       apiKey: deepSeekKey,
     })
   }

@@ -150,7 +150,9 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
   const chat = useChat({
     transport,
     messages: initialMessages,
-    onError: (err) => console.error("[housing AIChat]", err),
+    onError: (err) => {
+      console.error("[housing AIChat]", err)
+    },
   })
 
   const isLoading = chat.status === "submitted" || chat.status === "streaming"
@@ -181,7 +183,9 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
   return (
     <>
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          setIsOpen(!isOpen)
+        }}
         type="button"
         className={`fixed right-6 bottom-6 z-50 rounded-full p-4 shadow-2xl transition-all duration-300 ${
           isOpen
@@ -308,7 +312,9 @@ const AIChat: React.FC<AIChatProps> = ({ language }) => {
           <div className="relative">
             <ImeSafeTextarea
               value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
+              onChange={(e) => {
+                setInputText(e.target.value)
+              }}
               onKeyDown={handleKeyDown}
               placeholder={t.placeholder}
               className="focus:border-illini-blue focus:ring-illini-blue/20 w-full resize-none rounded-xl border border-gray-200 bg-gray-50 py-3 pr-12 pl-4 text-sm focus:ring-2 focus:outline-none"

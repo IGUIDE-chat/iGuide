@@ -37,10 +37,10 @@ function convertSupabaseUser(supabaseUser: SupabaseUser): User {
   return {
     id: supabaseUser.id,
     name:
-      supabaseUser.user_metadata?.display_name ||
-      supabaseUser.email?.split("@")[0] ||
+      supabaseUser.user_metadata?.display_name ??
+      supabaseUser.email?.split("@")[0] ??
       "User",
-    email: supabaseUser.email || "",
+    email: supabaseUser.email ?? "",
     isAdmin: supabaseUser.user_metadata?.is_admin === true,
   }
 }
@@ -87,12 +87,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setUser({
             id: supabaseUser.id,
             name:
-              supabaseUser.user_metadata?.display_name ||
-              supabaseUser.email?.split("@")[0] ||
+              supabaseUser.user_metadata?.display_name ??
+              supabaseUser.email?.split("@")[0] ??
               "User",
-            email: supabaseUser.email || "",
-            avatarUrl: supabaseUser.user_metadata?.avatar_url || "",
-            isAdmin: supabaseUser.user_metadata?.is_admin || false,
+            email: supabaseUser.email ?? "",
+            avatarUrl: supabaseUser.user_metadata?.avatar_url ?? "",
+            isAdmin: supabaseUser.user_metadata?.is_admin ?? false,
           })
         }
       } catch (error) {
@@ -108,12 +108,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser({
           id: supabaseUser.id,
           name:
-            supabaseUser.user_metadata?.display_name ||
-            supabaseUser.email?.split("@")[0] ||
+            supabaseUser.user_metadata?.display_name ??
+            supabaseUser.email?.split("@")[0] ??
             "User",
-          email: supabaseUser.email || "",
-          avatarUrl: supabaseUser.user_metadata?.avatar_url || "",
-          isAdmin: supabaseUser.user_metadata?.is_admin || false,
+          email: supabaseUser.email ?? "",
+          avatarUrl: supabaseUser.user_metadata?.avatar_url ?? "",
+          isAdmin: supabaseUser.user_metadata?.is_admin ?? false,
         })
       } else {
         setUser(null)
@@ -195,7 +195,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }
 
-  const requestLogin = () => setIsGuest(false)
+  const requestLogin = () => {
+    setIsGuest(false)
+  }
 
   const value: AuthContextType = useMemo(
     () => ({

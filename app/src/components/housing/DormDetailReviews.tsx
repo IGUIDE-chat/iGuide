@@ -113,7 +113,7 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
         }),
       })
       if (res.ok) {
-        const data = (await res.json()) as Record<string, unknown>
+        const data = await res.json()
         const choices = data.choices as
           | Array<{ message?: { content?: string } }>
           | undefined
@@ -173,9 +173,9 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
                   type="button"
                   whileHover={{ scale: 1.04 }}
                   whileTap={{ scale: 0.94 }}
-                  onClick={() =>
+                  onClick={() => {
                     setCommentVote(commentVote === vote ? null : vote)
-                  }
+                  }}
                   className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[12px] font-semibold transition-colors ${voteClasses} `}
                 >
                   <ThumbsUp
@@ -189,7 +189,9 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
           <textarea
             aria-label="Text input"
             value={commentContent}
-            onChange={(e) => setCommentContent(e.target.value)}
+            onChange={(e) => {
+              setCommentContent(e.target.value)
+            }}
             placeholder={t.leaveComment}
             rows={3}
             className="focus:border-illini-blue/40 w-full resize-none rounded-xl border border-slate-200 bg-white/50 px-3 py-2.5 text-[13px] font-medium placeholder-slate-400 transition-colors focus:outline-none md:text-[14px]"
@@ -293,7 +295,9 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
                         <motion.button
                           type="button"
                           whileTap={{ scale: 0.9 }}
-                          onClick={() => handleDeleteComment(comment.id)}
+                          onClick={() => {
+                            handleDeleteComment(comment.id)
+                          }}
                           className="p-1 text-slate-300 transition-colors hover:text-red-400"
                           aria-label={t.deleteComment}
                         >
@@ -327,12 +331,12 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
                     <motion.button
                       type="button"
                       whileTap={{ scale: 0.88 }}
-                      onClick={() =>
+                      onClick={() => {
                         onVoteOnComment(
                           comment.id,
                           comment.myVote === 1 ? null : 1
                         )
-                      }
+                      }}
                       className={`group flex items-center gap-1.5 transition-colors ${
                         comment.myVote === 1
                           ? "text-illini-orange"
@@ -385,7 +389,9 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
               type="button"
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => setShowAllReviews(!showAllReviews)}
+              onClick={() => {
+                setShowAllReviews(!showAllReviews)
+              }}
               className="w-full rounded-xl border border-white/50 bg-white/40 py-3 text-[13px] font-semibold text-slate-500 backdrop-blur-md transition-colors hover:bg-white/60 hover:text-slate-800 md:text-[14px]"
             >
               {showAllReviews

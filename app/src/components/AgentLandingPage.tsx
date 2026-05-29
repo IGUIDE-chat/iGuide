@@ -185,7 +185,9 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
               aria-label="Input field"
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value)
+              }}
               placeholder={t.emailPlaceholder}
               required
               className="focus:ring-illini-blue/10 w-full rounded-full border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 shadow-sm transition-all focus:border-slate-300 focus:ring-2 focus:outline-none"

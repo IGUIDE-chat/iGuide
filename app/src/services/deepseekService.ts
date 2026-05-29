@@ -30,7 +30,7 @@ const viteEnv = (
 const IS_DEV = Boolean(viteEnv?.DEV)
 const CHAT_ENDPOINT = IS_DEV
   ? "/api/chat"
-  : `${viteEnv?.VITE_API_GATEWAY_URL || "https://api.iguide.chat"}/chat`
+  : `${viteEnv?.VITE_API_GATEWAY_URL ?? "https://api.iguide.chat"}/chat`
 
 // ── RAG Context Builder ──────────────────────────────────────────
 
@@ -120,7 +120,7 @@ function buildOpenAIMessages(
   const messages: OpenAIMessage[] = []
 
   // System prompt with optional RAG context
-  const systemContent = systemInstruction || DEFAULT_SYSTEM_PROMPT
+  const systemContent = systemInstruction ?? DEFAULT_SYSTEM_PROMPT
   const languagePrompt =
     lang === "zh" ? LANGUAGE_PROMPTS.zh : LANGUAGE_PROMPTS.en
   messages.push({
@@ -178,12 +178,12 @@ export const streamDeepSeekChat = async function* (
       if (!response.ok) {
         const err = await response.json().catch(() => ({}))
         throw new Error(
-          (err as { error?: string }).error ||
+          (err as { error?: string }).error ??
             `Chat API returned ${response.status}`
         )
       }
 
-      const contentType = response.headers.get("content-type") || ""
+      const contentType = response.headers.get("content-type") ?? ""
 
       if (contentType.includes("text/event-stream") && response.body) {
         const reader = response.body.getReader()
@@ -193,7 +193,7 @@ export const streamDeepSeekChat = async function* (
 
       const data = (await response.json()) as { reply?: string; text?: string }
       if (data.reply || data.text) {
-        yield { text: data.reply || data.text || "" }
+        yield { text: data.reply ?? data.text ?? "" }
       }
       return
     }
@@ -310,12 +310,12 @@ export const streamDeepSeekChat = async function* (
     if (!response.ok) {
       const err = await response.json().catch(() => ({}))
       throw new Error(
-        (err as { error?: string }).error ||
+        (err as { error?: string }).error ??
           `DeepSeek API returned ${response.status}`
       )
     }
 
-    const contentType = response.headers.get("content-type") || ""
+    const contentType = response.headers.get("content-type") ?? ""
 
     if (contentType.includes("text/event-stream") && response.body) {
       // SSE streaming

@@ -53,7 +53,9 @@ const HousingTypeSection: React.FC<HousingTypeSectionProps> = ({
               type="checkbox"
               className={`size-5 rounded-md ${checkboxClass} `}
               checked={selected}
-              onChange={() => onChange(selected ? "ALL" : option.value)}
+              onChange={() => {
+                onChange(selected ? "ALL" : option.value)
+              }}
             />
             <div>
               <div className="font-bold">

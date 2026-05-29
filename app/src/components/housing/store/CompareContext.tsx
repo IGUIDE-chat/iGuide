@@ -52,8 +52,12 @@ export const CompareProvider: React.FC<{ children: ReactNode }> = ({
     setIsCompareOpen(false)
   }, [])
 
-  const openCompare = useCallback(() => setIsCompareOpen(true), [])
-  const closeCompare = useCallback(() => setIsCompareOpen(false), [])
+  const openCompare = useCallback(() => {
+    setIsCompareOpen(true)
+  }, [])
+  const closeCompare = useCallback(() => {
+    setIsCompareOpen(false)
+  }, [])
 
   const compareDorms = useMemo(
     () =>

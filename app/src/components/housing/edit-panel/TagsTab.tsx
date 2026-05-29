@@ -38,14 +38,14 @@ export const TagsTab: React.FC<TagsTabProps> = ({ form }) => {
                   <button
                     key={tagId}
                     type="button"
-                    onClick={() =>
+                    onClick={() => {
                       form.setCategorizedTags((prev) => ({
                         ...prev,
                         [category]: checked
                           ? prev[category].filter((tag) => tag !== tagId)
                           : [...prev[category], tagId],
                       }))
-                    }
+                    }}
                     className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition-all ${
                       checked
                         ? `border-illini-blue bg-illini-blue text-white shadow-sm`
@@ -68,7 +68,9 @@ export const TagsTab: React.FC<TagsTabProps> = ({ form }) => {
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
-            onClick={() => form.setPetFriendly(!form.petFriendly)}
+            onClick={() => {
+              form.setPetFriendly(!form.petFriendly)
+            }}
             className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition-all ${
               form.petFriendly
                 ? "border-illini-blue bg-illini-blue text-white shadow-sm"
@@ -92,7 +94,7 @@ export const TagsTab: React.FC<TagsTabProps> = ({ form }) => {
               <button
                 key={llc}
                 type="button"
-                onClick={() =>
+                onClick={() => {
                   form.setCategorizedTags((prev) => {
                     const current = prev.llcNames ?? []
                     const next = selected
@@ -107,7 +109,7 @@ export const TagsTab: React.FC<TagsTabProps> = ({ form }) => {
                       llcNames: next,
                     }
                   })
-                }
+                }}
                 className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition-all ${
                   selected
                     ? "border-illini-blue bg-illini-blue text-white shadow-sm"

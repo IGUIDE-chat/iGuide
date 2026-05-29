@@ -112,23 +112,23 @@ async function fetchConnectionsFromApi(): Promise<{
     user?: ApiConnection[]
   }
   return {
-    platform: (data.platform || []).map((c) => ({
+    platform: (data.platform ?? []).map((c) => ({
       id: c.id,
       name: c.display_name,
       status: deriveConnectionStatus(c.last_test_status),
-      toolCount: (c.tools || []).length,
+      toolCount: (c.tools ?? []).length,
       url: c.endpoint_url,
     })),
-    user: (data.user || []).map((c) => ({
+    user: (data.user ?? []).map((c) => ({
       id: c.id,
       name: c.display_name,
-      description: c.description || "",
+      description: c.description ?? "",
       status: deriveConnectionStatus(c.last_test_status),
       url: c.endpoint_url,
       is_enabled: c.is_enabled,
-      tools: (c.tools || []).map((t) => ({
+      tools: (c.tools ?? []).map((t) => ({
         name: t.name,
-        description: t.description || "",
+        description: t.description ?? "",
         enabled: true,
       })),
     })),
@@ -153,19 +153,19 @@ async function saveConnectionToApi(data: {
     const err = (await res
       .json()
       .catch(() => ({ error: "Unknown error" }))) as { error?: string }
-    throw new Error(err.error || `Failed to save: ${res.status}`)
+    throw new Error(err.error ?? `Failed to save: ${res.status}`)
   }
   const conn = (await res.json()) as ApiConnection
   return {
     id: conn.id,
     name: conn.display_name,
-    description: conn.description || "",
+    description: conn.description ?? "",
     status: deriveConnectionStatus(conn.last_test_status),
     url: conn.endpoint_url,
     is_enabled: conn.is_enabled,
-    tools: (conn.tools || []).map((t) => ({
+    tools: (conn.tools ?? []).map((t) => ({
       name: t.name,
-      description: t.description || "",
+      description: t.description ?? "",
       enabled: true,
     })),
   }
@@ -177,7 +177,7 @@ async function deleteConnectionFromApi(id: string): Promise<void> {
     const err = (await res
       .json()
       .catch(() => ({ error: "Unknown error" }))) as { error?: string }
-    throw new Error(err.error || `Failed to delete: ${res.status}`)
+    throw new Error(err.error ?? `Failed to delete: ${res.status}`)
   }
 }
 
@@ -743,7 +743,9 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                 aria-label="Input field"
                 type="text"
                 value={addName}
-                onChange={(e) => setAddName(e.target.value)}
+                onChange={(e) => {
+                  setAddName(e.target.value)
+                }}
                 placeholder={t.displayNamePlaceholder}
                 className="focus:border-illini-orange focus:ring-illini-orange/30 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder-slate-300 focus:ring-2 focus:outline-none"
               />
@@ -776,7 +778,9 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                 aria-label="Input field"
                 type="text"
                 value={addDesc}
-                onChange={(e) => setAddDesc(e.target.value)}
+                onChange={(e) => {
+                  setAddDesc(e.target.value)
+                }}
                 placeholder={t.descriptionPlaceholder}
                 className="focus:border-illini-orange focus:ring-illini-orange/30 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder-slate-300 focus:ring-2 focus:outline-none"
               />
@@ -881,9 +885,9 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                 {/* Card row */}
                 <button
                   type="button"
-                  onClick={() =>
+                  onClick={() => {
                     setDetailsId(detailsId === conn.id ? null : conn.id)
-                  }
+                  }}
                   className="flex w-full items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-3 py-2.5 text-left transition-colors hover:bg-slate-100"
                 >
                   <div className="flex min-w-0 items-center gap-2.5">
@@ -928,7 +932,9 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                       </p>
                       <button
                         type="button"
-                        onClick={() => setDetailsId(null)}
+                        onClick={() => {
+                          setDetailsId(null)
+                        }}
                         className="text-xs text-slate-400 hover:text-slate-600"
                       >
                         {t.close}
@@ -972,7 +978,9 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                       <button
                         type="button"
                         aria-label="Toggle connection"
-                        onClick={() => handleToggleConnection(conn.id)}
+                        onClick={() => {
+                          handleToggleConnection(conn.id)
+                        }}
                         className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${conn.is_enabled ? "bg-illini-orange" : "bg-slate-200"}`}
                         role="switch"
                         aria-checked={conn.is_enabled}
@@ -993,9 +1001,9 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                           <ToolRowItem
                             key={tool.name}
                             tool={tool}
-                            onToggle={() =>
+                            onToggle={() => {
                               handleToggleTool(conn.id, tool.name)
-                            }
+                            }}
                           />
                         ))}
                       </div>

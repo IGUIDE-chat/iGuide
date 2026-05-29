@@ -40,7 +40,7 @@ interface LlmRequestDumpInput {
 let llmDumpCounter = 0
 
 function isTruthyEnv(value: string | undefined) {
-  return TRUTHY_ENV_VALUES.has((value || "").trim().toLowerCase())
+  return TRUTHY_ENV_VALUES.has((value ?? "").trim().toLowerCase())
 }
 
 function redactHeaders(headers: OutgoingHttpHeaders, includeSecrets: boolean) {
@@ -221,7 +221,7 @@ export default defineConfig(({ mode }) => {
               req.on("end", () => {
                 try {
                   const parsed = JSON.parse(body)
-                  const model = parsed.model || "gemini-1.5-flash"
+                  const model = parsed.model ?? "gemini-1.5-flash"
                   delete parsed.model
                   const newBody = JSON.stringify(parsed)
                   proxyReq.path = `/v1beta/models/${model}:generateContent?key=${apiKey}`
@@ -272,9 +272,7 @@ export default defineConfig(({ mode }) => {
               req.on("end", () => {
                 try {
                   const parsed = JSON.parse(body)
-                  if (!parsed.api_key) {
-                    parsed.api_key = apiKey
-                  }
+                  parsed.api_key ??= apiKey
                   const newBody = JSON.stringify(parsed)
                   proxyReq.setHeader(
                     "Content-Length",

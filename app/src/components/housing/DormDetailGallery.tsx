@@ -137,9 +137,9 @@ export const DormDetailGallery: React.FC<DormDetailGalleryProps> = ({
         <p className="max-w-4xl text-[14px] leading-relaxed font-medium text-slate-600 md:text-[15px]">
           {dormDesc}
         </p>
-        {(website || housingType === "URH") && (
+        {(website ?? housingType === "URH") && (
           <a
-            href={website || "https://housing.illinois.edu/"}
+            href={website ?? "https://housing.illinois.edu/"}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex w-fit items-center gap-1 rounded-full bg-slate-100 px-3 py-1.5 text-[11px] font-semibold text-slate-500 transition-colors hover:bg-slate-200 md:text-[12px]"

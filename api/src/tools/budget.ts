@@ -82,12 +82,12 @@ export function withGuards<T extends Record<string, Tool>>(
   const guarded: Record<string, Tool> = {}
 
   for (const [name, rawTool] of Object.entries(rawTools)) {
-    const rawExecute = (rawTool as Tool).execute as
+    const rawExecute = rawTool.execute as
       | ((input: unknown, options?: unknown) => unknown)
       | undefined
 
     if (typeof rawExecute !== "function") {
-      guarded[name] = rawTool as Tool
+      guarded[name] = rawTool
       continue
     }
 

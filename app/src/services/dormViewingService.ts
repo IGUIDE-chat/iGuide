@@ -41,7 +41,7 @@ const dormViewingService = {
         user_id: user.id,
         dorm_id: dormId,
         dorm_name: dormName,
-        dorm_name_zh: dormNameZh || null,
+        dorm_name_zh: dormNameZh ?? null,
         last_viewed_at: new Date().toISOString(),
       },
       { onConflict: "user_id,dorm_id" }

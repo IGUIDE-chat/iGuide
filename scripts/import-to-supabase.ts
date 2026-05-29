@@ -264,7 +264,7 @@ function decodeHtmlEntities(input: string): string {
 
 function getEnv(): RuntimeEnv {
   const embeddingDimensions = Number.parseInt(
-    process.env.EMBEDDING_DIMENSIONS || String(DEFAULT_EMBEDDING_DIMENSIONS),
+    process.env.EMBEDDING_DIMENSIONS ?? String(DEFAULT_EMBEDDING_DIMENSIONS),
     10
   )
 
@@ -273,12 +273,12 @@ function getEnv(): RuntimeEnv {
     supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY,
     embeddingApiBaseUrl: process.env.EMBEDDING_API_BASE_URL,
     embeddingApiKey: process.env.EMBEDDING_API_KEY,
-    embeddingModel: process.env.EMBEDDING_MODEL || DEFAULT_EMBEDDING_MODEL,
+    embeddingModel: process.env.EMBEDDING_MODEL ?? DEFAULT_EMBEDDING_MODEL,
     embeddingDimensions:
       Number.isFinite(embeddingDimensions) && embeddingDimensions > 0
         ? embeddingDimensions
         : DEFAULT_EMBEDDING_DIMENSIONS,
-    schoolId: process.env.SCHOOL_ID || DEFAULT_SCHOOL_ID,
+    schoolId: process.env.SCHOOL_ID ?? DEFAULT_SCHOOL_ID,
   }
 }
 
@@ -655,7 +655,7 @@ async function loadMarkdownUnit(
   const chunks = chunkText(cleanedContent)
   const title =
     parsed.frontmatter.title ||
-    findMarkdownHeading(parsed.body) ||
+    findMarkdownHeading(parsed.body) ??
     deriveNameFromReference(filePath)
   const canonicalUrl = parsed.frontmatter.url || null
 
@@ -795,7 +795,7 @@ function unquoteYamlValue(value: string): string {
 
 function findMarkdownHeading(contents: string): string | null {
   const match = contents.match(/^#\s+(.+)$/m)
-  return match?.[1]?.trim() || null
+  return match?.[1]?.trim() ?? null
 }
 
 function normalizeMultilineText(input: string): string {
@@ -876,8 +876,8 @@ export class EmbeddingApiClient {
           data?: Array<{ embedding?: number[] }>
         }
 
-        const embeddings = (payload.data || []).map(
-          (item) => item.embedding || []
+        const embeddings = (payload.data ?? []).map(
+          (item) => item.embedding ?? []
         )
         if (embeddings.length !== batch.length) {
           throw new Error(
@@ -987,8 +987,8 @@ export class SupabaseRestClient {
       {
         ...init,
         headers: {
-          apikey: this.env.supabaseServiceKey || "",
-          Authorization: `Bearer ${this.env.supabaseServiceKey || ""}`,
+          apikey: this.env.supabaseServiceKey ?? "",
+          Authorization: `Bearer ${this.env.supabaseServiceKey ?? ""}`,
           "Content-Type": "application/json",
           ...init?.headers,
         },

@@ -48,7 +48,7 @@ import {
   buildZonesLabelLayer,
 } from "./dorm-map/layers"
 
-const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || ""
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN ?? ""
 
 interface MapErrorBoundaryState {
   hasError: boolean
@@ -107,10 +107,12 @@ class MapErrorBoundary extends Component<
               Map failed to load
             </h3>
             <p className="mb-4 text-sm text-gray-600">
-              {error?.message || "The map component encountered an error."}
+              {error?.message ?? "The map component encountered an error."}
             </p>
             <button
-              onClick={() => window.location.reload()}
+              onClick={() => {
+                window.location.reload()
+              }}
               type="button"
               className="bg-illini-blue hover:bg-illini-blue/90 rounded-xl px-6 py-2 font-semibold text-white transition-colors"
             >
@@ -345,7 +347,9 @@ const DormMap: React.FC<DormMapProps> = ({
       if (retryTimer) {
         window.clearTimeout(retryTimer)
       }
-      timeouts.forEach((timeoutId) => window.clearTimeout(timeoutId))
+      timeouts.forEach((timeoutId) => {
+        window.clearTimeout(timeoutId)
+      })
       observer.disconnect()
       transitionTarget?.removeEventListener(
         "transitionend",
@@ -388,7 +392,7 @@ const DormMap: React.FC<DormMapProps> = ({
 
   const onMapLoad = useCallback((event: mapboxgl.MapboxEvent) => {
     setIsMapReady(true)
-    const map = event.target as mapboxgl.Map
+    const map = event.target
     setAreMapImagesReady(registerMapAssets(map))
   }, [])
 
@@ -398,7 +402,9 @@ const DormMap: React.FC<DormMapProps> = ({
     }
 
     const map = mapRef.current.getMap()
-    const ensureAssets = () => setAreMapImagesReady(registerMapAssets(map))
+    const ensureAssets = () => {
+      setAreMapImagesReady(registerMapAssets(map))
+    }
     const handleStyleImageMissing = (event: { id: string }) => {
       if (
         event.id === "pill" ||
@@ -575,7 +581,7 @@ const DormMap: React.FC<DormMapProps> = ({
         <Source
           id="landmarks"
           type="geojson"
-          data={buildLandmarkFeatureCollection(visibleLandmarks as Landmark[])}
+          data={buildLandmarkFeatureCollection(visibleLandmarks)}
         >
           {areMapImagesReady && (
             <Layer
@@ -617,7 +623,9 @@ const DormMap: React.FC<DormMapProps> = ({
                 type="checkbox"
                 className="peer sr-only"
                 checked={showZones}
-                onChange={(e) => setShowZones(e.target.checked)}
+                onChange={(e) => {
+                  setShowZones(e.target.checked)
+                }}
               />
               <div className="peer peer-checked:bg-illini-orange h-4 w-7 rounded-full bg-slate-300 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:size-3 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white" />
             </div>
@@ -633,7 +641,9 @@ const DormMap: React.FC<DormMapProps> = ({
                 type="checkbox"
                 className="peer sr-only"
                 checked={showLandmarks}
-                onChange={(e) => setShowLandmarks(e.target.checked)}
+                onChange={(e) => {
+                  setShowLandmarks(e.target.checked)
+                }}
               />
               <div className="peer peer-checked:bg-illini-orange h-4 w-7 rounded-full bg-slate-300 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:size-3 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white" />
             </div>

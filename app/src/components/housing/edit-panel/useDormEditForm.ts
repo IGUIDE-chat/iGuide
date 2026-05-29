@@ -259,12 +259,13 @@ export const useDormEditForm = ({
   const updateFloorPlan = (
     index: number,
     updater: (plan: FloorPlan) => FloorPlan
-  ) =>
+  ) => {
     setFloorPlans((current) =>
       current.map((plan, currentIndex) =>
         currentIndex === index ? updater(plan) : plan
       )
     )
+  }
 
   const buildUpdate = (): DormUpdate => {
     const derived = deriveRoomOptions(normalizedFloorPlans, bathroomType)
@@ -350,7 +351,7 @@ export const useDormEditForm = ({
         kitchen: finalCategorized.facilities.includes("kitchen"),
         gymNearby: finalCategorized.facilities.includes("gym"),
         genderInclusive:
-          dorm.structuredTags?.genderInclusive ||
+          dorm.structuredTags?.genderInclusive ??
           finalCategorized.lifestyle.includes("genderInclusive"),
         llc: finalCategorized.lifestyle.includes("llc")
           ? [...(finalCategorized.llcNames ?? [])]
@@ -412,12 +413,14 @@ export const useDormEditForm = ({
     setSaving(false)
 
     if (!result.ok) {
-      setSaveError(result.errorMessage || t.alerts.saveFailed)
+      setSaveError(result.errorMessage ?? t.alerts.saveFailed)
       return
     }
 
     setSaveSuccess(true)
-    timerRef.current = setTimeout(() => setSaveSuccess(false), 2000)
+    timerRef.current = setTimeout(() => {
+      setSaveSuccess(false)
+    }, 2000)
     void dormAdminService.logEdit(
       dorm.id,
       dorm.name,
@@ -453,7 +456,7 @@ export const useDormEditForm = ({
     setResetting(false)
 
     if (!result.ok) {
-      setSaveError(result.errorMessage || t.alerts.saveFailed)
+      setSaveError(result.errorMessage ?? t.alerts.saveFailed)
       return
     }
 

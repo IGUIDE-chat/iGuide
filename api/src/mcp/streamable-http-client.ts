@@ -174,7 +174,9 @@ export class StreamableHttpMCPClient implements MCPAdapterClient {
   ): Promise<RequestResult> {
     const controller = new AbortController()
     const startedAt = performance.now()
-    const timeoutHandle = setTimeout(() => controller.abort(), this.timeoutMs)
+    const timeoutHandle = setTimeout(() => {
+      controller.abort()
+    }, this.timeoutMs)
 
     try {
       const response = await this.fetchImpl(url, {

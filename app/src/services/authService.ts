@@ -100,7 +100,7 @@ export const authService = {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
-      callback(session?.user || null)
+      callback(session?.user ?? null)
     })
     return subscription
   },

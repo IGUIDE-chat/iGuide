@@ -50,7 +50,7 @@ export const ChatThread = ({ language }: ChatThreadProps) => {
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === "Enter" && !event.shiftKey) {
-      const nativeEvent = event.nativeEvent as KeyboardEvent
+      const nativeEvent = event.nativeEvent
       if (nativeEvent.isComposing || event.keyCode === 229) {
         return
       }
@@ -106,7 +106,9 @@ export const ChatThread = ({ language }: ChatThreadProps) => {
             >
               <ImeSafeTextarea
                 value={ctx.input}
-                onChange={(e) => ctx.setInput(e.target.value)}
+                onChange={(e) => {
+                  ctx.setInput(e.target.value)
+                }}
                 onKeyDown={handleKeyDown}
                 placeholder={t.inputPlaceholder}
                 rows={1}

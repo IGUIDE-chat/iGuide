@@ -61,10 +61,9 @@ test("register throws on duplicate tool name", () => {
   const registry = new ToolRegistry()
   registry.register(createEchoTool())
 
-  assert.throws(
-    () => registry.register(createEchoTool()),
-    /Tool already registered: stub_echo/
-  )
+  assert.throws(() => {
+    registry.register(createEchoTool())
+  }, /Tool already registered: stub_echo/)
 })
 
 test("register allows different tool names", () => {
@@ -406,9 +405,9 @@ test("toOpenAITools converts registered tools", () => {
 
   assert.equal(openAITools.length, 2)
 
-  const names = openAITools.map((t) => t.function.name)
-  assert.ok(names.includes("stub_echo"))
-  assert.ok(names.includes("stub_fail"))
+  const names = new Set(openAITools.map((t) => t.function.name))
+  assert.ok(names.has("stub_echo"))
+  assert.ok(names.has("stub_fail"))
 
   for (const tool of openAITools) {
     assert.equal(tool.type, "function")

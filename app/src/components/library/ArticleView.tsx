@@ -201,7 +201,9 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
               <button
                 type="button"
                 key={tag}
-                onClick={() => onSearch(tag)}
+                onClick={() => {
+                  onSearch(tag)
+                }}
                 className="hover:text-illini-blue cursor-pointer text-xs text-slate-500 transition-colors hover:underline"
               >
                 #{tag}

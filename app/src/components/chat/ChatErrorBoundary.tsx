@@ -40,7 +40,7 @@ export class ChatErrorBoundary extends React.Component<
               Chat Error
             </h2>
             <p className="mb-4 text-sm text-red-600 dark:text-red-300">
-              {this.state.error?.message ||
+              {this.state.error?.message ??
                 "An unexpected error occurred in the chat component."}
             </p>
             <button

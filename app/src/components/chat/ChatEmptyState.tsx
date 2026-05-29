@@ -56,7 +56,9 @@ export const ChatEmptyState: React.FC<ChatEmptyStateProps> = ({
                 <button
                   type="button"
                   key={suggestion.text}
-                  onClick={() => onSuggestionClick(suggestion.text)}
+                  onClick={() => {
+                    onSuggestionClick(suggestion.text)
+                  }}
                   className="rounded-2xl border border-slate-200 p-3 text-left text-sm text-slate-600 shadow-sm transition-colors hover:bg-slate-50 hover:shadow-md"
                 >
                   <span className="mr-2.5 text-base">{suggestion.icon}</span>

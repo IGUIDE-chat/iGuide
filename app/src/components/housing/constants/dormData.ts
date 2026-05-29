@@ -2251,7 +2251,7 @@ const enrichDormZhContent = (dorm: Dorm): Dorm => {
   const locationZh = dorm.location
 
   const descriptionZh =
-    dorm.description_zh?.trim() ||
+    dorm.description_zh?.trim() ??
     `${nameZh}位于${locationZh}，属于${HOUSING_TYPE_ZH[dorm.housingType]}。年住宿费用约 $${dorm.price.toLocaleString()}，${dorm.ac ? "配有空调" : "未配备空调"}，${dorm.dining === "inside" ? "就近可使用食堂。" : "需前往附近区域就餐。"}`
 
   const prosZh =

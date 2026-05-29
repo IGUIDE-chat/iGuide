@@ -94,7 +94,7 @@ function uniqueStrings<T extends string>(
 
 function sanitizeOptionalString(value: string | null | undefined) {
   const trimmed = value?.trim()
-  return trimmed ? trimmed : undefined
+  return trimmed ?? undefined
 }
 
 function sanitizeUrlList(urls: Array<string | undefined | null>) {
@@ -141,16 +141,16 @@ function syncStructuredTags(
   return {
     ...structuredTags,
     laundry:
-      structuredTags.laundry || categorizedTags.facilities.includes("laundry"),
+      structuredTags.laundry ?? categorizedTags.facilities.includes("laundry"),
     studyRooms:
-      structuredTags.studyRooms ||
+      structuredTags.studyRooms ??
       categorizedTags.facilities.includes("studyLounge"),
     kitchen:
-      structuredTags.kitchen || categorizedTags.facilities.includes("kitchen"),
+      structuredTags.kitchen ?? categorizedTags.facilities.includes("kitchen"),
     gymNearby:
-      structuredTags.gymNearby || categorizedTags.facilities.includes("gym"),
+      structuredTags.gymNearby ?? categorizedTags.facilities.includes("gym"),
     genderInclusive:
-      structuredTags.genderInclusive ||
+      structuredTags.genderInclusive ??
       categorizedTags.lifestyle.includes("genderInclusive"),
     llc: categorizedTags.lifestyle.includes("llc")
       ? [...(categorizedTags.llcNames ?? [])]

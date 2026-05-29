@@ -244,7 +244,7 @@ async function updateDorm(
     safeUpdates.price !== undefined &&
     typeof safeUpdates.price === "number"
   ) {
-    safeUpdates.price_range = getDormPriceRange(safeUpdates.price as number)
+    safeUpdates.price_range = getDormPriceRange(safeUpdates.price)
   }
 
   const { error } = await supabase

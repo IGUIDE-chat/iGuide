@@ -46,8 +46,12 @@ export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({
   // Auto-collapse after thinking completes
   useEffect(() => {
     if (wasThinking.current && !isThinking) {
-      const timer = setTimeout(() => setIsExpanded(false), 1500)
-      return () => clearTimeout(timer)
+      const timer = setTimeout(() => {
+        setIsExpanded(false)
+      }, 1500)
+      return () => {
+        clearTimeout(timer)
+      }
     }
     wasThinking.current = isThinking
   }, [isThinking])
@@ -64,7 +68,9 @@ export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({
     <div className="mb-2">
       <button
         type="button"
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={() => {
+          setIsExpanded(!isExpanded)
+        }}
         aria-expanded={isExpanded}
         className="group flex items-center gap-1.5 text-xs text-slate-500 transition-colors hover:text-slate-700"
       >

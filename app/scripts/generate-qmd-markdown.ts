@@ -296,8 +296,8 @@ function buildFloorPlanLine(
   const parts: string[] = []
   const displayName =
     sanitizeLine(plan.officialName) ||
-    plan.labelCode ||
-    plan.type ||
+    (plan.labelCode ??
+    plan.type) ??
     (lang === "zh" ? "未命名房型" : "Unnamed layout")
 
   parts.push(displayName)
@@ -433,7 +433,7 @@ function mapDormRow(row: Record<string, unknown>): DormDocumentRecord {
       description_zh:
         (row.description_zh as string) ?? fallbackDorm?.description_zh,
       imageUrl: (row.image_url as string) ?? fallbackDorm?.imageUrl ?? "",
-      price: Number(row.price) || fallbackDorm?.price || 0,
+      price: Number(row.price) || fallbackDorm?.price ?? 0,
       priceRange:
         (row.price_range as Dorm["priceRange"]) ??
         fallbackDorm?.priceRange ??
@@ -458,8 +458,8 @@ function mapDormRow(row: Record<string, unknown>): DormDocumentRecord {
         (row.bathroom_type as Dorm["bathroomType"]) ??
         fallbackDorm?.bathroomType ??
         "communal",
-      lat: Number(row.lat) || fallbackDorm?.lat || 0,
-      lng: Number(row.lng) || fallbackDorm?.lng || 0,
+      lat: Number(row.lat) || fallbackDorm?.lat ?? 0,
+      lng: Number(row.lng) || fallbackDorm?.lng ?? 0,
       tags: (row.tags as string[]) ?? fallbackDorm?.tags ?? [],
       structuredTags:
         (row.structured_tags as Dorm["structuredTags"]) ??
@@ -511,10 +511,10 @@ function fallbackDormRecords(): DormDocumentRecord[] {
 }
 
 async function fetchDormRecords(): Promise<DormDocumentRecord[]> {
-  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL
+  const supabaseUrl = process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL
   const supabaseKey =
-    process.env.SUPABASE_SERVICE_KEY ||
-    process.env.SUPABASE_ANON_KEY ||
+    (process.env.SUPABASE_SERVICE_KEY ??
+    process.env.SUPABASE_ANON_KEY) ??
     process.env.VITE_SUPABASE_ANON_KEY
 
   if (!supabaseUrl || !supabaseKey) {

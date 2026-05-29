@@ -26,7 +26,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   const { user, logout, updateName } = useAuth()
   const navigate = useNavigate()
   const [isEditing, setIsEditing] = useState(false)
-  const [newName, setNewName] = useState(user?.name || "")
+  const [newName, setNewName] = useState(user?.name ?? "")
   const [isLoading, setIsLoading] = useState(false)
 
   // Soul editor state
@@ -204,7 +204,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   type="text"
                   aria-label="Edit name"
                   value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
+                  onChange={(e) => {
+                    setNewName(e.target.value)
+                  }}
                   className="border-illini-orange w-full border-b-2 bg-transparent px-3 py-1 text-center font-bold text-slate-900 focus:outline-none"
                   ref={(el) => {
                     el?.focus()
@@ -246,7 +248,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               <div className="mt-4 flex gap-2">
                 <button
                   type="button"
-                  onClick={() => setIsEditing(false)}
+                  onClick={() => {
+                    setIsEditing(false)
+                  }}
                   className="rounded-full bg-slate-100 px-4 py-1.5 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-200"
                 >
                   {t.cancel}
@@ -287,7 +291,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             {!isSoulEditing && (
               <button
                 type="button"
-                onClick={() => setIsSoulEditing(true)}
+                onClick={() => {
+                  setIsSoulEditing(true)
+                }}
                 className="text-illini-orange hover:text-illini-blue text-xs font-medium transition-colors"
               >
                 {t.edit}
@@ -299,7 +305,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               <textarea
                 aria-label="Soul prompt"
                 value={soul}
-                onChange={(e) => setSoul(e.target.value)}
+                onChange={(e) => {
+                  setSoul(e.target.value)
+                }}
                 maxLength={500}
                 rows={4}
                 placeholder={t.soulPlaceholder}
@@ -312,7 +320,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 <div className="flex gap-2">
                   <button
                     type="button"
-                    onClick={() => setIsSoulEditing(false)}
+                    onClick={() => {
+                      setIsSoulEditing(false)
+                    }}
                     className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-200"
                   >
                     {t.cancel}
@@ -361,7 +371,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               {!isMemoryEditing && (
                 <button
                   type="button"
-                  onClick={() => setIsMemoryEditing(true)}
+                  onClick={() => {
+                    setIsMemoryEditing(true)
+                  }}
                   className="text-illini-orange hover:text-illini-blue text-xs font-medium transition-colors"
                 >
                   {t.edit}
@@ -374,7 +386,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               <textarea
                 aria-label="Memory notes"
                 value={userMemory}
-                onChange={(e) => setUserMemory(e.target.value)}
+                onChange={(e) => {
+                  setUserMemory(e.target.value)
+                }}
                 maxLength={1500}
                 rows={6}
                 placeholder={t.memoryPlaceholder}
@@ -387,7 +401,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 <div className="flex gap-2">
                   <button
                     type="button"
-                    onClick={() => setIsMemoryEditing(false)}
+                    onClick={() => {
+                      setIsMemoryEditing(false)
+                    }}
                     className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-200"
                   >
                     {t.cancel}

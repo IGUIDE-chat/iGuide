@@ -48,16 +48,20 @@ const SortingDropdown: React.FC<SortingDropdownProps> = memo(
         }
       }
       document.addEventListener("mousedown", handleClickOutside)
-      return () => document.removeEventListener("mousedown", handleClickOutside)
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside)
+      }
     }, [])
 
     const currentLabel =
-      SORT_OPTIONS.find((option) => option.value === sortBy)?.label || "Sort"
+      SORT_OPTIONS.find((option) => option.value === sortBy)?.label ?? "Sort"
 
     return (
       <div className="relative" ref={dropdownRef}>
         <button
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => {
+            setIsOpen(!isOpen)
+          }}
           type="button"
           className={`focus:ring-illini-blue/20 flex size-10 items-center justify-center rounded-full border transition-all duration-200 focus:ring-2 focus:outline-none ${
             isOpen

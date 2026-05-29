@@ -31,7 +31,9 @@ const ChipButton = memo(function ChipButton({
   onToggle,
   unselectedClass,
 }: ChipButtonProps) {
-  const handleClick = useCallback(() => onToggle(value), [onToggle, value])
+  const handleClick = useCallback(() => {
+    onToggle(value)
+  }, [onToggle, value])
   return (
     <button
       key={value}

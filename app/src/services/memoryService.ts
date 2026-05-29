@@ -111,7 +111,7 @@ export const memoryService = {
       console.error("[memoryService] Failed to get soul:", { userId, error })
       return ""
     }
-    return data?.soul_prompt || ""
+    return data?.soul_prompt ?? ""
   },
 
   async updateSoul(userId: string, soulPrompt: string): Promise<void> {
@@ -153,7 +153,7 @@ export const memoryService = {
       })
       return ""
     }
-    return data?.memory_text || ""
+    return data?.memory_text ?? ""
   },
 
   async updateUserMemory(userId: string, memoryText: string): Promise<void> {
@@ -195,7 +195,7 @@ export const memoryService = {
       })
       return ""
     }
-    return data?.memory_text || ""
+    return data?.memory_text ?? ""
   },
 
   async updateConversationMemory(

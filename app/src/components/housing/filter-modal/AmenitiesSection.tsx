@@ -71,7 +71,9 @@ const AmenitiesSection: React.FC<AmenitiesSectionProps> = ({
                 type="checkbox"
                 className="hidden"
                 checked={isSelected}
-                onChange={() => onToggle(amenity.id)}
+                onChange={() => {
+                  onToggle(amenity.id)
+                }}
               />
             </div>
             <div className="group-hover:text-illini-blue flex items-center gap-2 text-gray-700 transition-colors">

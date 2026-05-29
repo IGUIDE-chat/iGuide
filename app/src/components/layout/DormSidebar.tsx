@@ -164,7 +164,9 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
                 damping: 30,
                 opacity: { duration: 0.2 },
               }}
-              onClick={() => openDorm(item.id)}
+              onClick={() => {
+                openDorm(item.id)
+              }}
               className={`group cursor-pointer rounded-lg p-2 transition-all ${
                 item.id === currentDormId
                   ? "bg-white/20 text-white"

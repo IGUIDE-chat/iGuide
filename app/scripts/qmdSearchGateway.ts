@@ -29,13 +29,13 @@ const PROJECT_ROOT = path.resolve(__dirname, "..")
 const QMD_CONTENT = path.resolve(PROJECT_ROOT, "../qmd-content")
 const NPM_BIN = process.platform === "win32" ? "npm.cmd" : "npm"
 const QMD_HOME =
-  process.env.HOME ||
-  process.env.USERPROFILE ||
+  process.env.HOME ??
+  process.env.USERPROFILE ??
   (process.env.HOMEDRIVE && process.env.HOMEPATH
     ? `${process.env.HOMEDRIVE}${process.env.HOMEPATH}`
     : undefined)
 const QMD_CACHE_HOME =
-  process.env.XDG_CACHE_HOME ||
+  process.env.XDG_CACHE_HOME ??
   (QMD_HOME ? path.join(QMD_HOME, ".cache") : undefined)
 
 if (QMD_HOME && !process.env.HOME) {
@@ -197,7 +197,9 @@ function readBody(req: IncomingMessage) {
     req.on("data", (chunk) => {
       chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk))
     })
-    req.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")))
+    req.on("end", () => {
+      resolve(Buffer.concat(chunks).toString("utf8"))
+    })
     req.on("error", reject)
   })
 }

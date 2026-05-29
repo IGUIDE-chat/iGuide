@@ -65,7 +65,7 @@ const dormFavoritesService = {
         user_id: user.id,
         dorm_id: dormId,
         dorm_name: dormName,
-        dorm_name_zh: dormNameZh || null,
+        dorm_name_zh: dormNameZh ?? null,
       })
       .select()
       .single()

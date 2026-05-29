@@ -45,10 +45,9 @@ export const LayoutProvider: React.FC<{
 }) => {
   const [mobileHeaderSlot, setMobileHeaderSlotState] =
     useState<ReactNode | null>(null)
-  const setMobileHeaderSlot = useCallback(
-    (node: ReactNode | null) => setMobileHeaderSlotState(node),
-    []
-  )
+  const setMobileHeaderSlot = useCallback((node: ReactNode | null) => {
+    setMobileHeaderSlotState(node)
+  }, [])
   const value = useMemo(
     () => ({
       isSidebarOpen,

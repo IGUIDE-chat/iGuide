@@ -380,7 +380,9 @@ const DormCard: React.FC<DormCardProps> = ({
     <button
       type="button"
       tabIndex={0}
-      onClick={() => onViewDetails(dorm)}
+      onClick={() => {
+        onViewDetails(dorm)
+      }}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault()

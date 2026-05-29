@@ -59,7 +59,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       headers: {
         ...corsHeaders,
         "Content-Type": "application/json",
-        "X-QMD-Region": res.headers.get("X-QMD-Region") || "unknown",
+        "X-QMD-Region": res.headers.get("X-QMD-Region") ?? "unknown",
       },
     })
   } catch (e: unknown) {

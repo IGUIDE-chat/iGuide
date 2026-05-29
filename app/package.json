@@ -1,7 +1,7 @@
 {
   "name": "@iguide/app",
-  "private": true,
   "version": "v0.0.0",
+  "private": true,
   "type": "module",
   "scripts": {
     "build": "vite build",
@@ -10,12 +10,12 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@ai-sdk/react": "^3.0.193",
     "@assistant-ui/react": "^0.14.11",
     "@headlessui/react": "^2.2.10",
     "@supabase/supabase-js": "^2.106.2",
-    "framer-motion": "^12.40.0",
-    "@ai-sdk/react": "^3.0.193",
     "ai": "^6.0.191",
+    "framer-motion": "^12.40.0",
     "lucide-react": "^1.14.0",
     "mapbox-gl": "^3.24.0",
     "rc-slider": "^11.1.9",

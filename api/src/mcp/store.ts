@@ -40,9 +40,7 @@ const globalScope = globalThis as typeof globalThis & {
 }
 
 function getSharedMap(): Map<string, string> {
-  if (!globalScope.__mcpStoreMap__) {
-    globalScope.__mcpStoreMap__ = new Map<string, string>()
-  }
+  globalScope.__mcpStoreMap__ ??= new Map<string, string>()
 
   return globalScope.__mcpStoreMap__
 }

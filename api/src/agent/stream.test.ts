@@ -37,7 +37,7 @@ async function collectSSEEvents(
 
     buffer += decoder.decode(value, { stream: true })
     const lines = buffer.split("\n")
-    buffer = lines.pop() || ""
+    buffer = lines.pop() ?? ""
 
     for (const line of lines) {
       const trimmed = line.trim()

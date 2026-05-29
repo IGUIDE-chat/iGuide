@@ -54,11 +54,11 @@ export function EditableList({
           />
           <button
             type="button"
-            onClick={() =>
+            onClick={() => {
               onChange(
                 items.filter((_, currentIndex) => currentIndex !== index)
               )
-            }
+            }}
             className="text-red-400 hover:text-red-600"
           >
             <Trash2 size={14} />
@@ -67,7 +67,9 @@ export function EditableList({
       ))}
       <button
         type="button"
-        onClick={() => onChange([...items, ""])}
+        onClick={() => {
+          onChange([...items, ""])
+        }}
         className="text-illini-blue flex items-center gap-1 text-xs hover:underline"
       >
         <Plus size={12} /> {placeholder}
@@ -91,7 +93,9 @@ export function Toggle({
         type="button"
         aria-label={label}
         tabIndex={0}
-        onClick={() => onChange(!checked)}
+        onClick={() => {
+          onChange(!checked)
+        }}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault()

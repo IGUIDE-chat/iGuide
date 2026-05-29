@@ -83,7 +83,9 @@ function ToggleButtonSection<T extends string | number>({
             <button
               key={String(value)}
               type="button"
-              onClick={() => onToggle(value)}
+              onClick={() => {
+                onToggle(value)
+              }}
               className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
                 selected
                   ? "border-illini-blue bg-illini-blue text-white"
@@ -139,7 +141,9 @@ function LivingConditionsSection({
             <button
               key={tag}
               type="button"
-              onClick={() => onToggleTag(tag)}
+              onClick={() => {
+                onToggleTag(tag)
+              }}
               className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
                 selected
                   ? `border-illini-blue bg-illini-blue text-white`
@@ -425,7 +429,9 @@ export const FilterModal: React.FC<FilterModalProps> = ({
   useEffect(() => {
     handleScroll()
     window.addEventListener("resize", handleScroll)
-    return () => window.removeEventListener("resize", handleScroll)
+    return () => {
+      window.removeEventListener("resize", handleScroll)
+    }
   }, [
     handleScroll,
     isOpen,
@@ -488,13 +494,13 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                     title={t.location}
                     options={locations}
                     selectedValues={localLocations}
-                    onToggle={(value) =>
+                    onToggle={(value) => {
                       toggleStringArray(
                         localLocations,
                         setLocalLocations,
                         value
                       )
-                    }
+                    }}
                     accentColor="blue"
                   />
 
@@ -523,13 +529,13 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                     title={t.bedCount}
                     options={BED_COUNT_OPTIONS}
                     selectedValues={localBedCounts}
-                    onToggle={(value) =>
+                    onToggle={(value) => {
                       toggleNumberArray(
                         localBedCounts,
                         setLocalBedCounts,
                         value
                       )
-                    }
+                    }}
                   />
 
                   <hr className="my-8 border-gray-100" />
@@ -538,13 +544,13 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                     title={t.bathroomCount}
                     options={bathroomCountOptions}
                     selectedValues={localBathroomCounts}
-                    onToggle={(value) =>
+                    onToggle={(value) => {
                       toggleNumberArray(
                         localBathroomCounts,
                         setLocalBathroomCounts,
                         value
                       )
-                    }
+                    }}
                   />
 
                   <hr className="my-8 border-gray-100" />
@@ -553,13 +559,13 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                     title={t.bathroomType}
                     options={bathroomScopeOptions}
                     selectedValues={localBathroomTypes}
-                    onToggle={(value) =>
+                    onToggle={(value) => {
                       setLocalBathroomTypes((prev) =>
                         prev.includes(value)
                           ? prev.filter((item) => item !== value)
                           : [...prev, value]
                       )
-                    }
+                    }}
                   />
 
                   <hr className="my-8 border-gray-100" />
@@ -568,16 +574,18 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                     title={t.livingConditions}
                     acLabel={t.airConditioning}
                     localRequireAc={localRequireAc}
-                    onToggleAc={() => setLocalRequireAc((prev) => !prev)}
+                    onToggleAc={() => {
+                      setLocalRequireAc((prev) => !prev)
+                    }}
                     tags={FILTERABLE_LIVING_CONDITION_TAGS}
                     selectedTags={localLivingConditions}
-                    onToggleTag={(tag) =>
+                    onToggleTag={(tag) => {
                       toggleDormTag(
                         tag,
                         localLivingConditions,
                         setLocalLivingConditions
                       )
-                    }
+                    }}
                     language={language}
                   />
 
@@ -588,9 +596,9 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                     language={language}
                     tags={TAGS_BY_CATEGORY.facilities}
                     selectedValues={localFacilities}
-                    onToggle={(tag) =>
+                    onToggle={(tag) => {
                       toggleDormTag(tag, localFacilities, setLocalFacilities)
-                    }
+                    }}
                   />
 
                   <hr className="my-8 border-gray-100" />
@@ -600,9 +608,9 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                     language={language}
                     tags={TAGS_BY_CATEGORY.lifestyle}
                     selectedValues={localLifestyle}
-                    onToggle={(tag) =>
+                    onToggle={(tag) => {
                       toggleDormTag(tag, localLifestyle, setLocalLifestyle)
-                    }
+                    }}
                   />
                 </div>
 

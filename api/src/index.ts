@@ -157,7 +157,7 @@ app.use(
 // Region detection middleware
 app.use("*", async (c, next) => {
   const country =
-    (c.req.raw as unknown as { cf?: { country?: string } }).cf?.country || "US"
+    (c.req.raw as unknown as { cf?: { country?: string } }).cf?.country ?? "US"
   const region = country === "CN" ? "CN" : "Global"
   c.set("region", region)
   await next()
@@ -202,7 +202,7 @@ const resolveUser = async (
     }
   }
 
-  const ip = c.req.header("cf-connecting-ip") || "unknown"
+  const ip = c.req.header("cf-connecting-ip") ?? "unknown"
   c.set("userId", await guestUserIdForIp(ip))
   await next()
 }
@@ -327,7 +327,9 @@ async function fetchQmd(
   timeoutMs: number
 ): Promise<Response> {
   const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), timeoutMs)
+  const timer = setTimeout(() => {
+    controller.abort()
+  }, timeoutMs)
   try {
     const res = await fetch(`${baseUrl}/api/search`, {
       method: "POST",
@@ -358,7 +360,7 @@ app.post("/api/search", async (c) => {
 
   if (primaryUrl) {
     try {
-      res = await fetchQmd(primaryUrl, body, c.env.QMD_API_KEY || "", 15000)
+      res = await fetchQmd(primaryUrl, body, c.env.QMD_API_KEY ?? "", 15000)
       if (!res.ok) {
         res = null
       }
@@ -371,7 +373,7 @@ app.post("/api/search", async (c) => {
   if (!res && fallbackUrl) {
     try {
       qmdRegion = isCN ? "us" : "cn"
-      res = await fetchQmd(fallbackUrl, body, c.env.QMD_API_KEY || "", 15000)
+      res = await fetchQmd(fallbackUrl, body, c.env.QMD_API_KEY ?? "", 15000)
     } catch (err) {
       console.error("[QMD] Fallback node failed:", err)
     }

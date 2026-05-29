@@ -89,7 +89,7 @@ export function createWebSearchTool(ctx: RequestContext) {
       }
 
       const data = (await response.json()) as TavilyResponse
-      const results = data.results || []
+      const results = data.results ?? []
 
       const sorted = results.toSorted(
         (a, b) =>

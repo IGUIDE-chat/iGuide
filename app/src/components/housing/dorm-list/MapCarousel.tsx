@@ -76,8 +76,12 @@ const MapCarouselCard: React.FC<MapCarouselCardProps> = ({
       onPointerCancel={() => {
         pointerStartRef.current = null
       }}
-      onMouseEnter={() => onHoverDorm(dorm.id)}
-      onMouseLeave={() => onHoverDorm(null)}
+      onMouseEnter={() => {
+        onHoverDorm(dorm.id)
+      }}
+      onMouseLeave={() => {
+        onHoverDorm(null)
+      }}
       className="w-[210px] shrink-0 cursor-pointer touch-manipulation snap-start"
     >
       <div className="flex h-[72px] flex-row overflow-hidden rounded-xl border border-gray-100/80 bg-white/95 shadow-[0_4px_14px_rgba(0,0,0,0.14)] backdrop-blur-md">
@@ -126,8 +130,12 @@ const MapCarouselCard: React.FC<MapCarouselCardProps> = ({
               <span className="text-[9px] text-gray-400">{t.perYear}</span>
             </div>
             <button
-              onPointerDown={(e) => e.stopPropagation()}
-              onPointerUp={(e) => e.stopPropagation()}
+              onPointerDown={(e) => {
+                e.stopPropagation()
+              }}
+              onPointerUp={(e) => {
+                e.stopPropagation()
+              }}
               onClick={(e) => {
                 e.stopPropagation()
                 onToggleFavorite(dorm, e)
@@ -183,10 +191,18 @@ const MapCarousel: React.FC<MapCarouselProps> = ({
           scrollPaddingInlineStart: "4px",
           scrollPaddingInlineEnd: "24px",
         }}
-        onMouseEnter={() => onHoveringChange(true)}
-        onMouseLeave={() => onHoveringChange(false)}
-        onTouchStart={() => onHoveringChange(true)}
-        onTouchEnd={() => onHoveringChange(false)}
+        onMouseEnter={() => {
+          onHoveringChange(true)
+        }}
+        onMouseLeave={() => {
+          onHoveringChange(false)
+        }}
+        onTouchStart={() => {
+          onHoveringChange(true)
+        }}
+        onTouchEnd={() => {
+          onHoveringChange(false)
+        }}
       >
         {dorms.map((dorm) => {
           const dormName =

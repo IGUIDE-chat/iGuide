@@ -266,9 +266,13 @@ const DormComparison: React.FC<DormComparisonProps> = ({
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 767px)")
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches)
+    const handler = (e: MediaQueryListEvent) => {
+      setIsMobile(e.matches)
+    }
     mq.addEventListener("change", handler)
-    return () => mq.removeEventListener("change", handler)
+    return () => {
+      mq.removeEventListener("change", handler)
+    }
   }, [])
 
   // Build floor plan detail rows (shared between mobile & desktop)
@@ -301,7 +305,7 @@ const DormComparison: React.FC<DormComparisonProps> = ({
               key={`item-${String(i)}`}
               className="font-semibold text-gray-800"
             >
-              {plan.officialName ||
+              {plan.officialName ??
                 getRoomOptionLabels(opt, language).primaryLabel}
             </span>
           )
@@ -446,7 +450,9 @@ const DormComparison: React.FC<DormComparisonProps> = ({
         <div className="sticky top-0 z-10 flex items-center gap-2 bg-white py-3">
           <button
             type="button"
-            onClick={() => setMobileActiveIdx((i) => Math.max(0, i - 1))}
+            onClick={() => {
+              setMobileActiveIdx((i) => Math.max(0, i - 1))
+            }}
             disabled={mobileActiveIdx === 0}
             className="flex size-8 shrink-0 items-center justify-center rounded-full bg-gray-100 disabled:opacity-30"
           >
@@ -457,7 +463,9 @@ const DormComparison: React.FC<DormComparisonProps> = ({
               <button
                 key={d.id}
                 type="button"
-                onClick={() => setMobileActiveIdx(i)}
+                onClick={() => {
+                  setMobileActiveIdx(i)
+                }}
                 className={`flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-colors ${
                   i === mobileActiveIdx
                     ? "bg-illini-blue text-white"
@@ -475,9 +483,9 @@ const DormComparison: React.FC<DormComparisonProps> = ({
           </div>
           <button
             type="button"
-            onClick={() =>
+            onClick={() => {
               setMobileActiveIdx((i) => Math.min(dorms.length - 1, i + 1))
-            }
+            }}
             disabled={mobileActiveIdx === dorms.length - 1}
             className="flex size-8 shrink-0 items-center justify-center rounded-full bg-gray-100 disabled:opacity-30"
           >
@@ -564,12 +572,12 @@ const DormComparison: React.FC<DormComparisonProps> = ({
                         <select
                           aria-label="Select option"
                           value={currentIdx}
-                          onChange={(e) =>
+                          onChange={(e) => {
                             setSelectedPlanIdx((prev) => ({
                               ...prev,
                               [activeDorm.id]: Number(e.target.value),
                             }))
-                          }
+                          }}
                           className="focus:ring-illini-blue/30 w-full appearance-none rounded-lg border border-gray-200 bg-white px-3 py-2.5 pr-8 text-sm font-medium text-gray-800 focus:ring-2 focus:outline-none"
                         >
                           {plans.map((plan, i) => {
@@ -581,7 +589,7 @@ const DormComparison: React.FC<DormComparisonProps> = ({
                               labelCode: plan.labelCode,
                             }
                             const label =
-                              plan.officialName ||
+                              plan.officialName ??
                               getRoomOptionLabels(opt, language).primaryLabel
                             const price = hasPublishedPrice(plan.price)
                               ? ` · ${formatPrice(plan.price)}`
@@ -748,12 +756,12 @@ const DormComparison: React.FC<DormComparisonProps> = ({
                       <select
                         aria-label="Select option"
                         value={currentIdx}
-                        onChange={(e) =>
+                        onChange={(e) => {
                           setSelectedPlanIdx((prev) => ({
                             ...prev,
                             [dorm.id]: Number(e.target.value),
                           }))
-                        }
+                        }}
                         className="focus:border-illini-blue focus:ring-illini-blue/30 w-full cursor-pointer appearance-none rounded-lg border border-gray-200 bg-white px-3 py-2 pr-8 text-[13px] font-medium text-gray-800 focus:ring-2 focus:outline-none"
                       >
                         {plans.map((plan, i) => {
@@ -765,7 +773,7 @@ const DormComparison: React.FC<DormComparisonProps> = ({
                             labelCode: plan.labelCode,
                           }
                           const label =
-                            plan.officialName ||
+                            plan.officialName ??
                             getRoomOptionLabels(opt, language).primaryLabel
                           const price = hasPublishedPrice(plan.price)
                             ? ` · ${formatPrice(plan.price)}`

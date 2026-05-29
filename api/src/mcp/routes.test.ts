@@ -204,7 +204,7 @@ test("GET /integrations returns platform/user sections and phase1 disclaimers", 
 
   const resolved = requireResponse(response)
   assert.equal(resolved.status, 200)
-  const body = (await resolved.json()) as any
+  const body = await resolved.json()
   assert.ok(
     Array.isArray(body.phase1_limitations),
     "phase1_limitations must be an array"
@@ -246,7 +246,7 @@ test("POST /integrations rejects credential fields", async () => {
 
   const resolved = requireResponse(response)
   assert.equal(resolved.status, 400)
-  const body = (await resolved.json()) as any
+  const body = await resolved.json()
   assert.match(body.error, /credential/i)
   assert.equal(body.failure_reason, "auth_required")
 })
@@ -268,7 +268,7 @@ test("POST /integrations rejects unsupported transports with failure classificat
 
   const resolved = requireResponse(response)
   assert.equal(resolved.status, 400)
-  const body = (await resolved.json()) as any
+  const body = await resolved.json()
   assert.equal(body.failure_reason, "unsupported_transport")
   assert.match(body.error, /streamable_http/i)
 })
@@ -290,7 +290,7 @@ test("POST /integrations rejects credentialed endpoint URLs with failure classif
 
   const resolved = requireResponse(response)
   assert.equal(resolved.status, 400)
-  const body = (await resolved.json()) as any
+  const body = await resolved.json()
   assert.equal(body.failure_reason, "auth_required")
   assert.match(body.error, /credential|auth/i)
 })
@@ -328,7 +328,7 @@ test("PUT on a platform-owned connection returns 403", async () => {
 
   const resolved = requireResponse(response)
   assert.equal(resolved.status, 403)
-  const body = (await resolved.json()) as any
+  const body = await resolved.json()
   assert.match(body.error, /platform/i)
 })
 

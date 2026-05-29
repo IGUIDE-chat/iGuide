@@ -149,7 +149,9 @@ export const ChatRuntimeProvider = ({
         setFollowUps(fu)
       }
     },
-    onError: (err) => console.error("[useChat]", err),
+    onError: (err) => {
+      console.error("[useChat]", err)
+    },
   })
 
   const isLoading = chat.status === "submitted" || chat.status === "streaming"

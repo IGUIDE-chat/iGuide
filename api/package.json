@@ -1,10 +1,10 @@
 {
   "name": "@iguide/api",
   "version": "0.1.0",
-  "description": "Cloudflare Worker API Gateway for IlliniGuide",
-  "main": "src/index.ts",
-  "type": "module",
   "private": true,
+  "description": "Cloudflare Worker API Gateway for IlliniGuide",
+  "type": "module",
+  "main": "src/index.ts",
   "scripts": {
     "deploy": "wrangler deploy",
     "deploy:production": "wrangler deploy --env production",
@@ -13,13 +13,13 @@
     "test": "node --test --experimental-strip-types --experimental-test-module-mocks --loader ./src/test/loaders/md-loader.ts \"src/**/*.test.ts\"",
     "types": "wrangler types"
   },
-  "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260527.1"
-  },
   "dependencies": {
     "@ai-sdk/deepseek": "^2.0.35",
     "ai": "^6.0.191",
     "hono": "^4.12.22",
     "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260527.1"
   }
 }

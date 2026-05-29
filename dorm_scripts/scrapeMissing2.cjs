@@ -164,8 +164,8 @@ async function scrapeDorm(page, dormId, mapUrl) {
   const initialReviewIdx = initialTabTexts.findIndex(
     (text) =>
       text &&
-      (text.includes("Reviews") ||
-        text.includes("评价") ||
+      (text.includes("Reviews") ??
+        text.includes("评价") ??
         text.includes("评论"))
   )
   if (initialReviewIdx !== -1) {
@@ -188,8 +188,8 @@ async function scrapeDorm(page, dormId, mapUrl) {
       const afterClickReviewIdx = afterClickTabTexts.findIndex(
         (text) =>
           text &&
-          (text.includes("Reviews") ||
-            text.includes("评价") ||
+          (text.includes("Reviews") ??
+            text.includes("评价") ??
             text.includes("评论"))
       )
       if (afterClickReviewIdx !== -1) {
@@ -268,7 +268,7 @@ async function scrapeDorm(page, dormId, mapUrl) {
       const starEl = card.querySelector("span.kvMYJc")
       let stars = 3
       if (starEl) {
-        const label = starEl.getAttribute("aria-label") || ""
+        const label = starEl.getAttribute("aria-label") ?? ""
         const match = label.match(/(\d)/)
         if (match) {
           stars = parseInt(match[1], 10)
@@ -299,7 +299,7 @@ async function scrapeDorm(page, dormId, mapUrl) {
         )
         let stars = 3
         if (starEl) {
-          const label = starEl.getAttribute("aria-label") || ""
+          const label = starEl.getAttribute("aria-label") ?? ""
           const match = label.match(/(\d)/)
           if (match) {
             stars = parseInt(match[1], 10)

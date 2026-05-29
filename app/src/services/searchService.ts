@@ -12,7 +12,7 @@ import {
 } from "../types"
 
 const SEARCH_ENDPOINT = import.meta.env.PROD
-  ? (import.meta.env.VITE_API_GATEWAY_URL || "https://api.iguide.chat") +
+  ? (import.meta.env.VITE_API_GATEWAY_URL ?? "https://api.iguide.chat") +
     "/api/search"
   : "/api/search"
 
@@ -66,7 +66,7 @@ async function searchKnowledgeBase(
   if (!response.ok) {
     const err = await response.json().catch(() => ({}))
     throw new Error(
-      (err as { error?: string }).error || `Search failed: ${response.status}`
+      (err as { error?: string }).error ?? `Search failed: ${response.status}`
     )
   }
 
@@ -105,13 +105,13 @@ async function quickSearch(
 // ── Helpers ──────────────────────────────────────────────────────
 
 function parseResultType(filePath: string): SearchResult["type"] {
-  if (/\/dorms[-/]/.test(filePath) || /\/dorms\//.test(filePath)) {
+  if (/\/dorms[-/]/.test(filePath) || filePath.includes("\/dorms\/")) {
     return "dorm"
   }
-  if (/\/articles[-/]/.test(filePath) || /\/articles\//.test(filePath)) {
+  if (/\/articles[-/]/.test(filePath) || filePath.includes("\/articles\/")) {
     return "article"
   }
-  if (/\/crawled\//.test(filePath)) {
+  if (filePath.includes("\/crawled\/")) {
     return "crawled"
   }
   return undefined

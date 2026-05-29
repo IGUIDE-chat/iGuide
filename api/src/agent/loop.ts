@@ -407,7 +407,7 @@ function accumulateStreamingToolCalls(
 
   for (const deltaToolCall of deltaToolCalls) {
     const accumulator =
-      accumulators.get(deltaToolCall.index) ||
+      accumulators.get(deltaToolCall.index) ??
       createToolCallAccumulator(deltaToolCall.index)
 
     if (deltaToolCall.id) {
@@ -521,7 +521,7 @@ async function readDeepSeekStreamingResponse(options: {
 
     buffer += decoder.decode(value, { stream: true })
     const events = buffer.split("\n\n")
-    buffer = events.pop() || ""
+    buffer = events.pop() ?? ""
 
     for (const eventText of events) {
       if (!eventText.trim()) {
@@ -878,7 +878,7 @@ export async function runAgentLoop(
     const responseMessage = data.choices?.[0]?.message
     if (!responseMessage) {
       throw new Error(
-        data.error?.message || "DeepSeek response missing message"
+        data.error?.message ?? "DeepSeek response missing message"
       )
     }
 

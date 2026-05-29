@@ -76,8 +76,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
   try {
     const apiKey = (
-      env.DEEPSEEK_API_KEY ||
-      env.VITE_DEEPSEEK_API_KEY ||
+      env.DEEPSEEK_API_KEY ??
+      env.VITE_DEEPSEEK_API_KEY ??
       ""
     ).trim()
     if (!apiKey) {
@@ -89,7 +89,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       )
     }
 
-    const body = (await request.json()) as DeepSeekBody
+    const body = await request.json()
     const messages = buildMessages(body)
     const useStream = body.stream !== false // default to streaming
 
@@ -124,10 +124,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         )
       }
 
-      const data = (await resp.json()) as {
-        choices?: Array<{ message?: { content?: string } }>
-      }
-      const reply = data?.choices?.[0]?.message?.content || ""
+      const data = await resp.json()
+      const reply = data?.choices?.[0]?.message?.content ?? ""
       return new Response(JSON.stringify({ reply }), {
         status: 200,
         headers: { "Content-Type": "application/json" },

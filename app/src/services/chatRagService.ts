@@ -359,7 +359,7 @@ function getResultKey(result: SearchResult): string {
 }
 
 function readMetadataUrl(result: SearchResult): string | null {
-  const metadata = result.metadata as Record<string, unknown> | undefined
+  const metadata = result.metadata
   if (!metadata) {
     return null
   }
@@ -540,9 +540,7 @@ async function fetchChatRAGContext(
     }
   }
 
-  const qmdSearches = [
-    safeQmdSearch(primaryQuery, (lang === "zh" ? "zh" : "en") as "en" | "zh"),
-  ]
+  const qmdSearches = [safeQmdSearch(primaryQuery, lang === "zh" ? "zh" : "en")]
 
   if (englishQuery) {
     qmdSearches.push(safeQmdSearch(englishQuery, "en"))

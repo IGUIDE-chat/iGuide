@@ -49,7 +49,9 @@ export default function App() {
 
   useEffect(() => {
     if (isGuest) {
-      queueMicrotask(() => clearConversation())
+      queueMicrotask(() => {
+        clearConversation()
+      })
     }
   }, [isGuest, clearConversation])
 
@@ -59,8 +61,12 @@ export default function App() {
     }
   }, [user, setIsGuest])
 
-  const handleGuestLogin = useCallback(() => setIsGuest(true), [setIsGuest])
-  const handleExitGuest = useCallback(() => setIsGuest(false), [setIsGuest])
+  const handleGuestLogin = useCallback(() => {
+    setIsGuest(true)
+  }, [setIsGuest])
+  const handleExitGuest = useCallback(() => {
+    setIsGuest(false)
+  }, [setIsGuest])
 
   const handleSelectConversation = useCallback(
     (conversationId: string | null) => {

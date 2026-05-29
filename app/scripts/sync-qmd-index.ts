@@ -23,13 +23,13 @@ const QMD_CONTENT = path.resolve(PROJECT_ROOT, "../qmd-content")
 const DEFAULT_GLOB = "**/*.md"
 const NPM_BIN = process.platform === "win32" ? "npm.cmd" : "npm"
 const QMD_HOME =
-  process.env.HOME ||
-  process.env.USERPROFILE ||
+  process.env.HOME ??
+  process.env.USERPROFILE ??
   (process.env.HOMEDRIVE && process.env.HOMEPATH
     ? `${process.env.HOMEDRIVE}${process.env.HOMEPATH}`
     : undefined)
 const QMD_CACHE_HOME =
-  process.env.XDG_CACHE_HOME ||
+  process.env.XDG_CACHE_HOME ??
   (QMD_HOME ? path.join(QMD_HOME, ".cache") : undefined)
 
 if (QMD_HOME && !process.env.HOME) {

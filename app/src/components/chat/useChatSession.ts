@@ -238,7 +238,7 @@ export const useChatSession = ({
           })),
           userMsg.text,
           language,
-          conversationId || undefined,
+          conversationId ?? undefined,
           user?.id
         )
 

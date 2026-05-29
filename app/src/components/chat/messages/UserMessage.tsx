@@ -99,7 +99,9 @@ export function UserMessage({ message, userRole = "You" }: UserMessageProps) {
                   el?.focus()
                 }}
                 value={draft}
-                onChange={(e) => setDraft(e.currentTarget.value)}
+                onChange={(e) => {
+                  setDraft(e.currentTarget.value)
+                }}
                 onKeyDown={handleKeyDown}
                 rows={Math.min(8, Math.max(2, draft.split("\n").length))}
                 className="w-full resize-none rounded-lg border border-slate-300 bg-white p-3 text-sm leading-relaxed text-slate-800 shadow-sm focus:border-slate-500 focus:ring-1 focus:ring-slate-500 focus:outline-none"
