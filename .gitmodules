@@ -1,3 +1,6 @@
 [submodule "data_collection"]
 	path = data_collection
 	url = https://github.com/AODadbase/UIUC-Web-Crawler
+[submodule "unimcp"]
+	path = unimcp
+	url = https://github.com/iguide-chat/unimcp
