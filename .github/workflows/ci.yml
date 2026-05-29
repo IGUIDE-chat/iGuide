@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+      - run: git config --global url."https://x-access-token:${{ secrets.PRIVATE_REPO_PAT }}@github.com/".insteadOf "https://github.com/"
       - uses: voidzero-dev/setup-vp@v1
         with:
           node-version: "lts"
