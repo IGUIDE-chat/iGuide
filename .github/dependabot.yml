@@ -1,80 +1,80 @@
-version: 2
-updates:
-  - package-ecosystem: "npm"
-    directory: "/app"
-    schedule:
-      interval: "cron"
-      cronjob: "30 11 * * 3,6"
-    open-pull-requests-limit: 10
-    groups:
-      minor:
-        dependency-type: "production"
-        update-types:
-          - "minor"
-          - "patch"
-      major:
-        dependency-type: "production"
-        update-types:
-          - "major"
-      dev-minor:
-        dependency-type: "development"
-        update-types:
-          - "minor"
-          - "patch"
+# version: 2
+# updates:
+#   - package-ecosystem: "npm"
+#     directory: "/app"
+#     schedule:
+#       interval: "cron"
+#       cronjob: "30 11 * * 3,6"
+#     open-pull-requests-limit: 10
+#     groups:
+#       minor:
+#         dependency-type: "production"
+#         update-types:
+#           - "minor"
+#           - "patch"
+#       major:
+#         dependency-type: "production"
+#         update-types:
+#           - "major"
+#       dev-minor:
+#         dependency-type: "development"
+#         update-types:
+#           - "minor"
+#           - "patch"
 
-  - package-ecosystem: "npm"
-    directory: "/api"
-    schedule:
-      interval: "cron"
-      cronjob: "30 11 * * 3,6"
-    open-pull-requests-limit: 10
-    groups:
-      minor:
-        dependency-type: "production"
-        update-types:
-          - "minor"
-          - "patch"
-      major:
-        dependency-type: "production"
-        update-types:
-          - "major"
-      dev-minor:
-        dependency-type: "development"
-        update-types:
-          - "minor"
-          - "patch"
+#   - package-ecosystem: "npm"
+#     directory: "/api"
+#     schedule:
+#       interval: "cron"
+#       cronjob: "30 11 * * 3,6"
+#     open-pull-requests-limit: 10
+#     groups:
+#       minor:
+#         dependency-type: "production"
+#         update-types:
+#           - "minor"
+#           - "patch"
+#       major:
+#         dependency-type: "production"
+#         update-types:
+#           - "major"
+#       dev-minor:
+#         dependency-type: "development"
+#         update-types:
+#           - "minor"
+#           - "patch"
 
-  # - package-ecosystem: "pip"
-  #   directory: "/data_collection"
-  #   schedule:
-  #     interval: "cron"
-  #     cronjob: "30 11 * * 3,6"
-  #   open-pull-requests-limit: 10
-  #   groups:
-  #     minor:
-  #       dependency-type: "production"
-  #       update-types:
-  #         - "minor"
-  #         - "patch"
-  #     major:
-  #       dependency-type: "production"
-  #       update-types:
-  #         - "major"
-  #     dev-minor:
-  #       dependency-type: "development"
-  #       update-types:
-  #         - "minor"
-  #         - "patch"
+#   # - package-ecosystem: "pip"
+#   #   directory: "/data_collection"
+#   #   schedule:
+#   #     interval: "cron"
+#   #     cronjob: "30 11 * * 3,6"
+#   #   open-pull-requests-limit: 10
+#   #   groups:
+#   #     minor:
+#   #       dependency-type: "production"
+#   #       update-types:
+#   #         - "minor"
+#   #         - "patch"
+#   #     major:
+#   #       dependency-type: "production"
+#   #       update-types:
+#   #         - "major"
+#   #     dev-minor:
+#   #       dependency-type: "development"
+#   #       update-types:
+#   #         - "minor"
+#   #         - "patch"
 
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "cron"
-      cronjob: "30 11 * * 3,6"
-    open-pull-requests-limit: 5
-    groups:
-      actions-updates:
-        update-types:
-          - "minor"
-          - "patch"
-          - "major"
+#   - package-ecosystem: "github-actions"
+#     directory: "/"
+#     schedule:
+#       interval: "cron"
+#       cronjob: "30 11 * * 3,6"
+#     open-pull-requests-limit: 5
+#     groups:
+#       actions-updates:
+#         update-types:
+#           - "minor"
+#           - "patch"
+#           - "major"
