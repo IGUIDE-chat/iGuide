@@ -28,10 +28,12 @@ const SENSITIVE_QUERY_KEYS = new Set([
   "token",
 ])
 
-type DevEnv = Record<string, string>
+// Load env vars at module level — Vite+ prefers static defineConfig({…}) over
+// the function form.  The empty prefix loads every variable so that proxy
+// configs see non‑VITE_ keys such as DEEPSEEK_API_KEY and GOOGLE_API_KEY.
+const env = loadEnv(process.env.NODE_ENV ?? "development", ".", "")
 
 interface LlmRequestDumpInput {
-  env: DevEnv
   provider: string
   localPath?: string
   upstreamUrl: string
@@ -89,7 +91,6 @@ function parseJsonBody(body: string) {
 }
 
 async function dumpLlmRequest({
-  env,
   provider,
   localPath,
   upstreamUrl,
@@ -152,205 +153,188 @@ function collectRequestBody(
   })
 }
 
-export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, ".", "")
-  return {
-    server: {
-      proxy: {
-        "/api/chat": {
-          target: "http://localhost:8787/chat",
-          changeOrigin: true,
-          rewrite: (p) => p.replace(/^\/api\/chat/, ""),
-        },
-        "/api/coze": {
-          target: "https://api.coze.com",
-          changeOrigin: true,
-          rewrite: (p) => p.replace(/^\/api\/coze/, ""),
-          secure: false,
-          configure: (proxy) => {
-            proxy.on("proxyReq", (proxyReq, req) => {
-              collectRequestBody(req, (body) => {
-                void dumpLlmRequest({
-                  env,
-                  provider: "coze",
-                  localPath: req.url,
-                  upstreamUrl: `https://api.coze.com${proxyReq.path}`,
-                  proxyReq,
-                  body,
-                })
+export default defineConfig({
+  server: {
+    proxy: {
+      "/api/chat": {
+        target: "http://localhost:8787/chat",
+        changeOrigin: true,
+        rewrite: (p) => p.replace(/^\/api\/chat/, ""),
+      },
+      "/api/coze": {
+        target: "https://api.coze.com",
+        changeOrigin: true,
+        rewrite: (p) => p.replace(/^\/api\/coze/, ""),
+        secure: false,
+        configure: (proxy) => {
+          proxy.on("proxyReq", (proxyReq, req) => {
+            collectRequestBody(req, (body) => {
+              void dumpLlmRequest({
+                provider: "coze",
+                localPath: req.url,
+                upstreamUrl: `https://api.coze.com${proxyReq.path}`,
+                proxyReq,
+                body,
               })
             })
-          },
-        },
-        // DeepSeek chat proxy — in dev, injects Authorization header server-side (key never in bundle)
-        "/api/deepseek-raw": {
-          target: "https://api.deepseek.com",
-          changeOrigin: true,
-          rewrite: () => "/chat/completions",
-          configure: (proxy) => {
-            proxy.on("proxyReq", (proxyReq, req) => {
-              const apiKey = env.DEEPSEEK_API_KEY
-              if (apiKey) {
-                proxyReq.setHeader("Authorization", `Bearer ${apiKey}`)
-              }
-              collectRequestBody(req, (body) => {
-                void dumpLlmRequest({
-                  env,
-                  provider: "deepseek",
-                  localPath: req.url,
-                  upstreamUrl: "https://api.deepseek.com/chat/completions",
-                  proxyReq,
-                  body,
-                })
-              })
-            })
-          },
-        },
-        // Gemini proxy — in dev, injects API key server-side (key never in bundle)
-        "/api/gemini": {
-          target: "https://generativelanguage.googleapis.com",
-          changeOrigin: true,
-          configure: (proxy) => {
-            proxy.on("proxyReq", (proxyReq, req) => {
-              const apiKey = env.GOOGLE_API_KEY
-              if (!apiKey) {
-                return
-              }
-              let body = ""
-              req.on("data", (chunk: Buffer) => {
-                body += chunk.toString()
-              })
-              req.on("end", () => {
-                try {
-                  const parsed = JSON.parse(body)
-                  const model = parsed.model ?? "gemini-1.5-flash"
-                  delete parsed.model
-                  const newBody = JSON.stringify(parsed)
-                  proxyReq.path = `/v1beta/models/${model}:generateContent?key=${apiKey}`
-                  proxyReq.setHeader(
-                    "Content-Length",
-                    Buffer.byteLength(newBody)
-                  )
-                  void dumpLlmRequest({
-                    env,
-                    provider: "gemini",
-                    localPath: req.url,
-                    upstreamUrl: `https://generativelanguage.googleapis.com${proxyReq.path}`,
-                    proxyReq,
-                    body: newBody,
-                  })
-                  proxyReq.write(newBody)
-                } catch {
-                  /* pass through as-is */
-                  void dumpLlmRequest({
-                    env,
-                    provider: "gemini",
-                    localPath: req.url,
-                    upstreamUrl: `https://generativelanguage.googleapis.com${proxyReq.path}`,
-                    proxyReq,
-                    body,
-                  })
-                }
-              })
-            })
-          },
-        },
-        // Tavily search proxy — in dev, injects API key server-side (key never in bundle)
-        "/api/tavily": {
-          target: "https://api.tavily.com",
-          changeOrigin: true,
-          rewrite: () => "/search",
-          configure: (proxy) => {
-            proxy.on("proxyReq", (proxyReq, req) => {
-              // Inject API key into the forwarded request body
-              const apiKey = env.TAVILY_API_KEY
-              if (!apiKey) {
-                return
-              }
-              let body = ""
-              req.on("data", (chunk: Buffer) => {
-                body += chunk.toString()
-              })
-              req.on("end", () => {
-                try {
-                  const parsed = JSON.parse(body)
-                  parsed.api_key ??= apiKey
-                  const newBody = JSON.stringify(parsed)
-                  proxyReq.setHeader(
-                    "Content-Length",
-                    Buffer.byteLength(newBody)
-                  )
-                  void dumpLlmRequest({
-                    env,
-                    provider: "tavily",
-                    localPath: req.url,
-                    upstreamUrl: `https://api.tavily.com${proxyReq.path}`,
-                    proxyReq,
-                    body: newBody,
-                  })
-                  proxyReq.write(newBody)
-                } catch {
-                  /* pass through as-is */
-                  void dumpLlmRequest({
-                    env,
-                    provider: "tavily",
-                    localPath: req.url,
-                    upstreamUrl: `https://api.tavily.com${proxyReq.path}`,
-                    proxyReq,
-                    body,
-                  })
-                }
-              })
-            })
-          },
+          })
         },
       },
-    },
-    plugins: [qmdSearchPlugin(), react(), ViteMcp()],
-    define: {
-      // Only inject public keys that are safe for frontend
-      // NEVER inject sensitive API keys here
-      "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(
-        env.VITE_SUPABASE_URL
-      ),
-      "import.meta.env.VITE_SUPABASE_ANON_KEY": JSON.stringify(
-        env.VITE_SUPABASE_ANON_KEY
-      ),
-      "import.meta.env.VITE_MAPBOX_TOKEN": JSON.stringify(
-        env.VITE_MAPBOX_TOKEN || ""
-      ),
-    },
-    build: {
-      chunkSizeWarningLimit: 600,
-      rollupOptions: {
-        output: {
-          manualChunks(id) {
-            if (id.includes("node_modules")) {
-              if (
-                id.includes("react") ||
-                id.includes("react-dom") ||
-                id.includes("react-router")
-              ) {
-                return "vendor-react"
-              }
-              if (id.includes("framer-motion")) {
-                return "vendor-motion"
-              }
-              if (id.includes("@supabase")) {
-                return "vendor-supabase"
-              }
-              if (id.includes("mapbox-gl")) {
-                return "vendor-mapbox"
-              }
+      // DeepSeek chat proxy — in dev, injects Authorization header server-side (key never in bundle)
+      "/api/deepseek-raw": {
+        target: "https://api.deepseek.com",
+        changeOrigin: true,
+        rewrite: () => "/chat/completions",
+        configure: (proxy) => {
+          proxy.on("proxyReq", (proxyReq, req) => {
+            const apiKey = env.DEEPSEEK_API_KEY
+            if (apiKey) {
+              proxyReq.setHeader("Authorization", `Bearer ${apiKey}`)
             }
-          },
+            collectRequestBody(req, (body) => {
+              void dumpLlmRequest({
+                provider: "deepseek",
+                localPath: req.url,
+                upstreamUrl: "https://api.deepseek.com/chat/completions",
+                proxyReq,
+                body,
+              })
+            })
+          })
+        },
+      },
+      // Gemini proxy — in dev, injects API key server-side (key never in bundle)
+      "/api/gemini": {
+        target: "https://generativelanguage.googleapis.com",
+        changeOrigin: true,
+        configure: (proxy) => {
+          proxy.on("proxyReq", (proxyReq, req) => {
+            const apiKey = env.GOOGLE_API_KEY
+            if (!apiKey) {
+              return
+            }
+            let body = ""
+            req.on("data", (chunk: Buffer) => {
+              body += chunk.toString()
+            })
+            req.on("end", () => {
+              try {
+                const parsed = JSON.parse(body)
+                const model = parsed.model ?? "gemini-1.5-flash"
+                delete parsed.model
+                const newBody = JSON.stringify(parsed)
+                proxyReq.path = `/v1beta/models/${model}:generateContent?key=${apiKey}`
+                proxyReq.setHeader("Content-Length", Buffer.byteLength(newBody))
+                void dumpLlmRequest({
+                  provider: "gemini",
+                  localPath: req.url,
+                  upstreamUrl: `https://generativelanguage.googleapis.com${proxyReq.path}`,
+                  proxyReq,
+                  body: newBody,
+                })
+                proxyReq.write(newBody)
+              } catch {
+                /* pass through as-is */
+                void dumpLlmRequest({
+                  provider: "gemini",
+                  localPath: req.url,
+                  upstreamUrl: `https://generativelanguage.googleapis.com${proxyReq.path}`,
+                  proxyReq,
+                  body,
+                })
+              }
+            })
+          })
+        },
+      },
+      // Tavily search proxy — in dev, injects API key server-side (key never in bundle)
+      "/api/tavily": {
+        target: "https://api.tavily.com",
+        changeOrigin: true,
+        rewrite: () => "/search",
+        configure: (proxy) => {
+          proxy.on("proxyReq", (proxyReq, req) => {
+            // Inject API key into the forwarded request body
+            const apiKey = env.TAVILY_API_KEY
+            if (!apiKey) {
+              return
+            }
+            let body = ""
+            req.on("data", (chunk: Buffer) => {
+              body += chunk.toString()
+            })
+            req.on("end", () => {
+              try {
+                const parsed = JSON.parse(body)
+                parsed.api_key ??= apiKey
+                const newBody = JSON.stringify(parsed)
+                proxyReq.setHeader("Content-Length", Buffer.byteLength(newBody))
+                void dumpLlmRequest({
+                  provider: "tavily",
+                  localPath: req.url,
+                  upstreamUrl: `https://api.tavily.com${proxyReq.path}`,
+                  proxyReq,
+                  body: newBody,
+                })
+                proxyReq.write(newBody)
+              } catch {
+                /* pass through as-is */
+                void dumpLlmRequest({
+                  provider: "tavily",
+                  localPath: req.url,
+                  upstreamUrl: `https://api.tavily.com${proxyReq.path}`,
+                  proxyReq,
+                  body,
+                })
+              }
+            })
+          })
         },
       },
     },
-    resolve: {
-      alias: {
-        "@": path.resolve(__dirname, "./src"),
+  },
+  plugins: [qmdSearchPlugin, react(), ViteMcp()],
+  define: {
+    // Only inject public keys that are safe for frontend
+    // NEVER inject sensitive API keys here
+    "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(env.VITE_SUPABASE_URL),
+    "import.meta.env.VITE_SUPABASE_ANON_KEY": JSON.stringify(
+      env.VITE_SUPABASE_ANON_KEY
+    ),
+    "import.meta.env.VITE_MAPBOX_TOKEN": JSON.stringify(
+      env.VITE_MAPBOX_TOKEN || ""
+    ),
+  },
+  build: {
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("node_modules")) {
+            if (
+              id.includes("react") ||
+              id.includes("react-dom") ||
+              id.includes("react-router")
+            ) {
+              return "vendor-react"
+            }
+            if (id.includes("framer-motion")) {
+              return "vendor-motion"
+            }
+            if (id.includes("@supabase")) {
+              return "vendor-supabase"
+            }
+            if (id.includes("mapbox-gl")) {
+              return "vendor-mapbox"
+            }
+          }
+        },
       },
     },
-  }
+  },
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
 })

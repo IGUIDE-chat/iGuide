@@ -19,6 +19,6 @@
     },
     "allowImportingTsExtensions": true,
     "noEmit": true,
-    "types": ["vite/client", "@cloudflare/workers-types"]
+    "types": ["vite-plus/client", "@cloudflare/workers-types"]
   }
 }
