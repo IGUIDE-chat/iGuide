@@ -10,10 +10,10 @@
     "app:typecheck": "pnpm --filter @iguide/app typecheck",
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",
-    "style": "prettier --check .",
-    "style:fix": "prettier --write .",
-    "style:md": "markdownlint-cli2 .",
-    "style:md:fix": "markdownlint-cli2 --fix ."
+    "fmt": "oxfmt --check .",
+    "fmt:fix": "oxfmt --write .",
+    "fmt:md": "markdownlint-cli2 .",
+    "fmt:md:fix": "markdownlint-cli2 --fix ."
   },
   "devDependencies": {
     "@types/node": "^25.9.1",
@@ -21,7 +21,6 @@
     "markdownlint-cli2": "^0.22.1",
     "oxfmt": "^0.52.0",
     "oxlint": "^1.66.0",
-    "prettier-plugin-tailwindcss": "^0.8.0",
     "supabase": "^2.101.0",
     "tsx": "^4.22.3",
     "typescript": "^6.0.3",

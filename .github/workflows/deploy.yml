@@ -13,8 +13,8 @@ jobs:
         run: |
           echo "✅ All CI checks passed."
           echo " → Lint: passed"
-          echo " → Style: passed"
-          echo " → Style (Markdown): passed"
+          echo " → Format: passed"
+          echo " → Format (Markdown): passed"
           echo " → TypeCheck: passed"
           echo " → Build: passed"
           echo " → Secret scan: passed (source + bundle)"

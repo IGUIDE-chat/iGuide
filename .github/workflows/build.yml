@@ -52,11 +52,11 @@ jobs:
       - name: Lint
         run: pnpm lint
 
-      - name: Style
-        run: pnpm style
+      - name: Format
+        run: pnpm fmt
 
-      - name: Style (Markdown)
-        run: pnpm style:md
+      - name: Format (Markdown)
+        run: pnpm fmt:md
 
       - name: TypeCheck
         run: pnpm run typecheck
