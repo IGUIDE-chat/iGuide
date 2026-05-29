@@ -1,10 +1,10 @@
 // [CONFIG] Vite build configuration and plugin setup.
 // [配置] Vite 构建配置和插件设置。
 import { mkdir, writeFile } from "node:fs/promises"
-import {
-  type ClientRequest,
-  type IncomingMessage,
-  type OutgoingHttpHeaders,
+import type {
+  ClientRequest,
+  IncomingMessage,
+  OutgoingHttpHeaders,
 } from "node:http"
 import path from "path"
 
@@ -293,7 +293,7 @@ export default defineConfig({
       },
     },
   },
-  plugins: [qmdSearchPlugin, react(), ViteMcp()],
+  plugins: [qmdSearchPlugin(), react(), ViteMcp()],
   define: {
     // Only inject public keys that are safe for frontend
     // NEVER inject sensitive API keys here
