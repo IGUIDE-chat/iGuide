@@ -5,7 +5,7 @@
   "scripts": {
     "api:dev": "pnpm --filter @iguide/api dev",
     "app:build": "pnpm --filter @iguide/app build",
-    "app:dev": "vp dev"
+    "app:dev": "pnpm --filter @iguide/app dev"
   },
   "devDependencies": {
     "@types/node": "^25.9.1",

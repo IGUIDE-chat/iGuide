@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "postinstall": "git submodule update --init --recursive && git config --local include.path ../.gitconfig",
-    "build": "vp build"
+    "build": "vp build",
+    "dev": "vp dev"
   },
   "dependencies": {
     "@ai-sdk/react": "^3.0.193",
