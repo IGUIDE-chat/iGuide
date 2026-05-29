@@ -5,6 +5,7 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
+import Slider from "rc-slider"
 import React, {
   memo,
   useCallback,
@@ -13,7 +14,7 @@ import React, {
   useRef,
   useState,
 } from "react"
-import Slider from "rc-slider"
+
 import { HISTOGRAM_DATA, type ModalText } from "./modalText"
 
 interface PriceSectionProps {

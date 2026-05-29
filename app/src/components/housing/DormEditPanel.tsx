@@ -5,19 +5,20 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
+import { FileText, History, Image, Info, Tag } from "lucide-react"
 // [COMPONENT] Entry point for the admin edit panel — wires form hook + shell + tab components.
 // [组件] 管理员编辑面板入口，将表单 hook、外壳和各 Tab 组件组合在一起。
 import React from "react"
-import { FileText, History, Image, Info, Tag } from "lucide-react"
-import { type Dorm } from "./types/index"
+
 import { type Language } from "../../types"
-import { useDormEditForm } from "./edit-panel/useDormEditForm"
-import { DormEditPanelShell } from "./edit-panel/DormEditPanelShell"
 import { ContentTab } from "./edit-panel/ContentTab"
 import { DetailsTab } from "./edit-panel/DetailsTab"
-import { TagsTab } from "./edit-panel/TagsTab"
-import { MediaTab } from "./edit-panel/MediaTab"
+import { DormEditPanelShell } from "./edit-panel/DormEditPanelShell"
 import { HistoryTab } from "./edit-panel/HistoryTab"
+import { MediaTab } from "./edit-panel/MediaTab"
+import { TagsTab } from "./edit-panel/TagsTab"
+import { useDormEditForm } from "./edit-panel/useDormEditForm"
+import { type Dorm } from "./types/index"
 
 interface DormEditPanelProps {
   dorm: Dorm

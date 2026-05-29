@@ -7,19 +7,20 @@
 
 import { useLayoutEffect, useMemo, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { type Dorm } from "../types/index"
-import { getPriceRangeFromData } from "../constants/pricing"
-import { useDormData } from "../store/HousingDataContext"
-import { useHousingFilters } from "../store/HousingContext"
-import { useSharedDormInteraction } from "../store/DormUserInteractionContext"
+
 import { useLayout } from "../../../contexts/LayoutContext"
 import { type Language } from "../../../types"
-import { filterAndSortDorms, normalizePriceRange } from "./filtering"
-import { type DormListText } from "./types"
+import { getPriceRangeFromData } from "../constants/pricing"
+import { useSharedDormInteraction } from "../store/DormUserInteractionContext"
+import { useHousingFilters } from "../store/HousingContext"
+import { useDormData } from "../store/HousingDataContext"
+import { type Dorm } from "../types/index"
 import {
   DEFAULT_FAVORITES_TARGET,
   DEFAULT_TOGGLE_TARGET,
 } from "./favoriteConstants"
+import { filterAndSortDorms, normalizePriceRange } from "./filtering"
+import { type DormListText } from "./types"
 
 const DORM_LIST_TEXT: Record<Language, DormListText> = {
   en: {

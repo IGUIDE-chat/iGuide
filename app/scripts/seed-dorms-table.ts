@@ -13,7 +13,6 @@
  */
 
 import { createClient } from "@supabase/supabase-js"
-
 // ── Inline the static dorm data (we cannot import from src in a standalone script context easily) ──
 // Instead we dynamically import from the compiled source.
 // For simplicity, use ts-node / tsx which can resolve TypeScript imports.

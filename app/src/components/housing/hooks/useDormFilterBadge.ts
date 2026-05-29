@@ -6,8 +6,9 @@
  */
 
 import { useMemo } from "react"
-import { useHousingFilters } from "../store/HousingContext"
+
 import { getPriceRangeFromData } from "../constants/pricing"
+import { useHousingFilters } from "../store/HousingContext"
 
 export const useDormFilterBadge = () => {
   const {

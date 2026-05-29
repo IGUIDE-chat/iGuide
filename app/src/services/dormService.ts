@@ -5,15 +5,15 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-// [SERVICE] Read dorms from Supabase `dorms` table with static fallback.
-// [服务] 从 Supabase `dorms` 表读取宿舍数据，静态数据作为 fallback。
-import { supabase } from "./supabase"
 import { type Dorm } from "../components/housing/types/index"
-import { normalizeDorm } from "../utils/roomOptions"
 import {
   finalizeDormRecord,
   sanitizeFloorPlansForStorage,
 } from "../utils/dormData"
+import { normalizeDorm } from "../utils/roomOptions"
+// [SERVICE] Read dorms from Supabase `dorms` table with static fallback.
+// [服务] 从 Supabase `dorms` 表读取宿舍数据，静态数据作为 fallback。
+import { supabase } from "./supabase"
 
 const TABLE = "dorms"
 

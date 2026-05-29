@@ -1,28 +1,29 @@
-import React, { useEffect, useState } from "react"
-import { useLocation, useNavigate, useParams } from "react-router-dom"
 import { AnimatePresence, type Variants, motion } from "framer-motion"
 import { ArrowLeft, Heart, Pencil } from "lucide-react"
-import { TAG_REGISTRY } from "./constants/metadata"
-import { useSharedDormInteraction } from "./store/DormUserInteractionContext"
-import { useDormData } from "./store/HousingDataContext"
+import React, { useEffect, useState } from "react"
+import { useLocation, useNavigate, useParams } from "react-router-dom"
+
 import { useAuth } from "../../contexts/AuthContext"
+import { useLayout } from "../../contexts/LayoutContext"
 import { dormService } from "../../services/dormService"
-import { useDormComments } from "./hooks/useDormComments"
-import { type Dorm, type DormTag } from "./types/index"
 import { type Language } from "../../types"
-import DormEditPanel from "./DormEditPanel"
-import ImageLightbox from "./ImageLightbox"
-import { dormDetailTexts } from "./i18n/dormTexts"
 import {
   getStorageBathroomScope,
   normalizeFloorPlan,
 } from "../../utils/roomOptions"
-import { useLayout } from "../../contexts/LayoutContext"
-import { DormDetailHeader } from "./DormDetailHeader"
+import { TAG_REGISTRY } from "./constants/metadata"
+import { DormDetailFloorPlans } from "./DormDetailFloorPlans"
 import { DormDetailGallery } from "./DormDetailGallery"
+import { DormDetailHeader } from "./DormDetailHeader"
 import { DormDetailInfo } from "./DormDetailInfo"
 import { DormDetailReviews } from "./DormDetailReviews"
-import { DormDetailFloorPlans } from "./DormDetailFloorPlans"
+import DormEditPanel from "./DormEditPanel"
+import { useDormComments } from "./hooks/useDormComments"
+import { dormDetailTexts } from "./i18n/dormTexts"
+import ImageLightbox from "./ImageLightbox"
+import { useSharedDormInteraction } from "./store/DormUserInteractionContext"
+import { useDormData } from "./store/HousingDataContext"
+import { type Dorm, type DormTag } from "./types/index"
 
 const pageVariants: Variants = {
   hidden: { opacity: 0, y: 10 },

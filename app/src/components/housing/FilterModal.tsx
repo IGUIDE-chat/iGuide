@@ -5,6 +5,8 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
+import { Dialog, Transition } from "@headlessui/react"
+import { X } from "lucide-react"
 import React, {
   Fragment,
   useCallback,
@@ -14,19 +16,8 @@ import React, {
   useRef,
   useState,
 } from "react"
-import { X } from "lucide-react"
-import { Dialog, Transition } from "@headlessui/react"
+
 import "rc-slider/assets/index.css"
-import { useHousingFilters } from "./store/HousingContext"
-import { getPriceRangeFromData } from "./constants/pricing"
-import { useDormData } from "./store/HousingDataContext"
-import {
-  type BathroomCountFilter,
-  type BathroomScope,
-  type BedCountFilter,
-  type DormTag,
-  type FilterOption,
-} from "./types/index"
 import {
   BATHROOM_SCOPE_OPTIONS,
   FILTERABLE_LIVING_CONDITION_TAGS,
@@ -35,11 +26,21 @@ import {
   getTagDisplay,
   mergeLocationOptions,
 } from "./constants/metadata"
-import PriceSection from "./filter-modal/PriceSection"
-import HousingTypeSection from "./filter-modal/HousingTypeSection"
+import { getPriceRangeFromData } from "./constants/pricing"
 import ChipSection from "./filter-modal/ChipSection"
-import TagFilterSection from "./filter-modal/TagFilterSection"
+import HousingTypeSection from "./filter-modal/HousingTypeSection"
 import { type FilterLanguage, MODAL_TEXT } from "./filter-modal/modalText"
+import PriceSection from "./filter-modal/PriceSection"
+import TagFilterSection from "./filter-modal/TagFilterSection"
+import { useHousingFilters } from "./store/HousingContext"
+import { useDormData } from "./store/HousingDataContext"
+import {
+  type BathroomCountFilter,
+  type BathroomScope,
+  type BedCountFilter,
+  type DormTag,
+  type FilterOption,
+} from "./types/index"
 
 interface FilterModalProps {
   isOpen: boolean

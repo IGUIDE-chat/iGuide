@@ -6,6 +6,7 @@
  */
 
 import React from "react"
+
 import { type Language } from "../../types"
 import CourseListPage from "./CourseListPage"
 

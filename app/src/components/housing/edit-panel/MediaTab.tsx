@@ -5,7 +5,6 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { useState } from "react"
 import {
   ChevronDown,
   ChevronUp,
@@ -15,19 +14,21 @@ import {
   Upload,
   X,
 } from "lucide-react"
+import React, { useState } from "react"
+
 import {
-  type BathroomScope,
-  type BedSize,
-  type FloorPlan,
-} from "../types/index"
+  getStorageBathroomScope,
+  normalizeFloorPlan,
+} from "../../../utils/roomOptions"
 import {
   BATHROOM_SCOPE_OPTIONS,
   getLocalizedLabel,
 } from "../constants/metadata"
 import {
-  getStorageBathroomScope,
-  normalizeFloorPlan,
-} from "../../../utils/roomOptions"
+  type BathroomScope,
+  type BedSize,
+  type FloorPlan,
+} from "../types/index"
 import { EditableList, Field, Toggle, inputCls } from "./EditPanelFields"
 import {
   type DormEditFormState,

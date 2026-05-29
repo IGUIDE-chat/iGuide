@@ -13,6 +13,8 @@ import React, {
   useMemo,
   useState,
 } from "react"
+
+import { getPriceRangeFromData } from "../constants/pricing"
 import {
   type BathroomCountFilter,
   type BathroomScope,
@@ -20,7 +22,6 @@ import {
   type DormTag,
   type FilterOption,
 } from "../types/index"
-import { getPriceRangeFromData } from "../constants/pricing"
 import { useDormData } from "./HousingDataContext"
 
 interface HousingFiltersContextType {

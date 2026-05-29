@@ -5,11 +5,12 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { useRef } from "react"
 import { Heart } from "lucide-react"
-import { type Dorm } from "../types/index"
+import React, { useRef } from "react"
+
 import { type Language } from "../../../types"
 import { formatPrice } from "../constants/pricing"
+import { type Dorm } from "../types/index"
 
 /** Max movement (px) between pointer down/up to count as a tap, not a scroll drag. */
 const TAP_MOVE_THRESHOLD_PX = 14

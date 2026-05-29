@@ -5,8 +5,8 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import * as React from "react"
 import { motion } from "framer-motion"
+import * as React from "react"
 import ReactMarkdown, { type Components } from "react-markdown"
 import remarkGfm from "remark-gfm"
 

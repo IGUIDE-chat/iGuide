@@ -3,11 +3,12 @@
  * @description Chat (AI) Component / Module
  */
 
-import * as React from "react"
 import { type UIMessage } from "ai"
+import * as React from "react"
+
 import { Typewriter } from "../../ui/Typewriter"
-import { ToolStatus } from "../ToolStatus"
 import { ChatSessionContext } from "../ChatRuntimeProvider"
+import { ToolStatus } from "../ToolStatus"
 
 interface AssistantMessageProps {
   message: UIMessage

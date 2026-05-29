@@ -5,6 +5,7 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
+import mapboxgl from "mapbox-gl"
 import React, {
   Component,
   type ReactNode,
@@ -15,14 +16,6 @@ import React, {
   useRef,
   useState,
 } from "react"
-import { type Dorm } from "./types/index"
-import { useHousingMapUi } from "./store/HousingContext"
-import {
-  CAMPUS_LANDMARKS,
-  CAMPUS_ZONES,
-  type Landmark,
-} from "./constants/mapData"
-import { type Language } from "../../types"
 import Map, {
   Layer,
   type MapRef,
@@ -30,14 +23,13 @@ import Map, {
   Popup,
   Source,
 } from "react-map-gl/mapbox"
-import mapboxgl from "mapbox-gl"
-import "mapbox-gl/dist/mapbox-gl.css"
+
+import { type Language } from "../../types"
 import {
-  buildDormFeatureCollection,
-  buildLandmarkFeatureCollection,
-} from "./dorm-map/mapFeatureBuilders"
-import { DEFAULT_CENTER, DEFAULT_ZOOM } from "./dorm-map/mapConstants"
-import { registerMapAssets } from "./dorm-map/mapAssets"
+  CAMPUS_LANDMARKS,
+  CAMPUS_ZONES,
+  type Landmark,
+} from "./constants/mapData"
 import { getHousingTypeMeta } from "./constants/metadata"
 import {
   CLUSTERS_LAYER,
@@ -47,6 +39,16 @@ import {
   buildZonesFillLayer,
   buildZonesLabelLayer,
 } from "./dorm-map/layers"
+
+import "mapbox-gl/dist/mapbox-gl.css"
+import { registerMapAssets } from "./dorm-map/mapAssets"
+import { DEFAULT_CENTER, DEFAULT_ZOOM } from "./dorm-map/mapConstants"
+import {
+  buildDormFeatureCollection,
+  buildLandmarkFeatureCollection,
+} from "./dorm-map/mapFeatureBuilders"
+import { useHousingMapUi } from "./store/HousingContext"
+import { type Dorm } from "./types/index"
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN ?? ""
 

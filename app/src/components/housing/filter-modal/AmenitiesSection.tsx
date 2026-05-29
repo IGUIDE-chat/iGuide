@@ -5,8 +5,9 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { memo } from "react"
 import { Check, GraduationCap, MapPin, Snowflake, Utensils } from "lucide-react"
+import React, { memo } from "react"
+
 import { FilterOption } from "../types/index"
 import { type FilterLanguage } from "./modalText"
 

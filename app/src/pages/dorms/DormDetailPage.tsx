@@ -6,8 +6,9 @@
  */
 
 import React from "react"
-import DormDetail from "../../components/housing/DormDetail"
+
 import AIChat from "../../components/housing/AIChat"
+import DormDetail from "../../components/housing/DormDetail"
 import { type Language } from "../../types"
 
 interface DormDetailPageProps {

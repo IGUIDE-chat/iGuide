@@ -1,5 +1,5 @@
-import { type ReactNode } from "react"
 import { type ToolCallPart, type ToolResultPart } from "ai"
+import { type ReactNode } from "react"
 
 export type SearchToolArgs = {
   query?: string

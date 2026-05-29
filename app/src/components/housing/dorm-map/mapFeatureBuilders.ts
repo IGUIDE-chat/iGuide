@@ -5,8 +5,8 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { type Dorm } from "../types/index"
 import { type Landmark } from "../constants/mapData"
+import { type Dorm } from "../types/index"
 import {
   type DormFeatureProperties,
   type LandmarkFeatureProperties,

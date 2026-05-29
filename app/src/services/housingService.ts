@@ -1,5 +1,5 @@
-import { supabase } from "./supabase"
 import { type Housing } from "../components/housing/types/index"
+import { supabase } from "./supabase"
 
 const TABLE = "housing"
 

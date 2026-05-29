@@ -5,10 +5,11 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { memo } from "react"
 import { Check } from "lucide-react"
-import { type DormTag } from "../types/index"
+import React, { memo } from "react"
+
 import { getTagDisplay } from "../constants/metadata"
+import { type DormTag } from "../types/index"
 import { type FilterLanguage } from "./modalText"
 
 interface TagFilterSectionProps {

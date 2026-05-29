@@ -1,12 +1,12 @@
 import { type SearchResult } from "../types"
+import rewriteSystemPrompt from "./prompts/chat-rag-query-rewrite-system.md?raw"
+import rewriteUserPrompt from "./prompts/chat-rag-query-rewrite-user.md?raw"
 import { quickSearch } from "./searchService"
 import {
   type WebSearchResult,
   isUiucOfficialUrl,
   webSearchWithOfficialPriority,
 } from "./webSearchService"
-import rewriteSystemPrompt from "./prompts/chat-rag-query-rewrite-system.md?raw"
-import rewriteUserPrompt from "./prompts/chat-rag-query-rewrite-user.md?raw"
 
 const viteEnv = (
   import.meta as ImportMeta & {

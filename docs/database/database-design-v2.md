@@ -129,6 +129,7 @@ The system must distinguish not only structure, but also freshness behavior.
 ### Default routing guidance
 
 #### Stable domains
+
 Usually safe for local-first behavior:
 
 - courses
@@ -138,6 +139,7 @@ Usually safe for local-first behavior:
 - academic calendar items
 
 #### Volatile domains
+
 Should not default to archived DB copies as current truth:
 
 - news
@@ -265,6 +267,7 @@ The course domain has exactly two first-class object levels:
 - `course_offering`
 
 #### `course`
+
 Represents stable catalog facts.
 
 Typical must-have fields:
@@ -295,6 +298,7 @@ Typical dual-layer facets:
 - `attribute_labels[]`
 
 #### `course_offering`
+
 Represents term-specific offering facts.
 
 Typical must-have fields:
@@ -529,16 +533,19 @@ QMD should be treated as **transitional infrastructure**, not the future canonic
 ### Migration stance
 
 #### Short term
+
 - keep QMD operational as a sidecar
 - preserve compatibility and rollback safety
 - use it for parity comparison
 
 #### Medium term
+
 - mirror ingestion into the Supabase-native path
 - compare retrieval quality and ranking behavior
 - tune chunking, weighting, ranking, and fallback behavior
 
 #### Long term
+
 - retire QMD from the primary production retrieval path once parity is acceptable
 
 ### Migration principle
@@ -595,6 +602,7 @@ Over time, the retrieval path should evolve from today’s flatter `documents/do
 The system should treat volatile domains differently from stable domains.
 
 ### Stable domains
+
 Usually local-first:
 
 - courses
@@ -604,6 +612,7 @@ Usually local-first:
 - academic calendar items
 
 ### Volatile domains
+
 Usually live-first or local-with-live-verify:
 
 - news

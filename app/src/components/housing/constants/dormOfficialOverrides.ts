@@ -6,13 +6,13 @@
  */
 
 import { type Dorm } from "../types/index"
+import { PCH_OFFICIAL_OVERRIDES } from "./dormOfficialOverridesPch"
+import { URH_OFFICIAL_OVERRIDES_NORTH } from "./dormOfficialOverridesUrhNorth"
+import { URH_OFFICIAL_OVERRIDES_SOUTH } from "./dormOfficialOverridesUrhSouth"
 import {
   type DormOverride,
   normalizeOverrideMedia,
 } from "./dormOfficialOverrideUtils"
-import { PCH_OFFICIAL_OVERRIDES } from "./dormOfficialOverridesPch"
-import { URH_OFFICIAL_OVERRIDES_NORTH } from "./dormOfficialOverridesUrhNorth"
-import { URH_OFFICIAL_OVERRIDES_SOUTH } from "./dormOfficialOverridesUrhSouth"
 
 export const DORM_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
   ...URH_OFFICIAL_OVERRIDES_NORTH,

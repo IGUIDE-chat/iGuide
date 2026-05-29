@@ -6,6 +6,7 @@
  */
 
 import React, { useCallback } from "react"
+
 import { ProfileScreen } from "../../components/profile/ProfileScreen"
 import { type Language } from "../../types"
 

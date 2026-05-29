@@ -5,8 +5,9 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from "react"
 import { motion } from "framer-motion"
+import React from "react"
+
 import {
   DEFAULT_FAVORITES_TARGET,
   DEFAULT_TOGGLE_TARGET,

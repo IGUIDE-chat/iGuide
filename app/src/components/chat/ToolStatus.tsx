@@ -3,8 +3,8 @@
  * @description Chat (AI) Component / Module
  */
 
-import { useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
+import { useEffect, useRef, useState } from "react"
 
 const TOOL_LABELS: Record<string, string> = {
   search_knowledge_base: "Searching knowledge base...",

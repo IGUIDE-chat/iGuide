@@ -1,12 +1,13 @@
-import { describe, it } from "node:test"
 import assert from "node:assert/strict"
+import { describe, it } from "node:test"
+
+import { type ChatMessage, type ThinkingStep } from "../../../../types"
 import {
   fromThreadMessage,
   isChatMessage,
   isThreadMessageLike,
   toThreadMessage,
 } from "../messageAdapter"
-import { type ChatMessage, type ThinkingStep } from "../../../../types"
 
 describe("messageAdapter", () => {
   const mockThinkingStep: ThinkingStep = {

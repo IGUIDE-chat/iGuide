@@ -5,8 +5,9 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from "react"
 import { BookOpen, GraduationCap, Hash } from "lucide-react"
+import React from "react"
+
 import { type Course } from "../../services/courseService"
 
 interface CourseCardProps {

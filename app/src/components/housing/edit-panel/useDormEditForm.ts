@@ -6,22 +6,21 @@
  */
 
 import { useLayoutEffect, useMemo, useRef, useState } from "react"
-import {
-  type BathroomType,
-  type DiningType,
-  type Dorm,
-  type DormCategorizedTags,
-  type FloorPlan,
-} from "../types/index"
-import { type Language } from "../../../types"
+
+import { useAuth } from "../../../contexts/AuthContext"
 import {
   type DormUpdate,
   type EditHistoryEntry,
   buildSummary,
   dormAdminService,
 } from "../../../services/dormAdminService"
-import { useAuth } from "../../../contexts/AuthContext"
 import { dormService } from "../../../services/dormService"
+import { type Language } from "../../../types"
+import {
+  buildLegacyDormTags,
+  getDormPriceRange,
+  sanitizeFloorPlansForStorage,
+} from "../../../utils/dormData"
 import {
   deriveRoomOptions,
   getPersistedBathroomType,
@@ -30,10 +29,12 @@ import {
   normalizeFloorPlan,
 } from "../../../utils/roomOptions"
 import {
-  buildLegacyDormTags,
-  getDormPriceRange,
-  sanitizeFloorPlansForStorage,
-} from "../../../utils/dormData"
+  type BathroomType,
+  type DiningType,
+  type Dorm,
+  type DormCategorizedTags,
+  type FloorPlan,
+} from "../types/index"
 import { TEXT } from "./editPanelText"
 
 interface UseDormEditFormOptions {

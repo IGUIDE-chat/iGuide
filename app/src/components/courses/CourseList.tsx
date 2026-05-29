@@ -6,6 +6,7 @@
  */
 
 import React, { useEffect, useState } from "react"
+
 import { type Course, courseService } from "../../services/courseService"
 import CourseCard from "./CourseCard"
 

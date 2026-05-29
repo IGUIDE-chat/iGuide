@@ -3,18 +3,19 @@
  * @description DormDetail header section - back button, title, location, tags, pricing cards
  */
 
-import React from "react"
 import { motion } from "framer-motion"
 import { Bath, MapPin, Snowflake, Utensils } from "lucide-react"
-import { type Dorm, type DormTag } from "./types/index"
+import React from "react"
+
 import { type Language } from "../../types"
+import { getDormBathroomSummary } from "../../utils/roomOptions"
+import { getDetailTagDisplay } from "../../utils/tagLabels"
 import {
   TAG_REGISTRY,
   getHousingTypeMeta,
   getLocalizedLabel,
 } from "./constants/metadata"
-import { getDetailTagDisplay } from "../../utils/tagLabels"
-import { getDormBathroomSummary } from "../../utils/roomOptions"
+import { type Dorm, type DormTag } from "./types/index"
 
 interface DormDetailHeaderProps {
   dorm: Dorm

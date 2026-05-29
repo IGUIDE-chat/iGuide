@@ -3,11 +3,12 @@
  * @description Chat (AI) Component / Module
  */
 
-import * as React from "react"
 import { type UIMessage } from "ai"
 import { Pencil } from "lucide-react"
-import { ImeSafeTextarea } from "../ImeSafeTextarea"
+import * as React from "react"
+
 import { ChatSessionContext } from "../ChatRuntimeProvider"
+import { ImeSafeTextarea } from "../ImeSafeTextarea"
 
 interface UserMessageProps {
   message: UIMessage

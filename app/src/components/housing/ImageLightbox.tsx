@@ -5,9 +5,9 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { useCallback, useEffect, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { ChevronLeft, ChevronRight, X, ZoomIn, ZoomOut } from "lucide-react"
+import React, { useCallback, useEffect, useState } from "react"
 
 interface LightboxImage {
   src: string

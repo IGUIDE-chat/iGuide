@@ -6,10 +6,11 @@
  */
 
 import React from "react"
-import { type Dorm } from "../types/index"
-import { type Language } from "../../../types"
+
 import { type DormCommentStats } from "../../../services/dormCommentsService"
+import { type Language } from "../../../types"
 import DormCard from "../DormCard"
+import { type Dorm } from "../types/index"
 
 interface DormGridProps {
   dorms: Dorm[]

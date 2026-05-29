@@ -10,10 +10,10 @@ A three-layer UIUC knowledge platform split across the app, API gateway, and cra
 
 ## Monorepo Map
 
-| Path | Role |
-| ---- | ---- |
-| `app/` | React app, Cloudflare Pages functions, docs, migrations, and active UI runtime. |
-| `api/` | Cloudflare Worker gateway for JWT auth, geo routing, proxying, CORS, and health checks. |
+| Path               | Role                                                                                           |
+| ------------------ | ---------------------------------------------------------------------------------------------- |
+| `app/`             | React app, Cloudflare Pages functions, docs, migrations, and active UI runtime.                |
+| `api/`             | Cloudflare Worker gateway for JWT auth, geo routing, proxying, CORS, and health checks.        |
 | `data_collection/` | Python crawler/ETL pipeline for harvesting, cleaning, and incrementally updating UIUC sources. |
 
 ## Unified Setup

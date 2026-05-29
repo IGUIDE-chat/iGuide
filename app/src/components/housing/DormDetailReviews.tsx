@@ -1,6 +1,7 @@
-import React, { useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { Globe, MessageSquare, ThumbsUp, User, X } from "lucide-react"
+import React, { useState } from "react"
+
 import { type Language } from "../../types"
 import { dormDetailTexts } from "./i18n/dormTexts"
 

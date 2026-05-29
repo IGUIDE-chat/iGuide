@@ -3,20 +3,20 @@
  * @description Generates the Markdown corpus consumed by tobi/qmd.
  */
 
+import { execFileSync } from "node:child_process"
 import fs from "node:fs/promises"
 import path from "node:path"
-import { execFileSync } from "node:child_process"
 
-import dotenv from "dotenv"
 import { createClient } from "@supabase/supabase-js"
+import dotenv from "dotenv"
 
-import { ARTICLES } from "../src/data/articles/index"
-import { type Article } from "../src/types"
 import { UIUC_DORMS } from "../src/components/housing/constants/dormData"
 import {
   type BathroomScope,
   type Dorm,
 } from "../src/components/housing/types/index"
+import { ARTICLES } from "../src/data/articles/index"
+import { type Article } from "../src/types"
 import {
   finalizeDormRecord,
   sanitizeFloorPlansForStorage,
@@ -30,7 +30,7 @@ const HANDBOOK_OCR_SCRIPT = path.resolve(
   PROJECT_ROOT,
   "scripts/generate-handbook-ocr.py"
 )
-const PYTHON_CMD = process.env.PYTHON ?? "python"
+const PYTHON_CMD = process.env.PYTHON || "python"
 const TODAY = new Date().toISOString().slice(0, 10)
 const DORMS_TABLE = "dorms"
 
@@ -55,7 +55,7 @@ interface Frontmatter {
 }
 
 function sanitizeLine(value: string | undefined | null) {
-  return (value ?? "").replaceAll("\r\n", "\n").trim()
+  return (value || "").replaceAll("\r\n", "\n").trim()
 }
 
 function sanitizeParagraph(value: string | undefined | null) {
@@ -296,14 +296,14 @@ function buildFloorPlanLine(
   const parts: string[] = []
   const displayName =
     sanitizeLine(plan.officialName) ||
-    (plan.labelCode ??
-    plan.type) ??
+    plan.labelCode ||
+    plan.type ||
     (lang === "zh" ? "未命名房型" : "Unnamed layout")
 
   parts.push(displayName)
 
   if (typeof plan.price === "number") {
-    parts.push(formatCurrency(plan.price) ?? "")
+    parts.push(formatCurrency(plan.price) || "")
   }
   if (typeof plan.sqft === "number" && Number.isFinite(plan.sqft)) {
     parts.push(`${plan.sqft} sqft`)
@@ -426,72 +426,72 @@ function mapDormRow(row: Record<string, unknown>): DormDocumentRecord {
   const dorm = finalizeDormRecord(
     normalizeDorm({
       id: row.id as string,
-      name: (row.name as string) ?? fallbackDorm?.name ?? "",
-      name_zh: (row.name_zh as string) ?? fallbackDorm?.name_zh,
+      name: (row.name as string) || fallbackDorm?.name || "",
+      name_zh: (row.name_zh as string) || fallbackDorm?.name_zh,
       description:
-        (row.description as string) ?? fallbackDorm?.description ?? "",
+        (row.description as string) || fallbackDorm?.description || "",
       description_zh:
-        (row.description_zh as string) ?? fallbackDorm?.description_zh,
-      imageUrl: (row.image_url as string) ?? fallbackDorm?.imageUrl ?? "",
-      price: Number(row.price) || fallbackDorm?.price ?? 0,
+        (row.description_zh as string) || fallbackDorm?.description_zh,
+      imageUrl: (row.image_url as string) || fallbackDorm?.imageUrl || "",
+      price: Number(row.price) || fallbackDorm?.price || 0,
       priceRange:
-        (row.price_range as Dorm["priceRange"]) ??
-        fallbackDorm?.priceRange ??
+        (row.price_range as Dorm["priceRange"]) ||
+        fallbackDorm?.priceRange ||
         "$",
       location:
-        (row.location as string) ?? fallbackDorm?.location ?? "Main Quad",
-      location_zh: (row.location_zh as string) ?? fallbackDorm?.location_zh,
+        (row.location as string) || fallbackDorm?.location || "Main Quad",
+      location_zh: (row.location_zh as string) || fallbackDorm?.location_zh,
       housingType:
-        (row.housing_type as Dorm["housingType"]) ??
-        fallbackDorm?.housingType ??
+        (row.housing_type as Dorm["housingType"]) ||
+        fallbackDorm?.housingType ||
         "URH",
       ac:
         row.ac === null || row.ac === undefined
-          ? (fallbackDorm?.ac ?? false)
+          ? fallbackDorm?.ac || false
           : Boolean(row.ac),
       dining:
-        (row.dining as Dorm["dining"]) ?? fallbackDorm?.dining ?? "nearby",
+        (row.dining as Dorm["dining"]) || fallbackDorm?.dining || "nearby",
       diningNearbyDetail:
-        (row.dining_nearby_detail as string) ??
+        (row.dining_nearby_detail as string) ||
         fallbackDorm?.diningNearbyDetail,
       bathroomType:
-        (row.bathroom_type as Dorm["bathroomType"]) ??
-        fallbackDorm?.bathroomType ??
+        (row.bathroom_type as Dorm["bathroomType"]) ||
+        fallbackDorm?.bathroomType ||
         "communal",
-      lat: Number(row.lat) || fallbackDorm?.lat ?? 0,
-      lng: Number(row.lng) || fallbackDorm?.lng ?? 0,
-      tags: (row.tags as string[]) ?? fallbackDorm?.tags ?? [],
+      lat: Number(row.lat) || fallbackDorm?.lat || 0,
+      lng: Number(row.lng) || fallbackDorm?.lng || 0,
+      tags: (row.tags as string[]) || fallbackDorm?.tags || [],
       structuredTags:
-        (row.structured_tags as Dorm["structuredTags"]) ??
+        (row.structured_tags as Dorm["structuredTags"]) ||
         fallbackDorm?.structuredTags,
-      categorizedTags: (row.categorized_tags as Dorm["categorizedTags"]) ?? {
-        livingConditions: fallbackDorm?.categorizedTags.livingConditions ?? [],
-        facilities: fallbackDorm?.categorizedTags.facilities ?? [],
-        lifestyle: fallbackDorm?.categorizedTags.lifestyle ?? [],
+      categorizedTags: (row.categorized_tags as Dorm["categorizedTags"]) || {
+        livingConditions: fallbackDorm?.categorizedTags.livingConditions || [],
+        facilities: fallbackDorm?.categorizedTags.facilities || [],
+        lifestyle: fallbackDorm?.categorizedTags.lifestyle || [],
         ...(fallbackDorm?.categorizedTags.llcNames?.length
           ? { llcNames: fallbackDorm.categorizedTags.llcNames }
           : {}),
       },
       roomTypes:
-        (row.room_types as Dorm["roomTypes"]) ?? fallbackDorm?.roomTypes ?? [],
+        (row.room_types as Dorm["roomTypes"]) || fallbackDorm?.roomTypes || [],
       roomOptions:
-        (row.room_options as Dorm["roomOptions"]) ?? fallbackDorm?.roomOptions,
+        (row.room_options as Dorm["roomOptions"]) || fallbackDorm?.roomOptions,
       floorPlans:
-        sanitizeFloorPlansForStorage(row.floor_plans as Dorm["floorPlans"]) ??
+        sanitizeFloorPlansForStorage(row.floor_plans as Dorm["floorPlans"]) ||
         fallbackDorm?.floorPlans,
       galleryImages:
-        (row.gallery_images as string[]) ?? fallbackDorm?.galleryImages,
-      pros: (row.pros as string[]) ?? fallbackDorm?.pros ?? [],
-      pros_zh: (row.pros_zh as string[]) ?? fallbackDorm?.pros_zh,
-      cons: (row.cons as string[]) ?? fallbackDorm?.cons ?? [],
-      cons_zh: (row.cons_zh as string[]) ?? fallbackDorm?.cons_zh,
+        (row.gallery_images as string[]) || fallbackDorm?.galleryImages,
+      pros: (row.pros as string[]) || fallbackDorm?.pros || [],
+      pros_zh: (row.pros_zh as string[]) || fallbackDorm?.pros_zh,
+      cons: (row.cons as string[]) || fallbackDorm?.cons || [],
+      cons_zh: (row.cons_zh as string[]) || fallbackDorm?.cons_zh,
       applicationFee:
         row.application_fee === null || row.application_fee === undefined
           ? fallbackDorm?.applicationFee
           : Number(row.application_fee),
-      address: (row.address as string) ?? fallbackDorm?.address,
-      address_zh: (row.address_zh as string) ?? fallbackDorm?.address_zh,
-      website: (row.website as string) ?? fallbackDorm?.website,
+      address: (row.address as string) || fallbackDorm?.address,
+      address_zh: (row.address_zh as string) || fallbackDorm?.address_zh,
+      website: (row.website as string) || fallbackDorm?.website,
     })
   )
 
@@ -511,10 +511,10 @@ function fallbackDormRecords(): DormDocumentRecord[] {
 }
 
 async function fetchDormRecords(): Promise<DormDocumentRecord[]> {
-  const supabaseUrl = process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL
   const supabaseKey =
-    (process.env.SUPABASE_SERVICE_KEY ??
-    process.env.SUPABASE_ANON_KEY) ??
+    process.env.SUPABASE_SERVICE_KEY ||
+    process.env.SUPABASE_ANON_KEY ||
     process.env.VITE_SUPABASE_ANON_KEY
 
   if (!supabaseUrl || !supabaseKey) {

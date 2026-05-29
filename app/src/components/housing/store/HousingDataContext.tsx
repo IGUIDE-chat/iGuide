@@ -14,8 +14,9 @@ import React, {
   useMemo,
   useState,
 } from "react"
-import { type Dorm } from "../types/index"
+
 import { housingService } from "../../../services/housingService"
+import { type Dorm } from "../types/index"
 
 interface HousingDataContextType {
   dorms: Dorm[]

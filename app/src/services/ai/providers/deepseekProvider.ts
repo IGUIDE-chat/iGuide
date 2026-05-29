@@ -3,8 +3,8 @@
  * @description DeepSeek AI provider with RAG-enhanced streaming.
  */
 
-import { type AIProvider } from "../types"
 import { streamDeepSeekChat } from "../../deepseekService"
+import { type AIProvider } from "../types"
 
 export const deepseekProvider: AIProvider = {
   id: "deepseek",

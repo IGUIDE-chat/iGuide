@@ -5,10 +5,10 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
+import { authService } from "./authService"
 // [SERVICE] Manages dorm favorites with Supabase.
 // [服务] 管理宿舍收藏（Supabase）。
 import { supabase } from "./supabase"
-import { authService } from "./authService"
 
 interface DormFavorite {
   id: string

@@ -5,17 +5,18 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
+import { AnimatePresence, motion } from "framer-motion"
 // [PAGE] Landing page template for specific agents (Courses, Dorms, Resume).
 // [页面] 用于特定智能体（课程、宿舍、简历）的着陆页模板。
 import * as React from "react"
 import { useState } from "react"
-import { AnimatePresence, motion } from "framer-motion"
-import { type Language } from "../types"
+
 import { UI_TEXT } from "../i18n/uiText"
 import {
   type MailingListTopic,
   mailingListService,
 } from "../services/mailingListService"
+import { type Language } from "../types"
 
 interface AgentLandingPageProps {
   type: "courses" | "dorms" | "resume"

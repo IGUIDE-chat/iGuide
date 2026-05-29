@@ -8,14 +8,14 @@
 import { type ChatHistoryItem, type StreamChunk } from "./ai/types"
 import { fetchChatRAGContext, isToolUseRagEnabled } from "./chatRagService"
 import { parseDeepSeekSSEStream } from "./deepseekSse"
-import { quickSearch } from "./searchService"
-import { webSearch } from "./webSearchService"
 import { memoryService } from "./memoryService"
 import defaultSystemPrompt from "./prompts/deepseek-default-system.md?raw"
 import memoryExtractionInstructions from "./prompts/deepseek-memory-extraction.md?raw"
 import soulExtractionInstructions from "./prompts/deepseek-soul-extraction.md?raw"
-import languageZhPrompt from "./prompts/language-zh.md?raw"
 import languageEnPrompt from "./prompts/language-en.md?raw"
+import languageZhPrompt from "./prompts/language-zh.md?raw"
+import { quickSearch } from "./searchService"
+import { webSearch } from "./webSearchService"
 
 // ── Config ──────────────────────────────────────────────────────
 

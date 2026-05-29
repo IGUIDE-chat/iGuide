@@ -5,8 +5,9 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
+import { useEffect, useRef, useState } from "react"
+
 import { type ThinkingStep } from "../../types"
 
 interface ThinkingProcessProps {

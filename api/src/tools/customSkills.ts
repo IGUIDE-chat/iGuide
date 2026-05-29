@@ -1,5 +1,6 @@
 import { tool } from "ai"
 import { z } from "zod"
+
 import campusNavigationSkill from "../skills/campus_navigation.json"
 import compareDormsSkill from "../skills/compare_dorms.json"
 import findByCriteriaSkill from "../skills/find_by_criteria.json"

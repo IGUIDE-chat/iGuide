@@ -5,12 +5,6 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { useEffect, useMemo, useRef, useState } from "react"
-import ReactMarkdown from "react-markdown"
-import remarkGfm from "remark-gfm"
-import { AnimatePresence, motion } from "framer-motion"
-import { Loader2, MessageCircle, Send, Sparkles, X } from "lucide-react"
-import { useNavigate } from "react-router-dom"
 import { useChat } from "@ai-sdk/react"
 import {
   DefaultChatTransport,
@@ -19,12 +13,19 @@ import {
   type UIMessagePart,
   type UITools,
 } from "ai"
-import { findMentionedDorms, isDormMention } from "../../utils/housingUtils"
-import { Typewriter } from "../ui/Typewriter"
-import { type Language } from "../../types"
-import { aiChatTexts } from "./i18n/dormTexts"
-import { ImeSafeTextarea } from "../chat/ImeSafeTextarea"
+import { AnimatePresence, motion } from "framer-motion"
+import { Loader2, MessageCircle, Send, Sparkles, X } from "lucide-react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
+import ReactMarkdown from "react-markdown"
+import { useNavigate } from "react-router-dom"
+import remarkGfm from "remark-gfm"
+
 import { supabase } from "../../services/supabase"
+import { type Language } from "../../types"
+import { findMentionedDorms, isDormMention } from "../../utils/housingUtils"
+import { ImeSafeTextarea } from "../chat/ImeSafeTextarea"
+import { Typewriter } from "../ui/Typewriter"
+import { aiChatTexts } from "./i18n/dormTexts"
 
 const DormMentionStrong = ({
   children,

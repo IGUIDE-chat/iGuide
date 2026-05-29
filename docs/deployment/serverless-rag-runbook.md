@@ -54,7 +54,7 @@ Managed Embedding Provider (OpenAI-compatible API)
 ### Component Responsibilities
 
 | Component                      | Purpose                                       |
-|--------------------------------|-----------------------------------------------|
+| ------------------------------ | --------------------------------------------- |
 | **Cloudflare Pages**           | Static frontend hosting with edge caching     |
 | **Cloudflare Worker**          | API gateway, auth, routing, RAG orchestration |
 | **Supabase**                   | Document storage, vector search, user auth    |
@@ -115,7 +115,7 @@ node --version       # Should be 18.x or higher
 Configure DNS records in Cloudflare:
 
 | Type  | Name  | Content                    | Proxy Status           |
-|-------|-------|----------------------------|------------------------|
+| ----- | ----- | -------------------------- | ---------------------- |
 | CNAME | `www` | `<pages-domain>.pages.dev` | Proxied (orange cloud) |
 | AAAA  | `api` | `100::`                    | Proxied (orange cloud) |
 
@@ -126,7 +126,7 @@ Complete list of all environment variables required for the serverless RAG deplo
 ### Cloudflare Worker Secrets (set via `wrangler secret put`)
 
 | Variable                 | Description                       | Required | Example Value                  |
-|--------------------------|-----------------------------------|----------|--------------------------------|
+| ------------------------ | --------------------------------- | -------- | ------------------------------ |
 | `SUPABASE_URL`           | Supabase project URL              | Yes      | `https://abc123.supabase.co`   |
 | `SUPABASE_ANON_KEY`      | Supabase anonymous key            | Yes      | `eyJhbGci...`                  |
 | `SUPABASE_SERVICE_KEY`   | Supabase service role key         | Yes      | `eyJhbGci...`                  |
@@ -144,7 +144,7 @@ Complete list of all environment variables required for the serverless RAG deplo
 ### Cloudflare Worker Vars (set in wrangler.jsonc)
 
 | Variable               | Description                     | Required | Default Value           |
-|------------------------|---------------------------------|----------|-------------------------|
+| ---------------------- | ------------------------------- | -------- | ----------------------- |
 | `EMBEDDING_MODEL`      | Embedding model name            | Yes      | `multilingual-e5-small` |
 | `EMBEDDING_DIMENSIONS` | Embedding vector dimensions     | Yes      | `384`                   |
 | `USE_TOOL_USE_RAG`     | Feature flag for serverless RAG | Yes      | `false`                 |
@@ -152,7 +152,7 @@ Complete list of all environment variables required for the serverless RAG deplo
 ### Frontend Environment Variables (app/.env.local)
 
 | Variable                 | Description              | Required | Example Value                |
-|--------------------------|--------------------------|----------|------------------------------|
+| ------------------------ | ------------------------ | -------- | ---------------------------- |
 | `VITE_SUPABASE_URL`      | Public Supabase URL      | Yes      | `https://abc123.supabase.co` |
 | `VITE_SUPABASE_ANON_KEY` | Public Supabase anon key | Yes      | `eyJhbGci...`                |
 | `VITE_MAPBOX_TOKEN`      | Mapbox public token      | Yes      | `pk.abc123...`               |
@@ -160,10 +160,10 @@ Complete list of all environment variables required for the serverless RAG deplo
 | `VITE_USE_TOOL_USE_RAG`  | Frontend RAG toggle      | Yes      | `false`                      |
 | `VITE_API_GATEWAY_URL`   | API Gateway URL          | Yes      | `https://api.iguide.chat`    |
 
-### Server-side Variables (app/.env.local, NOT VITE_ prefixed)
+### Server-side Variables (app/.env.local, NOT VITE\_ prefixed)
 
 | Variable           | Description                | Required | Example Value    |
-|--------------------|----------------------------|----------|------------------|
+| ------------------ | -------------------------- | -------- | ---------------- |
 | `COZE_API_TOKEN`   | Coze API token (dev proxy) | No       | `pat-abc123...`  |
 | `DEEPSEEK_API_KEY` | DeepSeek API (dev proxy)   | No       | `sk-abc123...`   |
 | `TAVILY_API_KEY`   | Tavily API (dev proxy)     | No       | `tvly-ghi789...` |
@@ -171,7 +171,7 @@ Complete list of all environment variables required for the serverless RAG deplo
 ### Data Import Variables (scripts/import-to-supabase.ts)
 
 | Variable                 | Description               | Required | Example Value                |
-|--------------------------|---------------------------|----------|------------------------------|
+| ------------------------ | ------------------------- | -------- | ---------------------------- |
 | `SUPABASE_URL`           | Supabase project URL      | Yes      | `https://abc123.supabase.co` |
 | `SUPABASE_SERVICE_KEY`   | Supabase service role key | Yes      | `eyJhbGci...`                |
 | `EMBEDDING_API_BASE_URL` | Embedding provider URL    | Yes      | `https://api.openai.com`     |
@@ -322,8 +322,8 @@ Run the following SQL in Supabase SQL Editor (see file: `supabase/migrations/001
 
 ```sql
 -- Verify table exists
-SELECT column_name, data_type 
-FROM information_schema.columns 
+SELECT column_name, data_type
+FROM information_schema.columns
 WHERE table_name = 'documents';
 
 -- Expected output: id, title, content, url, source, category, embedding, fts_vector, metadata, indexed_at, created_at, updated_at
@@ -352,8 +352,8 @@ Run the following SQL in Supabase SQL Editor (see file: `supabase/migrations/003
 
 ```sql
 -- Verify functions exist
-SELECT proname, proargnames 
-FROM pg_proc 
+SELECT proname, proargnames
+FROM pg_proc
 WHERE proname IN ('hybrid_search', 'hybrid_search_chunks', 'keyword_search');
 
 -- Expected output: 3 rows with the function names

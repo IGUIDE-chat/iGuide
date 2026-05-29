@@ -6,6 +6,7 @@
  */
 
 import React from "react"
+
 import { BlockIIcon } from "./BlockIIcon"
 
 interface BrandMarkProps {

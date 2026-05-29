@@ -5,8 +5,9 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from "react"
 import { AnimatePresence, motion } from "framer-motion"
+import React from "react"
+
 import { BrandMark } from "../ui/branding/BrandMark"
 
 interface NavItem {

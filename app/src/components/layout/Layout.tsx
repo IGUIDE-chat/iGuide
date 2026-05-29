@@ -5,9 +5,6 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import * as React from "react"
-import { useEffect, useRef, useState } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
 import {
   ArrowUpDown,
   List,
@@ -15,16 +12,20 @@ import {
   Search,
   SlidersHorizontal,
 } from "lucide-react"
-import { type Language } from "../../types"
-import { UI_TEXT } from "../../i18n/uiText"
+import * as React from "react"
+import { useEffect, useRef, useState } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
+
 import { useAuth } from "../../contexts/AuthContext"
-import { useHousingFilters } from "../housing/store/HousingContext"
 import { LayoutProvider } from "../../contexts/LayoutContext"
+import { UI_TEXT } from "../../i18n/uiText"
+import { type Language } from "../../types"
 import { useDormFilterBadge } from "../housing/hooks/useDormFilterBadge"
+import { useHousingFilters } from "../housing/store/HousingContext"
 import { AppShell } from "./AppShell"
 import { PrimaryNav } from "./PrimaryNav"
-import { SidebarPanel } from "./SidebarPanel"
 import { SidebarFooter } from "./SidebarFooter"
+import { SidebarPanel } from "./SidebarPanel"
 
 // ── Lightweight mobile sort dropdown (avoids cross-domain import) ─────────
 const SORT_OPTIONS = [

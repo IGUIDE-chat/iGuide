@@ -1,5 +1,5 @@
-import { type Observation } from "./observation.ts"
 import { type ToolResult } from "../tools/types.ts"
+import { type Observation } from "./observation.ts"
 
 export interface ProviderToolCall {
   id: string

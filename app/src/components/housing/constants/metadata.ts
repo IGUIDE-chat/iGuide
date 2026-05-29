@@ -5,15 +5,6 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { type Language } from "../../../types"
-import {
-  type BathroomScope,
-  type BathroomType,
-  type DiningType,
-  type Dorm,
-  type DormTag,
-  type TagCategory,
-} from "../types/index"
 import {
   BookOpen,
   Building2,
@@ -35,6 +26,16 @@ import {
   WashingMachine,
 } from "lucide-react"
 import { type ComponentType } from "react"
+
+import { type Language } from "../../../types"
+import {
+  type BathroomScope,
+  type BathroomType,
+  type DiningType,
+  type Dorm,
+  type DormTag,
+  type TagCategory,
+} from "../types/index"
 
 export interface LocalizedCopy {
   en: string

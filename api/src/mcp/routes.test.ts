@@ -1,13 +1,13 @@
-import test from "node:test"
 import assert from "node:assert/strict"
+import test from "node:test"
 
+import { type MCPDiscoveryResult, type MCPTestResult } from "./adapter.ts"
+import { maybeHandleIntegrationsRoute } from "./routes.ts"
 import {
   type MCPConnection,
   type MCPDiscoveredTool,
   type MCPToolOverride,
 } from "./types.ts"
-import { type MCPDiscoveryResult, type MCPTestResult } from "./adapter.ts"
-import { maybeHandleIntegrationsRoute } from "./routes.ts"
 
 interface MockServices {
   connections: {

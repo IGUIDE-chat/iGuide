@@ -6,11 +6,12 @@
  */
 
 import React, { useEffect, useState } from "react"
-import { Typewriter } from "../ui/Typewriter"
-import { type LibraryHistoryItem } from "../../types"
-import { libraryService } from "../../services/libraryService"
 import { useNavigate } from "react-router-dom"
+
+import { libraryService } from "../../services/libraryService"
 import { supabase } from "../../services/supabase"
+import { type LibraryHistoryItem } from "../../types"
+import { Typewriter } from "../ui/Typewriter"
 import {
   BaseSidebar,
   DeleteButton,

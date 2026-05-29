@@ -5,10 +5,11 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { memo } from "react"
 import { Check } from "lucide-react"
-import { type RoomType } from "../types/index"
+import React, { memo } from "react"
+
 import { ROOM_TYPES } from "../constants/filters"
+import { type RoomType } from "../types/index"
 import { type FilterLanguage } from "./modalText"
 
 interface RoomTypeSectionProps {

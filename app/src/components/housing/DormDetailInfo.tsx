@@ -1,10 +1,11 @@
-import React from "react"
 import { motion } from "framer-motion"
-import { type DormTag } from "./types/index"
+import React from "react"
+
 import { type Language } from "../../types"
-import { TAG_REGISTRY } from "./constants/metadata"
 import { getDetailTagDisplay } from "../../utils/tagLabels"
+import { TAG_REGISTRY } from "./constants/metadata"
 import { dormDetailTexts } from "./i18n/dormTexts"
+import { type DormTag } from "./types/index"
 
 interface DormDetailInfoProps {
   neutralTags: DormTag[]

@@ -1,6 +1,7 @@
-import React from "react"
 import { motion } from "framer-motion"
 import { ChevronLeft, ChevronRight, ExternalLink, ThumbsUp } from "lucide-react"
+import React from "react"
+
 import { type Language } from "../../types"
 import { dormDetailTexts } from "./i18n/dormTexts"
 

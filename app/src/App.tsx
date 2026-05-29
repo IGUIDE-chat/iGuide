@@ -5,17 +5,18 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
+import { AnimatePresence, motion } from "framer-motion"
 import * as React from "react"
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { AnimatePresence, motion } from "framer-motion"
-import { LoginScreen } from "./components/auth/LoginScreen"
-import { Layout } from "./components/layout/Layout"
+
 import { AppRoutes } from "./app/routes"
-import { useAuth } from "./contexts/AuthContext"
+import { LoginScreen } from "./components/auth/LoginScreen"
+import { CompareProvider } from "./components/housing/store/CompareContext"
+import { DormUserInteractionProvider } from "./components/housing/store/DormUserInteractionContext"
 import { HousingProvider } from "./components/housing/store/HousingContext"
 import { HousingDataProvider } from "./components/housing/store/HousingDataContext"
-import { DormUserInteractionProvider } from "./components/housing/store/DormUserInteractionContext"
-import { CompareProvider } from "./components/housing/store/CompareContext"
+import { Layout } from "./components/layout/Layout"
+import { useAuth } from "./contexts/AuthContext"
 import { type Language } from "./types"
 
 export default function App() {

@@ -6,6 +6,7 @@
  */
 
 import React from "react"
+
 import { AgentLandingPage } from "../../components/AgentLandingPage"
 import { type Language } from "../../types"
 

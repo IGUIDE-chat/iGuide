@@ -5,19 +5,20 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { Suspense, useCallback } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { GitCompareArrows, X } from "lucide-react"
+import React, { Suspense, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
-import { type Language } from "../../types"
+
 import { useAuth } from "../../contexts/AuthContext"
-import { FilterModal } from "./FilterModal"
-import DormListHeader from "./dorm-list/DormListHeader"
+import { type Language } from "../../types"
 import DormGrid from "./dorm-list/DormGrid"
-import { FavoriteFlyEffect } from "./dorm-list/FavoriteFlyEffect"
-import { ListEmptyState } from "./dorm-list/EmptyStates"
+import DormListHeader from "./dorm-list/DormListHeader"
 import { DormListMapPane } from "./dorm-list/DormListMapPane"
+import { ListEmptyState } from "./dorm-list/EmptyStates"
+import { FavoriteFlyEffect } from "./dorm-list/FavoriteFlyEffect"
 import { useDormListController } from "./dorm-list/useDormListController"
+import { FilterModal } from "./FilterModal"
 import { useDormCommentStats } from "./hooks/useDormCommentStats"
 import { useCompare } from "./store/CompareContext"
 

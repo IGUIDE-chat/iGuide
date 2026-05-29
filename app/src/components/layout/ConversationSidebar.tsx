@@ -7,11 +7,12 @@
 
 import * as React from "react"
 import { useCallback, useEffect, useState } from "react"
-import { Typewriter } from "../ui/Typewriter"
-import { type ConversationSummary } from "../../types"
+
+import { useAuth } from "../../contexts/AuthContext"
 import { conversationService } from "../../services/conversationService"
 import { localConversationService } from "../../services/localConversationService"
-import { useAuth } from "../../contexts/AuthContext"
+import { type ConversationSummary } from "../../types"
+import { Typewriter } from "../ui/Typewriter"
 import {
   BaseSidebar,
   DeleteButton,

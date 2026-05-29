@@ -6,6 +6,7 @@
  */
 
 import type mapboxgl from "mapbox-gl"
+
 import { LANDMARK_ICON_TYPES } from "./mapConstants"
 
 const createPillImage = () => {

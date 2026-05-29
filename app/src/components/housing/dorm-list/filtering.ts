@@ -5,9 +5,9 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
+import { deriveRoomOptions } from "../../../utils/roomOptions"
 import { type Dorm, type DormTag, FilterOption } from "../types/index"
 import { type DormFilterState } from "./types"
-import { deriveRoomOptions } from "../../../utils/roomOptions"
 
 // ── Categorized tag matchers ─────────────────────────────────────────────
 

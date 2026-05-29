@@ -5,15 +5,15 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-// [SERVICE] Admin-only operations for the `dorms` table.
-// [服务] 管理员专用——直接操作 `dorms` 表（替代旧的 override 模式）。
-import { supabase } from "./supabase"
 import { type Dorm } from "../components/housing/types/index"
 import {
   getDormPriceRange,
   sanitizeFloorPlansForStorage,
 } from "../utils/dormData"
 import { getPersistedBathroomType } from "../utils/roomOptions"
+// [SERVICE] Admin-only operations for the `dorms` table.
+// [服务] 管理员专用——直接操作 `dorms` 表（替代旧的 override 模式）。
+import { supabase } from "./supabase"
 
 const TABLE = "dorms"
 

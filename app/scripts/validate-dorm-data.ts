@@ -1,14 +1,15 @@
 import fs from "node:fs"
 import path from "node:path"
+
 import { UIUC_DORMS } from "../src/components/housing/constants/dormData"
-import {
-  LLC_OPTIONS,
-  TAGS_BY_CATEGORY,
-} from "../src/components/housing/constants/metadata"
 import {
   hasPeopleishFilename,
   isLikelyLowQualityMediaUrl,
 } from "../src/components/housing/constants/dormOfficialOverrideUtils"
+import {
+  LLC_OPTIONS,
+  TAGS_BY_CATEGORY,
+} from "../src/components/housing/constants/metadata"
 import { getDormPriceRange } from "../src/utils/dormData"
 
 const EXPECTED_IDS = [

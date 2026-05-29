@@ -655,7 +655,7 @@ async function loadMarkdownUnit(
   const chunks = chunkText(cleanedContent)
   const title =
     parsed.frontmatter.title ||
-    findMarkdownHeading(parsed.body) ??
+    findMarkdownHeading(parsed.body) ||
     deriveNameFromReference(filePath)
   const canonicalUrl = parsed.frontmatter.url || null
 

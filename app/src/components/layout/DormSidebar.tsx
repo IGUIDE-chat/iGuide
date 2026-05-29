@@ -5,13 +5,14 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { useMemo } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { Clock, Heart, Trash2 } from "lucide-react"
+import React, { useMemo } from "react"
 import { useNavigate } from "react-router-dom"
+
+import { type Language } from "../../types"
 import { useSharedDormInteraction } from "../housing/store/DormUserInteractionContext"
 import { useDormData } from "../housing/store/HousingDataContext"
-import { type Language } from "../../types"
 import { type Dorm } from "../housing/types/index"
 import { Typewriter } from "../ui/Typewriter"
 

@@ -5,9 +5,10 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from "react"
 import { AnimatePresence, motion } from "framer-motion"
+import React from "react"
 import { Link } from "react-router-dom"
+
 import { BrandMark } from "../ui/branding/BrandMark"
 
 interface SidebarFooterProps {

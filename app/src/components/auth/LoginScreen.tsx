@@ -5,11 +5,12 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
+import { motion } from "framer-motion"
 // [PAGE] Combined login/registration screen with guest mode support.
 // [页面] 集成了访客模式支持的登录/注册页面。
 import * as React from "react"
 import { useState } from "react"
-import { motion } from "framer-motion"
+
 import { useAuth } from "../../contexts/AuthContext"
 import { UI_TEXT } from "../../i18n/uiText"
 import { type Language } from "../../types"

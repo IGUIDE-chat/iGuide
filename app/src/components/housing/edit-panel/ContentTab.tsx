@@ -5,11 +5,12 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from "react"
 import { RotateCcw } from "lucide-react"
+import React from "react"
+
 import { LOCATION_PRESETS } from "../constants/metadata"
-import { type DormEditFormState } from "./useDormEditForm"
 import { EditableList, Field, inputCls } from "./EditPanelFields"
+import { type DormEditFormState } from "./useDormEditForm"
 
 interface ContentTabProps {
   form: DormEditFormState

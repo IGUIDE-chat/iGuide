@@ -3,8 +3,8 @@
  * @description Shared sidebar layout component with category grouping and animated list items.
  */
 
-import React from "react"
 import { AnimatePresence, motion } from "framer-motion"
+import React from "react"
 
 export const sidebarItemAnimation = {
   layout: true,

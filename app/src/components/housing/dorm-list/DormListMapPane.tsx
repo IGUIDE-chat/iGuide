@@ -6,10 +6,11 @@
  */
 
 import React, { Suspense } from "react"
-import { type Dorm } from "../types/index"
+
 import { type Language } from "../../../types"
-import MapCarousel from "./MapCarousel"
+import { type Dorm } from "../types/index"
 import { MapEmptyViewportOverlay, MapNoResultsOverlay } from "./EmptyStates"
+import MapCarousel from "./MapCarousel"
 import { type DormListText } from "./types"
 
 // Lazy-load DormMap to defer mapbox-gl (~700KB) until map view is actually used

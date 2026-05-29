@@ -5,7 +5,6 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { useLayoutEffect, useMemo, useRef, useState } from "react"
 import {
   Bath,
   BedSingle,
@@ -16,11 +15,13 @@ import {
   Utensils,
   Wind,
 } from "lucide-react"
-import { formatPrice } from "./constants/pricing"
-import { type Dorm } from "./types/index"
+import React, { useLayoutEffect, useMemo, useRef, useState } from "react"
+
 import { type Language } from "../../types"
 import { deriveRoomOptions, getRoomRangeSummary } from "../../utils/roomOptions"
 import { type CardTagItem, getCardTagCandidates } from "../../utils/tagLabels"
+import { formatPrice } from "./constants/pricing"
+import { type Dorm } from "./types/index"
 
 interface DormCardProps {
   dorm: Dorm

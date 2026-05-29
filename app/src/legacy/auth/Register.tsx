@@ -8,6 +8,7 @@
 // [LEGACY/UNUSED] Old register component. Replaced by LoginScreen.tsx.
 // [遗留/未使用] 旧的注册组件。已被 LoginScreen.tsx 取代。
 import React, { useState } from "react"
+
 import { useAuth } from "./AuthContext"
 
 interface RegisterProps {

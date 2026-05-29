@@ -4,13 +4,14 @@
  */
 
 import * as React from "react"
-import { type Language } from "../../types"
+
 import { UI_TEXT } from "../../i18n/uiText"
+import { type Language } from "../../types"
 import { ChatEmptyState } from "./ChatEmptyState"
-import { UserMessage } from "./messages/UserMessage"
-import { AssistantMessage } from "./messages/AssistantMessage"
 import { ChatSessionContext } from "./ChatRuntimeProvider"
 import { ImeSafeTextarea } from "./ImeSafeTextarea"
+import { AssistantMessage } from "./messages/AssistantMessage"
+import { UserMessage } from "./messages/UserMessage"
 
 interface ChatThreadProps {
   language: Language

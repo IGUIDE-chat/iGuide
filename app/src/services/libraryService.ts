@@ -8,8 +8,8 @@
 // [SERVICE] Manages reading history, pinned articles, and library interactions.
 // [服务] 管理阅读历史、置顶文章以及知识库交互功能。
 import { type Article, type LibraryHistoryItem } from "../types"
-import { supabase } from "./supabase"
 import { authService } from "./authService"
+import { supabase } from "./supabase"
 
 export const libraryService = {
   /**

@@ -28,13 +28,13 @@ Tool 是 **模型可以直接调用的函数接口**。
 
 ```ts
 export interface ToolDefinition {
- name: string;
- description: string;
- parameters: Record<string, unknown>;
- execute: (
-  args: Record<string, unknown>,
-  ctx: RequestContext,
- ) => Promise<ToolResult>;
+  name: string
+  description: string
+  parameters: Record<string, unknown>
+  execute: (
+    args: Record<string, unknown>,
+    ctx: RequestContext
+  ) => Promise<ToolResult>
 }
 ```
 
@@ -69,11 +69,11 @@ Skill 不是一段可执行代码，而是一个**结构化的任务模板**。
 当前注册方式：
 
 ```ts
-const registry = new ToolRegistry();
-createSearchKnowledgeBaseTool(registry);
-createWebSearchTool(registry);
-createGrepDocsTool(registry);
-createCustomSkillsTool(registry);
+const registry = new ToolRegistry()
+createSearchKnowledgeBaseTool(registry)
+createWebSearchTool(registry)
+createGrepDocsTool(registry)
+createCustomSkillsTool(registry)
 ```
 
 也就是说，**新增 tool 的最低要求**是：
@@ -142,82 +142,90 @@ createCustomSkillsTool(registry);
 基础模板可以是：
 
 ```ts
-import { ToolRegistry } from "./registry";
-import type { RequestContext, ToolDefinition, ToolResult } from "./types";
+import { ToolRegistry } from "./registry"
+import type { RequestContext, ToolDefinition, ToolResult } from "./types"
 
 interface SearchDeadlinesArgs {
- query: string;
- limit?: number;
+  query: string
+  limit?: number
 }
 
-function parseArgs(args: Record<string, unknown>): SearchDeadlinesArgs | ToolResult {
- const { query, limit } = args;
+function parseArgs(
+  args: Record<string, unknown>
+): SearchDeadlinesArgs | ToolResult {
+  const { query, limit } = args
 
- if (typeof query !== "string" || query.trim().length === 0) {
+  if (typeof query !== "string" || query.trim().length === 0) {
+    return {
+      content: JSON.stringify({
+        error: "invalid_query",
+        message: "query must be a non-empty string",
+      }),
+      metadata: { error: true },
+    }
+  }
+
   return {
-   content: JSON.stringify({
-    error: "invalid_query",
-    message: "query must be a non-empty string",
-   }),
-   metadata: { error: true },
-  };
- }
-
- return {
-  query: query.trim(),
-  limit: typeof limit === "number" ? Math.min(Math.max(Math.floor(limit), 1), 10) : 5,
- };
+    query: query.trim(),
+    limit:
+      typeof limit === "number"
+        ? Math.min(Math.max(Math.floor(limit), 1), 10)
+        : 5,
+  }
 }
 
-export function createSearchDeadlinesTool(registry: ToolRegistry): ToolDefinition {
- const tool: ToolDefinition = {
-  name: "search_deadlines",
-  description: "Search important deadlines, dates, and time-sensitive campus milestones.",
-  parameters: {
-   type: "object",
-   properties: {
-    query: {
-     type: "string",
-     description: "Deadline-related query",
+export function createSearchDeadlinesTool(
+  registry: ToolRegistry
+): ToolDefinition {
+  const tool: ToolDefinition = {
+    name: "search_deadlines",
+    description:
+      "Search important deadlines, dates, and time-sensitive campus milestones.",
+    parameters: {
+      type: "object",
+      properties: {
+        query: {
+          type: "string",
+          description: "Deadline-related query",
+        },
+        limit: {
+          type: "integer",
+          description: "Maximum number of results",
+          default: 5,
+          minimum: 1,
+          maximum: 10,
+        },
+      },
+      required: ["query"],
     },
-    limit: {
-     type: "integer",
-     description: "Maximum number of results",
-     default: 5,
-     minimum: 1,
-     maximum: 10,
+    execute: async (
+      args: Record<string, unknown>,
+      ctx: RequestContext
+    ): Promise<ToolResult> => {
+      const parsed = parseArgs(args)
+      if ("content" in parsed) {
+        return parsed
+      }
+
+      const { query, limit } = parsed
+
+      // TODO: 在这里接入真实的数据源或检索逻辑
+      return {
+        content: JSON.stringify(
+          {
+            query,
+            limit,
+            results: [],
+          },
+          null,
+          2
+        ),
+      }
     },
-   },
-   required: ["query"],
-  },
-  execute: async (
-   args: Record<string, unknown>,
-   ctx: RequestContext,
-  ): Promise<ToolResult> => {
-   const parsed = parseArgs(args);
-   if ("content" in parsed) {
-    return parsed;
-   }
+  }
 
-   const { query, limit } = parsed;
-
-   // TODO: 在这里接入真实的数据源或检索逻辑
-   return {
-    content: JSON.stringify(
-     {
-      query,
-      limit,
-      results: [],
-     },
-     null,
-     2,
-    ),
-   };
-  },
- };
-
- registry.register(tool);
- return tool;
+  registry.register(tool)
+  return tool
 }
 ```
 
@@ -239,8 +247,8 @@ export function createSearchDeadlinesTool(registry: ToolRegistry): ToolDefinitio
 
 ```json
 {
- "error": "invalid_query",
- "message": "query must be a non-empty string"
+  "error": "invalid_query",
+  "message": "query must be a non-empty string"
 }
 ```
 
@@ -255,18 +263,18 @@ export function createSearchDeadlinesTool(registry: ToolRegistry): ToolDefinitio
 先导入：
 
 ```ts
-import { createSearchDeadlinesTool } from "./tools/search-deadlines";
+import { createSearchDeadlinesTool } from "./tools/search-deadlines"
 ```
 
 再注册：
 
 ```ts
-const registry = new ToolRegistry();
-createSearchKnowledgeBaseTool(registry);
-createWebSearchTool(registry);
-createGrepDocsTool(registry);
-createSearchDeadlinesTool(registry);
-createCustomSkillsTool(registry);
+const registry = new ToolRegistry()
+createSearchKnowledgeBaseTool(registry)
+createWebSearchTool(registry)
+createGrepDocsTool(registry)
+createSearchDeadlinesTool(registry)
+createCustomSkillsTool(registry)
 ```
 
 建议把注册顺序按“基础工具在前，高层工具在后”来保持清晰。
@@ -311,19 +319,19 @@ createCustomSkillsTool(registry);
 
 ```json
 {
- "id": "deadline_lookup",
- "name": "Deadline Lookup",
- "description": "Find important campus deadlines for a given topic",
- "prompt_template": "Find the most important deadlines related to {{topic}}. Include date, scope, and source.",
- "required_tools": ["search_deadlines"],
- "output_format": "deadline_list",
- "parameters": {
-  "topic": {
-   "type": "string",
-   "description": "The topic to search deadlines for",
-   "required": true
+  "id": "deadline_lookup",
+  "name": "Deadline Lookup",
+  "description": "Find important campus deadlines for a given topic",
+  "prompt_template": "Find the most important deadlines related to {{topic}}. Include date, scope, and source.",
+  "required_tools": ["search_deadlines"],
+  "output_format": "deadline_list",
+  "parameters": {
+    "topic": {
+      "type": "string",
+      "description": "The topic to search deadlines for",
+      "required": true
+    }
   }
- }
 }
 ```
 
@@ -336,18 +344,18 @@ createCustomSkillsTool(registry);
 先导入：
 
 ```ts
-import deadlineLookupSkill from "../skills/deadline_lookup.json";
+import deadlineLookupSkill from "../skills/deadline_lookup.json"
 ```
 
 再加入 `SKILL_CONFIGS`：
 
 ```ts
 const SKILL_CONFIGS: SkillConfig[] = [
- parseSkillConfig(compareDormsSkill),
- parseSkillConfig(findByCriteriaSkill),
- parseSkillConfig(campusNavigationSkill),
- parseSkillConfig(deadlineLookupSkill),
-];
+  parseSkillConfig(compareDormsSkill),
+  parseSkillConfig(findByCriteriaSkill),
+  parseSkillConfig(campusNavigationSkill),
+  parseSkillConfig(deadlineLookupSkill),
+]
 ```
 
 这样它就会自动进入：
@@ -509,7 +517,7 @@ Skill 参数主要服务于模板展开，所以要：
 
 ```json
 {
- "error": "Unknown skill"
+  "error": "Unknown skill"
 }
 ```
 

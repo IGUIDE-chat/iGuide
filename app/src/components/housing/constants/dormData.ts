@@ -5,9 +5,9 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { type Dorm } from "../types/index"
-import { normalizeDorm } from "../../../utils/roomOptions"
 import { finalizeDormRecord } from "../../../utils/dormData"
+import { normalizeDorm } from "../../../utils/roomOptions"
+import { type Dorm } from "../types/index"
 import { applyDormOfficialOverride } from "./dormOfficialOverrides"
 
 // Accurate UIUC dorm coordinates based on campus geography

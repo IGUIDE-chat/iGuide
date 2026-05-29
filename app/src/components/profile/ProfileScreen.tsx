@@ -9,9 +9,10 @@
 // [页面] 用户个人资料管理和设置页面。
 import React, { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
+
 import { useAuth } from "../../contexts/AuthContext"
-import { type Language } from "../../types"
 import { memoryService } from "../../services/memoryService"
+import { type Language } from "../../types"
 import { IntegrationsSection } from "./IntegrationsSection"
 
 interface ProfileScreenProps {

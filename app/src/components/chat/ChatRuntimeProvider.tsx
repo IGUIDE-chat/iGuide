@@ -4,18 +4,19 @@
  *   exposes a stable ChatSessionContext for child components.
  */
 
-import * as React from "react"
 import { useChat } from "@ai-sdk/react"
 import { DefaultChatTransport, type UIMessage } from "ai"
+import * as React from "react"
+
 import { useAuth } from "../../contexts/AuthContext"
-import { supabase } from "../../services/supabase"
 import { conversationService } from "../../services/conversationService"
 import { localConversationService } from "../../services/localConversationService"
-import { chatMessagesToUIMessages } from "./messageAdapters"
-import { extractMemoryTags } from "./memoryTagExtraction"
-import { extractFollowUps } from "./followUpExtraction"
 import { memoryService } from "../../services/memoryService"
+import { supabase } from "../../services/supabase"
 import { ChatErrorBoundary } from "./ChatErrorBoundary"
+import { extractFollowUps } from "./followUpExtraction"
+import { extractMemoryTags } from "./memoryTagExtraction"
+import { chatMessagesToUIMessages } from "./messageAdapters"
 
 interface ChatSessionContextValue {
   messages: UIMessage[]

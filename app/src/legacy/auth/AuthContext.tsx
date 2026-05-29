@@ -15,6 +15,7 @@ import {
   ReactNode,
   FC,
 } from "react"
+
 import { User, AuthContextType } from "../../types"
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)

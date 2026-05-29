@@ -5,9 +5,9 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { type Message, supabase } from "./supabase"
-import { authService } from "./authService"
 import { type ChatMessage } from "../types"
+import { authService } from "./authService"
+import { type Message, supabase } from "./supabase"
 
 export const conversationService = {
   /**

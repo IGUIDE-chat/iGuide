@@ -1,3 +1,11 @@
+import { type ToolRegistry } from "../tools/registry.ts"
+import {
+  type OpenAITool,
+  type RequestContext,
+  type ToolResult,
+} from "../tools/types.ts"
+import { executeToolAction } from "./actions.ts"
+import { DEFAULT_MAX_ITERATIONS, evaluateStopCondition } from "./bounds.ts"
 /* eslint-disable no-await-in-loop -- Agent loop requires sequential streaming reads, tool execution, and SSE writes */
 import {
   type FallbackEvent,
@@ -5,7 +13,16 @@ import {
   logFallbackEvent,
   withFallback,
 } from "./fallback.ts"
-import { DEFAULT_MAX_ITERATIONS, evaluateStopCondition } from "./bounds.ts"
+import { analyzeFreshness } from "./freshness-router.ts"
+import {
+  type ProviderMessage,
+  type ProviderToolCall,
+  buildProviderMessages,
+  convertObservationToMessage,
+} from "./messages.ts"
+import { type Observation } from "./observation.ts"
+import { buildSystemPrompt } from "./prompts.ts"
+import { shouldEnableRetrievalTools } from "./retrieval-policy.ts"
 import {
   emitAgentStep,
   emitFinalizing,
@@ -16,23 +33,6 @@ import {
   sendToolResult,
   sendToolStart,
 } from "./stream.ts"
-import { buildSystemPrompt } from "./prompts.ts"
-import { shouldEnableRetrievalTools } from "./retrieval-policy.ts"
-import { analyzeFreshness } from "./freshness-router.ts"
-import {
-  type ProviderMessage,
-  type ProviderToolCall,
-  buildProviderMessages,
-  convertObservationToMessage,
-} from "./messages.ts"
-import { executeToolAction } from "./actions.ts"
-import { type Observation } from "./observation.ts"
-import { type ToolRegistry } from "../tools/registry.ts"
-import {
-  type OpenAITool,
-  type RequestContext,
-  type ToolResult,
-} from "../tools/types.ts"
 
 export interface AgentLoopOptions {
   message: string

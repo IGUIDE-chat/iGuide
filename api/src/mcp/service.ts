@@ -1,8 +1,6 @@
-import {
-  type MCPConnection,
-  type MCPDiscoveredTool,
-  type MCPToolOverride,
-} from "./types.ts"
+import { tool } from "ai"
+import { z } from "zod"
+
 import {
   type MCPAdapterClient,
   type MCPDiscoveryResult,
@@ -10,8 +8,11 @@ import {
 } from "./adapter.ts"
 import { type MCPStore, createMCPStore } from "./store.ts"
 import { StreamableHttpMCPClient } from "./streamable-http-client.ts"
-import { tool } from "ai"
-import { z } from "zod"
+import {
+  type MCPConnection,
+  type MCPDiscoveredTool,
+  type MCPToolOverride,
+} from "./types.ts"
 
 type CreateConnectionInput = Pick<
   MCPConnection,

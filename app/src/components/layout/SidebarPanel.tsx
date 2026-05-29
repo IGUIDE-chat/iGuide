@@ -6,10 +6,11 @@
  */
 
 import React from "react"
+
 import { type Language } from "../../types"
 import { ConversationSidebar } from "./ConversationSidebar"
-import { LibrarySidebar } from "./LibrarySidebar"
 import { DormSidebar } from "./DormSidebar"
+import { LibrarySidebar } from "./LibrarySidebar"
 
 interface SidebarPanelProps {
   activeTab: string

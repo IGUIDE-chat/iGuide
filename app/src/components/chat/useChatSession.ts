@@ -6,13 +6,14 @@
  */
 
 import { useCallback, useEffect, useReducer, useState } from "react"
-import { type ChatMessage, type Language, type ThinkingStep } from "../../types"
+
+import { useAuth } from "../../contexts/AuthContext"
+import { useThrottle } from "../../hooks/useThrottle"
 import { streamChatResponse } from "../../services/ai"
 import { conversationService } from "../../services/conversationService"
 import { localConversationService } from "../../services/localConversationService"
 import { memoryService } from "../../services/memoryService"
-import { useAuth } from "../../contexts/AuthContext"
-import { useThrottle } from "../../hooks/useThrottle"
+import { type ChatMessage, type Language, type ThinkingStep } from "../../types"
 
 interface UseChatSessionOptions {
   language: Language

@@ -5,8 +5,9 @@
  */
 
 import React, { useEffect, useState } from "react"
-import { type Language } from "../../types"
+
 import { supabase } from "../../services/supabase"
+import { type Language } from "../../types"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

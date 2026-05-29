@@ -10,9 +10,10 @@
 import * as React from "react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
-import { type Article, type Language } from "../../types"
+
 import { CATEGORIES, getArticleText, getCategoryText } from "../../constants"
 import { UI_TEXT } from "../../i18n/uiText"
+import { type Article, type Language } from "../../types"
 
 interface ArticleViewProps {
   article: Article

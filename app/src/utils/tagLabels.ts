@@ -5,17 +5,17 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-// [UTILITY] Tag label i18n and hero tag selection utilities.
-// [工具] 标签国际化和 Hero 标签选择工具。
-import { type Language } from "../types"
-import {
-  type DormCategorizedTags,
-  type DormTag,
-} from "../components/housing/types/index"
 import {
   TAG_REGISTRY,
   getTagDisplay,
 } from "../components/housing/constants/metadata"
+import {
+  type DormCategorizedTags,
+  type DormTag,
+} from "../components/housing/types/index"
+// [UTILITY] Tag label i18n and hero tag selection utilities.
+// [工具] 标签国际化和 Hero 标签选择工具。
+import { type Language } from "../types"
 
 // ── Legacy tag map (kept for backward compat during migration) ──────────────
 

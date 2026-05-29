@@ -5,8 +5,8 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { memo, useLayoutEffect, useRef, useState } from "react"
 import { ArrowUpDown, Check } from "lucide-react"
+import React, { memo, useLayoutEffect, useRef, useState } from "react"
 
 interface SortingDropdownProps {
   sortBy: string

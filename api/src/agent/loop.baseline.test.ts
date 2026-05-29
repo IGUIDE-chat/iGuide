@@ -1,14 +1,14 @@
 import assert from "node:assert/strict"
 import test from "node:test"
 
-import { runAgentLoop, runStreamingAgentLoop } from "./loop.ts"
-import { ToolRegistry } from "../tools/registry.ts"
 import {
   type MockProviderResponseInput,
   type RecordedProviderRequest,
   createMockProviderFetch,
 } from "../test/utils/mockProvider.ts"
 import { createStubTool } from "../test/utils/stubTools.ts"
+import { ToolRegistry } from "../tools/registry.ts"
+import { runAgentLoop, runStreamingAgentLoop } from "./loop.ts"
 
 interface ProviderRequestBody {
   model?: string

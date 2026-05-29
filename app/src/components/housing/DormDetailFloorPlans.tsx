@@ -1,4 +1,3 @@
-import React, { useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import {
   ArrowRightLeft,
@@ -10,14 +9,16 @@ import {
   ChevronRight,
   SquareDashed,
 } from "lucide-react"
-import { type BathroomScope, type FloorPlan } from "./types/index"
+import React, { useState } from "react"
+
 import { type Language } from "../../types"
-import { formatPrice } from "./constants/pricing"
-import { dormDetailTexts } from "./i18n/dormTexts"
 import {
   getBathroomScopeLabel,
   getRoomOptionLabels,
 } from "../../utils/roomOptions"
+import { formatPrice } from "./constants/pricing"
+import { dormDetailTexts } from "./i18n/dormTexts"
+import { type BathroomScope, type FloorPlan } from "./types/index"
 
 interface DormDetailFloorPlansProps {
   sortedPlans: FloorPlan[]

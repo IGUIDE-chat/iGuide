@@ -5,9 +5,10 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from "react"
-import { List, Map as MapIcon, Search, SlidersHorizontal } from "lucide-react"
 import { motion } from "framer-motion"
+import { List, Map as MapIcon, Search, SlidersHorizontal } from "lucide-react"
+import React from "react"
+
 import SortingDropdown from "../SortingDropdown"
 import { type DormListText } from "./types"
 

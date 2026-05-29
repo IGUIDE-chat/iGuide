@@ -1,12 +1,12 @@
 import assert from "node:assert/strict"
 import test from "node:test"
 
-import { ToolRegistry } from "./registry.ts"
 import {
   createEchoTool,
   createFailingTool,
   createStubTool,
 } from "../test/utils/stubTools.ts"
+import { ToolRegistry } from "./registry.ts"
 import {
   type RequestContext,
   type ToolDefinition,

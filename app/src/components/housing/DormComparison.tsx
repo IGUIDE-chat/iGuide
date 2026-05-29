@@ -5,11 +5,7 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { useEffect, useMemo, useState } from "react"
-import { type Dorm, type FloorPlan } from "./types/index"
-import { formatPrice } from "./constants/pricing"
-import { getHousingTypeMeta, getLocalizedLabel } from "./constants/metadata"
-import { type Language } from "../../types"
+import { AnimatePresence, motion } from "framer-motion"
 import {
   AlertCircle,
   Bath,
@@ -21,7 +17,9 @@ import {
   SquareDashed,
   X,
 } from "lucide-react"
-import { AnimatePresence, motion } from "framer-motion"
+import React, { useEffect, useMemo, useState } from "react"
+
+import { type Language } from "../../types"
 import {
   deriveRoomOptions,
   getBathroomScopeLabel,
@@ -30,6 +28,9 @@ import {
   getStorageBathroomScope,
   normalizeFloorPlan,
 } from "../../utils/roomOptions"
+import { getHousingTypeMeta, getLocalizedLabel } from "./constants/metadata"
+import { formatPrice } from "./constants/pricing"
+import { type Dorm, type FloorPlan } from "./types/index"
 
 interface DormComparisonProps {
   dorms: Dorm[]

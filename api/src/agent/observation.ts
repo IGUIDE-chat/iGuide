@@ -1,5 +1,5 @@
-import { type ProviderMessage, buildToolResultContent } from "./messages.ts"
 import { type ToolResult } from "../tools/types.ts"
+import { type ProviderMessage, buildToolResultContent } from "./messages.ts"
 
 export interface ObservationError {
   code: string

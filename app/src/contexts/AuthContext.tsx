@@ -5,6 +5,7 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
+import { type User as SupabaseUser } from "@supabase/supabase-js"
 // [CONTEXT] Authentication provider managing user login state and session persistence.
 // [上下文] 管理用户登录状态和会话持久化的身份验证提供者。
 import React, {
@@ -15,8 +16,8 @@ import React, {
   useMemo,
   useState,
 } from "react"
+
 import { authService } from "../services/authService"
-import { type User as SupabaseUser } from "@supabase/supabase-js"
 import { type AuthContextType, type User } from "../types"
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)

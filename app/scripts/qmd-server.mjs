@@ -29,9 +29,9 @@ import {
   writeFileSync,
 } from "node:fs"
 import { createServer } from "node:http"
+import { freemem, totalmem } from "node:os"
 import { join, relative, resolve } from "node:path"
 import { promisify } from "node:util"
-import { freemem, totalmem } from "node:os"
 
 const execFileAsync = promisify(execFile)
 

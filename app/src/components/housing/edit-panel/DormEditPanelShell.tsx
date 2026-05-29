@@ -5,8 +5,9 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from "react"
 import { X } from "lucide-react"
+import React from "react"
+
 import { type ActiveTab } from "./useDormEditForm"
 
 interface TabConfig {

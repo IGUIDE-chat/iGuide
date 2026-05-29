@@ -1,14 +1,14 @@
 import assert from "node:assert/strict"
 import test from "node:test"
 
-import { executeToolAction } from "./actions.ts"
-import { ToolRegistry } from "../tools/registry.ts"
 import { createEchoTool, createFailingTool } from "../test/utils/stubTools.ts"
+import { ToolRegistry } from "../tools/registry.ts"
 import {
   type RequestContext,
   type ToolDefinition,
   type ToolResult,
 } from "../tools/types.ts"
+import { executeToolAction } from "./actions.ts"
 
 const MOCK_CTX: RequestContext = {
   env: {},

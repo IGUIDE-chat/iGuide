@@ -6,9 +6,10 @@
  */
 
 import React, { type ReactNode, createContext, useContext } from "react"
+
+import { type DormFavorite } from "../../../services/dormFavoritesService"
 import { useDormUserInteraction } from "../hooks/useDormUserInteraction"
 import { type Dorm } from "../types/index"
-import { type DormFavorite } from "../../../services/dormFavoritesService"
 
 interface DormUserInteractionContextType {
   favorites: string[]

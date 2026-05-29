@@ -6,14 +6,15 @@
  */
 
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { type Dorm } from "../types/index"
-import { dormViewingService } from "../../../services/dormViewingService"
+
+import { useAuth } from "../../../contexts/AuthContext"
 import {
   type DormFavorite,
   dormFavoritesService,
 } from "../../../services/dormFavoritesService"
-import { useAuth } from "../../../contexts/AuthContext"
+import { dormViewingService } from "../../../services/dormViewingService"
 import { useDormData } from "../store/HousingDataContext"
+import { type Dorm } from "../types/index"
 
 const FAVORITES_KEY = "uiuc-dorm-favorites"
 const HISTORY_KEY = "uiuc-dorm-history"

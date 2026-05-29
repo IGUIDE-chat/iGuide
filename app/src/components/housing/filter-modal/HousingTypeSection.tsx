@@ -6,6 +6,7 @@
  */
 
 import React, { memo } from "react"
+
 import {
   HOUSING_TYPE_OPTIONS,
   getHousingTypeMeta,

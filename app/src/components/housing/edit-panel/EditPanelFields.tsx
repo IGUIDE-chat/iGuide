@@ -5,8 +5,8 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from "react"
 import { Plus, Trash2 } from "lucide-react"
+import React from "react"
 
 export const inputCls =
   "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-illini-blue"

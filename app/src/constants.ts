@@ -5,9 +5,9 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
+import { UI_TEXT as I18N_UI_TEXT } from "./i18n/uiText"
 // [ROOT] Global constants and static library metadata.
 import { type Article, type Category, type Language } from "./types"
-import { UI_TEXT as I18N_UI_TEXT } from "./i18n/uiText"
 
 /** @deprecated Use UI_TEXT from './i18n/uiText' directly. */
 export const UI_TEXT = I18N_UI_TEXT
