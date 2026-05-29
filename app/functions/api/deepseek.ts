@@ -89,7 +89,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       )
     }
 
-    const body = await request.json()
+    const body = await request.json() as DeepSeekBody
     const messages = buildMessages(body)
     const useStream = body.stream !== false // default to streaming
 
@@ -105,7 +105,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
           model: "deepseek-chat",
           messages,
           stream: false,
-          temperature: 1.0,
+          temperature: 1,
         }),
       })
 
@@ -124,7 +124,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         )
       }
 
-      const data = await resp.json()
+      const data = await resp.json() as { choices?: Array<{ message?: { content?: string } }> }
       const reply = data?.choices?.[0]?.message?.content ?? ""
       return new Response(JSON.stringify({ reply }), {
         status: 200,
@@ -143,7 +143,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         model: "deepseek-chat",
         messages,
         stream: true,
-        temperature: 1.0,
+        temperature: 1,
       }),
     })
 

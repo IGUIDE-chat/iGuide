@@ -1,4 +1,5 @@
-import { AnimatePresence, type Variants, motion } from "framer-motion"
+import { AnimatePresence, motion } from 'framer-motion';
+import type { Variants } from 'framer-motion';
 import { ArrowLeft, Heart, Pencil } from "lucide-react"
 import React, { useEffect, useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
@@ -6,7 +7,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom"
 import { useAuth } from "../../contexts/AuthContext"
 import { useLayout } from "../../contexts/LayoutContext"
 import { dormService } from "../../services/dormService"
-import { type Language } from "../../types"
+import type { Language } from '../../types';
 import {
   getStorageBathroomScope,
   normalizeFloorPlan,
@@ -23,7 +24,7 @@ import { dormDetailTexts } from "./i18n/dormTexts"
 import ImageLightbox from "./ImageLightbox"
 import { useSharedDormInteraction } from "./store/DormUserInteractionContext"
 import { useDormData } from "./store/HousingDataContext"
-import { type Dorm, type DormTag } from "./types/index"
+import type { Dorm, DormTag } from './types/index';
 
 const pageVariants: Variants = {
   hidden: { opacity: 0, y: 10 },
@@ -51,7 +52,7 @@ const fadeUp: Variants = {
 
 const hasPublishedPlanPrice = (price: unknown): price is number =>
   typeof price === "number" && Number.isFinite(price) && price > 0
-const getPublishedPlanPrice = (plan: unknown) =>
+const getPublishedPlanPrice = (plan: { price?: unknown }) =>
   hasPublishedPlanPrice(plan.price) ? plan.price : null
 
 interface DormDetailProps {
@@ -106,12 +107,12 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
         setDorm(d)
       }
     }
-    loadDorm()
+    void loadDorm()
   }, [id, getFromContext])
 
   useEffect(() => {
     if (dorm) {
-      addToHistory(dorm)
+      void addToHistory(dorm)
     }
   }, [dorm, addToHistory])
 
@@ -166,7 +167,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
           <button
             type="button"
             onClick={() => {
-              toggleFavorite(dorm.id, dorm.name, dorm.name_zh)
+              void toggleFavorite(dorm.id, dorm.name, dorm.name_zh)
             }}
             className="hover:text-illini-orange rounded-full p-1.5 text-slate-400 transition-colors"
           >

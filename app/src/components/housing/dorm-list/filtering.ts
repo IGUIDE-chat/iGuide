@@ -6,8 +6,9 @@
  */
 
 import { deriveRoomOptions } from "../../../utils/roomOptions"
-import { type Dorm, type DormTag, FilterOption } from "../types/index"
-import { type DormFilterState } from "./types"
+import { FilterOption } from '../types/index';
+import type { Dorm, DormTag } from '../types/index';
+import type { DormFilterState } from './types';
 
 // ── Categorized tag matchers ─────────────────────────────────────────────
 
@@ -23,7 +24,7 @@ const matchesCategorizedTagFilters = (
     return false
   }
 
-  const allDormTags: DormTag[] = new Set([
+  const allDormTags = new Set<DormTag>([
     ...(dorm.categorizedTags.livingConditions ?? []),
     ...(dorm.categorizedTags.facilities ?? []),
     ...(dorm.categorizedTags.lifestyle ?? []),
@@ -34,8 +35,7 @@ const matchesCategorizedTagFilters = (
 
 // ── Sort ────────────────────────────────────────────────────────────────────
 
-const sortDorms = (dorms: Dorm[], sortBy: string) => {
-  return [...dorms].toSorted((a, b) => {
+const sortDorms = (dorms: Dorm[], sortBy: string) => [...dorms].toSorted((a, b) => {
     switch (sortBy) {
       case "name-asc":
         return a.name.localeCompare(b.name)
@@ -49,7 +49,6 @@ const sortDorms = (dorms: Dorm[], sortBy: string) => {
         return 0
     }
   })
-}
 
 export const normalizePriceRange = (
   range: [number, number],

@@ -11,19 +11,10 @@ import { useCallback, useEffect, useState } from "react"
 import { useAuth } from "../../contexts/AuthContext"
 import { conversationService } from "../../services/conversationService"
 import { localConversationService } from "../../services/localConversationService"
-import { type ConversationSummary } from "../../types"
+import type { ConversationSummary } from '../../types';
 import { Typewriter } from "../ui/Typewriter"
-import {
-  BaseSidebar,
-  DeleteButton,
-  PinButton,
-  SidebarEmptyState,
-  SidebarItem,
-  SidebarLoadingSpinner,
-  type TimeCategoryLabels,
-  getCategoryOrder,
-  groupByCategory,
-} from "./BaseSidebar"
+import { BaseSidebar, DeleteButton, PinButton, SidebarEmptyState, SidebarItem, SidebarLoadingSpinner, getCategoryOrder, groupByCategory } from './BaseSidebar';
+import type { TimeCategoryLabels } from './BaseSidebar';
 
 interface ConversationSidebarProps {
   currentConversationId: string | null
@@ -93,7 +84,15 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
       }
 
       if (data) {
-        const summaries: ConversationSummary[] = data.map((conv) => ({
+        const summaries: ConversationSummary[] = (
+          data as Array<{
+            id: string
+            title: string
+            updated_at: string
+            is_pinned: boolean
+            messages?: unknown[]
+          }>
+        ).map((conv) => ({
           id: conv.id,
           title: conv.title,
           updatedAt: conv.updated_at,
@@ -111,7 +110,7 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
 
   // Reload conversations when user changes OR when a new conversation is created/selected
   useEffect(() => {
-    loadConversations()
+    void loadConversations()
   }, [user, currentConversationId, loadConversations])
 
   const handleTogglePin = async (
@@ -132,7 +131,7 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
       }
 
       // Reload conversations
-      loadConversations()
+      void loadConversations()
     } catch (error) {
       console.error("Failed to toggle pin:", error)
     }
@@ -163,7 +162,7 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
         onNewConversation()
       }
 
-      loadConversations()
+      void loadConversations()
     } catch (error) {
       console.error("Failed to delete conversation:", error)
     } finally {

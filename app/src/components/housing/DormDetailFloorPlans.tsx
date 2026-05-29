@@ -1,4 +1,5 @@
-import { AnimatePresence, motion } from "framer-motion"
+import { AnimatePresence, motion } from 'framer-motion';
+import type { Variants } from 'framer-motion';
 import {
   ArrowRightLeft,
   Bath,
@@ -11,14 +12,14 @@ import {
 } from "lucide-react"
 import React, { useState } from "react"
 
-import { type Language } from "../../types"
+import type { Language } from '../../types';
 import {
   getBathroomScopeLabel,
   getRoomOptionLabels,
 } from "../../utils/roomOptions"
 import { formatPrice } from "./constants/pricing"
 import { dormDetailTexts } from "./i18n/dormTexts"
-import { type BathroomScope, type FloorPlan } from "./types/index"
+import type { BathroomScope, FloorPlan } from './types/index';
 
 interface DormDetailFloorPlansProps {
   sortedPlans: FloorPlan[]
@@ -26,8 +27,11 @@ interface DormDetailFloorPlansProps {
   minPrice: number | null
   maxPrice: number | null
   language: Language
-  fadeUp: unknown
-  onLightboxOpen: (images: unknown[], index: number) => void
+  fadeUp: Variants
+  onLightboxOpen: (
+    images: Array<{ src: string; alt?: string; label?: string }>,
+    index: number
+  ) => void
 }
 
 const getPlanKey = (plan: FloorPlan, idx: number) =>
@@ -122,7 +126,7 @@ const PlanRoomDetails: React.FC<{
           <span className="text-[12px] font-semibold tabular-nums md:text-[14px]">
             {sqft} {sqftLabel}
             <span className="ml-1 font-medium text-slate-400">
-              (~{Math.round(sqft * 0.092903)}㎡)
+              (~{Math.round(sqft * 0.092_903)}㎡)
             </span>
           </span>
         </div>
@@ -378,7 +382,7 @@ export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
           }
 
           let bathLabel: string
-          if (plan.bathroomCount !== null && plan.bathroomCount > 0) {
+          if (plan.bathroomCount != null && plan.bathroomCount > 0) {
             let bathUnit: string
             if (language === "zh") {
               bathUnit = "卫"
@@ -448,7 +452,7 @@ export const DormDetailFloorPlans: React.FC<DormDetailFloorPlansProps> = ({
                     />
 
                     <PlanRoomDetails
-                      bedCount={plan.bedCount}
+                      bedCount={plan.bedCount ?? null}
                       bedLabel={bedLabel}
                       bathLabel={bathLabel}
                       sqft={plan.sqft}

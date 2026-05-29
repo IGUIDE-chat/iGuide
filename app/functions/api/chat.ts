@@ -41,7 +41,13 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   const { request, env } = context
 
   try {
-    const body = await request.json()
+    const body = await request.json() as {
+      message: string
+      conversationId?: string
+      history?: Array<{ role: string; text: string }>
+      userId?: string
+      lang?: string
+    }
     const { message, conversationId, history, userId, lang = "en" } = body
 
     // Prefer server-only secrets first to avoid accidentally using stale public vars.
@@ -98,7 +104,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
     // Stream back
     const { readable, writable } = new TransformStream()
-    cozeRes.body?.pipeTo(writable)
+    cozeRes.body?.pipeTo(writable).catch(() => {})
 
     return new Response(readable, {
       headers: {
@@ -107,8 +113,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         Connection: "keep-alive",
       },
     })
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error"
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error"
     return new Response(JSON.stringify({ error: message }), { status: 500 })
   }
 }

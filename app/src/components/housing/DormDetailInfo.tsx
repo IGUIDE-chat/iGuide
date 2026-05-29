@@ -1,18 +1,19 @@
-import { motion } from "framer-motion"
+import { motion } from 'framer-motion';
+import type { Variants } from 'framer-motion';
 import React from "react"
 
-import { type Language } from "../../types"
+import type { Language } from '../../types';
 import { getDetailTagDisplay } from "../../utils/tagLabels"
 import { TAG_REGISTRY } from "./constants/metadata"
 import { dormDetailTexts } from "./i18n/dormTexts"
-import { type DormTag } from "./types/index"
+import type { DormCategorizedTags, DormTag } from './types/index';
 
 interface DormDetailInfoProps {
   neutralTags: DormTag[]
   mutedTags: DormTag[]
-  categorizedTags: unknown
+  categorizedTags: DormCategorizedTags
   language: Language
-  fadeUp: unknown
+  fadeUp: Variants
 }
 
 export const DormDetailInfo: React.FC<DormDetailInfoProps> = ({

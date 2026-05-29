@@ -17,11 +17,12 @@ import {
 } from "lucide-react"
 import React, { useLayoutEffect, useMemo, useRef, useState } from "react"
 
-import { type Language } from "../../types"
+import type { Language } from '../../types';
 import { deriveRoomOptions, getRoomRangeSummary } from "../../utils/roomOptions"
-import { type CardTagItem, getCardTagCandidates } from "../../utils/tagLabels"
+import { getCardTagCandidates } from '../../utils/tagLabels';
+import type { CardTagItem } from '../../utils/tagLabels';
 import { formatPrice } from "./constants/pricing"
-import { type Dorm } from "./types/index"
+import type { Dorm } from './types/index';
 
 interface DormCardProps {
   dorm: Dorm
@@ -403,7 +404,7 @@ const DormCard: React.FC<DormCardProps> = ({
           className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
         {positivePercent !== null &&
-          totalReviews !== null &&
+          totalReviews != null &&
           totalReviews > 0 && (
             <button
               type="button"

@@ -5,14 +5,7 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import {
-  type BathroomScope,
-  type BathroomType,
-  type Dorm,
-  type FloorPlan,
-  type RoomOption,
-  type RoomType,
-} from "../components/housing/types/index"
+import type { BathroomScope, BathroomType, Dorm, FloorPlan, RoomOption, RoomType } from '../components/housing/types/index';
 
 const LEGACY_CODE_RE = /^(\d)B(\d)B$/
 const SPECIAL_ROOM_TYPES = new Set<RoomType>(["Studio", "Suite", "Cluster"])
@@ -315,18 +308,24 @@ function getBathroomSecondaryLabel(
 
 function getChineseBedStem(bedCount: number) {
   switch (bedCount) {
-    case 1:
+    case 1: {
       return "单"
-    case 2:
+    }
+    case 2: {
       return "双"
-    case 3:
+    }
+    case 3: {
       return "三"
-    case 4:
+    }
+    case 4: {
       return "四"
-    case 5:
+    }
+    case 5: {
       return "五"
-    default:
+    }
+    default: {
       return `${bedCount}人`
+    }
   }
 }
 
@@ -357,7 +356,7 @@ function getChineseStandardOccupancyLabel(bedCounts: number[]) {
     (count, index) => index === 0 || count - bedCounts[index - 1] === 1
   )
   if (isContiguous && bedCounts.length >= 4) {
-    return `${getChineseBedStem(bedCounts[0])}-${getBedCountLabel(bedCounts.at(-1), "zh")}`
+    return `${getChineseBedStem(bedCounts[0])}-${getBedCountLabel(bedCounts.at(-1) ?? null, "zh")}`
   }
 
   return `${bedCounts.map((count) => getChineseBedStem(count)).join("/")}人间`

@@ -1,11 +1,11 @@
 import { useCallback, useRef } from "react"
 
-export const useThrottle = <T extends (...args: unknown[]) => void>(
+export const useThrottle = <T extends (...args: any[]) => void>(
   callback: T,
   delay: number
 ): T => {
   const lastRun = useRef(0)
-  const timeoutRef = useRef<ReturnType<typeof setTimeout>>()
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   const throttledFn = useCallback(
     (...args: unknown[]) => {

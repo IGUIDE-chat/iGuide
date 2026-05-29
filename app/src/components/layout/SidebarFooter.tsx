@@ -67,8 +67,7 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
   profileName,
   onToggleLanguage,
   onGuestLogin,
-}) => {
-  return (
+}) => (
     <div className="space-y-2 border-t border-white/10 p-3">
       <button
         type="button"
@@ -113,9 +112,9 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
           </SidebarLabel>
         </button>
       ) : (
+        // eslint-disable-next-line jsx-a11y/anchor-is-valid -- Link derives href from to
         <Link
           to="/profile"
-          href="/profile"
           className="block flex cursor-pointer items-center gap-3 rounded-md bg-white/5 px-3 py-2 transition-colors hover:bg-white/10"
         >
           <div className="bg-illini-orange flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white">
@@ -140,4 +139,3 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
       )}
     </div>
   )
-}

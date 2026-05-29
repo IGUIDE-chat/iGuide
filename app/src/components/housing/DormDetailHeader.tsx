@@ -3,11 +3,12 @@
  * @description DormDetail header section - back button, title, location, tags, pricing cards
  */
 
-import { motion } from "framer-motion"
+import { motion } from 'framer-motion';
+import type { Variants } from 'framer-motion';
 import { Bath, MapPin, Snowflake, Utensils } from "lucide-react"
 import React from "react"
 
-import { type Language } from "../../types"
+import type { Language } from '../../types';
 import { getDormBathroomSummary } from "../../utils/roomOptions"
 import { getDetailTagDisplay } from "../../utils/tagLabels"
 import {
@@ -15,7 +16,7 @@ import {
   getHousingTypeMeta,
   getLocalizedLabel,
 } from "./constants/metadata"
-import { type Dorm, type DormTag } from "./types/index"
+import type { Dorm, DormTag } from './types/index';
 
 interface DormDetailHeaderProps {
   dorm: Dorm
@@ -24,7 +25,7 @@ interface DormDetailHeaderProps {
   dormAddress: string | null
   dormLocation: string
   positiveTags: DormTag[]
-  fadeUp: unknown
+  fadeUp: Variants
 }
 
 export const DormDetailHeader: React.FC<DormDetailHeaderProps> = ({

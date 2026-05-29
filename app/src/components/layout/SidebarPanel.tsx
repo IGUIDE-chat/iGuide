@@ -7,7 +7,7 @@
 
 import React from "react"
 
-import { type Language } from "../../types"
+import type { Language } from '../../types';
 import { ConversationSidebar } from "./ConversationSidebar"
 import { DormSidebar } from "./DormSidebar"
 import { LibrarySidebar } from "./LibrarySidebar"
@@ -30,15 +30,14 @@ export const SidebarPanel: React.FC<SidebarPanelProps> = ({
   onNewConversation,
   onSelectConversation,
   favoritesIconRef,
-}) => {
-  return (
+}) => (
     <div className="mx-3 flex min-h-0 flex-1 flex-col overflow-hidden border-t border-white/10 pt-2">
       {activeTab === "chat" && (
         <ConversationSidebar
           currentConversationId={currentConversationId ?? null}
           onSelectConversation={
             onSelectConversation ??
-            ((_id: string) => {
+            ((_id: string | null) => {
               /* noop */
             })
           }
@@ -74,4 +73,3 @@ export const SidebarPanel: React.FC<SidebarPanelProps> = ({
       )}
     </div>
   )
-}

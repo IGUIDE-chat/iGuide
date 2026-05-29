@@ -27,9 +27,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type",
 }
 
-export const onRequestOptions: PagesFunction = async () => {
-  return new Response(null, { status: 204, headers: corsHeaders })
-}
+export const onRequestOptions: PagesFunction = async () => new Response(null, { status: 204, headers: corsHeaders })
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   const { request, env } = context
@@ -48,7 +46,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       )
     }
 
-    const body = await request.json()
+    const body = await request.json() as TavilyRequestBody
 
     if (!body.query || typeof body.query !== "string") {
       return new Response(

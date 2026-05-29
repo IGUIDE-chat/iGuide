@@ -5,7 +5,7 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { type ChatHistoryItem, type StreamChunk } from "./ai/types"
+import type { ChatHistoryItem, StreamChunk } from './ai/types';
 import { fetchChatRAGContext, isToolUseRagEnabled } from "./chatRagService"
 import { parseDeepSeekSSEStream } from "./deepseekSse"
 import { memoryService } from "./memoryService"
@@ -59,8 +59,8 @@ async function _fetchQMDContext(
           : "N/A"
         return `[${typeLabel}] ${r.title} (relevance: ${r.score.toFixed(2)})\nURL: ${url}\n${r.snippet}`
       })
-  } catch (err) {
-    console.warn("[RAG] QMD search failed:", err)
+  } catch (error) {
+    console.warn("[RAG] QMD search failed:", error)
     return []
   }
 }
@@ -74,8 +74,8 @@ async function _fetchWebContext(query: string): Promise<string[]> {
     return results.map(
       (r) => `[🌐 Web] ${r.title}\nURL: ${r.url}\n${r.content.slice(0, 300)}`
     )
-  } catch (err) {
-    console.warn("[RAG] Web search failed:", err)
+  } catch (error) {
+    console.warn("[RAG] Web search failed:", error)
     return []
   }
 }
@@ -154,7 +154,7 @@ function buildOpenAIMessages(
 export const streamDeepSeekChat = async function* (
   history: ChatHistoryItem[],
   newMessage: string,
-  lang: string = "en",
+  lang = "en",
   options?: { conversationId?: string; userId?: string }
 ): AsyncGenerator<StreamChunk> {
   const conversationId = options?.conversationId
@@ -207,9 +207,9 @@ export const streamDeepSeekChat = async function* (
     try {
       const [ragResult, chatCtx] = await Promise.all([
         fetchRAGContext(newMessage, lang),
-        _userId
+        userId
           ? memoryService
-              .getChatContext(_userId, _conversationId)
+              .getChatContext(userId, conversationId)
               .catch(() => ({
                 soul: "",
                 userMemory: "",
@@ -255,8 +255,8 @@ export const streamDeepSeekChat = async function* (
     const basePrompt = [
       DEFAULT_SYSTEM_PROMPT,
       soul ? `## 🎭 Persona Customization (用户自定义人设)\n${soul}` : "",
-      _userId ? MEMORY_EXTRACTION_INSTRUCTIONS : "",
-      _userId ? SOUL_EXTRACTION_INSTRUCTIONS : "",
+      userId ? MEMORY_EXTRACTION_INSTRUCTIONS : "",
+      userId ? SOUL_EXTRACTION_INSTRUCTIONS : "",
       userMemory
         ? `## 📋 User Profile (remembered from past conversations)\n${userMemory}`
         : "",
@@ -289,7 +289,7 @@ export const streamDeepSeekChat = async function* (
           model: "deepseek-chat",
           messages,
           stream: true,
-          temperature: 1.0,
+          temperature: 1,
         }),
       })
     } else {

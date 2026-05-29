@@ -6,30 +6,13 @@
  */
 
 import mapboxgl from "mapbox-gl"
-import React, {
-  Component,
-  type ReactNode,
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react"
-import Map, {
-  Layer,
-  type MapRef,
-  NavigationControl,
-  Popup,
-  Source,
-} from "react-map-gl/mapbox"
+import React, { Component, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
+import Map, { Layer, NavigationControl, Popup, Source } from 'react-map-gl/mapbox';
+import type { MapRef } from 'react-map-gl/mapbox';
 
-import { type Language } from "../../types"
-import {
-  CAMPUS_LANDMARKS,
-  CAMPUS_ZONES,
-  type Landmark,
-} from "./constants/mapData"
+import type { Language } from '../../types';
+import { CAMPUS_LANDMARKS, CAMPUS_ZONES } from './constants/mapData';
 import { getHousingTypeMeta } from "./constants/metadata"
 import {
   CLUSTERS_LAYER,
@@ -48,7 +31,7 @@ import {
   buildLandmarkFeatureCollection,
 } from "./dorm-map/mapFeatureBuilders"
 import { useHousingMapUi } from "./store/HousingContext"
-import { type Dorm } from "./types/index"
+import type { Dorm } from './types/index';
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN ?? ""
 
@@ -438,14 +421,14 @@ const DormMap: React.FC<DormMapProps> = ({
       const map = mapRef.current?.getMap()
 
       if (clusterId && map) {
-        ;(map.getSource("dorms") as never).getClusterExpansionZoom(
+        ;(map.getSource("dorms") as any).getClusterExpansionZoom(
           clusterId,
           (error: unknown, zoom: number) => {
             if (error) {
               return
             }
             map.easeTo({
-              center: (feature.geometry as never).coordinates,
+              center: (feature.geometry as any).coordinates,
               zoom,
               duration: 500,
             })
@@ -482,7 +465,7 @@ const DormMap: React.FC<DormMapProps> = ({
 
       const dorm = dorms.find((item) => item.id === dormId)
       if (dorm) {
-        const coords = (feature.geometry as never).coordinates.slice() as [
+        const coords = (feature.geometry as any).coordinates.slice() as [
           number,
           number,
         ]
@@ -550,9 +533,9 @@ const DormMap: React.FC<DormMapProps> = ({
         mapStyle="mapbox://styles/mapbox/light-v11"
         mapboxAccessToken={MAPBOX_TOKEN}
         attributionControl={false}
-        pitchWithRotate={true}
-        dragRotate={true}
-        touchPitch={true}
+        pitchWithRotate
+        dragRotate
+        touchPitch
       >
         <style>{`
                     .mapboxgl-popup-content {
@@ -570,13 +553,13 @@ const DormMap: React.FC<DormMapProps> = ({
         <NavigationControl position="bottom-right" showCompass={false} />
 
         <Source id="zones" type="geojson" data={CAMPUS_ZONES as never}>
-          <Layer {...(buildZonesFillLayer(showZones) as never)} />
+          <Layer {...(buildZonesFillLayer(showZones) as any)} />
           <Layer
             {...(buildZonesLabelLayer(
               showZones,
               showZoneLabels,
               isChinese
-            ) as never)}
+            ) as any)}
           />
         </Source>
 
@@ -587,7 +570,7 @@ const DormMap: React.FC<DormMapProps> = ({
         >
           {areMapImagesReady && (
             <Layer
-              {...(buildLandmarksLayer(showLandmarks, isChinese) as never)}
+              {...(buildLandmarksLayer(showLandmarks, isChinese) as any)}
             />
           )}
         </Source>
@@ -600,14 +583,14 @@ const DormMap: React.FC<DormMapProps> = ({
             hoveredDorm?.id,
             highlightedDormId
           )}
-          cluster={true}
+          cluster
           clusterMaxZoom={16}
           clusterRadius={50}
         >
-          <Layer {...(CLUSTERS_LAYER as never)} />
-          <Layer {...(CLUSTER_COUNT_LAYER as never)} />
+          <Layer {...(CLUSTERS_LAYER as any)} />
+          <Layer {...(CLUSTER_COUNT_LAYER as any)} />
 
-          {areMapImagesReady && <Layer {...(UNCLUSTERED_LAYER as never)} />}
+          {areMapImagesReady && <Layer {...(UNCLUSTERED_LAYER as any)} />}
         </Source>
 
         <div className="absolute top-4 left-4 z-10 flex min-w-[140px] flex-col gap-2 rounded-lg border border-slate-200/50 bg-white/90 p-3 shadow-lg backdrop-blur-sm">

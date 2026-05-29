@@ -8,14 +8,10 @@
 import { useLayoutEffect, useMemo, useRef, useState } from "react"
 
 import { useAuth } from "../../../contexts/AuthContext"
-import {
-  type DormUpdate,
-  type EditHistoryEntry,
-  buildSummary,
-  dormAdminService,
-} from "../../../services/dormAdminService"
+import { buildSummary, dormAdminService } from '../../../services/dormAdminService';
+import type { DormUpdate, EditHistoryEntry } from '../../../services/dormAdminService';
 import { dormService } from "../../../services/dormService"
-import { type Language } from "../../../types"
+import type { Language } from '../../../types';
 import {
   buildLegacyDormTags,
   getDormPriceRange,
@@ -28,13 +24,7 @@ import {
   getStorageBathroomScope,
   normalizeFloorPlan,
 } from "../../../utils/roomOptions"
-import {
-  type BathroomType,
-  type DiningType,
-  type Dorm,
-  type DormCategorizedTags,
-  type FloorPlan,
-} from "../types/index"
+import type { BathroomType, DiningType, Dorm, DormCategorizedTags, FloorPlan } from '../types/index';
 import { TEXT } from "./editPanelText"
 
 interface UseDormEditFormOptions {
@@ -215,13 +205,11 @@ export const useDormEditForm = ({
     setPetFriendly(dorm.structuredTags?.petFriendly ?? false)
   }, [dorm])
 
-  useLayoutEffect(() => {
-    return () => {
+  useLayoutEffect(() => () => {
       if (timerRef.current) {
         clearTimeout(timerRef.current)
       }
-    }
-  }, [])
+    }, [])
 
   useLayoutEffect(() => {
     if (activeTab !== "history") {
@@ -236,7 +224,7 @@ export const useDormEditForm = ({
         setHistoryLoading(false)
       }
     }
-    loadHistory()
+    void loadHistory()
   }, [activeTab, dorm.id])
 
   const normalizedFloorPlans = useMemo(
@@ -422,13 +410,13 @@ export const useDormEditForm = ({
     timerRef.current = setTimeout(() => {
       setSaveSuccess(false)
     }, 2000)
-    void dormAdminService.logEdit(
-      dorm.id,
-      dorm.name,
-      user?.email ?? "unknown",
+    void dormAdminService.logEdit({
+      dormId: dorm.id,
+      dormName: dorm.name,
+      changedBy: user?.email ?? "unknown",
       summary,
-      snapshotBefore
-    )
+      snapshotBefore,
+    })
     await refreshDorm()
   }
 

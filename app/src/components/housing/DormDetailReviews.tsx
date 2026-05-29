@@ -1,8 +1,9 @@
-import { AnimatePresence, motion } from "framer-motion"
+import { AnimatePresence, motion } from 'framer-motion';
+import type { Variants } from 'framer-motion';
 import { Globe, MessageSquare, ThumbsUp, User, X } from "lucide-react"
 import React, { useState } from "react"
 
-import { type Language } from "../../types"
+import type { Language } from '../../types';
 import { dormDetailTexts } from "./i18n/dormTexts"
 
 interface Comment {
@@ -19,9 +20,9 @@ interface Comment {
 interface DormDetailReviewsProps {
   comments: Comment[]
   commentsLoading: boolean
-  user: unknown
+  user: { id: string } | null
   language: Language
-  fadeUp: unknown
+  fadeUp: Variants
   onRequestLogin: () => void
   onSaveComment: (content: string, vote: 1 | -1 | null) => Promise<void>
   onDeleteComment: (commentId: string) => void
@@ -114,7 +115,10 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
         }),
       })
       if (res.ok) {
-        const data = await res.json()
+        const data = (await res.json()) as {
+          choices?: Array<{ message?: { content?: string } }>
+          reply?: string
+        }
         const choices = data.choices as
           | Array<{ message?: { content?: string } }>
           | undefined

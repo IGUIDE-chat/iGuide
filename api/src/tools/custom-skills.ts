@@ -1,8 +1,8 @@
 import campusNavigationSkill from "../skills/campus_navigation.json"
 import compareDormsSkill from "../skills/compare_dorms.json"
 import findByCriteriaSkill from "../skills/find_by_criteria.json"
-import { type ToolRegistry } from "./registry"
-import { type ToolDefinition, type ToolResult } from "./types"
+import type { ToolRegistry } from './registry';
+import type { ToolDefinition, ToolResult } from './types';
 
 type SkillParameterType = "string" | "number" | "boolean"
 
@@ -56,7 +56,7 @@ function parseSkillConfig(rawConfig: unknown): SkillConfig {
     required_tools.some((toolName) => typeof toolName !== "string") ||
     !isObjectRecord(parameters)
   ) {
-    throw new Error(`Invalid skill config: ${String(id ?? "unknown")}`)
+    throw new Error(`Invalid skill config: ${JSON.stringify(id ?? "unknown")}`)
   }
 
   const parsedParameters: Record<string, SkillParameterDefinition> = {}

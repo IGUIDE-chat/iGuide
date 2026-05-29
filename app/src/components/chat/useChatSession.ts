@@ -13,7 +13,7 @@ import { streamChatResponse } from "../../services/ai"
 import { conversationService } from "../../services/conversationService"
 import { localConversationService } from "../../services/localConversationService"
 import { memoryService } from "../../services/memoryService"
-import { type ChatMessage, type Language, type ThinkingStep } from "../../types"
+import type { ChatMessage, Language, ThinkingStep } from '../../types';
 
 interface UseChatSessionOptions {
   language: Language
@@ -35,22 +35,27 @@ const messageReducer = (
   action: MessageAction
 ): ChatMessage[] => {
   switch (action.type) {
-    case "SET_MESSAGES":
+    case "SET_MESSAGES": {
       return action.payload
-    case "ADD_MESSAGE":
+    }
+    case "ADD_MESSAGE": {
       return [...state, action.payload]
-    case "UPDATE_MESSAGE":
+    }
+    case "UPDATE_MESSAGE": {
       return state.map((msg) =>
         msg.id === action.payload.id
           ? { ...msg, ...action.payload.updates }
           : msg
       )
-    case "REPLACE_MESSAGE":
+    }
+    case "REPLACE_MESSAGE": {
       return state.map((msg) =>
         msg.id === action.payload.id ? action.payload : msg
       )
-    default:
+    }
+    default: {
       return state
+    }
   }
 }
 
@@ -232,16 +237,16 @@ export const useChatSession = ({
           },
         })
 
-        const stream = await streamChatResponse(
-          messages.map((message) => ({
+        const stream = streamChatResponse({
+          history: messages.map((message) => ({
             role: message.role as "user" | "model",
             text: message.text,
           })),
-          userMsg.text,
-          language,
-          conversationId ?? undefined,
-          user?.id
-        )
+          newMessage: userMsg.text,
+          lang: language,
+          conversationId: conversationId ?? undefined,
+          userId: user?.id,
+        })
 
         let fullText = ""
         let followUpQuestions: string[] | undefined
@@ -250,7 +255,7 @@ export const useChatSession = ({
         for await (const chunk of stream) {
           if (chunk.thinkingStep) {
             if (thinkingSteps.length > 0) {
-              thinkingSteps.at(-1).done = true
+              thinkingSteps.at(-1)!.done = true
             }
             const step: ThinkingStep = {
               id: `step-${Date.now()}-${thinkingSteps.length}`,

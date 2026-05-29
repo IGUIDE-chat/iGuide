@@ -1,7 +1,5 @@
-import {
-  type EmbeddingConfig,
-  MAX_EMBEDDING_BATCH_SIZE,
-} from "./embedding-config"
+import { MAX_EMBEDDING_BATCH_SIZE } from './embedding-config';
+import type { EmbeddingConfig } from './embedding-config';
 import {
   EmbeddingConfigError,
   EmbeddingDimensionError,
@@ -114,13 +112,13 @@ export class EmbeddingClient {
           input: texts,
         }),
       })
-    } catch (cause) {
+    } catch (error) {
       throw new EmbeddingProviderError(
         `Embedding provider request failed for ${provider}`,
         {
           provider,
           url: endpoint,
-          cause,
+          cause: error,
         }
       )
     }
