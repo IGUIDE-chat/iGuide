@@ -17,9 +17,7 @@ jobs:
           node-version: "lts"
           cache: true
           run-install: |
-            - cwd: ./packages/app
-              args: ['--frozen-lockfile']
-            - cwd: ./packages/lib
+            args: ['--frozen-lockfile']
       - run: vp check
       - run: vp test
       - run: vp build

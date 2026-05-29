@@ -134,7 +134,7 @@ export default defineConfig({
       "typescript/no-explicit-any": "warn",
 
       "react/exhaustive-deps": "warn",
-      "react/no-unstable-nested-components": "error",
+      // "react/no-unstable-nested-components": "error", // introduced in later oxlint version
       "react/self-closing-comp": "warn",
       "react/button-has-type": "warn",
       "react/jsx-curly-brace-presence": [
@@ -151,7 +151,7 @@ export default defineConfig({
       "jsx-a11y/anchor-ambiguous-text": "warn",
       "jsx-a11y/tabindex-no-positive": "warn",
       "jsx-a11y/prefer-tag-over-role": "warn",
-      "jsx-a11y/control-has-associated-label": "warn",
+      // "jsx-a11y/control-has-associated-label": "warn", // introduced in later oxlint version
       "jsx-a11y/no-static-element-interactions": "warn",
       "jsx-a11y/click-events-have-key-events": "warn",
 
@@ -183,7 +183,7 @@ export default defineConfig({
       "import/consistent-type-specifier-style": ["warn", "prefer-inline"],
       "import/first": "warn",
       "import/no-named-as-default": "warn",
-      "import/newline-after-import": "warn",
+      // "import/newline-after-import": "warn", // introduced in later oxlint version
       "import/no-default-export": "off",
       "import/no-named-export": "off",
       "import/no-namespace": "off",
