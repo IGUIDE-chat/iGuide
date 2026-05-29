@@ -4,7 +4,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "postinstall": "git submodule update --init --recursive && git config --local include.path ../.gitconfig",
     "build": "vp build",
     "dev": "vp dev"
   },
