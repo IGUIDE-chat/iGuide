@@ -69,11 +69,7 @@ export const DormListMapPane: React.FC<DormListMapPaneProps> = ({
 
   return (
     <div
-      className={`flex h-full min-w-0 flex-col transition-opacity duration-200 ${
-        isMapView
-          ? `absolute inset-0 z-20 opacity-100 xl:static xl:z-auto xl:min-w-0 xl:flex-1`
-          : `pointer-events-none absolute inset-0 opacity-0 xl:static xl:hidden`
-      } `}
+      className="flex h-full min-w-0 flex-col transition-opacity duration-200 absolute inset-0 z-20 opacity-100 xl:static xl:z-auto xl:min-w-0 xl:flex-1"
     >
       <div className="relative flex min-h-0 min-w-0 flex-1 flex-col">
         <div className="min-h-[200px] w-full flex-1 bg-gray-100">
@@ -89,7 +85,7 @@ export const DormListMapPane: React.FC<DormListMapPaneProps> = ({
             />
           </Suspense>
 
-          {isMapView && filteredDorms.length === 0 && (
+          {filteredDorms.length === 0 && (
             <MapNoResultsOverlay
               t={t}
               hasPriceFilter={hasPriceFilter}
@@ -99,7 +95,7 @@ export const DormListMapPane: React.FC<DormListMapPaneProps> = ({
         </div>
       </div>
 
-      {isMapView && visibleInMap.length > 0 && (
+      {visibleInMap.length > 0 && (
         <MapCarousel
           dorms={visibleInMap}
           language={language}
@@ -112,7 +108,7 @@ export const DormListMapPane: React.FC<DormListMapPaneProps> = ({
         />
       )}
 
-      {isMapView && filteredDorms.length > 0 && visibleInMap.length === 0 && (
+      {filteredDorms.length > 0 && visibleInMap.length === 0 && (
         <MapEmptyViewportOverlay t={t} />
       )}
     </div>
