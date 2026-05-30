@@ -1,6 +1,20 @@
+import { readFileSync } from "node:fs"
+
 import { defineConfig } from "vite-plus"
 
+function mdLoaderPlugin() {
+  return {
+    name: "md-loader",
+    load(id: string) {
+      if (id.endsWith(".md")) {
+        return `export default ${JSON.stringify(readFileSync(id, "utf8"))};`
+      }
+    },
+  }
+}
+
 export default defineConfig({
+  plugins: [mdLoaderPlugin()],
   staged: {
     "*": "vp check --fix",
   },
