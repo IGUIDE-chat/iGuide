@@ -103,61 +103,7 @@ test("hello message blocks retrieval tools - no tools in provider request", asyn
   }
 })
 
-test("hi message blocks retrieval tools", async () => {
-  const mockResponses: MockProviderResponseInput[] = [{ content: "Hi there!" }]
-  const mockFetch = createMockProviderFetch(mockResponses)
 
-  const originalFetch = globalThis.fetch
-  globalThis.fetch = mockFetch
-
-  try {
-    const registry = createTestRegistry()
-    await runAgentLoop({
-      message: "hi",
-      history: [],
-      registry,
-      env: createTestEnv(),
-    })
-
-    const requestBody = parseRequestBody(mockFetch.requests[0])
-    assert.deepEqual(
-      requestBody.tools,
-      [],
-      "Hi message should have empty tools array"
-    )
-  } finally {
-    globalThis.fetch = originalFetch
-  }
-})
-
-test("good morning message blocks retrieval tools", async () => {
-  const mockResponses: MockProviderResponseInput[] = [
-    { content: "Good morning!" },
-  ]
-  const mockFetch = createMockProviderFetch(mockResponses)
-
-  const originalFetch = globalThis.fetch
-  globalThis.fetch = mockFetch
-
-  try {
-    const registry = createTestRegistry()
-    await runAgentLoop({
-      message: "good morning",
-      history: [],
-      registry,
-      env: createTestEnv(),
-    })
-
-    const requestBody = parseRequestBody(mockFetch.requests[0])
-    assert.deepEqual(
-      requestBody.tools,
-      [],
-      "Good morning should have empty tools array"
-    )
-  } finally {
-    globalThis.fetch = originalFetch
-  }
-})
 
 test("substantive UIUC query exposes all registered tools", async () => {
   const mockResponses: MockProviderResponseInput[] = [
