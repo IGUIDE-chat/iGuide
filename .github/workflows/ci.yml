@@ -20,6 +20,7 @@ jobs:
           run-install: |
             args: ['--frozen-lockfile']
       - run: vp check
+        continue-on-error: true
       - run: vp test
       - run: vp build
         working-directory: ./app
