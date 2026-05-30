@@ -1,5 +1,5 @@
 import { tool } from "ai"
-import { type z } from "zod"
+import type { z } from "zod"
 
 export interface ToolBudget {
   maxSteps?: number
@@ -35,9 +35,7 @@ export function wrapTools(
     result[name] = tool({
       description: customTool.description,
       inputSchema: customTool.parameters,
-      execute: async (args) => {
-        return customTool.execute(args, context)
-      },
+      execute: async (args) => customTool.execute(args, context),
     })
   }
 

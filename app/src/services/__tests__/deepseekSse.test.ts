@@ -1,5 +1,4 @@
-import assert from "node:assert/strict"
-import test from "node:test"
+import { expect, test } from "vite-plus/test"
 
 import { createSSEParserState, parseDeepSeekSSELine } from "../deepseekSse.ts"
 
@@ -13,10 +12,10 @@ test("tool_start event: parses Worker payload with name field", () => {
     "en"
   )
 
-  assert.equal(chunks.length, 1)
-  assert.equal(chunks[0].thinkingStep?.type, "tool_call")
-  assert.equal(chunks[0].thinkingStep?.label, "Calling tool: web_search")
-  assert.equal(chunks[0].thinkingStep?.detail, '{"query":"housing"}')
+  expect(chunks.length).toBe(1)
+  expect(chunks[0].thinkingStep?.type).toBe("tool_call")
+  expect(chunks[0].thinkingStep?.label).toBe("Calling tool: web_search")
+  expect(chunks[0].thinkingStep?.detail).toBe('{"query":"housing"}')
 })
 
 test("tool_start event: parses legacy payload with tool field", () => {
@@ -29,10 +28,9 @@ test("tool_start event: parses legacy payload with tool field", () => {
     "en"
   )
 
-  assert.equal(chunks.length, 1)
-  assert.equal(chunks[0].thinkingStep?.type, "tool_call")
-  assert.equal(
-    chunks[0].thinkingStep?.label,
+  expect(chunks.length).toBe(1)
+  expect(chunks[0].thinkingStep?.type).toBe("tool_call")
+  expect(chunks[0].thinkingStep?.label).toBe(
     "Calling tool: search_knowledge_base"
   )
 })
@@ -47,7 +45,7 @@ test("tool_start event: uses Chinese locale labels", () => {
     "zh"
   )
 
-  assert.equal(chunks[0].thinkingStep?.label, "调用工具: custom_skills")
+  expect(chunks[0].thinkingStep?.label).toBe("调用工具: custom_skills")
 })
 
 test("tool_result event: parses Worker payload with name field", () => {
@@ -60,10 +58,10 @@ test("tool_result event: parses Worker payload with name field", () => {
     "en"
   )
 
-  assert.equal(chunks.length, 1)
-  assert.equal(chunks[0].thinkingStep?.type, "processing")
-  assert.equal(chunks[0].thinkingStep?.label, "Tool finished: web_search")
-  assert.equal(chunks[0].thinkingStep?.detail, "success — 3 results")
+  expect(chunks.length).toBe(1)
+  expect(chunks[0].thinkingStep?.type).toBe("processing")
+  expect(chunks[0].thinkingStep?.label).toBe("Tool finished: web_search")
+  expect(chunks[0].thinkingStep?.detail).toBe("success — 3 results")
 })
 
 test("tool_result event: parses legacy payload with tool field", () => {
@@ -76,10 +74,10 @@ test("tool_result event: parses legacy payload with tool field", () => {
     "en"
   )
 
-  assert.equal(chunks.length, 1)
-  assert.equal(chunks[0].thinkingStep?.type, "processing")
-  assert.equal(chunks[0].thinkingStep?.label, "Tool finished: grep_docs")
-  assert.equal(chunks[0].thinkingStep?.detail, "success — found 5 matches")
+  expect(chunks.length).toBe(1)
+  expect(chunks[0].thinkingStep?.type).toBe("processing")
+  expect(chunks[0].thinkingStep?.label).toBe("Tool finished: grep_docs")
+  expect(chunks[0].thinkingStep?.detail).toBe("success — found 5 matches")
 })
 
 test("tool_result event: handles missing status and summary", () => {
@@ -92,8 +90,8 @@ test("tool_result event: handles missing status and summary", () => {
     "en"
   )
 
-  assert.equal(chunks.length, 1)
-  assert.equal(chunks[0].thinkingStep?.detail, undefined)
+  expect(chunks.length).toBe(1)
+  expect(chunks[0].thinkingStep?.detail).toBe(undefined)
 })
 
 test("content event: parses delta field", () => {
@@ -106,8 +104,8 @@ test("content event: parses delta field", () => {
     "en"
   )
 
-  assert.equal(chunks.length, 1)
-  assert.equal(chunks[0].text, "Hello, world!")
+  expect(chunks.length).toBe(1)
+  expect(chunks[0].text).toBe("Hello, world!")
 })
 
 test("content event: parses content field (legacy)", () => {
@@ -120,8 +118,8 @@ test("content event: parses content field (legacy)", () => {
     "en"
   )
 
-  assert.equal(chunks.length, 1)
-  assert.equal(chunks[0].text, "Final answer here.")
+  expect(chunks.length).toBe(1)
+  expect(chunks[0].text).toBe("Final answer here.")
 })
 
 test("content event: returns empty for empty content", () => {
@@ -130,7 +128,7 @@ test("content event: returns empty for empty content", () => {
   parseDeepSeekSSELine("event: content", state, "en")
   const chunks = parseDeepSeekSSELine('data: {"delta":""}', state, "en")
 
-  assert.equal(chunks.length, 0)
+  expect(chunks.length).toBe(0)
 })
 
 test("reasoning buffer: accumulates across multiple reasoning_content deltas", () => {
@@ -142,9 +140,9 @@ test("reasoning buffer: accumulates across multiple reasoning_content deltas", (
     "en"
   )
 
-  assert.equal(state.isInReasoning, true)
-  assert.equal(state.reasoningBuffer, "Let me ")
-  assert.equal(chunk1[0].thinkingStep?.detail, "Let me ")
+  expect(state.isInReasoning).toBe(true)
+  expect(state.reasoningBuffer).toBe("Let me ")
+  expect(chunk1[0].thinkingStep?.detail).toBe("Let me ")
 
   const chunk2 = parseDeepSeekSSELine(
     'data: {"choices":[{"delta":{"reasoning_content":"think about this"}}]}',
@@ -152,8 +150,8 @@ test("reasoning buffer: accumulates across multiple reasoning_content deltas", (
     "en"
   )
 
-  assert.equal(state.reasoningBuffer, "Let me think about this")
-  assert.equal(chunk2[0].thinkingStep?.detail, "Let me think about this")
+  expect(state.reasoningBuffer).toBe("Let me think about this")
+  expect(chunk2[0].thinkingStep?.detail).toBe("Let me think about this")
 })
 
 test("reasoning buffer: resets when content starts", () => {
@@ -164,8 +162,8 @@ test("reasoning buffer: resets when content starts", () => {
     state,
     "en"
   )
-  assert.equal(state.isInReasoning, true)
-  assert.equal(state.reasoningBuffer, "thinking...")
+  expect(state.isInReasoning).toBe(true)
+  expect(state.reasoningBuffer).toBe("thinking...")
 
   const contentChunk = parseDeepSeekSSELine(
     'data: {"choices":[{"delta":{"content":"Final answer"}}]}',
@@ -173,15 +171,15 @@ test("reasoning buffer: resets when content starts", () => {
     "en"
   )
 
-  assert.equal(state.isInReasoning, false)
-  assert.equal(state.reasoningBuffer, "")
-  assert.equal(contentChunk[0].text, "Final answer")
+  expect(state.isInReasoning).toBe(false)
+  expect(state.reasoningBuffer).toBe("")
+  expect(contentChunk[0].text).toBe("Final answer")
 })
 
 test("reasoning buffer: starts new buffer on first reasoning_content", () => {
   const state = createSSEParserState()
-  assert.equal(state.isInReasoning, false)
-  assert.equal(state.reasoningBuffer, "")
+  expect(state.isInReasoning).toBe(false)
+  expect(state.reasoningBuffer).toBe("")
 
   const chunk = parseDeepSeekSSELine(
     'data: {"choices":[{"delta":{"reasoning_content":"new thought"}}]}',
@@ -189,28 +187,28 @@ test("reasoning buffer: starts new buffer on first reasoning_content", () => {
     "en"
   )
 
-  assert.equal(state.isInReasoning, true)
-  assert.equal(state.reasoningBuffer, "new thought")
-  assert.equal(chunk[0].thinkingStep?.type, "reasoning")
-  assert.equal(chunk[0].thinkingStep?.label, "Thinking...")
+  expect(state.isInReasoning).toBe(true)
+  expect(state.reasoningBuffer).toBe("new thought")
+  expect(chunk[0].thinkingStep?.type).toBe("reasoning")
+  expect(chunk[0].thinkingStep?.label).toBe("Thinking...")
 })
 
 test("handles empty lines", () => {
   const state = createSSEParserState()
   const chunks = parseDeepSeekSSELine("", state, "en")
-  assert.equal(chunks.length, 0)
+  expect(chunks.length).toBe(0)
 })
 
 test("handles [DONE] marker", () => {
   const state = createSSEParserState()
   const chunks = parseDeepSeekSSELine("data: [DONE]", state, "en")
-  assert.equal(chunks.length, 0)
+  expect(chunks.length).toBe(0)
 })
 
 test("handles malformed JSON gracefully", () => {
   const state = createSSEParserState()
   const chunks = parseDeepSeekSSELine("data: {invalid json}", state, "en")
-  assert.equal(chunks.length, 0)
+  expect(chunks.length).toBe(0)
 })
 
 test("ignores unknown events", () => {
@@ -219,5 +217,5 @@ test("ignores unknown events", () => {
   parseDeepSeekSSELine("event: unknown_event", state, "en")
   const chunks = parseDeepSeekSSELine('data: {"some":"data"}', state, "en")
 
-  assert.equal(chunks.length, 0)
+  expect(chunks.length).toBe(0)
 })

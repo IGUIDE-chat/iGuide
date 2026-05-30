@@ -1,12 +1,11 @@
-import assert from "node:assert/strict"
-import test from "node:test"
+import { expect, test } from "vite-plus/test"
 
 import { createEchoTool, createFailingTool } from "../test/utils/stubTools.ts"
 import { ToolRegistry } from "../tools/registry.ts"
-import {
-  type RequestContext,
-  type ToolDefinition,
-  type ToolResult,
+import type {
+  RequestContext,
+  ToolDefinition,
+  ToolResult,
 } from "../tools/types.ts"
 import { executeToolAction } from "./actions.ts"
 
@@ -59,15 +58,15 @@ test("executeToolAction executes a valid tool call through the registry", async 
     stepIndex: 2,
   })
 
-  assert.deepEqual(capturedArgs, { query: "UIUC housing" })
-  assert.equal(capturedCtx, MOCK_CTX)
-  assert.equal(observation.toolCallId, "call_1")
-  assert.equal(observation.toolName, "web_search")
-  assert.deepEqual(observation.input, { query: "UIUC housing" })
-  assert.equal(observation.status, "success")
-  assert.equal(observation.summary, "UIUC housing search result")
-  assert.equal(observation.stepIndex, 2)
-  assert.equal(observation.providerMessage?.tool_call_id, "call_1")
+  expect(capturedArgs).toEqual({ query: "UIUC housing" })
+  expect(capturedCtx).toBe(MOCK_CTX)
+  expect(observation.toolCallId).toBe("call_1")
+  expect(observation.toolName).toBe("web_search")
+  expect(observation.input).toEqual({ query: "UIUC housing" })
+  expect(observation.status).toBe("success")
+  expect(observation.summary).toBe("UIUC housing search result")
+  expect(observation.stepIndex).toBe(2)
+  expect(observation.providerMessage?.tool_call_id).toBe("call_1")
 })
 
 test("executeToolAction returns an error observation for invalid JSON arguments", async () => {
@@ -85,19 +84,19 @@ test("executeToolAction returns an error observation for invalid JSON arguments"
     stepIndex: 0,
   })
 
-  assert.equal(observation.toolCallId, "call_bad_args")
-  assert.equal(observation.toolName, "web_search")
-  assert.deepEqual(observation.input, {})
-  assert.equal(observation.status, "error")
-  assert.equal(observation.error?.code, "invalid_arguments")
-  assert.match(observation.summary, /JSON|Unexpected|Expected/i)
-  assert.deepEqual(JSON.parse(observation.raw), {
+  expect(observation.toolCallId).toBe("call_bad_args")
+  expect(observation.toolName).toBe("web_search")
+  expect(observation.input).toEqual({})
+  expect(observation.status).toBe("error")
+  expect(observation.error?.code).toBe("invalid_arguments")
+  expect(observation.summary).toMatch(/JSON|Unexpected|Expected/i)
+  expect(JSON.parse(observation.raw)).toEqual({
     error: "invalid_arguments",
     tool: "web_search",
     message: observation.summary,
     raw_arguments: '{"query":',
   })
-  assert.equal(registry.getCallCount(), 0)
+  expect(registry.getCallCount()).toBe(0)
 })
 
 test("executeToolAction returns an error observation for missing tools", async () => {
@@ -110,11 +109,11 @@ test("executeToolAction returns an error observation for missing tools", async (
     stepIndex: 1,
   })
 
-  assert.equal(observation.toolCallId, "call_missing")
-  assert.equal(observation.toolName, "missing_tool")
-  assert.equal(observation.status, "error")
-  assert.equal(observation.error?.code, "tool_not_found")
-  assert.deepEqual(JSON.parse(observation.raw), {
+  expect(observation.toolCallId).toBe("call_missing")
+  expect(observation.toolName).toBe("missing_tool")
+  expect(observation.status).toBe("error")
+  expect(observation.error?.code).toBe("tool_not_found")
+  expect(JSON.parse(observation.raw)).toEqual({
     error: "tool_not_found",
     tool: "missing_tool",
   })
@@ -131,10 +130,10 @@ test("executeToolAction returns an error observation when a tool throws", async 
     stepIndex: 1,
   })
 
-  assert.equal(observation.toolCallId, "call_throw")
-  assert.equal(observation.status, "error")
-  assert.equal(observation.error?.code, "execution_failed")
-  assert.equal(observation.summary, "stub tool failure")
+  expect(observation.toolCallId).toBe("call_throw")
+  expect(observation.status).toBe("error")
+  expect(observation.error?.code).toBe("execution_failed")
+  expect(observation.summary).toBe("stub tool failure")
 })
 
 test("executeToolAction returns an error observation when registry budget is exceeded", async () => {
@@ -155,10 +154,10 @@ test("executeToolAction returns an error observation when registry budget is exc
     stepIndex: 1,
   })
 
-  assert.equal(observation.toolCallId, "call_budget")
-  assert.equal(observation.status, "error")
-  assert.equal(observation.error?.code, "budget_exceeded")
-  assert.deepEqual(JSON.parse(observation.raw), {
+  expect(observation.toolCallId).toBe("call_budget")
+  expect(observation.status).toBe("error")
+  expect(observation.error?.code).toBe("budget_exceeded")
+  expect(JSON.parse(observation.raw)).toEqual({
     error: "budget_exceeded",
     max_calls: 1,
   })

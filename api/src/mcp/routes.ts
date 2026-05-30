@@ -1,20 +1,15 @@
-import {
-  type MCPAdapterClient,
-  type MCPDiscoveryResult,
-  type MCPFailureReason,
-  type MCPTestResult,
-} from "./adapter.ts"
+import type { MCPAdapterClient, MCPFailureReason } from "./adapter.ts"
 import {
   MCPConnectionService,
   MCPDiscoveredToolService,
   MCPToolOverrideService,
 } from "./service.ts"
 import { StreamableHttpMCPClient } from "./streamable-http-client.ts"
-import {
-  type MCPConnection,
-  type MCPConnectionTransport,
-  type MCPDiscoveredTool,
-  type MCPToolOverride,
+import type {
+  MCPConnection,
+  MCPConnectionTransport,
+  MCPDiscoveredTool,
+  MCPToolOverride,
 } from "./types.ts"
 
 const INTEGRATIONS_LIMITATIONS = [
@@ -28,9 +23,7 @@ const INTEGRATIONS_LIMITATIONS = [
 const CREDENTIAL_FIELD_PATTERN =
   /(credential|credentials|secret|token|api[_-]?key|authorization|password|headers?)/i
 
-interface JSONHeaders {
-  [key: string]: string
-}
+type JSONHeaders = Record<string, string>
 
 class MCPRouteError extends Error {
   readonly status: number

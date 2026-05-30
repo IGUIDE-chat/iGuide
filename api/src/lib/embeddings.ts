@@ -1,5 +1,5 @@
-import { MAX_EMBEDDING_BATCH_SIZE } from './embedding-config';
-import type { EmbeddingConfig } from './embedding-config';
+import { MAX_EMBEDDING_BATCH_SIZE } from "./embedding-config"
+import type { EmbeddingConfig } from "./embedding-config"
 import {
   EmbeddingConfigError,
   EmbeddingDimensionError,

@@ -1,4 +1,4 @@
-import { type Tool } from "ai"
+import type { Tool } from "ai"
 
 /**
  * Thrown when the tool call budget (maxCalls) is exceeded.
@@ -32,7 +32,7 @@ export interface BudgetOptions {
 const DEFAULTS = {
   maxCalls: 10,
   timeoutMs: 10_000,
-  maxResultBytes: 4_096,
+  maxResultBytes: 4096,
 } as const satisfies BudgetOptions
 
 const TRUNCATION_SUFFIX = "\n...[truncated]"
@@ -135,13 +135,13 @@ function createGuardedExecute(
             resolve(value)
             return null
           })
-          .catch((err: unknown) => {
+          .catch((error: unknown) => {
             clearTimeout(timer)
-            reject(err)
+            reject(error)
           })
-      } catch (err) {
+      } catch (error) {
         clearTimeout(timer)
-        reject(err)
+        reject(error)
       }
     })
 

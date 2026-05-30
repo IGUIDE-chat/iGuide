@@ -1,9 +1,5 @@
-import { type ToolRegistry } from "./registry"
-import {
-  type RequestContext,
-  type ToolDefinition,
-  type ToolResult,
-} from "./types"
+import type { ToolRegistry } from "./registry"
+import type { RequestContext, ToolDefinition, ToolResult } from "./types"
 
 interface TavilyResponse {
   results?: Array<{

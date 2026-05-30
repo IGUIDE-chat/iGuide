@@ -1,4 +1,4 @@
-import { type RequestContext } from "../tools/types"
+import type { RequestContext } from "../tools/types"
 
 export async function callSupabaseRpc<T>(
   ctx: RequestContext,

@@ -1,7 +1,6 @@
-import assert from "node:assert/strict"
-import test from "node:test"
+import { expect, test } from "vite-plus/test"
 
-import { type Observation } from "./observation.ts"
+import type { Observation } from "./observation.ts"
 import {
   advanceStep,
   createInitialState,
@@ -36,21 +35,13 @@ function createMinimalObservation(): Observation {
 
 test("advanceStep increments step index", () => {
   const state = createInitialState()
-  assert.equal(state.stepIndex, 0)
+  expect(state.stepIndex).toBe(0)
 
   const nextState = advanceStep(state)
-  assert.equal(
-    nextState.stepIndex,
-    1,
-    "After one advance, stepIndex should be 1"
-  )
+  expect(nextState.stepIndex).toBe(1)
 
   const finalState = advanceStep(nextState)
-  assert.equal(
-    finalState.stepIndex,
-    2,
-    "After two advances, stepIndex should be 2"
-  )
+  expect(finalState.stepIndex).toBe(2)
 })
 
 test("advanceStep preserves other state fields", () => {
@@ -60,9 +51,9 @@ test("advanceStep preserves other state fields", () => {
 
   const nextState = advanceStep(state)
 
-  assert.equal(nextState.stepIndex, 1)
-  assert.equal(nextState.currentToolCalls.length, 1)
-  assert.equal(nextState.currentToolCalls[0].id, "call_123")
+  expect(nextState.stepIndex).toBe(1)
+  expect(nextState.currentToolCalls.length).toBe(1)
+  expect(nextState.currentToolCalls[0].id).toBe("call_123")
 })
 
 test("observations can be added to state", () => {
@@ -72,8 +63,8 @@ test("observations can be added to state", () => {
   state.observations.push(observation)
 
   const observations = getObservations(state)
-  assert.equal(observations.length, 1)
-  assert.equal(observations[0].toolCallId, "call_123")
+  expect(observations.length).toBe(1)
+  expect(observations[0].toolCallId).toBe("call_123")
 })
 
 test("observations maintain order", () => {
@@ -107,58 +98,50 @@ test("observations maintain order", () => {
   state.observations.push(obs2)
 
   const observations = getObservations(state)
-  assert.equal(observations.length, 2)
-  assert.equal(observations[0].toolCallId, "call_1")
-  assert.equal(observations[1].toolCallId, "call_2")
+  expect(observations.length).toBe(2)
+  expect(observations[0].toolCallId).toBe("call_1")
+  expect(observations[1].toolCallId).toBe("call_2")
 })
 
 test("stop reason can be set and retrieved", () => {
   const state = createInitialState()
-  assert.equal(getStopReason(state), null)
+  expect(getStopReason(state)).toBe(null)
 
   state.stopReason = "stop"
-  assert.equal(getStopReason(state), "stop")
+  expect(getStopReason(state)).toBe("stop")
 
   state.stopReason = "tool_calls"
-  assert.equal(getStopReason(state), "tool_calls")
+  expect(getStopReason(state)).toBe("tool_calls")
 })
 
 test("stop reason tracks max iterations", () => {
   const state = createInitialState()
   state.stopReason = "max_iterations"
 
-  assert.equal(getStopReason(state), "max_iterations")
+  expect(getStopReason(state)).toBe("max_iterations")
 })
 
 test("initial state is first turn", () => {
   const state = createInitialState()
-  assert.equal(isFirstTurn(state), true, "Initial state should be first turn")
-  assert.equal(isReplayTurn(state), false, "Initial state should not be replay")
+  expect(isFirstTurn(state)).toBe(true)
+  expect(isReplayTurn(state)).toBe(false)
 })
 
 test("state after advance is not first turn", () => {
   const state = createInitialState()
   const nextState = advanceStep(state)
 
-  assert.equal(
-    isFirstTurn(nextState),
-    false,
-    "After advance should not be first turn"
-  )
+  expect(isFirstTurn(nextState)).toBe(false)
 })
 
 test("replay turn has prior observations", () => {
   const state = createInitialState()
 
-  assert.equal(isReplayTurn(state), false)
+  expect(isReplayTurn(state)).toBe(false)
 
   state.observations.push(createMinimalObservation())
 
-  assert.equal(
-    isReplayTurn(state),
-    true,
-    "State with prior observations should be replay"
-  )
+  expect(isReplayTurn(state)).toBe(true)
 })
 
 test("replay turn preserves conversation context", () => {
@@ -169,20 +152,20 @@ test("replay turn preserves conversation context", () => {
   state.observations.push(createMinimalObservation())
   state.stopReason = "tool_calls"
 
-  assert.equal(isReplayTurn(state), true)
+  expect(isReplayTurn(state)).toBe(true)
 
-  assert.equal(state.messages.length, 2)
-  assert.equal(state.messages[0].role, "user")
-  assert.equal(state.messages[1].role, "assistant")
+  expect(state.messages.length).toBe(2)
+  expect(state.messages[0].role).toBe("user")
+  expect(state.messages[1].role).toBe("assistant")
 })
 
 test("advanceStep returns new state object", () => {
   const state = createInitialState()
   const nextState = advanceStep(state)
 
-  assert.notEqual(state, nextState, "advanceStep should return new state")
-  assert.equal(state.stepIndex, 0, "Original state should be unchanged")
-  assert.equal(nextState.stepIndex, 1, "New state should have advanced index")
+  expect(state).not.toBe(nextState)
+  expect(state.stepIndex).toBe(0)
+  expect(nextState.stepIndex).toBe(1)
 })
 
 test("state can track multiple concurrent tool calls", () => {
@@ -201,9 +184,9 @@ test("state can track multiple concurrent tool calls", () => {
   })
 
   const calls = getCurrentToolCalls(state)
-  assert.equal(calls.length, 2, "Should support multiple concurrent tool calls")
+  expect(calls.length).toBe(2)
 
-  assert.equal(calls[0].id, "call_1")
-  assert.equal(calls[1].id, "call_2")
-  assert.notEqual(calls[0].name, calls[1].name)
+  expect(calls[0].id).toBe("call_1")
+  expect(calls[1].id).toBe("call_2")
+  expect(calls[0].name).not.toBe(calls[1].name)
 })

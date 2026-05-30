@@ -111,16 +111,21 @@ function buildGuidance(sources: Source[]): string {
 
 function getPolicyDescription(policy: string): string {
   switch (policy) {
-    case "local_first":
+    case "local_first": {
       return "Prefer the knowledge base (search_knowledge_base) for this domain; only use web search as fallback."
-    case "live_first":
+    }
+    case "live_first": {
       return "Prefer live web search (web_search) for this domain; local knowledge base may be stale."
-    case "local_with_live_verify":
+    }
+    case "local_with_live_verify": {
       return "Use the knowledge base first, then verify with web search."
-    case "archive_only":
+    }
+    case "archive_only": {
       return "Use only the knowledge base (search_knowledge_base); do NOT use web search for this domain."
-    default:
+    }
+    default: {
       return ""
+    }
   }
 }
 

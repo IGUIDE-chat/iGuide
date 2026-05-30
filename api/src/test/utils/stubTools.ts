@@ -1,7 +1,7 @@
-import {
-  type RequestContext,
-  type ToolDefinition,
-  type ToolResult,
+import type {
+  RequestContext,
+  ToolDefinition,
+  ToolResult,
 } from "../../tools/types.ts"
 
 export interface StubToolOptions {

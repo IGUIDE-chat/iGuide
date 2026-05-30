@@ -1,4 +1,4 @@
-import { type MiddlewareHandler } from "hono"
+import type { MiddlewareHandler } from "hono"
 
 /**
  * Cloudflare Rate Limiting binding interface.

@@ -1,12 +1,11 @@
-import assert from "node:assert/strict"
-import test from "node:test"
+import { expect, test } from "vite-plus/test"
 
-import { type MCPDiscoveryResult, type MCPTestResult } from "./adapter.ts"
+import type { MCPDiscoveryResult, MCPTestResult } from "./adapter.ts"
 import { maybeHandleIntegrationsRoute } from "./routes.ts"
-import {
-  type MCPConnection,
-  type MCPDiscoveredTool,
-  type MCPToolOverride,
+import type {
+  MCPConnection,
+  MCPDiscoveredTool,
+  MCPToolOverride,
 } from "./types.ts"
 
 interface MockServices {
@@ -174,8 +173,8 @@ function createServices(overrides: Partial<MockServices> = {}): MockServices {
 }
 
 function requireResponse(response: Response | null): Response {
-  assert.ok(response)
-  return response
+  expect(response).toBeTruthy()
+  return response!
 }
 
 test("GET /integrations returns platform/user sections and phase1 disclaimers", async () => {
@@ -203,29 +202,19 @@ test("GET /integrations returns platform/user sections and phase1 disclaimers", 
   )
 
   const resolved = requireResponse(response)
-  assert.equal(resolved.status, 200)
+  expect(resolved.status).toBe(200)
   const body = await resolved.json()
-  assert.ok(
-    Array.isArray(body.phase1_limitations),
-    "phase1_limitations must be an array"
-  )
-  assert.ok(
-    body.phase1_limitations.length > 0,
-    "phase1_limitations must not be empty"
-  )
+  expect(Array.isArray(body.phase1_limitations)).toBeTruthy()
+  expect(body.phase1_limitations.length > 0).toBeTruthy()
   for (const limitation of body.phase1_limitations) {
-    assert.equal(
-      typeof limitation,
-      "string",
-      "each limitation must be a string"
-    )
-    assert.ok(limitation.length > 0, "each limitation must be non-empty")
+    expect(typeof limitation).toBe("string")
+    expect(limitation.length > 0).toBeTruthy()
   }
-  assert.equal(body.platform[0].owner_type, "platform")
-  assert.equal(body.user[0].owner_type, "user")
-  assert.ok(Array.isArray(body.platform[0].tools))
-  assert.ok(Array.isArray(body.user[0].tools))
-  assert.ok(Array.isArray(body.user[0].overrides))
+  expect(body.platform[0].owner_type).toBe("platform")
+  expect(body.user[0].owner_type).toBe("user")
+  expect(Array.isArray(body.platform[0].tools)).toBeTruthy()
+  expect(Array.isArray(body.user[0].tools)).toBeTruthy()
+  expect(Array.isArray(body.user[0].overrides)).toBeTruthy()
 })
 
 test("POST /integrations rejects credential fields", async () => {
@@ -245,10 +234,10 @@ test("POST /integrations rejects credential fields", async () => {
   )
 
   const resolved = requireResponse(response)
-  assert.equal(resolved.status, 400)
+  expect(resolved.status).toBe(400)
   const body = await resolved.json()
-  assert.match(body.error, /credential/i)
-  assert.equal(body.failure_reason, "auth_required")
+  expect(body.error).toMatch(/credential/i)
+  expect(body.failure_reason).toBe("auth_required")
 })
 
 test("POST /integrations rejects unsupported transports with failure classification", async () => {
@@ -267,10 +256,10 @@ test("POST /integrations rejects unsupported transports with failure classificat
   )
 
   const resolved = requireResponse(response)
-  assert.equal(resolved.status, 400)
+  expect(resolved.status).toBe(400)
   const body = await resolved.json()
-  assert.equal(body.failure_reason, "unsupported_transport")
-  assert.match(body.error, /streamable_http/i)
+  expect(body.failure_reason).toBe("unsupported_transport")
+  expect(body.error).toMatch(/streamable_http/i)
 })
 
 test("POST /integrations rejects credentialed endpoint URLs with failure classification", async () => {
@@ -289,10 +278,10 @@ test("POST /integrations rejects credentialed endpoint URLs with failure classif
   )
 
   const resolved = requireResponse(response)
-  assert.equal(resolved.status, 400)
+  expect(resolved.status).toBe(400)
   const body = await resolved.json()
-  assert.equal(body.failure_reason, "auth_required")
-  assert.match(body.error, /credential|auth/i)
+  expect(body.failure_reason).toBe("auth_required")
+  expect(body.error).toMatch(/credential|auth/i)
 })
 
 test("PUT on a platform-owned connection returns 403", async () => {
@@ -327,9 +316,9 @@ test("PUT on a platform-owned connection returns 403", async () => {
   )
 
   const resolved = requireResponse(response)
-  assert.equal(resolved.status, 403)
+  expect(resolved.status).toBe(403)
   const body = await resolved.json()
-  assert.match(body.error, /platform/i)
+  expect(body.error).toMatch(/platform/i)
 })
 
 test("POST /integrations/:id/test returns MCPTestResult and persists it", async () => {
@@ -355,8 +344,8 @@ test("POST /integrations/:id/test returns MCPTestResult and persists it", async 
   )
 
   const resolved = requireResponse(response)
-  assert.equal(resolved.status, 200)
+  expect(resolved.status).toBe(200)
   const body = (await resolved.json()) as MCPTestResult
-  assert.equal(body.success, true)
-  assert.equal(recordedResult?.latency_ms, 42)
+  expect(body.success).toBe(true)
+  expect((recordedResult as unknown as MCPTestResult).latency_ms).toBe(42)
 })

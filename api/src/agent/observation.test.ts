@@ -1,5 +1,4 @@
-import assert from "node:assert/strict"
-import test from "node:test"
+import { expect, test } from "vite-plus/test"
 
 import { buildObservation } from "./observation.ts"
 
@@ -14,29 +13,26 @@ test("buildObservation converts successful tool results into canonical observati
     stepIndex: 2,
   })
 
-  assert.equal(observation.toolCallId, "call_123")
-  assert.equal(observation.toolName, "search_knowledge_base")
-  assert.deepEqual(observation.input, { query: "PAR" })
-  assert.equal(observation.status, "success")
-  assert.equal(observation.summary, "PAR has multiple dining options.")
-  assert.equal(
-    observation.output,
+  expect(observation.toolCallId).toBe("call_123")
+  expect(observation.toolName).toBe("search_knowledge_base")
+  expect(observation.input).toEqual({ query: "PAR" })
+  expect(observation.status).toBe("success")
+  expect(observation.summary).toBe("PAR has multiple dining options.")
+  expect(observation.output).toBe(
     "PAR has multiple dining options.\nSource: housing guide"
   )
-  assert.equal(
-    observation.raw,
+  expect(observation.raw).toBe(
     "PAR has multiple dining options.\nSource: housing guide"
   )
-  assert.equal(observation.truncated, false)
-  assert.equal(observation.error, null)
-  assert.equal(observation.stepIndex, 2)
-  assert.equal(observation.byteCount, 54)
-  assert.equal(observation.originalByteCount, 54)
-  assert.equal(observation.truncatedByteCount, null)
-  assert.equal(observation.providerMessage.role, "tool")
-  assert.equal(observation.providerMessage.tool_call_id, "call_123")
-  assert.equal(
-    observation.providerMessage.content,
+  expect(observation.truncated).toBe(false)
+  expect(observation.error).toBe(null)
+  expect(observation.stepIndex).toBe(2)
+  expect(observation.byteCount).toBe(54)
+  expect(observation.originalByteCount).toBe(54)
+  expect(observation.truncatedByteCount).toBe(null)
+  expect(observation.providerMessage!.role).toBe("tool")
+  expect(observation.providerMessage!.tool_call_id).toBe("call_123")
+  expect(observation.providerMessage!.content).toBe(
     "PAR has multiple dining options.\nSource: housing guide"
   )
 })
@@ -57,20 +53,19 @@ test("buildObservation preserves error result diagnostics", () => {
     stepIndex: 0,
   })
 
-  assert.equal(observation.status, "error")
-  assert.equal(observation.summary, "permission denied")
-  assert.deepEqual(observation.error, {
+  expect(observation.status).toBe("error")
+  expect(observation.summary).toBe("permission denied")
+  expect(observation.error).toEqual({
     code: "execution_failed",
     message: "permission denied",
     type: "execution_failed",
   })
-  assert.equal(
-    observation.raw,
+  expect(observation.raw).toBe(
     '{"error":"execution_failed","tool":"grep_docs","message":"permission denied"}'
   )
-  assert.equal(observation.providerMessage.tool_call_id, "call_error")
+  expect(observation.providerMessage!.tool_call_id).toBe("call_error")
   // eslint-disable-next-line vitest/no-conditional-in-test -- nullish coalescing for safe JSON parse
-  assert.deepEqual(JSON.parse(observation.providerMessage.content ?? ""), {
+  expect(JSON.parse(observation.providerMessage!.content ?? "")).toEqual({
     content: observation.raw,
     metadata: { error: true },
   })
@@ -92,9 +87,9 @@ test("buildObservation classifies timeout errors", () => {
     stepIndex: 1,
   })
 
-  assert.equal(observation.status, "error")
-  assert.equal(observation.summary, "timeout")
-  assert.deepEqual(observation.error, {
+  expect(observation.status).toBe("error")
+  expect(observation.summary).toBe("timeout")
+  expect(observation.error).toEqual({
     code: "timeout",
     message: "timeout",
     type: "timeout",
@@ -107,7 +102,7 @@ test("buildObservation records truncation byte counts and keeps provider content
     toolName: "web_search",
     input: { query: "UIUC housing" },
     result: {
-      content: "x".repeat(20) + "\n...[truncated]",
+      content: `${"x".repeat(20)}\n...[truncated]`,
       metadata: {
         error: true,
         original_bytes: 500,
@@ -118,21 +113,21 @@ test("buildObservation records truncation byte counts and keeps provider content
     stepIndex: 3,
   })
 
-  assert.equal(observation.status, "error")
-  assert.equal(observation.truncated, true)
-  assert.equal(observation.byteCount, 35)
-  assert.equal(observation.originalByteCount, 500)
-  assert.equal(observation.truncatedByteCount, 35)
-  assert.deepEqual(observation.error, {
+  expect(observation.status).toBe("error")
+  expect(observation.truncated).toBe(true)
+  expect(observation.byteCount).toBe(35)
+  expect(observation.originalByteCount).toBe(500)
+  expect(observation.truncatedByteCount).toBe(35)
+  expect(observation.error).toEqual({
     code: "tool_error",
     message: "xxxxxxxxxxxxxxxxxxxx",
     type: "tool_error",
   })
 
   // eslint-disable-next-line vitest/no-conditional-in-test -- nullish coalescing for safe JSON parse
-  const content = observation.providerMessage.content ?? ""
-  assert.deepEqual(JSON.parse(content), {
-    content: "x".repeat(20) + "\n...[truncated]",
+  const content = observation.providerMessage!.content ?? ""
+  expect(JSON.parse(content)).toEqual({
+    content: `${"x".repeat(20)}\n...[truncated]`,
     metadata: {
       error: true,
       original_bytes: 500,
@@ -151,12 +146,12 @@ test("buildObservation handles empty successful output", () => {
     stepIndex: 4,
   })
 
-  assert.equal(observation.status, "success")
-  assert.equal(observation.summary, "")
-  assert.equal(observation.output, "")
-  assert.equal(observation.raw, "")
-  assert.equal(observation.byteCount, 0)
-  assert.equal(observation.originalByteCount, 0)
-  assert.equal(observation.truncatedByteCount, null)
-  assert.equal(observation.providerMessage.content, "")
+  expect(observation.status).toBe("success")
+  expect(observation.summary).toBe("")
+  expect(observation.output).toBe("")
+  expect(observation.raw).toBe("")
+  expect(observation.byteCount).toBe(0)
+  expect(observation.originalByteCount).toBe(0)
+  expect(observation.truncatedByteCount).toBe(null)
+  expect(observation.providerMessage!.content).toBe("")
 })

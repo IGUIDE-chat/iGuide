@@ -1,8 +1,8 @@
-import {
-  type OpenAITool,
-  type RequestContext,
-  type ToolDefinition,
-  type ToolResult,
+import type {
+  OpenAITool,
+  RequestContext,
+  ToolDefinition,
+  ToolResult,
 } from "./types.ts"
 
 interface ToolRegistryOptions {
@@ -22,7 +22,7 @@ export class ToolRegistry {
 
   constructor(options?: ToolRegistryOptions) {
     this.maxCalls = options?.maxCalls ?? 5
-    this.timeoutMs = options?.timeoutMs ?? 10000
+    this.timeoutMs = options?.timeoutMs ?? 10_000
     this.maxResultBytes = options?.maxResultBytes ?? 4096
   }
 

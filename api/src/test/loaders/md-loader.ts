@@ -21,7 +21,7 @@ export function load(
 ): LoadResult {
   if (url.endsWith(".md")) {
     const path = fileURLToPath(url)
-    const content = readFileSync(path, "utf-8")
+    const content = readFileSync(path, "utf8")
     return {
       format: "module",
       shortCircuit: true,

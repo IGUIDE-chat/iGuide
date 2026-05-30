@@ -1,11 +1,11 @@
-import { type ToolResult } from "../tools/types.ts"
-import {
-  type MCPAdapterClient,
-  type MCPCallResult,
-  type MCPDiscoveredTool,
-  type MCPDiscoveryResult,
-  type MCPFailureReason,
-  type MCPTestResult,
+import type { ToolResult } from "../tools/types.ts"
+import type {
+  MCPAdapterClient,
+  MCPCallResult,
+  MCPDiscoveredTool,
+  MCPDiscoveryResult,
+  MCPFailureReason,
+  MCPTestResult,
 } from "./adapter.ts"
 
 const JSON_RPC_VERSION = "2.0"

@@ -1,5 +1,4 @@
-import assert from "node:assert/strict"
-import test from "node:test"
+import { expect, test } from "vite-plus/test"
 
 import {
   buildProviderMessages,
@@ -14,17 +13,11 @@ test("first-turn provider messages preserve system and current user order", () =
     message: "Where should I live freshman year?",
   })
 
-  assert.equal(messages.length, 2)
-  assert.deepEqual(
-    messages.map((message) => message.role),
-    ["system", "user"]
-  )
-  assert.equal(messages[0].content, "system prompt")
-  assert.equal(messages[1].content, "Where should I live freshman year?")
-  assert.ok(
-    messages.every((message) => message.role !== "tool"),
-    "First turn must not invent tool messages"
-  )
+  expect(messages.length).toBe(2)
+  expect(messages.map((message) => message.role)).toEqual(["system", "user"])
+  expect(messages[0].content).toBe("system prompt")
+  expect(messages[1].content).toBe("Where should I live freshman year?")
+  expect(messages.every((message) => message.role !== "tool")).toBeTruthy()
 })
 
 test("normalizes history roles and appends current user message", () => {
@@ -37,7 +30,7 @@ test("normalizes history roles and appends current user message", () => {
     message: "Compare ISR and PAR.",
   })
 
-  assert.deepEqual(messages, [
+  expect(messages).toEqual([
     { role: "assistant", content: "I can help with housing." },
     { role: "assistant", content: "What preferences do you have?" },
     { role: "user", content: "I want quiet dorms." },
@@ -77,29 +70,30 @@ test("replay-turn provider messages preserve assistant tool call and linked tool
     message: "Use that result to answer.",
   })
 
-  assert.deepEqual(
-    messages.map((message) => message.role),
-    ["system", "user", "assistant", "tool", "user"]
-  )
+  expect(messages.map((message) => message.role)).toEqual([
+    "system",
+    "user",
+    "assistant",
+    "tool",
+    "user",
+  ])
 
   const assistantMessage = messages[2]
-  assert.equal(assistantMessage.tool_calls?.[0]?.id, "call_search_1")
-  assert.equal(
-    assistantMessage.tool_calls?.[0]?.function.name,
+  expect(assistantMessage.tool_calls?.[0]?.id).toBe("call_search_1")
+  expect(assistantMessage.tool_calls?.[0]?.function.name).toBe(
     "search_knowledge_base"
   )
 
   const replayToolMessage = messages[3]
-  assert.equal(replayToolMessage.tool_call_id, "call_search_1")
-  assert.equal(replayToolMessage.role, "tool")
-  assert.match(
+  expect(replayToolMessage.tool_call_id).toBe("call_search_1")
+  expect(replayToolMessage.role).toBe("tool")
+  expect(
     // eslint-disable-next-line vitest/no-conditional-in-test -- nullish coalescing for safe assertion
-    replayToolMessage.content ?? "",
-    /PAR has multiple dining options/
-  )
+    replayToolMessage.content ?? ""
+  ).toMatch(/PAR has multiple dining options/)
   // eslint-disable-next-line vitest/no-conditional-in-test -- nullish coalescing for safe assertion
-  assert.match(replayToolMessage.content ?? "", /knowledge_base/)
-  assert.equal(messages.at(-1)?.content, "Use that result to answer.")
+  expect(replayToolMessage.content ?? "").toMatch(/knowledge_base/)
+  expect(messages.at(-1)?.content).toBe("Use that result to answer.")
 })
 
 test("plain tool result conversion keeps simple content unchanged", () => {
@@ -112,7 +106,7 @@ test("plain tool result conversion keeps simple content unchanged", () => {
     result: { content: "plain result" },
   })
 
-  assert.deepEqual(message, {
+  expect(message).toEqual({
     role: "tool",
     tool_call_id: "call_plain",
     content: "plain result",

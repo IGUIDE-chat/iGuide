@@ -1,7 +1,5 @@
-import assert from "node:assert/strict"
-import test from "node:test"
-
 import { tool } from "ai"
+import { expect, test } from "vite-plus/test"
 import { z } from "zod"
 
 import {
@@ -16,6 +14,8 @@ test("under budget passes through (9 of 10 succeeds)", async () => {
     test_tool: tool({
       description: "test",
       parameters: z.object({}),
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error -- pre-existing ai package version mismatch
       execute: async () => {
         callCount++
         return "ok"
@@ -27,10 +27,11 @@ test("under budget passes through (9 of 10 succeeds)", async () => {
 
   for (let i = 0; i < 9; i++) {
     // eslint-disable-next-line no-await-in-loop -- sequential test assertions
+    // @ts-expect-error -- ai package expects 2 args
     const result = await guarded.test_tool.execute!({})
-    assert.equal(result, "ok")
+    expect(result).toBe("ok")
   }
-  assert.equal(callCount, 9)
+  expect(callCount).toBe(9)
 })
 
 test("over budget rejects 11th call when maxCalls=10", async () => {
@@ -38,6 +39,8 @@ test("over budget rejects 11th call when maxCalls=10", async () => {
     test_tool: tool({
       description: "test",
       parameters: z.object({}),
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error -- pre-existing ai package version mismatch
       execute: async () => "ok",
     }),
   }
@@ -46,11 +49,12 @@ test("over budget rejects 11th call when maxCalls=10", async () => {
 
   for (let i = 0; i < 10; i++) {
     // eslint-disable-next-line no-await-in-loop -- sequential test assertions
+    // @ts-expect-error -- ai package expects 2 args
     await guarded.test_tool.execute!({})
   }
 
-  await assert.rejects(
-    () => guarded.test_tool.execute!({}),
+  // @ts-expect-error -- ai package expects 2 args
+  await expect(guarded.test_tool.execute!({})).rejects.toThrow(
     ToolBudgetExceededError
   )
 })
@@ -60,6 +64,8 @@ test("timeout rejects after timeoutMs", async () => {
     slow_tool: tool({
       description: "slow",
       parameters: z.object({}),
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error -- pre-existing ai package version mismatch
       execute: async () => {
         await new Promise<void>((resolve) => {
           setTimeout(resolve, 200)
@@ -71,7 +77,8 @@ test("timeout rejects after timeoutMs", async () => {
 
   const guarded = withGuards(tools, { timeoutMs: 50, maxCalls: 10 })
 
-  await assert.rejects(() => guarded.slow_tool.execute!({}), ToolTimeoutError)
+  // @ts-expect-error -- ai package expects 2 args
+  await expect(guarded.slow_tool.execute!({})).rejects.toThrow(ToolTimeoutError)
 })
 
 test("truncation kicks in past maxResultBytes", async () => {
@@ -79,14 +86,17 @@ test("truncation kicks in past maxResultBytes", async () => {
     big_tool: tool({
       description: "big",
       parameters: z.object({}),
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error -- pre-existing ai package version mismatch
       execute: async () => "x".repeat(500),
     }),
   }
 
   const guarded = withGuards(tools, { maxResultBytes: 100, maxCalls: 10 })
 
+  // @ts-expect-error -- ai package expects 2 args
   const result = await guarded.big_tool.execute!({})
-  assert.equal(typeof result, "string")
-  assert.ok(result.includes("[truncated]"))
-  assert.ok(result.length < 500)
+  expect(typeof result).toBe("string")
+  expect((result as string).includes("[truncated]")).toBeTruthy()
+  expect((result as string).length < 500).toBeTruthy()
 })

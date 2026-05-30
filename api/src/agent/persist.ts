@@ -180,7 +180,7 @@ export async function persistTurn(params: PersistTurnParams): Promise<void> {
         `[persistTurn] Conversation update failed: ${patchRes.status} ${body}`
       )
     }
-  } catch (err) {
-    console.error("[persistTurn] Unexpected error during persistence:", err)
+  } catch (error) {
+    console.error("[persistTurn] Unexpected error during persistence:", error)
   }
 }

@@ -1,11 +1,10 @@
-import assert from "node:assert/strict"
-import test from "node:test"
+import { expect, test } from "vite-plus/test"
 
-import {
-  type MockProviderResponseInput,
-  type RecordedProviderRequest,
-  createMockProviderFetch,
+import type {
+  MockProviderResponseInput,
+  RecordedProviderRequest,
 } from "../test/utils/mockProvider.ts"
+import { createMockProviderFetch } from "../test/utils/mockProvider.ts"
 import { createStubTool } from "../test/utils/stubTools.ts"
 import { ToolRegistry } from "../tools/registry.ts"
 import { runAgentLoop, runStreamingAgentLoop } from "./loop.ts"
@@ -85,25 +84,19 @@ test("hello message blocks retrieval tools - no tools in provider request", asyn
       env: createTestEnv(),
     })
 
-    assert.equal(mockFetch.requests.length, 1, "Provider should be called once")
+    expect(mockFetch.requests.length).toBe(1)
 
     const requestBody = parseRequestBody(mockFetch.requests[0])
 
     // Conversational gate: tools must be empty array to block retrieval
-    assert.deepEqual(
-      requestBody.tools,
-      [],
-      "Hello message should have empty tools array"
-    )
+    expect(requestBody.tools).toEqual([])
 
-    assert.equal(result.content, "Hello! How can I help you today?")
-    assert.equal(result.toolCalls.length, 0, "No tool calls should be made")
+    expect(result.content).toBe("Hello! How can I help you today?")
+    expect(result.toolCalls.length).toBe(0)
   } finally {
     globalThis.fetch = originalFetch
   }
 })
-
-
 
 test("substantive UIUC query exposes all registered tools", async () => {
   const mockResponses: MockProviderResponseInput[] = [
@@ -132,29 +125,19 @@ test("substantive UIUC query exposes all registered tools", async () => {
       env: createTestEnv(),
     })
 
-    assert.equal(
-      mockFetch.requests.length,
-      2,
-      "Provider should be called twice"
-    )
+    expect(mockFetch.requests.length).toBe(2)
 
     const firstRequest = parseRequestBody(mockFetch.requests[0])
-    assert.ok(firstRequest.tools, "First request should have tools defined")
-    assert.ok(
-      firstRequest.tools.length > 0,
-      "First request should have non-empty tools array"
-    )
+    expect(firstRequest.tools).toBeTruthy()
+    expect(firstRequest.tools!.length > 0).toBeTruthy()
 
-    const toolNames = new Set(firstRequest.tools.map((t) => t.function.name))
-    assert.ok(
-      toolNames.has("search_knowledge_base"),
-      "Should include search_knowledge_base tool"
-    )
-    assert.ok(toolNames.has("web_search"), "Should include web_search tool")
-    assert.ok(toolNames.has("grep_docs"), "Should include grep_docs tool")
+    const toolNames = new Set(firstRequest.tools!.map((t) => t.function.name))
+    expect(toolNames.has("search_knowledge_base")).toBeTruthy()
+    expect(toolNames.has("web_search")).toBeTruthy()
+    expect(toolNames.has("grep_docs")).toBeTruthy()
 
-    assert.equal(result.toolCalls.length, 1, "One tool call should be made")
-    assert.equal(result.toolCalls[0].name, "search_knowledge_base")
+    expect(result.toolCalls.length).toBe(1)
+    expect(result.toolCalls[0].name).toBe("search_knowledge_base")
   } finally {
     globalThis.fetch = originalFetch
   }
@@ -188,14 +171,11 @@ test("housing query exposes tools and can trigger search", async () => {
     })
 
     const firstRequest = parseRequestBody(mockFetch.requests[0])
-    assert.ok(
-      // eslint-disable-next-line vitest/no-conditional-in-test -- checking optional field existence
-      firstRequest.tools && firstRequest.tools.length > 0,
-      "Substantive query should expose tools"
-    )
+    // eslint-disable-next-line vitest/no-conditional-in-test -- checking optional field existence
+    expect(firstRequest.tools && firstRequest.tools.length > 0).toBeTruthy()
 
-    assert.equal(result.toolCalls.length, 1)
-    assert.equal(result.toolCalls[0].name, "search_knowledge_base")
+    expect(result.toolCalls.length).toBe(1)
+    expect(result.toolCalls[0].name).toBe("search_knowledge_base")
   } finally {
     globalThis.fetch = originalFetch
   }
@@ -219,21 +199,15 @@ test("content-only response stops without tool calls", async () => {
       env: createTestEnv(),
     })
 
-    assert.equal(
-      mockFetch.requests.length,
-      1,
-      "Provider should be called once for content-only response"
-    )
+    expect(mockFetch.requests.length).toBe(1)
 
-    assert.equal(result.toolCalls.length, 0, "No tool calls should be made")
-    assert.equal(
-      result.content,
+    expect(result.toolCalls.length).toBe(0)
+    expect(result.content).toBe(
       "Here is a direct answer without needing tools."
     )
-    assert.equal(result.iterations, 1, "Should stop after 1 iteration")
-    assert.equal(result.metadata?.stopReason, "final_answer")
-    assert.equal(
-      result.metadata?.stopSemanticLabel,
+    expect(result.iterations).toBe(1)
+    expect(result.metadata?.stopReason).toBe("final_answer")
+    expect(result.metadata?.stopSemanticLabel).toBe(
       "final_answer_no_tool_calls"
     )
   } finally {
@@ -280,17 +254,14 @@ test("max iterations triggers fallback behavior", async () => {
       maxIterations: 3,
     })
 
-    assert.equal(result.iterations, 3, "Should stop at max iterations")
+    expect(result.iterations).toBe(3)
 
-    assert.ok(
-      result.content.includes("maximum tool-call iterations"),
-      "Should include max iterations disclaimer"
-    )
-    assert.equal(result.metadata?.stopReason, "max_iterations")
-    assert.equal(result.metadata?.stopSemanticLabel, "max_iterations_reached")
-    assert.equal(result.metadata?.fallbackReason, "max_iterations_exceeded")
+    expect(result.content.includes("maximum tool-call iterations")).toBeTruthy()
+    expect(result.metadata?.stopReason).toBe("max_iterations")
+    expect(result.metadata?.stopSemanticLabel).toBe("max_iterations_reached")
+    expect(result.metadata?.fallbackReason).toBe("max_iterations_exceeded")
 
-    assert.ok(result.toolCalls.length > 0, "Should have made some tool calls")
+    expect(result.toolCalls.length > 0).toBeTruthy()
   } finally {
     globalThis.fetch = originalFetch
   }
@@ -308,24 +279,14 @@ test("provider error triggers fallback", async () => {
   try {
     const registry = createTestRegistry()
 
-    await assert.rejects(
-      async () => {
-        await runAgentLoop({
-          message: "Test query",
-          history: [],
-          registry,
-          env: createTestEnv(),
-        })
-      },
-      (error: Error) => {
-        assert.ok(
-          // eslint-disable-next-line vitest/no-conditional-in-test -- checking error message variants
-          error.message.includes("500") || error.message.includes("error")
-        )
-        return true
-      },
-      "Provider error should propagate"
-    )
+    await expect(
+      runAgentLoop({
+        message: "Test query",
+        history: [],
+        registry,
+        env: createTestEnv(),
+      })
+    ).rejects.toThrow(/DeepSeek API returned 500/)
   } finally {
     globalThis.fetch = originalFetch
   }
@@ -366,9 +327,9 @@ test("tool execution error is captured in result", async () => {
       env: createTestEnv(),
     })
 
-    assert.equal(result.toolCalls.length, 1, "One tool call should be recorded")
-    assert.equal(result.toolCalls[0].result.metadata?.error, true)
-    assert.equal(result.content, "The search failed, but I can still help.")
+    expect(result.toolCalls.length).toBe(1)
+    expect(result.toolCalls[0].result.metadata?.error).toBe(true)
+    expect(result.content).toBe("The search failed, but I can still help.")
   } finally {
     globalThis.fetch = originalFetch
   }
@@ -396,13 +357,9 @@ test("streaming hello blocks retrieval tools", async () => {
     })
 
     const requestBody = parseRequestBody(mockFetch.requests[0])
-    assert.deepEqual(
-      requestBody.tools,
-      [],
-      "Streaming hello should have empty tools array"
-    )
+    expect(requestBody.tools).toEqual([])
 
-    assert.equal(result.toolCalls.length, 0)
+    expect(result.toolCalls.length).toBe(0)
   } finally {
     globalThis.fetch = originalFetch
   }
@@ -437,13 +394,10 @@ test("streaming substantive query exposes tools", async () => {
     })
 
     const requestBody = parseRequestBody(mockFetch.requests[0])
-    assert.ok(
-      // eslint-disable-next-line vitest/no-conditional-in-test -- checking optional field existence
-      requestBody.tools && requestBody.tools.length > 0,
-      "Streaming substantive query should expose tools"
-    )
+    // eslint-disable-next-line vitest/no-conditional-in-test -- checking optional field existence
+    expect(requestBody.tools && requestBody.tools.length > 0).toBeTruthy()
 
-    assert.equal(result.toolCalls.length, 1)
+    expect(result.toolCalls.length).toBe(1)
   } finally {
     globalThis.fetch = originalFetch
   }

@@ -1,5 +1,4 @@
-import assert from "node:assert/strict"
-import test from "node:test"
+import { expect, test } from "vite-plus/test"
 
 import {
   createSSEStream,
@@ -79,17 +78,13 @@ test("tool_start payload uses 'name' field (not 'tool')", async () => {
   await writer.close()
 
   const parsed = await events
-  assert.equal(parsed.length, 1, "Should emit exactly one event")
-  assert.equal(parsed[0].event, "tool_start")
+  expect(parsed.length).toBe(1)
+  expect(parsed[0].event).toBe("tool_start")
 
   const payload = parsed[0].data as Record<string, unknown>
-  assert.equal(
-    payload.name,
-    "search_knowledge_base",
-    "tool_start payload must use 'name' field"
-  )
-  assert.ok(!("tool" in payload), "tool_start must NOT have 'tool' field")
-  assert.deepEqual(payload.args, { query: "housing" })
+  expect(payload.name).toBe("search_knowledge_base")
+  expect(!("tool" in payload)).toBeTruthy()
+  expect(payload.args).toEqual({ query: "housing" })
 })
 
 test("tool_result payload uses 'name' field (not 'tool')", async () => {
@@ -99,21 +94,15 @@ test("tool_result payload uses 'name' field (not 'tool')", async () => {
   await writer.close()
 
   const parsed = await events
-  assert.equal(parsed.length, 1)
-  assert.equal(parsed[0].event, "tool_result")
+  expect(parsed.length).toBe(1)
+  expect(parsed[0].event).toBe("tool_result")
 
   const payload = parsed[0].data as Record<string, unknown>
-  assert.equal(
-    payload.name,
-    "search_knowledge_base",
-    "tool_result payload must use 'name' field"
-  )
-  assert.ok(!("tool" in payload), "tool_result must NOT have 'tool' field")
-  assert.equal(payload.status, "success")
-  assert.equal(payload.summary, "2 results")
+  expect(payload.name).toBe("search_knowledge_base")
+  expect(!("tool" in payload)).toBeTruthy()
+  expect(payload.status).toBe("success")
+  expect(payload.summary).toBe("2 results")
 })
-
-
 
 test("content payload uses choices[].delta.content structure", async () => {
   const { writer, events } = createTestWriterPair()
@@ -122,22 +111,20 @@ test("content payload uses choices[].delta.content structure", async () => {
   await writer.close()
 
   const parsed = await events
-  assert.equal(parsed.length, 1)
-  assert.equal(parsed[0].event, "content")
+  expect(parsed.length).toBe(1)
+  expect(parsed[0].event).toBe("content")
 
   const payload = parsed[0].data as {
     choices: Array<{ delta: { content: string } }>
   }
-  assert.ok(Array.isArray(payload.choices), "content must have choices array")
-  assert.equal(payload.choices.length, 1)
-  assert.equal(
-    payload.choices[0].delta.content,
+  expect(Array.isArray(payload.choices)).toBeTruthy()
+  expect(payload.choices.length).toBe(1)
+  expect(payload.choices[0].delta.content).toBe(
     "Housing options are available."
   )
-  assert.equal(payload.choices[0].index, 0)
+  // @ts-expect-error -- index field present at runtime
+  expect(payload.choices[0].index).toBe(0)
 })
-
-
 
 test("fallback payload includes type and reason", async () => {
   const { writer, events } = createTestWriterPair()
@@ -146,12 +133,12 @@ test("fallback payload includes type and reason", async () => {
   await writer.close()
 
   const parsed = await events
-  assert.equal(parsed.length, 1)
-  assert.equal(parsed[0].event, "fallback")
+  expect(parsed.length).toBe(1)
+  expect(parsed[0].event).toBe("fallback")
 
   const payload = parsed[0].data as Record<string, unknown>
-  assert.equal(payload.type, "fallback")
-  assert.equal(payload.reason, "max iterations reached")
+  expect(payload.type).toBe("fallback")
+  expect(payload.reason).toBe("max iterations reached")
 })
 
 test("done payload includes usage object", async () => {
@@ -161,11 +148,11 @@ test("done payload includes usage object", async () => {
   await writer.close()
 
   const parsed = await events
-  assert.equal(parsed.length, 1)
-  assert.equal(parsed[0].event, "done")
+  expect(parsed.length).toBe(1)
+  expect(parsed[0].event).toBe("done")
 
   const payload = parsed[0].data as { usage: Record<string, unknown> }
-  assert.deepEqual(payload.usage, { prompt_tokens: 100, completion_tokens: 50 })
+  expect(payload.usage).toEqual({ prompt_tokens: 100, completion_tokens: 50 })
 })
 
 test("tool_start -> tool_result -> content -> done order is stable", async () => {
@@ -189,22 +176,15 @@ test("tool_start -> tool_result -> content -> done order is stable", async () =>
   const contentIdx = parsed.findIndex((e) => e.event === "content")
   const doneIdx = parsed.findIndex((e) => e.event === "done")
 
-  assert.notEqual(toolStartIdx, -1, "Must have tool_start event")
-  assert.notEqual(toolResultIdx, -1, "Must have tool_result event")
-  assert.notEqual(contentIdx, -1, "Must have content event")
-  assert.notEqual(doneIdx, -1, "Must have done event")
+  expect(toolStartIdx).not.toBe(-1)
+  expect(toolResultIdx).not.toBe(-1)
+  expect(contentIdx).not.toBe(-1)
+  expect(doneIdx).not.toBe(-1)
 
-  assert.ok(
-    toolStartIdx < toolResultIdx,
-    "tool_start must come before tool_result"
-  )
-  assert.ok(toolResultIdx < contentIdx, "tool_result must come before content")
-  assert.ok(contentIdx < doneIdx, "content must come before done")
+  expect(toolStartIdx < toolResultIdx).toBeTruthy()
+  expect(toolResultIdx < contentIdx).toBeTruthy()
+  expect(contentIdx < doneIdx).toBeTruthy()
 })
-
-
-
-
 
 test("trace events do not break existing event order", async () => {
   const { writer, events } = createTestWriterPair()
@@ -237,11 +217,7 @@ test("trace events do not break existing event order", async () => {
   ]
 
   for (const eventType of expectedEventTypes) {
-    assert.notEqual(
-      parsed.findIndex((e) => e.event === eventType),
-      -1,
-      `Must have ${eventType} event`
-    )
+    expect(parsed.findIndex((e) => e.event === eventType)).not.toBe(-1)
   }
 
   const toolStartIdx = parsed.findIndex((e) => e.event === "tool_start")
@@ -249,9 +225,6 @@ test("trace events do not break existing event order", async () => {
   const contentIdx = parsed.findIndex((e) => e.event === "content")
   const doneIdx = parsed.findIndex((e) => e.event === "done")
 
-  assert.ok(
-    toolStartIdx < toolResultIdx,
-    "tool_start must come before tool_result"
-  )
-  assert.ok(contentIdx < doneIdx, "content must come before done")
+  expect(toolStartIdx < toolResultIdx).toBeTruthy()
+  expect(contentIdx < doneIdx).toBeTruthy()
 })

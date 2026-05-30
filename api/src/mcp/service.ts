@@ -1,17 +1,18 @@
 import { tool } from "ai"
 import { z } from "zod"
 
-import {
-  type MCPAdapterClient,
-  type MCPDiscoveryResult,
-  type MCPTestResult,
+import type {
+  MCPAdapterClient,
+  MCPDiscoveryResult,
+  MCPTestResult,
 } from "./adapter.ts"
-import { type MCPStore, createMCPStore } from "./store.ts"
+import { createMCPStore } from "./store.ts"
+import type { MCPStore } from "./store.ts"
 import { StreamableHttpMCPClient } from "./streamable-http-client.ts"
-import {
-  type MCPConnection,
-  type MCPDiscoveredTool,
-  type MCPToolOverride,
+import type {
+  MCPConnection,
+  MCPDiscoveredTool,
+  MCPToolOverride,
 } from "./types.ts"
 
 type CreateConnectionInput = Pick<
@@ -84,12 +85,15 @@ function isPlatformConnectionVisible(
   viewerId: string
 ): boolean {
   switch (connection.visibility) {
-    case "global":
+    case "global": {
       return true
-    case "owner_only":
+    }
+    case "owner_only": {
       return connection.owner_id === viewerId
-    case "institution":
+    }
+    case "institution": {
       return connection.institution_id === viewerId
+    }
   }
 }
 

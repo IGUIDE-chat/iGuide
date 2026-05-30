@@ -1,9 +1,8 @@
-import assert from "node:assert/strict"
-import test from "node:test"
+import { expect, test } from "vite-plus/test"
 
 import { DEFAULT_MAX_ITERATIONS, evaluateStopCondition } from "./bounds.ts"
-import { type ProviderToolCall } from "./messages.ts"
-import { type Observation } from "./observation.ts"
+import type { ProviderToolCall } from "./messages.ts"
+import type { Observation } from "./observation.ts"
 
 function toolCall(name = "web_search"): ProviderToolCall {
   return {
@@ -48,10 +47,10 @@ test("evaluateStopCondition stops content-only model responses as final answers"
     toolCalls: [],
   })
 
-  assert.equal(decision.shouldStop, true)
-  assert.equal(decision.reason, "final_answer")
-  assert.equal(decision.semanticLabel, "final_answer_no_tool_calls")
-  assert.equal(decision.fallbackReason, null)
+  expect(decision.shouldStop).toBe(true)
+  expect(decision.reason).toBe("final_answer")
+  expect(decision.semanticLabel).toBe("final_answer_no_tool_calls")
+  expect(decision.fallbackReason).toBe(null)
 })
 
 test("evaluateStopCondition stops continued tool use at the max iteration bound", () => {
@@ -61,10 +60,10 @@ test("evaluateStopCondition stops continued tool use at the max iteration bound"
     toolCalls: [toolCall()],
   })
 
-  assert.equal(decision.shouldStop, true)
-  assert.equal(decision.reason, "max_iterations")
-  assert.equal(decision.semanticLabel, "max_iterations_reached")
-  assert.equal(decision.fallbackReason, "max_iterations_exceeded")
+  expect(decision.shouldStop).toBe(true)
+  expect(decision.reason).toBe("max_iterations")
+  expect(decision.semanticLabel).toBe("max_iterations_reached")
+  expect(decision.fallbackReason).toBe("max_iterations_exceeded")
 })
 
 test("evaluateStopCondition stops when the registry reports max tool-call budget exceeded", () => {
@@ -75,10 +74,10 @@ test("evaluateStopCondition stops when the registry reports max tool-call budget
     observations: [observation({ code: "budget_exceeded" })],
   })
 
-  assert.equal(decision.shouldStop, true)
-  assert.equal(decision.reason, "max_tool_calls")
-  assert.equal(decision.semanticLabel, "tool_call_budget_exceeded")
-  assert.equal(decision.fallbackReason, "tool_failure")
+  expect(decision.shouldStop).toBe(true)
+  expect(decision.reason).toBe("max_tool_calls")
+  expect(decision.semanticLabel).toBe("tool_call_budget_exceeded")
+  expect(decision.fallbackReason).toBe("tool_failure")
 })
 
 test("evaluateStopCondition stops unrecoverable invalid tool calls", () => {
@@ -89,13 +88,10 @@ test("evaluateStopCondition stops unrecoverable invalid tool calls", () => {
     observations: [observation({ code: "invalid_arguments" })],
   })
 
-  assert.equal(invalidArguments.shouldStop, true)
-  assert.equal(invalidArguments.reason, "invalid_tool_call")
-  assert.equal(
-    invalidArguments.semanticLabel,
-    "unrecoverable_invalid_tool_call"
-  )
-  assert.equal(invalidArguments.fallbackReason, "tool_failure")
+  expect(invalidArguments.shouldStop).toBe(true)
+  expect(invalidArguments.reason).toBe("invalid_tool_call")
+  expect(invalidArguments.semanticLabel).toBe("unrecoverable_invalid_tool_call")
+  expect(invalidArguments.fallbackReason).toBe("tool_failure")
 
   const missingTool = evaluateStopCondition({
     iterationCount: 1,
@@ -104,8 +100,8 @@ test("evaluateStopCondition stops unrecoverable invalid tool calls", () => {
     observations: [observation({ code: "tool_not_found" })],
   })
 
-  assert.equal(missingTool.shouldStop, true)
-  assert.equal(missingTool.reason, "invalid_tool_call")
+  expect(missingTool.shouldStop).toBe(true)
+  expect(missingTool.reason).toBe("invalid_tool_call")
 })
 
 test("evaluateStopCondition keeps recoverable tool errors in the loop with fallback context", () => {
@@ -116,10 +112,10 @@ test("evaluateStopCondition keeps recoverable tool errors in the loop with fallb
     observations: [observation({ code: "execution_failed" })],
   })
 
-  assert.equal(failure.shouldStop, false)
-  assert.equal(failure.reason, null)
-  assert.equal(failure.semanticLabel, "continue_after_recoverable_tool_error")
-  assert.equal(failure.fallbackReason, "tool_failure")
+  expect(failure.shouldStop).toBe(false)
+  expect(failure.reason).toBe(null)
+  expect(failure.semanticLabel).toBe("continue_after_recoverable_tool_error")
+  expect(failure.fallbackReason).toBe("tool_failure")
 
   const timeout = evaluateStopCondition({
     iterationCount: 1,
@@ -128,8 +124,8 @@ test("evaluateStopCondition keeps recoverable tool errors in the loop with fallb
     observations: [observation({ code: "timeout" })],
   })
 
-  assert.equal(timeout.shouldStop, false)
-  assert.equal(timeout.fallbackReason, "tool_timeout")
+  expect(timeout.shouldStop).toBe(false)
+  expect(timeout.fallbackReason).toBe("tool_timeout")
 })
 
 test("evaluateStopCondition exposes generic loop errors as machine-readable stops", () => {
@@ -140,10 +136,10 @@ test("evaluateStopCondition exposes generic loop errors as machine-readable stop
     error: new Error("provider failed"),
   })
 
-  assert.equal(decision.shouldStop, true)
-  assert.equal(decision.reason, "error")
-  assert.equal(decision.semanticLabel, "loop_error")
-  assert.equal(decision.fallbackReason, "tool_failure")
+  expect(decision.shouldStop).toBe(true)
+  expect(decision.reason).toBe("error")
+  expect(decision.semanticLabel).toBe("loop_error")
+  expect(decision.fallbackReason).toBe("tool_failure")
 })
 
 test("evaluateStopCondition continues when tools and observations are within bounds", () => {
@@ -154,8 +150,8 @@ test("evaluateStopCondition continues when tools and observations are within bou
     observations: [observation({ status: "success" })],
   })
 
-  assert.equal(decision.shouldStop, false)
-  assert.equal(decision.reason, null)
-  assert.equal(decision.semanticLabel, "continue_within_bounds")
-  assert.equal(decision.fallbackReason, null)
+  expect(decision.shouldStop).toBe(false)
+  expect(decision.reason).toBe(null)
+  expect(decision.semanticLabel).toBe("continue_within_bounds")
+  expect(decision.fallbackReason).toBe(null)
 })

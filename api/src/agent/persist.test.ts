@@ -1,12 +1,7 @@
-import assert from "node:assert/strict"
-import test from "node:test"
+import { expect, test } from "vite-plus/test"
 
 import { persistTurn } from "./persist.ts"
-import {
-  type PersistEnv,
-  type ResponseMessage,
-  type UserMessage,
-} from "./persist.ts"
+import type { PersistEnv, ResponseMessage, UserMessage } from "./persist.ts"
 
 interface CapturedRequest {
   url: string
@@ -25,6 +20,7 @@ function makeMockFetch(
     input: RequestInfo | URL,
     init?: RequestInit
   ): Promise<Response> => {
+    // eslint-disable-next-line @typescript-eslint/no-base-to-string -- Request types may not have toString
     const url = typeof input === "string" ? input : input.toString()
     const headers: Record<string, string> = {}
     if (init?.headers) {
@@ -82,7 +78,7 @@ test("persistTurn: bails early when conversationId is absent", async () => {
       userMessage: { role: "user", content: "hello" },
       responseMessages: [],
     })
-    assert.equal(captured.length, 0)
+    expect(captured.length).toBe(0)
   } finally {
     globalThis.fetch = originalFetch
   }
@@ -133,48 +129,47 @@ test("persistTurn: inserts correct rows for assistant text + tool-call + tool re
       responseMessages,
     })
 
-    assert.equal(captured.length, 2)
+    expect(captured.length).toBe(2)
 
     const insertReq = captured[0]
-    assert.equal(insertReq.url, "https://test.supabase.co/rest/v1/messages")
-    assert.equal(insertReq.method, "POST")
-    assert.equal(insertReq.headers["apikey"], "service-role-key")
-    assert.equal(insertReq.headers["Prefer"], "return=minimal")
+    expect(insertReq.url).toBe("https://test.supabase.co/rest/v1/messages")
+    expect(insertReq.method).toBe("POST")
+    expect(insertReq.headers.apikey).toBe("service-role-key")
+    expect(insertReq.headers.Prefer).toBe("return=minimal")
 
     const rows = insertReq.body as Array<Record<string, unknown>>
-    assert.equal(rows.length, 3)
+    expect(rows.length).toBe(3)
 
     const [userRow, assistantRow, toolRow] = rows
 
-    assert.equal(userRow.role, "user")
-    assert.equal(userRow.content, "What is UIUC?")
-    assert.equal(userRow.conversation_id, "conv-xyz")
+    expect(userRow.role).toBe("user")
+    expect(userRow.content).toBe("What is UIUC?")
+    expect(userRow.conversation_id).toBe("conv-xyz")
 
-    assert.equal(assistantRow.role, "assistant")
-    assert.equal(assistantRow.content, "Let me search for that.")
-    assert.equal(assistantRow.conversation_id, "conv-xyz")
+    expect(assistantRow.role).toBe("assistant")
+    expect(assistantRow.content).toBe("Let me search for that.")
+    expect(assistantRow.conversation_id).toBe("conv-xyz")
     const toolCalls = assistantRow.tool_calls as Array<Record<string, unknown>>
-    assert.equal(toolCalls.length, 1)
-    assert.equal(toolCalls[0].id, "call_abc123")
-    assert.equal(toolCalls[0].name, "search_knowledge_base")
-    assert.deepEqual(toolCalls[0].arguments, { query: "UIUC" })
+    expect(toolCalls.length).toBe(1)
+    expect(toolCalls[0].id).toBe("call_abc123")
+    expect(toolCalls[0].name).toBe("search_knowledge_base")
+    expect(toolCalls[0].arguments).toEqual({ query: "UIUC" })
 
-    assert.equal(toolRow.role, "tool")
-    assert.equal(toolRow.tool_call_id, "call_abc123")
-    assert.equal(
-      toolRow.content,
+    expect(toolRow.role).toBe("tool")
+    expect(toolRow.tool_call_id).toBe("call_abc123")
+    expect(toolRow.content).toBe(
       JSON.stringify({ text: "University of Illinois Urbana-Champaign" })
     )
 
     const patchReq = captured[1]
-    assert.ok(
+    expect(
       patchReq.url.startsWith(
         "https://test.supabase.co/rest/v1/conversations?id=eq."
       )
-    )
-    assert.equal(patchReq.method, "PATCH")
+    ).toBeTruthy()
+    expect(patchReq.method).toBe("PATCH")
     const patchBody = patchReq.body as Record<string, unknown>
-    assert.ok(typeof patchBody.updated_at === "string")
+    expect(typeof patchBody.updated_at === "string").toBeTruthy()
   } finally {
     globalThis.fetch = originalFetch
   }
@@ -213,8 +208,8 @@ test("persistTurn: tool message with string result uses content directly", async
 
     const rows = captured[0].body as Array<Record<string, unknown>>
     const toolRow = rows[1]
-    assert.equal(toolRow.content, "plain string result")
-    assert.equal(toolRow.tool_call_id, "call_str")
+    expect(toolRow.content).toBe("plain string result")
+    expect(toolRow.tool_call_id).toBe("call_str")
   } finally {
     globalThis.fetch = originalFetch
   }
@@ -227,7 +222,7 @@ test("persistTurn: swallows errors and does not throw", async () => {
   }
 
   try {
-    await assert.doesNotReject(
+    await expect(
       persistTurn({
         env: testEnv,
         userId: "user-1",
@@ -235,7 +230,7 @@ test("persistTurn: swallows errors and does not throw", async () => {
         userMessage: { role: "user", content: "test" },
         responseMessages: [],
       })
-    )
+    ).resolves.toBeUndefined()
   } finally {
     globalThis.fetch = originalFetch
   }

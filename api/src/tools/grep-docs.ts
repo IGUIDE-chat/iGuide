@@ -1,10 +1,6 @@
 import { callSupabaseRpc } from "../lib/supabase-rpc"
-import { type ToolRegistry } from "./registry"
-import {
-  type RequestContext,
-  type ToolDefinition,
-  type ToolResult,
-} from "./types"
+import type { ToolRegistry } from "./registry"
+import type { RequestContext, ToolDefinition, ToolResult } from "./types"
 
 interface KeywordSearchArgs {
   pattern: string

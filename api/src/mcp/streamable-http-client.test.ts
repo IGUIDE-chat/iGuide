@@ -1,4 +1,4 @@
-import test from "node:test"
+import { expect, test } from "vite-plus/test"
 
 import { createMCPToolWrapper } from "./adapter.ts"
 import { StreamableHttpMCPClient } from "./streamable-http-client.ts"
@@ -9,12 +9,6 @@ type TestCase = {
 }
 
 type FetchStub = typeof fetch
-
-function assert(condition: unknown, message: string): asserts condition {
-  if (!condition) {
-    throw new Error(message)
-  }
-}
 
 async function withMockFetch(
   stub: FetchStub,
@@ -36,21 +30,18 @@ const tests: TestCase[] = [
     async run() {
       await withMockFetch(
         async (input, init) => {
-          assert(input === "https://example.com/mcp", "unexpected test URL")
-          assert(init?.method === "POST", "expected POST request")
-          assert(
+          expect(input === "https://example.com/mcp").toBeTruthy()
+          expect(init?.method === "POST").toBeTruthy()
+          expect(
             init?.headers &&
               typeof init.headers === "object" &&
-              "Content-Type" in init.headers,
-            "expected content-type header"
-          )
+              "Content-Type" in init.headers
+          ).toBeTruthy()
 
+          // eslint-disable-next-line @typescript-eslint/no-base-to-string -- body may be URL or Request
           const body = JSON.parse(String(init?.body))
-          assert(body.method === "initialize", "expected initialize method")
-          assert(
-            body.params?.protocolVersion === "2024-11-05",
-            "expected protocol version"
-          )
+          expect(body.method === "initialize").toBeTruthy()
+          expect(body.params?.protocolVersion === "2024-11-05").toBeTruthy()
 
           return new Response(
             JSON.stringify({
@@ -72,9 +63,9 @@ const tests: TestCase[] = [
           const client = new StreamableHttpMCPClient()
           const result = await client.test("https://example.com/mcp")
 
-          assert(result.success, "expected initialize success")
-          assert(result.failure_reason === null, "unexpected failure reason")
-          assert(result.latency_ms !== null, "expected latency")
+          expect(result.success).toBeTruthy()
+          expect(result.failure_reason === null).toBeTruthy()
+          expect(result.latency_ms !== null).toBeTruthy()
         }
       )
     },
@@ -87,11 +78,8 @@ const tests: TestCase[] = [
         async () => {
           const client = new StreamableHttpMCPClient()
           const result = await client.test("https://example.com/mcp")
-          assert(!result.success, "expected initialize failure")
-          assert(
-            result.failure_reason === "auth_required",
-            "expected auth_required failure reason"
-          )
+          expect(!result.success).toBeTruthy()
+          expect(result.failure_reason === "auth_required").toBeTruthy()
         }
       )
     },
@@ -101,6 +89,7 @@ const tests: TestCase[] = [
     async run() {
       await withMockFetch(
         async (_input, init) => {
+          // eslint-disable-next-line @typescript-eslint/no-base-to-string -- body may be URL or Request
           const body = JSON.parse(String(init?.body))
           if (body.method === "tools/list") {
             return new Response(
@@ -137,18 +126,18 @@ const tests: TestCase[] = [
           const client = new StreamableHttpMCPClient()
           const discovery = await client.discover("https://example.com/mcp")
 
-          assert(discovery.success, "expected discovery success")
-          assert(discovery.tools.length === 1, "expected one discovered tool")
-          assert(
+          expect(discovery.success).toBeTruthy()
+          expect(discovery.tools.length === 1).toBeTruthy()
+          expect(
             discovery.tools[0]?.parameters &&
-              typeof discovery.tools[0].parameters === "object",
-            "expected mapped parameters"
-          )
+              typeof discovery.tools[0].parameters === "object"
+          ).toBeTruthy()
         }
       )
 
       await withMockFetch(
         async (_input, init) => {
+          // eslint-disable-next-line @typescript-eslint/no-base-to-string -- body may be URL or Request
           const body = JSON.parse(String(init?.body))
           return new Response(
             JSON.stringify({
@@ -165,11 +154,10 @@ const tests: TestCase[] = [
         async () => {
           const client = new StreamableHttpMCPClient()
           const discovery = await client.discover("https://example.com/mcp")
-          assert(!discovery.success, "expected discovery failure")
-          assert(
-            discovery.failure_reason === "no_tools_discovered",
-            "expected empty discovery failure reason"
-          )
+          expect(!discovery.success).toBeTruthy()
+          expect(
+            discovery.failure_reason === "no_tools_discovered"
+          ).toBeTruthy()
         }
       )
     },
@@ -179,12 +167,10 @@ const tests: TestCase[] = [
     async run() {
       await withMockFetch(
         async (_input, init) => {
+          // eslint-disable-next-line @typescript-eslint/no-base-to-string -- body may be URL or Request
           const body = JSON.parse(String(init?.body))
           if (body.method === "tools/call") {
-            assert(
-              body.params?.name === "lookup_housing",
-              "expected tool name in call payload"
-            )
+            expect(body.params?.name === "lookup_housing").toBeTruthy()
 
             return new Response(
               JSON.stringify({
@@ -218,12 +204,11 @@ const tests: TestCase[] = [
             { dorm: "Allen Hall" }
           )
 
-          assert(callResult.success, "expected successful tool call")
-          assert(
+          expect(callResult.success).toBeTruthy()
+          expect(
             callResult.tool_result?.content ===
-              'Allen Hall\n{"type":"image","url":"https://example.com/a.png"}',
-            "expected mapped tool content"
-          )
+              'Allen Hall\n{"type":"image","url":"https://example.com/a.png"}'
+          ).toBeTruthy()
 
           const wrapped = createMCPToolWrapper(
             {
@@ -244,7 +229,7 @@ const tests: TestCase[] = [
                   success: false,
                   failure_reason: "timeout",
                   error_message: "MCP timed out",
-                  latency_ms: 10000,
+                  latency_ms: 10_000,
                   tool_result: null,
                 }
               },
@@ -252,10 +237,9 @@ const tests: TestCase[] = [
           )
 
           const wrappedResult = await wrapped.execute({}, { env: {} })
-          assert(
-            wrappedResult.content.includes('"failure_reason":"timeout"'),
-            "expected wrapper to surface adapter failure"
-          )
+          expect(
+            wrappedResult.content.includes('"failure_reason":"timeout"')
+          ).toBeTruthy()
         }
       )
     },
@@ -275,11 +259,8 @@ const tests: TestCase[] = [
         async () => {
           const client = new StreamableHttpMCPClient({ timeoutMs: 1 })
           const result = await client.test("https://example.com/mcp")
-          assert(!result.success, "expected timeout failure")
-          assert(
-            result.failure_reason === "timeout",
-            "expected timeout failure reason"
-          )
+          expect(!result.success).toBeTruthy()
+          expect(result.failure_reason === "timeout").toBeTruthy()
         }
       )
     },
@@ -287,5 +268,6 @@ const tests: TestCase[] = [
 ]
 
 for (const testCase of tests) {
+  // eslint-disable-next-line vitest/expect-expect, vitest/valid-title -- dynamic test case with assertions
   test(testCase.name, testCase.run)
 }

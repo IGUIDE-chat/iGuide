@@ -1,12 +1,11 @@
 /* eslint-disable no-await-in-loop -- streaming reads require sequential consumption */
-import assert from "node:assert/strict"
-import test from "node:test"
+import { expect, test } from "vite-plus/test"
 
-import {
-  type MockProviderResponseInput,
-  type RecordedProviderRequest,
-  createMockProviderFetch,
+import type {
+  MockProviderResponseInput,
+  RecordedProviderRequest,
 } from "../test/utils/mockProvider.ts"
+import { createMockProviderFetch } from "../test/utils/mockProvider.ts"
 import { createStubTool } from "../test/utils/stubTools.ts"
 import { ToolRegistry } from "../tools/registry.ts"
 import { runStreamingAgentLoop } from "./loop.ts"
@@ -139,8 +138,8 @@ function _assertEventExists(
   eventName: string
 ): ParsedSSEEvent {
   const event = events.find((e) => e.event === eventName)
-  assert.ok(event, `Expected ${eventName} event to exist`)
-  return event
+  expect(event).toBeTruthy()
+  return event!
 }
 
 function _assertEventPayload(
@@ -149,11 +148,7 @@ function _assertEventPayload(
 ): void {
   const payload = event.data as Record<string, unknown>
   for (const [key, value] of Object.entries(expected)) {
-    assert.deepEqual(
-      payload[key],
-      value,
-      `Expected payload.${key} to equal ${value}`
-    )
+    expect(payload[key]).toEqual(value)
   }
 }
 
@@ -183,23 +178,18 @@ test("streaming no-tool final answer emits content then done", async () => {
     const contentEvents = parsed.filter((e) => e.event === "content")
     const doneEvents = parsed.filter((e) => e.event === "done")
 
-    assert.equal(
-      contentEvents.length > 0,
-      true,
-      "Should have at least one content event"
-    )
-    assert.equal(doneEvents.length, 1, "Should have exactly one done event")
+    expect(contentEvents.length > 0).toBe(true)
+    expect(doneEvents.length).toBe(1)
 
     const contentPayload = contentEvents[0].data as {
       choices: Array<{ delta: { content: string } }>
     }
-    assert.ok(
-      contentPayload.choices[0].delta.content.includes("Hello!"),
-      "Content should include greeting"
-    )
+    expect(
+      contentPayload.choices[0].delta.content.includes("Hello!")
+    ).toBeTruthy()
 
-    assert.equal(result.toolCalls.length, 0, "No tool calls should be made")
-    assert.equal(result.iterations, 1, "Should complete in 1 iteration")
+    expect(result.toolCalls.length).toBe(0)
+    expect(result.iterations).toBe(1)
   } finally {
     globalThis.fetch = originalFetch
   }
@@ -240,61 +230,45 @@ test("streaming one tool then final answer completes act-observe loop", async ()
 
     // Verify event sequence
     const eventNames = new Set(parsed.map((e) => e.event))
-    assert.ok(eventNames.has("tool_start"), "Should have tool_start event")
-    assert.ok(eventNames.has("tool_result"), "Should have tool_result event")
-    assert.ok(eventNames.has("content"), "Should have content event")
-    assert.ok(eventNames.has("done"), "Should have done event")
+    expect(eventNames.has("tool_start")).toBeTruthy()
+    expect(eventNames.has("tool_result")).toBeTruthy()
+    expect(eventNames.has("content")).toBeTruthy()
+    expect(eventNames.has("done")).toBeTruthy()
 
     // Verify tool_start payload
     const toolStartEvent = parsed.find((e) => e.event === "tool_start")
-    assert.ok(toolStartEvent, "tool_start event should exist")
-    const toolStartPayload = toolStartEvent.data as {
+    expect(toolStartEvent).toBeTruthy()
+    const toolStartPayload = toolStartEvent!.data as {
       name: string
       args: unknown
     }
-    assert.equal(
-      toolStartPayload.name,
-      "search_knowledge_base",
-      "Tool name should match"
-    )
+    expect(toolStartPayload.name).toBe("search_knowledge_base")
 
     // Verify tool_result payload
     const toolResultEvent = parsed.find((e) => e.event === "tool_result")
-    assert.ok(toolResultEvent, "tool_result event should exist")
-    const toolResultPayload = toolResultEvent.data as {
+    expect(toolResultEvent).toBeTruthy()
+    const toolResultPayload = toolResultEvent!.data as {
       name: string
       status: string
     }
-    assert.equal(
-      toolResultPayload.name,
-      "search_knowledge_base",
-      "Tool result name should match"
-    )
-    assert.equal(toolResultPayload.status, "success", "Tool should succeed")
+    expect(toolResultPayload.name).toBe("search_knowledge_base")
+    expect(toolResultPayload.status).toBe("success")
 
     // Verify provider was called twice (initial + after observation)
-    assert.equal(
-      mockFetch.requests.length,
-      2,
-      "Provider should be called twice"
-    )
+    expect(mockFetch.requests.length).toBe(2)
 
     // Verify second request includes tool observation
     const secondRequest = parseRequestBody(mockFetch.requests[1])
-    assert.ok(secondRequest.messages, "Second request should have messages")
+    expect(secondRequest.messages).toBeTruthy()
     const toolMessages = secondRequest.messages?.filter(
       (m) => m.role === "tool"
     )
-    assert.equal(toolMessages?.length, 1, "Should have one tool message")
+    expect(toolMessages?.length).toBe(1)
 
     // Verify result
-    assert.equal(result.toolCalls.length, 1, "Should have one tool call")
-    assert.equal(
-      result.toolCalls[0].name,
-      "search_knowledge_base",
-      "Tool name should match"
-    )
-    assert.equal(result.iterations, 2, "Should complete in 2 iterations")
+    expect(result.toolCalls.length).toBe(1)
+    expect(result.toolCalls[0].name).toBe("search_knowledge_base")
+    expect(result.iterations).toBe(2)
   } finally {
     globalThis.fetch = originalFetch
   }
@@ -341,19 +315,15 @@ test("streaming multiple iterations with tool chaining", async () => {
     const toolStartEvents = parsed.filter((e) => e.event === "tool_start")
     const toolResultEvents = parsed.filter((e) => e.event === "tool_result")
 
-    assert.equal(toolStartEvents.length, 2, "Should have 2 tool_start events")
-    assert.equal(toolResultEvents.length, 2, "Should have 2 tool_result events")
+    expect(toolStartEvents.length).toBe(2)
+    expect(toolResultEvents.length).toBe(2)
 
     // Verify provider called 3 times
-    assert.equal(
-      mockFetch.requests.length,
-      3,
-      "Provider should be called 3 times"
-    )
+    expect(mockFetch.requests.length).toBe(3)
 
     // Verify result
-    assert.equal(result.toolCalls.length, 2, "Should have 2 tool calls")
-    assert.equal(result.iterations, 3, "Should complete in 3 iterations")
+    expect(result.toolCalls.length).toBe(2)
+    expect(result.iterations).toBe(3)
   } finally {
     globalThis.fetch = originalFetch
   }
@@ -401,21 +371,14 @@ test("streaming tool error is captured and handled gracefully", async () => {
     const parsed = await events
 
     const doneEvents = parsed.filter((e) => e.event === "done")
-    assert.equal(doneEvents.length, 1, "Should have done event")
+    expect(doneEvents.length).toBe(1)
 
     const toolResultEvents = parsed.filter((e) => e.event === "tool_result")
-    assert.equal(toolResultEvents.length, 1, "Should have tool_result event")
+    expect(toolResultEvents.length).toBe(1)
     const toolResultPayload = toolResultEvents[0].data as { status: string }
-    assert.equal(
-      toolResultPayload.status,
-      "error",
-      "Tool result should indicate error"
-    )
+    expect(toolResultPayload.status).toBe("error")
 
-    assert.ok(
-      result.toolCalls.length >= 0,
-      "Tool calls may be recorded depending on fallback path"
-    )
+    expect(result.toolCalls.length >= 0).toBeTruthy()
   } finally {
     globalThis.fetch = originalFetch
   }
@@ -461,22 +424,21 @@ test("streaming max iterations triggers fallback with bounded stop", async () =>
 
     const parsed = await events
 
-    assert.equal(result.iterations, 3, "Should stop at max iterations")
+    expect(result.iterations).toBe(3)
 
     const fallbackEvents = parsed.filter((e) => e.event === "fallback")
-    assert.ok(fallbackEvents.length > 0, "Should have fallback event")
+    expect(fallbackEvents.length > 0).toBeTruthy()
 
     const doneEvents = parsed.filter((e) => e.event === "done")
-    assert.equal(doneEvents.length, 1, "Should have done event")
+    expect(doneEvents.length).toBe(1)
 
-    assert.ok(
-      // eslint-disable-next-line vitest/no-conditional-in-test -- defensive assertion on optional result fields
+    // eslint-disable-next-line vitest/no-conditional-in-test -- defensive assertion on optional result fields
+    expect(
       result.content.includes("maximum") ||
         result.content.includes("incomplete") ||
         result.metadata?.stopReason === "max_iterations" ||
-        result.metadata?.reason === "max_iterations_exceeded",
-      "Should indicate max iterations reached"
-    )
+        result.metadata?.reason === "max_iterations_exceeded"
+    ).toBeTruthy()
   } finally {
     globalThis.fetch = originalFetch
   }
@@ -521,18 +483,14 @@ test("streaming fallback direct response when all tools fail", async () => {
     const parsed = await events
 
     const doneEvents = parsed.filter((e) => e.event === "done")
-    assert.equal(doneEvents.length, 1, "Should have done event")
+    expect(doneEvents.length).toBe(1)
 
     const toolResultEvents = parsed.filter((e) => e.event === "tool_result")
-    assert.equal(toolResultEvents.length, 1, "Should have tool_result event")
+    expect(toolResultEvents.length).toBe(1)
     const toolResultPayload = toolResultEvents[0].data as { status: string }
-    assert.equal(
-      toolResultPayload.status,
-      "error",
-      "Tool result should indicate error"
-    )
+    expect(toolResultPayload.status).toBe("error")
 
-    assert.ok(result.iterations >= 1, "Should complete at least one iteration")
+    expect(result.iterations >= 1).toBeTruthy()
   } finally {
     globalThis.fetch = originalFetch
   }
@@ -572,16 +530,10 @@ test("streaming trace events are emitted at key points", async () => {
     const eventNames = new Set(parsed.map((e) => e.event))
 
     // Should have agent_step event
-    assert.ok(
-      eventNames.has("agent_step"),
-      "Should have agent_step trace event"
-    )
+    expect(eventNames.has("agent_step")).toBeTruthy()
 
     // Should have observation event
-    assert.ok(
-      eventNames.has("observation"),
-      "Should have observation trace event"
-    )
+    expect(eventNames.has("observation")).toBeTruthy()
 
     // Verify observation event structure
     const observationEvent = parsed.find((e) => e.event === "observation")
@@ -592,13 +544,12 @@ test("streaming trace events are emitted at key points", async () => {
         status: string
         summary: string
       }
-      assert.equal(
-        payload.name,
-        "search_knowledge_base",
-        "Observation should have tool name"
-      )
-      assert.equal(payload.status, "success", "Observation should have status")
-      assert.ok(payload.summary, "Observation should have summary")
+      // eslint-disable-next-line vitest/no-conditional-expect -- guarded by if block
+      expect(payload.name).toBe("search_knowledge_base")
+      // eslint-disable-next-line vitest/no-conditional-expect -- guarded by if block
+      expect(payload.status).toBe("success")
+      // eslint-disable-next-line vitest/no-conditional-expect -- guarded by if block
+      expect(payload.summary).toBeTruthy()
     }
   } finally {
     globalThis.fetch = originalFetch
@@ -639,30 +590,24 @@ test("streaming preserves SSE backward compatibility", async () => {
     const eventNames = new Set(parsed.map((e) => e.event))
 
     // Core events must exist
-    assert.ok(eventNames.has("tool_start"), "Must have tool_start")
-    assert.ok(eventNames.has("tool_result"), "Must have tool_result")
-    assert.ok(eventNames.has("content"), "Must have content")
-    assert.ok(eventNames.has("done"), "Must have done")
+    expect(eventNames.has("tool_start")).toBeTruthy()
+    expect(eventNames.has("tool_result")).toBeTruthy()
+    expect(eventNames.has("content")).toBeTruthy()
+    expect(eventNames.has("done")).toBeTruthy()
 
     // Verify tool_start uses 'name' not 'tool'
     const toolStartEvent = parsed.find((e) => e.event === "tool_start")
-    assert.ok(toolStartEvent, "tool_start should exist")
-    const toolStartPayload = toolStartEvent.data as Record<string, unknown>
-    assert.ok("name" in toolStartPayload, "tool_start must have 'name' field")
-    assert.ok(
-      !("tool" in toolStartPayload),
-      "tool_start must NOT have 'tool' field"
-    )
+    expect(toolStartEvent).toBeTruthy()
+    const toolStartPayload = toolStartEvent!.data as Record<string, unknown>
+    expect("name" in toolStartPayload).toBeTruthy()
+    expect(!("tool" in toolStartPayload)).toBeTruthy()
 
     // Verify tool_result uses 'name' not 'tool'
     const toolResultEvent = parsed.find((e) => e.event === "tool_result")
-    assert.ok(toolResultEvent, "tool_result should exist")
-    const toolResultPayload = toolResultEvent.data as Record<string, unknown>
-    assert.ok("name" in toolResultPayload, "tool_result must have 'name' field")
-    assert.ok(
-      !("tool" in toolResultPayload),
-      "tool_result must NOT have 'tool' field"
-    )
+    expect(toolResultEvent).toBeTruthy()
+    const toolResultPayload = toolResultEvent!.data as Record<string, unknown>
+    expect("name" in toolResultPayload).toBeTruthy()
+    expect(!("tool" in toolResultPayload)).toBeTruthy()
   } finally {
     globalThis.fetch = originalFetch
   }
@@ -693,19 +638,11 @@ test("streaming retrieval safety gate blocks tools for hello", async () => {
 
     // Should NOT have tool events for hello
     const toolStartEvents = parsed.filter((e) => e.event === "tool_start")
-    assert.equal(
-      toolStartEvents.length,
-      0,
-      "Hello should not trigger tool_start"
-    )
+    expect(toolStartEvents.length).toBe(0)
 
     // Verify request had empty tools
     const requestBody = parseRequestBody(mockFetch.requests[0])
-    assert.deepEqual(
-      requestBody.tools,
-      [],
-      "Hello should have empty tools array"
-    )
+    expect(requestBody.tools).toEqual([])
   } finally {
     globalThis.fetch = originalFetch
   }
@@ -743,19 +680,12 @@ test("streaming allows tools for substantive query", async () => {
 
     // Should have tool events for substantive query
     const toolStartEvents = parsed.filter((e) => e.event === "tool_start")
-    assert.equal(
-      toolStartEvents.length,
-      1,
-      "Substantive query should trigger tool"
-    )
+    expect(toolStartEvents.length).toBe(1)
 
     // Verify request had tools
     const requestBody = parseRequestBody(mockFetch.requests[0])
-    assert.ok(
-      // eslint-disable-next-line vitest/no-conditional-in-test -- checking optional field existence
-      requestBody.tools && requestBody.tools.length > 0,
-      "Should have tools"
-    )
+    // eslint-disable-next-line vitest/no-conditional-in-test -- checking optional field existence
+    expect(requestBody.tools && requestBody.tools.length > 0).toBeTruthy()
   } finally {
     globalThis.fetch = originalFetch
   }

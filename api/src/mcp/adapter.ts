@@ -1,4 +1,4 @@
-import { type ToolDefinition, type ToolResult } from "../tools/types.ts"
+import type { ToolDefinition, ToolResult } from "../tools/types.ts"
 
 /**
  * Thin adapter boundary for exposing remote MCP tools through the existing

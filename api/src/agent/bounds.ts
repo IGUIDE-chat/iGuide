@@ -1,6 +1,6 @@
-import { type FallbackReason } from "./fallback.ts"
-import { type ProviderToolCall } from "./messages.ts"
-import { type Observation } from "./observation.ts"
+import type { FallbackReason } from "./fallback.ts"
+import type { ProviderToolCall } from "./messages.ts"
+import type { Observation } from "./observation.ts"
 
 export const DEFAULT_MAX_ITERATIONS = 3
 

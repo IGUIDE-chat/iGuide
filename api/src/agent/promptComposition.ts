@@ -14,7 +14,8 @@ export function fillPromptTemplate(
   template: string,
   values: Record<string, string | null | undefined>
 ): string {
-  return template.replaceAll(/{{\s*([\w-]+)\s*}}/g, (_match, key: string) => {
-    return values[key]?.trim() ?? ""
-  })
+  return template.replaceAll(
+    /{{\s*([\w-]+)\s*}}/g,
+    (_match, key: string) => values[key]?.trim() ?? ""
+  )
 }
