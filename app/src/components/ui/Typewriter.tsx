@@ -5,15 +5,15 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import * as React from "react";
-import { motion } from "framer-motion";
-import ReactMarkdown, { Components } from "react-markdown";
-import remarkGfm from "remark-gfm";
+import { motion } from "framer-motion"
+import * as React from "react"
+import ReactMarkdown, { type Components } from "react-markdown"
+import remarkGfm from "remark-gfm"
 
-export type TypewriterMode = "animate" | "stream" | "static";
+export type TypewriterMode = "animate" | "stream" | "static"
 
 export interface TypewriterProps {
-  text: string;
+  text: string
 
   /**
    * Animation mode:
@@ -22,40 +22,40 @@ export interface TypewriterProps {
    *  - "static": No animation, just render (for completed messages)
    * @default "static"
    */
-  mode?: TypewriterMode;
+  mode?: TypewriterMode
 
-  speed?: number;
-  delay?: number;
-  className?: string;
-  markdown?: boolean;
-  markdownComponents?: Components;
-  onComplete?: () => void;
+  speed?: number
+  delay?: number
+  className?: string
+  markdown?: boolean
+  markdownComponents?: Components
+  onComplete?: () => void
 }
 
 const AnimateTypewriter: React.FC<{
-  text: string;
-  className?: string;
-  delay?: number;
+  text: string
+  className?: string
+  delay?: number
 }> = ({ text, className = "", delay = 0 }) => {
-  const characters = text.split("");
+  const characters = text.split("")
 
   return (
     <span className={className}>
       {characters.map((char, index) => {
-        let cumulativeDelay = delay;
-        const startGap = 0.15;
-        const minGap = 0.01;
-        const decay = 0.9;
+        let cumulativeDelay = delay
+        const startGap = 0.15
+        const minGap = 0.01
+        const decay = 0.9
 
-        let currentGap = startGap;
+        let currentGap = startGap
         for (let i = 0; i < index; i++) {
-          cumulativeDelay += currentGap;
-          currentGap = Math.max(minGap, currentGap * decay);
+          cumulativeDelay += currentGap
+          currentGap = Math.max(minGap, currentGap * decay)
         }
 
         return (
           <motion.span
-            key={index}
+            key={`char-${String(index)}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{
@@ -66,46 +66,50 @@ const AnimateTypewriter: React.FC<{
           >
             {char}
           </motion.span>
-        );
+        )
       })}
     </span>
-  );
-};
+  )
+}
 
 const useStreamText = (
   text: string,
   speed: number,
   onComplete?: () => void
 ) => {
-  const [displayedText, setDisplayedText] = React.useState("");
-  const [currentIndex, setCurrentIndex] = React.useState(0);
+  const [displayedText, setDisplayedText] = React.useState("")
+  const [currentIndex, setCurrentIndex] = React.useState(0)
 
   React.useEffect(() => {
     if (text.length > 0 && currentIndex === 0) {
-      queueMicrotask(() => setDisplayedText(""));
+      queueMicrotask(() => {
+        setDisplayedText("")
+      })
     }
-  }, [text, currentIndex]);
+  }, [text, currentIndex])
 
   React.useEffect(() => {
     if (currentIndex < text.length) {
-      const isLong = text.length > 150;
-      const chunkSize = isLong ? 3 : 1;
-      const renderSpeed = isLong ? 2 : speed;
+      const isLong = text.length > 150
+      const chunkSize = isLong ? 3 : 1
+      const renderSpeed = isLong ? 2 : speed
 
       const timeout = setTimeout(() => {
-        const nextIndex = Math.min(currentIndex + chunkSize, text.length);
-        setDisplayedText(text.slice(0, nextIndex));
-        setCurrentIndex(nextIndex);
-      }, renderSpeed);
+        const nextIndex = Math.min(currentIndex + chunkSize, text.length)
+        setDisplayedText(text.slice(0, nextIndex))
+        setCurrentIndex(nextIndex)
+      }, renderSpeed)
 
-      return () => clearTimeout(timeout);
+      return () => {
+        clearTimeout(timeout)
+      }
     } else if (currentIndex >= text.length && onComplete) {
-      onComplete();
+      onComplete()
     }
-  }, [currentIndex, text, speed, onComplete]);
+  }, [currentIndex, text, speed, onComplete])
 
-  return displayedText;
-};
+  return displayedText
+}
 
 export const Typewriter: React.FC<TypewriterProps> = ({
   text,
@@ -121,7 +125,7 @@ export const Typewriter: React.FC<TypewriterProps> = ({
     mode === "stream" ? text : "",
     speed,
     mode === "stream" ? onComplete : undefined
-  );
+  )
 
   if (mode === "static") {
     if (markdown) {
@@ -132,28 +136,19 @@ export const Typewriter: React.FC<TypewriterProps> = ({
         >
           {text || ""}
         </ReactMarkdown>
-      );
+      )
     }
-    return <span className={className}>{text}</span>;
+    return <span className={className}>{text}</span>
   }
 
   if (mode === "animate") {
-    return (
-      <AnimateTypewriter text={text} className={className} delay={delay} />
-    );
+    return <AnimateTypewriter text={text} className={className} delay={delay} />
   }
 
   if (mode === "stream") {
     if (markdown) {
       return (
-        <div
-          className="
-            prose prose-sm
-            prose-p:leading-relaxed
-            prose-pre:bg-gray-100
-            max-w-none text-gray-800
-          "
-        >
+        <div className="prose prose-sm prose-p:leading-relaxed prose-pre:bg-gray-100 max-w-none text-gray-800">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={markdownComponents}
@@ -161,11 +156,11 @@ export const Typewriter: React.FC<TypewriterProps> = ({
             {streamedText}
           </ReactMarkdown>
         </div>
-      );
+      )
     }
 
-    return <span className={className}>{streamedText}</span>;
+    return <span className={className}>{streamedText}</span>
   }
 
-  return null;
-};
+  return null
+}

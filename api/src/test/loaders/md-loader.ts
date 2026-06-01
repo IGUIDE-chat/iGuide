@@ -1,5 +1,5 @@
-import { readFileSync } from 'node:fs'
-import { fileURLToPath } from 'node:url'
+import { readFileSync } from "node:fs"
+import { fileURLToPath } from "node:url"
 
 interface LoadContext {
   format?: string
@@ -19,11 +19,11 @@ export function load(
   context: LoadContext,
   nextLoad: NextLoad
 ): LoadResult {
-  if (url.endsWith('.md')) {
+  if (url.endsWith(".md")) {
     const path = fileURLToPath(url)
-    const content = readFileSync(path, 'utf-8')
+    const content = readFileSync(path, "utf8")
     return {
-      format: 'module',
+      format: "module",
       shortCircuit: true,
       source: `export default ${JSON.stringify(content)};`,
     }

@@ -5,25 +5,25 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react"
+import React from "react"
 
 export const inputCls =
-  "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-illini-blue";
+  "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-illini-blue"
 
 export function Field({
   label,
   children,
 }: {
-  label: string;
-  children: React.ReactNode;
+  label: string
+  children: React.ReactNode
 }) {
   return (
     <div className="space-y-1">
       <label className="block font-medium text-gray-700">{label}</label>
       {children}
     </div>
-  );
+  )
 }
 
 export function EditableList({
@@ -31,37 +31,35 @@ export function EditableList({
   onChange,
   placeholder,
 }: {
-  items: string[];
-  onChange: (next: string[]) => void;
-  placeholder: string;
+  items: string[]
+  onChange: (next: string[]) => void
+  placeholder: string
 }) {
   return (
     <div className="space-y-2">
       {items.map((item, index) => (
-        <div key={index} className="flex items-center gap-2">
+        <div
+          key={item || `empty-${String(index)}`}
+          className="flex items-center gap-2"
+        >
           <input
-            className="
-              flex-1 rounded-lg border border-gray-300 px-3 py-1.5 text-sm
-              focus:ring-2 focus:ring-illini-blue focus:outline-none
-            "
+            aria-label="Input field"
+            className="focus:ring-illini-blue flex-1 rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:outline-none"
             value={item}
             onChange={(event) => {
-              const next = [...items];
-              next[index] = event.target.value;
-              onChange(next);
+              const next = [...items]
+              next[index] = event.target.value
+              onChange(next)
             }}
           />
           <button
             type="button"
-            onClick={() =>
+            onClick={() => {
               onChange(
                 items.filter((_, currentIndex) => currentIndex !== index)
               )
-            }
-            className="
-              text-red-400
-              hover:text-red-600
-            "
+            }}
+            className="text-red-400 hover:text-red-600"
           >
             <Trash2 size={14} />
           </button>
@@ -69,16 +67,15 @@ export function EditableList({
       ))}
       <button
         type="button"
-        onClick={() => onChange([...items, ""])}
-        className="
-          flex items-center gap-1 text-xs text-illini-blue
-          hover:underline
-        "
+        onClick={() => {
+          onChange([...items, ""])
+        }}
+        className="text-illini-blue flex items-center gap-1 text-xs hover:underline"
       >
         <Plus size={12} /> {placeholder}
       </button>
     </div>
-  );
+  )
 }
 
 export function Toggle({
@@ -86,27 +83,32 @@ export function Toggle({
   checked,
   onChange,
 }: {
-  label: string;
-  checked: boolean;
-  onChange: (value: boolean) => void;
+  label: string
+  checked: boolean
+  onChange: (value: boolean) => void
 }) {
   return (
     <label className="flex cursor-pointer items-center gap-2 select-none">
-      <div
-        onClick={() => onChange(!checked)}
-        className={`
-          flex h-5 w-9 items-center rounded-full px-0.5 transition-colors
-          ${checked ? "bg-illini-orange" : "bg-gray-300"}
-        `}
+      <button
+        type="button"
+        aria-label={label}
+        tabIndex={0}
+        onClick={() => {
+          onChange(!checked)
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault()
+            ;(e.currentTarget as HTMLElement).click()
+          }
+        }}
+        className={`flex h-5 w-9 items-center rounded-full px-0.5 transition-colors ${checked ? "bg-illini-orange" : "bg-gray-300"} `}
       >
         <div
-          className={`
-            size-4 rounded-full bg-white shadow-sm transition-transform
-            ${checked ? "translate-x-4" : "translate-x-0"}
-          `}
+          className={`size-4 rounded-full bg-white shadow-sm transition-transform ${checked ? "translate-x-4" : "translate-x-0"} `}
         />
-      </div>
+      </button>
       <span className="text-gray-700">{label}</span>
     </label>
-  );
+  )
 }

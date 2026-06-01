@@ -1,25 +1,26 @@
-import { makeAssistantToolUI } from "@assistant-ui/react";
+import { type ToolCallPart, type ToolResultPart } from "ai"
+
 import {
   ToolCard,
+  extractToolArgs,
+  extractToolResult,
   getResultMetric,
   getStringArg,
-  type SearchToolArgs,
-  type ToolSummaryResult,
-} from "./toolUiHelpers";
+} from "./toolUiHelpers"
 
-export const SearchToolUI = makeAssistantToolUI<
-  SearchToolArgs,
-  ToolSummaryResult
->({
-  toolName: "search_knowledge_base",
-  render: ({ args, result, status }) => (
+interface SearchToolUIProps {
+  toolCall: ToolCallPart
+  toolResult?: ToolResultPart
+}
+
+export function SearchToolUI({ toolCall, toolResult }: SearchToolUIProps) {
+  const isLoading = !toolResult
+  const args = extractToolArgs(toolCall)
+  const result = extractToolResult(toolResult)
+  return (
     <ToolCard
       icon="🔎"
-      title={
-        status.type === "running"
-          ? "Searching knowledge base"
-          : "Knowledge base search"
-      }
+      title={isLoading ? "Searching knowledge base" : "Knowledge base search"}
       primaryLabel="Query:"
       primaryValue={getStringArg(args, ["query"], "Search query")}
       metricLabel="Results:"
@@ -29,7 +30,7 @@ export const SearchToolUI = makeAssistantToolUI<
         "Searching...",
         "Completed"
       )}
-      isLoading={status.type === "running"}
+      isLoading={isLoading}
     />
-  ),
-});
+  )
+}

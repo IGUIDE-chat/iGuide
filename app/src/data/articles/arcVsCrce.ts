@@ -7,7 +7,7 @@
 
 // [DATA] Article content for ARC vs CRCE guide.
 // [数据] ARC 与 CRCE 指南的文章内容。
-import { Article } from "../../types";
+import { type Article } from "../../types"
 
 export const arcVsCrce: Article = {
   id: "arc-vs-crce",
@@ -45,4 +45,4 @@ export const arcVsCrce: Article = {
   `,
   tags_zh: ["健身房", "运动", "体育", "ARC", "CRCE", "健康"],
   lastUpdated: "2024-01-20",
-};
+}

@@ -1,16 +1,16 @@
-import { Project } from "ts-morph";
+import { Project } from "ts-morph"
 
 const project = new Project({
   tsConfigFilePath: "tsconfig.json",
-});
+})
 
-console.log("Starting lightweight Colocation migration...");
+console.log("Starting lightweight Colocation migration...")
 
-project.createDirectory("src/components/housing/hooks");
-project.createDirectory("src/components/housing/types");
-project.createDirectory("src/components/housing/store");
-project.createDirectory("src/components/housing/constants");
-project.createDirectory("src/components/ui");
+project.createDirectory("src/components/housing/hooks")
+project.createDirectory("src/components/housing/types")
+project.createDirectory("src/components/housing/store")
+project.createDirectory("src/components/housing/constants")
+project.createDirectory("src/components/ui")
 
 const fileMoves = [
   // Store
@@ -50,17 +50,17 @@ const fileMoves = [
     src: "/src/types/housing.ts",
     dest: "/src/components/housing/types/index.ts",
   },
-];
+]
 
 for (const sourceFile of project.getSourceFiles()) {
-  const p = sourceFile.getFilePath();
+  const p = sourceFile.getFilePath()
 
   // Handle explicit moves
-  const explicitMove = fileMoves.find((m) => p.endsWith(m.src));
+  const explicitMove = fileMoves.find((m) => p.endsWith(m.src))
   if (explicitMove) {
-    console.log(`Moving explicit: ${p} -> ${explicitMove.dest}`);
-    sourceFile.move(p.replace(explicitMove.src, explicitMove.dest));
-    continue;
+    console.log(`Moving explicit: ${p} -> ${explicitMove.dest}`)
+    sourceFile.move(p.replace(explicitMove.src, explicitMove.dest))
+    continue
   }
 
   // Handle generic housing constants
@@ -68,13 +68,13 @@ for (const sourceFile of project.getSourceFiles()) {
     p.includes("/src/constants/housing/") &&
     !p.includes("/src/components/housing/")
   ) {
-    console.log(`Moving constant: ${p}`);
+    console.log(`Moving constant: ${p}`)
     sourceFile.move(
       p.replace("/src/constants/housing/", "/src/components/housing/constants/")
-    );
+    )
   }
 }
 
-console.log("Saving AST... this will update all imports globally.");
-project.saveSync();
-console.log("Migration complete!");
+console.log("Saving AST... this will update all imports globally.")
+project.saveSync()
+console.log("Migration complete!")

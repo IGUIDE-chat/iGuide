@@ -5,20 +5,20 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { useCallback, useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { X, ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion"
+import { ChevronLeft, ChevronRight, X, ZoomIn, ZoomOut } from "lucide-react"
+import React, { useCallback, useEffect, useState } from "react"
 
 interface LightboxImage {
-  src: string;
-  alt?: string;
-  label?: string;
+  src: string
+  alt?: string
+  label?: string
 }
 
 interface ImageLightboxProps {
-  images: LightboxImage[];
-  initialIndex?: number;
-  onClose: () => void;
+  images: LightboxImage[]
+  initialIndex?: number
+  onClose: () => void
 }
 
 const ImageLightbox: React.FC<ImageLightboxProps> = ({
@@ -26,34 +26,42 @@ const ImageLightbox: React.FC<ImageLightboxProps> = ({
   initialIndex = 0,
   onClose,
 }) => {
-  const [currentIndex, setCurrentIndex] = useState(initialIndex);
-  const [scale, setScale] = useState(1);
-  const hasMultiple = images.length > 1;
-  const current = images[currentIndex];
+  const [currentIndex, setCurrentIndex] = useState(initialIndex)
+  const [scale, setScale] = useState(1)
+  const hasMultiple = images.length > 1
+  const current = images[currentIndex]
 
   const goNext = useCallback(() => {
-    setScale(1);
-    setCurrentIndex((i) => (i + 1) % images.length);
-  }, [images.length]);
+    setScale(1)
+    setCurrentIndex((i) => (i + 1) % images.length)
+  }, [images.length])
 
   const goPrev = useCallback(() => {
-    setScale(1);
-    setCurrentIndex((i) => (i - 1 + images.length) % images.length);
-  }, [images.length]);
+    setScale(1)
+    setCurrentIndex((i) => (i - 1 + images.length) % images.length)
+  }, [images.length])
 
   const toggleZoom = useCallback(() => {
-    setScale((s) => (s > 1 ? 1 : 2));
-  }, []);
+    setScale((s) => (s > 1 ? 1 : 2))
+  }, [])
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-      if (e.key === "ArrowRight" && hasMultiple) goNext();
-      if (e.key === "ArrowLeft" && hasMultiple) goPrev();
-    };
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
-  }, [onClose, goNext, goPrev, hasMultiple]);
+      if (e.key === "Escape") {
+        onClose()
+      }
+      if (e.key === "ArrowRight" && hasMultiple) {
+        goNext()
+      }
+      if (e.key === "ArrowLeft" && hasMultiple) {
+        goPrev()
+      }
+    }
+    window.addEventListener("keydown", handleKey)
+    return () => {
+      window.removeEventListener("keydown", handleKey)
+    }
+  }, [onClose, goNext, goPrev, hasMultiple])
 
   return (
     <motion.div
@@ -61,19 +69,11 @@ const ImageLightbox: React.FC<ImageLightboxProps> = ({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
-      className="
-        fixed inset-0 z-100 flex items-center justify-center bg-black/80
-        backdrop-blur-sm
-      "
+      className="fixed inset-0 z-100 flex items-center justify-center bg-black/80 backdrop-blur-sm"
       onClick={onClose}
     >
       {/* Top bar */}
-      <div
-        className="
-          absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4
-          py-3
-        "
-      >
+      <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4 py-3">
         <div className="text-sm font-medium text-white/70">
           {current?.label && <span>{current.label}</span>}
           {hasMultiple && (
@@ -86,13 +86,10 @@ const ImageLightbox: React.FC<ImageLightboxProps> = ({
           <button
             type="button"
             onClick={(e) => {
-              e.stopPropagation();
-              toggleZoom();
+              e.stopPropagation()
+              toggleZoom()
             }}
-            className="
-              rounded-full bg-white/10 p-2 text-white transition-colors
-              hover:bg-white/20
-            "
+            className="rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20"
           >
             {scale > 1 ? (
               <ZoomOut className="size-5" />
@@ -103,10 +100,7 @@ const ImageLightbox: React.FC<ImageLightboxProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="
-              rounded-full bg-white/10 p-2 text-white transition-colors
-              hover:bg-white/20
-            "
+            className="rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20"
           >
             <X className="size-5" />
           </button>
@@ -123,11 +117,10 @@ const ImageLightbox: React.FC<ImageLightboxProps> = ({
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
           transition={{ duration: 0.2 }}
-          onClick={(e) => e.stopPropagation()}
-          className="
-            max-h-[85vh] max-w-[90vw] cursor-zoom-in rounded-lg object-contain
-            transition-transform duration-200 select-none
-          "
+          onClick={(e) => {
+            e.stopPropagation()
+          }}
+          className="max-h-[85vh] max-w-[90vw] cursor-zoom-in rounded-lg object-contain transition-transform duration-200 select-none"
           style={{ transform: `scale(${scale})` }}
         />
       </AnimatePresence>
@@ -138,35 +131,27 @@ const ImageLightbox: React.FC<ImageLightboxProps> = ({
           <button
             type="button"
             onClick={(e) => {
-              e.stopPropagation();
-              goPrev();
+              e.stopPropagation()
+              goPrev()
             }}
-            className="
-              absolute top-1/2 left-3 -translate-y-1/2 rounded-full bg-white/10
-              p-2.5 text-white transition-colors
-              hover:bg-white/25
-            "
+            className="absolute top-1/2 left-3 -translate-y-1/2 rounded-full bg-white/10 p-2.5 text-white transition-colors hover:bg-white/25"
           >
             <ChevronLeft className="size-6" />
           </button>
           <button
             type="button"
             onClick={(e) => {
-              e.stopPropagation();
-              goNext();
+              e.stopPropagation()
+              goNext()
             }}
-            className="
-              absolute top-1/2 right-3 -translate-y-1/2 rounded-full bg-white/10
-              p-2.5 text-white transition-colors
-              hover:bg-white/25
-            "
+            className="absolute top-1/2 right-3 -translate-y-1/2 rounded-full bg-white/10 p-2.5 text-white transition-colors hover:bg-white/25"
           >
             <ChevronRight className="size-6" />
           </button>
         </>
       )}
     </motion.div>
-  );
-};
+  )
+}
 
-export default ImageLightbox;
+export default ImageLightbox

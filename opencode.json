@@ -3,8 +3,7 @@
   "mcp": {
     "vite": {
       "type": "remote",
-      "url": "http://localhost:5173/__mcp/sse",
-      "enabled": false
+      "url": "http://localhost:5173/__mcp/sse"
     },
     "supabase": {
       "type": "remote",
@@ -12,10 +11,7 @@
     },
     "cloudflare-docs": {
       "type": "local",
-      "command": [
-        "mcp-remote",
-        "https://docs.mcp.cloudflare.com/mcp"
-      ]
+      "command": ["mcp-remote", "https://docs.mcp.cloudflare.com/mcp"]
     },
     "cloudflare-worker-builds": {
       "type": "remote",
@@ -38,6 +34,14 @@
     "webstorm": {
       "type": "remote",
       "url": "http://127.0.0.1:64343/sse"
+    },
+    "supabase-local": {
+      "type": "remote",
+      "url": "http://127.0.0.1:54321/mcp"
+    },
+    "chrome": {
+      "type": "local",
+      "command": ["chrome-devtools-mcp"]
     }
   }
 }

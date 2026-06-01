@@ -1,5 +1,5 @@
 export interface KVNamespaceLike {
-  get(key: string, type: 'text'): Promise<string | null>
+  get(key: string, type: "text"): Promise<string | null>
   put(key: string, value: string): Promise<void>
   delete(key: string): Promise<void>
   list(options?: {
@@ -22,7 +22,7 @@ export interface MCPStore {
   get<T>(key: string): Promise<T | null>
   put<T>(key: string, value: T): Promise<void>
   delete(key: string): Promise<void>
-  list<T>(prefix: string): Promise<MCPStoreRecord<T>[]>
+  list<T>(prefix: string): Promise<Array<MCPStoreRecord<T>>>
 }
 
 export interface MCPStoreOptions {
@@ -32,17 +32,15 @@ export interface MCPStoreOptions {
   namespace?: string
 }
 
-const DEFAULT_NAMESPACE = 'mcp'
-const DEFAULT_BINDING_NAME = 'KV'
+const DEFAULT_NAMESPACE = "mcp"
+const DEFAULT_BINDING_NAME = "MCP_TOOLS_KV"
 
 const globalScope = globalThis as typeof globalThis & {
   __mcpStoreMap__?: Map<string, string>
 }
 
 function getSharedMap(): Map<string, string> {
-  if (!globalScope.__mcpStoreMap__) {
-    globalScope.__mcpStoreMap__ = new Map<string, string>()
-  }
+  globalScope.__mcpStoreMap__ ??= new Map<string, string>()
 
   return globalScope.__mcpStoreMap__
 }
@@ -86,9 +84,9 @@ class MapMCPStore implements MCPStore {
     this.storage.delete(buildKey(this.namespace, key))
   }
 
-  async list<T>(prefix: string): Promise<MCPStoreRecord<T>[]> {
+  async list<T>(prefix: string): Promise<Array<MCPStoreRecord<T>>> {
     const qualifiedPrefix = buildKey(this.namespace, prefix)
-    const matches: MCPStoreRecord<T>[] = []
+    const matches: Array<MCPStoreRecord<T>> = []
 
     for (const [qualifiedKey, rawValue] of this.storage.entries()) {
       if (!qualifiedKey.startsWith(qualifiedPrefix)) {
@@ -101,7 +99,7 @@ class MapMCPStore implements MCPStore {
       })
     }
 
-    return matches.sort((left, right) => left.key.localeCompare(right.key))
+    return matches.toSorted((left, right) => left.key.localeCompare(right.key))
   }
 }
 
@@ -115,7 +113,7 @@ class KVMCPStore implements MCPStore {
   }
 
   async get<T>(key: string): Promise<T | null> {
-    const value = await this.kv.get(buildKey(this.namespace, key), 'text')
+    const value = await this.kv.get(buildKey(this.namespace, key), "text")
     return deserialize<T>(value)
   }
 
@@ -127,12 +125,13 @@ class KVMCPStore implements MCPStore {
     await this.kv.delete(buildKey(this.namespace, key))
   }
 
-  async list<T>(prefix: string): Promise<MCPStoreRecord<T>[]> {
+  async list<T>(prefix: string): Promise<Array<MCPStoreRecord<T>>> {
     const qualifiedPrefix = buildKey(this.namespace, prefix)
     const keys: string[] = []
     let cursor: string | undefined
 
     while (true) {
+      // eslint-disable-next-line no-await-in-loop -- KV pagination requires sequential cursor-based fetching
       const page = await this.kv.list({
         prefix: qualifiedPrefix,
         cursor,
@@ -147,8 +146,8 @@ class KVMCPStore implements MCPStore {
     }
 
     const records = await Promise.all(
-      keys.sort().map(async (qualifiedKey) => {
-        const value = await this.kv.get(qualifiedKey, 'text')
+      keys.toSorted().map(async (qualifiedKey) => {
+        const value = await this.kv.get(qualifiedKey, "text")
         if (value === null) {
           return null
         }
@@ -174,7 +173,7 @@ function resolveKV(options?: MCPStoreOptions): KVNamespaceLike | null {
   const bindingName = options?.bindingName ?? DEFAULT_BINDING_NAME
   const maybeKV = options?.env?.[bindingName]
 
-  if (!maybeKV || typeof maybeKV !== 'object') {
+  if (!maybeKV || typeof maybeKV !== "object") {
     return null
   }
 

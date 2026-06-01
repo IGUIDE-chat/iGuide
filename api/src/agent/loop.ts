@@ -1,32 +1,29 @@
+import type { ToolRegistry } from "../tools/registry.ts"
+import type { OpenAITool, RequestContext, ToolResult } from "../tools/types.ts"
+import { executeToolAction } from "./actions.ts"
+import { DEFAULT_MAX_ITERATIONS, evaluateStopCondition } from "./bounds.ts"
+/* eslint-disable no-await-in-loop -- Agent loop requires sequential streaming reads, tool execution, and SSE writes */
+import { logFallbackEvent, withFallback } from "./fallback.ts"
+import type { FallbackEvent, FallbackReason } from "./fallback.ts"
+import { analyzeFreshness } from "./freshness-router.ts"
 import {
-  logFallbackEvent,
-  withFallback,
-  type FallbackEvent,
-  type FallbackReason,
-} from './fallback.ts'
-import { DEFAULT_MAX_ITERATIONS, evaluateStopCondition } from './bounds.ts'
+  buildProviderMessages,
+  convertObservationToMessage,
+} from "./messages.ts"
+import type { ProviderMessage, ProviderToolCall } from "./messages.ts"
+import type { Observation } from "./observation.ts"
+import { buildSystemPrompt } from "./prompts.ts"
+import { shouldEnableRetrievalTools } from "./retrieval-policy.ts"
 import {
+  emitAgentStep,
+  emitFinalizing,
+  emitObservation,
   sendContent,
   sendDone,
   sendFallback,
   sendToolResult,
   sendToolStart,
-  emitAgentStep,
-  emitObservation,
-  emitFinalizing,
-} from './stream.ts'
-import { buildSystemPrompt } from './prompts.ts'
-import { shouldEnableRetrievalTools } from './retrieval-policy.ts'
-import {
-  buildProviderMessages,
-  convertObservationToMessage,
-  type ProviderMessage,
-  type ProviderToolCall,
-} from './messages.ts'
-import { executeToolAction } from './actions.ts'
-import type { Observation } from './observation.ts'
-import type { ToolRegistry } from '../tools/registry.ts'
-import type { OpenAITool, RequestContext, ToolResult } from '../tools/types.ts'
+} from "./stream.ts"
 
 export interface AgentLoopOptions {
   message: string
@@ -59,7 +56,7 @@ type DeepSeekToolCall = ProviderToolCall
 
 interface DeepSeekChoice {
   message?: {
-    role: 'assistant'
+    role: "assistant"
     content: string | null
     reasoning_content?: string | null
     tool_calls?: DeepSeekToolCall[] | null
@@ -70,7 +67,7 @@ interface DeepSeekChoice {
 interface DeepSeekStreamDeltaToolCall {
   index: number
   id?: string
-  type?: 'function'
+  type?: "function"
   function?: {
     name?: string
     arguments?: string
@@ -79,7 +76,7 @@ interface DeepSeekStreamDeltaToolCall {
 
 interface DeepSeekStreamChoice {
   delta?: {
-    role?: 'assistant'
+    role?: "assistant"
     content?: string | null
     reasoning_content?: string | null
     tool_calls?: DeepSeekStreamDeltaToolCall[] | null
@@ -118,7 +115,7 @@ interface ProviderConfig {
 interface StreamingToolCallAccumulator {
   id: string
   index: number
-  type: 'function'
+  type: "function"
   function: {
     name: string
     arguments: string
@@ -166,11 +163,11 @@ function detectRegion(region?: string, env?: Record<string, string>): string {
     env?.CF_COUNTRY,
   ]
     .filter(Boolean)
-    .map((value) => value!.toUpperCase())
+    .map((value) => (value as string).toUpperCase())
 
-  return candidates.some((value) => value === 'CN' || value === 'CHINA')
-    ? 'CN'
-    : 'Global'
+  return candidates.some((value) => value === "CN" || value === "CHINA")
+    ? "CN"
+    : "Global"
 }
 
 function getProviderConfig(options: {
@@ -180,37 +177,39 @@ function getProviderConfig(options: {
   const detectedRegion = detectRegion(options.region, options.env)
   const deepSeekKey = options.env.DEEPSEEK_API_KEY
   const siliconFlowKey = options.env.SILICONFLOW_API_KEY
+  const deepSeekEndpointOverride = options.env.DEEPSEEK_ENDPOINT
 
-  if (detectedRegion === 'CN' && siliconFlowKey) {
+  if (detectedRegion === "CN" && siliconFlowKey) {
     return {
-      endpoint: 'https://api.siliconflow.cn/v1/chat/completions',
+      endpoint: "https://api.siliconflow.cn/v1/chat/completions",
       apiKey: siliconFlowKey,
-      region: 'CN',
+      region: "CN",
     }
   }
 
   if (deepSeekKey) {
     return {
-      endpoint: 'https://api.deepseek.com/chat/completions',
+      endpoint:
+        deepSeekEndpointOverride || "https://api.deepseek.com/chat/completions",
       apiKey: deepSeekKey,
-      region: 'Global',
+      region: "Global",
     }
   }
 
   if (siliconFlowKey) {
     return {
-      endpoint: 'https://api.siliconflow.cn/v1/chat/completions',
+      endpoint: "https://api.siliconflow.cn/v1/chat/completions",
       apiKey: siliconFlowKey,
       region: detectedRegion,
     }
   }
 
-  throw new Error('No DeepSeek-compatible API key configured')
+  throw new Error("No DeepSeek-compatible API key configured")
 }
 
 function buildSupabaseHeaders(env: Record<string, string>): HeadersInit | null {
   const supabaseUrl = env.SUPABASE_URL
-  const authKey = env.SUPABASE_SERVICE_KEY || env.SUPABASE_ANON_KEY
+  const authKey = env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_ANON_KEY
 
   if (!supabaseUrl || !authKey) {
     return null
@@ -232,25 +231,25 @@ async function fetchSingleColumn(options: {
   const headers = buildSupabaseHeaders(options.env)
 
   if (!supabaseUrl || !headers) {
-    return ''
+    return ""
   }
 
   const endpoint = new URL(`${supabaseUrl}/rest/v1/${options.table}`)
-  endpoint.searchParams.set('select', options.column)
-  endpoint.searchParams.set('user_id', `eq.${options.userId}`)
-  endpoint.searchParams.set('limit', '1')
+  endpoint.searchParams.set("select", options.column)
+  endpoint.searchParams.set("user_id", `eq.${options.userId}`)
+  endpoint.searchParams.set("limit", "1")
 
   try {
     const response = await fetch(endpoint.toString(), { headers })
     if (!response.ok) {
-      return ''
+      return ""
     }
 
     const payload = (await response.json()) as Array<Record<string, unknown>>
     const value = payload[0]?.[options.column]
-    return typeof value === 'string' ? value : ''
+    return typeof value === "string" ? value : ""
   } catch {
-    return ''
+    return ""
   }
 }
 
@@ -265,14 +264,14 @@ async function getUserMemoryBlock(
   const [soul, userMemory] = await Promise.all([
     fetchSingleColumn({
       env,
-      table: 'user_souls',
-      column: 'soul_prompt',
+      table: "user_souls",
+      column: "soul_prompt",
       userId,
     }),
     fetchSingleColumn({
       env,
-      table: 'user_memories',
-      column: 'memory_text',
+      table: "user_memories",
+      column: "memory_text",
       userId,
     }),
   ])
@@ -285,15 +284,15 @@ async function getUserMemoryBlock(
     sections.push(`### Remembered User Facts\n${userMemory}`)
   }
 
-  return sections.length > 0 ? sections.join('\n\n') : undefined
+  return sections.length > 0 ? sections.join("\n\n") : undefined
 }
 
 function buildIterationLimitMessage(lang?: string): string {
-  if (lang === 'zh') {
-    return '我已经达到本轮可用的最大工具调用次数，下面的回答可能不完整。'
+  if (lang === "zh") {
+    return "我已经达到本轮可用的最大工具调用次数，下面的回答可能不完整。"
   }
 
-  return 'I reached the maximum tool-call iterations for this turn, so the answer below may be incomplete.'
+  return "I reached the maximum tool-call iterations for this turn, so the answer below may be incomplete."
 }
 
 async function callDeepSeek(options: {
@@ -303,13 +302,13 @@ async function callDeepSeek(options: {
   tools?: OpenAITool[]
 }): Promise<DeepSeekResponse> {
   const response = await fetch(options.provider.endpoint, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       Authorization: `Bearer ${options.provider.apiKey}`,
     },
     body: JSON.stringify({
-      model: 'deepseek-chat',
+      model: "deepseek-chat",
       messages: options.messages,
       tools: options.tools ?? options.registry.toOpenAITools(),
       stream: false,
@@ -319,7 +318,7 @@ async function callDeepSeek(options: {
   if (!response.ok) {
     const errorText = await response.text()
     throw new Error(
-      `DeepSeek API returned ${response.status}${errorText ? `: ${errorText}` : ''}`
+      `DeepSeek API returned ${response.status}${errorText ? `: ${errorText}` : ""}`
     )
   }
 
@@ -332,32 +331,44 @@ async function callDeepSeekStream(options: {
   registry: ToolRegistry
   tools?: OpenAITool[]
 }): Promise<ReadableStreamDefaultReader<Uint8Array>> {
-  const response = await fetch(options.provider.endpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${options.provider.apiKey}`,
-    },
-    body: JSON.stringify({
-      model: 'deepseek-chat',
-      messages: options.messages,
-      tools: options.tools ?? options.registry.toOpenAITools(),
-      stream: true,
-      stream_options: {
-        include_usage: true,
+  let response: Response
+  try {
+    response = await fetch(options.provider.endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${options.provider.apiKey}`,
       },
-    }),
-  })
+      body: JSON.stringify({
+        model: "deepseek-chat",
+        messages: options.messages,
+        tools: options.tools ?? options.registry.toOpenAITools(),
+        stream: true,
+        stream_options: {
+          include_usage: true,
+        },
+      }),
+    })
+  } catch (fetchError) {
+    console.error("[callDeepSeekStream] Fetch failed:", fetchError)
+    console.error("[callDeepSeekStream] Endpoint:", options.provider.endpoint)
+    throw fetchError
+  }
 
   if (!response.ok) {
     const errorText = await response.text()
+    console.error(
+      "[callDeepSeekStream] Non-OK response:",
+      response.status,
+      errorText
+    )
     throw new Error(
-      `DeepSeek API returned ${response.status}${errorText ? `: ${errorText}` : ''}`
+      `DeepSeek API returned ${response.status}${errorText ? `: ${errorText}` : ""}`
     )
   }
 
   if (!response.body) {
-    throw new Error('DeepSeek streaming response missing body')
+    throw new Error("DeepSeek streaming response missing body")
   }
 
   return response.body.getReader()
@@ -369,10 +380,10 @@ function createToolCallAccumulator(
   return {
     id: `tool_call_${index}`,
     index,
-    type: 'function',
+    type: "function",
     function: {
-      name: '',
-      arguments: '',
+      name: "",
+      arguments: "",
     },
   }
 }
@@ -387,7 +398,7 @@ function accumulateStreamingToolCalls(
 
   for (const deltaToolCall of deltaToolCalls) {
     const accumulator =
-      accumulators.get(deltaToolCall.index) ||
+      accumulators.get(deltaToolCall.index) ??
       createToolCallAccumulator(deltaToolCall.index)
 
     if (deltaToolCall.id) {
@@ -414,7 +425,7 @@ function finalizeStreamingToolCalls(
   accumulators: Map<number, StreamingToolCallAccumulator>
 ): DeepSeekToolCall[] {
   return Array.from(accumulators.values())
-    .sort((a, b) => a.index - b.index)
+    .toSorted((a, b) => a.index - b.index)
     .map((toolCall) => ({
       id: toolCall.id,
       type: toolCall.type,
@@ -430,29 +441,40 @@ async function readDeepSeekStreamingResponse(options: {
   writer: WritableStreamDefaultWriter<string>
 }): Promise<ParsedStreamResponse> {
   const decoder = new TextDecoder()
-  let buffer = ''
-  let content = ''
+  let buffer = ""
+  let content = ""
   let finishReason: string | null = null
   let latestUsage: DeepSeekUsage | undefined
   const toolCallAccumulators = new Map<number, StreamingToolCallAccumulator>()
 
   const processChunk = async (chunkText: string): Promise<void> => {
     const lines = chunkText
-      .split('\n')
+      .split("\n")
       .map((line) => line.trim())
       .filter(Boolean)
 
     for (const line of lines) {
-      if (!line.startsWith('data: ')) {
+      if (!line.startsWith("data: ")) {
         continue
       }
 
       const payload = line.slice(6)
-      if (payload === '[DONE]') {
+      if (payload === "[DONE]") {
         continue
       }
 
-      const data = JSON.parse(payload) as DeepSeekStreamChunk
+      let data: DeepSeekStreamChunk
+      try {
+        data = JSON.parse(payload) as DeepSeekStreamChunk
+      } catch (parseError) {
+        console.error("[readDeepSeekStreamingResponse] JSON parse failed")
+        console.error("Raw payload:", payload)
+        console.error(
+          "Parse error:",
+          parseError instanceof Error ? parseError.message : parseError
+        )
+        throw parseError
+      }
       if (data.error?.message) {
         throw new Error(data.error.message)
       }
@@ -472,7 +494,7 @@ async function readDeepSeekStreamingResponse(options: {
         continue
       }
 
-      if (typeof delta.content === 'string' && delta.content.length > 0) {
+      if (typeof delta.content === "string" && delta.content.length > 0) {
         content += delta.content
         await sendContent(options.writer, delta.content)
       }
@@ -489,8 +511,8 @@ async function readDeepSeekStreamingResponse(options: {
     }
 
     buffer += decoder.decode(value, { stream: true })
-    const events = buffer.split('\n\n')
-    buffer = events.pop() || ''
+    const events = buffer.split("\n\n")
+    buffer = events.pop() ?? ""
 
     for (const eventText of events) {
       if (!eventText.trim()) {
@@ -516,7 +538,7 @@ async function readDeepSeekStreamingResponse(options: {
 function observationToToolResult(observation: Observation): ToolResult {
   return {
     content: observation.raw,
-    metadata: observation.status === 'error' ? { error: true } : undefined,
+    metadata: observation.status === "error" ? { error: true } : undefined,
     truncated: observation.truncated ? true : undefined,
   }
 }
@@ -528,14 +550,14 @@ function buildSimplifiedRetryMessages(
   const [systemMessage, ...rest] = messages
   const trimmedContext = rest.slice(-4)
   const retryInstruction =
-    reason === 'tool_timeout'
-      ? 'Fallback retry: tool requests timed out. Retry with one tool only and minimal context.'
-      : 'Fallback retry: tool use failed. Retry with one tool only and minimal context.'
+    reason === "tool_timeout"
+      ? "Fallback retry: tool requests timed out. Retry with one tool only and minimal context."
+      : "Fallback retry: tool use failed. Retry with one tool only and minimal context."
 
   return [
     systemMessage,
     {
-      role: 'system',
+      role: "system",
       content: retryInstruction,
     },
     ...trimmedContext,
@@ -549,9 +571,9 @@ function buildDirectFallbackMessages(
     messages[0],
     ...messages.slice(-4),
     {
-      role: 'user',
+      role: "user",
       content:
-        'Tool access is unavailable. Answer directly without tools using general knowledge, be explicit about uncertainty, and keep helping the user.',
+        "Tool access is unavailable. Answer directly without tools using general knowledge, be explicit about uncertainty, and keep helping the user.",
     },
   ]
 }
@@ -613,19 +635,30 @@ async function runStreamingIteration(options: {
   iterations: number
   tools?: OpenAITool[]
 }): Promise<StreamingIterationOutcome> {
-  await emitAgentStep(options.writer, options.iterations, options.iterations)
+  let streamResponse: ParsedStreamResponse
 
-  const reader = await callDeepSeekStream({
-    provider: options.provider,
-    messages: options.messages,
-    registry: options.registry,
-    tools: options.tools,
-  })
+  try {
+    await emitAgentStep(options.writer, options.iterations, options.iterations)
 
-  const streamResponse = await readDeepSeekStreamingResponse({
-    reader,
-    writer: options.writer,
-  })
+    const reader = await callDeepSeekStream({
+      provider: options.provider,
+      messages: options.messages,
+      registry: options.registry,
+      tools: options.tools,
+    })
+
+    streamResponse = await readDeepSeekStreamingResponse({
+      reader,
+      writer: options.writer,
+    })
+  } catch (error) {
+    console.error("[runStreamingIteration] Error in initial flow:", error)
+    console.error(
+      "[runStreamingIteration] Stack:",
+      error instanceof Error ? error.stack : "N/A"
+    )
+    throw error
+  }
 
   const usage = {
     prompt_tokens:
@@ -666,7 +699,7 @@ async function runStreamingIteration(options: {
   const nextMessages = [
     ...options.messages,
     {
-      role: 'assistant' as const,
+      role: "assistant" as const,
       content: streamResponse.content,
       tool_calls: toolCalls,
     },
@@ -791,15 +824,27 @@ export async function runAgentLoop(
     region: provider.region,
   }
 
+  let systemPrompt = buildSystemPrompt({
+    userMemory,
+    lang: options.lang,
+  })
+  const tools = shouldEnableRetrievalTools(options.message) ? undefined : []
+
+  if (options.env.USE_TOOL_USE_RAG === "true" && tools === undefined) {
+    const freshnessGuidance = await analyzeFreshness(
+      options.message,
+      options.env
+    )
+    if (freshnessGuidance) {
+      systemPrompt = `${systemPrompt}\n\n## Freshness Routing\n${freshnessGuidance}`
+    }
+  }
+
   const messages = buildProviderMessages({
-    systemPrompt: buildSystemPrompt({
-      userMemory,
-      lang: options.lang,
-    }),
+    systemPrompt,
     history: options.history,
     message: options.message,
   })
-  const tools = shouldEnableRetrievalTools(options.message) ? undefined : []
 
   const executedToolCalls: AgentLoopToolCall[] = []
   const usage = {
@@ -807,7 +852,7 @@ export async function runAgentLoop(
     completion_tokens: 0,
   }
   let iterations = 0
-  let lastAssistantContent = ''
+  let lastAssistantContent = ""
 
   for (let index = 0; index < maxIterations; index += 1) {
     iterations = index + 1
@@ -823,11 +868,11 @@ export async function runAgentLoop(
     const responseMessage = data.choices?.[0]?.message
     if (!responseMessage) {
       throw new Error(
-        data.error?.message || 'DeepSeek response missing message'
+        data.error?.message ?? "DeepSeek response missing message"
       )
     }
 
-    const assistantContent = responseMessage.content ?? ''
+    const assistantContent = responseMessage.content ?? ""
     if (assistantContent) {
       lastAssistantContent = assistantContent
     }
@@ -838,7 +883,7 @@ export async function runAgentLoop(
       maxIterations,
       toolCalls,
     })
-    if (responseStop.shouldStop && responseStop.reason === 'final_answer') {
+    if (responseStop.shouldStop && responseStop.reason === "final_answer") {
       return {
         content: assistantContent || lastAssistantContent,
         toolCalls: executedToolCalls,
@@ -852,7 +897,7 @@ export async function runAgentLoop(
     }
 
     messages.push({
-      role: 'assistant',
+      role: "assistant",
       content: responseMessage.content,
       tool_calls: toolCalls,
     })
@@ -892,7 +937,7 @@ export async function runAgentLoop(
       messages.push(convertObservationToMessage(toolResult.observation))
     }
 
-    if (toolStop.shouldStop && toolStop.reason !== 'max_iterations') {
+    if (toolStop.shouldStop && toolStop.reason !== "max_iterations") {
       return {
         content: assistantContent || lastAssistantContent,
         toolCalls: executedToolCalls,
@@ -912,11 +957,11 @@ export async function runAgentLoop(
     maxIterations,
     toolCalls: [
       {
-        id: 'max_iterations',
-        type: 'function',
+        id: "max_iterations",
+        type: "function",
         function: {
-          name: 'max_iterations',
-          arguments: '{}',
+          name: "max_iterations",
+          arguments: "{}",
         },
       },
     ],
@@ -954,15 +999,27 @@ export async function runStreamingAgentLoop(
     region: provider.region,
   }
 
+  let systemPrompt = buildSystemPrompt({
+    userMemory,
+    lang: options.lang,
+  })
+  const tools = shouldEnableRetrievalTools(options.message) ? undefined : []
+
+  if (options.env.USE_TOOL_USE_RAG === "true" && tools === undefined) {
+    const freshnessGuidance = await analyzeFreshness(
+      options.message,
+      options.env
+    )
+    if (freshnessGuidance) {
+      systemPrompt = `${systemPrompt}\n\n## Freshness Routing\n${freshnessGuidance}`
+    }
+  }
+
   let messages = buildProviderMessages({
-    systemPrompt: buildSystemPrompt({
-      userMemory,
-      lang: options.lang,
-    }),
+    systemPrompt,
     history: options.history,
     message: options.message,
   })
-  const tools = shouldEnableRetrievalTools(options.message) ? undefined : []
 
   const executedToolCalls: AgentLoopToolCall[] = []
   const usage = {
@@ -971,13 +1028,14 @@ export async function runStreamingAgentLoop(
     total_tokens: 0,
   }
   let iterations = 0
-  let lastAssistantContent = ''
+  let lastAssistantContent = ""
   let doneSent = false
 
   try {
     for (let index = 0; index < maxIterations; index += 1) {
       iterations = index + 1
       const iterationOutcome = await withFallback(
+        // eslint-disable-next-line no-loop-func -- closures intentionally capture current iteration state
         () =>
           runStreamingIteration({
             provider,
@@ -996,10 +1054,11 @@ export async function runStreamingAgentLoop(
             shouldFallback: Boolean(result.fallbackReason),
             reason: result.fallbackReason,
           }),
+          // eslint-disable-next-line no-loop-func -- closures intentionally capture current iteration state
           retryOnce: (reason, previousResult) => {
             const simplifiedTools = (previousResult?.nextMessages ?? [])
               .slice()
-              .reverse()
+              .toReversed()
               .flatMap((message) => message.tool_calls ?? [])
               .slice(0, 1)
               .map((toolCall) => toolCall.function.name)
@@ -1022,6 +1081,7 @@ export async function runStreamingAgentLoop(
               tools: allowedTools,
             })
           },
+          // eslint-disable-next-line no-loop-func -- closures intentionally capture current iteration state
           directResponse: (reason) =>
             runDirectFallbackResponse({
               provider,
@@ -1035,10 +1095,17 @@ export async function runStreamingAgentLoop(
             }),
           onFallbackEvent: async (event: FallbackEvent) => {
             if (event.fallback_level === 3) {
-              await sendFallback(options.writer, event.failure_reason)
+              try {
+                await sendFallback(options.writer, event.failure_reason)
+              } catch (fallbackError) {
+                console.error(
+                  "[onFallbackEvent] sendFallback failed:",
+                  fallbackError
+                )
+              }
             }
           },
-          onError: () => 'tool_failure',
+          onError: () => "tool_failure",
         }
       )
 
@@ -1054,7 +1121,7 @@ export async function runStreamingAgentLoop(
         const stopReason = iterationOutcome.metadata?.stopReason as
           | string
           | undefined
-        await emitFinalizing(options.writer, stopReason ?? 'complete')
+        await emitFinalizing(options.writer, stopReason ?? "complete")
         await sendDone(options.writer, iterationOutcome.usage)
         doneSent = true
         return {
@@ -1074,7 +1141,7 @@ export async function runStreamingAgentLoop(
     logFallbackEvent({
       timestamp: new Date().toISOString(),
       query: options.message,
-      failure_reason: 'max_iterations_exceeded',
+      failure_reason: "max_iterations_exceeded",
       fallback_level: 2,
     })
 
@@ -1083,11 +1150,11 @@ export async function runStreamingAgentLoop(
       maxIterations,
       toolCalls: [
         {
-          id: 'max_iterations',
-          type: 'function',
+          id: "max_iterations",
+          type: "function",
           function: {
-            name: 'max_iterations',
-            arguments: '{}',
+            name: "max_iterations",
+            arguments: "{}",
           },
         },
       ],
@@ -1097,8 +1164,8 @@ export async function runStreamingAgentLoop(
       ? `${lastAssistantContent}\n\n${disclaimer}`
       : disclaimer
 
-    await emitFinalizing(options.writer, 'max_iterations')
-    await sendFallback(options.writer, 'max_iterations_exceeded')
+    await emitFinalizing(options.writer, "max_iterations")
+    await sendFallback(options.writer, "max_iterations_exceeded")
     await sendDone(options.writer, usage)
     doneSent = true
 
@@ -1113,11 +1180,14 @@ export async function runStreamingAgentLoop(
         fallbackReason: maxIterationStop.fallbackReason,
         fallback: true,
         fallbackLevel: 2,
-        reason: 'max_iterations_exceeded',
+        reason: "max_iterations_exceeded",
       },
     }
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error'
+    console.error("[runStreamingAgentLoop] Caught error before re-throw")
+    console.error("Error:", error)
+    console.error("Stack:", error instanceof Error ? error.stack : "N/A")
+    const message = error instanceof Error ? error.message : "Unknown error"
     await sendContent(options.writer, `\n(Error: ${message})`)
     if (!doneSent) {
       await sendDone(options.writer, {

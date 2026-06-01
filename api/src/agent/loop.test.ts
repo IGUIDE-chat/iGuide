@@ -1,14 +1,14 @@
-import assert from 'node:assert/strict'
-import test from 'node:test'
+/* eslint-disable no-await-in-loop -- streaming reads require sequential consumption */
+import { expect, test } from "vite-plus/test"
 
-import { runStreamingAgentLoop } from './loop.ts'
-import { ToolRegistry } from '../tools/registry.ts'
-import {
-  createMockProviderFetch,
-  type MockProviderResponseInput,
-  type RecordedProviderRequest,
-} from '../test/utils/mockProvider.ts'
-import { createStubTool } from '../test/utils/stubTools.ts'
+import type {
+  MockProviderResponseInput,
+  RecordedProviderRequest,
+} from "../test/utils/mockProvider.ts"
+import { createMockProviderFetch } from "../test/utils/mockProvider.ts"
+import { createStubTool } from "../test/utils/stubTools.ts"
+import { ToolRegistry } from "../tools/registry.ts"
+import { runStreamingAgentLoop } from "./loop.ts"
 
 interface ProviderRequestBody {
   model?: string
@@ -26,7 +26,7 @@ function parseRequestBody(
   request: RecordedProviderRequest
 ): ProviderRequestBody {
   const body = request.body
-  if (typeof body === 'string') {
+  if (typeof body === "string") {
     return JSON.parse(body) as ProviderRequestBody
   }
   return body as ProviderRequestBody
@@ -34,10 +34,10 @@ function parseRequestBody(
 
 function createTestEnv(): Record<string, string> {
   return {
-    DEEPSEEK_API_KEY: 'test-key',
-    SUPABASE_URL: '',
-    SUPABASE_ANON_KEY: '',
-    SUPABASE_SERVICE_KEY: '',
+    DEEPSEEK_API_KEY: "test-key",
+    SUPABASE_URL: "",
+    SUPABASE_ANON_KEY: "",
+    SUPABASE_SERVICE_ROLE_KEY: "",
   }
 }
 
@@ -45,23 +45,23 @@ function createTestRegistry(): ToolRegistry {
   const registry = new ToolRegistry()
   registry.register(
     createStubTool({
-      name: 'search_knowledge_base',
-      description: 'Search the UIUC knowledge base',
-      content: 'test knowledge result',
+      name: "search_knowledge_base",
+      description: "Search the UIUC knowledge base",
+      content: "test knowledge result",
     })
   )
   registry.register(
     createStubTool({
-      name: 'web_search',
-      description: 'Search the web',
-      content: 'test web result',
+      name: "web_search",
+      description: "Search the web",
+      content: "test web result",
     })
   )
   registry.register(
     createStubTool({
-      name: 'grep_docs',
-      description: 'Grep documentation',
-      content: 'test grep result',
+      name: "grep_docs",
+      description: "Grep documentation",
+      content: "test grep result",
     })
   )
   return registry
@@ -77,31 +77,37 @@ async function collectSSEEvents(
 ): Promise<ParsedSSEEvent[]> {
   const reader = stream.getReader()
   const decoder = new TextDecoder()
-  let buffer = ''
+  let buffer = ""
   const events: ParsedSSEEvent[] = []
-  let currentEvent = ''
+  let currentEvent = ""
 
   while (true) {
     const { done, value } = await reader.read()
-    if (done) break
+    if (done) {
+      break
+    }
 
     buffer += decoder.decode(value, { stream: true })
-    const lines = buffer.split('\n')
-    buffer = lines.pop() || ''
+    const lines = buffer.split("\n")
+    buffer = lines.pop() ?? ""
 
     for (const line of lines) {
       const trimmed = line.trim()
-      if (!trimmed) continue
+      if (!trimmed) {
+        continue
+      }
 
-      if (trimmed.startsWith('event:')) {
+      if (trimmed.startsWith("event:")) {
         currentEvent = trimmed.slice(6).trim()
-      } else if (trimmed.startsWith('data:')) {
+      } else if (trimmed.startsWith("data:")) {
         const jsonStr = trimmed.slice(5).trim()
         try {
           const data = JSON.parse(jsonStr)
           events.push({ event: currentEvent, data })
-          currentEvent = ''
-        } catch { /* JSON parse failure during SSE parsing */ }
+          currentEvent = ""
+        } catch {
+          /* JSON parse failure during SSE parsing */
+        }
       }
     }
   }
@@ -132,8 +138,8 @@ function _assertEventExists(
   eventName: string
 ): ParsedSSEEvent {
   const event = events.find((e) => e.event === eventName)
-  assert.ok(event, `Expected ${eventName} event to exist`)
-  return event
+  expect(event).toBeTruthy()
+  return event!
 }
 
 function _assertEventPayload(
@@ -142,17 +148,13 @@ function _assertEventPayload(
 ): void {
   const payload = event.data as Record<string, unknown>
   for (const [key, value] of Object.entries(expected)) {
-    assert.deepEqual(
-      payload[key],
-      value,
-      `Expected payload.${key} to equal ${value}`
-    )
+    expect(payload[key]).toEqual(value)
   }
 }
 
-test('streaming no-tool final answer emits content then done', async () => {
+test("streaming no-tool final answer emits content then done", async () => {
   const mockResponses: MockProviderResponseInput[] = [
-    { content: 'Hello! How can I help you today?', stream: true },
+    { content: "Hello! How can I help you today?", stream: true },
   ]
   const mockFetch = createMockProviderFetch(mockResponses)
 
@@ -164,7 +166,7 @@ test('streaming no-tool final answer emits content then done', async () => {
     const { writer, events } = createWriterWithStream()
 
     const result = await runStreamingAgentLoop({
-      message: 'hello',
+      message: "hello",
       history: [],
       registry,
       env: createTestEnv(),
@@ -173,44 +175,39 @@ test('streaming no-tool final answer emits content then done', async () => {
 
     const parsed = await events
 
-    const contentEvents = parsed.filter((e) => e.event === 'content')
-    const doneEvents = parsed.filter((e) => e.event === 'done')
+    const contentEvents = parsed.filter((e) => e.event === "content")
+    const doneEvents = parsed.filter((e) => e.event === "done")
 
-    assert.equal(
-      contentEvents.length >= 1,
-      true,
-      'Should have at least one content event'
-    )
-    assert.equal(doneEvents.length, 1, 'Should have exactly one done event')
+    expect(contentEvents.length > 0).toBe(true)
+    expect(doneEvents.length).toBe(1)
 
     const contentPayload = contentEvents[0].data as {
       choices: Array<{ delta: { content: string } }>
     }
-    assert.ok(
-      contentPayload.choices[0].delta.content.includes('Hello!'),
-      'Content should include greeting'
-    )
+    expect(
+      contentPayload.choices[0].delta.content.includes("Hello!")
+    ).toBeTruthy()
 
-    assert.equal(result.toolCalls.length, 0, 'No tool calls should be made')
-    assert.equal(result.iterations, 1, 'Should complete in 1 iteration')
+    expect(result.toolCalls.length).toBe(0)
+    expect(result.iterations).toBe(1)
   } finally {
     globalThis.fetch = originalFetch
   }
 })
 
-test('streaming one tool then final answer completes act-observe loop', async () => {
+test("streaming one tool then final answer completes act-observe loop", async () => {
   const mockResponses: MockProviderResponseInput[] = [
     {
-      content: 'Let me search for that...',
+      content: "Let me search for that...",
       toolCalls: [
         {
-          name: 'search_knowledge_base',
-          arguments: { query: 'PAR dorm dining' },
+          name: "search_knowledge_base",
+          arguments: { query: "PAR dorm dining" },
         },
       ],
       stream: true,
     },
-    { content: 'PAR has several dining options including...', stream: true },
+    { content: "PAR has several dining options including...", stream: true },
   ]
   const mockFetch = createMockProviderFetch(mockResponses)
 
@@ -222,7 +219,7 @@ test('streaming one tool then final answer completes act-observe loop', async ()
     const { writer, events } = createWriterWithStream()
 
     const result = await runStreamingAgentLoop({
-      message: 'What are PAR dorm dining options?',
+      message: "What are PAR dorm dining options?",
       history: [],
       registry,
       env: createTestEnv(),
@@ -232,87 +229,68 @@ test('streaming one tool then final answer completes act-observe loop', async ()
     const parsed = await events
 
     // Verify event sequence
-    const eventNames = parsed.map((e) => e.event)
-    assert.ok(eventNames.includes('tool_start'), 'Should have tool_start event')
-    assert.ok(
-      eventNames.includes('tool_result'),
-      'Should have tool_result event'
-    )
-    assert.ok(eventNames.includes('content'), 'Should have content event')
-    assert.ok(eventNames.includes('done'), 'Should have done event')
+    const eventNames = new Set(parsed.map((e) => e.event))
+    expect(eventNames.has("tool_start")).toBeTruthy()
+    expect(eventNames.has("tool_result")).toBeTruthy()
+    expect(eventNames.has("content")).toBeTruthy()
+    expect(eventNames.has("done")).toBeTruthy()
 
     // Verify tool_start payload
-    const toolStartEvent = parsed.find((e) => e.event === 'tool_start')
-    assert.ok(toolStartEvent, 'tool_start event should exist')
-    const toolStartPayload = toolStartEvent.data as {
+    const toolStartEvent = parsed.find((e) => e.event === "tool_start")
+    expect(toolStartEvent).toBeTruthy()
+    const toolStartPayload = toolStartEvent!.data as {
       name: string
       args: unknown
     }
-    assert.equal(
-      toolStartPayload.name,
-      'search_knowledge_base',
-      'Tool name should match'
-    )
+    expect(toolStartPayload.name).toBe("search_knowledge_base")
 
     // Verify tool_result payload
-    const toolResultEvent = parsed.find((e) => e.event === 'tool_result')
-    assert.ok(toolResultEvent, 'tool_result event should exist')
-    const toolResultPayload = toolResultEvent.data as {
+    const toolResultEvent = parsed.find((e) => e.event === "tool_result")
+    expect(toolResultEvent).toBeTruthy()
+    const toolResultPayload = toolResultEvent!.data as {
       name: string
       status: string
     }
-    assert.equal(
-      toolResultPayload.name,
-      'search_knowledge_base',
-      'Tool result name should match'
-    )
-    assert.equal(toolResultPayload.status, 'success', 'Tool should succeed')
+    expect(toolResultPayload.name).toBe("search_knowledge_base")
+    expect(toolResultPayload.status).toBe("success")
 
     // Verify provider was called twice (initial + after observation)
-    assert.equal(
-      mockFetch.requests.length,
-      2,
-      'Provider should be called twice'
-    )
+    expect(mockFetch.requests.length).toBe(2)
 
     // Verify second request includes tool observation
     const secondRequest = parseRequestBody(mockFetch.requests[1])
-    assert.ok(secondRequest.messages, 'Second request should have messages')
+    expect(secondRequest.messages).toBeTruthy()
     const toolMessages = secondRequest.messages?.filter(
-      (m) => m.role === 'tool'
+      (m) => m.role === "tool"
     )
-    assert.equal(toolMessages?.length, 1, 'Should have one tool message')
+    expect(toolMessages?.length).toBe(1)
 
     // Verify result
-    assert.equal(result.toolCalls.length, 1, 'Should have one tool call')
-    assert.equal(
-      result.toolCalls[0].name,
-      'search_knowledge_base',
-      'Tool name should match'
-    )
-    assert.equal(result.iterations, 2, 'Should complete in 2 iterations')
+    expect(result.toolCalls.length).toBe(1)
+    expect(result.toolCalls[0].name).toBe("search_knowledge_base")
+    expect(result.iterations).toBe(2)
   } finally {
     globalThis.fetch = originalFetch
   }
 })
 
-test('streaming multiple iterations with tool chaining', async () => {
+test("streaming multiple iterations with tool chaining", async () => {
   const mockResponses: MockProviderResponseInput[] = [
     {
-      content: 'Searching knowledge base...',
+      content: "Searching knowledge base...",
       toolCalls: [
-        { name: 'search_knowledge_base', arguments: { query: 'dorms' } },
+        { name: "search_knowledge_base", arguments: { query: "dorms" } },
       ],
       stream: true,
     },
     {
-      content: 'Let me search the web for more info...',
+      content: "Let me search the web for more info...",
       toolCalls: [
-        { name: 'web_search', arguments: { query: 'UIUC dorms 2024' } },
+        { name: "web_search", arguments: { query: "UIUC dorms 2024" } },
       ],
       stream: true,
     },
-    { content: 'Based on my searches, here is what I found...', stream: true },
+    { content: "Based on my searches, here is what I found...", stream: true },
   ]
   const mockFetch = createMockProviderFetch(mockResponses)
 
@@ -324,7 +302,7 @@ test('streaming multiple iterations with tool chaining', async () => {
     const { writer, events } = createWriterWithStream()
 
     const result = await runStreamingAgentLoop({
-      message: 'Tell me about UIUC dorms',
+      message: "Tell me about UIUC dorms",
       history: [],
       registry,
       env: createTestEnv(),
@@ -334,40 +312,36 @@ test('streaming multiple iterations with tool chaining', async () => {
     const parsed = await events
 
     // Should have multiple tool events
-    const toolStartEvents = parsed.filter((e) => e.event === 'tool_start')
-    const toolResultEvents = parsed.filter((e) => e.event === 'tool_result')
+    const toolStartEvents = parsed.filter((e) => e.event === "tool_start")
+    const toolResultEvents = parsed.filter((e) => e.event === "tool_result")
 
-    assert.equal(toolStartEvents.length, 2, 'Should have 2 tool_start events')
-    assert.equal(toolResultEvents.length, 2, 'Should have 2 tool_result events')
+    expect(toolStartEvents.length).toBe(2)
+    expect(toolResultEvents.length).toBe(2)
 
     // Verify provider called 3 times
-    assert.equal(
-      mockFetch.requests.length,
-      3,
-      'Provider should be called 3 times'
-    )
+    expect(mockFetch.requests.length).toBe(3)
 
     // Verify result
-    assert.equal(result.toolCalls.length, 2, 'Should have 2 tool calls')
-    assert.equal(result.iterations, 3, 'Should complete in 3 iterations')
+    expect(result.toolCalls.length).toBe(2)
+    expect(result.iterations).toBe(3)
   } finally {
     globalThis.fetch = originalFetch
   }
 })
 
-test('streaming tool error is captured and handled gracefully', async () => {
+test("streaming tool error is captured and handled gracefully", async () => {
   const mockResponses: MockProviderResponseInput[] = [
     {
-      content: 'Let me search...',
+      content: "Let me search...",
       toolCalls: [
         {
-          name: 'search_knowledge_base',
-          arguments: { query: 'test' },
+          name: "search_knowledge_base",
+          arguments: { query: "test" },
         },
       ],
       stream: true,
     },
-    { content: 'The search failed, but I can still help.', stream: true },
+    { content: "The search failed, but I can still help.", stream: true },
   ]
   const mockFetch = createMockProviderFetch(mockResponses)
 
@@ -378,16 +352,16 @@ test('streaming tool error is captured and handled gracefully', async () => {
     const registry = new ToolRegistry()
     registry.register(
       createStubTool({
-        name: 'search_knowledge_base',
-        description: 'Search that fails',
-        throws: 'Database connection failed',
+        name: "search_knowledge_base",
+        description: "Search that fails",
+        throws: "Database connection failed",
       })
     )
 
     const { writer, events } = createWriterWithStream()
 
     const result = await runStreamingAgentLoop({
-      message: 'What are the dorm options?',
+      message: "What are the dorm options?",
       history: [],
       registry,
       env: createTestEnv(),
@@ -396,44 +370,37 @@ test('streaming tool error is captured and handled gracefully', async () => {
 
     const parsed = await events
 
-    const doneEvents = parsed.filter((e) => e.event === 'done')
-    assert.equal(doneEvents.length, 1, 'Should have done event')
+    const doneEvents = parsed.filter((e) => e.event === "done")
+    expect(doneEvents.length).toBe(1)
 
-    const toolResultEvents = parsed.filter((e) => e.event === 'tool_result')
-    assert.equal(toolResultEvents.length, 1, 'Should have tool_result event')
+    const toolResultEvents = parsed.filter((e) => e.event === "tool_result")
+    expect(toolResultEvents.length).toBe(1)
     const toolResultPayload = toolResultEvents[0].data as { status: string }
-    assert.equal(
-      toolResultPayload.status,
-      'error',
-      'Tool result should indicate error'
-    )
+    expect(toolResultPayload.status).toBe("error")
 
-    assert.ok(
-      result.toolCalls.length >= 0,
-      'Tool calls may be recorded depending on fallback path'
-    )
+    expect(result.toolCalls.length >= 0).toBeTruthy()
   } finally {
     globalThis.fetch = originalFetch
   }
 })
 
-test('streaming max iterations triggers fallback with bounded stop', async () => {
+test("streaming max iterations triggers fallback with bounded stop", async () => {
   const mockResponses: MockProviderResponseInput[] = [
     {
-      content: 'Searching...',
+      content: "Searching...",
       toolCalls: [
-        { name: 'search_knowledge_base', arguments: { query: 'test1' } },
+        { name: "search_knowledge_base", arguments: { query: "test1" } },
       ],
       stream: true,
     },
     {
-      content: 'Still searching...',
-      toolCalls: [{ name: 'web_search', arguments: { query: 'test2' } }],
+      content: "Still searching...",
+      toolCalls: [{ name: "web_search", arguments: { query: "test2" } }],
       stream: true,
     },
     {
-      content: 'More searching...',
-      toolCalls: [{ name: 'grep_docs', arguments: { query: 'test3' } }],
+      content: "More searching...",
+      toolCalls: [{ name: "grep_docs", arguments: { query: "test3" } }],
       stream: true,
     },
   ]
@@ -447,7 +414,7 @@ test('streaming max iterations triggers fallback with bounded stop', async () =>
     const { writer, events } = createWriterWithStream()
 
     const result = await runStreamingAgentLoop({
-      message: 'Complex query requiring many searches',
+      message: "Complex query requiring many searches",
       history: [],
       registry,
       env: createTestEnv(),
@@ -457,32 +424,32 @@ test('streaming max iterations triggers fallback with bounded stop', async () =>
 
     const parsed = await events
 
-    assert.equal(result.iterations, 3, 'Should stop at max iterations')
+    expect(result.iterations).toBe(3)
 
-    const fallbackEvents = parsed.filter((e) => e.event === 'fallback')
-    assert.ok(fallbackEvents.length >= 1, 'Should have fallback event')
+    const fallbackEvents = parsed.filter((e) => e.event === "fallback")
+    expect(fallbackEvents.length > 0).toBeTruthy()
 
-    const doneEvents = parsed.filter((e) => e.event === 'done')
-    assert.equal(doneEvents.length, 1, 'Should have done event')
+    const doneEvents = parsed.filter((e) => e.event === "done")
+    expect(doneEvents.length).toBe(1)
 
-    assert.ok(
-      result.content.includes('maximum') ||
-        result.content.includes('incomplete') ||
-        result.metadata?.stopReason === 'max_iterations' ||
-        result.metadata?.reason === 'max_iterations_exceeded',
-      'Should indicate max iterations reached'
-    )
+    // eslint-disable-next-line vitest/no-conditional-in-test -- defensive assertion on optional result fields
+    expect(
+      result.content.includes("maximum") ||
+        result.content.includes("incomplete") ||
+        result.metadata?.stopReason === "max_iterations" ||
+        result.metadata?.reason === "max_iterations_exceeded"
+    ).toBeTruthy()
   } finally {
     globalThis.fetch = originalFetch
   }
 })
 
-test('streaming fallback direct response when all tools fail', async () => {
+test("streaming fallback direct response when all tools fail", async () => {
   const mockResponses: MockProviderResponseInput[] = [
     {
-      content: 'Let me try...',
+      content: "Let me try...",
       toolCalls: [
-        { name: 'search_knowledge_base', arguments: { query: 'test' } },
+        { name: "search_knowledge_base", arguments: { query: "test" } },
       ],
       stream: true,
     },
@@ -497,16 +464,16 @@ test('streaming fallback direct response when all tools fail', async () => {
     const registry = new ToolRegistry()
     registry.register(
       createStubTool({
-        name: 'search_knowledge_base',
-        description: 'Search that fails',
-        throws: 'Connection error',
+        name: "search_knowledge_base",
+        description: "Search that fails",
+        throws: "Connection error",
       })
     )
 
     const { writer, events } = createWriterWithStream()
 
     const result = await runStreamingAgentLoop({
-      message: 'What are the dorms?',
+      message: "What are the dorms?",
       history: [],
       registry,
       env: createTestEnv(),
@@ -515,34 +482,30 @@ test('streaming fallback direct response when all tools fail', async () => {
 
     const parsed = await events
 
-    const doneEvents = parsed.filter((e) => e.event === 'done')
-    assert.equal(doneEvents.length, 1, 'Should have done event')
+    const doneEvents = parsed.filter((e) => e.event === "done")
+    expect(doneEvents.length).toBe(1)
 
-    const toolResultEvents = parsed.filter((e) => e.event === 'tool_result')
-    assert.equal(toolResultEvents.length, 1, 'Should have tool_result event')
+    const toolResultEvents = parsed.filter((e) => e.event === "tool_result")
+    expect(toolResultEvents.length).toBe(1)
     const toolResultPayload = toolResultEvents[0].data as { status: string }
-    assert.equal(
-      toolResultPayload.status,
-      'error',
-      'Tool result should indicate error'
-    )
+    expect(toolResultPayload.status).toBe("error")
 
-    assert.ok(result.iterations >= 1, 'Should complete at least one iteration')
+    expect(result.iterations >= 1).toBeTruthy()
   } finally {
     globalThis.fetch = originalFetch
   }
 })
 
-test('streaming trace events are emitted at key points', async () => {
+test("streaming trace events are emitted at key points", async () => {
   const mockResponses: MockProviderResponseInput[] = [
     {
-      content: 'Let me search...',
+      content: "Let me search...",
       toolCalls: [
-        { name: 'search_knowledge_base', arguments: { query: 'test' } },
+        { name: "search_knowledge_base", arguments: { query: "test" } },
       ],
       stream: true,
     },
-    { content: 'Here is the answer.', stream: true },
+    { content: "Here is the answer.", stream: true },
   ]
   const mockFetch = createMockProviderFetch(mockResponses)
 
@@ -554,7 +517,7 @@ test('streaming trace events are emitted at key points', async () => {
     const { writer, events } = createWriterWithStream()
 
     await runStreamingAgentLoop({
-      message: 'What are the dorms?',
+      message: "What are the dorms?",
       history: [],
       registry,
       env: createTestEnv(),
@@ -564,51 +527,45 @@ test('streaming trace events are emitted at key points', async () => {
     const parsed = await events
 
     // Check for trace events
-    const eventNames = parsed.map((e) => e.event)
+    const eventNames = new Set(parsed.map((e) => e.event))
 
     // Should have agent_step event
-    assert.ok(
-      eventNames.includes('agent_step'),
-      'Should have agent_step trace event'
-    )
+    expect(eventNames.has("agent_step")).toBeTruthy()
 
     // Should have observation event
-    assert.ok(
-      eventNames.includes('observation'),
-      'Should have observation trace event'
-    )
+    expect(eventNames.has("observation")).toBeTruthy()
 
     // Verify observation event structure
-    const observationEvent = parsed.find((e) => e.event === 'observation')
+    const observationEvent = parsed.find((e) => e.event === "observation")
+    // eslint-disable-next-line vitest/no-conditional-in-test -- defensive check on optional event
     if (observationEvent) {
       const payload = observationEvent.data as {
         name: string
         status: string
         summary: string
       }
-      assert.equal(
-        payload.name,
-        'search_knowledge_base',
-        'Observation should have tool name'
-      )
-      assert.equal(payload.status, 'success', 'Observation should have status')
-      assert.ok(payload.summary, 'Observation should have summary')
+      // eslint-disable-next-line vitest/no-conditional-expect -- guarded by if block
+      expect(payload.name).toBe("search_knowledge_base")
+      // eslint-disable-next-line vitest/no-conditional-expect -- guarded by if block
+      expect(payload.status).toBe("success")
+      // eslint-disable-next-line vitest/no-conditional-expect -- guarded by if block
+      expect(payload.summary).toBeTruthy()
     }
   } finally {
     globalThis.fetch = originalFetch
   }
 })
 
-test('streaming preserves SSE backward compatibility', async () => {
+test("streaming preserves SSE backward compatibility", async () => {
   const mockResponses: MockProviderResponseInput[] = [
     {
-      content: 'Let me search...',
+      content: "Let me search...",
       toolCalls: [
-        { name: 'search_knowledge_base', arguments: { query: 'test' } },
+        { name: "search_knowledge_base", arguments: { query: "test" } },
       ],
       stream: true,
     },
-    { content: 'Here is the answer.', stream: true },
+    { content: "Here is the answer.", stream: true },
   ]
   const mockFetch = createMockProviderFetch(mockResponses)
 
@@ -620,7 +577,7 @@ test('streaming preserves SSE backward compatibility', async () => {
     const { writer, events } = createWriterWithStream()
 
     await runStreamingAgentLoop({
-      message: 'What are the dorms?',
+      message: "What are the dorms?",
       history: [],
       registry,
       env: createTestEnv(),
@@ -630,41 +587,35 @@ test('streaming preserves SSE backward compatibility', async () => {
     const parsed = await events
 
     // Verify all legacy events exist
-    const eventNames = parsed.map((e) => e.event)
+    const eventNames = new Set(parsed.map((e) => e.event))
 
     // Core events must exist
-    assert.ok(eventNames.includes('tool_start'), 'Must have tool_start')
-    assert.ok(eventNames.includes('tool_result'), 'Must have tool_result')
-    assert.ok(eventNames.includes('content'), 'Must have content')
-    assert.ok(eventNames.includes('done'), 'Must have done')
+    expect(eventNames.has("tool_start")).toBeTruthy()
+    expect(eventNames.has("tool_result")).toBeTruthy()
+    expect(eventNames.has("content")).toBeTruthy()
+    expect(eventNames.has("done")).toBeTruthy()
 
     // Verify tool_start uses 'name' not 'tool'
-    const toolStartEvent = parsed.find((e) => e.event === 'tool_start')
-    assert.ok(toolStartEvent, 'tool_start should exist')
-    const toolStartPayload = toolStartEvent.data as Record<string, unknown>
-    assert.ok('name' in toolStartPayload, "tool_start must have 'name' field")
-    assert.ok(
-      !('tool' in toolStartPayload),
-      "tool_start must NOT have 'tool' field"
-    )
+    const toolStartEvent = parsed.find((e) => e.event === "tool_start")
+    expect(toolStartEvent).toBeTruthy()
+    const toolStartPayload = toolStartEvent!.data as Record<string, unknown>
+    expect("name" in toolStartPayload).toBeTruthy()
+    expect(!("tool" in toolStartPayload)).toBeTruthy()
 
     // Verify tool_result uses 'name' not 'tool'
-    const toolResultEvent = parsed.find((e) => e.event === 'tool_result')
-    assert.ok(toolResultEvent, 'tool_result should exist')
-    const toolResultPayload = toolResultEvent.data as Record<string, unknown>
-    assert.ok('name' in toolResultPayload, "tool_result must have 'name' field")
-    assert.ok(
-      !('tool' in toolResultPayload),
-      "tool_result must NOT have 'tool' field"
-    )
+    const toolResultEvent = parsed.find((e) => e.event === "tool_result")
+    expect(toolResultEvent).toBeTruthy()
+    const toolResultPayload = toolResultEvent!.data as Record<string, unknown>
+    expect("name" in toolResultPayload).toBeTruthy()
+    expect(!("tool" in toolResultPayload)).toBeTruthy()
   } finally {
     globalThis.fetch = originalFetch
   }
 })
 
-test('streaming retrieval safety gate blocks tools for hello', async () => {
+test("streaming retrieval safety gate blocks tools for hello", async () => {
   const mockResponses: MockProviderResponseInput[] = [
-    { content: 'Hello! How can I help?', stream: true },
+    { content: "Hello! How can I help?", stream: true },
   ]
   const mockFetch = createMockProviderFetch(mockResponses)
 
@@ -676,7 +627,7 @@ test('streaming retrieval safety gate blocks tools for hello', async () => {
     const { writer, events } = createWriterWithStream()
 
     await runStreamingAgentLoop({
-      message: 'hello',
+      message: "hello",
       history: [],
       registry,
       env: createTestEnv(),
@@ -686,35 +637,27 @@ test('streaming retrieval safety gate blocks tools for hello', async () => {
     const parsed = await events
 
     // Should NOT have tool events for hello
-    const toolStartEvents = parsed.filter((e) => e.event === 'tool_start')
-    assert.equal(
-      toolStartEvents.length,
-      0,
-      'Hello should not trigger tool_start'
-    )
+    const toolStartEvents = parsed.filter((e) => e.event === "tool_start")
+    expect(toolStartEvents.length).toBe(0)
 
     // Verify request had empty tools
     const requestBody = parseRequestBody(mockFetch.requests[0])
-    assert.deepEqual(
-      requestBody.tools,
-      [],
-      'Hello should have empty tools array'
-    )
+    expect(requestBody.tools).toEqual([])
   } finally {
     globalThis.fetch = originalFetch
   }
 })
 
-test('streaming allows tools for substantive query', async () => {
+test("streaming allows tools for substantive query", async () => {
   const mockResponses: MockProviderResponseInput[] = [
     {
-      content: 'Let me search...',
+      content: "Let me search...",
       toolCalls: [
-        { name: 'search_knowledge_base', arguments: { query: 'PAR dorm' } },
+        { name: "search_knowledge_base", arguments: { query: "PAR dorm" } },
       ],
       stream: true,
     },
-    { content: 'PAR has...', stream: true },
+    { content: "PAR has...", stream: true },
   ]
   const mockFetch = createMockProviderFetch(mockResponses)
 
@@ -726,7 +669,7 @@ test('streaming allows tools for substantive query', async () => {
     const { writer, events } = createWriterWithStream()
 
     await runStreamingAgentLoop({
-      message: 'What are PAR dorm dining options?',
+      message: "What are PAR dorm dining options?",
       history: [],
       registry,
       env: createTestEnv(),
@@ -736,19 +679,13 @@ test('streaming allows tools for substantive query', async () => {
     const parsed = await events
 
     // Should have tool events for substantive query
-    const toolStartEvents = parsed.filter((e) => e.event === 'tool_start')
-    assert.equal(
-      toolStartEvents.length,
-      1,
-      'Substantive query should trigger tool'
-    )
+    const toolStartEvents = parsed.filter((e) => e.event === "tool_start")
+    expect(toolStartEvents.length).toBe(1)
 
     // Verify request had tools
     const requestBody = parseRequestBody(mockFetch.requests[0])
-    assert.ok(
-      requestBody.tools && requestBody.tools.length > 0,
-      'Should have tools'
-    )
+    // eslint-disable-next-line vitest/no-conditional-in-test -- checking optional field existence
+    expect(requestBody.tools && requestBody.tools.length > 0).toBeTruthy()
   } finally {
     globalThis.fetch = originalFetch
   }

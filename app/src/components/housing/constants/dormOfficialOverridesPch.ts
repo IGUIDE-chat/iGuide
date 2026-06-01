@@ -5,7 +5,7 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { DormOverride, plan, urls } from "./dormOfficialOverrideUtils";
+import { type DormOverride, plan, urls } from "./dormOfficialOverrideUtils"
 
 export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
   bromley: {
@@ -757,4 +757,4 @@ export const PCH_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
       }),
     ],
   },
-};
+}

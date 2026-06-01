@@ -3,15 +3,19 @@ export function joinPromptSections(
 ): string {
   return sections
     .map((section) => section?.trim())
-    .filter((section): section is string => Boolean(section))
-    .join('\n\n')
+    .filter(
+      (section): section is string =>
+        section !== null && section !== undefined && section.length > 0
+    )
+    .join("\n\n")
 }
 
 export function fillPromptTemplate(
   template: string,
   values: Record<string, string | null | undefined>
 ): string {
-  return template.replace(/{{\s*([\w-]+)\s*}}/g, (_match, key: string) => {
-    return values[key]?.trim() ?? ''
-  })
+  return template.replaceAll(
+    /{{\s*([\w-]+)\s*}}/g,
+    (_match, key: string) => values[key]?.trim() ?? ""
+  )
 }

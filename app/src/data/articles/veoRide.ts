@@ -7,7 +7,7 @@
 
 // [DATA] Article content for VeoRide guide.
 // [数据] VeoRide 共享单车指南的文章内容。
-import { Article } from "../../types";
+import { type Article } from "../../types"
 
 export const veoRide: Article = {
   id: "veoride-rules",
@@ -39,4 +39,4 @@ You will see teal e-scooters and bikes everywhere.
   `,
   tags_zh: ["滑板车", "自行车", "Veo", "交通", "罚款"],
   lastUpdated: "2023-09-01",
-};
+}

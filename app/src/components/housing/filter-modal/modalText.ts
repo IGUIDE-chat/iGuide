@@ -5,35 +5,35 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-export type FilterLanguage = "en" | "zh";
+export type FilterLanguage = "en" | "zh"
 
 export interface ModalText {
-  filters: string;
-  priceRange: string;
-  typeOfPlace: string;
-  amenities: string;
-  roomType?: string;
-  bedCount: string;
-  bathroomCount: string;
-  clearAll: string;
-  showPlaces: string;
-  minPrice: string;
-  maxPrice: string;
-  avgPrice: string;
-  location: string;
-  livingConditions: string;
-  facilities: string;
-  lifestyle: string;
-  bathroomType: string;
-  airConditioning: string;
-  zeroBathrooms: string;
-  onePlusBathrooms: string;
-  twoPlusBathrooms: string;
+  filters: string
+  priceRange: string
+  typeOfPlace: string
+  amenities: string
+  roomType?: string
+  bedCount: string
+  bathroomCount: string
+  clearAll: string
+  showPlaces: string
+  minPrice: string
+  maxPrice: string
+  avgPrice: string
+  location: string
+  livingConditions: string
+  facilities: string
+  lifestyle: string
+  bathroomType: string
+  airConditioning: string
+  zeroBathrooms: string
+  onePlusBathrooms: string
+  twoPlusBathrooms: string
 }
 
 export const HISTOGRAM_DATA = [
   4, 8, 12, 25, 35, 42, 45, 30, 20, 15, 10, 5, 2, 1,
-];
+]
 
 export const MODAL_TEXT: Record<FilterLanguage, ModalText> = {
   en: {
@@ -80,4 +80,4 @@ export const MODAL_TEXT: Record<FilterLanguage, ModalText> = {
     onePlusBathrooms: "1+",
     twoPlusBathrooms: "2+",
   },
-};
+}

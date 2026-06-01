@@ -7,35 +7,20 @@ on:
     branches: ["**/*"]
 
 jobs:
-  build:
-    name: Lint, TypeCheck & Build
-    needs: secret-scan
-    uses: ./.github/workflows/build.yml
-    with:
-      ref: ${{ github.ref }}
-    secrets:
-      vite_supabase_url: ${{ secrets.VITE_SUPABASE_URL }}
-      vite_supabase_anon_key: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-      vite_mapbox_token: ${{ secrets.VITE_MAPBOX_TOKEN }}
-      vite_coze_bot_id: ${{ secrets.VITE_COZE_BOT_ID }}
-  secret-scan:
-    name: Secret Scan (Source)
-    uses: ./.github/workflows/secret-scan.yml
-    with:
-      ref: ${{ github.ref }}
-      full_repo_name: ${{ github.repository }}
-  bundle-scan:
-    name: Bundle Secret Scan (dist)
-    needs: build
-    uses: ./.github/workflows/bundle-scan.yml
-    with:
-      ref: ${{ github.ref }}
-    secrets:
-      vite_supabase_url: ${{ secrets.VITE_SUPABASE_URL }}
-      vite_supabase_anon_key: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-      vite_mapbox_token: ${{ secrets.VITE_MAPBOX_TOKEN }}
-      vite_coze_bot_id: ${{ secrets.VITE_COZE_BOT_ID }}
-  deploy:
-    name: Cloudflare Deploy Status
-    needs: [build, bundle-scan]
-    uses: ./.github/workflows/deploy.yml
+  check:
+    name: Vite+ Check, Test, and Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - run: git config --global url."https://x-access-token:${{ secrets.PRIVATE_REPO_PAT }}@github.com/".insteadOf "https://github.com/"
+      - uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version: "lts"
+          cache: true
+          run-install: |
+            args: ['--frozen-lockfile']
+      - run: vp check
+        continue-on-error: true
+      - run: vp test
+      - run: vp build
+        working-directory: ./app

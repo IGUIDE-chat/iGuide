@@ -1,0 +1,211 @@
+import { readFileSync } from "node:fs"
+
+import { defineConfig } from "vite-plus"
+
+function mdLoaderPlugin() {
+  return {
+    name: "md-loader",
+    load(id: string) {
+      if (id.endsWith(".md")) {
+        return `export default ${JSON.stringify(readFileSync(id, "utf8"))};`
+      }
+    },
+  }
+}
+
+export default defineConfig({
+  plugins: [mdLoaderPlugin()],
+  staged: {
+    "*": "vp check --fix",
+  },
+  fmt: {
+    singleQuote: false,
+    semi: false,
+    sortImports: true,
+    trailingComma: "es5",
+    printWidth: 80,
+    sortTailwindcss: {},
+    ignorePatterns: [
+      "AGENTS.md",
+      "node_modules",
+      "pnpm-lock.yaml",
+      "build",
+      "dist",
+      "*.env.*",
+      "*.jsonc",
+      "unimcp",
+      "data_collection",
+    ],
+  },
+  lint: {
+    plugins: [
+      "typescript",
+      "unicorn",
+      "oxc",
+      "import",
+      "react",
+      "jsx-a11y",
+      "react-perf",
+      "promise",
+      "vitest",
+    ],
+    categories: {
+      correctness: "error",
+    },
+    env: {
+      builtin: true,
+    },
+    settings: {
+      react: {
+        version: "19.2.6",
+      },
+      "jsx-a11y": {
+        components: {
+          Image: "img",
+          Link: "a",
+          Button: "button",
+          Input: "input",
+          Select: "select",
+          Textarea: "textarea",
+        },
+      },
+    },
+    options: {
+      respectEslintDisableDirectives: true,
+      typeAware: true,
+      typeCheck: true,
+    },
+    ignorePatterns: [
+      "node_modules/**",
+      "dist/**",
+      "build/**",
+      "coverage/**",
+      ".wrangler/**",
+      "app/.vite/**",
+      "app/.debug/**",
+      "app/tests/artifacts/**",
+      "app/src/legacy/**",
+      "src/legacy/**",
+      "app/src/components/housing/legacy/**",
+      "src/components/housing/legacy/**",
+      "supabase/.temp/**",
+      "**/*.min.*",
+      "**/*.generated.*",
+      "**/*.gen.*",
+      "**/worker-configuration.d.ts",
+    ],
+    rules: {
+      // ── PEDANTIC: valuable / auto-fixable ──
+      "eslint/array-callback-return": "warn",
+      "eslint/eqeqeq": ["warn", "always", { null: "ignore" }],
+      "eslint/no-array-constructor": "error",
+      "eslint/no-case-declarations": "warn",
+      "eslint/no-fallthrough": "error",
+      "eslint/no-loop-func": "error",
+      "eslint/no-new-wrappers": "error",
+      "eslint/no-object-constructor": "error",
+      "eslint/no-promise-executor-return": "error",
+      "eslint/no-redeclare": "error",
+      "eslint/no-self-compare": "error",
+      "eslint/symbol-description": "warn",
+
+      "typescript/ban-ts-comment": [
+        "warn",
+        { "ts-expect-error": "allow-with-description" },
+      ],
+      "typescript/ban-types": "warn",
+      "typescript/only-throw-error": "error",
+      "typescript/prefer-includes": "error",
+      "typescript/prefer-ts-expect-error": "error",
+
+      "react/checked-requires-onchange-or-readonly": "warn",
+      "react/jsx-no-target-blank": "error",
+      "react/jsx-no-useless-fragment": "warn",
+      "react/no-unescaped-entities": "warn",
+
+      "unicorn/consistent-assert": "warn",
+      "unicorn/consistent-empty-array-spread": "warn",
+      "unicorn/escape-case": "warn",
+      "unicorn/explicit-length-check": "warn",
+      "unicorn/new-for-builtins": "warn",
+      "unicorn/no-hex-escape": "warn",
+      "unicorn/no-instanceof-array": "error",
+      "unicorn/no-useless-promise-resolve-reject": "error",
+      "unicorn/no-useless-switch-case": "warn",
+      "unicorn/prefer-array-some": "warn",
+      "unicorn/prefer-date-now": "error",
+      "unicorn/prefer-dom-node-append": "warn",
+      "unicorn/prefer-dom-node-dataset": "warn",
+      "unicorn/prefer-dom-node-remove": "warn",
+      "unicorn/prefer-regexp-test": "error",
+      "unicorn/prefer-string-replace-all": "error",
+      "unicorn/prefer-type-error": "error",
+
+      // ── STYLE: valuable / auto-fixable ──
+      "typescript/adjacent-overload-signatures": "warn",
+      "typescript/array-type": ["warn", { default: "array-simple" }],
+      "typescript/ban-tslint-comment": "error",
+      "typescript/class-literal-property-style": ["warn", "fields"],
+      "typescript/consistent-generic-constructors": "warn",
+      "typescript/consistent-indexed-object-style": "warn",
+      "typescript/consistent-type-assertions": "warn",
+      "typescript/consistent-type-imports": [
+        "warn",
+        { fixStyle: "separate-type-imports" },
+      ],
+      "typescript/dot-notation": "warn",
+      "typescript/no-empty-interface": "warn",
+      "typescript/no-inferrable-types": "warn",
+      "typescript/prefer-function-type": "warn",
+
+      "eslint/arrow-body-style": ["warn", "as-needed"],
+      "eslint/curly": ["warn", "all"],
+      "eslint/default-case-last": "warn",
+      "eslint/default-param-last": "warn",
+      "eslint/guard-for-in": "warn",
+      "eslint/logical-assignment-operators": ["warn", "always"],
+      "eslint/no-lonely-if": "warn",
+      "eslint/no-useless-computed-key": "warn",
+      "eslint/object-shorthand": "warn",
+      "eslint/operator-assignment": "warn",
+      // "eslint/prefer-arrow-callback": "warn",
+      "eslint/prefer-const": "warn",
+      "eslint/prefer-exponentiation-operator": "warn",
+      "eslint/prefer-object-has-own": "warn",
+      "eslint/prefer-object-spread": "warn",
+      "eslint/prefer-rest-params": "warn",
+      "eslint/prefer-spread": "warn",
+      "eslint/prefer-template": "warn",
+      "eslint/yoda": "warn",
+
+      "react/jsx-boolean-value": "warn",
+      "react/jsx-curly-brace-presence": "warn",
+      "react/jsx-fragments": "warn",
+      "react/jsx-pascal-case": "warn",
+      "react/self-closing-comp": "warn",
+
+      "unicorn/catch-error-name": "warn",
+      "unicorn/consistent-date-clone": "warn",
+      "unicorn/consistent-existence-index-check": "warn",
+      "unicorn/empty-brace-spaces": "warn",
+      "unicorn/no-console-spaces": "warn",
+      "unicorn/no-zero-fractions": "warn",
+      "unicorn/number-literal-case": "warn",
+      "unicorn/numeric-separators-style": "warn",
+      "unicorn/prefer-optional-catch-binding": "warn",
+      "unicorn/prefer-set-size": "warn",
+      "unicorn/prefer-string-trim-start-end": "warn",
+      "unicorn/require-array-join-separator": "warn",
+      "unicorn/switch-case-braces": "warn",
+      "unicorn/text-encoding-identifier-case": "warn",
+      "unicorn/throw-new-error": "warn",
+
+      "import/consistent-type-specifier-style": ["warn", "prefer-top-level"],
+      // "import/newline-after-import": "warn",
+      "import/no-duplicates": "warn",
+      "import/no-named-default": "warn",
+      "import/no-mutable-exports": "warn",
+    },
+    overrides: [],
+  },
+})

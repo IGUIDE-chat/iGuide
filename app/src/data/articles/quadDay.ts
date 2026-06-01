@@ -7,7 +7,7 @@
 
 // [DATA] Article content for Quad Day guide.
 // [数据] 迎新日（Quad Day）指南的文章内容。
-import { Article } from "../../types";
+import { type Article } from "../../types"
 
 export const quadDay: Article = {
   id: "quad-day",
@@ -44,4 +44,4 @@ Held on the Sunday before classes start, Quad Day is where hundreds of Registere
   `,
   tags_zh: ["社交", "社团", "RSO", "活动", "Quad Day"],
   lastUpdated: "2024-08-15",
-};
+}

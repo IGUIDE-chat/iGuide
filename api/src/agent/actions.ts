@@ -1,7 +1,8 @@
-import type { ProviderToolCall } from './messages.ts'
-import { buildObservation, type Observation } from './observation.ts'
-import type { ToolRegistry } from '../tools/registry.ts'
-import type { RequestContext, ToolResult } from '../tools/types.ts'
+import type { ToolRegistry } from "../tools/registry.ts"
+import type { RequestContext, ToolResult } from "../tools/types.ts"
+import type { ProviderToolCall } from "./messages.ts"
+import { buildObservation } from "./observation.ts"
+import type { Observation } from "./observation.ts"
 
 export interface ExecuteToolActionOptions {
   toolCall: ProviderToolCall
@@ -22,7 +23,7 @@ export async function executeToolAction(
       toolName,
       input: {},
       result: createToolErrorResult({
-        error: 'invalid_arguments',
+        error: "invalid_arguments",
         tool: toolName,
         message: parsedArgs.message,
         raw_arguments: options.toolCall.function.arguments,
@@ -37,7 +38,7 @@ export async function executeToolAction(
       toolName,
       input: parsedArgs.args,
       result: createToolErrorResult({
-        error: 'tool_not_found',
+        error: "tool_not_found",
         tool: toolName,
       }),
       stepIndex: options.stepIndex,
@@ -69,15 +70,15 @@ type ParsedToolArguments =
 
 function parseToolArguments(rawArguments: string): ParsedToolArguments {
   try {
-    const parsed = JSON.parse(rawArguments || '{}') as unknown
+    const parsed = JSON.parse(rawArguments || "{}") as unknown
     if (
       parsed === null ||
-      typeof parsed !== 'object' ||
+      typeof parsed !== "object" ||
       Array.isArray(parsed)
     ) {
       return {
         ok: false,
-        message: 'Tool arguments must be a JSON object',
+        message: "Tool arguments must be a JSON object",
       }
     }
 
@@ -86,7 +87,7 @@ function parseToolArguments(rawArguments: string): ParsedToolArguments {
     return {
       ok: false,
       message:
-        error instanceof Error ? error.message : 'Invalid tool arguments',
+        error instanceof Error ? error.message : "Invalid tool arguments",
     }
   }
 }

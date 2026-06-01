@@ -1,31 +1,18 @@
 {
   "name": "@iguide/app",
+  "version": "v0.0.0",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "audit:dorm-media": "npx tsx scripts/audit-dorm-media.ts",
-    "build": "vite build",
-    "dev": "vite",
-    "generate:qmd-content": "npx tsx scripts/generate-qmd-markdown.ts",
-    "lint:fix": "oxlint --fix src functions scripts",
-    "lint": "oxlint src functions scripts",
-    "preview": "vite preview",
-    "style:fix": "prettier --write . && pnpm run style:md:fix",
-    "style:md:fix": "markdownlint-cli2 --fix \"**/*.md\" \"#node_modules\"",
-    "style:md": "markdownlint-cli2 \"**/*.md\" \"#node_modules\"",
-    "style": "prettier --check . && pnpm run style:md",
-    "submodule:init": "git submodule update --init --recursive",
-    "submodule:update": "git submodule update --remote --merge",
-    "sync:qmd": "npx tsx scripts/sync-qmd-index.ts",
-    "typecheck": "tsc --noEmit",
-    "validate:dorm-data": "npx tsx scripts/validate-dorm-data.ts",
-    "postinstall": "git submodule update --init --recursive && git config --local include.path ../.gitconfig"
+    "build": "vp build",
+    "dev": "vp dev"
   },
   "dependencies": {
+    "@ai-sdk/react": "^3.0.193",
     "@assistant-ui/react": "^0.14.11",
     "@headlessui/react": "^2.2.10",
     "@supabase/supabase-js": "^2.106.2",
+    "ai": "^6.0.191",
     "framer-motion": "^12.40.0",
     "lucide-react": "^1.14.0",
     "mapbox-gl": "^3.24.0",
@@ -35,26 +22,19 @@
     "react-map-gl": "^8.1.1",
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.15.0",
-    "remark-gfm": "^4.0.1"
+    "remark-gfm": "^4.0.1",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260527.1",
     "@tailwindcss/postcss": "^4.3.0",
-    "@types/node": "^25.9.1",
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
     "autoprefixer": "^10.5.0",
     "dotenv": "^17.4.2",
-    "markdownlint-cli2": "^0.22.1",
-    "oxlint": "^1.67.0",
     "postcss": "^8.5.15",
-    "prettier": "^3.8.3",
     "tailwindcss": "^4.3.0",
-    "ts-morph": "^28.0.0",
-    "ts-node": "^10.9.2",
-    "typescript": "~6.0.3",
-    "vite": "^8.0.14",
     "vite-plugin-mcp": "^0.3.2"
   }
 }

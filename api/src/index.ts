@@ -1,51 +1,320 @@
-// API Gateway Worker for api.iguide.chat
-// Handles: Auth verification, Geo-IP routing, LLM selection, Backend proxy
+import { convertToModelMessages, stepCountIs, streamText } from "ai"
+import { Hono } from "hono"
+import type { Context, Next } from "hono"
+import { cors } from "hono/cors"
 
-import { runStreamingAgentLoop } from './agent/loop'
-import { createSSEStream } from './agent/stream'
-import { createCustomSkillsTool } from './tools/custom-skills'
-import { createGrepDocsTool } from './tools/grep-docs'
-import { ToolRegistry } from './tools/registry'
-import { createSearchKnowledgeBaseTool } from './tools/search-knowledge-base'
-import { createWebSearchTool } from './tools/web-search'
-import {
-  createMCPRouteServices,
-  maybeHandleIntegrationsRoute,
-} from './mcp/routes'
-import { registerRuntimeMCPTools } from './mcp/service'
+import { persistTurn } from "./agent/persist.ts"
+import type { PersistEnv, ResponseMessage } from "./agent/persist.ts"
+import { resolveProvider } from "./agent/provider.ts"
+import { verifyAndCacheJwt } from "./auth/jwtCache.ts"
+import { ipRateLimit, userRateLimit } from "./middleware/ratelimit.ts"
+import type { RateLimitBinding } from "./middleware/ratelimit.ts"
+import { createCustomSkillsTool } from "./tools/customSkills.ts"
+import { createGrepDocsTool } from "./tools/grepDocs.ts"
+import { createSearchKnowledgeBaseTool } from "./tools/searchKnowledgeBase.ts"
+import type { RequestContext } from "./tools/types.ts"
+import { createWebSearchTool } from "./tools/webSearch.ts"
 
 interface Env {
   SUPABASE_URL: string
   SUPABASE_ANON_KEY: string
+  SUPABASE_SERVICE_ROLE_KEY: string
   DEEPSEEK_API_KEY: string
-  SILICONFLOW_API_KEY: string
+  DEEPSEEK_ENDPOINT?: string
+  SILICONFLOW_API_KEY?: string
   TAVILY_API_KEY: string
   EMBEDDING_API_BASE_URL: string
   EMBEDDING_API_KEY: string
   EMBEDDING_MODEL: string
   EMBEDDING_DIMENSIONS: string
   EMBEDDING_FALLBACK_URL?: string
-  BACKEND_URL: string // Argo Tunnel URL to VPS
-  QMD_CN_URL: string // Alibaba Cloud QMD service
-  QMD_US_URL: string // Chicago VPS QMD service
-  QMD_API_KEY: string // QMD service auth key
-  USE_TOOL_USE_RAG: string // Feature flag for tool-use RAG (default: "false")
+  QMD_CN_URL?: string
+  QMD_US_URL?: string
+  QMD_API_KEY?: string
+  CHAT_IP_LIMITER: RateLimitBinding
+  CHAT_USER_LIMITER: RateLimitBinding
 }
 
-interface ChatRequestBody {
-  message?: string
-  newMessage?: string
-  history?: Array<{
-    role?: string
-    content?: string
-  }>
-  lang?: string
+type Variables = {
+  userId: string
+  region: string
 }
 
-interface SupabaseUserResponse {
-  id?: string
+async function registerMCPTools(
+  ctx: RequestContext
+  // eslint-disable-next-line typescript/no-explicit-any -- AI SDK ToolSet requires Record<string, any>
+): Promise<Record<string, any>> {
+  if (!ctx.userId) {
+    return {}
+  }
+  const { registerRuntimeMCPTools } = await import("./mcp/service.ts")
+  return registerRuntimeMCPTools({
+    viewerId: ctx.userId,
+    env: ctx.env,
+  })
 }
 
+const DSML_BLOCK_PATTERN =
+  /<｜｜DSML｜｜tool_calls>[\s\S]*?<\/｜｜DSML｜｜tool_calls>/g
+const DSML_TAG_PATTERN = /<\/?｜｜DSML｜｜[^<>]*>/g
+const DSML_HOLDBACK_PREFIX = "<"
+
+function cleanDsml(text: string): string {
+  return text.replace(DSML_BLOCK_PATTERN, "").replace(DSML_TAG_PATTERN, "")
+}
+
+const stripDsmlTransform = () => {
+  let buffer = ""
+  return new TransformStream({
+    transform(part, controller) {
+      if (part.type !== "text-delta" || typeof part.text !== "string") {
+        if (
+          buffer &&
+          (part.type === "text-end" ||
+            part.type === "finish-step" ||
+            part.type === "finish")
+        ) {
+          const flushed = cleanDsml(buffer)
+          buffer = ""
+          if (flushed) {
+            controller.enqueue({
+              type: "text-delta",
+              id: part.id,
+              text: flushed,
+            })
+          }
+        }
+        controller.enqueue(part)
+        return
+      }
+      buffer += part.text
+      const lastUnsafeIdx = buffer.lastIndexOf(DSML_HOLDBACK_PREFIX)
+      let safeBoundary = buffer.length
+      if (lastUnsafeIdx !== -1) {
+        const tail = buffer.slice(lastUnsafeIdx)
+        const isCompleteTag = /^<\/?｜｜DSML｜｜[^<>]*>/.test(tail)
+        if (!isCompleteTag) {
+          safeBoundary = lastUnsafeIdx
+        }
+      }
+      const safe = buffer.slice(0, safeBoundary)
+      buffer = buffer.slice(safeBoundary)
+      const cleaned = cleanDsml(safe)
+      if (cleaned) {
+        controller.enqueue({ ...part, text: cleaned })
+      }
+    },
+    flush(controller) {
+      if (buffer) {
+        const cleaned = cleanDsml(buffer)
+        buffer = ""
+        if (cleaned) {
+          controller.enqueue({ type: "text-delta", id: "flush", text: cleaned })
+        }
+      }
+    },
+  })
+}
+
+const ALLOWED_ORIGINS = new Set([
+  "https://iguide.chat",
+  "https://app.iguide.chat",
+  "http://localhost:5173",
+  "http://localhost:3000",
+])
+
+const PREVIEW_ORIGIN_PATTERNS: RegExp[] = [
+  /^https:\/\/[a-z0-9-]+\.iguide-6d0\.pages\.dev$/i,
+]
+
+function isAllowedOrigin(origin: string | undefined): origin is string {
+  if (!origin) {
+    return false
+  }
+  if (ALLOWED_ORIGINS.has(origin)) {
+    return true
+  }
+  return PREVIEW_ORIGIN_PATTERNS.some((re) => re.test(origin))
+}
+
+const app = new Hono<{ Bindings: Env; Variables: Variables }>()
+
+app.use(
+  "*",
+  cors({
+    origin: (origin) => (isAllowedOrigin(origin) ? origin : ""),
+    allowMethods: ["GET", "POST", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Authorization"],
+    maxAge: 86_400,
+  })
+)
+
+// Region detection middleware
+app.use("*", async (c, next) => {
+  const country =
+    (c.req.raw as unknown as { cf?: { country?: string } }).cf?.country ?? "US"
+  const region = country === "CN" ? "CN" : "Global"
+  c.set("region", region)
+  await next()
+})
+
+// Health check
+app.get("/health", (c) =>
+  c.json({
+    status: "ok",
+    region: c.get("region"),
+    timestamp: new Date().toISOString(),
+  })
+)
+
+// Optional auth: signed-in users get payload.sub; guests get guest_<ipHash>
+// so per-user rate limiting and MCP global-visibility filtering still apply.
+async function guestUserIdForIp(ip: string): Promise<string> {
+  const data = new TextEncoder().encode(ip)
+  const hash = await crypto.subtle.digest("SHA-256", data)
+  const hex = Array.from(new Uint8Array(hash).slice(0, 8))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("")
+  return `guest_${hex}`
+}
+
+const resolveUser = async (
+  c: Context<{ Bindings: Env; Variables: Variables }>,
+  next: Next
+) => {
+  const authHeader = c.req.header("Authorization")
+  const token =
+    authHeader && authHeader.startsWith("Bearer ")
+      ? authHeader.replace("Bearer ", "").trim()
+      : ""
+
+  if (token) {
+    const payload = await verifyAndCacheJwt(token, caches.default, c.env)
+    if (payload) {
+      c.set("userId", payload.sub)
+      await next()
+      return
+    }
+  }
+
+  const ip = c.req.header("cf-connecting-ip") ?? "unknown"
+  c.set("userId", await guestUserIdForIp(ip))
+  await next()
+}
+
+// POST /chat with auth + rate limiting + streamText
+app.post(
+  "/chat",
+  resolveUser,
+  async (c, next) => ipRateLimit(c.env.CHAT_IP_LIMITER)(c, next),
+  async (c, next) => userRateLimit(c.env.CHAT_USER_LIMITER)(c, next),
+  async (c) => {
+    const body = await c.req.json()
+    const { messages: rawMessages, conversationId, lang = "en" } = body
+
+    if (!Array.isArray(rawMessages) || rawMessages.length === 0) {
+      return c.json({ error: "Messages array required" }, 400)
+    }
+
+    // Convert UIMessages (from @ai-sdk/react) to ModelMessages (for streamText)
+    const messages = await convertToModelMessages(rawMessages)
+
+    const userId = c.get("userId")
+    const region = c.get("region")
+
+    const ctx: RequestContext = {
+      env: c.env as unknown as Record<string, string>,
+      userId,
+      region,
+    }
+
+    // Build tools only if user query is substantive
+    const lastMessage = messages.at(-1)
+    const lastContent = lastMessage?.content
+    let userText = ""
+    if (typeof lastContent === "string") {
+      userText = lastContent
+    } else if (Array.isArray(lastContent)) {
+      userText = lastContent
+        .filter((p: { type: string }) => p.type === "text")
+        .map((p: { type: string; text?: string }) => p.text ?? "")
+        .join("")
+    }
+    const shouldUseTool = userText.length > 3
+
+    // eslint-disable-next-line typescript/no-explicit-any -- AI SDK ToolSet requires Record<string, any>
+    let tools: Record<string, any> = {}
+    if (shouldUseTool) {
+      tools = {
+        search_knowledge_base: createSearchKnowledgeBaseTool(ctx),
+        web_search: createWebSearchTool(ctx),
+        grep_docs: createGrepDocsTool(ctx),
+        custom_skills: createCustomSkillsTool(ctx),
+        ...(await registerMCPTools(ctx)),
+      }
+    }
+
+    const provider = resolveProvider({
+      env: c.env as unknown as Record<string, string | undefined>,
+      region: region as "CN" | "Global",
+    })
+    const model = provider("deepseek-v4-flash")
+
+    const systemPrompt =
+      lang === "zh"
+        ? "你是 IlliniGuide AI 助手，专门帮助 UIUC 学生解答关于校园生活、课程、住宿等问题。"
+        : "You are IlliniGuide AI assistant, helping UIUC students with campus life, courses, housing, and more."
+
+    const MAX_STEPS = 8
+    const result = streamText({
+      model,
+      system: systemPrompt,
+      messages,
+      tools,
+      // AI SDK v6 streamText defaults to stepCountIs(1); without a wider budget,
+      // the tool-call consumes the only step and the model never produces a text reply.
+      stopWhen: stepCountIs(MAX_STEPS),
+      // On the final allowed step, force the model to answer in text instead of
+      // calling yet another tool. Otherwise a model that keeps trying tools will
+      // exhaust the step budget without producing a reply.
+      prepareStep: ({ stepNumber }) => {
+        if (stepNumber >= MAX_STEPS - 1) {
+          const finalSystem =
+            lang === "zh"
+              ? `${systemPrompt}\n\n注意：你已用完工具调用次数。请直接基于到目前为止收集到的信息用中文回答用户的问题，不要再尝试调用任何工具。`
+              : `${systemPrompt}\n\nNote: You have exhausted your tool budget. Answer the user's question directly in English using whatever information you have gathered so far. Do not attempt to call any further tools.`
+          return { toolChoice: "none", system: finalSystem }
+        }
+        return {}
+      },
+      // DeepSeek occasionally emits its native DSML tool-call markup as text when
+      // toolChoice is 'none'. Strip these markers from text deltas so the user
+      // never sees them.
+      experimental_transform: stripDsmlTransform,
+      onFinish: async ({ response }) => {
+        if (userId.startsWith("guest_")) {
+          return
+        }
+        c.executionCtx.waitUntil(
+          persistTurn({
+            env: c.env as unknown as PersistEnv,
+            userId,
+            conversationId,
+            userMessage: { role: "user", content: userText },
+            responseMessages: response.messages as ResponseMessage[],
+          })
+        )
+      },
+      onError: (error) => {
+        console.error("[streamText] Error:", error)
+      },
+    })
+
+    return result.toUIMessageStreamResponse()
+  }
+)
+
+// QMD search endpoints
 async function fetchQmd(
   baseUrl: string,
   body: string,
@@ -53,398 +322,104 @@ async function fetchQmd(
   timeoutMs: number
 ): Promise<Response> {
   const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), timeoutMs)
+  const timer = setTimeout(() => {
+    controller.abort()
+  }, timeoutMs)
   try {
-    const res = await fetch(`${baseUrl}/api/search`, {
-      method: 'POST',
+    return await fetch(`${baseUrl}/api/search`, {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
       },
       body,
       signal: controller.signal,
     })
-    return res
   } finally {
     clearTimeout(timer)
   }
 }
 
-export default {
-  async fetch(
-    request: Request,
-    env: Env,
-    ctx: ExecutionContext
-  ): Promise<Response> {
-    // CORS headers
-    const corsHeaders = {
-      'Access-Control-Allow-Origin': '*', // TODO: Change to your frontend domain in production
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      'Access-Control-Max-Age': '86400',
-    }
+app.post("/api/search", async (c) => {
+  const body = await c.req.text()
+  const region = c.get("region")
+  const isCN = region === "CN"
 
-    // Handle preflight requests
-    if (request.method === 'OPTIONS') {
-      return new Response(null, {
-        status: 204,
-        headers: corsHeaders,
-      })
-    }
+  const [primaryUrl, fallbackUrl] = isCN
+    ? [c.env.QMD_CN_URL, c.env.QMD_US_URL]
+    : [c.env.QMD_US_URL, c.env.QMD_CN_URL]
 
+  let qmdRegion = isCN ? "cn" : "us"
+  let res: Response | null = null
+
+  if (primaryUrl) {
     try {
-      const url = new URL(request.url)
-      const mcpServices = createMCPRouteServices(env)
-
-      // 1. Geo-IP Detection
-      const cf = (request as { cf?: { country?: string } }).cf
-      const country = cf?.country || 'US'
-      const isCN = country === 'CN'
-      const region = isCN ? 'CN' : 'Global'
-
-      console.log(`Request from ${country}, region: ${region}`)
-
-      // 2. Auth Verification (JWT)
-      const authHeader = request.headers.get('Authorization')
-      let userId = 'anonymous'
-      let isAuthenticated = false
-
-      if (authHeader && authHeader.startsWith('Bearer ')) {
-        try {
-          const token = authHeader.replace('Bearer ', '')
-
-          // Verify JWT with Supabase
-          const supabaseResponse = await fetch(
-            `${env.SUPABASE_URL}/auth/v1/user`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                apikey: env.SUPABASE_ANON_KEY,
-              },
-            }
-          )
-
-          if (supabaseResponse.ok) {
-            const userData =
-              (await supabaseResponse.json()) as SupabaseUserResponse
-            userId = userData.id || userId
-            isAuthenticated = true
-            console.log(`Authenticated user: ${userId}`)
-          } else {
-            console.warn('Invalid token')
-            return new Response(
-              JSON.stringify({ error: 'Invalid or expired token' }),
-              {
-                status: 401,
-                headers: {
-                  ...corsHeaders,
-                  'Content-Type': 'application/json',
-                },
-              }
-            )
-          }
-        } catch (err) {
-          console.error('Auth error:', err)
-          return new Response(
-            JSON.stringify({ error: 'Authentication failed' }),
-            {
-              status: 500,
-              headers: {
-                ...corsHeaders,
-                'Content-Type': 'application/json',
-              },
-            }
-          )
-        }
+      res = await fetchQmd(primaryUrl, body, c.env.QMD_API_KEY ?? "", 15_000)
+      if (!res.ok) {
+        res = null
       }
-
-      // 3. Rate limiting for search (per-IP, 20 req/min)
-      const pathname = url.pathname
-      if (pathname === '/api/search' || pathname === '/search') {
-        const ip = request.headers.get('CF-Connecting-IP') || 'unknown'
-        const minute = Math.floor(Date.now() / 60000)
-        const rateLimitKey = `https://rate-limit/${ip}:${minute}`
-        const cacheStore = caches.default
-        const cachedCount = await cacheStore.match(new Request(rateLimitKey))
-        let count = cachedCount ? parseInt(await cachedCount.text()) : 0
-        if (count >= 20) {
-          return new Response(
-            JSON.stringify({ error: 'Rate limited, try again later' }),
-            {
-              status: 429,
-              headers: {
-                ...corsHeaders,
-                'Content-Type': 'application/json',
-                'Retry-After': '30',
-              },
-            }
-          )
-        }
-        count++
-        ctx.waitUntil(
-          cacheStore.put(
-            new Request(rateLimitKey),
-            new Response(String(count), {
-              headers: { 'Cache-Control': 'max-age=60' },
-            })
-          )
-        )
-      }
-
-      // Health check endpoint
-      if (pathname === '/health' || pathname === '/api/health') {
-        return new Response(
-          JSON.stringify({
-            status: 'ok',
-            region,
-            country,
-            authenticated: isAuthenticated,
-            timestamp: new Date().toISOString(),
-            version: '1.0.0',
-          }),
-          {
-            headers: {
-              ...corsHeaders,
-              'Content-Type': 'application/json',
-            },
-          }
-        )
-      }
-
-      const integrationsResponse = await maybeHandleIntegrationsRoute(
-        request,
-        mcpServices,
-        userId,
-        corsHeaders
-      )
-      if (integrationsResponse) {
-        return integrationsResponse
-      }
-
-      // Chat endpoint - proxy to VPS backend
-      if (pathname === '/chat' || pathname === '/api/chat') {
-        if (request.method !== 'POST') {
-          return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-            status: 405,
-            headers: {
-              ...corsHeaders,
-              'Content-Type': 'application/json',
-            },
-          })
-        }
-
-        // Check USE_TOOL_USE_RAG feature flag
-        if (env.USE_TOOL_USE_RAG === 'true') {
-          const body = (await request.json()) as ChatRequestBody
-          const message =
-            typeof body.message === 'string'
-              ? body.message
-              : typeof body.newMessage === 'string'
-                ? body.newMessage
-                : ''
-
-          if (!message.trim()) {
-            return new Response(
-              JSON.stringify({ error: 'Message is required' }),
-              {
-                status: 400,
-                headers: {
-                  ...corsHeaders,
-                  'Content-Type': 'application/json',
-                },
-              }
-            )
-          }
-
-          const history = Array.isArray(body.history)
-            ? body.history.flatMap((entry) => {
-                if (
-                  typeof entry?.role !== 'string' ||
-                  typeof entry?.content !== 'string'
-                ) {
-                  return []
-                }
-
-                return [
-                  {
-                    role: entry.role,
-                    content: entry.content,
-                  },
-                ]
-              })
-            : []
-
-          const registry = new ToolRegistry()
-          createSearchKnowledgeBaseTool(registry)
-          createWebSearchTool(registry)
-          createGrepDocsTool(registry)
-          createCustomSkillsTool(registry)
-          await registerRuntimeMCPTools({
-            registry,
-            viewerId: userId,
-            env,
-          })
-
-          const { stream, writer } = createSSEStream()
-          const responseHeaders = {
-            ...corsHeaders,
-            'Content-Type': 'text/event-stream',
-            'Cache-Control': 'no-cache',
-            Connection: 'keep-alive',
-          }
-
-          const envRecord = env as unknown as Record<string, string>
-          const runPromise = runStreamingAgentLoop({
-            message,
-            history,
-            registry,
-            env: envRecord,
-            userId: isAuthenticated ? userId : undefined,
-            region,
-            lang: body.lang,
-            writer,
-          }).catch(async (error) => {
-            console.error('Streaming agent loop error:', error)
-          })
-
-          ctx.waitUntil(runPromise)
-
-          return new Response(stream, {
-            status: 200,
-            headers: responseHeaders,
-          })
-        }
-
-        // Forward request to VPS backend
-        const backendResponse = await fetch(env.BACKEND_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-User-Region': region,
-            'X-User-Country': country,
-            'X-User-ID': userId,
-            'X-Authenticated': isAuthenticated.toString(),
-          },
-          body: await request.text(),
-        })
-
-        // Handle streaming response (SSE)
-        const contentType = backendResponse.headers.get('content-type') || ''
-        if (contentType.includes('text/event-stream')) {
-          return new Response(backendResponse.body, {
-            status: backendResponse.status,
-            headers: {
-              ...corsHeaders,
-              'Content-Type': 'text/event-stream',
-              'Cache-Control': 'no-cache',
-              Connection: 'keep-alive',
-            },
-          })
-        }
-
-        // Regular JSON response
-        const responseData = await backendResponse.text()
-        return new Response(responseData, {
-          status: backendResponse.status,
-          headers: {
-            ...corsHeaders,
-            'Content-Type': 'application/json',
-          },
-        })
-      }
-
-      // QMD Search endpoint - dual-node with fallback
-      if (pathname === '/api/search' || pathname === '/search') {
-        if (request.method !== 'POST') {
-          return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-            status: 405,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          })
-        }
-
-        const body = await request.text()
-        const [primaryUrl, fallbackUrl] = isCN
-          ? [env.QMD_CN_URL, env.QMD_US_URL]
-          : [env.QMD_US_URL, env.QMD_CN_URL]
-
-        let qmdRegion = isCN ? 'cn' : 'us'
-        let res: Response | null = null
-
-        // Try primary node
-        if (primaryUrl) {
-          try {
-            res = await fetchQmd(primaryUrl, body, env.QMD_API_KEY, 15000)
-            if (!res.ok) res = null
-          } catch {
-            console.warn(
-              `[QMD] Primary node (${qmdRegion}) failed, trying fallback`
-            )
-            res = null
-          }
-        }
-
-        // Fallback to secondary node
-        if (!res && fallbackUrl) {
-          try {
-            qmdRegion = isCN ? 'us' : 'cn'
-            res = await fetchQmd(fallbackUrl, body, env.QMD_API_KEY, 15000)
-          } catch (err) {
-            const fallbackMsg = err instanceof Error ? err.message : String(err)
-            console.error(`[QMD] Fallback node also failed:`, fallbackMsg)
-          }
-        }
-
-        if (res && res.ok) {
-          const data = await res.text()
-          return new Response(data, {
-            status: 200,
-            headers: {
-              ...corsHeaders,
-              'Content-Type': 'application/json',
-              'X-QMD-Region': qmdRegion,
-            },
-          })
-        }
-
-        return new Response(
-          JSON.stringify({ error: 'QMD search unavailable on all nodes' }),
-          {
-            status: 503,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          }
-        )
-      }
-
-      // 404 for unknown paths
-      return new Response(
-        JSON.stringify({
-          error: 'Not found',
-          path: pathname,
-          availableEndpoints: ['/health', '/chat', '/api/search'],
-        }),
-        {
-          status: 404,
-          headers: {
-            ...corsHeaders,
-            'Content-Type': 'application/json',
-          },
-        }
-      )
-    } catch (error) {
-      console.error('Worker error:', error)
-      const errorMsg = error instanceof Error ? error.message : String(error)
-      return new Response(
-        JSON.stringify({
-          error: 'Internal server error',
-          message: errorMsg,
-        }),
-        {
-          status: 500,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      )
+    } catch {
+      console.warn(`[QMD] Primary node (${qmdRegion}) failed`)
+      res = null
     }
-  },
-}
+  }
+
+  if (!res && fallbackUrl) {
+    try {
+      qmdRegion = isCN ? "us" : "cn"
+      res = await fetchQmd(fallbackUrl, body, c.env.QMD_API_KEY ?? "", 15_000)
+    } catch (error) {
+      console.error("[QMD] Fallback node failed:", error)
+    }
+  }
+
+  if (res && res.ok) {
+    const data = await res.text()
+    return c.json(JSON.parse(data), 200, {
+      "X-QMD-Region": qmdRegion,
+    })
+  }
+
+  return c.json({ error: "QMD search unavailable" }, 503)
+})
+
+app.post("/search", async (c) => {
+  const url = new URL(c.req.url)
+  url.pathname = "/api/search"
+  const newReq = new Request(url.toString(), {
+    method: "POST",
+    headers: c.req.raw.headers,
+    body: c.req.raw.body,
+  })
+  return app.fetch(newReq, c.env, c.executionCtx)
+})
+
+// MCP integrations routes (stub for T9)
+app.all("/integrations/*", async (c) =>
+  c.json({ error: "MCP integrations not yet implemented" }, 501)
+)
+
+// 404 handler
+app.notFound((c) =>
+  c.json(
+    {
+      error: "Not found",
+      path: new URL(c.req.url).pathname,
+    },
+    404
+  )
+)
+
+// Error handler
+app.onError((err, c) => {
+  console.error("Worker error:", err)
+  return c.json(
+    {
+      error: "Internal server error",
+      message: err.message,
+    },
+    500
+  )
+})
+
+export default app

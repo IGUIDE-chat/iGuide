@@ -5,13 +5,14 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from "react";
-import DormList from "../../components/housing/DormList";
-import AIChat from "../../components/housing/AIChat";
-import { Language } from "../../types";
+import React from "react"
+
+import AIChat from "../../components/housing/AIChat"
+import DormList from "../../components/housing/DormList"
+import { type Language } from "../../types"
 
 interface DormListPageProps {
-  language: Language;
+  language: Language
 }
 
 const DormListPage: React.FC<DormListPageProps> = ({ language }) => {
@@ -20,7 +21,7 @@ const DormListPage: React.FC<DormListPageProps> = ({ language }) => {
       <DormList language={language} />
       <AIChat language={language} />
     </>
-  );
-};
+  )
+}
 
-export default DormListPage;
+export default DormListPage

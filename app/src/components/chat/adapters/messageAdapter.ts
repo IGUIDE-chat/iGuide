@@ -1,5 +1,6 @@
-import type { ThreadMessageLike } from "@assistant-ui/react";
-import type { ChatMessage, ThinkingStep } from "../../../types";
+import type { ThreadMessageLike } from "@assistant-ui/react"
+
+import type { ChatMessage, ThinkingStep } from "../../../types"
 
 export function toThreadMessage(msg: ChatMessage): ThreadMessageLike {
   return {
@@ -14,7 +15,7 @@ export function toThreadMessage(msg: ChatMessage): ThreadMessageLike {
         isStreaming: msg.isStreaming,
       },
     },
-  };
+  }
 }
 
 export function fromThreadMessage(
@@ -23,22 +24,22 @@ export function fromThreadMessage(
 ): ChatMessage {
   const custom = msg.metadata?.custom as
     | {
-        thinkingSteps?: ThinkingStep[];
-        isThinking?: boolean;
-        followUpQuestions?: string[];
-        isStreaming?: boolean;
+        thinkingSteps?: ThinkingStep[]
+        isThinking?: boolean
+        followUpQuestions?: string[]
+        isStreaming?: boolean
       }
-    | undefined;
+    | undefined
 
-  const content = msg.content;
-  let text = "";
+  const content = msg.content
+  let text: string
   if (typeof content === "string") {
-    text = content;
+    text = content
   } else {
     const textContent = content?.find(
       (part: { type: string; text?: string }) => part.type === "text"
-    );
-    text = textContent?.type === "text" ? (textContent.text ?? "") : "";
+    )
+    text = textContent?.type === "text" ? (textContent.text ?? "") : ""
   }
 
   return {
@@ -49,7 +50,7 @@ export function fromThreadMessage(
     followUpQuestions: custom?.followUpQuestions,
     thinkingSteps: custom?.thinkingSteps,
     isThinking: custom?.isThinking,
-  };
+  }
 }
 
 export function isChatMessage(obj: unknown): obj is ChatMessage {
@@ -61,7 +62,7 @@ export function isChatMessage(obj: unknown): obj is ChatMessage {
     "text" in obj &&
     ((obj as Record<string, unknown>).role === "user" ||
       (obj as Record<string, unknown>).role === "model")
-  );
+  )
 }
 
 export function isThreadMessageLike(obj: unknown): obj is ThreadMessageLike {
@@ -72,5 +73,5 @@ export function isThreadMessageLike(obj: unknown): obj is ThreadMessageLike {
     "role" in obj &&
     ((obj as Record<string, unknown>).role === "user" ||
       (obj as Record<string, unknown>).role === "assistant")
-  );
+  )
 }

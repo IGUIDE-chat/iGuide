@@ -5,27 +5,27 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { Dorm } from "../types/index";
+import { type Dorm } from "../types/index"
+import { PCH_OFFICIAL_OVERRIDES } from "./dormOfficialOverridesPch"
+import { URH_OFFICIAL_OVERRIDES_NORTH } from "./dormOfficialOverridesUrhNorth"
+import { URH_OFFICIAL_OVERRIDES_SOUTH } from "./dormOfficialOverridesUrhSouth"
 import {
-  DormOverride,
+  type DormOverride,
   normalizeOverrideMedia,
-} from "./dormOfficialOverrideUtils";
-import { PCH_OFFICIAL_OVERRIDES } from "./dormOfficialOverridesPch";
-import { URH_OFFICIAL_OVERRIDES_NORTH } from "./dormOfficialOverridesUrhNorth";
-import { URH_OFFICIAL_OVERRIDES_SOUTH } from "./dormOfficialOverridesUrhSouth";
+} from "./dormOfficialOverrideUtils"
 
 export const DORM_OFFICIAL_OVERRIDES: Record<string, DormOverride> = {
   ...URH_OFFICIAL_OVERRIDES_NORTH,
   ...URH_OFFICIAL_OVERRIDES_SOUTH,
   ...PCH_OFFICIAL_OVERRIDES,
-};
+}
 
 export function applyDormOfficialOverride(dorm: Dorm): Dorm {
-  const rawOverride = DORM_OFFICIAL_OVERRIDES[dorm.id];
+  const rawOverride = DORM_OFFICIAL_OVERRIDES[dorm.id]
   if (!rawOverride) {
-    return dorm;
+    return dorm
   }
-  const override = normalizeOverrideMedia(rawOverride);
+  const override = normalizeOverrideMedia(rawOverride)
 
   return {
     ...dorm,
@@ -39,5 +39,5 @@ export function applyDormOfficialOverride(dorm: Dorm): Dorm {
     categorizedTags: override.categorizedTags ?? dorm.categorizedTags,
     floorPlans: override.floorPlans ?? dorm.floorPlans,
     galleryImages: override.galleryImages ?? dorm.galleryImages,
-  };
+  }
 }

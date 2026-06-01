@@ -1,7 +1,12 @@
+import { MAX_EMBEDDING_BATCH_SIZE } from "./embedding-config"
+import type { EmbeddingConfig } from "./embedding-config"
 import {
-  type EmbeddingConfig,
-  MAX_EMBEDDING_BATCH_SIZE,
-} from './embedding-config'
+  EmbeddingConfigError,
+  EmbeddingDimensionError,
+  EmbeddingProviderError,
+} from "./embedding-errors"
+
+export { EmbeddingConfigError, EmbeddingDimensionError, EmbeddingProviderError }
 
 export interface EmbeddingResult {
   embeddings: number[][]
@@ -15,61 +20,20 @@ interface EmbeddingResponse {
   }>
 }
 
-interface EmbeddingProviderErrorDetails {
-  provider: string
-  url: string
-  status?: number
-  body?: string
-  cause?: unknown
-}
-
-export class EmbeddingConfigError extends Error {
-  constructor(message: string) {
-    super(message)
-    this.name = 'EmbeddingConfigError'
-  }
-}
-
-export class EmbeddingDimensionError extends Error {
-  readonly expected: number
-  readonly actual: number
-  readonly provider: string
-
-  constructor(expected: number, actual: number, provider: string) {
-    super(
-      `Embedding provider returned ${actual} dimensions, expected ${expected}`
-    )
-    this.name = 'EmbeddingDimensionError'
-    this.expected = expected
-    this.actual = actual
-    this.provider = provider
-  }
-}
-
-export class EmbeddingProviderError extends Error {
-  readonly details: EmbeddingProviderErrorDetails
-
-  constructor(message: string, details: EmbeddingProviderErrorDetails) {
-    super(message)
-    this.name = 'EmbeddingProviderError'
-    this.details = details
-  }
-}
-
 export class EmbeddingClient {
   constructor(private config: EmbeddingConfig) {
     if (!config.apiBaseUrl) {
-      throw new EmbeddingConfigError('EMBEDDING_API_BASE_URL is required')
+      throw new EmbeddingConfigError("EMBEDDING_API_BASE_URL is required")
     }
 
     if (!config.apiKey) {
-      throw new EmbeddingConfigError('EMBEDDING_API_KEY is required')
+      throw new EmbeddingConfigError("EMBEDDING_API_KEY is required")
     }
   }
 
   async embed(
     texts: string[],
-    type: 'query' | 'document'
+    type: "query" | "document"
   ): Promise<EmbeddingResult> {
     if (texts.length === 0) {
       return {
@@ -79,7 +43,7 @@ export class EmbeddingClient {
       }
     }
 
-    const prefix = type === 'query' ? 'query: ' : 'passage: '
+    const prefix = type === "query" ? "query: " : "passage: "
     const formattedTexts = texts.map((text) => `${prefix}${text}`)
     const embeddings: number[][] = []
     let provider = this.getProviderLabel(this.config.apiBaseUrl)
@@ -93,6 +57,7 @@ export class EmbeddingClient {
         index,
         index + MAX_EMBEDDING_BATCH_SIZE
       )
+      // eslint-disable-next-line no-await-in-loop -- sequential batching required by API rate limits
       const batchResult = await this.embedBatch(batch)
       embeddings.push(...batchResult.embeddings)
       provider = batchResult.provider
@@ -106,12 +71,12 @@ export class EmbeddingClient {
   }
 
   async embedQuery(text: string): Promise<number[]> {
-    const result = await this.embed([text], 'query')
+    const result = await this.embed([text], "query")
     return result.embeddings[0] || []
   }
 
   async embedDocuments(texts: string[]): Promise<number[][]> {
-    const result = await this.embed(texts, 'document')
+    const result = await this.embed(texts, "document")
     return result.embeddings
   }
 
@@ -137,9 +102,9 @@ export class EmbeddingClient {
     let response: Response
     try {
       response = await fetch(endpoint, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${this.config.apiKey}`,
         },
         body: JSON.stringify({
@@ -147,13 +112,13 @@ export class EmbeddingClient {
           input: texts,
         }),
       })
-    } catch (cause) {
+    } catch (error) {
       throw new EmbeddingProviderError(
         `Embedding provider request failed for ${provider}`,
         {
           provider,
           url: endpoint,
-          cause,
+          cause: error,
         }
       )
     }
@@ -172,7 +137,7 @@ export class EmbeddingClient {
     }
 
     const json = (await response.json()) as EmbeddingResponse
-    const embeddings = (json.data || []).map((item) => item.embedding || [])
+    const embeddings = (json.data ?? []).map((item) => item.embedding ?? [])
 
     if (embeddings.length !== texts.length) {
       throw new EmbeddingProviderError(
@@ -202,7 +167,7 @@ export class EmbeddingClient {
   }
 
   private buildEmbeddingsUrl(baseUrl: string): string {
-    return `${baseUrl.replace(/\/+$/, '')}/v1/embeddings`
+    return `${baseUrl.replace(/\/+$/, "")}/v1/embeddings`
   }
 
   private getProviderLabel(baseUrl: string): string {

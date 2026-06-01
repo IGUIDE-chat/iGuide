@@ -5,34 +5,35 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { useEffect, useState } from "react";
-import { Typewriter } from "../ui/Typewriter";
-import { LibraryHistoryItem } from "../../types";
-import { libraryService } from "../../services/libraryService";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "../../services/supabase";
+import React, { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
+
+import { libraryService } from "../../services/libraryService"
+import { supabase } from "../../services/supabase"
+import type { LibraryHistoryItem } from "../../types"
+import { Typewriter } from "../ui/Typewriter"
 import {
   BaseSidebar,
-  SidebarItem,
-  PinButton,
   DeleteButton,
+  PinButton,
   SidebarEmptyState,
-  groupByCategory,
+  SidebarItem,
   getCategoryOrder,
-  TimeCategoryLabels,
-} from "./BaseSidebar";
+  groupByCategory,
+} from "./BaseSidebar"
+import type { TimeCategoryLabels } from "./BaseSidebar"
 
 interface LibrarySidebarProps {
-  language: "en" | "zh";
-  currentArticleId?: string | null;
+  language: "en" | "zh"
+  currentArticleId?: string | null
 }
 
 export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
   language,
   currentArticleId,
 }) => {
-  const [history, setHistory] = useState<LibraryHistoryItem[]>([]);
-  const navigate = useNavigate();
+  const [history, setHistory] = useState<LibraryHistoryItem[]>([])
+  const navigate = useNavigate()
 
   const t = {
     en: {
@@ -61,7 +62,7 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
       unpin: "取消置顶",
       delete: "删除",
     },
-  }[language];
+  }[language]
 
   const categoryLabels: TimeCategoryLabels = {
     pinned: t.pinned,
@@ -69,16 +70,16 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
     yesterday: t.yesterday,
     thisWeek: t.thisWeek,
     older: t.older,
-  };
+  }
 
   const loadHistory = async () => {
-    const data = await libraryService.getHistory();
-    setHistory(data);
-  };
+    const data = await libraryService.getHistory()
+    setHistory(data)
+  }
 
   // Subscribe to reading_history changes for dynamic refresh
   useEffect(() => {
-    loadHistory();
+    void loadHistory()
 
     const channel = supabase
       .channel("reading_history_changes")
@@ -90,15 +91,15 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
           table: "reading_history",
         },
         () => {
-          loadHistory();
+          void loadHistory()
         }
       )
-      .subscribe();
+      .subscribe()
 
     return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
+      void supabase.removeChannel(channel)
+    }
+  }, [])
 
   const handleClearHistory = async () => {
     if (
@@ -108,27 +109,27 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
           : "Are you sure you want to clear history?"
       )
     ) {
-      await libraryService.clearHistory();
-      loadHistory();
+      await libraryService.clearHistory()
+      await loadHistory()
     }
-  };
+  }
 
   const handleTogglePin = async (
     id: string,
     isPinned: boolean,
     e: React.MouseEvent
   ) => {
-    e.stopPropagation();
+    e.stopPropagation()
     try {
-      await libraryService.togglePin(id, isPinned);
-      loadHistory();
-    } catch (err) {
-      console.error("Failed to toggle pin:", err);
+      await libraryService.togglePin(id, isPinned)
+      await loadHistory()
+    } catch (error) {
+      console.error("Failed to toggle pin:", error)
     }
-  };
+  }
 
   const handleDeleteClick = async (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
+    e.stopPropagation()
     if (
       window.confirm(
         language === "zh"
@@ -137,41 +138,35 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
       )
     ) {
       try {
-        await libraryService.removeFromHistory(id);
-        loadHistory();
-      } catch (err) {
-        console.error("Failed to delete item:", err);
+        await libraryService.removeFromHistory(id)
+        await loadHistory()
+      } catch (error) {
+        console.error("Failed to delete item:", error)
       }
     }
-  };
+  }
 
   const groupedHistory = groupByCategory(
     history,
     (item) => item.viewedAt,
     categoryLabels
-  );
+  )
 
-  const categoryOrder = getCategoryOrder(categoryLabels);
+  const categoryOrder = getCategoryOrder(categoryLabels)
 
   return (
     <BaseSidebar
       className="bg-[#171717]"
       header={
         <div className="mb-2 flex items-center justify-between px-3 py-2">
-          <h3
-            className="
-              text-xs font-semibold tracking-wider text-slate-400 uppercase
-            "
-          >
+          <h3 className="text-xs font-semibold tracking-wider text-slate-400 uppercase">
             {t.title}
           </h3>
           {history.length > 0 && (
             <button
+              type="button"
               onClick={handleClearHistory}
-              className="
-                text-[10px] text-slate-500 transition-colors
-                hover:text-white
-              "
+              className="text-[10px] text-slate-500 transition-colors hover:text-white"
             >
               {t.clear}
             </button>
@@ -182,7 +177,7 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
       categoryOrder={categoryOrder}
       emptyState={<SidebarEmptyState message={t.empty} />}
       renderItem={(item) => {
-        const historyItem = item as LibraryHistoryItem;
+        const historyItem = item as LibraryHistoryItem
         return (
           <SidebarItem
             key={historyItem.id}
@@ -207,12 +202,7 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
                   />
                 </div>
               </div>
-              <div
-                className="
-                  flex gap-0.5 opacity-0 transition-opacity
-                  group-hover:opacity-100
-                "
-              >
+              <div className="flex gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
                 <PinButton
                   isPinned={historyItem.isPinned}
                   onClick={(e) =>
@@ -227,8 +217,8 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
               </div>
             </div>
           </SidebarItem>
-        );
+        )
       }}
     />
-  );
-};
+  )
+}

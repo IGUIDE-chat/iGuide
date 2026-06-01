@@ -1,36 +1,29 @@
-import type {
-  MCPAdapterClient,
-  MCPDiscoveryResult,
-  MCPFailureReason,
-  MCPTestResult,
-} from './adapter.ts'
+import type { MCPAdapterClient, MCPFailureReason } from "./adapter.ts"
 import {
   MCPConnectionService,
   MCPDiscoveredToolService,
   MCPToolOverrideService,
-} from './service.ts'
-import { StreamableHttpMCPClient } from './streamable-http-client.ts'
+} from "./service.ts"
+import { StreamableHttpMCPClient } from "./streamable-http-client.ts"
 import type {
   MCPConnection,
   MCPConnectionTransport,
   MCPDiscoveredTool,
   MCPToolOverride,
-} from './types.ts'
+} from "./types.ts"
 
 const INTEGRATIONS_LIMITATIONS = [
-  'Streamable HTTP only',
-  'Credential-protected third-party MCP endpoints are not supported',
-  'Stdio and legacy SSE transports are not supported',
-  'Marketplace/template flows are not available in phase 1',
-  'Arbitrary public third-party MCP quality is not guaranteed by the platform',
+  "Streamable HTTP only",
+  "Credential-protected third-party MCP endpoints are not supported",
+  "Stdio and legacy SSE transports are not supported",
+  "Marketplace/template flows are not available in phase 1",
+  "Arbitrary public third-party MCP quality is not guaranteed by the platform",
 ] as const
 
 const CREDENTIAL_FIELD_PATTERN =
   /(credential|credentials|secret|token|api[_-]?key|authorization|password|headers?)/i
 
-interface JSONHeaders {
-  [key: string]: string
-}
+type JSONHeaders = Record<string, string>
 
 class MCPRouteError extends Error {
   readonly status: number
@@ -42,7 +35,7 @@ class MCPRouteError extends Error {
     failureReason?: MCPFailureReason
   ) {
     super(message)
-    this.name = 'MCPRouteError'
+    this.name = "MCPRouteError"
     this.status = status
     this.failureReason = failureReason
   }
@@ -53,7 +46,7 @@ class MCPJSONBodyError extends Error {
 
   constructor(message: string, cause: unknown) {
     super(message)
-    this.name = 'MCPJSONBodyError'
+    this.name = "MCPJSONBodyError"
     this.cause = cause
   }
 }
@@ -61,23 +54,23 @@ class MCPJSONBodyError extends Error {
 export interface MCPRouteServices {
   connections: Pick<
     MCPConnectionService,
-    | 'listForViewer'
-    | 'createUserConnection'
-    | 'getByIdForViewer'
-    | 'updateUserConnection'
-    | 'deleteUserConnection'
-    | 'recordTestResult'
-    | 'recordDiscoveryResult'
+    | "listForViewer"
+    | "createUserConnection"
+    | "getByIdForViewer"
+    | "updateUserConnection"
+    | "deleteUserConnection"
+    | "recordTestResult"
+    | "recordDiscoveryResult"
   >
   tools: Pick<
     MCPDiscoveredToolService,
-    'listByConnectionIds' | 'replaceDiscoveredTools'
+    "listByConnectionIds" | "replaceDiscoveredTools"
   >
   overrides: Pick<
     MCPToolOverrideService,
-    'listOverridesByConnectionIds' | 'disableTool' | 'enableTool'
+    "listOverridesByConnectionIds" | "disableTool" | "enableTool"
   >
-  client: Pick<MCPAdapterClient, 'test' | 'discover'>
+  client: Pick<MCPAdapterClient, "test" | "discover">
 }
 
 interface CreateConnectionBody {
@@ -102,39 +95,39 @@ function jsonResponse(
     status,
     headers: {
       ...headers,
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
   })
 }
 
 function stripApiPrefix(pathname: string) {
-  return pathname.startsWith('/api/') ? pathname.slice(4) : pathname
+  return pathname.startsWith("/api/") ? pathname.slice(4) : pathname
 }
 
 function parseEndpointUrl(endpointUrl: string): URL {
   try {
     return new URL(endpointUrl)
   } catch {
-    throw new MCPRouteError('endpoint_url must be a valid URL', 400)
+    throw new MCPRouteError("endpoint_url must be a valid URL", 400)
   }
 }
 
 function assertNoCredentialedEndpoint(url: URL) {
   if (url.username || url.password) {
     throw new MCPRouteError(
-      'Credential-protected endpoints are not supported in phase 1',
+      "Credential-protected endpoints are not supported in phase 1",
       400,
-      'auth_required'
+      "auth_required"
     )
   }
 }
 
 function hasCredentialFields(value: unknown): boolean {
   if (Array.isArray(value)) {
-    return value.some(hasCredentialFields)
+    return value.some((item) => hasCredentialFields(item))
   }
 
-  if (value && typeof value === 'object') {
+  if (value && typeof value === "object") {
     return Object.entries(value as Record<string, unknown>).some(
       ([key, nested]) =>
         CREDENTIAL_FIELD_PATTERN.test(key) || hasCredentialFields(nested)
@@ -149,14 +142,14 @@ async function readJSONBody(
 ): Promise<Record<string, unknown>> {
   try {
     const body = await request.json()
-    if (!body || typeof body !== 'object' || Array.isArray(body)) {
-      throw new Error('Request body must be an object')
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+      throw new Error("Request body must be an object")
     }
 
     return body as Record<string, unknown>
   } catch (error) {
     throw new MCPJSONBodyError(
-      error instanceof Error ? error.message : 'Invalid JSON request body',
+      error instanceof Error ? error.message : "Invalid JSON request body",
       error
     )
   }
@@ -165,41 +158,41 @@ async function readJSONBody(
 function parseCreateBody(body: Record<string, unknown>): CreateConnectionBody {
   if (hasCredentialFields(body)) {
     throw new MCPRouteError(
-      'Credential fields are not supported in phase 1',
+      "Credential fields are not supported in phase 1",
       400,
-      'auth_required'
+      "auth_required"
     )
   }
 
-  if (typeof body.display_name !== 'string' || !body.display_name.trim()) {
-    throw new MCPRouteError('display_name is required', 400)
+  if (typeof body.display_name !== "string" || !body.display_name.trim()) {
+    throw new MCPRouteError("display_name is required", 400)
   }
 
-  if (typeof body.endpoint_url !== 'string' || !body.endpoint_url.trim()) {
-    throw new MCPRouteError('endpoint_url is required', 400)
+  if (typeof body.endpoint_url !== "string" || !body.endpoint_url.trim()) {
+    throw new MCPRouteError("endpoint_url is required", 400)
   }
 
   const endpointUrl = body.endpoint_url.trim()
   const parsedEndpointUrl = parseEndpointUrl(endpointUrl)
   assertNoCredentialedEndpoint(parsedEndpointUrl)
 
-  if (body.transport !== 'streamable_http') {
+  if (body.transport !== "streamable_http") {
     throw new MCPRouteError(
-      'transport must be streamable_http',
+      "transport must be streamable_http",
       400,
-      'unsupported_transport'
+      "unsupported_transport"
     )
   }
 
-  if (body.description !== undefined && typeof body.description !== 'string') {
-    throw new MCPRouteError('description must be a string when provided', 400)
+  if (body.description !== undefined && typeof body.description !== "string") {
+    throw new MCPRouteError("description must be a string when provided", 400)
   }
 
   return {
     display_name: body.display_name.trim(),
     endpoint_url: endpointUrl,
-    transport: 'streamable_http',
-    ...(typeof body.description === 'string'
+    transport: "streamable_http",
+    ...(typeof body.description === "string"
       ? { description: body.description.trim() }
       : {}),
   }
@@ -208,38 +201,38 @@ function parseCreateBody(body: Record<string, unknown>): CreateConnectionBody {
 function parseUpdateBody(body: Record<string, unknown>): UpdateConnectionBody {
   if (hasCredentialFields(body)) {
     throw new MCPRouteError(
-      'Credential fields are not supported in phase 1',
+      "Credential fields are not supported in phase 1",
       400,
-      'auth_required'
+      "auth_required"
     )
   }
 
   const patch: UpdateConnectionBody = {}
 
   if (body.display_name !== undefined) {
-    if (typeof body.display_name !== 'string' || !body.display_name.trim()) {
-      throw new MCPRouteError('display_name must be a non-empty string', 400)
+    if (typeof body.display_name !== "string" || !body.display_name.trim()) {
+      throw new MCPRouteError("display_name must be a non-empty string", 400)
     }
     patch.display_name = body.display_name.trim()
   }
 
   if (body.description !== undefined) {
-    if (typeof body.description !== 'string') {
-      throw new MCPRouteError('description must be a string', 400)
+    if (typeof body.description !== "string") {
+      throw new MCPRouteError("description must be a string", 400)
     }
     patch.description = body.description.trim()
   }
 
   if (body.is_enabled !== undefined) {
-    if (typeof body.is_enabled !== 'boolean') {
-      throw new MCPRouteError('is_enabled must be a boolean', 400)
+    if (typeof body.is_enabled !== "boolean") {
+      throw new MCPRouteError("is_enabled must be a boolean", 400)
     }
     patch.is_enabled = body.is_enabled
   }
 
   if (Object.keys(patch).length === 0) {
     throw new MCPRouteError(
-      'At least one of display_name, description, or is_enabled must be provided',
+      "At least one of display_name, description, or is_enabled must be provided",
       400
     )
   }
@@ -248,20 +241,20 @@ function parseUpdateBody(body: Record<string, unknown>): UpdateConnectionBody {
 }
 
 function assertMutableConnection(connection: MCPConnection) {
-  if (connection.owner_type === 'platform') {
+  if (connection.owner_type === "platform") {
     throw new MCPRouteError(
-      'Platform-owned integrations are not mutable via user endpoints',
+      "Platform-owned integrations are not mutable via user endpoints",
       403
     )
   }
 }
 
 function assertPhase1CompatibleConnection(connection: MCPConnection) {
-  if (connection.transport !== 'streamable_http') {
+  if (connection.transport !== "streamable_http") {
     throw new MCPRouteError(
-      'Only streamable_http integrations can be tested or refreshed in phase 1',
+      "Only streamable_http integrations can be tested or refreshed in phase 1",
       400,
-      'unsupported_transport'
+      "unsupported_transport"
     )
   }
 
@@ -276,7 +269,7 @@ function mapConnectionWithMetadata(
   const tools = toolsByConnectionId[connection.id] ?? []
   const overrides = overridesByConnectionId[connection.id] ?? []
 
-  return connection.owner_type === 'user'
+  return connection.owner_type === "user"
     ? { ...connection, tools, overrides }
     : { ...connection, tools }
 }
@@ -316,8 +309,8 @@ export async function handleIntegrationsRoute(
   const url = new URL(request.url)
   const pathname = stripApiPrefix(url.pathname)
 
-  if (pathname === '/integrations') {
-    if (request.method === 'GET') {
+  if (pathname === "/integrations") {
+    if (request.method === "GET") {
       const connections = await services.connections.listForViewer(viewerId)
       const connectionIds = [
         ...connections.platform.map((connection) => connection.id),
@@ -354,7 +347,7 @@ export async function handleIntegrationsRoute(
       )
     }
 
-    if (request.method === 'POST') {
+    if (request.method === "POST") {
       const body = parseCreateBody(await readJSONBody(request))
       const connection = await services.connections.createUserConnection(
         viewerId,
@@ -375,13 +368,13 @@ export async function handleIntegrationsRoute(
 
     if (!connection) {
       return jsonResponse(
-        { error: 'Integration not found' },
+        { error: "Integration not found" },
         404,
         responseHeaders
       )
     }
 
-    if (request.method === 'GET') {
+    if (request.method === "GET") {
       return jsonResponse(
         await buildConnectionDetail(connection, services, viewerId),
         200,
@@ -389,7 +382,7 @@ export async function handleIntegrationsRoute(
       )
     }
 
-    if (request.method === 'PUT') {
+    if (request.method === "PUT") {
       assertMutableConnection(connection)
       const patch = parseUpdateBody(await readJSONBody(request))
       const updated = await services.connections.updateUserConnection(
@@ -400,7 +393,7 @@ export async function handleIntegrationsRoute(
 
       if (!updated) {
         return jsonResponse(
-          { error: 'Integration not found' },
+          { error: "Integration not found" },
           404,
           responseHeaders
         )
@@ -413,7 +406,7 @@ export async function handleIntegrationsRoute(
       )
     }
 
-    if (request.method === 'DELETE') {
+    if (request.method === "DELETE") {
       assertMutableConnection(connection)
       const deleted = await services.connections.deleteUserConnection(
         connectionId,
@@ -422,7 +415,7 @@ export async function handleIntegrationsRoute(
 
       if (!deleted) {
         return jsonResponse(
-          { error: 'Integration not found' },
+          { error: "Integration not found" },
           404,
           responseHeaders
         )
@@ -433,7 +426,7 @@ export async function handleIntegrationsRoute(
   }
 
   const testMatch = pathname.match(/^\/integrations\/([^/]+)\/test$/)
-  if (testMatch && request.method === 'POST') {
+  if (testMatch && request.method === "POST") {
     const connectionId = decodeURIComponent(testMatch[1])
     const connection = await services.connections.getByIdForViewer(
       connectionId,
@@ -442,7 +435,7 @@ export async function handleIntegrationsRoute(
 
     if (!connection) {
       return jsonResponse(
-        { error: 'Integration not found' },
+        { error: "Integration not found" },
         404,
         responseHeaders
       )
@@ -450,15 +443,13 @@ export async function handleIntegrationsRoute(
 
     assertMutableConnection(connection)
     assertPhase1CompatibleConnection(connection)
-    const result = (await services.client.test(
-      connection.endpoint_url
-    )) as MCPTestResult
+    const result = await services.client.test(connection.endpoint_url)
     await services.connections.recordTestResult(connectionId, viewerId, result)
     return jsonResponse(result, 200, responseHeaders)
   }
 
   const refreshMatch = pathname.match(/^\/integrations\/([^/]+)\/refresh$/)
-  if (refreshMatch && request.method === 'POST') {
+  if (refreshMatch && request.method === "POST") {
     const connectionId = decodeURIComponent(refreshMatch[1])
     const connection = await services.connections.getByIdForViewer(
       connectionId,
@@ -467,7 +458,7 @@ export async function handleIntegrationsRoute(
 
     if (!connection) {
       return jsonResponse(
-        { error: 'Integration not found' },
+        { error: "Integration not found" },
         404,
         responseHeaders
       )
@@ -475,9 +466,7 @@ export async function handleIntegrationsRoute(
 
     assertMutableConnection(connection)
     assertPhase1CompatibleConnection(connection)
-    const result = (await services.client.discover(
-      connection.endpoint_url
-    )) as MCPDiscoveryResult
+    const result = await services.client.discover(connection.endpoint_url)
     await services.connections.recordDiscoveryResult(
       connectionId,
       viewerId,
@@ -492,7 +481,7 @@ export async function handleIntegrationsRoute(
   const toolToggleMatch = pathname.match(
     /^\/integrations\/([^/]+)\/tools\/([^/]+)\/(disable|enable)$/
   )
-  if (toolToggleMatch && request.method === 'POST') {
+  if (toolToggleMatch && request.method === "POST") {
     const connectionId = decodeURIComponent(toolToggleMatch[1])
     const toolName = decodeURIComponent(toolToggleMatch[2])
     const mode = toolToggleMatch[3]
@@ -503,7 +492,7 @@ export async function handleIntegrationsRoute(
 
     if (!connection) {
       return jsonResponse(
-        { error: 'Integration not found' },
+        { error: "Integration not found" },
         404,
         responseHeaders
       )
@@ -511,7 +500,7 @@ export async function handleIntegrationsRoute(
 
     assertMutableConnection(connection)
     const override =
-      mode === 'disable'
+      mode === "disable"
         ? await services.overrides.disableTool(connectionId, toolName, viewerId)
         : await services.overrides.enableTool(connectionId, toolName, viewerId)
 
@@ -519,7 +508,7 @@ export async function handleIntegrationsRoute(
       {
         success: true,
         tool_name: toolName,
-        is_disabled: mode === 'disable',
+        is_disabled: mode === "disable",
         override,
       },
       200,
@@ -527,7 +516,7 @@ export async function handleIntegrationsRoute(
     )
   }
 
-  return jsonResponse({ error: 'Method not allowed' }, 400, responseHeaders)
+  return jsonResponse({ error: "Method not allowed" }, 400, responseHeaders)
 }
 
 export async function maybeHandleIntegrationsRoute(
@@ -537,7 +526,7 @@ export async function maybeHandleIntegrationsRoute(
   responseHeaders: JSONHeaders = {}
 ): Promise<Response | null> {
   const pathname = stripApiPrefix(new URL(request.url).pathname)
-  if (!pathname.startsWith('/integrations')) {
+  if (!pathname.startsWith("/integrations")) {
     return null
   }
 
@@ -562,24 +551,23 @@ export async function maybeHandleIntegrationsRoute(
       )
     }
 
-    if (error instanceof Error) {
-      if (
-        error.message.includes('required') ||
-        error.message.includes('must be') ||
-        error.message.includes('At least one') ||
-        error.message.includes('Request body') ||
-        error.message.includes('Invalid JSON')
-      ) {
-        return jsonResponse({ error: error.message }, 400, responseHeaders)
-      }
+    if (
+      error instanceof Error &&
+      (error.message.includes("required") ||
+        error.message.includes("must be") ||
+        error.message.includes("At least one") ||
+        error.message.includes("Request body") ||
+        error.message.includes("Invalid JSON"))
+    ) {
+      return jsonResponse({ error: error.message }, 400, responseHeaders)
     }
 
-    console.error('Integrations route error:', error)
+    console.error("Integrations route error:", error)
     return jsonResponse(
       {
-        error: 'Internal server error',
+        error: "Internal server error",
         message:
-          error instanceof Error ? error.message : 'Unknown integrations error',
+          error instanceof Error ? error.message : "Unknown integrations error",
       },
       500,
       responseHeaders

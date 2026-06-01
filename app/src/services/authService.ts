@@ -5,10 +5,11 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
+import { type User } from "@supabase/supabase-js"
+
 // [SERVICE] Authentication service utilities for checking user status.
 // [服务] 用于检查用户状态的身份验证服务工具类。
-import { supabase } from "./supabase";
-import type { User } from "@supabase/supabase-js";
+import { supabase } from "./supabase"
 
 export const authService = {
   /**
@@ -20,8 +21,8 @@ export const authService = {
       options: {
         redirectTo: window.location.origin,
       },
-    });
-    return { data, error };
+    })
+    return { data, error }
   },
 
   /**
@@ -34,8 +35,8 @@ export const authService = {
         scopes: "email",
         redirectTo: window.location.origin,
       },
-    });
-    return { data, error };
+    })
+    return { data, error }
   },
 
   /**
@@ -45,8 +46,8 @@ export const authService = {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
-    });
-    return { data, error };
+    })
+    return { data, error }
   },
 
   /**
@@ -61,7 +62,7 @@ export const authService = {
           display_name: displayName,
         },
       },
-    });
+    })
 
     // Create user profile
     if (data.user && !error) {
@@ -69,18 +70,18 @@ export const authService = {
         id: data.user.id,
         display_name: displayName,
         language: "zh",
-      });
+      })
     }
 
-    return { data, error };
+    return { data, error }
   },
 
   /**
    * Sign out current user
    */
   async signOut() {
-    const { error } = await supabase.auth.signOut();
-    return { error };
+    const { error } = await supabase.auth.signOut()
+    return { error }
   },
 
   /**
@@ -89,8 +90,8 @@ export const authService = {
   async getCurrentUser(): Promise<User | null> {
     const {
       data: { user },
-    } = await supabase.auth.getUser();
-    return user;
+    } = await supabase.auth.getUser()
+    return user
   },
 
   /**
@@ -100,9 +101,9 @@ export const authService = {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
-      callback(session?.user || null);
-    });
-    return subscription;
+      callback(session?.user ?? null)
+    })
+    return subscription
   },
 
   /**
@@ -113,9 +114,9 @@ export const authService = {
       .from("user_profiles")
       .select("*")
       .eq("id", userId)
-      .single();
+      .single()
 
-    return { data, error };
+    return { data, error }
   },
 
   /**
@@ -128,16 +129,16 @@ export const authService = {
     const { data, error } = await supabase
       .from("user_profiles")
       .update(updates)
-      .eq("id", userId);
+      .eq("id", userId)
 
-    return { data, error };
+    return { data, error }
   },
 
   /**
    * Update user metadata (display name)
    */
   async updateUser(attributes: { data: { display_name: string } }) {
-    const { data, error } = await supabase.auth.updateUser(attributes);
-    return { data, error };
+    const { data, error } = await supabase.auth.updateUser(attributes)
+    return { data, error }
   },
-};
+}

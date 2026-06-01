@@ -1,23 +1,26 @@
-import { makeAssistantToolUI } from "@assistant-ui/react";
+import { type ToolCallPart, type ToolResultPart } from "ai"
+
 import {
   ToolCard,
+  extractToolArgs,
+  extractToolResult,
   getResultMetric,
   getStringArg,
-  type SearchToolArgs,
-  type ToolSummaryResult,
-} from "./toolUiHelpers";
+} from "./toolUiHelpers"
 
-export const GrepDocsToolUI = makeAssistantToolUI<
-  SearchToolArgs,
-  ToolSummaryResult
->({
-  toolName: "grep_docs",
-  render: ({ args, result, status }) => (
+interface GrepDocsToolUIProps {
+  toolCall: ToolCallPart
+  toolResult?: ToolResultPart
+}
+
+export function GrepDocsToolUI({ toolCall, toolResult }: GrepDocsToolUIProps) {
+  const isLoading = !toolResult
+  const args = extractToolArgs(toolCall)
+  const result = extractToolResult(toolResult)
+  return (
     <ToolCard
       icon="📄"
-      title={
-        status.type === "running" ? "Searching documents" : "Document grep"
-      }
+      title={isLoading ? "Searching documents" : "Document grep"}
       primaryLabel="Pattern:"
       primaryValue={getStringArg(args, ["pattern", "query"], "Search pattern")}
       metricLabel="Matched files:"
@@ -27,7 +30,7 @@ export const GrepDocsToolUI = makeAssistantToolUI<
         "Searching...",
         "Completed"
       )}
-      isLoading={status.type === "running"}
+      isLoading={isLoading}
     />
-  ),
-});
+  )
+}

@@ -5,96 +5,117 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { Suspense } from "react";
-import { Navigate, Route, Routes, useParams } from "react-router-dom";
-import { Language } from "../types";
+import React, { Suspense, useMemo } from "react"
+import { Navigate, Route, Routes, useParams } from "react-router-dom"
 
-const ChatPage = React.lazy(() => import("../pages/chat/ChatPage"));
+import { type Language } from "../types"
+
+const ChatPage = React.lazy(() => import("../pages/chat/ChatPage"))
 const LibraryHomePage = React.lazy(
   () => import("../pages/library/LibraryHomePage")
-);
+)
 const LibraryCategoryPage = React.lazy(
   () => import("../pages/library/LibraryCategoryPage")
-);
+)
 const LibraryArticlePage = React.lazy(
   () => import("../pages/library/LibraryArticlePage")
-);
-const ProfilePage = React.lazy(() => import("../pages/profile/ProfilePage"));
+)
+const ProfilePage = React.lazy(() => import("../pages/profile/ProfilePage"))
 const CoursesLandingPage = React.lazy(
   () => import("../pages/courses/CoursesLandingPage")
-);
+)
 const ResumeLandingPage = React.lazy(
   () => import("../pages/resume/ResumeLandingPage")
-);
-const DormListPage = React.lazy(() => import("../pages/dorms/DormListPage"));
-const DormDetailPage = React.lazy(
-  () => import("../pages/dorms/DormDetailPage")
-);
+)
+const DormListPage = React.lazy(() => import("../pages/dorms/DormListPage"))
+const DormDetailPage = React.lazy(() => import("../pages/dorms/DormDetailPage"))
 
 export interface AppRoutesProps {
-  language: Language;
-  currentConversationId: string | null;
-  onConversationCreated: (conversationId: string) => void;
+  language: Language
+  currentConversationId: string | null
+  onConversationCreated: (conversationId: string) => void
 }
 
 const LegacyDormRedirect: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  return <Navigate to={id ? `/dorms/${id}` : "/dorms"} replace />;
-};
+  const { id } = useParams<{ id: string }>()
+  return <Navigate to={id ? `/dorms/${id}` : "/dorms"} replace />
+}
 
 export const AppRoutes: React.FC<AppRoutesProps> = ({
   language,
   currentConversationId,
   onConversationCreated,
 }) => {
-  const loadingText = language === "zh" ? "页面加载中..." : "Loading page...";
+  const loadingText = language === "zh" ? "页面加载中..." : "Loading page..."
+
+  const fallbackEl = useMemo(
+    () => <div className="p-6 text-center text-slate-600">{loadingText}</div>,
+    [loadingText]
+  )
+
+  const navigateHome = useMemo(() => <Navigate to="/chat" replace />, [])
+  const chatEl = useMemo(
+    () => (
+      <ChatPage
+        language={language}
+        currentConversationId={currentConversationId}
+        onConversationCreated={onConversationCreated}
+      />
+    ),
+    [language, currentConversationId, onConversationCreated]
+  )
+  const libraryEl = useMemo(
+    () => <LibraryHomePage language={language} />,
+    [language]
+  )
+  const libraryCategoryEl = useMemo(
+    () => <LibraryCategoryPage language={language} />,
+    [language]
+  )
+  const libraryArticleEl = useMemo(
+    () => <LibraryArticlePage language={language} />,
+    [language]
+  )
+  const profileEl = useMemo(
+    () => <ProfilePage language={language} />,
+    [language]
+  )
+  const coursesEl = useMemo(
+    () => <CoursesLandingPage language={language} />,
+    [language]
+  )
+  const resumeEl = useMemo(
+    () => <ResumeLandingPage language={language} />,
+    [language]
+  )
+  const dormListEl = useMemo(
+    () => <DormListPage language={language} />,
+    [language]
+  )
+  const dormDetailEl = useMemo(
+    () => <DormDetailPage language={language} />,
+    [language]
+  )
+  const legacyRedirectEl = useMemo(() => <LegacyDormRedirect />, [])
 
   return (
-    <Suspense
-      fallback={
-        <div className="p-6 text-center text-slate-600">{loadingText}</div>
-      }
-    >
+    <Suspense fallback={fallbackEl}>
       <Routes>
-        <Route path="/" element={<Navigate to="/chat" replace />} />
-        <Route
-          path="/chat"
-          element={
-            <ChatPage
-              language={language}
-              currentConversationId={currentConversationId}
-              onConversationCreated={onConversationCreated}
-            />
-          }
-        />
-        <Route
-          path="/library"
-          element={<LibraryHomePage language={language} />}
-        />
+        <Route path="/" element={navigateHome} />
+        <Route path="/chat" element={chatEl} />
+        <Route path="/library" element={libraryEl} />
         <Route
           path="/library/category/:categoryId"
-          element={<LibraryCategoryPage language={language} />}
+          element={libraryCategoryEl}
         />
-        <Route
-          path="/library/article/:articleId"
-          element={<LibraryArticlePage language={language} />}
-        />
-        <Route path="/profile" element={<ProfilePage language={language} />} />
-        <Route
-          path="/courses"
-          element={<CoursesLandingPage language={language} />}
-        />
-        <Route
-          path="/resume"
-          element={<ResumeLandingPage language={language} />}
-        />
-        <Route path="/dorms" element={<DormListPage language={language} />} />
-        <Route
-          path="/dorms/:id"
-          element={<DormDetailPage language={language} />}
-        />
-        <Route path="/dorm/:id" element={<LegacyDormRedirect />} />
+        <Route path="/library/article/:articleId" element={libraryArticleEl} />
+        <Route path="/profile" element={profileEl} />
+        <Route path="/courses" element={coursesEl} />
+        <Route path="/resume" element={resumeEl} />
+        <Route path="/dorms" element={dormListEl} />
+        <Route path="/dorms/:id" element={dormDetailEl} />
+        <Route path="/dorm/:id" element={legacyRedirectEl} />
       </Routes>
     </Suspense>
-  );
-};
+  )
+}

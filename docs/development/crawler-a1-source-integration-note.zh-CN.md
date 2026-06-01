@@ -89,18 +89,18 @@
 
 ## 旧输出到新模型的映射
 
-| 现有产物 | 在 source-first 基础模型中的定位 | 建议 |
-|---|---|---|
-| `raw_crawl.jsonl` | 主 artifact 输入锚点 | **保留并作为主入口** |
-| `raw_crawl.jsonl.url/title/content/links/timestamp` | artifact + snapshot 基础字段 | **保留** |
-| `crawl_state.json` | snapshot/runtime metadata | **保留，但不进检索正文** |
-| `pending_queue.json` | crawler runtime state | **保留，但不进入核心模型** |
-| `blacklist.txt` | crawler runtime policy/state | **保留，但不进入核心模型** |
-| `uiuc_knowledge_base/**/*.md` | derived artifact | **可保留，但降级为派生产物** |
-| `pagerank_results.txt` | legacy byproduct | **不再作为新模型核心输入** |
-| markdown frontmatter `pagerank_score` | legacy metadata | **不再依赖** |
-| markdown frontmatter `priority` | legacy metadata | **不再依赖** |
-| `category` | weak metadata label | **保留但降级，后续 review** |
+| 现有产物                                            | 在 source-first 基础模型中的定位 | 建议                         |
+| --------------------------------------------------- | -------------------------------- | ---------------------------- |
+| `raw_crawl.jsonl`                                   | 主 artifact 输入锚点             | **保留并作为主入口**         |
+| `raw_crawl.jsonl.url/title/content/links/timestamp` | artifact + snapshot 基础字段     | **保留**                     |
+| `crawl_state.json`                                  | snapshot/runtime metadata        | **保留，但不进检索正文**     |
+| `pending_queue.json`                                | crawler runtime state            | **保留，但不进入核心模型**   |
+| `blacklist.txt`                                     | crawler runtime policy/state     | **保留，但不进入核心模型**   |
+| `uiuc_knowledge_base/**/*.md`                       | derived artifact                 | **可保留，但降级为派生产物** |
+| `pagerank_results.txt`                              | legacy byproduct                 | **不再作为新模型核心输入**   |
+| markdown frontmatter `pagerank_score`               | legacy metadata                  | **不再依赖**                 |
+| markdown frontmatter `priority`                     | legacy metadata                  | **不再依赖**                 |
+| `category`                                          | weak metadata label              | **保留但降级，后续 review**  |
 
 ---
 

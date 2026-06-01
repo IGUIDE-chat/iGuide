@@ -5,10 +5,10 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { Dorm } from "../types/index";
-import { normalizeDorm } from "../../../utils/roomOptions";
-import { finalizeDormRecord } from "../../../utils/dormData";
-import { applyDormOfficialOverride } from "./dormOfficialOverrides";
+import { finalizeDormRecord } from "../../../utils/dormData"
+import { normalizeDorm } from "../../../utils/roomOptions"
+import { type Dorm } from "../types/index"
+import { applyDormOfficialOverride } from "./dormOfficialOverrides"
 
 // Accurate UIUC dorm coordinates based on campus geography
 // Campus reference: Main Quad (40.1074, -88.2317), Engineering Quad (40.1130, -88.2280)
@@ -2183,7 +2183,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
     lat: 40.1057022499472,
     lng: -88.2367063025306,
   },
-];
+]
 
 const _DORM_NAME_ZH_BY_ID: Record<string, string> = {
   isr: "Illinois Street Residence (ISR)",
@@ -2210,7 +2210,7 @@ const _DORM_NAME_ZH_BY_ID: Record<string, string> = {
   "eugene-field": "Eugene Field Hall",
   presby: "Presby Hall",
   armory: "Armory Hall",
-};
+}
 
 const _LOCATION_ZH: Record<Dorm["location"], string> = {
   Ikenberry: "Ikenberry",
@@ -2218,12 +2218,12 @@ const _LOCATION_ZH: Record<Dorm["location"], string> = {
   "PAR/FAR": "PAR/FAR",
   Campustown: "Campustown",
   "South Campus": "South Campus",
-};
+}
 
 const HOUSING_TYPE_ZH: Record<Dorm["housingType"], string> = {
   URH: "University Housing",
   PCH: "Private Certified Housing",
-};
+}
 
 const buildDefaultProsZh = (dorm: Dorm): string[] => [
   `位于${dorm.location}，日常通勤较方便`,
@@ -2231,7 +2231,7 @@ const buildDefaultProsZh = (dorm: Dorm): string[] => [
   dorm.dining === "inside"
     ? "食堂可达，用餐便利"
     : "可选择周边餐饮，选择更灵活",
-];
+]
 
 const buildDefaultConsZh = (dorm: Dorm): string[] => [
   `年费用约 $${dorm.price.toLocaleString()}，请结合预算评估`,
@@ -2241,27 +2241,27 @@ const buildDefaultConsZh = (dorm: Dorm): string[] => [
   dorm.location === "Ikenberry" || dorm.location === "South Campus"
     ? "距离部分院系步行时间可能偏长"
     : "热门时段周边人流较多",
-];
+]
 
 const enrichDormZhContent = (dorm: Dorm): Dorm => {
   // User requested English names for Dorms and Locations even in Chinese mode
-  const nameZh = dorm.name; // Use English name
+  const nameZh = dorm.name // Use English name
 
   // Use English location name directly
-  const locationZh = dorm.location;
+  const locationZh = dorm.location
 
   const descriptionZh =
-    dorm.description_zh?.trim() ||
-    `${nameZh}位于${locationZh}，属于${HOUSING_TYPE_ZH[dorm.housingType]}。年住宿费用约 $${dorm.price.toLocaleString()}，${dorm.ac ? "配有空调" : "未配备空调"}，${dorm.dining === "inside" ? "就近可使用食堂。" : "需前往附近区域就餐。"}`;
+    dorm.description_zh?.trim() ??
+    `${nameZh}位于${locationZh}，属于${HOUSING_TYPE_ZH[dorm.housingType]}。年住宿费用约 $${dorm.price.toLocaleString()}，${dorm.ac ? "配有空调" : "未配备空调"}，${dorm.dining === "inside" ? "就近可使用食堂。" : "需前往附近区域就餐。"}`
 
   const prosZh =
     dorm.pros_zh && dorm.pros_zh.length > 0
       ? dorm.pros_zh
-      : buildDefaultProsZh(dorm);
+      : buildDefaultProsZh(dorm)
   const consZh =
     dorm.cons_zh && dorm.cons_zh.length > 0
       ? dorm.cons_zh
-      : buildDefaultConsZh(dorm);
+      : buildDefaultConsZh(dorm)
 
   return {
     ...dorm,
@@ -2270,13 +2270,15 @@ const enrichDormZhContent = (dorm: Dorm): Dorm => {
     pros_zh: prosZh,
     cons_zh: consZh,
     location_zh: locationZh,
-  };
-};
+  }
+}
 
-export const UIUC_DORMS: Dorm[] = RAW_UIUC_DORMS.map(applyDormOfficialOverride)
-  .map(finalizeDormRecord)
-  .map(enrichDormZhContent)
-  .map(normalizeDorm);
+export const UIUC_DORMS: Dorm[] = RAW_UIUC_DORMS.map((d) =>
+  applyDormOfficialOverride(d)
+)
+  .map((d) => finalizeDormRecord(d))
+  .map((d) => enrichDormZhContent(d))
+  .map((d) => normalizeDorm(d))
 
 // Export dorm IDs for individual routes
-export const DORM_IDS = UIUC_DORMS.map((dorm) => dorm.id);
+export const DORM_IDS = UIUC_DORMS.map((dorm) => dorm.id)

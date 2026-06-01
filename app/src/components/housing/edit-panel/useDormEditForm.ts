@@ -5,74 +5,69 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
-import {
-  BathroomType,
-  DiningType,
-  Dorm,
-  DormCategorizedTags,
-  FloorPlan,
-} from "../types/index";
-import { Language } from "../../../types";
-import {
-  buildSummary,
-  DormUpdate,
-  dormAdminService,
-  EditHistoryEntry,
-} from "../../../services/dormAdminService";
-import { useAuth } from "../../../contexts/AuthContext";
-import { dormService } from "../../../services/dormService";
-import {
-  deriveRoomOptions,
-  getPersistedBathroomType,
-  getStorageBathroomScope,
-  getRoomDisplayLabel,
-  normalizeFloorPlan,
-} from "../../../utils/roomOptions";
+import { useLayoutEffect, useMemo, useRef, useState } from "react"
+
+import { useAuth } from "../../../contexts/AuthContext"
+import { buildSummary, dormAdminService } from '../../../services/dormAdminService';
+import type { DormUpdate, EditHistoryEntry } from '../../../services/dormAdminService';
+import { dormService } from "../../../services/dormService"
+import type { Language } from '../../../types';
 import {
   buildLegacyDormTags,
   getDormPriceRange,
   sanitizeFloorPlansForStorage,
-} from "../../../utils/dormData";
-import { TEXT } from "./editPanelText";
+} from "../../../utils/dormData"
+import {
+  deriveRoomOptions,
+  getPersistedBathroomType,
+  getRoomDisplayLabel,
+  getStorageBathroomScope,
+  normalizeFloorPlan,
+} from "../../../utils/roomOptions"
+import type { BathroomType, DiningType, Dorm, DormCategorizedTags, FloorPlan } from '../types/index';
+import { TEXT } from "./editPanelText"
 
 interface UseDormEditFormOptions {
-  dorm: Dorm;
-  language: Language;
-  onClose: () => void;
-  onSaved: (updated: Dorm) => void;
+  dorm: Dorm
+  language: Language
+  onClose: () => void
+  onSaved: (updated: Dorm) => void
 }
 
-export type ActiveTab = "content" | "details" | "tags" | "media" | "history";
-type LayoutKind = "standard" | "Studio" | "Suite" | "Cluster";
+type ActiveTab = "content" | "details" | "tags" | "media" | "history"
+type LayoutKind = "standard" | "Studio" | "Suite" | "Cluster"
 
 const emptyCategorized: DormCategorizedTags = {
   livingConditions: [],
   facilities: [],
   lifestyle: [],
   llcNames: [],
-};
+}
 
 const getBathroomScopeFallback = (
   bathroomType: Dorm["bathroomType"],
   floorPlans?: FloorPlan[]
-) => getStorageBathroomScope(bathroomType, floorPlans);
+) => getStorageBathroomScope(bathroomType, floorPlans)
 
-export const getLayoutKind = (plan: FloorPlan): LayoutKind =>
-  plan.type === "Studio" || plan.labelCode === "Studio"
-    ? "Studio"
-    : plan.type === "Suite" || plan.labelCode === "Suite"
-      ? "Suite"
-      : plan.type === "Cluster" || plan.labelCode === "Cluster"
-        ? "Cluster"
-        : "standard";
+const getLayoutKind = (plan: FloorPlan): LayoutKind => {
+  if (plan.type === "Studio" || plan.labelCode === "Studio") {
+    return "Studio"
+  }
+  if (plan.type === "Suite" || plan.labelCode === "Suite") {
+    return "Suite"
+  }
+  if (plan.type === "Cluster" || plan.labelCode === "Cluster") {
+    return "Cluster"
+  }
+  return "standard"
+}
 
-export const createFloorPlan = (): FloorPlan => ({
+const createFloorPlan = (): FloorPlan => ({
   bedCount: 1,
   bathroomCount: 0,
   bathroomScope: "communal",
   available: true,
-});
+})
 
 function dormToSnapshot(dorm: Dorm): Record<string, unknown> {
   return {
@@ -105,7 +100,7 @@ function dormToSnapshot(dorm: Dorm): Record<string, unknown> {
     address: dorm.address ?? null,
     address_zh: dorm.address_zh ?? null,
     website: dorm.website ?? null,
-  };
+  }
 }
 
 export const useDormEditForm = ({
@@ -114,34 +109,34 @@ export const useDormEditForm = ({
   onClose,
   onSaved,
 }: UseDormEditFormOptions) => {
-  const { user } = useAuth();
-  const t = TEXT[language];
-  const [activeTab, setActiveTab] = useState<ActiveTab>("content");
-  const [contentLang, setContentLang] = useState<"en" | "zh">("en");
-  const [saving, setSaving] = useState(false);
-  const [resetting, setResetting] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
-  const [uploadingImage, setUploadingImage] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { user } = useAuth()
+  const t = TEXT[language]
+  const [activeTab, setActiveTab] = useState<ActiveTab>("content")
+  const [contentLang, setContentLang] = useState<"en" | "zh">("en")
+  const [saving, setSaving] = useState(false)
+  const [resetting, setResetting] = useState(false)
+  const [saveSuccess, setSaveSuccess] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
+  const [uploadingImage, setUploadingImage] = useState(false)
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // History tab state
-  const [historyEntries, setHistoryEntries] = useState<EditHistoryEntry[]>([]);
-  const [historyLoading, setHistoryLoading] = useState(false);
-  const [restoringId, setRestoringId] = useState<string | null>(null);
+  const [historyEntries, setHistoryEntries] = useState<EditHistoryEntry[]>([])
+  const [historyLoading, setHistoryLoading] = useState(false)
+  const [restoringId, setRestoringId] = useState<string | null>(null)
 
-  const [name, setName] = useState(dorm.name);
-  const [nameZh, setNameZh] = useState(dorm.name_zh ?? "");
-  const [description, setDescription] = useState(dorm.description);
-  const [descriptionZh, setDescriptionZh] = useState(dorm.description_zh ?? "");
-  const [imageUrl, setImageUrl] = useState(dorm.imageUrl);
-  const [price, setPrice] = useState(String(dorm.price));
+  const [name, setName] = useState(dorm.name)
+  const [nameZh, setNameZh] = useState(dorm.name_zh ?? "")
+  const [description, setDescription] = useState(dorm.description)
+  const [descriptionZh, setDescriptionZh] = useState(dorm.description_zh ?? "")
+  const [imageUrl, setImageUrl] = useState(dorm.imageUrl)
+  const [price, setPrice] = useState(String(dorm.price))
   const [applicationFee, setApplicationFee] = useState(
     String(dorm.applicationFee ?? "")
-  );
-  const [location, setLocation] = useState(dorm.location);
-  const [locationZh, setLocationZh] = useState(dorm.location_zh ?? "");
-  const [housingType, setHousingType] = useState(dorm.housingType);
+  )
+  const [location, setLocation] = useState(dorm.location)
+  const [locationZh, setLocationZh] = useState(dorm.location_zh ?? "")
+  const [housingType, setHousingType] = useState(dorm.housingType)
   const [floorPlans, setFloorPlans] = useState<FloorPlan[]>(
     (sanitizeFloorPlansForStorage(dorm.floorPlans) ?? []).map((plan) =>
       normalizeFloorPlan(
@@ -149,43 +144,43 @@ export const useDormEditForm = ({
         getBathroomScopeFallback(dorm.bathroomType, dorm.floorPlans)
       )
     )
-  );
+  )
   const [galleryImages, setGalleryImages] = useState<string[]>(
     dorm.galleryImages ?? []
-  );
-  const [ac, setAc] = useState(dorm.ac);
-  const [dining, setDining] = useState<DiningType>(dorm.dining);
+  )
+  const [ac, setAc] = useState(dorm.ac)
+  const [dining, setDining] = useState<DiningType>(dorm.dining)
   const [diningNearbyDetail, setDiningNearbyDetail] = useState(
     dorm.diningNearbyDetail ?? ""
-  );
+  )
   const [bathroomType, setBathroomType] = useState<BathroomType>(
     dorm.bathroomType
-  );
-  const [pros, setPros] = useState(dorm.pros);
-  const [prosZh, setProsZh] = useState(dorm.pros_zh ?? []);
-  const [cons, setCons] = useState(dorm.cons);
-  const [consZh, setConsZh] = useState(dorm.cons_zh ?? []);
+  )
+  const [pros, setPros] = useState(dorm.pros)
+  const [prosZh, setProsZh] = useState(dorm.pros_zh ?? [])
+  const [cons, setCons] = useState(dorm.cons)
+  const [consZh, setConsZh] = useState(dorm.cons_zh ?? [])
   const [categorizedTags, setCategorizedTags] = useState<DormCategorizedTags>(
     dorm.categorizedTags ?? emptyCategorized
-  );
-  const [address, setAddress] = useState(dorm.address ?? "");
-  const [addressZh, setAddressZh] = useState(dorm.address_zh ?? "");
-  const [website, setWebsite] = useState(dorm.website ?? "");
+  )
+  const [address, setAddress] = useState(dorm.address ?? "")
+  const [addressZh, setAddressZh] = useState(dorm.address_zh ?? "")
+  const [website, setWebsite] = useState(dorm.website ?? "")
   const [petFriendly, setPetFriendly] = useState(
     dorm.structuredTags?.petFriendly ?? false
-  );
+  )
 
   useLayoutEffect(() => {
-    setName(dorm.name);
-    setNameZh(dorm.name_zh ?? "");
-    setDescription(dorm.description);
-    setDescriptionZh(dorm.description_zh ?? "");
-    setImageUrl(dorm.imageUrl);
-    setPrice(String(dorm.price));
-    setApplicationFee(String(dorm.applicationFee ?? ""));
-    setLocation(dorm.location);
-    setLocationZh(dorm.location_zh ?? "");
-    setHousingType(dorm.housingType);
+    setName(dorm.name)
+    setNameZh(dorm.name_zh ?? "")
+    setDescription(dorm.description)
+    setDescriptionZh(dorm.description_zh ?? "")
+    setImageUrl(dorm.imageUrl)
+    setPrice(String(dorm.price))
+    setApplicationFee(String(dorm.applicationFee ?? ""))
+    setLocation(dorm.location)
+    setLocationZh(dorm.location_zh ?? "")
+    setHousingType(dorm.housingType)
     setFloorPlans(
       (sanitizeFloorPlansForStorage(dorm.floorPlans) ?? []).map((plan) =>
         normalizeFloorPlan(
@@ -193,39 +188,44 @@ export const useDormEditForm = ({
           getBathroomScopeFallback(dorm.bathroomType, dorm.floorPlans)
         )
       )
-    );
-    setGalleryImages([...(dorm.galleryImages ?? [])]);
-    setAc(dorm.ac);
-    setDining(dorm.dining);
-    setDiningNearbyDetail(dorm.diningNearbyDetail ?? "");
-    setBathroomType(dorm.bathroomType);
-    setPros([...dorm.pros]);
-    setProsZh([...(dorm.pros_zh ?? [])]);
-    setCons([...dorm.cons]);
-    setConsZh([...(dorm.cons_zh ?? [])]);
-    setCategorizedTags(dorm.categorizedTags ?? emptyCategorized);
-    setAddress(dorm.address ?? "");
-    setAddressZh(dorm.address_zh ?? "");
-    setWebsite(dorm.website ?? "");
-    setPetFriendly(dorm.structuredTags?.petFriendly ?? false);
-  }, [dorm]);
+    )
+    setGalleryImages([...(dorm.galleryImages ?? [])])
+    setAc(dorm.ac)
+    setDining(dorm.dining)
+    setDiningNearbyDetail(dorm.diningNearbyDetail ?? "")
+    setBathroomType(dorm.bathroomType)
+    setPros([...dorm.pros])
+    setProsZh([...(dorm.pros_zh ?? [])])
+    setCons([...dorm.cons])
+    setConsZh([...(dorm.cons_zh ?? [])])
+    setCategorizedTags(dorm.categorizedTags ?? emptyCategorized)
+    setAddress(dorm.address ?? "")
+    setAddressZh(dorm.address_zh ?? "")
+    setWebsite(dorm.website ?? "")
+    setPetFriendly(dorm.structuredTags?.petFriendly ?? false)
+  }, [dorm])
 
-  useLayoutEffect(() => {
-    return () => {
+  useLayoutEffect(() => () => {
       if (timerRef.current) {
-        clearTimeout(timerRef.current);
+        clearTimeout(timerRef.current)
       }
-    };
-  }, []);
+    }, [])
 
   useLayoutEffect(() => {
-    if (activeTab !== "history") return;
-    setHistoryLoading(true);
-    dormAdminService
-      .getEditHistory(dorm.id)
-      .then((entries) => setHistoryEntries(entries))
-      .finally(() => setHistoryLoading(false));
-  }, [activeTab, dorm.id]);
+    if (activeTab !== "history") {
+      return
+    }
+    setHistoryLoading(true)
+    const loadHistory = async () => {
+      try {
+        const entries = await dormAdminService.getEditHistory(dorm.id)
+        setHistoryEntries(entries)
+      } finally {
+        setHistoryLoading(false)
+      }
+    }
+    void loadHistory()
+  }, [activeTab, dorm.id])
 
   const normalizedFloorPlans = useMemo(
     () =>
@@ -238,25 +238,26 @@ export const useDormEditForm = ({
         )
       ) ?? [],
     [bathroomType, floorPlans]
-  );
+  )
 
   const derivedRoomOptions = useMemo(
     () => deriveRoomOptions(normalizedFloorPlans, bathroomType).roomOptions,
     [normalizedFloorPlans, bathroomType]
-  );
+  )
 
   const updateFloorPlan = (
     index: number,
     updater: (plan: FloorPlan) => FloorPlan
-  ) =>
+  ) => {
     setFloorPlans((current) =>
       current.map((plan, currentIndex) =>
         currentIndex === index ? updater(plan) : plan
       )
-    );
+    )
+  }
 
   const buildUpdate = (): DormUpdate => {
-    const derived = deriveRoomOptions(normalizedFloorPlans, bathroomType);
+    const derived = deriveRoomOptions(normalizedFloorPlans, bathroomType)
     const finalCategorized: DormCategorizedTags = {
       ...categorizedTags,
       llcNames:
@@ -264,8 +265,8 @@ export const useDormEditForm = ({
         (categorizedTags.llcNames?.length ?? 0) > 0
           ? categorizedTags.llcNames
           : undefined,
-    };
-    const numericPrice = price !== "" ? Number(price) : null;
+    }
+    const numericPrice = price === "" ? null : Number(price)
     const nextDormLike: Dorm = {
       ...dorm,
       name,
@@ -291,12 +292,12 @@ export const useDormEditForm = ({
       cons,
       cons_zh: consZh,
       applicationFee:
-        applicationFee !== "" ? Number(applicationFee) : undefined,
+        applicationFee === "" ? undefined : Number(applicationFee),
       address: address || undefined,
       address_zh: addressZh || undefined,
       website: website || undefined,
-    };
-    const syncedTags = buildLegacyDormTags(nextDormLike);
+    }
+    const syncedTags = buildLegacyDormTags(nextDormLike)
 
     return {
       name,
@@ -306,17 +307,18 @@ export const useDormEditForm = ({
       image_url: imageUrl || null,
       price: numericPrice,
       price_range:
-        numericPrice != null ? getDormPriceRange(numericPrice) : null,
-      application_fee: applicationFee !== "" ? Number(applicationFee) : null,
+        numericPrice === null ? null : getDormPriceRange(numericPrice),
+      application_fee: applicationFee === "" ? null : Number(applicationFee),
       location,
       location_zh: locationZh || null,
       housing_type: housingType,
-      room_types: derived.roomTypes.length ? derived.roomTypes : null,
-      room_options: derived.roomOptions.length ? derived.roomOptions : null,
-      tags: syncedTags.length ? syncedTags : null,
+      room_types: derived.roomTypes.length > 0 ? derived.roomTypes : null,
+      room_options: derived.roomOptions.length > 0 ? derived.roomOptions : null,
+      tags: syncedTags.length > 0 ? syncedTags : null,
       categorized_tags: finalCategorized as unknown as Record<string, unknown>,
-      floor_plans: normalizedFloorPlans.length ? normalizedFloorPlans : null,
-      gallery_images: galleryImages.length ? galleryImages : null,
+      floor_plans:
+        normalizedFloorPlans.length > 0 ? normalizedFloorPlans : null,
+      gallery_images: galleryImages.length > 0 ? galleryImages : null,
       ac,
       dining,
       dining_nearby_detail: diningNearbyDetail || null,
@@ -325,9 +327,9 @@ export const useDormEditForm = ({
         derived.roomOptions
       ),
       pros,
-      pros_zh: prosZh.length ? prosZh : null,
+      pros_zh: prosZh.length > 0 ? prosZh : null,
       cons,
-      cons_zh: consZh.length ? consZh : null,
+      cons_zh: consZh.length > 0 ? consZh : null,
       address: address || null,
       address_zh: addressZh || null,
       website: website || null,
@@ -338,7 +340,7 @@ export const useDormEditForm = ({
         kitchen: finalCategorized.facilities.includes("kitchen"),
         gymNearby: finalCategorized.facilities.includes("gym"),
         genderInclusive:
-          dorm.structuredTags?.genderInclusive ||
+          dorm.structuredTags?.genderInclusive ??
           finalCategorized.lifestyle.includes("genderInclusive"),
         llc: finalCategorized.lifestyle.includes("llc")
           ? [...(finalCategorized.llcNames ?? [])]
@@ -348,104 +350,108 @@ export const useDormEditForm = ({
         // Preserve existing values for legacy fields that are still used in filters
         quietFloors: finalCategorized.lifestyle.includes("quiet"),
       } as unknown as Record<string, unknown>,
-    };
-  };
+    }
+  }
 
   const refreshDorm = async () => {
-    const freshDorm = await dormService.getDormById(dorm.id);
-    onSaved(freshDorm ?? dorm);
-  };
+    const freshDorm = await dormService.getDormById(dorm.id)
+    onSaved(freshDorm ?? dorm)
+  }
 
   const uploadImage = async (file: File, onSuccess: (url: string) => void) => {
     if (!file.type.startsWith("image/")) {
-      alert(t.alerts.onlyImages);
-      return;
+      alert(t.alerts.onlyImages)
+      return
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      alert(t.alerts.imageTooLarge);
-      return;
+      alert(t.alerts.imageTooLarge)
+      return
     }
 
-    setUploadingImage(true);
+    setUploadingImage(true)
     const { publicUrl, errorMessage } =
-      await dormAdminService.uploadDormImage(file);
-    setUploadingImage(false);
+      await dormAdminService.uploadDormImage(file)
+    setUploadingImage(false)
 
     if (publicUrl) {
-      onSuccess(publicUrl);
-      return;
+      onSuccess(publicUrl)
+      return
     }
 
     alert(
       errorMessage
         ? `${t.alerts.imageUploadFailed}\n${errorMessage}`
         : t.alerts.imageUploadFailed
-    );
-  };
+    )
+  }
 
   const save = async () => {
-    setSaving(true);
-    setSaveError(null);
-    setSaveSuccess(false);
+    setSaving(true)
+    setSaveError(null)
+    setSaveSuccess(false)
     if (timerRef.current) {
-      clearTimeout(timerRef.current);
+      clearTimeout(timerRef.current)
     }
 
-    const updates = buildUpdate();
-    const snapshotBefore = dormToSnapshot(dorm);
-    const summary = buildSummary(dorm, updates);
+    const updates = buildUpdate()
+    const snapshotBefore = dormToSnapshot(dorm)
+    const summary = buildSummary(dorm, updates)
 
-    const result = await dormAdminService.updateDorm(dorm.id, updates);
-    setSaving(false);
+    const result = await dormAdminService.updateDorm(dorm.id, updates)
+    setSaving(false)
 
     if (!result.ok) {
-      setSaveError(result.errorMessage || t.alerts.saveFailed);
-      return;
+      setSaveError(result.errorMessage ?? t.alerts.saveFailed)
+      return
     }
 
-    setSaveSuccess(true);
-    timerRef.current = setTimeout(() => setSaveSuccess(false), 2000);
-    void dormAdminService.logEdit(
-      dorm.id,
-      dorm.name,
-      user?.email ?? "unknown",
+    setSaveSuccess(true)
+    timerRef.current = setTimeout(() => {
+      setSaveSuccess(false)
+    }, 2000)
+    void dormAdminService.logEdit({
+      dormId: dorm.id,
+      dormName: dorm.name,
+      changedBy: user?.email ?? "unknown",
       summary,
-      snapshotBefore
-    );
-    await refreshDorm();
-  };
+      snapshotBefore,
+    })
+    await refreshDorm()
+  }
 
   const handleRestore = async (entry: EditHistoryEntry) => {
-    if (!window.confirm(t.alerts.restoreConfirm)) return;
-    setRestoringId(entry.id);
-    const ok = await dormAdminService.restoreSnapshot(dorm.id, entry);
-    setRestoringId(null);
-    if (!ok) {
-      alert(t.alerts.restoreFailed);
-      return;
+    if (!window.confirm(t.alerts.restoreConfirm)) {
+      return
     }
-    await refreshDorm();
-    setActiveTab("content");
-  };
+    setRestoringId(entry.id)
+    const ok = await dormAdminService.restoreSnapshot(dorm.id, entry)
+    setRestoringId(null)
+    if (!ok) {
+      alert(t.alerts.restoreFailed)
+      return
+    }
+    await refreshDorm()
+    setActiveTab("content")
+  }
 
   const reset = async () => {
     if (!window.confirm(t.alerts.resetConfirm)) {
-      return;
+      return
     }
 
-    setResetting(true);
-    const result = await dormAdminService.resetDormToStatic(dorm.id);
-    setResetting(false);
+    setResetting(true)
+    const result = await dormAdminService.resetDormToStatic(dorm.id)
+    setResetting(false)
 
     if (!result.ok) {
-      setSaveError(result.errorMessage || t.alerts.saveFailed);
-      return;
+      setSaveError(result.errorMessage ?? t.alerts.saveFailed)
+      return
     }
 
-    await refreshDorm();
-    onClose();
-  };
+    await refreshDorm()
+    onClose()
+  }
 
   return {
     dorm,
@@ -522,7 +528,9 @@ export const useDormEditForm = ({
     historyLoading,
     restoringId,
     handleRestore,
-  };
-};
+  }
+}
 
-export type DormEditFormState = ReturnType<typeof useDormEditForm>;
+export type { ActiveTab }
+export { getLayoutKind, createFloorPlan }
+export type DormEditFormState = ReturnType<typeof useDormEditForm>

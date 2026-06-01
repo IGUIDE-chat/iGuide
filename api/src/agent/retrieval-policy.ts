@@ -11,11 +11,11 @@ const CONVERSATIONAL_PATTERNS = [
 
 function normalizeTurn(message: string): string {
   return message
-    .normalize('NFKC')
+    .normalize("NFKC")
     .toLowerCase()
-    .replace(/[\s\u3000]+/g, ' ')
+    .replaceAll(/[\s\u3000]+/g, " ")
     .trim()
-    .replace(/^[\p{P}\p{S}]+|[\p{P}\p{S}]+$/gu, '')
+    .replaceAll(/^[\p{P}\p{S}]+|[\p{P}\p{S}]+$/gu, "")
     .trim()
 }
 
@@ -25,9 +25,5 @@ export function shouldEnableRetrievalTools(message: string): boolean {
     return false
   }
 
-  if (CONVERSATIONAL_PATTERNS.some((pattern) => pattern.test(normalized))) {
-    return false
-  }
-
-  return true
+  return !CONVERSATIONAL_PATTERNS.some((pattern) => pattern.test(normalized))
 }

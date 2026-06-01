@@ -5,17 +5,17 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from "react";
-import { History, Loader2 } from "lucide-react";
-import { DormEditFormState } from "./useDormEditForm";
+import { History, Loader2 } from "lucide-react"
+import React from "react"
+
+import { type DormEditFormState } from "./useDormEditForm"
 
 interface HistoryTabProps {
-  form: DormEditFormState;
+  form: DormEditFormState
 }
 
 export const HistoryTab: React.FC<HistoryTabProps> = ({ form }) => {
-  const { t, historyEntries, historyLoading, restoringId, handleRestore } =
-    form;
+  const { t, historyEntries, historyLoading, restoringId, handleRestore } = form
 
   if (historyLoading) {
     return (
@@ -23,7 +23,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ form }) => {
         <Loader2 size={20} className="mr-2 animate-spin" />
         <span className="text-sm">{t.actions.loading}</span>
       </div>
-    );
+    )
   }
 
   if (historyEntries.length === 0) {
@@ -32,7 +32,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ form }) => {
         <History size={32} className="mx-auto mb-3 opacity-40" />
         <p className="text-sm">{t.hints.historyEmpty}</p>
       </div>
-    );
+    )
   }
 
   return (
@@ -59,7 +59,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ form }) => {
               <p className="mt-0.5 truncate text-xs text-gray-500">
                 {entry.changed_by}
               </p>
-              <p className="mt-1 text-xs wrap-break-word text-illini-blue">
+              <p className="text-illini-blue mt-1 text-xs wrap-break-word">
                 {entry.summary}
               </p>
             </div>
@@ -67,13 +67,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ form }) => {
               type="button"
               onClick={() => handleRestore(entry)}
               disabled={restoringId !== null}
-              className="
-                flex shrink-0 items-center justify-center rounded-md border
-                border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-700
-                transition-colors
-                hover:border-illini-blue hover:text-illini-blue
-                disabled:opacity-40
-              "
+              className="hover:border-illini-blue hover:text-illini-blue flex shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-700 transition-colors disabled:opacity-40"
             >
               {restoringId === entry.id ? (
                 <Loader2 size={12} className="animate-spin" />
@@ -85,5 +79,5 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ form }) => {
         </li>
       ))}
     </ul>
-  );
-};
+  )
+}

@@ -7,7 +7,7 @@
 
 // [DATA] Article content for Grainger Library guide.
 // [数据] 格兰杰图书馆指南的文章内容。
-import { Article } from "../../types";
+import { type Article } from "../../types"
 
 export const graingerLibrary: Article = {
   id: "grainger-library",
@@ -45,4 +45,4 @@ Located on the Engineering Quad (North of Green St).
   `,
   tags_zh: ["图书馆", "自习", "工学院", "Grainger", "安静"],
   lastUpdated: "2024-03-10",
-};
+}

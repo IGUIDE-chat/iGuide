@@ -6,15 +6,15 @@
  */
 
 import {
-  DormOverride,
+  type DormOverride,
   clean,
   plan,
   urhPage,
   urls,
-} from "./dormOfficialOverrideUtils";
+} from "./dormOfficialOverrideUtils"
 
 const twinXl = (value: Parameters<typeof plan>[0]) =>
-  plan({ bedSize: "Twin XL", ...value });
+  plan({ bedSize: "Twin XL", ...value })
 
 export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
   isr: {
@@ -677,4 +677,4 @@ export const URH_OFFICIAL_OVERRIDES_NORTH: Record<string, DormOverride> = {
       }),
     ],
   },
-};
+}

@@ -1,4 +1,4 @@
-import type { RequestContext } from '../tools/types'
+import type { RequestContext } from "../tools/types"
 
 export async function callSupabaseRpc<T>(
   ctx: RequestContext,
@@ -9,15 +9,15 @@ export async function callSupabaseRpc<T>(
   const anonKey = ctx.env.SUPABASE_ANON_KEY
 
   if (!supabaseUrl || !anonKey) {
-    throw new Error('Supabase credentials not configured')
+    throw new Error("Supabase credentials not configured")
   }
 
   const response = await fetch(`${supabaseUrl}/rest/v1/rpc/${rpcName}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       apikey: anonKey,
       Authorization: `Bearer ${anonKey}`,
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(body),
   })

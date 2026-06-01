@@ -6,9 +6,9 @@
  */
 
 export interface PageRegistryItem {
-  id: string;
-  path: string;
-  componentPath: string;
+  id: string
+  path: string
+  componentPath: string
   ownerFeature:
     | "chat"
     | "library"
@@ -16,9 +16,9 @@ export interface PageRegistryItem {
     | "courses"
     | "resume"
     | "profile"
-    | "router";
-  contexts: Array<"auth" | "housing" | "dorm-user-interaction" | "none">;
-  status: "active" | "redirect";
+    | "router"
+  contexts: Array<"auth" | "housing" | "dorm-user-interaction" | "none">
+  status: "active" | "redirect"
 }
 
 export const PAGE_REGISTRY: PageRegistryItem[] = [
@@ -110,4 +110,4 @@ export const PAGE_REGISTRY: PageRegistryItem[] = [
     contexts: ["none"],
     status: "redirect",
   },
-];
+]

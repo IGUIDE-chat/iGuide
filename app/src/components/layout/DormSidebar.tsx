@@ -5,28 +5,29 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { useMemo } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { Clock, Heart, Trash2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useSharedDormInteraction } from "../housing/store/DormUserInteractionContext";
-import { useDormData } from "../housing/store/DormDataContext";
-import { Language } from "../../types";
-import { Dorm } from "../housing/types/index";
-import { Typewriter } from "../ui/Typewriter";
+import { AnimatePresence, motion } from "framer-motion"
+import { Clock, Heart, Trash2 } from "lucide-react"
+import React, { useMemo } from "react"
+import { useNavigate } from "react-router-dom"
+
+import { type Language } from "../../types"
+import { useSharedDormInteraction } from "../housing/store/DormUserInteractionContext"
+import { useDormData } from "../housing/store/HousingDataContext"
+import { type Dorm } from "../housing/types/index"
+import { Typewriter } from "../ui/Typewriter"
 
 interface DormSidebarProps {
-  language: Language;
-  currentDormId?: string | null;
+  language: Language
+  currentDormId?: string | null
   /** Ref for the favorites section heart icon SVG (flying-heart target) */
-  favoritesIconRef?: React.RefObject<SVGSVGElement | null>;
+  favoritesIconRef?: React.RefObject<SVGSVGElement | null>
 }
 
 interface SidebarDormItem {
-  id: string;
-  name: string;
-  nameZh: string;
-  imageUrl: string;
+  id: string
+  name: string
+  nameZh: string
+  imageUrl: string
 }
 
 export const DormSidebar: React.FC<DormSidebarProps> = ({
@@ -34,12 +35,12 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
   currentDormId,
   favoritesIconRef,
 }) => {
-  const navigate = useNavigate();
-  const { dorms } = useDormData();
+  const navigate = useNavigate()
+  const { dorms } = useDormData()
   const dormById = useMemo(
     () => new Map(dorms.map((dorm) => [dorm.id, dorm])),
     [dorms]
-  );
+  )
   const {
     favorites,
     cloudFavorites,
@@ -49,7 +50,7 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
     removeFromHistory,
     clearHistory,
     isLoading,
-  } = useSharedDormInteraction();
+  } = useSharedDormInteraction()
 
   const t = {
     en: {
@@ -70,35 +71,37 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
       clearFavoritesConfirm: "确认清空全部宿舍收藏吗？",
       clearHistoryConfirm: "确认清空全部宿舍浏览记录吗？",
     },
-  }[language];
+  }[language]
 
   const favoriteItems = useMemo<SidebarDormItem[]>(() => {
     return favorites
       .map((favoriteId) => {
-        const dorm = dormById.get(favoriteId);
+        const dorm = dormById.get(favoriteId)
         if (dorm) {
           return {
             id: dorm.id,
             name: dorm.name,
             nameZh: dorm.name_zh ?? "",
             imageUrl: dorm.imageUrl ?? "",
-          };
+          }
         }
 
         const cloudFavorite = cloudFavorites.find(
           (favorite) => favorite.dorm_id === favoriteId
-        );
-        if (!cloudFavorite) return null;
+        )
+        if (!cloudFavorite) {
+          return null
+        }
 
         return {
           id: cloudFavorite.dorm_id,
           name: cloudFavorite.dorm_name,
           nameZh: cloudFavorite.dorm_name_zh ?? "",
           imageUrl: "",
-        };
+        }
       })
-      .filter((item): item is SidebarDormItem => item !== null);
-  }, [favorites, cloudFavorites, dormById]);
+      .filter((item): item is SidebarDormItem => item !== null)
+  }, [favorites, cloudFavorites, dormById])
 
   const historyItems = useMemo<SidebarDormItem[]>(() => {
     return recentlyViewed.map((dorm: Dorm) => ({
@@ -106,24 +109,24 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
       name: dorm.name,
       nameZh: dorm.name_zh ?? "",
       imageUrl: dorm.imageUrl ?? "",
-    }));
-  }, [recentlyViewed]);
+    }))
+  }, [recentlyViewed])
 
   const openDorm = (dormId: string) => {
-    navigate(`/dorms/${dormId}`);
-  };
+    navigate(`/dorms/${dormId}`)
+  }
 
   const handleClearFavorites = () => {
     if (window.confirm(t.clearFavoritesConfirm)) {
-      void clearFavorites();
+      void clearFavorites()
     }
-  };
+  }
 
   const handleClearHistory = () => {
     if (window.confirm(t.clearHistoryConfirm)) {
-      void clearHistory();
+      void clearHistory()
     }
-  };
+  }
 
   const renderDormList = (
     items: SidebarDormItem[],
@@ -133,14 +136,9 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
     if (isLoading) {
       return (
         <div className="flex items-center justify-center py-6">
-          <div
-            className="
-              size-4 animate-spin rounded-full border-2 border-illini-orange
-              border-t-transparent
-            "
-          />
+          <div className="border-illini-orange size-4 animate-spin rounded-full border-2 border-t-transparent" />
         </div>
-      );
+      )
     }
 
     if (items.length === 0) {
@@ -148,7 +146,7 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
         <div className="px-2 py-3">
           <p className="text-[11px] text-slate-600">{emptyText}</p>
         </div>
-      );
+      )
     }
 
     return (
@@ -167,26 +165,18 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
                 damping: 30,
                 opacity: { duration: 0.2 },
               }}
-              onClick={() => openDorm(item.id)}
-              className={`
-                group cursor-pointer rounded-lg p-2 transition-all
-                ${
-                  item.id === currentDormId
-                    ? "bg-white/20 text-white"
-                    : `
-                      text-slate-300
-                      hover:bg-white/10
-                    `
-                }
-              `}
+              onClick={() => {
+                openDorm(item.id)
+              }}
+              className={`group cursor-pointer rounded-lg p-2 transition-all ${
+                item.id === currentDormId
+                  ? "bg-white/20 text-white"
+                  : `text-slate-300 hover:bg-white/10`
+              } `}
             >
               <div className="relative overflow-hidden">
                 <div className="flex items-center gap-2 pr-7">
-                  <div
-                    className="
-                      size-7 shrink-0 overflow-hidden rounded-sm bg-white/10
-                    "
-                  >
+                  <div className="size-7 shrink-0 overflow-hidden rounded-sm bg-white/10">
                     {item.imageUrl ? (
                       <img
                         src={item.imageUrl}
@@ -199,17 +189,11 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
                   </div>
                   <div className="min-w-0 flex-1">
                     <div
-                      className={`
-                        truncate text-xs font-medium
-                        ${
-                          item.id === currentDormId
-                            ? "text-white"
-                            : `
-                              text-slate-300
-                              group-hover:text-white
-                            `
-                        }
-                      `}
+                      className={`truncate text-xs font-medium ${
+                        item.id === currentDormId
+                          ? "text-white"
+                          : `text-slate-300 group-hover:text-white`
+                      } `}
                     >
                       <Typewriter
                         text={
@@ -223,23 +207,13 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
                   </div>
                 </div>
 
-                <div
-                  className="
-                    absolute inset-y-0 right-0 flex items-center bg-linear-to-l
-                    from-[#2E2E2E] to-transparent px-1 opacity-0 transition-all
-                    duration-200
-                    group-hover:opacity-100
-                  "
-                >
+                <div className="absolute inset-y-0 right-0 flex items-center bg-linear-to-l from-[#2E2E2E] to-transparent px-1 opacity-0 transition-all duration-200 group-hover:opacity-100">
                   <button
                     onClick={(event) => {
-                      event.stopPropagation();
-                      onRemove(item.id);
+                      event.stopPropagation()
+                      onRemove(item.id)
                     }}
-                    className="
-                      rounded-md p-1 transition-colors
-                      hover:bg-red-500/20
-                    "
+                    className="rounded-md p-1 transition-colors hover:bg-red-500/20"
                     title="Remove"
                     type="button"
                   >
@@ -251,8 +225,8 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
           ))}
         </AnimatePresence>
       </div>
-    );
-  };
+    )
+  }
 
   return (
     <div className="flex h-full min-h-0 flex-col px-3">
@@ -272,10 +246,7 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
             {favoriteItems.length > 0 && (
               <button
                 onClick={handleClearFavorites}
-                className="
-                  text-[10px] text-slate-500 transition-colors
-                  hover:text-white
-                "
+                className="text-[10px] text-slate-500 transition-colors hover:text-white"
                 type="button"
               >
                 {t.clear}
@@ -283,7 +254,7 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
             )}
           </div>
           {renderDormList(favoriteItems, t.noFavorites, (dormId: string) => {
-            void removeFavorite(dormId);
+            void removeFavorite(dormId)
           })}
         </section>
 
@@ -298,10 +269,7 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
             {historyItems.length > 0 && (
               <button
                 onClick={handleClearHistory}
-                className="
-                  text-[10px] text-slate-500 transition-colors
-                  hover:text-white
-                "
+                className="text-[10px] text-slate-500 transition-colors hover:text-white"
                 type="button"
               >
                 {t.clear}
@@ -309,10 +277,10 @@ export const DormSidebar: React.FC<DormSidebarProps> = ({
             )}
           </div>
           {renderDormList(historyItems, t.noHistory, (dormId: string) => {
-            void removeFromHistory(dormId);
+            void removeFromHistory(dormId)
           })}
         </section>
       </div>
     </div>
-  );
-};
+  )
+}

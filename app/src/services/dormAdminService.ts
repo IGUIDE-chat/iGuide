@@ -5,64 +5,64 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-// [SERVICE] Admin-only operations for the `dorms` table.
-// [服务] 管理员专用——直接操作 `dorms` 表（替代旧的 override 模式）。
-import { supabase } from "./supabase";
-import { Dorm } from "../components/housing/types/index";
+import { type Dorm } from "../components/housing/types/index"
 import {
   getDormPriceRange,
   sanitizeFloorPlansForStorage,
-} from "../utils/dormData";
-import { getPersistedBathroomType } from "../utils/roomOptions";
+} from "../utils/dormData"
+import { getPersistedBathroomType } from "../utils/roomOptions"
+// [SERVICE] Admin-only operations for the `dorms` table.
+// [服务] 管理员专用——直接操作 `dorms` 表（替代旧的 override 模式）。
+import { supabase } from "./supabase"
 
-const TABLE = "dorms";
+const TABLE = "dorms"
 
 /** Partial update payload — camelCase fields mapped to snake_case for DB. */
-export interface DormUpdate {
-  name?: string;
-  name_zh?: string | null;
-  description?: string;
-  description_zh?: string | null;
-  image_url?: string | null;
-  price?: number | null;
-  price_range?: Dorm["priceRange"] | null;
-  location?: string | null;
-  location_zh?: string | null;
-  housing_type?: string | null;
-  ac?: boolean;
-  dining?: string;
-  dining_nearby_detail?: string | null;
-  bathroom_type?: string | null;
-  room_types?: string[] | null;
-  room_options?: unknown[] | null;
-  tags?: string[] | null;
-  structured_tags?: Record<string, unknown> | null;
-  categorized_tags?: Record<string, unknown> | null;
-  application_fee?: number | null;
-  floor_plans?: unknown[] | null;
-  gallery_images?: string[] | null;
-  pros?: string[] | null;
-  pros_zh?: string[] | null;
-  cons?: string[] | null;
-  cons_zh?: string[] | null;
-  address?: string | null;
-  address_zh?: string | null;
-  website?: string | null;
+interface DormUpdate {
+  name?: string
+  name_zh?: string | null
+  description?: string
+  description_zh?: string | null
+  image_url?: string | null
+  price?: number | null
+  price_range?: Dorm["priceRange"] | null
+  location?: string | null
+  location_zh?: string | null
+  housing_type?: string | null
+  ac?: boolean
+  dining?: string
+  dining_nearby_detail?: string | null
+  bathroom_type?: string | null
+  room_types?: string[] | null
+  room_options?: unknown[] | null
+  tags?: string[] | null
+  structured_tags?: Record<string, unknown> | null
+  categorized_tags?: Record<string, unknown> | null
+  application_fee?: number | null
+  floor_plans?: unknown[] | null
+  gallery_images?: string[] | null
+  pros?: string[] | null
+  pros_zh?: string[] | null
+  cons?: string[] | null
+  cons_zh?: string[] | null
+  address?: string | null
+  address_zh?: string | null
+  website?: string | null
 }
 
-export interface DormMutationResult {
-  ok: boolean;
-  errorMessage?: string;
+interface DormMutationResult {
+  ok: boolean
+  errorMessage?: string
 }
 
-export interface EditHistoryEntry {
-  id: string;
-  dorm_id: string;
-  dorm_name: string;
-  changed_by: string;
-  changed_at: string;
-  summary: string;
-  snapshot: Record<string, unknown>;
+interface EditHistoryEntry {
+  id: string
+  dorm_id: string
+  dorm_name: string
+  changed_by: string
+  changed_at: string
+  summary: string
+  snapshot: Record<string, unknown>
 }
 
 /**
@@ -99,31 +99,48 @@ const KNOWN_DB_COLUMNS = new Set([
   "address",
   "address_zh",
   "website",
-]);
+])
 
 /** Build a human-readable summary of what changed between dorm and updates. */
-export function buildSummary(dorm: Dorm, updates: DormUpdate): string {
-  const parts: string[] = [];
-  if (updates.name !== undefined && updates.name !== dorm.name)
-    parts.push("名称");
-  if (updates.price !== undefined && updates.price !== dorm.price)
-    parts.push(`价格: $${dorm.price} → $${updates.price}`);
-  if (updates.ac !== undefined && updates.ac !== dorm.ac)
-    parts.push(`空调: ${dorm.ac ? "有" : "无"} → ${updates.ac ? "有" : "无"}`);
-  if (updates.dining !== undefined && updates.dining !== dorm.dining)
-    parts.push("食堂");
+function buildSummary(dorm: Dorm, updates: DormUpdate): string {
+  const parts: string[] = []
+  if (updates.name !== undefined && updates.name !== dorm.name) {
+    parts.push("名称")
+  }
+  if (updates.price !== undefined && updates.price !== dorm.price) {
+    parts.push(`价格: $${dorm.price} → $${updates.price}`)
+  }
+  if (updates.ac !== undefined && updates.ac !== dorm.ac) {
+    parts.push(`空调: ${dorm.ac ? "有" : "无"} → ${updates.ac ? "有" : "无"}`)
+  }
+  if (updates.dining !== undefined && updates.dining !== dorm.dining) {
+    parts.push("食堂")
+  }
   if (
     updates.description !== undefined &&
     updates.description !== dorm.description
-  )
-    parts.push("描述");
-  if (updates.pros !== undefined) parts.push("优点");
-  if (updates.cons !== undefined) parts.push("缺点");
-  if (updates.categorized_tags !== undefined) parts.push("标签");
-  if (updates.floor_plans !== undefined) parts.push("户型图");
-  if (updates.gallery_images !== undefined) parts.push("图库");
-  if (updates.address !== undefined) parts.push("地址");
-  return parts.length > 0 ? `修改: ${parts.join(", ")}` : "保存";
+  ) {
+    parts.push("描述")
+  }
+  if (updates.pros !== undefined) {
+    parts.push("优点")
+  }
+  if (updates.cons !== undefined) {
+    parts.push("缺点")
+  }
+  if (updates.categorized_tags !== undefined) {
+    parts.push("标签")
+  }
+  if (updates.floor_plans !== undefined) {
+    parts.push("户型图")
+  }
+  if (updates.gallery_images !== undefined) {
+    parts.push("图库")
+  }
+  if (updates.address !== undefined) {
+    parts.push("地址")
+  }
+  return parts.length > 0 ? `修改: ${parts.join(", ")}` : "保存"
 }
 
 /**
@@ -135,33 +152,36 @@ async function getEditHistory(dormId: string): Promise<EditHistoryEntry[]> {
     .select("*")
     .eq("dorm_id", dormId)
     .order("changed_at", { ascending: false })
-    .limit(20);
+    .limit(20)
   if (error) {
-    console.error("[dormAdminService] getEditHistory error:", error);
-    return [];
+    console.error("[dormAdminService] getEditHistory error:", error)
+    return []
   }
-  return (data ?? []) as EditHistoryEntry[];
+  return (data ?? []) as EditHistoryEntry[]
 }
 
 /**
  * Fire-and-forget: insert a history entry for an edit. Errors are non-blocking.
  */
-async function logEdit(
-  dormId: string,
-  dormName: string,
-  changedBy: string,
-  summary: string,
+interface LogEditParams {
+  dormId: string
+  dormName: string
+  changedBy: string
+  summary: string
   snapshotBefore: Record<string, unknown>
-): Promise<void> {
+}
+
+async function logEdit(params: LogEditParams): Promise<void> {
+  const { dormId, dormName, changedBy, summary, snapshotBefore } = params
   const { error } = await supabase.from("dorm_edit_history").insert({
     dorm_id: dormId,
     dorm_name: dormName,
     changed_by: changedBy,
     summary,
     snapshot: snapshotBefore,
-  });
+  })
   if (error) {
-    console.warn("[dormAdminService] logEdit error (non-blocking):", error);
+    console.warn("[dormAdminService] logEdit error (non-blocking):", error)
   }
 }
 
@@ -172,31 +192,31 @@ async function restoreSnapshot(
   dormId: string,
   entry: EditHistoryEntry
 ): Promise<boolean> {
-  const safeSnapshot: Record<string, unknown> = {};
+  const safeSnapshot: Record<string, unknown> = {}
   for (const [key, value] of Object.entries(entry.snapshot)) {
     if (KNOWN_DB_COLUMNS.has(key)) {
       safeSnapshot[key] =
         key === "floor_plans"
           ? (sanitizeFloorPlansForStorage(value as Dorm["floorPlans"]) ?? [])
-          : value;
+          : value
     }
   }
   const { error } = await supabase
     .from(TABLE)
     .update(safeSnapshot)
-    .eq("id", dormId);
+    .eq("id", dormId)
   if (error) {
-    console.error("[dormAdminService] restoreSnapshot error:", error);
-    return false;
+    console.error("[dormAdminService] restoreSnapshot error:", error)
+    return false
   }
-  await logEdit(
+  await logEdit({
     dormId,
-    entry.dorm_name,
-    entry.changed_by,
-    `由管理员还原至 ${entry.changed_at} 版本`,
-    entry.snapshot
-  );
-  return true;
+    dormName: entry.dorm_name,
+    changedBy: entry.changed_by,
+    summary: `由管理员还原至 ${entry.changed_at} 版本`,
+    snapshotBefore: entry.snapshot,
+  })
+  return true
 }
 
 /**
@@ -208,33 +228,37 @@ async function updateDorm(
   updates: DormUpdate
 ): Promise<DormMutationResult> {
   // Strip keys that don't exist in the DB yet
-  const safeUpdates: Record<string, unknown> = {};
+  const safeUpdates: Record<string, unknown> = {}
   for (const [key, value] of Object.entries(updates)) {
     if (KNOWN_DB_COLUMNS.has(key)) {
       safeUpdates[key] =
         key === "floor_plans"
           ? (sanitizeFloorPlansForStorage(value as Dorm["floorPlans"]) ?? null)
-          : value;
+          : value
     }
   }
 
   // Auto-recalculate price_range when price changes
-  if (safeUpdates.price != null && typeof safeUpdates.price === "number") {
-    safeUpdates.price_range = getDormPriceRange(safeUpdates.price as number);
+  if (
+    safeUpdates.price !== null &&
+    safeUpdates.price !== undefined &&
+    typeof safeUpdates.price === "number"
+  ) {
+    safeUpdates.price_range = getDormPriceRange(safeUpdates.price)
   }
 
   const { error } = await supabase
     .from(TABLE)
     .update(safeUpdates)
-    .eq("id", dormId);
+    .eq("id", dormId)
   if (error) {
-    console.error("[dormAdminService] updateDorm error:", error);
+    console.error("[dormAdminService] updateDorm error:", error)
     const errorMessage = [error.message, error.details, error.hint]
       .filter(Boolean)
-      .join(" ");
-    return { ok: false, errorMessage };
+      .join(" ")
+    return { ok: false, errorMessage }
   }
-  return { ok: true };
+  return { ok: true }
 }
 
 /**
@@ -242,17 +266,17 @@ async function updateDorm(
  */
 async function resetDormToStatic(dormId: string): Promise<DormMutationResult> {
   const { UIUC_DORMS } =
-    await import("../components/housing/constants/dormData");
-  const staticDorm = UIUC_DORMS.find((d) => d.id === dormId);
+    await import("../components/housing/constants/dormData")
+  const staticDorm = UIUC_DORMS.find((d) => d.id === dormId)
   if (!staticDorm) {
     console.error(
       "[dormAdminService] resetDormToStatic: dorm not found in static data:",
       dormId
-    );
+    )
     return {
       ok: false,
       errorMessage: `Dorm "${dormId}" was not found in static data.`,
-    };
+    }
   }
 
   const row: DormUpdate = {
@@ -291,14 +315,14 @@ async function resetDormToStatic(dormId: string): Promise<DormMutationResult> {
     address: staticDorm.address ?? null,
     address_zh: staticDorm.address_zh ?? null,
     website: staticDorm.website ?? null,
-  };
+  }
 
-  return updateDorm(dormId, row);
+  return updateDorm(dormId, row)
 }
 
-export interface DormImageUploadResult {
-  publicUrl: string | null;
-  errorMessage?: string;
+interface DormImageUploadResult {
+  publicUrl: string | null
+  errorMessage?: string
 }
 
 /**
@@ -306,27 +330,27 @@ export interface DormImageUploadResult {
  * Refreshes the auth session first so Storage RLS checks use fresh JWT claims.
  */
 async function uploadDormImage(file: File): Promise<DormImageUploadResult> {
-  const { error: refreshError } = await supabase.auth.refreshSession();
+  const { error: refreshError } = await supabase.auth.refreshSession()
   if (refreshError) {
     console.warn(
       "[dormAdminService] refreshSession warning:",
       refreshError.message
-    );
+    )
   }
 
   const {
     data: { session },
-  } = await supabase.auth.getSession();
+  } = await supabase.auth.getSession()
   if (!session) {
     return {
       publicUrl: null,
       errorMessage: "Not authenticated. Please sign in again.",
-    };
+    }
   }
 
-  const fileExt = file.name.split(".").pop();
-  const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
-  const filePath = `user_uploads/${fileName}`;
+  const fileExt = file.name.split(".").pop()
+  const fileName = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}.${fileExt}`
+  const filePath = `user_uploads/${fileName}`
 
   const { error: uploadError } = await supabase.storage
     .from("dorm-images")
@@ -334,25 +358,25 @@ async function uploadDormImage(file: File): Promise<DormImageUploadResult> {
       cacheControl: "3600",
       upsert: false,
       contentType: file.type || undefined,
-    });
+    })
 
   if (uploadError) {
-    console.error("[dormAdminService] uploadDormImage error:", uploadError);
+    console.error("[dormAdminService] uploadDormImage error:", uploadError)
     return {
       publicUrl: null,
       errorMessage: uploadError.message,
-    };
+    }
   }
 
-  const { data } = supabase.storage.from("dorm-images").getPublicUrl(filePath);
+  const { data } = supabase.storage.from("dorm-images").getPublicUrl(filePath)
   if (!data?.publicUrl) {
     return {
       publicUrl: null,
       errorMessage: "Upload succeeded but no public URL was returned.",
-    };
+    }
   }
 
-  return { publicUrl: data.publicUrl };
+  return { publicUrl: data.publicUrl }
 }
 
 export const dormAdminService = {
@@ -362,4 +386,12 @@ export const dormAdminService = {
   getEditHistory,
   logEdit,
   restoreSnapshot,
-};
+}
+
+export {
+  type DormUpdate,
+  type DormMutationResult,
+  type EditHistoryEntry,
+  type DormImageUploadResult,
+  buildSummary,
+}

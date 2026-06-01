@@ -5,7 +5,6 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { useState } from "react";
 import {
   ChevronDown,
   ChevronUp,
@@ -14,78 +13,85 @@ import {
   Trash2,
   Upload,
   X,
-} from "lucide-react";
-import { BathroomScope, BedSize, FloorPlan } from "../types/index";
-import {
-  BATHROOM_SCOPE_OPTIONS,
-  getLocalizedLabel,
-} from "../constants/metadata";
+} from "lucide-react"
+import React, { useState } from "react"
+
 import {
   getStorageBathroomScope,
   normalizeFloorPlan,
-} from "../../../utils/roomOptions";
-import { EditableList, Field, Toggle, inputCls } from "./EditPanelFields";
+} from "../../../utils/roomOptions"
 import {
+  BATHROOM_SCOPE_OPTIONS,
+  getLocalizedLabel,
+} from "../constants/metadata"
+import {
+  type BathroomScope,
+  type BedSize,
+  type FloorPlan,
+} from "../types/index"
+import { EditableList, Field, Toggle, inputCls } from "./EditPanelFields"
+import {
+  type DormEditFormState,
   createFloorPlan,
-  DormEditFormState,
   getLayoutKind,
-} from "./useDormEditForm";
+} from "./useDormEditForm"
 
 interface MediaTabProps {
-  form: DormEditFormState;
+  form: DormEditFormState
 }
 
 const hasPublishedPrice = (price: FloorPlan["price"]): price is number =>
-  typeof price === "number" && Number.isFinite(price) && price > 0;
+  typeof price === "number" && Number.isFinite(price) && price > 0
 
 /** Small thumbnail chip for an uploaded image URL */
 const ImageChip: React.FC<{
-  url: string;
-  onRemove: () => void;
-  onClick?: () => void;
+  url: string
+  onRemove: () => void
+  onClick?: () => void
 }> = ({ url, onRemove, onClick }) => (
-  <div
-    className="
-      group relative size-16 shrink-0 cursor-pointer overflow-hidden rounded-lg
-      border border-gray-200 bg-gray-50
-    "
+  <button
+    type="button"
+    tabIndex={0}
+    className="group relative size-16 shrink-0 cursor-pointer overflow-hidden rounded-lg border border-gray-200 bg-gray-50"
     onClick={onClick}
+    onKeyDown={(e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault()
+        ;(e.currentTarget as HTMLElement).click()
+      }
+    }}
   >
     <img src={url} alt="" className="size-full object-cover" />
     <button
       type="button"
       onClick={(e) => {
-        e.stopPropagation();
-        onRemove();
+        e.stopPropagation()
+        onRemove()
       }}
-      className="
-        absolute -top-1 -right-1 rounded-full bg-red-500 p-0.5 text-white
-        opacity-0 transition-opacity
-        group-hover:opacity-100
-      "
+      className="absolute -top-1 -right-1 rounded-full bg-red-500 p-0.5 text-white opacity-0 transition-opacity group-hover:opacity-100"
     >
       <X size={10} />
     </button>
-  </div>
-);
+  </button>
+)
 
 /** Multi-image field: shows chips + URL input + upload button */
 const MultiImageField: React.FC<{
-  label: string;
-  urls: string[];
-  onChange: (urls: string[]) => void;
-  form: DormEditFormState;
+  label: string
+  urls: string[]
+  onChange: (urls: string[]) => void
+  form: DormEditFormState
 }> = ({ label, urls, onChange, form }) => {
-  const [inputValue, setInputValue] = useState("");
-  const { t } = form;
+  const [inputValue, setInputValue] = useState("")
+  const { t } = form
 
   const addUrl = (url: string) => {
-    const trimmed = url.trim();
+    const trimmed = url.trim()
     if (trimmed && !urls.includes(trimmed)) {
-      onChange([...urls, trimmed]);
+      onChange([...urls, trimmed])
     }
-    setInputValue("");
-  };
+    setInputValue("")
+  }
 
   return (
     <Field label={label}>
@@ -93,35 +99,33 @@ const MultiImageField: React.FC<{
         <div className="mb-2 flex flex-wrap gap-2">
           {urls.map((url, i) => (
             <ImageChip
-              key={i}
+              key={`item-${String(i)}`}
               url={url}
-              onRemove={() => onChange(urls.filter((_, idx) => idx !== i))}
+              onRemove={() => {
+                onChange(urls.filter((_, idx) => idx !== i))
+              }}
             />
           ))}
         </div>
       )}
       <div className="flex gap-2">
         <input
+          aria-label="Input field"
           type="text"
           value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
+          onChange={(e) => {
+            setInputValue(e.target.value)
+          }}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
-              e.preventDefault();
-              addUrl(inputValue);
+              e.preventDefault()
+              addUrl(inputValue)
             }
           }}
           className={inputCls}
           placeholder="https://..."
         />
-        <label
-          className="
-            flex shrink-0 cursor-pointer items-center justify-center gap-1
-            rounded-lg border border-gray-300 bg-gray-100 px-3 text-gray-700
-            transition-colors
-            hover:bg-gray-200
-          "
-        >
+        <label className="flex shrink-0 cursor-pointer items-center justify-center gap-1 rounded-lg border border-gray-300 bg-gray-100 px-3 text-gray-700 transition-colors hover:bg-gray-200">
           {form.uploadingImage ? (
             <Loader2 size={14} className="animate-spin" />
           ) : (
@@ -129,74 +133,70 @@ const MultiImageField: React.FC<{
           )}
           <span className="text-xs font-medium">{t.actions.upload}</span>
           <input
+            aria-label="Input field"
             type="file"
             accept="image/*"
             className="hidden"
             onChange={(e) => {
               if (e.target.files?.[0]) {
                 void form.uploadImage(e.target.files[0], (url) => {
-                  onChange([...urls, url]);
-                });
+                  onChange([...urls, url])
+                })
               }
-              e.target.value = "";
+              e.target.value = ""
             }}
           />
         </label>
         {inputValue.trim() && (
           <button
             type="button"
-            onClick={() => addUrl(inputValue)}
-            className="
-              flex shrink-0 items-center justify-center rounded-lg
-              bg-illini-blue px-2 text-white
-            "
+            onClick={() => {
+              addUrl(inputValue)
+            }}
+            className="bg-illini-blue flex shrink-0 items-center justify-center rounded-lg px-2 text-white"
           >
             <Plus size={14} />
           </button>
         )}
       </div>
     </Field>
-  );
-};
+  )
+}
 
 export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
-  const { t } = form;
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  const { t } = form
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null)
 
   const toggleExpand = (idx: number) => {
-    setExpandedIndex(expandedIndex === idx ? null : idx);
-  };
+    setExpandedIndex(expandedIndex === idx ? null : idx)
+  }
 
   const moveFloorPlan = (fromIdx: number, toIdx: number) => {
     form.setFloorPlans((current) => {
-      const arr = [...current];
-      const [item] = arr.splice(fromIdx, 1);
-      arr.splice(toIdx, 0, item);
-      return arr;
-    });
+      const arr = [...current]
+      const [item] = arr.splice(fromIdx, 1)
+      arr.splice(toIdx, 0, item)
+      return arr
+    })
     // Keep the moved item expanded
-    setExpandedIndex(toIdx);
-  };
+    setExpandedIndex(toIdx)
+  }
 
   return (
     <>
       <Field label={t.labels.imageUrl}>
         <div className="flex gap-2">
           <input
+            aria-label="Input field"
             type="text"
             value={form.imageUrl || ""}
-            onChange={(event) => form.setImageUrl(event.target.value)}
+            onChange={(event) => {
+              form.setImageUrl(event.target.value)
+            }}
             className={inputCls}
             placeholder="https://..."
           />
-          <label
-            className="
-              flex shrink-0 cursor-pointer items-center justify-center gap-1
-              rounded-lg border border-gray-300 bg-gray-100 px-3 text-gray-700
-              transition-colors
-              hover:bg-gray-200
-            "
-          >
+          <label className="flex shrink-0 cursor-pointer items-center justify-center gap-1 rounded-lg border border-gray-300 bg-gray-100 px-3 text-gray-700 transition-colors hover:bg-gray-200">
             {form.uploadingImage ? (
               <Loader2 size={16} className="animate-spin" />
             ) : (
@@ -204,17 +204,15 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
             )}
             <span className="text-xs font-medium">{t.actions.upload}</span>
             <input
+              aria-label="Input field"
               type="file"
               accept="image/*"
               className="hidden"
               onChange={(event) => {
                 if (event.target.files?.[0]) {
-                  void form.uploadImage(
-                    event.target.files[0],
-                    form.setImageUrl
-                  );
+                  void form.uploadImage(event.target.files[0], form.setImageUrl)
                 }
-                event.target.value = "";
+                event.target.value = ""
               }}
             />
           </label>
@@ -230,13 +228,13 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
       <Field label={t.labels.floorPlans}>
         <div className="space-y-2">
           {form.normalizedFloorPlans.map((plan, index) => {
-            const layoutKind = getLayoutKind(plan);
+            const layoutKind = getLayoutKind(plan)
             const scope =
               plan.bathroomScope ??
               getStorageBathroomScope(
                 form.bathroomType,
                 form.normalizedFloorPlans
-              );
+              )
             const preview = form.getRoomDisplayLabel(
               {
                 bedCount: plan.bedCount ?? null,
@@ -245,8 +243,8 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                 labelCode: plan.labelCode,
               },
               form.language
-            );
-            const update = (patch: Partial<FloorPlan>, renormalize = true) =>
+            )
+            const update = (patch: Partial<FloorPlan>, renormalize = true) => {
               form.updateFloorPlan(index, (current) =>
                 renormalize
                   ? normalizeFloorPlan(
@@ -257,22 +255,21 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                       )
                     )
                   : ({ ...current, ...patch } as FloorPlan)
-              );
+              )
+            }
 
-            const isExpanded = expandedIndex === index;
+            const isExpanded = expandedIndex === index
 
             // Multi-image arrays (fallback to legacy single)
             const photoUrls =
-              plan.photoUrls ?? (plan.photoUrl ? [plan.photoUrl] : []);
+              plan.photoUrls ?? (plan.photoUrl ? [plan.photoUrl] : [])
             const imageUrls =
-              plan.imageUrls ?? (plan.imageUrl ? [plan.imageUrl] : []);
+              plan.imageUrls ?? (plan.imageUrl ? [plan.imageUrl] : [])
 
             return (
               <div
-                key={index}
-                className="
-                  overflow-hidden rounded-lg border border-gray-200 bg-gray-50
-                "
+                key={`item-${String(index)}`}
+                className="overflow-hidden rounded-lg border border-gray-200 bg-gray-50"
               >
                 {/* Collapsed header — always visible */}
                 <div className="flex items-center gap-0">
@@ -281,15 +278,12 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                     <button
                       type="button"
                       onClick={() => {
-                        if (index > 0) moveFloorPlan(index, index - 1);
+                        if (index > 0) {
+                          moveFloorPlan(index, index - 1)
+                        }
                       }}
                       disabled={index === 0}
-                      className="
-                        flex h-6 w-8 items-center justify-center text-gray-400
-                        transition-colors
-                        hover:bg-blue-50 hover:text-illini-blue
-                        disabled:cursor-not-allowed disabled:opacity-20
-                      "
+                      className="hover:text-illini-blue flex h-6 w-8 items-center justify-center text-gray-400 transition-colors hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-20"
                       title={form.language === "zh" ? "上移" : "Move up"}
                     >
                       <ChevronUp size={14} strokeWidth={2.5} />
@@ -297,29 +291,25 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                     <button
                       type="button"
                       onClick={() => {
-                        if (index < form.normalizedFloorPlans.length - 1)
-                          moveFloorPlan(index, index + 1);
+                        if (index < form.normalizedFloorPlans.length - 1) {
+                          moveFloorPlan(index, index + 1)
+                        }
                       }}
                       disabled={index === form.normalizedFloorPlans.length - 1}
-                      className="
-                        flex h-6 w-8 items-center justify-center text-gray-400
-                        transition-colors
-                        hover:bg-blue-50 hover:text-illini-blue
-                        disabled:cursor-not-allowed disabled:opacity-20
-                      "
+                      className="hover:text-illini-blue flex h-6 w-8 items-center justify-center text-gray-400 transition-colors hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-20"
                       title={form.language === "zh" ? "下移" : "Move down"}
                     >
                       <ChevronDown size={14} strokeWidth={2.5} />
                     </button>
                   </div>
                   {/* Toggle expand zone */}
-                  <div
-                    className="
-                      flex min-w-0 flex-1 cursor-pointer items-center gap-2 px-3
-                      py-2.5 transition-colors
-                      hover:bg-gray-100
-                    "
-                    onClick={() => toggleExpand(index)}
+                  <button
+                    type="button"
+                    tabIndex={0}
+                    className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 px-3 py-2.5 transition-colors hover:bg-gray-100"
+                    onClick={() => {
+                      toggleExpand(index)
+                    }}
                   >
                     <div className="min-w-0 flex-1">
                       <span className="text-xs font-bold text-gray-500">
@@ -327,11 +317,7 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                       </span>
                       <div className="mt-0.5 min-w-0">
                         {plan.officialName && (
-                          <div
-                            className="
-                              truncate text-xs font-semibold text-gray-700
-                            "
-                          >
+                          <div className="truncate text-xs font-semibold text-gray-700">
                             {plan.officialName}
                           </div>
                         )}
@@ -340,70 +326,64 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                         </span>
                       </div>
                       {hasPublishedPrice(plan.price) && (
-                        <span className="ml-2 text-xs font-medium text-illini-blue">
+                        <span className="text-illini-blue ml-2 text-xs font-medium">
                           ${plan.price.toLocaleString()}/yr
                         </span>
                       )}
                     </div>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        form.setFloorPlans((current) =>
-                          current.filter((_, i) => i !== index)
-                        );
-                        if (expandedIndex === index) setExpandedIndex(null);
-                        else if (
-                          expandedIndex !== null &&
-                          expandedIndex > index
-                        )
-                          setExpandedIndex(expandedIndex - 1);
-                      }}
-                      className="
-                        shrink-0 text-red-400
-                        hover:text-red-600
-                      "
-                    >
-                      <Trash2 size={14} />
-                    </button>
                     <ChevronDown
                       size={16}
-                      className={`
-                        shrink-0 text-gray-400 transition-transform duration-200
-                        ${isExpanded ? "rotate-180" : ""}
-                      `}
+                      className={`shrink-0 text-gray-400 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""} `}
                     />
-                  </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      form.setFloorPlans((current) =>
+                        current.filter((_, i) => i !== index)
+                      )
+                      if (expandedIndex === index) {
+                        setExpandedIndex(null)
+                      } else if (
+                        expandedIndex !== null &&
+                        expandedIndex > index
+                      ) {
+                        setExpandedIndex(expandedIndex - 1)
+                      }
+                    }}
+                    className="shrink-0 text-red-400 hover:text-red-600"
+                  >
+                    <Trash2 size={14} />
+                  </button>
                 </div>
 
                 {/* Expanded body */}
                 {isExpanded && (
-                  <div
-                    className="
-                      space-y-3 border-t border-gray-200 px-3 pt-1 pb-3
-                    "
-                  >
+                  <div className="space-y-3 border-t border-gray-200 px-3 pt-1 pb-3">
                     <div className="grid grid-cols-2 gap-2">
                       <Field label="Official Room Name">
                         <input
+                          aria-label="Input field"
                           type="text"
                           value={plan.officialName ?? ""}
-                          onChange={(event) =>
+                          onChange={(event) => {
                             update(
                               {
                                 officialName: event.target.value || undefined,
                               },
                               false
                             )
-                          }
+                          }}
                           className={inputCls}
                           placeholder="e.g. East Double Standard Room"
                         />
                       </Field>
                       <Field label={t.labels.layoutKind}>
                         <select
+                          aria-label="Select option"
                           value={layoutKind}
-                          onChange={(event) =>
+                          onChange={(event) => {
                             update(
                               {
                                 type:
@@ -417,7 +397,7 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                               },
                               true
                             )
-                          }
+                          }}
                           className={inputCls}
                         >
                           <option value="standard">{t.values.standard}</option>
@@ -428,8 +408,9 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                       </Field>
                       <Field label={t.labels.bathroomType}>
                         <select
+                          aria-label="Select option"
                           value={scope}
-                          onChange={(event) =>
+                          onChange={(event) => {
                             update(
                               {
                                 bathroomScope: event.target
@@ -441,7 +422,7 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                               },
                               true
                             )
-                          }
+                          }}
                           className={inputCls}
                         >
                           {BATHROOM_SCOPE_OPTIONS.map((option) => (
@@ -454,15 +435,16 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                       {layoutKind !== "Studio" && (
                         <Field label={t.labels.bedCount}>
                           <select
+                            aria-label="Select option"
                             value={plan.bedCount ?? 1}
-                            onChange={(event) =>
+                            onChange={(event) => {
                               update(
                                 {
                                   bedCount: Number(event.target.value),
                                 },
                                 true
                               )
-                            }
+                            }}
                             className={inputCls}
                           >
                             {[1, 2, 3, 4, 5].map((count) => (
@@ -475,6 +457,7 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                       )}
                       <Field label={t.labels.bathroomCount}>
                         <input
+                          aria-label="Number input"
                           type="number"
                           min={0}
                           value={
@@ -482,7 +465,7 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                               ? 0
                               : (plan.bathroomCount ?? "")
                           }
-                          onChange={(event) =>
+                          onChange={(event) => {
                             update(
                               {
                                 bathroomCount:
@@ -492,17 +475,18 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                               },
                               true
                             )
-                          }
+                          }}
                           className={inputCls}
                           disabled={scope === "communal"}
                         />
                       </Field>
                       <Field label={t.labels.pricePerYear}>
                         <input
+                          aria-label="Number input"
                           type="number"
                           min={0}
                           value={plan.price ?? ""}
-                          onChange={(event) =>
+                          onChange={(event) => {
                             update(
                               {
                                 price:
@@ -512,16 +496,17 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                               },
                               false
                             )
-                          }
+                          }}
                           className={inputCls}
                         />
                       </Field>
                       <Field label={t.labels.sqft}>
                         <input
+                          aria-label="Number input"
                           type="number"
                           min={0}
                           value={plan.sqft ?? ""}
-                          onChange={(event) =>
+                          onChange={(event) => {
                             update(
                               {
                                 sqft:
@@ -531,14 +516,15 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                               },
                               false
                             )
-                          }
+                          }}
                           className={inputCls}
                         />
                       </Field>
                       <Field label={t.labels.bedSize}>
                         <select
+                          aria-label="Select option"
                           value={plan.bedSize ?? ""}
-                          onChange={(event) =>
+                          onChange={(event) => {
                             update(
                               {
                                 bedSize:
@@ -548,7 +534,7 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                               },
                               false
                             )
-                          }
+                          }}
                           className={inputCls}
                         >
                           <option value="">—</option>
@@ -561,11 +547,12 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                     </div>
                     <Field label={t.labels.shortDescription}>
                       <input
+                        aria-label="Input field"
                         type="text"
                         value={plan.description ?? ""}
-                        onChange={(event) =>
+                        onChange={(event) => {
                           update({ description: event.target.value }, false)
-                        }
+                        }}
                         className={inputCls}
                       />
                     </Field>
@@ -576,15 +563,15 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                           : "Room Photos"
                       }
                       urls={photoUrls}
-                      onChange={(urls) =>
+                      onChange={(urls) => {
                         update(
                           {
-                            photoUrls: urls.length ? urls : undefined,
+                            photoUrls: urls.length > 0 ? urls : undefined,
                             photoUrl: undefined,
                           },
                           false
                         )
-                      }
+                      }}
                       form={form}
                     />
                     <MultiImageField
@@ -594,43 +581,42 @@ export const MediaTab: React.FC<MediaTabProps> = ({ form }) => {
                           : "Floor Plans"
                       }
                       urls={imageUrls}
-                      onChange={(urls) =>
+                      onChange={(urls) => {
                         update(
                           {
-                            imageUrls: urls.length ? urls : undefined,
+                            imageUrls: urls.length > 0 ? urls : undefined,
                             imageUrl: undefined,
                           },
                           false
                         )
-                      }
+                      }}
                       form={form}
                     />
                     <Toggle
                       label={t.labels.available}
                       checked={plan.available !== false}
-                      onChange={(value) => update({ available: value }, false)}
+                      onChange={(value) => {
+                        update({ available: value }, false)
+                      }}
                     />
                   </div>
                 )}
               </div>
-            );
+            )
           })}
           <button
             type="button"
             onClick={() => {
-              form.setFloorPlans((current) => [...current, createFloorPlan()]);
+              form.setFloorPlans((current) => [...current, createFloorPlan()])
               // Auto-expand the new plan
-              setExpandedIndex(form.normalizedFloorPlans.length);
+              setExpandedIndex(form.normalizedFloorPlans.length)
             }}
-            className="
-              flex items-center gap-1 text-xs text-illini-blue
-              hover:underline
-            "
+            className="text-illini-blue flex items-center gap-1 text-xs hover:underline"
           >
             <Plus size={12} /> {t.actions.addFloorPlan}
           </button>
         </div>
       </Field>
     </>
-  );
-};
+  )
+}

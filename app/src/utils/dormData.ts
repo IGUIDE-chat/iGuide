@@ -6,21 +6,21 @@
  */
 
 import {
-  Dorm,
-  DormCategorizedTags,
-  DormTags,
-  FacilityTag,
-  FloorPlan,
-  LifestyleTag,
-  LivingConditionTag,
-} from "../components/housing/types/index";
-import { deriveRoomOptions } from "./roomOptions";
+  type Dorm,
+  type DormCategorizedTags,
+  type DormTags,
+  type FacilityTag,
+  type FloorPlan,
+  type LifestyleTag,
+  type LivingConditionTag,
+} from "../components/housing/types/index"
+import { deriveRoomOptions } from "./roomOptions"
 
 const LIVING_CONDITION_LABELS: Record<LivingConditionTag, string> = {
   noAc: "No AC",
   newlyRenovated: "Renovated",
   olderBuilding: "Older Building",
-};
+}
 
 const FACILITY_LABELS: Record<FacilityTag, string> = {
   gym: "Gym Nearby",
@@ -32,7 +32,7 @@ const FACILITY_LABELS: Record<FacilityTag, string> = {
   laundry: "Laundry",
   kitchen: "Kitchen",
   busStop: "Bus Routes",
-};
+}
 
 const LIFESTYLE_LABELS: Record<LifestyleTag, string> = {
   quiet: "Quiet",
@@ -41,7 +41,7 @@ const LIFESTYLE_LABELS: Record<LifestyleTag, string> = {
   llc: "LLC",
   artsyCreative: "Artsy",
   genderInclusive: "Gender-Inclusive",
-};
+}
 
 const PROXIMITY_LABELS: Array<[keyof DormTags, string]> = [
   ["nearMainQuad", "Near Main Quad"],
@@ -50,7 +50,7 @@ const PROXIMITY_LABELS: Array<[keyof DormTags, string]> = [
   ["nearARC", "Near ARC/CRCE"],
   ["nearGreenStreet", "Near Green Street"],
   ["nearIkenberryDining", "Near Ikenberry Dining"],
-];
+]
 
 const STRUCTURED_AMENITY_LABELS: Array<[keyof DormTags, string]> = [
   ["elevator", "Elevator"],
@@ -64,7 +64,7 @@ const STRUCTURED_AMENITY_LABELS: Array<[keyof DormTags, string]> = [
   ["quietFloors", "Quiet Floors"],
   ["substanceFree", "Substance-Free"],
   ["petFriendly", "Pet-Friendly"],
-];
+]
 
 const OFFICIAL_SQFT_ALLOWLIST: Record<string, Set<string>> = {
   bromley: new Set(["Standard Double", "Triple", "Quad"]),
@@ -77,46 +77,57 @@ const OFFICIAL_SQFT_ALLOWLIST: Record<string, Set<string>> = {
     "C1",
     "D1",
   ]),
-};
+}
 
 function uniqueStrings<T extends string>(
   items: Array<T | undefined | null>
 ): T[] {
   return Array.from(
-    new Set(items.filter((value): value is T => Boolean(value)))
-  );
+    new Set(
+      items.filter(
+        (value): value is T =>
+          value !== null && value !== undefined && value !== ""
+      )
+    )
+  )
 }
 
 function sanitizeOptionalString(value: string | null | undefined) {
-  const trimmed = value?.trim();
-  return trimmed ? trimmed : undefined;
+  const trimmed = value?.trim()
+  return trimmed ?? undefined
 }
 
 function sanitizeUrlList(urls: Array<string | undefined | null>) {
-  return uniqueStrings(urls.map((url) => sanitizeOptionalString(url)));
+  return uniqueStrings(urls.map((url) => sanitizeOptionalString(url)))
 }
 
-export function getDormPriceRange(price: number): Dorm["priceRange"] {
-  if (price < 9000) return "$";
-  if (price < 14500) return "$$";
-  if (price < 17500) return "$$$";
-  return "$$$$";
+function getDormPriceRange(price: number): Dorm["priceRange"] {
+  if (price < 9000) {
+    return "$"
+  }
+  if (price < 14500) {
+    return "$$"
+  }
+  if (price < 17500) {
+    return "$$$"
+  }
+  return "$$$$"
 }
 
-export function normalizeCategorizedTags(
+function normalizeCategorizedTags(
   categorizedTags: DormCategorizedTags
 ): DormCategorizedTags {
-  const lifestyle = uniqueStrings(categorizedTags.lifestyle);
+  const lifestyle = uniqueStrings(categorizedTags.lifestyle)
   const llcNames = lifestyle.includes("llc")
     ? uniqueStrings(categorizedTags.llcNames ?? [])
-    : undefined;
+    : undefined
 
   return {
     livingConditions: uniqueStrings(categorizedTags.livingConditions),
     facilities: uniqueStrings(categorizedTags.facilities),
     lifestyle,
     ...(llcNames && llcNames.length > 0 ? { llcNames } : {}),
-  };
+  }
 }
 
 function syncStructuredTags(
@@ -124,30 +135,30 @@ function syncStructuredTags(
   categorizedTags: DormCategorizedTags
 ): Dorm["structuredTags"] {
   if (!structuredTags) {
-    return structuredTags;
+    return structuredTags
   }
 
   return {
     ...structuredTags,
     laundry:
-      structuredTags.laundry || categorizedTags.facilities.includes("laundry"),
+      structuredTags.laundry ?? categorizedTags.facilities.includes("laundry"),
     studyRooms:
-      structuredTags.studyRooms ||
+      structuredTags.studyRooms ??
       categorizedTags.facilities.includes("studyLounge"),
     kitchen:
-      structuredTags.kitchen || categorizedTags.facilities.includes("kitchen"),
+      structuredTags.kitchen ?? categorizedTags.facilities.includes("kitchen"),
     gymNearby:
-      structuredTags.gymNearby || categorizedTags.facilities.includes("gym"),
+      structuredTags.gymNearby ?? categorizedTags.facilities.includes("gym"),
     genderInclusive:
-      structuredTags.genderInclusive ||
+      structuredTags.genderInclusive ??
       categorizedTags.lifestyle.includes("genderInclusive"),
     llc: categorizedTags.lifestyle.includes("llc")
       ? [...(categorizedTags.llcNames ?? [])]
       : [],
-  };
+  }
 }
 
-export function buildLegacyDormTags(
+function buildLegacyDormTags(
   dorm: Pick<
     Dorm,
     | "housingType"
@@ -159,96 +170,95 @@ export function buildLegacyDormTags(
     | "roomOptions"
   >
 ): string[] {
-  const categorizedTags = normalizeCategorizedTags(dorm.categorizedTags);
-  const tags: string[] = [];
+  const categorizedTags = normalizeCategorizedTags(dorm.categorizedTags)
+  const tags: string[] = []
 
   for (const tag of categorizedTags.lifestyle) {
     if (tag === "llc") {
-      tags.push(...(categorizedTags.llcNames ?? []));
-      continue;
+      tags.push(...(categorizedTags.llcNames ?? []))
+      continue
     }
-    tags.push(LIFESTYLE_LABELS[tag]);
+    tags.push(LIFESTYLE_LABELS[tag])
   }
 
   for (const tag of categorizedTags.livingConditions) {
-    tags.push(LIVING_CONDITION_LABELS[tag]);
+    tags.push(LIVING_CONDITION_LABELS[tag])
   }
 
   for (const tag of categorizedTags.facilities) {
-    tags.push(FACILITY_LABELS[tag]);
+    tags.push(FACILITY_LABELS[tag])
   }
 
   if (dorm.housingType === "PCH") {
-    tags.push("PCH");
+    tags.push("PCH")
   }
 
   if (dorm.dining === "inside") {
-    tags.push("Dining Hall");
+    tags.push("Dining Hall")
   }
   const bathroomScopes = new Set(
     (
       dorm.roomOptions ??
       deriveRoomOptions(dorm.floorPlans, dorm.bathroomType).roomOptions
     ).map((option) => option.bathroomScope)
-  );
+  )
   if (bathroomScopes.has("private") || dorm.bathroomType === "private") {
-    tags.push("Private Bath");
+    tags.push("Private Bath")
   }
   if (
     bathroomScopes.has("individual-use") ||
     dorm.bathroomType === "individual-use"
   ) {
-    tags.push("Communal Single-Use Bath");
+    tags.push("Communal Single-Use Bath")
   }
   if (
     bathroomScopes.has("semi-private") ||
     dorm.bathroomType === "semi-private"
   ) {
-    tags.push("Semi-Private Bath");
+    tags.push("Semi-Private Bath")
   }
 
   const structuredTags = syncStructuredTags(
     dorm.structuredTags,
     categorizedTags
-  );
+  )
   if (structuredTags) {
     for (const [key, label] of PROXIMITY_LABELS) {
       if (structuredTags[key]) {
-        tags.push(label);
+        tags.push(label)
       }
     }
 
     for (const [key, label] of STRUCTURED_AMENITY_LABELS) {
       if (structuredTags[key]) {
-        tags.push(label);
+        tags.push(label)
       }
     }
   }
 
-  return uniqueStrings(tags);
+  return uniqueStrings(tags)
 }
 
-export function finalizeDormRecord(dorm: Dorm): Dorm {
-  const categorizedTags = normalizeCategorizedTags(dorm.categorizedTags);
+function finalizeDormRecord(dorm: Dorm): Dorm {
+  const categorizedTags = normalizeCategorizedTags(dorm.categorizedTags)
   const structuredTags = syncStructuredTags(
     dorm.structuredTags,
     categorizedTags
-  );
-  const allowedSqftPlans =
-    OFFICIAL_SQFT_ALLOWLIST[dorm.id] ?? new Set<string>();
+  )
+  const allowedSqftPlans = OFFICIAL_SQFT_ALLOWLIST[dorm.id] ?? new Set<string>()
   const floorPlans = dorm.floorPlans?.map((plan) => {
-    if (plan.sqft == null) {
-      return plan;
+    if (plan.sqft === null || plan.sqft === undefined) {
+      return plan
     }
 
-    const planName = plan.officialName ?? plan.labelCode ?? plan.type;
+    const planName = plan.officialName ?? plan.labelCode ?? plan.type
     if (!planName || !allowedSqftPlans.has(planName)) {
-      const { sqft: _sqft, ...rest } = plan;
-      return rest;
+      const { sqft: _sqft, ...rest } = plan
+      return rest
     }
 
-    return plan;
-  });
+    return plan
+  })
 
   return {
     ...dorm,
@@ -265,10 +275,10 @@ export function finalizeDormRecord(dorm: Dorm): Dorm {
       roomOptions: dorm.roomOptions,
     }),
     priceRange: getDormPriceRange(dorm.price),
-  };
+  }
 }
 
-export function sanitizeFloorPlanForStorage(plan: FloorPlan): FloorPlan {
+function sanitizeFloorPlanForStorage(plan: FloorPlan): FloorPlan {
   const {
     imageUrl: legacyImageUrl,
     photoUrl: legacyPhotoUrl,
@@ -279,15 +289,15 @@ export function sanitizeFloorPlanForStorage(plan: FloorPlan): FloorPlan {
     price,
     sqft,
     ...rest
-  } = plan;
+  } = plan
   const normalizedImageUrls = sanitizeUrlList([
     ...(imageUrls ?? []),
     legacyImageUrl,
-  ]);
+  ])
   const normalizedPhotoUrls = sanitizeUrlList([
     ...(photoUrls ?? []),
     legacyPhotoUrl,
-  ]);
+  ])
 
   return {
     ...rest,
@@ -303,17 +313,30 @@ export function sanitizeFloorPlanForStorage(plan: FloorPlan): FloorPlan {
     ...(sanitizeOptionalString(description)
       ? { description: sanitizeOptionalString(description) }
       : {}),
-    ...(normalizedImageUrls.length ? { imageUrls: normalizedImageUrls } : {}),
-    ...(normalizedPhotoUrls.length ? { photoUrls: normalizedPhotoUrls } : {}),
-  };
+    ...(normalizedImageUrls.length > 0
+      ? { imageUrls: normalizedImageUrls }
+      : {}),
+    ...(normalizedPhotoUrls.length > 0
+      ? { photoUrls: normalizedPhotoUrls }
+      : {}),
+  }
 }
 
-export function sanitizeFloorPlansForStorage(
+function sanitizeFloorPlansForStorage(
   floorPlans?: FloorPlan[] | null
 ): FloorPlan[] | undefined {
   if (!floorPlans?.length) {
-    return undefined;
+    return undefined
   }
 
-  return floorPlans.map((plan) => sanitizeFloorPlanForStorage(plan));
+  return floorPlans.map((plan) => sanitizeFloorPlanForStorage(plan))
+}
+
+export {
+  getDormPriceRange,
+  normalizeCategorizedTags,
+  buildLegacyDormTags,
+  finalizeDormRecord,
+  sanitizeFloorPlanForStorage,
+  sanitizeFloorPlansForStorage,
 }

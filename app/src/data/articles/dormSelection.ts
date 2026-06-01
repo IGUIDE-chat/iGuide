@@ -7,7 +7,7 @@
 
 // [DATA] Article content for Dorm Selection guide.
 // [数据] 宿舍选择指南的文章内容。
-import { Article } from "../../types";
+import { type Article } from "../../types"
 
 export const dormSelection: Article = {
   id: "dorm-selection",
@@ -50,4 +50,4 @@ Known for artsy, creative vibes and Unit One LLC.
   `,
   tags_zh: ["住宿", "大一", "宿舍", "ISR", "Ike", "PAR", "FAR"],
   lastUpdated: "2024-05-15",
-};
+}

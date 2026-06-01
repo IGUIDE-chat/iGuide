@@ -5,17 +5,17 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import type { StreamChunk, ChatHistoryItem } from "./ai/types";
-import { fetchChatRAGContext, isToolUseRagEnabled } from "./chatRagService";
-import { parseDeepSeekSSEStream } from "./deepseekSse";
-import { quickSearch } from "./searchService";
-import { webSearch } from "./webSearchService";
-import { memoryService } from "./memoryService";
-import defaultSystemPrompt from "./prompts/deepseek-default-system.md?raw";
-import memoryExtractionInstructions from "./prompts/deepseek-memory-extraction.md?raw";
-import soulExtractionInstructions from "./prompts/deepseek-soul-extraction.md?raw";
-import languageZhPrompt from "./prompts/language-zh.md?raw";
-import languageEnPrompt from "./prompts/language-en.md?raw";
+import type { ChatHistoryItem, StreamChunk } from './ai/types';
+import { fetchChatRAGContext, isToolUseRagEnabled } from "./chatRagService"
+import { parseDeepSeekSSEStream } from "./deepseekSse"
+import { memoryService } from "./memoryService"
+import defaultSystemPrompt from "./prompts/deepseek-default-system.md?raw"
+import memoryExtractionInstructions from "./prompts/deepseek-memory-extraction.md?raw"
+import soulExtractionInstructions from "./prompts/deepseek-soul-extraction.md?raw"
+import languageEnPrompt from "./prompts/language-en.md?raw"
+import languageZhPrompt from "./prompts/language-zh.md?raw"
+import { quickSearch } from "./searchService"
+import { webSearch } from "./webSearchService"
 
 // ── Config ──────────────────────────────────────────────────────
 
@@ -24,13 +24,13 @@ import languageEnPrompt from "./prompts/language-en.md?raw";
 // PROD: CF Pages Function /api/deepseek injects key from CF environment variables
 const viteEnv = (
   import.meta as ImportMeta & {
-    env?: Record<string, string | boolean | undefined>;
+    env?: Record<string, string | boolean | undefined>
   }
-).env;
-const IS_DEV = Boolean(viteEnv?.DEV);
+).env
+const IS_DEV = Boolean(viteEnv?.DEV)
 const CHAT_ENDPOINT = IS_DEV
   ? "/api/chat"
-  : `${viteEnv?.VITE_API_GATEWAY_URL || "https://api.iguide.chat"}/chat`;
+  : `${viteEnv?.VITE_API_GATEWAY_URL ?? "https://api.iguide.chat"}/chat`
 
 // ── RAG Context Builder ──────────────────────────────────────────
 
@@ -42,24 +42,26 @@ async function _fetchQMDContext(
   lang: string
 ): Promise<string[]> {
   try {
-    const { results } = await quickSearch(query, lang as "en" | "zh", 5);
+    const { results } = await quickSearch(query, lang as "en" | "zh", 5)
     return results
       .filter((r) => r.score > 0.3)
       .map((r) => {
-        const typeLabel =
-          r.type === "dorm"
-            ? "🏠 Dorm"
-            : r.type === "article"
-              ? "📄 Article"
-              : "🌐 Web";
+        let typeLabel: string
+        if (r.type === "dorm") {
+          typeLabel = "🏠 Dorm"
+        } else if (r.type === "article") {
+          typeLabel = "📄 Article"
+        } else {
+          typeLabel = "🌐 Web"
+        }
         const url = r.id
           ? `/${r.type === "dorm" ? "housing" : "article"}/${r.id}`
-          : "N/A";
-        return `[${typeLabel}] ${r.title} (relevance: ${r.score.toFixed(2)})\nURL: ${url}\n${r.snippet}`;
-      });
-  } catch (err) {
-    console.warn("[RAG] QMD search failed:", err);
-    return [];
+          : "N/A"
+        return `[${typeLabel}] ${r.title} (relevance: ${r.score.toFixed(2)})\nURL: ${url}\n${r.snippet}`
+      })
+  } catch (error) {
+    console.warn("[RAG] QMD search failed:", error)
+    return []
   }
 }
 
@@ -68,28 +70,28 @@ async function _fetchQMDContext(
  */
 async function _fetchWebContext(query: string): Promise<string[]> {
   try {
-    const results = await webSearch(query, { maxResults: 3 });
+    const results = await webSearch(query, { maxResults: 3 })
     return results.map(
       (r) => `[🌐 Web] ${r.title}\nURL: ${r.url}\n${r.content.slice(0, 300)}`
-    );
-  } catch (err) {
-    console.warn("[RAG] Web search failed:", err);
-    return [];
+    )
+  } catch (error) {
+    console.warn("[RAG] Web search failed:", error)
+    return []
   }
 }
 
-const DEFAULT_SYSTEM_PROMPT = defaultSystemPrompt.trim();
-const MEMORY_EXTRACTION_INSTRUCTIONS = memoryExtractionInstructions.trim();
-const SOUL_EXTRACTION_INSTRUCTIONS = soulExtractionInstructions.trim();
+const DEFAULT_SYSTEM_PROMPT = defaultSystemPrompt.trim()
+const MEMORY_EXTRACTION_INSTRUCTIONS = memoryExtractionInstructions.trim()
+const SOUL_EXTRACTION_INSTRUCTIONS = soulExtractionInstructions.trim()
 const LANGUAGE_PROMPTS = {
   zh: languageZhPrompt.trim(),
   en: languageEnPrompt.trim(),
-} as const;
+} as const
 
 interface RAGResult {
-  context: string;
-  hasQMD: boolean;
-  hasWeb: boolean;
+  context: string
+  hasQMD: boolean
+  hasWeb: boolean
 }
 
 /**
@@ -99,14 +101,14 @@ async function fetchRAGContext(
   query: string,
   lang: string
 ): Promise<RAGResult> {
-  return fetchChatRAGContext(query, lang);
+  return fetchChatRAGContext(query, lang)
 }
 
 // ── Message Builder ─────────────────────────────────────────────
 
 interface OpenAIMessage {
-  role: "system" | "user" | "assistant";
-  content: string;
+  role: "system" | "user" | "assistant"
+  content: string
 }
 
 function buildOpenAIMessages(
@@ -115,28 +117,28 @@ function buildOpenAIMessages(
   lang: string,
   systemInstruction?: string
 ): OpenAIMessage[] {
-  const messages: OpenAIMessage[] = [];
+  const messages: OpenAIMessage[] = []
 
   // System prompt with optional RAG context
-  const systemContent = systemInstruction || DEFAULT_SYSTEM_PROMPT;
+  const systemContent = systemInstruction ?? DEFAULT_SYSTEM_PROMPT
   const languagePrompt =
-    lang === "zh" ? LANGUAGE_PROMPTS.zh : LANGUAGE_PROMPTS.en;
+    lang === "zh" ? LANGUAGE_PROMPTS.zh : LANGUAGE_PROMPTS.en
   messages.push({
     role: "system",
     content: [systemContent, languagePrompt].filter(Boolean).join("\n\n"),
-  });
+  })
 
   // Conversation history
   for (const h of history) {
     messages.push({
       role: h.role === "model" ? "assistant" : "user",
       content: h.text,
-    });
+    })
   }
 
   // Current user message
-  messages.push({ role: "user", content: newMessage });
-  return messages;
+  messages.push({ role: "user", content: newMessage })
+  return messages
 }
 
 // ── Main Streaming Function ──────────────────────────────────────
@@ -152,12 +154,13 @@ function buildOpenAIMessages(
 export const streamDeepSeekChat = async function* (
   history: ChatHistoryItem[],
   newMessage: string,
-  lang: string = "en",
-  _conversationId?: string,
-  _userId?: string
+  lang = "en",
+  options?: { conversationId?: string; userId?: string }
 ): AsyncGenerator<StreamChunk> {
+  const conversationId = options?.conversationId
+  const userId = options?.userId
   try {
-    const useToolUseRag = isToolUseRagEnabled();
+    const useToolUseRag = isToolUseRagEnabled()
 
     if (useToolUseRag) {
       const response = await fetch(CHAT_ENDPOINT, {
@@ -166,47 +169,47 @@ export const streamDeepSeekChat = async function* (
         body: JSON.stringify({
           message: newMessage,
           history,
-          conversationId: _conversationId,
-          userId: _userId,
+          conversationId,
+          userId,
           lang,
         }),
-      });
+      })
 
       if (!response.ok) {
-        const err = await response.json().catch(() => ({}));
+        const err = await response.json().catch(() => ({}))
         throw new Error(
-          (err as { error?: string }).error ||
+          (err as { error?: string }).error ??
             `Chat API returned ${response.status}`
-        );
+        )
       }
 
-      const contentType = response.headers.get("content-type") || "";
+      const contentType = response.headers.get("content-type") ?? ""
 
       if (contentType.includes("text/event-stream") && response.body) {
-        const reader = response.body.getReader();
-        yield* parseDeepSeekSSEStream(reader, lang as "en" | "zh");
-        return;
+        const reader = response.body.getReader()
+        yield* parseDeepSeekSSEStream(reader, lang as "en" | "zh")
+        return
       }
 
-      const data = (await response.json()) as { reply?: string; text?: string };
+      const data = (await response.json()) as { reply?: string; text?: string }
       if (data.reply || data.text) {
-        yield { text: data.reply || data.text || "" };
+        yield { text: data.reply ?? data.text ?? "" }
       }
-      return;
+      return
     }
 
     // 1. Fetch RAG context + personalization context in parallel
-    let ragContext = "";
-    let soul = "";
-    let userMemory = "";
-    let conversationMemory = "";
+    let ragContext = ""
+    let soul = ""
+    let userMemory = ""
+    let conversationMemory = ""
 
     try {
       const [ragResult, chatCtx] = await Promise.all([
         fetchRAGContext(newMessage, lang),
-        _userId
+        userId
           ? memoryService
-              .getChatContext(_userId, _conversationId)
+              .getChatContext(userId, conversationId)
               .catch(() => ({
                 soul: "",
                 userMemory: "",
@@ -217,11 +220,11 @@ export const streamDeepSeekChat = async function* (
               userMemory: "",
               conversationMemory: "",
             }),
-      ]);
-      ragContext = ragResult.context;
-      soul = chatCtx.soul;
-      userMemory = chatCtx.userMemory;
-      conversationMemory = chatCtx.conversationMemory;
+      ])
+      ragContext = ragResult.context
+      soul = chatCtx.soul
+      userMemory = chatCtx.userMemory
+      conversationMemory = chatCtx.conversationMemory
 
       if (ragResult.hasQMD) {
         yield {
@@ -232,7 +235,7 @@ export const streamDeepSeekChat = async function* (
               lang === "zh" ? "知识库检索完成" : "Knowledge base retrieved",
             detail: "QMD knowledge base",
           },
-        };
+        }
       }
       if (ragResult.hasWeb) {
         yield {
@@ -242,7 +245,7 @@ export const streamDeepSeekChat = async function* (
             label: lang === "zh" ? "网络搜索完成" : "Web search complete",
             detail: "Tavily web search",
           },
-        };
+        }
       }
     } catch {
       // QMD / Tavily might not be available; proceed without RAG
@@ -252,8 +255,8 @@ export const streamDeepSeekChat = async function* (
     const basePrompt = [
       DEFAULT_SYSTEM_PROMPT,
       soul ? `## 🎭 Persona Customization (用户自定义人设)\n${soul}` : "",
-      _userId ? MEMORY_EXTRACTION_INSTRUCTIONS : "",
-      _userId ? SOUL_EXTRACTION_INSTRUCTIONS : "",
+      userId ? MEMORY_EXTRACTION_INSTRUCTIONS : "",
+      userId ? SOUL_EXTRACTION_INSTRUCTIONS : "",
       userMemory
         ? `## 📋 User Profile (remembered from past conversations)\n${userMemory}`
         : "",
@@ -262,14 +265,14 @@ export const streamDeepSeekChat = async function* (
         : "",
     ]
       .filter((s) => s?.trim())
-      .join("\n\n");
+      .join("\n\n")
 
     const systemInstruction = [basePrompt, ragContext]
       .filter((s) => s?.trim())
-      .join("\n\n");
+      .join("\n\n")
 
     // 3. Call DeepSeek — dev calls API directly, prod uses CF Function
-    let response: Response;
+    let response: Response
 
     if (IS_DEV) {
       // DEV: build OpenAI-format messages, call via Vite proxy (proxy injects Authorization header)
@@ -278,7 +281,7 @@ export const streamDeepSeekChat = async function* (
         newMessage,
         lang,
         systemInstruction
-      );
+      )
       response = await fetch("/api/deepseek-raw", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -286,9 +289,9 @@ export const streamDeepSeekChat = async function* (
           model: "deepseek-chat",
           messages,
           stream: true,
-          temperature: 1.0,
+          temperature: 1,
         }),
-      });
+      })
     } else {
       // PROD: CF Function handles format translation
       response = await fetch("/api/deepseek", {
@@ -301,33 +304,33 @@ export const streamDeepSeekChat = async function* (
           stream: true,
           systemInstruction,
         }),
-      });
+      })
     }
 
     if (!response.ok) {
-      const err = await response.json().catch(() => ({}));
+      const err = await response.json().catch(() => ({}))
       throw new Error(
-        (err as { error?: string }).error ||
+        (err as { error?: string }).error ??
           `DeepSeek API returned ${response.status}`
-      );
+      )
     }
 
-    const contentType = response.headers.get("content-type") || "";
+    const contentType = response.headers.get("content-type") ?? ""
 
     if (contentType.includes("text/event-stream") && response.body) {
       // SSE streaming
-      const reader = response.body.getReader();
-      yield* parseDeepSeekSSEStream(reader, lang as "en" | "zh");
+      const reader = response.body.getReader()
+      yield* parseDeepSeekSSEStream(reader, lang as "en" | "zh")
     } else {
       // Fallback: non-streaming JSON response
-      const data = (await response.json()) as { reply?: string };
+      const data = (await response.json()) as { reply?: string }
       if (data.reply) {
-        yield { text: data.reply };
+        yield { text: data.reply }
       }
     }
   } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : "Unknown error";
-    console.error("[DeepSeek] Stream error:", msg);
-    yield { text: `\n(Error: ${msg})` };
+    const msg = error instanceof Error ? error.message : "Unknown error"
+    console.error("[DeepSeek] Stream error:", msg)
+    yield { text: `\n(Error: ${msg})` }
   }
-};
+}

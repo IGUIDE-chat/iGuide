@@ -7,11 +7,23 @@
       "skillPath": "skills/agents-sdk/SKILL.md",
       "computedHash": "cb669fba9289d500872584ea0daab1c5114f1c8f12a991f90871431d3fadbf3c"
     },
+    "ai-sdk": {
+      "source": "vercel/ai",
+      "sourceType": "github",
+      "skillPath": "skills/use-ai-sdk/SKILL.md",
+      "computedHash": "2249889eb47ef0f61c4dba4cf2afe01c1c8dd793bb4c24230347c1ab909bb7dd"
+    },
     "assistant-ui": {
       "source": "assistant-ui/skills",
       "sourceType": "github",
       "skillPath": "assistant-ui/skills/assistant-ui/SKILL.md",
       "computedHash": "cfce3ce8c4c2da38f0fc8e881af677efa8166d379862541f79c54e66f1a599d5"
+    },
+    "chatgpt-apps": {
+      "source": "openai/skills",
+      "sourceType": "github",
+      "skillPath": "skills/.curated/chatgpt-apps/SKILL.md",
+      "computedHash": "71759cbfd2e81141e962584fe14ac158d2ce404383460513b5b01c638068a568"
     },
     "cloud": {
       "source": "assistant-ui/skills",
@@ -31,6 +43,12 @@
       "skillPath": "manual-frontend-qa/SKILL.md",
       "computedHash": "ddbbeec4944fd7d2a2c59c6aa4e5e8298d78c986e79f62c499795a837c7b122c"
     },
+    "openai-docs": {
+      "source": "openai/skills",
+      "sourceType": "github",
+      "skillPath": "skills/.curated/openai-docs/SKILL.md",
+      "computedHash": "2fbde863c4a84ea971136f3138baa0a81648038747724cc60f4e8d46718f8d7d"
+    },
     "primitives": {
       "source": "assistant-ui/skills",
       "sourceType": "github",
@@ -48,6 +66,18 @@
       "sourceType": "github",
       "skillPath": "assistant-ui/skills/setup/SKILL.md",
       "computedHash": "283c7cbc08cbc1a3b58307083f505a24fcc8b5e5621608d6e1fb88034b1afce0"
+    },
+    "slop-design": {
+      "source": "arcadi4/skills",
+      "sourceType": "github",
+      "skillPath": "slop-design/SKILL.md",
+      "computedHash": "12f3e602b91314eb4d87d736a62046c0034b1ea6c4c83cb40f2f170c017afaea"
+    },
+    "slop-tests": {
+      "source": "arcadi4/skills",
+      "sourceType": "github",
+      "skillPath": "slop-tests/SKILL.md",
+      "computedHash": "e4d86681e211381755697aa94c0761dd8a511d006957c560d9fa1bcdc117deb6"
     },
     "streaming": {
       "source": "assistant-ui/skills",

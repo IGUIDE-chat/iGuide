@@ -1,35 +1,36 @@
+import { tool } from "ai"
+import { z } from "zod"
+
+import type {
+  MCPAdapterClient,
+  MCPDiscoveryResult,
+  MCPTestResult,
+} from "./adapter.ts"
+import { createMCPStore } from "./store.ts"
+import type { MCPStore } from "./store.ts"
+import { StreamableHttpMCPClient } from "./streamable-http-client.ts"
 import type {
   MCPConnection,
   MCPDiscoveredTool,
   MCPToolOverride,
-} from './types.ts'
-import type {
-  MCPAdapterClient,
-  MCPDiscoveryResult,
-  MCPDiscoveredTool as AdapterDiscoveredTool,
-  MCPTestResult,
-} from './adapter.ts'
-import { createMCPToolWrapper } from './adapter.ts'
-import { createMCPStore, type MCPStore } from './store.ts'
-import type { ToolDefinition } from '../tools/types.ts'
-import { StreamableHttpMCPClient } from './streamable-http-client.ts'
+} from "./types.ts"
 
 type CreateConnectionInput = Pick<
   MCPConnection,
-  'display_name' | 'endpoint_url' | 'transport'
+  "display_name" | "endpoint_url" | "transport"
 > &
-  Partial<Pick<MCPConnection, 'description'>>
+  Partial<Pick<MCPConnection, "description">>
 
 type UpdateConnectionInput = Partial<
-  Pick<MCPConnection, 'display_name' | 'description' | 'is_enabled'>
+  Pick<MCPConnection, "display_name" | "description" | "is_enabled">
 >
 
-const CONNECTION_PREFIX = 'conn:'
-const TOOL_PREFIX = 'tool:'
-const OVERRIDE_PREFIX = 'override:'
+const CONNECTION_PREFIX = "conn:"
+const TOOL_PREFIX = "tool:"
+const OVERRIDE_PREFIX = "override:"
 
 function asEnvRecord(env?: unknown): Record<string, unknown> | undefined {
-  return env && typeof env === 'object'
+  return env && typeof env === "object"
     ? (env as Record<string, unknown>)
     : undefined
 }
@@ -37,11 +38,11 @@ function asEnvRecord(env?: unknown): Record<string, unknown> | undefined {
 function isMCPStore(value: unknown): value is MCPStore {
   return Boolean(
     value &&
-    typeof value === 'object' &&
-    'get' in value &&
-    'put' in value &&
-    'delete' in value &&
-    'list' in value
+    typeof value === "object" &&
+    "get" in value &&
+    "put" in value &&
+    "delete" in value &&
+    "list" in value
   )
 }
 
@@ -84,12 +85,15 @@ function isPlatformConnectionVisible(
   viewerId: string
 ): boolean {
   switch (connection.visibility) {
-    case 'global':
+    case "global": {
       return true
-    case 'owner_only':
+    }
+    case "owner_only": {
       return connection.owner_id === viewerId
-    case 'institution':
+    }
+    case "institution": {
       return connection.institution_id === viewerId
+    }
   }
 }
 
@@ -121,7 +125,7 @@ export class MCPConnectionService {
     const user: MCPConnection[] = []
 
     for (const { value: connection } of records) {
-      if (connection.owner_type === 'platform') {
+      if (connection.owner_type === "platform") {
         if (isPlatformConnectionVisible(connection, viewerId)) {
           platform.push(connection)
         }
@@ -129,7 +133,7 @@ export class MCPConnectionService {
       }
 
       if (
-        connection.owner_type === 'user' &&
+        connection.owner_type === "user" &&
         connection.owner_id === viewerId
       ) {
         user.push(connection)
@@ -147,14 +151,14 @@ export class MCPConnectionService {
     const connection: MCPConnection = {
       id: crypto.randomUUID(),
       owner_id: viewerId,
-      owner_type: 'user',
-      visibility: 'owner_only',
+      owner_type: "user",
+      visibility: "owner_only",
       display_name: input.display_name,
       endpoint_url: input.endpoint_url,
       transport: input.transport,
-      ...(input.description !== undefined
-        ? { description: input.description }
-        : {}),
+      ...(input.description === undefined
+        ? {}
+        : { description: input.description }),
       is_enabled: true,
       last_test_status: null,
       created_at: timestamp,
@@ -174,7 +178,7 @@ export class MCPConnectionService {
       return null
     }
 
-    if (connection.owner_type === 'user') {
+    if (connection.owner_type === "user") {
       return connection.owner_id === viewerId ? connection : null
     }
 
@@ -187,7 +191,7 @@ export class MCPConnectionService {
     patch: UpdateConnectionInput
   ): Promise<MCPConnection | null> {
     const existing = await this.getByIdForViewer(id, viewerId)
-    if (!existing || existing.owner_type !== 'user') {
+    if (!existing || existing.owner_type !== "user") {
       return null
     }
 
@@ -203,7 +207,7 @@ export class MCPConnectionService {
 
   async deleteUserConnection(id: string, viewerId: string): Promise<boolean> {
     const existing = await this.getByIdForViewer(id, viewerId)
-    if (!existing || existing.owner_type !== 'user') {
+    if (!existing || existing.owner_type !== "user") {
       return false
     }
 
@@ -217,14 +221,14 @@ export class MCPConnectionService {
     result: MCPTestResult
   ): Promise<void> {
     const existing = await this.getByIdForViewer(id, viewerId)
-    if (!existing || existing.owner_type !== 'user') {
+    if (!existing || existing.owner_type !== "user") {
       return
     }
 
     const updated: MCPConnection = {
       ...existing,
       last_test_at: new Date().toISOString(),
-      last_test_status: result.success ? 'ok' : 'failed',
+      last_test_status: result.success ? "ok" : "failed",
       last_test_error: result.error_message ?? undefined,
       updated_at: new Date().toISOString(),
     }
@@ -238,7 +242,7 @@ export class MCPConnectionService {
     result: MCPDiscoveryResult
   ): Promise<void> {
     const existing = await this.getByIdForViewer(id, viewerId)
-    if (!existing || existing.owner_type !== 'user') {
+    if (!existing || existing.owner_type !== "user") {
       return
     }
 
@@ -286,7 +290,7 @@ export class MCPDiscoveredToolService {
 
   async replaceDiscoveredTools(
     connectionId: string,
-    tools: MCPDiscoveryResult['tools']
+    tools: MCPDiscoveryResult["tools"]
   ): Promise<void> {
     const existing = await this.store.list<MCPDiscoveredTool>(
       toolPrefix(connectionId)
@@ -295,14 +299,16 @@ export class MCPDiscoveredToolService {
 
     const discoveredAt = new Date().toISOString()
     await Promise.all(
-      tools.map((tool) => {
-        const key = toolKey(connectionId, tool.name)
+      tools.map((mcpToolDef) => {
+        const key = toolKey(connectionId, mcpToolDef.name)
         const record: MCPDiscoveredTool = {
           id: key,
           connection_id: connectionId,
-          name: tool.name,
-          ...(tool.description ? { description: tool.description } : {}),
-          input_schema: tool.parameters,
+          name: mcpToolDef.name,
+          ...(mcpToolDef.description
+            ? { description: mcpToolDef.description }
+            : {}),
+          input_schema: mcpToolDef.parameters,
           discovered_at: discoveredAt,
         }
 
@@ -387,17 +393,12 @@ export class MCPToolOverrideService {
   }
 }
 
-interface RuntimeToolRegistry {
-  register(tool: ToolDefinition): void
-}
-
 interface RuntimeLogger {
   error(message?: unknown, ...optionalParams: unknown[]): void
   warn?(message?: unknown, ...optionalParams: unknown[]): void
 }
 
 export interface RegisterRuntimeMCPToolsOptions {
-  registry: RuntimeToolRegistry
   viewerId: string
   env?: unknown
   store?: MCPStore
@@ -405,31 +406,58 @@ export interface RegisterRuntimeMCPToolsOptions {
   logger?: RuntimeLogger
 }
 
-function toAdapterDiscoveredTool(
-  connection: MCPConnection,
-  tool: MCPDiscoveredTool
-): AdapterDiscoveredTool {
-  return {
-    url: connection.endpoint_url,
-    name: tool.name,
-    description: tool.description ?? `MCP tool ${tool.name}`,
-    parameters: tool.input_schema,
+function jsonSchemaToZod(schema: Record<string, unknown>): z.ZodTypeAny {
+  const type = schema.type as string | undefined
+
+  if (type === "string") {
+    return z.string()
   }
+  if (type === "number") {
+    return z.number()
+  }
+  if (type === "integer") {
+    return z.number().int()
+  }
+  if (type === "boolean") {
+    return z.boolean()
+  }
+  if (type === "array") {
+    const items = schema.items as Record<string, unknown> | undefined
+    return items ? z.array(jsonSchemaToZod(items)) : z.array(z.any())
+  }
+  if (type === "object") {
+    const properties = schema.properties as
+      | Record<string, Record<string, unknown>>
+      | undefined
+    if (properties) {
+      const shape: Record<string, z.ZodTypeAny> = {}
+      for (const [key, propSchema] of Object.entries(properties)) {
+        shape[key] = jsonSchemaToZod(propSchema)
+      }
+      return z.object(shape)
+    }
+    return z.record(z.string(), z.any())
+  }
+
+  return z.any()
 }
 
 export async function registerRuntimeMCPTools({
-  registry,
   viewerId,
   env,
   store,
   client = new StreamableHttpMCPClient(),
   logger = console,
-}: RegisterRuntimeMCPToolsOptions): Promise<void> {
+  // eslint-disable-next-line typescript/no-explicit-any -- AI SDK ToolSet requires Record<string, any>
+}: RegisterRuntimeMCPToolsOptions): Promise<Record<string, any>> {
   const resolvedStore = store ?? createMCPStore({ env: asEnvRecord(env) })
   const connections = new MCPConnectionService(resolvedStore)
   const tools = new MCPDiscoveredToolService(resolvedStore)
   const overrides = new MCPToolOverrideService(resolvedStore)
   const visibleConnections = await connections.listForViewer(viewerId)
+
+  // eslint-disable-next-line typescript/no-explicit-any -- AI SDK ToolSet requires Record<string, any>
+  const result: Record<string, any> = {}
 
   for (const connection of [
     ...visibleConnections.platform,
@@ -440,23 +468,40 @@ export async function registerRuntimeMCPTools({
     }
 
     try {
+      // eslint-disable-next-line no-await-in-loop -- connections must be processed sequentially for deterministic key ordering
       const [discoveredTools, disabledToolNames] = await Promise.all([
         tools.listTools(connection.id),
         overrides.getDisabledToolNames(connection.id, viewerId),
       ])
       const disabledToolNameSet = new Set(disabledToolNames)
 
-      for (const tool of discoveredTools) {
-        if (disabledToolNameSet.has(tool.name)) {
+      for (const mcpTool of discoveredTools) {
+        if (disabledToolNameSet.has(mcpTool.name)) {
           continue
         }
 
-        registry.register(
-          createMCPToolWrapper(
-            toAdapterDiscoveredTool(connection, tool),
-            client
-          )
-        )
+        const sanitizedConnectionId = connection.id.replaceAll("-", "_")
+        const registryKey = `mcp_${sanitizedConnectionId}_${mcpTool.name}`
+        const zodSchema = jsonSchemaToZod(mcpTool.input_schema)
+
+        result[registryKey] = tool({
+          description: mcpTool.description ?? `MCP tool ${mcpTool.name}`,
+          parameters: zodSchema,
+          // @ts-expect-error - AI SDK tool() execute signature inference issue with dynamic schemas
+          execute: async (args) => {
+            const callResult = await client.call(
+              connection.endpoint_url,
+              mcpTool.name,
+              args
+            )
+
+            if (callResult.success && callResult.tool_result) {
+              return callResult.tool_result.content
+            }
+
+            throw new Error(callResult.error_message ?? "MCP call failed")
+          },
+        })
       }
     } catch (error) {
       logger.error(
@@ -465,4 +510,6 @@ export async function registerRuntimeMCPTools({
       )
     }
   }
+
+  return result
 }

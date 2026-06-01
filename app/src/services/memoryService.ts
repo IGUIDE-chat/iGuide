@@ -5,11 +5,11 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { supabase } from "./supabase";
+import { supabase } from "./supabase"
 
-const SOUL_MAX_LENGTH = 500;
-const USER_MEMORY_MAX_LENGTH = 1500;
-const CONV_MEMORY_MAX_LENGTH = 1000;
+const SOUL_MAX_LENGTH = 500
+const USER_MEMORY_MAX_LENGTH = 1500
+const CONV_MEMORY_MAX_LENGTH = 1000
 
 /**
  * Merge new soul preference entries into existing soul prompt.
@@ -19,39 +19,41 @@ function mergeSoul(existing: string, incoming: string): string {
   const existingLines = existing
     .split("\n")
     .map((l) => l.trim())
-    .filter(Boolean);
+    .filter(Boolean)
   const newEntries = incoming
     .split(/[;\n]/)
     .map((l) => l.trim())
-    .filter(Boolean);
+    .filter(Boolean)
 
   for (const entry of newEntries) {
-    const colonIdx = entry.indexOf(":");
+    const colonIdx = entry.indexOf(":")
+    let idx: number
     if (colonIdx > 0) {
-      const key = entry.substring(0, colonIdx).trim().toLowerCase();
-      const idx = existingLines.findIndex((line) => {
-        const lineColonIdx = line.indexOf(":");
+      const key = entry.slice(0, colonIdx).trim().toLowerCase()
+      idx = existingLines.findIndex((line) => {
+        const lineColonIdx = line.indexOf(":")
         return (
           lineColonIdx > 0 &&
-          line.substring(0, lineColonIdx).trim().toLowerCase() === key
-        );
-      });
-      if (idx !== -1) existingLines.splice(idx, 1);
+          line.slice(0, lineColonIdx).trim().toLowerCase() === key
+        )
+      })
     } else {
-      const idx = existingLines.findIndex(
+      idx = existingLines.findIndex(
         (line) => line.toLowerCase() === entry.toLowerCase()
-      );
-      if (idx !== -1) existingLines.splice(idx, 1);
+      )
     }
-    existingLines.push(entry);
+    if (idx !== -1) {
+      existingLines.splice(idx, 1)
+    }
+    existingLines.push(entry)
   }
 
-  let result = existingLines.join("\n");
+  let result = existingLines.join("\n")
   while (result.length > SOUL_MAX_LENGTH && existingLines.length > 1) {
-    existingLines.shift();
-    result = existingLines.join("\n");
+    existingLines.shift()
+    result = existingLines.join("\n")
   }
-  return result;
+  return result
 }
 
 /**
@@ -62,36 +64,38 @@ function mergeUserMemory(existing: string, incoming: string): string {
   const existingLines = existing
     .split("\n")
     .map((l) => l.trim())
-    .filter(Boolean);
+    .filter(Boolean)
   const newEntries = incoming
     .split(/[;\n]/)
     .map((l) => l.trim())
-    .filter(Boolean);
+    .filter(Boolean)
 
   for (const entry of newEntries) {
-    const colonIdx = entry.indexOf(":");
+    const colonIdx = entry.indexOf(":")
     if (colonIdx > 0) {
-      const key = entry.substring(0, colonIdx).trim().toLowerCase();
+      const key = entry.slice(0, colonIdx).trim().toLowerCase()
       // Remove existing line with same key
       const idx = existingLines.findIndex((line) => {
-        const lineColonIdx = line.indexOf(":");
+        const lineColonIdx = line.indexOf(":")
         return (
           lineColonIdx > 0 &&
-          line.substring(0, lineColonIdx).trim().toLowerCase() === key
-        );
-      });
-      if (idx !== -1) existingLines.splice(idx, 1);
+          line.slice(0, lineColonIdx).trim().toLowerCase() === key
+        )
+      })
+      if (idx !== -1) {
+        existingLines.splice(idx, 1)
+      }
     }
-    existingLines.push(entry);
+    existingLines.push(entry)
   }
 
-  let result = existingLines.join("\n");
+  let result = existingLines.join("\n")
   // Enforce max length by dropping oldest lines
   while (result.length > USER_MEMORY_MAX_LENGTH && existingLines.length > 1) {
-    existingLines.shift();
-    result = existingLines.join("\n");
+    existingLines.shift()
+    result = existingLines.join("\n")
   }
-  return result;
+  return result
 }
 
 export const memoryService = {
@@ -102,16 +106,16 @@ export const memoryService = {
       .from("user_souls")
       .select("soul_prompt")
       .eq("user_id", userId)
-      .maybeSingle();
+      .maybeSingle()
     if (error) {
-      console.error("[memoryService] Failed to get soul:", { userId, error });
-      return "";
+      console.error("[memoryService] Failed to get soul:", { userId, error })
+      return ""
     }
-    return data?.soul_prompt || "";
+    return data?.soul_prompt ?? ""
   },
 
   async updateSoul(userId: string, soulPrompt: string): Promise<void> {
-    const trimmed = soulPrompt.slice(0, SOUL_MAX_LENGTH);
+    const trimmed = soulPrompt.slice(0, SOUL_MAX_LENGTH)
     const { error } = await supabase.from("user_souls").upsert(
       {
         user_id: userId,
@@ -119,8 +123,10 @@ export const memoryService = {
         updated_at: new Date().toISOString(),
       },
       { onConflict: "user_id" }
-    );
-    if (error) console.error("[memoryService] Failed to update soul:", error);
+    )
+    if (error) {
+      console.error("[memoryService] Failed to update soul:", error)
+    }
   },
 
   // ── User Memory ──────────────────────────────────────────────
@@ -129,9 +135,9 @@ export const memoryService = {
    * Merge new entries into the user's soul/persona preferences.
    */
   async appendSoul(userId: string, newEntries: string): Promise<void> {
-    const existing = await this.getSoul(userId);
-    const merged = mergeSoul(existing, newEntries);
-    await this.updateSoul(userId, merged);
+    const existing = await this.getSoul(userId)
+    const merged = mergeSoul(existing, newEntries)
+    await this.updateSoul(userId, merged)
   },
 
   async getUserMemory(userId: string): Promise<string> {
@@ -139,19 +145,19 @@ export const memoryService = {
       .from("user_memories")
       .select("memory_text")
       .eq("user_id", userId)
-      .maybeSingle();
+      .maybeSingle()
     if (error) {
       console.error("[memoryService] Failed to get user memory:", {
         userId,
         error,
-      });
-      return "";
+      })
+      return ""
     }
-    return data?.memory_text || "";
+    return data?.memory_text ?? ""
   },
 
   async updateUserMemory(userId: string, memoryText: string): Promise<void> {
-    const trimmed = memoryText.slice(0, USER_MEMORY_MAX_LENGTH);
+    const trimmed = memoryText.slice(0, USER_MEMORY_MAX_LENGTH)
     const { error } = await supabase.from("user_memories").upsert(
       {
         user_id: userId,
@@ -159,18 +165,19 @@ export const memoryService = {
         updated_at: new Date().toISOString(),
       },
       { onConflict: "user_id" }
-    );
-    if (error)
-      console.error("[memoryService] Failed to update user memory:", error);
+    )
+    if (error) {
+      console.error("[memoryService] Failed to update user memory:", error)
+    }
   },
 
   /**
    * Merge new entries into existing user memory (dedup by key).
    */
   async appendUserMemory(userId: string, newEntries: string): Promise<void> {
-    const existing = await this.getUserMemory(userId);
-    const merged = mergeUserMemory(existing, newEntries);
-    await this.updateUserMemory(userId, merged);
+    const existing = await this.getUserMemory(userId)
+    const merged = mergeUserMemory(existing, newEntries)
+    await this.updateUserMemory(userId, merged)
   },
 
   // ── Conversation Memory ──────────────────────────────────────
@@ -180,22 +187,22 @@ export const memoryService = {
       .from("conversation_memories")
       .select("memory_text")
       .eq("conversation_id", conversationId)
-      .maybeSingle();
+      .maybeSingle()
     if (error) {
       console.error("[memoryService] Failed to get conversation memory:", {
         conversationId,
         error,
-      });
-      return "";
+      })
+      return ""
     }
-    return data?.memory_text || "";
+    return data?.memory_text ?? ""
   },
 
   async updateConversationMemory(
     conversationId: string,
     memoryText: string
   ): Promise<void> {
-    const trimmed = memoryText.slice(0, CONV_MEMORY_MAX_LENGTH);
+    const trimmed = memoryText.slice(0, CONV_MEMORY_MAX_LENGTH)
     const { error } = await supabase.from("conversation_memories").upsert(
       {
         conversation_id: conversationId,
@@ -203,12 +210,13 @@ export const memoryService = {
         updated_at: new Date().toISOString(),
       },
       { onConflict: "conversation_id" }
-    );
-    if (error)
+    )
+    if (error) {
       console.error(
         "[memoryService] Failed to update conversation memory:",
         error
-      );
+      )
+    }
   },
 
   // ── Composite fetch (parallel) ──────────────────────────────
@@ -223,7 +231,7 @@ export const memoryService = {
       conversationId
         ? this.getConversationMemory(conversationId).catch(() => "")
         : Promise.resolve(""),
-    ]);
-    return { soul, userMemory, conversationMemory };
+    ])
+    return { soul, userMemory, conversationMemory }
   },
-};
+}

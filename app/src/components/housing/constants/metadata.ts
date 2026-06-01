@@ -5,66 +5,67 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { Language } from "../../../types";
 import {
-  BathroomScope,
-  BathroomType,
-  DiningType,
-  Dorm,
-  DormTag,
-  TagCategory,
-} from "../types/index";
-import {
-  Snowflake,
-  Hammer,
-  Building2,
-  Dumbbell,
-  Music,
-  Store,
   BookOpen,
-  WashingMachine,
-  CookingPot,
+  Building2,
   Bus,
-  Monitor,
-  LibraryBig,
-  Volume2,
-  PartyPopper,
+  CookingPot,
+  Dumbbell,
   Globe,
   GraduationCap,
+  Hammer,
+  LibraryBig,
+  Monitor,
+  Music,
   Palette,
+  PartyPopper,
+  Snowflake,
+  Store,
   UsersRound,
-} from "lucide-react";
-import { ComponentType } from "react";
+  Volume2,
+  WashingMachine,
+} from "lucide-react"
+import { type ComponentType } from "react"
+
+import { type Language } from "../../../types"
+import {
+  type BathroomScope,
+  type BathroomType,
+  type DiningType,
+  type Dorm,
+  type DormTag,
+  type TagCategory,
+} from "../types/index"
 
 export interface LocalizedCopy {
-  en: string;
-  zh: string;
+  en: string
+  zh: string
 }
 
 export interface LocalizedOption<T extends string> extends LocalizedCopy {
-  value: T;
+  value: T
 }
 
 export interface TagDefinition extends LocalizedCopy {
-  category: TagCategory;
+  category: TagCategory
   /** 1 = highest priority. Tags with priority >= 7 are excluded from hero display. */
-  priority: number;
-  cardLayer: "secondary" | "vibe" | "hidden";
-  cardPriority: number;
-  cardTone: "positive" | "neutral" | "muted";
+  priority: number
+  cardLayer: "secondary" | "vibe" | "hidden"
+  cardPriority: number
+  cardTone: "positive" | "neutral" | "muted"
   icon?: ComponentType<{
-    size?: number;
-    className?: string;
-    strokeWidth?: number;
-  }>;
+    size?: number
+    className?: string
+    strokeWidth?: number
+  }>
 }
 
 export interface HousingTypeOption extends LocalizedOption<
   Dorm["housingType"]
 > {
-  shortLabel: string;
-  description: LocalizedCopy;
-  badgeClassName: string;
+  shortLabel: string
+  description: LocalizedCopy
+  badgeClassName: string
 }
 
 export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
@@ -248,7 +249,7 @@ export const TAG_REGISTRY: Record<DormTag, TagDefinition> = {
     cardTone: "positive",
     icon: UsersRound,
   },
-};
+}
 
 export const TAGS_BY_CATEGORY: Record<TagCategory, DormTag[]> = {
   livingConditions: ["noAc", "newlyRenovated", "olderBuilding"],
@@ -271,15 +272,15 @@ export const TAGS_BY_CATEGORY: Record<TagCategory, DormTag[]> = {
     "artsyCreative",
     "genderInclusive",
   ],
-};
+}
 
 export const CATEGORY_LABELS: Record<TagCategory, LocalizedCopy> = {
   livingConditions: { en: "Living Conditions", zh: "居住条件" },
   facilities: { en: "Facilities", zh: "配套设施" },
   lifestyle: { en: "Lifestyle", zh: "生活方式" },
-};
+}
 
-export const FILTERABLE_LIVING_CONDITION_TAGS: DormTag[] = ["newlyRenovated"];
+export const FILTERABLE_LIVING_CONDITION_TAGS: DormTag[] = ["newlyRenovated"]
 
 export const HOUSING_TYPE_OPTIONS: HousingTypeOption[] = [
   {
@@ -304,33 +305,33 @@ export const HOUSING_TYPE_OPTIONS: HousingTypeOption[] = [
     },
     badgeClassName: "bg-blue-100 text-illini-blue",
   },
-];
+]
 
-export const LOCATION_PRESETS: LocalizedOption<string>[] = [
+export const LOCATION_PRESETS: Array<LocalizedOption<string>> = [
   { value: "Ikenberry", en: "Ikenberry", zh: "Ikenberry" },
   { value: "Main Quad", en: "Main Quad", zh: "Main Quad" },
   { value: "PAR/FAR", en: "PAR/FAR", zh: "PAR/FAR" },
   { value: "Campustown", en: "Campustown", zh: "Campustown" },
   { value: "South Campus", en: "South Campus", zh: "South Campus" },
-];
+]
 
-export const DINING_OPTIONS: LocalizedOption<DiningType>[] = [
+export const DINING_OPTIONS: Array<LocalizedOption<DiningType>> = [
   { value: "inside", en: "On-site", zh: "楼内" },
   { value: "nearby", en: "Nearby", zh: "附近" },
   { value: "none", en: "None", zh: "无" },
-];
+]
 
-export const BATHROOM_SCOPE_OPTIONS: LocalizedOption<BathroomScope>[] = [
+export const BATHROOM_SCOPE_OPTIONS: Array<LocalizedOption<BathroomScope>> = [
   { value: "communal", en: "Communal", zh: "公共卫浴" },
   { value: "individual-use", en: "Communal Single-Use", zh: "公共单人卫浴" },
   { value: "semi-private", en: "Semi-Private", zh: "半独立卫浴" },
   { value: "private", en: "Private", zh: "独立卫浴" },
-];
+]
 
-export const BATHROOM_TYPE_OPTIONS: LocalizedOption<BathroomType>[] = [
+export const BATHROOM_TYPE_OPTIONS: Array<LocalizedOption<BathroomType>> = [
   ...BATHROOM_SCOPE_OPTIONS,
   { value: "mixed", en: "Mixed", zh: "混合卫浴" },
-];
+]
 
 export const LLC_OPTIONS = [
   "Beckwith Residential Community",
@@ -347,21 +348,21 @@ export const LLC_OPTIONS = [
   "Transfer Community",
   "Unit One LLC",
   "WIMSE LLC",
-] as const;
+] as const
 
 export function getLocalizedLabel(copy: LocalizedCopy, language: Language) {
-  return language === "zh" ? copy.zh : copy.en;
+  return language === "zh" ? copy.zh : copy.en
 }
 
 export function getTagDisplay(tag: DormTag, language: Language) {
-  return getLocalizedLabel(TAG_REGISTRY[tag] ?? { en: tag, zh: tag }, language);
+  return getLocalizedLabel(TAG_REGISTRY[tag] ?? { en: tag, zh: tag }, language)
 }
 
 export function getHousingTypeMeta(housingType: Dorm["housingType"]) {
   return (
     HOUSING_TYPE_OPTIONS.find((option) => option.value === housingType) ??
     HOUSING_TYPE_OPTIONS[0]
-  );
+  )
 }
 
 export function getDimensionOptionLabel<T extends string>(
@@ -369,33 +370,33 @@ export function getDimensionOptionLabel<T extends string>(
   value: T,
   language: Language
 ) {
-  const option = options.find((item) => item.value === value);
-  return option ? getLocalizedLabel(option, language) : value;
+  const option = options.find((item) => item.value === value)
+  return option ? getLocalizedLabel(option, language) : value
 }
 
 export function mergeLocationOptions(locationsFromData: string[]) {
-  const seen = new Set<string>();
-  const merged: LocalizedOption<string>[] = [];
+  const seen = new Set<string>()
+  const merged: Array<LocalizedOption<string>> = []
 
   for (const preset of LOCATION_PRESETS) {
     if (locationsFromData.includes(preset.value)) {
-      merged.push(preset);
-      seen.add(preset.value);
+      merged.push(preset)
+      seen.add(preset.value)
     }
   }
 
   for (const location of locationsFromData) {
     if (seen.has(location)) {
-      continue;
+      continue
     }
 
     merged.push({
       value: location,
       en: location,
       zh: location,
-    });
-    seen.add(location);
+    })
+    seen.add(location)
   }
 
-  return merged;
+  return merged
 }

@@ -5,11 +5,17 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { streamChatResponse as cozeStreamChatResponse } from "../../cozeService";
-import { AIProvider } from "../types";
+import { streamChatResponse as cozeStreamChatResponse } from "../../cozeService"
+import { type AIProvider } from "../types"
 
 export const cozeProvider: AIProvider = {
   id: "coze",
-  streamChatResponse: (history, newMessage, lang, conversationId, userId) =>
-    cozeStreamChatResponse(history, newMessage, lang, conversationId, userId),
-};
+  streamChatResponse: ({ history, newMessage, lang, conversationId, userId }) =>
+    cozeStreamChatResponse({
+      history,
+      newMessage,
+      lang,
+      conversationId,
+      userId,
+    }),
+}

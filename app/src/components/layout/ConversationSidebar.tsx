@@ -5,30 +5,22 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import * as React from "react";
-import { useEffect, useState } from "react";
-import { Typewriter } from "../ui/Typewriter";
-import { ConversationSummary } from "../../types";
-import { conversationService } from "../../services/conversationService";
-import { localConversationService } from "../../services/localConversationService";
-import { useAuth } from "../../contexts/AuthContext";
-import {
-  BaseSidebar,
-  SidebarItem,
-  PinButton,
-  DeleteButton,
-  SidebarLoadingSpinner,
-  SidebarEmptyState,
-  groupByCategory,
-  getCategoryOrder,
-  TimeCategoryLabels,
-} from "./BaseSidebar";
+import * as React from "react"
+import { useCallback, useEffect, useState } from "react"
+
+import { useAuth } from "../../contexts/AuthContext"
+import { conversationService } from "../../services/conversationService"
+import { localConversationService } from "../../services/localConversationService"
+import type { ConversationSummary } from '../../types';
+import { Typewriter } from "../ui/Typewriter"
+import { BaseSidebar, DeleteButton, PinButton, SidebarEmptyState, SidebarItem, SidebarLoadingSpinner, getCategoryOrder, groupByCategory } from './BaseSidebar';
+import type { TimeCategoryLabels } from './BaseSidebar';
 
 interface ConversationSidebarProps {
-  currentConversationId: string | null;
-  onSelectConversation: (conversationId: string | null) => void;
-  onNewConversation: () => void;
-  language: "en" | "zh";
+  currentConversationId: string | null
+  onSelectConversation: (conversationId: string | null) => void
+  onNewConversation: () => void
+  language: "en" | "zh"
 }
 
 export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
@@ -37,9 +29,9 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
   onNewConversation,
   language,
 }) => {
-  const { user } = useAuth();
-  const [conversations, setConversations] = useState<ConversationSummary[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuth()
+  const [conversations, setConversations] = useState<ConversationSummary[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   const t = {
     en: {
@@ -66,7 +58,7 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
       thisWeek: "本周",
       older: "更早",
     },
-  }[language];
+  }[language]
 
   const categoryLabels: TimeCategoryLabels = {
     pinned: t.pinned,
@@ -74,101 +66,117 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
     yesterday: t.yesterday,
     thisWeek: t.thisWeek,
     older: t.older,
-  };
+  }
 
   // ... (keep usage of hooks)
 
   // ... (keep loadConversations and other handlers)
 
-  const loadConversations = async () => {
-    setIsLoading(true);
+  const loadConversations = useCallback(async () => {
+    setIsLoading(true)
     try {
       // Use local service if not logged in
-      const service = user ? conversationService : localConversationService;
-      const { data, error } = await service.getUserConversations();
+      const service = user ? conversationService : localConversationService
+      const { data, error } = await service.getUserConversations()
 
-      if (error) throw error;
+      if (error) {
+        throw error
+      }
 
       if (data) {
-        const summaries: ConversationSummary[] = data.map((conv) => ({
+        const summaries: ConversationSummary[] = (
+          data as Array<{
+            id: string
+            title: string
+            updated_at: string
+            is_pinned: boolean
+            messages?: unknown[]
+          }>
+        ).map((conv) => ({
           id: conv.id,
           title: conv.title,
           updatedAt: conv.updated_at,
           isPinned: conv.is_pinned,
-          messageCount: conv.messages?.length || 0,
-        }));
-        setConversations(summaries);
+          messageCount: conv.messages?.length ?? 0,
+        }))
+        setConversations(summaries)
       }
     } catch (error) {
-      console.error("Failed to load conversations:", error);
+      console.error("Failed to load conversations:", error)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }, [user])
 
   // Reload conversations when user changes OR when a new conversation is created/selected
   useEffect(() => {
-    loadConversations();
-  }, [user, currentConversationId]);
+    void loadConversations()
+  }, [user, currentConversationId, loadConversations])
 
   const handleTogglePin = async (
     conversationId: string,
     isPinned: boolean,
     e: React.MouseEvent
   ) => {
-    e.stopPropagation();
+    e.stopPropagation()
 
     try {
-      const service = user ? conversationService : localConversationService;
+      const service = user ? conversationService : localConversationService
       const { error } = await service.togglePinConversation(
         conversationId,
         !isPinned
-      );
-      if (error) throw error;
+      )
+      if (error) {
+        throw error
+      }
 
       // Reload conversations
-      loadConversations();
+      void loadConversations()
     } catch (error) {
-      console.error("Failed to toggle pin:", error);
+      console.error("Failed to toggle pin:", error)
     }
-  };
+  }
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(
     null
-  );
+  )
 
   const handleDeleteClick = (conversationId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setShowDeleteConfirm(conversationId);
-  };
+    e.stopPropagation()
+    setShowDeleteConfirm(conversationId)
+  }
 
   const confirmDelete = async () => {
-    if (!showDeleteConfirm) return;
+    if (!showDeleteConfirm) {
+      return
+    }
 
     try {
-      const service = user ? conversationService : localConversationService;
-      const { error } = await service.deleteConversation(showDeleteConfirm);
-      if (error) throw error;
-
-      if (showDeleteConfirm === currentConversationId) {
-        onNewConversation();
+      const service = user ? conversationService : localConversationService
+      const { error } = await service.deleteConversation(showDeleteConfirm)
+      if (error) {
+        throw error
       }
 
-      loadConversations();
+      if (showDeleteConfirm === currentConversationId) {
+        onNewConversation()
+      }
+
+      void loadConversations()
     } catch (error) {
-      console.error("Failed to delete conversation:", error);
+      console.error("Failed to delete conversation:", error)
     } finally {
-      setShowDeleteConfirm(null);
+      setShowDeleteConfirm(null)
     }
-  };
+  }
 
   const groupedConversations = groupByCategory(
     conversations,
     (conv) => conv.updatedAt,
     categoryLabels
-  );
+  )
 
-  const categoryOrder = getCategoryOrder(categoryLabels);
+  const categoryOrder = getCategoryOrder(categoryLabels)
 
   return (
     <>
@@ -180,30 +188,26 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
         loadingState={<SidebarLoadingSpinner />}
         emptyState={<SidebarEmptyState message={t.noConversations} />}
         renderItem={(item) => {
-          const conv = item as ConversationSummary;
+          const conv = item as ConversationSummary
           return (
             <SidebarItem
               key={conv.id}
               id={conv.id}
               isActive={conv.id === currentConversationId}
-              onClick={() => onSelectConversation(conv.id)}
+              onClick={() => {
+                onSelectConversation(conv.id)
+              }}
               activeBgClass="bg-white/20 text-white"
               inactiveBgClass="text-slate-300 hover:bg-white/10"
             >
               <div className="relative overflow-hidden">
                 <div className="pr-1">
                   <div
-                    className={`
-                      truncate text-xs font-medium
-                      ${
-                        conv.id === currentConversationId
-                          ? "text-white"
-                          : `
-                            text-slate-300
-                            group-hover:text-white
-                          `
-                      }
-                    `}
+                    className={`truncate text-xs font-medium ${
+                      conv.id === currentConversationId
+                        ? "text-white"
+                        : `text-slate-300 group-hover:text-white`
+                    } `}
                   >
                     <Typewriter text={conv.title} mode="animate" />
                   </div>
@@ -215,17 +219,11 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                 </div>
 
                 <div
-                  className={`
-                    absolute inset-y-0 right-0 flex w-24 items-center
-                    justify-end gap-0.5 bg-linear-to-l to-transparent px-2
-                    opacity-0 transition-all duration-200
-                    group-hover:opacity-100
-                    ${
-                      conv.id === currentConversationId
-                        ? "from-[#454545] via-[#454545]"
-                        : "from-[#2E2E2E] via-[#2E2E2E]"
-                    }
-                  `}
+                  className={`absolute inset-y-0 right-0 flex w-24 items-center justify-end gap-0.5 bg-linear-to-l to-transparent px-2 opacity-0 transition-all duration-200 group-hover:opacity-100 ${
+                    conv.id === currentConversationId
+                      ? "from-[#454545] via-[#454545]"
+                      : "from-[#2E2E2E] via-[#2E2E2E]"
+                  } `}
                 >
                   <PinButton
                     isPinned={conv.isPinned}
@@ -233,37 +231,24 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                     label={conv.isPinned ? t.unpin : t.pin}
                   />
                   <DeleteButton
-                    onClick={(e) => handleDeleteClick(conv.id, e)}
+                    onClick={(e) => {
+                      handleDeleteClick(conv.id, e)
+                    }}
                     label={t.delete}
                   />
                 </div>
               </div>
             </SidebarItem>
-          );
+          )
         }}
       />
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div
-          className="
-            fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4
-            backdrop-blur-sm
-          "
-        >
-          <div
-            className="
-              animate-scale-in w-full max-w-sm overflow-hidden rounded-xl border
-              border-white/10 bg-[#1E1E1E] shadow-2xl
-            "
-          >
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+          <div className="animate-scale-in w-full max-w-sm overflow-hidden rounded-xl border border-white/10 bg-[#1E1E1E] shadow-2xl">
             <div className="p-5 text-center">
-              <div
-                className="
-                  mx-auto mb-4 flex size-12 items-center justify-center
-                  rounded-full bg-red-500/10
-                "
-              >
+              <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-red-500/10">
                 <svg
                   className="size-6 text-red-500"
                   fill="none"
@@ -288,22 +273,18 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
               </p>
               <div className="flex gap-3">
                 <button
-                  onClick={() => setShowDeleteConfirm(null)}
-                  className="
-                    flex-1 rounded-lg bg-white/5 px-4 py-2 text-sm font-medium
-                    text-slate-300 transition-colors
-                    hover:bg-white/10
-                  "
+                  type="button"
+                  onClick={() => {
+                    setShowDeleteConfirm(null)
+                  }}
+                  className="flex-1 rounded-lg bg-white/5 px-4 py-2 text-sm font-medium text-slate-300 transition-colors hover:bg-white/10"
                 >
                   {language === "zh" ? "取消" : "Cancel"}
                 </button>
                 <button
+                  type="button"
                   onClick={confirmDelete}
-                  className="
-                    flex-1 rounded-lg bg-red-500 px-4 py-2 text-sm font-medium
-                    text-white transition-colors
-                    hover:bg-red-600
-                  "
+                  className="flex-1 rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-600"
                 >
                   {language === "zh" ? "删除" : "Delete"}
                 </button>
@@ -313,5 +294,5 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
         </div>
       )}
     </>
-  );
-};
+  )
+}

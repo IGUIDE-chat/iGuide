@@ -178,4 +178,4 @@ export const TEXT = {
       restoreFailed: "还原失败，请重试。",
     },
   },
-} as const;
+} as const

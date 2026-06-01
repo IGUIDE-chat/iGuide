@@ -3,7 +3,7 @@ import type {
   RequestContext,
   ToolDefinition,
   ToolResult,
-} from './types'
+} from "./types.ts"
 
 interface ToolRegistryOptions {
   maxCalls?: number
@@ -22,7 +22,7 @@ export class ToolRegistry {
 
   constructor(options?: ToolRegistryOptions) {
     this.maxCalls = options?.maxCalls ?? 5
-    this.timeoutMs = options?.timeoutMs ?? 10000
+    this.timeoutMs = options?.timeoutMs ?? 10_000
     this.maxResultBytes = options?.maxResultBytes ?? 4096
   }
 
@@ -40,7 +40,7 @@ export class ToolRegistry {
 
   toOpenAITools(): OpenAITool[] {
     return this.getTools().map((tool) => ({
-      type: 'function',
+      type: "function",
       function: {
         name: tool.name,
         description: tool.description,
@@ -57,14 +57,14 @@ export class ToolRegistry {
     const tool = this.tools.get(name)
     if (!tool) {
       return this.createErrorResult({
-        error: 'tool_not_found',
+        error: "tool_not_found",
         tool: name,
       })
     }
 
     if (this.callCount >= this.maxCalls) {
       return this.createErrorResult({
-        error: 'budget_exceeded',
+        error: "budget_exceeded",
         max_calls: this.maxCalls,
       })
     }
@@ -81,16 +81,16 @@ export class ToolRegistry {
     } catch (error) {
       if (error instanceof ToolExecutionTimeoutError) {
         return this.createErrorResult({
-          error: 'timeout',
+          error: "timeout",
           tool: name,
           timeout_ms: this.timeoutMs,
         })
       }
 
       return this.createErrorResult({
-        error: 'execution_failed',
+        error: "execution_failed",
         tool: name,
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? error.message : "Unknown error",
       })
     }
   }
@@ -112,7 +112,7 @@ export class ToolRegistry {
     try {
       return await Promise.race([
         execution,
-        new Promise<never>((_, reject) => {
+        new Promise<never>((_resolve, reject) => {
           timeoutHandle = setTimeout(() => {
             reject(new ToolExecutionTimeoutError(toolName, this.timeoutMs))
           }, this.timeoutMs)
@@ -131,7 +131,7 @@ export class ToolRegistry {
       return result
     }
 
-    const suffix = '\n...[truncated]'
+    const suffix = "\n...[truncated]"
     const suffixBytes = this.textEncoder.encode(suffix)
     const contentLimit = Math.max(this.maxResultBytes - suffixBytes.length, 0)
     const truncatedBytes = contentBytes.slice(0, contentLimit)
@@ -168,7 +168,7 @@ class ToolExecutionTimeoutError extends Error {
 
   constructor(toolName: string, timeoutMs: number) {
     super(`Tool timed out: ${toolName}`)
-    this.name = 'ToolExecutionTimeoutError'
+    this.name = "ToolExecutionTimeoutError"
     this.toolName = toolName
     this.timeoutMs = timeoutMs
   }

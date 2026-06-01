@@ -5,16 +5,11 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { memo } from "react";
-import {
-  Check,
-  GraduationCap,
-  MapPin,
-  Snowflake,
-  Utensils,
-} from "lucide-react";
-import { FilterOption } from "../types/index";
-import { FilterLanguage } from "./modalText";
+import { Check, GraduationCap, MapPin, Snowflake, Utensils } from "lucide-react"
+import React, { memo } from "react"
+
+import { FilterOption } from "../types/index"
+import { type FilterLanguage } from "./modalText"
 
 const DISPLAY_AMENITIES = [
   {
@@ -37,13 +32,13 @@ const DISPLAY_AMENITIES = [
     label: { en: "Near Main Quad", zh: "靠近主广场" },
     icon: MapPin,
   },
-] as const;
+] as const
 
 interface AmenitiesSectionProps {
-  title: string;
-  language: FilterLanguage;
-  selectedValues: FilterOption[];
-  onToggle: (value: FilterOption) => void;
+  title: string
+  language: FilterLanguage
+  selectedValues: FilterOption[]
+  onToggle: (value: FilterOption) => void
 }
 
 const AmenitiesSection: React.FC<AmenitiesSectionProps> = ({
@@ -54,69 +49,46 @@ const AmenitiesSection: React.FC<AmenitiesSectionProps> = ({
 }) => (
   <section className="mb-8">
     <h3 className="mb-6 text-xl font-bold">{title}</h3>
-    <div
-      className="
-        grid grid-cols-1 gap-4
-        md:grid-cols-2
-      "
-    >
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
       {DISPLAY_AMENITIES.map((amenity) => {
-        const isSelected = selectedValues.includes(amenity.id);
-        const Icon = amenity.icon;
+        const isSelected = selectedValues.includes(amenity.id)
+        const Icon = amenity.icon
 
         return (
           <label
             key={amenity.id}
-            className="
-              group flex cursor-pointer items-center gap-3 py-1 select-none
-            "
+            className="group flex cursor-pointer items-center gap-3 py-1 select-none"
           >
             <div
-              className={`
-                flex size-6 items-center justify-center rounded-[4px] border
-                transition-all duration-200
-                ${
-                  isSelected
-                    ? `
-                      border-illini-blue bg-illini-blue text-white
-                      active:border-[#0e2240] active:bg-[#0e2240]
-                    `
-                    : `
-                      border-gray-300 bg-white
-                      group-hover:border-illini-blue
-                      active:border-illini-blue active:bg-blue-50/50
-                    `
-                }
-              `}
+              className={`flex size-6 items-center justify-center rounded-[4px] border transition-all duration-200 ${
+                isSelected
+                  ? `border-illini-blue bg-illini-blue text-white active:border-[#0e2240] active:bg-[#0e2240]`
+                  : `group-hover:border-illini-blue active:border-illini-blue border-gray-300 bg-white active:bg-blue-50/50`
+              } `}
             >
               {isSelected && <Check size={16} strokeWidth={3} />}
               <input
+                aria-label="Toggle option"
                 type="checkbox"
                 className="hidden"
                 checked={isSelected}
-                onChange={() => onToggle(amenity.id)}
+                onChange={() => {
+                  onToggle(amenity.id)
+                }}
               />
             </div>
-            <div
-              className="
-                flex items-center gap-2 text-gray-700 transition-colors
-                group-hover:text-illini-blue
-              "
-            >
+            <div className="group-hover:text-illini-blue flex items-center gap-2 text-gray-700 transition-colors">
               <Icon
                 size={18}
-                className="
-                  text-gray-500
-                  group-hover:text-illini-blue
-                "
+                className="group-hover:text-illini-blue text-gray-500"
               />
               <span>{amenity.label[language] || amenity.label.en}</span>
             </div>
           </label>
-        );
+        )
       })}
     </div>
   </section>
-);
+)
 
-export default memo(AmenitiesSection);
+export default memo(AmenitiesSection)

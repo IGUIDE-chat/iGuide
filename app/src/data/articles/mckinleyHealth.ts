@@ -7,7 +7,7 @@
 
 // [DATA] Article content for McKinley Health Center guide.
 // [数据] 麦金利校医院指南的文章内容。
-import { Article } from "../../types";
+import { type Article } from "../../types"
 
 export const mckinleyHealth: Article = {
   id: "mckinley-health",
@@ -43,4 +43,4 @@ Your student fees cover most services here!
   `,
   tags_zh: ["健康", "医生", "药", "McKinley", "安全", "免费"],
   lastUpdated: "2024-08-01",
-};
+}

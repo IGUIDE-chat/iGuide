@@ -5,20 +5,21 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { Link } from "react-router-dom";
-import { BrandMark } from "../ui/branding/BrandMark";
+import { AnimatePresence, motion } from "framer-motion"
+import React from "react"
+import { Link } from "react-router-dom"
+
+import { BrandMark } from "../ui/branding/BrandMark"
 
 interface SidebarFooterProps {
-  isSidebarOpen: boolean;
-  isGuest?: boolean;
-  languageLabel: string;
-  guestLabel: string;
-  signedInLabel: string;
-  profileName: string;
-  onToggleLanguage: () => void;
-  onGuestLogin?: () => void;
+  isSidebarOpen: boolean
+  isGuest?: boolean
+  languageLabel: string
+  guestLabel: string
+  signedInLabel: string
+  profileName: string
+  onToggleLanguage: () => void
+  onGuestLogin?: () => void
 }
 
 const AnimatedText = ({ children }: { children: React.ReactNode }) => (
@@ -34,14 +35,14 @@ const AnimatedText = ({ children }: { children: React.ReactNode }) => (
       {children}
     </motion.span>
   </AnimatePresence>
-);
+)
 
 const SidebarLabel = ({
   isOpen,
   children,
 }: {
-  isOpen: boolean;
-  children: React.ReactNode;
+  isOpen: boolean
+  children: React.ReactNode
 }) => (
   <motion.span
     initial={false}
@@ -55,7 +56,7 @@ const SidebarLabel = ({
   >
     {children}
   </motion.span>
-);
+)
 
 export const SidebarFooter: React.FC<SidebarFooterProps> = ({
   isSidebarOpen,
@@ -66,16 +67,13 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
   profileName,
   onToggleLanguage,
   onGuestLogin,
-}) => {
-  return (
+}) => (
     <div className="space-y-2 border-t border-white/10 p-3">
       <button
+        type="button"
+        aria-label="Toggle language"
         onClick={onToggleLanguage}
-        className="
-          flex w-full items-center gap-3 rounded-md p-3 text-sm text-slate-300
-          transition-colors
-          hover:bg-[#212121]
-        "
+        className="flex w-full items-center gap-3 rounded-md p-3 text-sm text-slate-300 transition-colors hover:bg-[#212121]"
       >
         <span>
           <svg
@@ -99,19 +97,11 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
 
       {isGuest ? (
         <button
+          type="button"
           onClick={onGuestLogin}
-          className="
-            group flex w-full items-center gap-3 rounded-md p-3 text-sm
-            text-white transition-colors
-            hover:bg-[#212121]
-          "
+          className="group flex w-full items-center gap-3 rounded-md p-3 text-sm text-white transition-colors hover:bg-[#212121]"
         >
-          <div
-            className="
-              transition-transform
-              group-hover:scale-110
-            "
-          >
+          <div className="transition-transform group-hover:scale-110">
             <BrandMark
               className="size-5 rounded-[4px]"
               iconClassName="text-[10px]"
@@ -122,20 +112,12 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
           </SidebarLabel>
         </button>
       ) : (
+        // eslint-disable-next-line jsx-a11y/anchor-is-valid -- Link derives href from to
         <Link
           to="/profile"
-          className="
-            block flex cursor-pointer items-center gap-3 rounded-md bg-white/5
-            px-3 py-2 transition-colors
-            hover:bg-white/10
-          "
+          className="block flex cursor-pointer items-center gap-3 rounded-md bg-white/5 px-3 py-2 transition-colors hover:bg-white/10"
         >
-          <div
-            className="
-              flex size-8 shrink-0 items-center justify-center rounded-full
-              bg-illini-orange text-sm font-semibold text-white
-            "
-          >
+          <div className="bg-illini-orange flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white">
             {profileName.charAt(0).toUpperCase() || "U"}
           </div>
           <motion.div
@@ -156,5 +138,4 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
         </Link>
       )}
     </div>
-  );
-};
+  )

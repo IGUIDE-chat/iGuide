@@ -1,12 +1,15 @@
 # ADR-0006: Use a four-layer source-first base model
 
 ## Status
+
 Accepted
 
 ## Date
+
 2026-04-18
 
 ## Context
+
 The campus assistant has already adopted a hybrid product model: a small number of high-value stable domains use object-first indexing, while most campus information remains source-first and volatile information must respect live-first retrieval rules. That higher-level direction is captured in ADR-0004, and the course-domain object boundary is captured in ADR-0005.
 
 The next unresolved decision is the persistence shape underneath that hybrid model. The assistant needs a base layer that can express all of the following without collapsing back into one overloaded "documents" table:
@@ -23,6 +26,7 @@ The source layer also needs to support heterogeneous inputs such as webpages, RS
 The main design pressure is not relational elegance. The design standard is that the model must be able to obtain a precise, complete, and explainable index through tools, while the data layer remains portable across schools and robust to uneven source quality.
 
 ## Decision
+
 Adopt **a strict four-layer source-first base model** as the canonical persistence shape for source-derived knowledge:
 
 1. **`sources`** — source definition and default retrieval/freshness policy
@@ -40,6 +44,7 @@ The four layers have distinct responsibilities:
 The base model should follow these field and responsibility boundaries.
 
 ### `sources`
+
 `sources` define the long-lived identity and default policy of a source. They should answer:
 
 - what source this is
@@ -59,6 +64,7 @@ Typical fields for `sources` should include:
 `sources` should not store authoritative content bodies.
 
 ### `source_snapshots`
+
 `source_snapshots` capture one source version or observed state. They should answer:
 
 - what was captured
@@ -76,6 +82,7 @@ Typical fields for `source_snapshots` should include:
 Freshness and archive semantics belong here rather than only in tool logic.
 
 ### `artifacts`
+
 `artifacts` are explicitly **multi-type**. One snapshot may produce several artifact rows, for example:
 
 - `raw_html`
@@ -105,6 +112,7 @@ Typical fields for `artifacts` should include:
 The model should allow both `content_text` and `content_json` in the same table so that webpages, APIs, feeds, and object projections can coexist without forcing everything into a single serialization strategy.
 
 ### `chunks`
+
 `chunks` are **retrieval artifacts, not authoritative records**. They exist to support search and citation, not to replace source or artifact truth.
 
 Typical fields for `chunks` should include:
@@ -117,17 +125,20 @@ Typical fields for `chunks` should include:
 Chunks must remain derivations of authoritative artifacts. They should never become the only stored truth for a source-derived record.
 
 ### Source-grounded object records
+
 Object-first tables such as `course`, `course_offering`, `housing`, `location_or_service`, and `academic_calendar_item` should remain source-grounded by carrying references back to source evidence, typically through `source_id`, `source_snapshot_id`, and/or `primary_artifact_id`.
 
 The source-first base layer therefore remains the grounding substrate even when a domain later receives object-first indexing.
 
 ### Policy constraints
+
 - Volatile content must continue to support `live_first`, `local_first`, `local_with_live_verify`, and `archive_only` style retrieval behavior rather than assuming all stored records are equally current.
 - `chunks` remain retrieval derivatives; they are not allowed to define freshness policy or canonical currentness on their own.
 - Hot retrieval filters that determine routing or truth status should eventually prefer typed columns at the source/snapshot/artifact level over JSON-only conventions.
 - New source-derived domains should enter through this four-layer model before introducing special-case persistence.
 
 ## Alternatives Considered
+
 - **Collapse the source layer into a simpler `sources -> documents -> chunks` model**  
   Plausible because it looks closer to the current Supabase retrieval schema and would be faster to implement. Rejected because it overloads `documents` with source identity, version history, normalization output, and retrieval responsibilities, making archive/live routing and multi-artifact provenance much harder to model cleanly.
 
@@ -135,6 +146,7 @@ The source-first base layer therefore remains the grounding substrate even when 
   Plausible because each source family has different shapes. Rejected because it would fragment the ingestion architecture too early, raise cross-school onboarding cost, and make the shared tool-selection model harder to maintain.
 
 ## Consequences
+
 - **Benefits**
   - Gives the hybrid assistant a source model that can express provenance, archive state, freshness policy, and multi-artifact normalization explicitly.
   - Supports both object-first domains and source-first domains without forcing a campus-wide ERP schema.
@@ -159,12 +171,14 @@ The source-first base layer therefore remains the grounding substrate even when 
   - `sources` should usually be modeled as source configuration units, not as one giant platform-wide bucket and not as one row per page.
 
 ## Revisit Triggers
+
 - Multiple future domains require artifact or snapshot semantics that the four-layer base model cannot express without repeated exceptions.
 - Cross-school ingestion shows that the current source/artifact abstractions are still too rigid or too noisy for practical onboarding.
 - The team repeatedly needs policy tables, artifact subtypes, or snapshot rules that cannot be represented cleanly without splitting the model further.
 - Object-first domains prove unable to maintain stable evidence links back to source/snapshot/artifact records.
 
 ## Related
+
 - `docs/adr/ADR-0004-hybrid-data-model.md`
 - `docs/adr/ADR-0005-course-domain.md`
 - `docs/adr/ADR-0007-supabase-hybrid-retrieval-and-migration.md`

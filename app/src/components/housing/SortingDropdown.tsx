@@ -5,13 +5,13 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { memo, useRef, useLayoutEffect, useState } from "react";
-import { ArrowUpDown, Check } from "lucide-react";
+import { ArrowUpDown, Check } from "lucide-react"
+import React, { memo, useLayoutEffect, useRef, useState } from "react"
 
 interface SortingDropdownProps {
-  sortBy: string;
-  onSortChange: (value: string) => void;
-  viewMode: "list" | "map";
+  sortBy: string
+  onSortChange: (value: string) => void
+  viewMode: "list" | "map"
 }
 
 const SORT_OPTIONS = [
@@ -19,13 +19,13 @@ const SORT_OPTIONS = [
   { value: "name-desc", label: "Name (Z-A)" },
   { value: "price-asc", label: "Price (Low-High)" },
   { value: "price-desc", label: "Price (High-Low)" },
-] as const;
+] as const
 
 const SortingDropdown: React.FC<SortingDropdownProps> = memo(
   ({ sortBy, onSortChange, viewMode }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const dropdownRef = useRef<HTMLDivElement>(null);
-    const previousViewModeRef = useRef<"list" | "map" | null>(null);
+    const [isOpen, setIsOpen] = useState(false)
+    const dropdownRef = useRef<HTMLDivElement>(null)
+    const previousViewModeRef = useRef<"list" | "map" | null>(null)
 
     useLayoutEffect(() => {
       // Close dropdown if view mode changes
@@ -33,10 +33,10 @@ const SortingDropdown: React.FC<SortingDropdownProps> = memo(
         previousViewModeRef.current !== null &&
         previousViewModeRef.current !== viewMode
       ) {
-        setIsOpen(false);
+        setIsOpen(false)
       }
-      previousViewModeRef.current = viewMode;
-    }, [viewMode]);
+      previousViewModeRef.current = viewMode
+    }, [viewMode])
 
     useLayoutEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
@@ -44,75 +44,52 @@ const SortingDropdown: React.FC<SortingDropdownProps> = memo(
           dropdownRef.current &&
           !dropdownRef.current.contains(event.target as Node)
         ) {
-          setIsOpen(false);
+          setIsOpen(false)
         }
-      };
-      document.addEventListener("mousedown", handleClickOutside);
-      return () =>
-        document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
+      }
+      document.addEventListener("mousedown", handleClickOutside)
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside)
+      }
+    }, [])
 
     const currentLabel =
-      SORT_OPTIONS.find((option) => option.value === sortBy)?.label || "Sort";
+      SORT_OPTIONS.find((option) => option.value === sortBy)?.label ?? "Sort"
 
     return (
       <div className="relative" ref={dropdownRef}>
         <button
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => {
+            setIsOpen(!isOpen)
+          }}
           type="button"
-          className={`
-            flex size-10 items-center justify-center rounded-full border
-            transition-all duration-200
-            focus:ring-2 focus:ring-illini-blue/20 focus:outline-none
-            ${
-              isOpen
-                ? "border-illini-blue/50 bg-illini-blue/10 text-illini-blue"
-                : `
-                  border-gray-200 bg-white text-gray-700
-                  hover:border-illini-blue/40 hover:bg-illini-blue/5
-                  hover:text-illini-blue/80
-                  active:border-illini-blue/50 active:bg-illini-blue/10
-                  active:text-illini-blue
-                `
-            }
-          `}
+          className={`focus:ring-illini-blue/20 flex size-10 items-center justify-center rounded-full border transition-all duration-200 focus:ring-2 focus:outline-none ${
+            isOpen
+              ? "border-illini-blue/50 bg-illini-blue/10 text-illini-blue"
+              : `hover:border-illini-blue/40 hover:bg-illini-blue/5 hover:text-illini-blue/80 active:border-illini-blue/50 active:bg-illini-blue/10 active:text-illini-blue border-gray-200 bg-white text-gray-700`
+          } `}
           title={`Sort by: ${currentLabel}`}
         >
           <ArrowUpDown size={18} strokeWidth={2} />
         </button>
 
         {isOpen && (
-          <div
-            className="
-              animate-in fade-in zoom-in-95 absolute right-0 z-50 mt-2 w-48
-              origin-top-right rounded-xl border border-gray-100 bg-white py-1
-              shadow-lg duration-100
-            "
-          >
+          <div className="animate-in fade-in zoom-in-95 absolute right-0 z-50 mt-2 w-48 origin-top-right rounded-xl border border-gray-100 bg-white py-1 shadow-lg duration-100">
             {SORT_OPTIONS.map((option) => (
               <button
                 key={option.value}
                 onClick={() => {
-                  onSortChange(option.value);
-                  setIsOpen(false);
+                  onSortChange(option.value)
+                  setIsOpen(false)
                 }}
                 type="button"
-                className="
-                  group flex w-full items-center justify-between px-4 py-2
-                  text-left text-sm transition-colors
-                  first:rounded-t-lg
-                  last:rounded-b-lg
-                  hover:bg-illini-blue/5
-                "
+                className="group hover:bg-illini-blue/5 flex w-full items-center justify-between px-4 py-2 text-left text-sm transition-colors first:rounded-t-lg last:rounded-b-lg"
               >
                 <span
                   className={
                     sortBy === option.value
-                      ? "font-medium text-illini-blue"
-                      : `
-                        text-gray-600
-                        group-hover:text-illini-blue/80
-                      `
+                      ? "text-illini-blue font-medium"
+                      : `group-hover:text-illini-blue/80 text-gray-600`
                   }
                 >
                   {option.label}
@@ -125,17 +102,17 @@ const SortingDropdown: React.FC<SortingDropdownProps> = memo(
           </div>
         )}
       </div>
-    );
+    )
   },
   (prevProps, nextProps) => {
     return (
       prevProps.sortBy === nextProps.sortBy &&
       prevProps.onSortChange === nextProps.onSortChange &&
       prevProps.viewMode === nextProps.viewMode
-    ); // Changed: viewMode might matter for closing
+    ) // Changed: viewMode might matter for closing
   }
-);
+)
 
-SortingDropdown.displayName = "SortingDropdown";
+SortingDropdown.displayName = "SortingDropdown"
 
-export default SortingDropdown;
+export default SortingDropdown

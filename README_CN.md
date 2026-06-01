@@ -10,11 +10,11 @@
 
 ## 仓库结构
 
-| 路径 | 作用 |
-|:-----|:-----|
-| `app/` | React 应用、Cloudflare Pages 相关内容、文档、迁移脚本，以及当前活跃的 UI 运行时。 |
-| `api/` | Cloudflare Worker 层，负责 JWT 鉴权、Geo 路由、SSE 响应，以及服务端 tool-use 运行时入口。 |
-| `data_collection/` | Python 爬虫 / ETL 流水线，用于抓取、清洗和增量更新 UIUC 数据源。 |
+| 路径               | 作用                                                                                      |
+| ------------------ | ----------------------------------------------------------------------------------------- |
+| `app/`             | React 应用、Cloudflare Pages 相关内容、文档、迁移脚本，以及当前活跃的 UI 运行时。         |
+| `api/`             | Cloudflare Worker 层，负责 JWT 鉴权、Geo 路由、SSE 响应，以及服务端 tool-use 运行时入口。 |
+| `data_collection/` | Python 爬虫 / ETL 流水线，用于抓取、清洗和增量更新 UIUC 数据源。                          |
 
 ## 统一开发入口
 
