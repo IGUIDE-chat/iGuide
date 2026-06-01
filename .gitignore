@@ -28,7 +28,6 @@ dist/
 
 # editor specific files
 .idea
-.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
