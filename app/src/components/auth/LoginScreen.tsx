@@ -13,7 +13,7 @@ import { useState } from "react"
 
 import { useAuth } from "../../contexts/AuthContext"
 import { UI_TEXT } from "../../i18n/uiText"
-import { type Language } from "../../types"
+import type { Language } from "../../types"
 
 interface LoginScreenProps {
   onGuestLogin?: () => void
@@ -41,7 +41,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
     setLoading(true)
 
     try {
-      let success = false
+      let success: boolean
       if (isLogin) {
         success = await login(email, password)
       } else {

@@ -9,18 +9,18 @@ import { useLayoutEffect, useMemo, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { useLayout } from "../../../contexts/LayoutContext"
-import { type Language } from "../../../types"
+import type { Language } from "../../../types"
 import { getPriceRangeFromData } from "../constants/pricing"
 import { useSharedDormInteraction } from "../store/DormUserInteractionContext"
 import { useHousingFilters } from "../store/HousingContext"
 import { useDormData } from "../store/HousingDataContext"
-import { type Dorm } from "../types/index"
+import type { Dorm } from "../types/index"
 import {
   DEFAULT_FAVORITES_TARGET,
   DEFAULT_TOGGLE_TARGET,
 } from "./favoriteConstants"
 import { filterAndSortDorms, normalizePriceRange } from "./filtering"
-import { type DormListText } from "./types"
+import type { DormListText } from "./types"
 
 const DORM_LIST_TEXT: Record<Language, DormListText> = {
   en: {
@@ -222,8 +222,8 @@ export const useDormListController = (language: Language) => {
   }, [viewMode, filteredDorms.length])
 
   const handleViewDetails = (dorm: Dorm) => {
-    addToHistory(dorm)
-    navigate(`/dorms/${dorm.id}`)
+    void addToHistory(dorm)
+    void navigate(`/dorms/${dorm.id}`)
   }
 
   const handleMapNoResultAction = () => {

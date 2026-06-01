@@ -7,10 +7,8 @@
 
 import { useEffect, useState } from "react"
 
-import {
-  type DormCommentStats,
-  dormCommentsService,
-} from "../../../services/dormCommentsService"
+import { dormCommentsService } from "../../../services/dormCommentsService"
+import type { DormCommentStats } from "../../../services/dormCommentsService"
 import { SHOW_GOOGLE_REVIEWS } from "../constants/featureFlags"
 
 /**
@@ -49,7 +47,7 @@ export function useDormCommentStats() {
       }
       setStats(updatedStats)
     }
-    loadStats()
+    void loadStats()
   }, [])
 
   return stats

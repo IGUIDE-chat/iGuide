@@ -10,10 +10,8 @@
 import { useCallback, useEffect, useState } from "react"
 
 import { useAuth } from "../../../contexts/AuthContext"
-import {
-  type DormComment,
-  dormCommentsService,
-} from "../../../services/dormCommentsService"
+import { dormCommentsService } from "../../../services/dormCommentsService"
+import type { DormComment } from "../../../services/dormCommentsService"
 import { SHOW_GOOGLE_REVIEWS } from "../constants/featureFlags"
 
 // ── Guest vote localStorage helpers ──────────────────────────────────────
@@ -67,11 +65,12 @@ export function useDormComments(dormId: string) {
         if (gv === null || gv === undefined) {
           return c
         }
-        return Object.assign({}, c, {
+        return {
+          ...c,
           myVote: gv,
           upvotes: c.upvotes + (gv === 1 ? 1 : 0),
           downvotes: c.downvotes + (gv === -1 ? 1 : 0),
-        })
+        }
       })
       setComments(merged)
     }
@@ -79,7 +78,7 @@ export function useDormComments(dormId: string) {
   }, [dormId, user])
 
   useEffect(() => {
-    load()
+    void load()
   }, [load])
 
   const saveComment = async (content: string, dormVote: 1 | -1 | null) => {

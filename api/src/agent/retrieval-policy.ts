@@ -25,9 +25,5 @@ export function shouldEnableRetrievalTools(message: string): boolean {
     return false
   }
 
-  if (CONVERSATIONAL_PATTERNS.some((pattern) => pattern.test(normalized))) {
-    return false
-  }
-
-  return true
+  return !CONVERSATIONAL_PATTERNS.some((pattern) => pattern.test(normalized))
 }

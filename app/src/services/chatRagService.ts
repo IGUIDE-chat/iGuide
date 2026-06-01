@@ -1,12 +1,12 @@
-import { type SearchResult } from "../types"
+import type { SearchResult } from "../types"
 import rewriteSystemPrompt from "./prompts/chat-rag-query-rewrite-system.md?raw"
 import rewriteUserPrompt from "./prompts/chat-rag-query-rewrite-user.md?raw"
 import { quickSearch } from "./searchService"
 import {
-  type WebSearchResult,
   isUiucOfficialUrl,
   webSearchWithOfficialPriority,
 } from "./webSearchService"
+import type { WebSearchResult } from "./webSearchService"
 
 const viteEnv = (
   import.meta as ImportMeta & {
@@ -179,10 +179,7 @@ function extractAsciiKeywords(query: string): string[] {
     if (token.length === 1) {
       return false
     }
-    if (token.length === 2 && token === token.toLowerCase()) {
-      return false
-    }
-    return true
+    return !(token.length === 2 && token === token.toLowerCase())
   })
 }
 

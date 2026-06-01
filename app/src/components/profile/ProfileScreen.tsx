@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom"
 
 import { useAuth } from "../../contexts/AuthContext"
 import { memoryService } from "../../services/memoryService"
-import { type Language } from "../../types"
+import type { Language } from "../../types"
 import { IntegrationsSection } from "./IntegrationsSection"
 
 interface ProfileScreenProps {
@@ -53,7 +53,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
       setSoul(soulData)
       setUserMemory(memoryData)
     }
-    loadData()
+    void loadData()
   }, [user])
 
   const handleSaveSoul = async () => {
@@ -140,8 +140,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
   const handleSignOut = async () => {
     if (confirm(t.confirmSignOut)) {
-      await logout()
-      navigate("/")
+      logout()
+      void navigate("/")
     }
   }
 

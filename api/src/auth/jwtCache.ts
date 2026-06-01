@@ -53,8 +53,7 @@ export async function verifyAndCacheJwt(
 
   const cached = await cache.match(cacheKey)
   if (cached) {
-    const payload: JwtPayload = await cached.json()
-    return payload
+    return (await cached.json()) as JwtPayload
   }
 
   try {

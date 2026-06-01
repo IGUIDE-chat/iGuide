@@ -6,13 +6,26 @@
  */
 
 import mapboxgl from "mapbox-gl"
-import React, { Component, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import type { ReactNode } from 'react';
-import Map, { Layer, NavigationControl, Popup, Source } from 'react-map-gl/mapbox';
-import type { MapRef } from 'react-map-gl/mapbox';
+import React, {
+  Component,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
+import type { ReactNode } from "react"
+import Map, {
+  Layer,
+  NavigationControl,
+  Popup,
+  Source,
+} from "react-map-gl/mapbox"
+import type { MapRef } from "react-map-gl/mapbox"
 
-import type { Language } from '../../types';
-import { CAMPUS_LANDMARKS, CAMPUS_ZONES } from './constants/mapData';
+import type { Language } from "../../types"
+import { CAMPUS_LANDMARKS, CAMPUS_ZONES } from "./constants/mapData"
 import { getHousingTypeMeta } from "./constants/metadata"
 import {
   CLUSTERS_LAYER,
@@ -31,7 +44,7 @@ import {
   buildLandmarkFeatureCollection,
 } from "./dorm-map/mapFeatureBuilders"
 import { useHousingMapUi } from "./store/HousingContext"
-import type { Dorm } from './types/index';
+import type { Dorm } from "./types/index"
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN ?? ""
 
@@ -189,12 +202,10 @@ const DormMap: React.FC<DormMapProps> = ({
       setVisibleDorms([])
       return []
     }
-    const visible = safeDorms.filter((dorm) => {
+    return safeDorms.filter((dorm) => {
       const point = new mapboxgl.LngLat(dorm.lng, dorm.lat)
       return bounds.contains(point)
     })
-
-    return visible
   }, [safeDorms])
 
   useEffect(() => {

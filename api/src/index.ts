@@ -1,23 +1,18 @@
 import { convertToModelMessages, stepCountIs, streamText } from "ai"
-import { type Context, Hono, type Next } from "hono"
+import { Hono } from "hono"
+import type { Context, Next } from "hono"
 import { cors } from "hono/cors"
 
-import {
-  type PersistEnv,
-  type ResponseMessage,
-  persistTurn,
-} from "./agent/persist.ts"
+import { persistTurn } from "./agent/persist.ts"
+import type { PersistEnv, ResponseMessage } from "./agent/persist.ts"
 import { resolveProvider } from "./agent/provider.ts"
 import { verifyAndCacheJwt } from "./auth/jwtCache.ts"
-import {
-  type RateLimitBinding,
-  ipRateLimit,
-  userRateLimit,
-} from "./middleware/ratelimit.ts"
+import { ipRateLimit, userRateLimit } from "./middleware/ratelimit.ts"
+import type { RateLimitBinding } from "./middleware/ratelimit.ts"
 import { createCustomSkillsTool } from "./tools/customSkills.ts"
 import { createGrepDocsTool } from "./tools/grepDocs.ts"
 import { createSearchKnowledgeBaseTool } from "./tools/searchKnowledgeBase.ts"
-import { type RequestContext } from "./tools/types.ts"
+import type { RequestContext } from "./tools/types.ts"
 import { createWebSearchTool } from "./tools/webSearch.ts"
 
 interface Env {
@@ -95,7 +90,7 @@ const stripDsmlTransform = () => {
       buffer += part.text
       const lastUnsafeIdx = buffer.lastIndexOf(DSML_HOLDBACK_PREFIX)
       let safeBoundary = buffer.length
-      if (lastUnsafeIdx >= 0) {
+      if (lastUnsafeIdx !== -1) {
         const tail = buffer.slice(lastUnsafeIdx)
         const isCompleteTag = /^<\/?｜｜DSML｜｜[^<>]*>/.test(tail)
         if (!isCompleteTag) {
@@ -150,7 +145,7 @@ app.use(
     origin: (origin) => (isAllowedOrigin(origin) ? origin : ""),
     allowMethods: ["GET", "POST", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
-    maxAge: 86400,
+    maxAge: 86_400,
   })
 )
 
@@ -164,13 +159,13 @@ app.use("*", async (c, next) => {
 })
 
 // Health check
-app.get("/health", (c) => {
-  return c.json({
+app.get("/health", (c) =>
+  c.json({
     status: "ok",
     region: c.get("region"),
     timestamp: new Date().toISOString(),
   })
-})
+)
 
 // Optional auth: signed-in users get payload.sub; guests get guest_<ipHash>
 // so per-user rate limiting and MCP global-visibility filtering still apply.
@@ -331,7 +326,7 @@ async function fetchQmd(
     controller.abort()
   }, timeoutMs)
   try {
-    const res = await fetch(`${baseUrl}/api/search`, {
+    return await fetch(`${baseUrl}/api/search`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -340,7 +335,6 @@ async function fetchQmd(
       body,
       signal: controller.signal,
     })
-    return res
   } finally {
     clearTimeout(timer)
   }
@@ -360,7 +354,7 @@ app.post("/api/search", async (c) => {
 
   if (primaryUrl) {
     try {
-      res = await fetchQmd(primaryUrl, body, c.env.QMD_API_KEY ?? "", 15000)
+      res = await fetchQmd(primaryUrl, body, c.env.QMD_API_KEY ?? "", 15_000)
       if (!res.ok) {
         res = null
       }
@@ -373,9 +367,9 @@ app.post("/api/search", async (c) => {
   if (!res && fallbackUrl) {
     try {
       qmdRegion = isCN ? "us" : "cn"
-      res = await fetchQmd(fallbackUrl, body, c.env.QMD_API_KEY ?? "", 15000)
-    } catch (err) {
-      console.error("[QMD] Fallback node failed:", err)
+      res = await fetchQmd(fallbackUrl, body, c.env.QMD_API_KEY ?? "", 15_000)
+    } catch (error) {
+      console.error("[QMD] Fallback node failed:", error)
     }
   }
 
@@ -401,20 +395,20 @@ app.post("/search", async (c) => {
 })
 
 // MCP integrations routes (stub for T9)
-app.all("/integrations/*", async (c) => {
-  return c.json({ error: "MCP integrations not yet implemented" }, 501)
-})
+app.all("/integrations/*", async (c) =>
+  c.json({ error: "MCP integrations not yet implemented" }, 501)
+)
 
 // 404 handler
-app.notFound((c) => {
-  return c.json(
+app.notFound((c) =>
+  c.json(
     {
       error: "Not found",
       path: new URL(c.req.url).pathname,
     },
     404
   )
-})
+)
 
 // Error handler
 app.onError((err, c) => {

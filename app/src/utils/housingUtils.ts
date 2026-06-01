@@ -5,7 +5,7 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { type Dorm } from "../components/housing/types/index"
+import type { Dorm } from "../components/housing/types/index"
 
 /**
  * Checks if a given text fragment is a dorm name or a significant part of one.
@@ -32,11 +32,7 @@ export const isDormMention = (text: string, dorms: Dorm[] = []): boolean => {
 
     // Check for known abbreviations or variations if they exist in name
     // e.g. "ISR" is in "Illinois Street Residence (ISR)"
-    if (lowerText.length > 2 && dormName.includes(`(${lowerText})`)) {
-      return true
-    }
-
-    return false
+    return lowerText.length > 2 && dormName.includes(`(${lowerText})`)
   })
 }
 

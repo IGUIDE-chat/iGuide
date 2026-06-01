@@ -11,7 +11,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import { ArticleView } from "../../components/library/ArticleView"
 import { ARTICLES } from "../../constants"
 import { libraryService } from "../../services/libraryService"
-import { type Language } from "../../types"
+import type { Language } from "../../types"
 
 interface LibraryArticlePageProps {
   language: Language
@@ -27,14 +27,14 @@ const LibraryArticlePage: React.FC<LibraryArticlePageProps> = ({
 
   useEffect(() => {
     if (article) {
-      libraryService.addToHistory(article)
+      void libraryService.addToHistory(article)
     }
   }, [article])
 
   const handleBack = useCallback(() => navigate("/library"), [navigate])
   const handleSearch = useCallback(
     (query: string) => {
-      navigate(`/library?q=${encodeURIComponent(query)}`)
+      void navigate(`/library?q=${encodeURIComponent(query)}`)
     },
     [navigate]
   )

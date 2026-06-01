@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom"
 
 import { libraryService } from "../../services/libraryService"
 import { supabase } from "../../services/supabase"
-import { type LibraryHistoryItem } from "../../types"
+import type { LibraryHistoryItem } from "../../types"
 import { Typewriter } from "../ui/Typewriter"
 import {
   BaseSidebar,
@@ -18,10 +18,10 @@ import {
   PinButton,
   SidebarEmptyState,
   SidebarItem,
-  type TimeCategoryLabels,
   getCategoryOrder,
   groupByCategory,
 } from "./BaseSidebar"
+import type { TimeCategoryLabels } from "./BaseSidebar"
 
 interface LibrarySidebarProps {
   language: "en" | "zh"
@@ -79,7 +79,7 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
 
   // Subscribe to reading_history changes for dynamic refresh
   useEffect(() => {
-    loadHistory()
+    void loadHistory()
 
     const channel = supabase
       .channel("reading_history_changes")
@@ -91,13 +91,13 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
           table: "reading_history",
         },
         () => {
-          loadHistory()
+          void loadHistory()
         }
       )
       .subscribe()
 
     return () => {
-      supabase.removeChannel(channel)
+      void supabase.removeChannel(channel)
     }
   }, [])
 
@@ -110,7 +110,7 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
       )
     ) {
       await libraryService.clearHistory()
-      loadHistory()
+      await loadHistory()
     }
   }
 
@@ -122,9 +122,9 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
     e.stopPropagation()
     try {
       await libraryService.togglePin(id, isPinned)
-      loadHistory()
-    } catch (err) {
-      console.error("Failed to toggle pin:", err)
+      await loadHistory()
+    } catch (error) {
+      console.error("Failed to toggle pin:", error)
     }
   }
 
@@ -139,9 +139,9 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
     ) {
       try {
         await libraryService.removeFromHistory(id)
-        loadHistory()
-      } catch (err) {
-        console.error("Failed to delete item:", err)
+        await loadHistory()
+      } catch (error) {
+        console.error("Failed to delete item:", error)
       }
     }
   }

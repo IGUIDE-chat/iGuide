@@ -7,7 +7,7 @@
 import React, { useEffect, useState } from "react"
 
 import { supabase } from "../../services/supabase"
-import { type Language } from "../../types"
+import type { Language } from "../../types"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -297,15 +297,15 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
         const { platform, user } = await fetchConnectionsFromApi()
         setPlatformConnections(platform)
         setUserConnections(user)
-      } catch (err: unknown) {
+      } catch (error: unknown) {
         setLoadError(
-          err instanceof Error ? err.message : "Failed to load integrations"
+          error instanceof Error ? error.message : "Failed to load integrations"
         )
       } finally {
         setIsLoading(false)
       }
     }
-    load()
+    void load()
   }, [])
 
   // Add form
@@ -525,10 +525,12 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
       setIsSaving(false)
       setShowAddForm(false)
       setTestResult({ state: "idle" })
-    } catch (err) {
-      console.error("Failed to save connection:", err)
+    } catch (error) {
+      console.error("Failed to save connection:", error)
       setIsSaving(false)
-      alert(err instanceof Error ? err.message : "Failed to save connection")
+      alert(
+        error instanceof Error ? error.message : "Failed to save connection"
+      )
     }
   }
 
@@ -588,9 +590,10 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
             ? {
                 ...c,
                 status: "ok",
-                tools: (result.tools ?? []).map((tool) =>
-                  Object.assign({}, tool, { enabled: true })
-                ),
+                tools: (result.tools ?? []).map((tool) => ({
+                  ...tool,
+                  enabled: true,
+                })),
               }
             : c
         )
@@ -610,9 +613,11 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
       if (detailsId === id) {
         setDetailsId(null)
       }
-    } catch (err) {
-      console.error("Failed to delete connection:", err)
-      alert(err instanceof Error ? err.message : "Failed to delete connection")
+    } catch (error) {
+      console.error("Failed to delete connection:", error)
+      alert(
+        error instanceof Error ? error.message : "Failed to delete connection"
+      )
     }
   }
 
@@ -663,10 +668,10 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                     const { platform, user } = await fetchConnectionsFromApi()
                     setPlatformConnections(platform)
                     setUserConnections(user)
-                  } catch (err: unknown) {
+                  } catch (error: unknown) {
                     setLoadError(
-                      err instanceof Error
-                        ? err.message
+                      error instanceof Error
+                        ? error.message
                         : "Failed to load integrations"
                     )
                   } finally {

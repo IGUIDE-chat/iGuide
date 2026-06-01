@@ -7,7 +7,8 @@
 
 import React, { useEffect, useState } from "react"
 
-import { type Course, courseService } from "../../services/courseService"
+import { courseService } from "../../services/courseService"
+import type { Course } from "../../services/courseService"
 import CourseCard from "./CourseCard"
 
 interface CourseListProps {
@@ -38,7 +39,7 @@ const CourseList: React.FC<CourseListProps> = ({ schoolId }) => {
         }
       }
     }
-    loadCourses()
+    void loadCourses()
 
     return () => {
       cancelled = true

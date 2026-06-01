@@ -6,7 +6,7 @@
 import * as React from "react"
 
 import { UI_TEXT } from "../../i18n/uiText"
-import { type Language } from "../../types"
+import type { Language } from "../../types"
 import { ChatEmptyState } from "./ChatEmptyState"
 import { ChatSessionContext } from "./ChatRuntimeProvider"
 import { ImeSafeTextarea } from "./ImeSafeTextarea"
@@ -52,7 +52,7 @@ export const ChatThread = ({ language }: ChatThreadProps) => {
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === "Enter" && !event.shiftKey) {
       const nativeEvent = event.nativeEvent
-      if (nativeEvent.isComposing || event.keyCode === 229) {
+      if (nativeEvent.isComposing) {
         return
       }
       event.preventDefault()

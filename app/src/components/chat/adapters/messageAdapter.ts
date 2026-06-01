@@ -1,6 +1,6 @@
-import { type ThreadMessageLike } from "@assistant-ui/react"
+import type { ThreadMessageLike } from "@assistant-ui/react"
 
-import { type ChatMessage, type ThinkingStep } from "../../../types"
+import type { ChatMessage, ThinkingStep } from "../../../types"
 
 export function toThreadMessage(msg: ChatMessage): ThreadMessageLike {
   return {
@@ -32,7 +32,7 @@ export function fromThreadMessage(
     | undefined
 
   const content = msg.content
-  let text = ""
+  let text: string
   if (typeof content === "string") {
     text = content
   } else {
