@@ -18,11 +18,11 @@
     "style:fix": "prettier --write ."
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260530.1",
+    "@cloudflare/workers-types": "^4.20260603.1",
     "@types/node": "^25.9.1",
-    "oxlint": "^1.67.0",
+    "oxlint": "^1.68.0",
     "prettier": "^3.8.3",
     "typescript": "^6.0.3",
-    "wrangler": "^4.95.0"
+    "wrangler": "^4.97.0"
   }
 }
