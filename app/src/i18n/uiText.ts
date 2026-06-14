@@ -33,6 +33,10 @@ export type UITextEntry = {
   botName: string;
   userRole: string;
   aiError: string;
+  stopGenerating: string;
+  editMessage: string;
+  editSave: string;
+  editCancel: string;
   providerCloud: string;
   providerLocal: string;
   providerCoze: string;
@@ -111,6 +115,10 @@ export const UI_TEXT: Record<Language, UITextEntry> = {
     highTrafficMsg:
       "I'm a bit overwhelmed right now. You can check the Library for verified guides.",
     goToLibrary: "Go to Library ->",
+    stopGenerating: "Stop generating",
+    editMessage: "Edit",
+    editSave: "Send",
+    editCancel: "Cancel",
     botName: "UIUC Guide",
     userRole: "You",
     aiError: "AI can make mistakes. Please check important info.",
@@ -189,6 +197,10 @@ export const UI_TEXT: Record<Language, UITextEntry> = {
     highTraffic: "当前请求较多",
     highTrafficMsg: "我现在有点忙不过来。你可以先去知识库查看已验证内容。",
     goToLibrary: "前往知识库 ->",
+    stopGenerating: "停止生成",
+    editMessage: "编辑",
+    editSave: "发送",
+    editCancel: "取消",
     botName: "UIUC 助手",
     userRole: "你",
     aiError: "AI 可能会出错，请核对重要信息。",

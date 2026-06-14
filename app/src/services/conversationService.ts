@@ -139,6 +139,43 @@ export const conversationService = {
   },
 
   /**
+   * Replace all messages in a conversation with the given list.
+   *
+   * Used by regenerate / edit-and-resend, which rewrite the tail of the
+   * thread. Per-row `created_at` is set with millisecond offsets so the
+   * `created_at ASC` ordering used on reload is preserved.
+   */
+  async overwriteMessages(conversationId: string, messages: ChatMessage[]) {
+    const { error: deleteError } = await supabase
+      .from("messages")
+      .delete()
+      .eq("conversation_id", conversationId);
+    if (deleteError) return { error: deleteError };
+
+    if (messages.length > 0) {
+      const base = Date.now();
+      const rows = messages.map((message, index) => ({
+        conversation_id: conversationId,
+        role: message.role,
+        content: message.text,
+        follow_up_questions: message.followUpQuestions || null,
+        created_at: new Date(base + index).toISOString(),
+      }));
+      const { error: insertError } = await supabase
+        .from("messages")
+        .insert(rows);
+      if (insertError) return { error: insertError };
+    }
+
+    await supabase
+      .from("conversations")
+      .update({ updated_at: new Date().toISOString() })
+      .eq("id", conversationId);
+
+    return { error: null };
+  },
+
+  /**
    * Update conversation's Coze conversation ID
    */
   async updateCozeConversationId(

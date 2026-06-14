@@ -25,7 +25,8 @@ export type StreamChatResponseFn = (
   newMessage: string,
   lang?: string,
   conversationId?: string,
-  userId?: string
+  userId?: string,
+  signal?: AbortSignal
 ) => AsyncGenerator<StreamChunk>;
 
 export interface AIProvider {

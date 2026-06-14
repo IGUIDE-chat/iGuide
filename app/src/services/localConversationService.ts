@@ -134,6 +134,34 @@ export const localConversationService = {
     return { data: newMessage, error: null };
   },
 
+  /**
+   * Replace all messages in a guest conversation (regenerate / edit-and-resend).
+   */
+  async overwriteMessages(conversationId: string, messages: ChatMessage[]) {
+    const conversations = getStorage();
+    const conv = conversations[conversationId];
+
+    if (!conv) {
+      return { error: new Error("Conversation not found") };
+    }
+
+    const now = Date.now();
+    conv.messages = messages.map((message, index) => ({
+      id: `${now + index}`,
+      conversation_id: conversationId,
+      role: message.role,
+      content: message.text,
+      created_at: new Date(now + index).toISOString(),
+      follow_up_questions: message.followUpQuestions,
+    }));
+    conv.updated_at = new Date().toISOString();
+
+    conversations[conversationId] = conv;
+    setStorage(conversations);
+
+    return { error: null };
+  },
+
   async updateConversationTitle(conversationId: string, title: string) {
     const conversations = getStorage();
     if (conversations[conversationId]) {
