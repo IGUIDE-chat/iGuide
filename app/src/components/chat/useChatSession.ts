@@ -442,6 +442,11 @@ export const useChatSession = ({
       const baseMessages = [...messages, userMsg];
       dispatch({ type: "ADD_MESSAGE", payload: userMsg });
       setInput("");
+      // Set loading before any await so the conversation-load effect (guarded
+      // by `if (isLoading) return`) does not fire when onConversationCreated
+      // flips currentConversationId for a brand-new conversation — that reload
+      // would replace the streaming placeholder and drop its thinking steps.
+      setIsLoading(true);
 
       let conversationId = conversationIdRef.current;
       if (!conversationId) {
