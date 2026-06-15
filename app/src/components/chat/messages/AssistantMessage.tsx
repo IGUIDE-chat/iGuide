@@ -30,6 +30,108 @@ const FEEDBACK_LABELS = {
   zh: { helpful: "有帮助", notHelpful: "没帮助" },
 } as const;
 
+const actionButtonClass = `
+  rounded-md p-1.5 text-slate-500 transition-colors
+  hover:bg-slate-100 hover:text-slate-700
+`;
+
+/**
+ * Message action bar (copy, regenerate, 👍/👎). Rendered as a static row
+ * below the answer so it is always discoverable — including on touch devices
+ * where there is no hover. It is hidden only while the response is streaming.
+ */
+const MessageActionBar: React.FC<{
+  feedbackLabels: { helpful: string; notHelpful: string };
+}> = ({ feedbackLabels }) => (
+  <ActionBarPrimitive.Root hideWhenRunning className="mt-3 flex gap-1">
+    <ActionBarPrimitive.Copy aria-label="Copy message" className={actionButtonClass}>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+      </svg>
+    </ActionBarPrimitive.Copy>
+    <ActionBarPrimitive.Reload
+      aria-label="Regenerate response"
+      className={actionButtonClass}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <polyline points="23 4 23 10 17 10" />
+        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+      </svg>
+    </ActionBarPrimitive.Reload>
+    <ActionBarPrimitive.FeedbackPositive
+      aria-label={feedbackLabels.helpful}
+      title={feedbackLabels.helpful}
+      className="
+        rounded-md p-1.5 text-slate-500 transition-colors
+        hover:bg-slate-100 hover:text-emerald-600
+        data-[submitted]:text-emerald-600
+      "
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
+      </svg>
+    </ActionBarPrimitive.FeedbackPositive>
+    <ActionBarPrimitive.FeedbackNegative
+      aria-label={feedbackLabels.notHelpful}
+      title={feedbackLabels.notHelpful}
+      className="
+        rounded-md p-1.5 text-slate-500 transition-colors
+        hover:bg-slate-100 hover:text-rose-600
+        data-[submitted]:text-rose-600
+      "
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17" />
+      </svg>
+    </ActionBarPrimitive.FeedbackNegative>
+  </ActionBarPrimitive.Root>
+);
+
 export const AssistantMessage: React.FC<AssistantMessageProps> = ({
   language = "zh",
   botName = "iGuide",
@@ -65,108 +167,7 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
         </div>
 
         {/* Content */}
-        <div className="relative flex-1 overflow-hidden pt-0.5">
-          <ActionBarPrimitive.Root
-            hideWhenRunning
-            autohide="not-last"
-            className="absolute top-0 right-0 flex gap-1"
-          >
-            <ActionBarPrimitive.Copy
-              aria-label="Copy message"
-              className="
-                rounded-md p-1.5 text-slate-500 transition-colors
-                hover:bg-slate-100 hover:text-slate-700
-              "
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-              </svg>
-            </ActionBarPrimitive.Copy>
-            <ActionBarPrimitive.Reload
-              aria-label="Regenerate response"
-              className="
-                rounded-md p-1.5 text-slate-500 transition-colors
-                hover:bg-slate-100 hover:text-slate-700
-              "
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <polyline points="23 4 23 10 17 10" />
-                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
-              </svg>
-            </ActionBarPrimitive.Reload>
-            <ActionBarPrimitive.FeedbackPositive
-              aria-label={feedbackLabels.helpful}
-              title={feedbackLabels.helpful}
-              className="
-                rounded-md p-1.5 text-slate-500 transition-colors
-                hover:bg-slate-100 hover:text-emerald-600
-                data-[submitted]:text-emerald-600
-              "
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
-              </svg>
-            </ActionBarPrimitive.FeedbackPositive>
-            <ActionBarPrimitive.FeedbackNegative
-              aria-label={feedbackLabels.notHelpful}
-              title={feedbackLabels.notHelpful}
-              className="
-                rounded-md p-1.5 text-slate-500 transition-colors
-                hover:bg-slate-100 hover:text-rose-600
-                data-[submitted]:text-rose-600
-              "
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17" />
-              </svg>
-            </ActionBarPrimitive.FeedbackNegative>
-          </ActionBarPrimitive.Root>
-
+        <div className="relative flex-1 pt-0.5">
           {/* Bot name label */}
           <div
             className="
@@ -312,6 +313,9 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
               }}
             </MessagePrimitive.Parts>
           </div>
+
+          {/* Action bar — copy / regenerate / feedback */}
+          <MessageActionBar feedbackLabels={feedbackLabels} />
 
           {/* Follow-up chips */}
           {meta?.followUpQuestions && meta.followUpQuestions.length > 0 && (
