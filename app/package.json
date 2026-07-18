@@ -23,18 +23,18 @@
     "postinstall": "git submodule update --init --recursive && git config --local include.path ../.gitconfig"
   },
   "dependencies": {
-    "@assistant-ui/react": "^0.14.14",
+    "@assistant-ui/react": "^0.14.27",
     "@headlessui/react": "^2.2.10",
-    "@supabase/supabase-js": "^2.107.0",
-    "framer-motion": "^12.40.0",
-    "lucide-react": "^1.17.0",
-    "mapbox-gl": "^3.24.0",
+    "@supabase/supabase-js": "^2.110.7",
+    "framer-motion": "^12.42.2",
+    "lucide-react": "^1.25.0",
+    "mapbox-gl": "^3.26.0",
     "rc-slider": "^11.1.9",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-map-gl": "^8.1.1",
     "react-markdown": "^10.1.0",
-    "react-router-dom": "^7.17.0",
+    "react-router-dom": "^7.18.1",
     "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
