@@ -5,12 +5,16 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { useCallback, useEffect, useReducer, useState } from "react";
+import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { Language, ChatMessage, ThinkingStep } from "../../types";
 import { streamChatResponse } from "../../services/ai";
 import { conversationService } from "../../services/conversationService";
 import { localConversationService } from "../../services/localConversationService";
 import { memoryService } from "../../services/memoryService";
+import {
+  feedbackService,
+  type FeedbackVote,
+} from "../../services/feedbackService";
 import { useAuth } from "../../contexts/AuthContext";
 import { useThrottle } from "../../hooks/useThrottle";
 
@@ -97,6 +101,18 @@ export const useChatSession = ({
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [feedback, setFeedback] = useState<Record<string, FeedbackVote>>({});
+
+  // Always-current conversation id, including one just created during a send,
+  // so regenerate / edit persist to the right conversation without waiting for
+  // the parent prop to round-trip.
+  const conversationIdRef = useRef<string | null>(currentConversationId);
+  useEffect(() => {
+    conversationIdRef.current = currentConversationId;
+  }, [currentConversationId]);
+
+  // In-flight request controller, used to cancel streaming on stop.
+  const abortRef = useRef<AbortController | null>(null);
 
   const updateMessageText = useCallback(
     (id: string, text: string, steps: ThinkingStep[]) => {
@@ -133,6 +149,12 @@ export const useChatSession = ({
             payload: service.convertToChatMessages(data.messages),
           });
         }
+
+        const votes = await feedbackService.getFeedbackForConversation(
+          conversationId,
+          user?.id
+        );
+        setFeedback(votes);
       } catch (error) {
         console.error("Failed to load conversation:", error);
       } finally {
@@ -150,6 +172,7 @@ export const useChatSession = ({
 
     if (!currentConversationId) {
       dispatch({ type: "SET_MESSAGES", payload: [] });
+      setFeedback({});
       return;
     }
 
@@ -164,82 +187,60 @@ export const useChatSession = ({
     void loadConversation(currentConversationId);
   }, [currentConversationId, isLoading, loadConversation, user]);
 
-  const sendMessage = useCallback(
-    async (text: string) => {
-      if (!text.trim() || isLoading) {
-        return;
-      }
+  /**
+   * Stream an assistant reply for the given thread state.
+   *
+   * `baseMessages` is the full visible thread the assistant should answer,
+   * with the user message to respond to as its last element. The caller is
+   * responsible for having dispatched `baseMessages` into the visible state
+   * before calling this. Persistence is "append" for a fresh turn or
+   * "overwrite" when the tail was rewritten (regenerate / edit).
+   */
+  const streamAssistant = useCallback(
+    async (
+      baseMessages: ChatMessage[],
+      conversationId: string | null,
+      persistMode: "append" | "overwrite"
+    ) => {
+      const lastUserMessage = baseMessages[baseMessages.length - 1];
+      if (!lastUserMessage) return;
 
-      const userMsg: ChatMessage = {
-        id: crypto.randomUUID(),
-        role: "user",
-        text,
-      };
-
-      dispatch({ type: "ADD_MESSAGE", payload: userMsg });
-      setInput("");
+      const controller = new AbortController();
+      abortRef.current = controller;
       setIsLoading(true);
 
-      let conversationId = currentConversationId;
-      if (!conversationId) {
-        try {
-          const service = user ? conversationService : localConversationService;
-          const { data, error } = await service.createConversation(
-            undefined,
-            generateSmartTitle(text, language)
-          );
-          if (error) {
-            throw error;
-          }
-          if (data) {
-            conversationId = data.id;
-            onConversationCreated?.(data.id);
-          }
-        } catch (error) {
-          console.error("Failed to create conversation:", error);
-        }
-      }
-
-      if (conversationId) {
-        try {
-          const service = user ? conversationService : localConversationService;
-          await service.saveMessage(conversationId, userMsg);
-        } catch (error) {
-          console.error("Failed to save user message:", error);
-        }
-      }
+      const aiMsgId = crypto.randomUUID();
+      dispatch({
+        type: "ADD_MESSAGE",
+        payload: {
+          id: aiMsgId,
+          role: "model",
+          text: "",
+          isStreaming: true,
+          isThinking: true,
+          thinkingSteps: [
+            {
+              id: `step-${Date.now()}-init`,
+              type: "processing" as const,
+              label: language === "zh" ? "理解问题..." : "Understanding...",
+              timestamp: Date.now(),
+              done: false,
+            },
+          ],
+        },
+      });
 
       try {
-        const aiMsgId = crypto.randomUUID();
-        dispatch({
-          type: "ADD_MESSAGE",
-          payload: {
-            id: aiMsgId,
-            role: "model",
-            text: "",
-            isStreaming: true,
-            isThinking: true,
-            thinkingSteps: [
-              {
-                id: `step-${Date.now()}-init`,
-                type: "processing" as const,
-                label: language === "zh" ? "理解问题..." : "Understanding...",
-                timestamp: Date.now(),
-                done: false,
-              },
-            ],
-          },
-        });
-
         const stream = await streamChatResponse(
-          messages.map((message) => ({
+          baseMessages.slice(0, -1).map((message) => ({
             role: message.role,
             text: message.text,
           })),
-          userMsg.text,
+          lastUserMessage.text,
           language,
           conversationId || undefined,
-          user?.id
+          user?.id,
+          controller.signal
         );
 
         let fullText = "";
@@ -291,7 +292,9 @@ export const useChatSession = ({
           }
         }
 
-        if (!fullText.trim()) {
+        const wasAborted = controller.signal.aborted;
+
+        if (!fullText.trim() && !wasAborted) {
           fullText = INVALID_RESPONSE[language];
         }
 
@@ -353,11 +356,6 @@ export const useChatSession = ({
           .replace(/<conv_memory>[\s\S]*/g, "")
           .trim();
 
-        // If all content was stripped, ensure clean empty string
-        if (!fullText.trim()) {
-          fullText = "";
-        }
-
         // Persist extracted memories (fire-and-forget)
         if (user && (userSoulMatch || userMemoryMatch || convMemoryMatch)) {
           const uid = user.id;
@@ -393,14 +391,21 @@ export const useChatSession = ({
 
         dispatch({ type: "REPLACE_MESSAGE", payload: aiMsg });
 
-        if (conversationId && aiMsg.text.trim()) {
+        if (conversationId) {
           try {
             const service = user
               ? conversationService
               : localConversationService;
-            await service.saveMessage(conversationId, aiMsg);
+            if (persistMode === "overwrite") {
+              const finalMessages = aiMsg.text.trim()
+                ? [...baseMessages, aiMsg]
+                : baseMessages;
+              await service.overwriteMessages(conversationId, finalMessages);
+            } else if (aiMsg.text.trim()) {
+              await service.saveMessage(conversationId, aiMsg);
+            }
           } catch (error) {
-            console.error("Failed to save AI message:", error);
+            console.error("Failed to persist assistant message:", error);
           }
         }
       } catch {
@@ -413,18 +418,151 @@ export const useChatSession = ({
           },
         });
       } finally {
+        if (abortRef.current === controller) {
+          abortRef.current = null;
+        }
         setIsLoading(false);
       }
     },
+    [language, throttledUpdateMessageText, user]
+  );
+
+  const sendMessage = useCallback(
+    async (text: string) => {
+      if (!text.trim() || isLoading) {
+        return;
+      }
+
+      const userMsg: ChatMessage = {
+        id: crypto.randomUUID(),
+        role: "user",
+        text,
+      };
+
+      const baseMessages = [...messages, userMsg];
+      dispatch({ type: "ADD_MESSAGE", payload: userMsg });
+      setInput("");
+      // Set loading before any await so the conversation-load effect (guarded
+      // by `if (isLoading) return`) does not fire when onConversationCreated
+      // flips currentConversationId for a brand-new conversation — that reload
+      // would replace the streaming placeholder and drop its thinking steps.
+      setIsLoading(true);
+
+      let conversationId = conversationIdRef.current;
+      if (!conversationId) {
+        try {
+          const service = user ? conversationService : localConversationService;
+          const { data, error } = await service.createConversation(
+            undefined,
+            generateSmartTitle(text, language)
+          );
+          if (error) {
+            throw error;
+          }
+          if (data) {
+            conversationId = data.id;
+            conversationIdRef.current = data.id;
+            onConversationCreated?.(data.id);
+          }
+        } catch (error) {
+          console.error("Failed to create conversation:", error);
+        }
+      }
+
+      if (conversationId) {
+        try {
+          const service = user ? conversationService : localConversationService;
+          await service.saveMessage(conversationId, userMsg);
+        } catch (error) {
+          console.error("Failed to save user message:", error);
+        }
+      }
+
+      await streamAssistant(baseMessages, conversationId, "append");
+    },
     [
-      currentConversationId,
       isLoading,
       language,
       messages,
       onConversationCreated,
-      throttledUpdateMessageText,
+      streamAssistant,
       user,
     ]
+  );
+
+  /** Stop the in-flight response; partial text is kept. */
+  const stopGeneration = useCallback(() => {
+    abortRef.current?.abort();
+  }, []);
+
+  /**
+   * Regenerate the assistant reply whose parent is `parentId` (the user
+   * message that prompted it). Everything after that user message is dropped
+   * and a fresh reply is streamed.
+   */
+  const regenerate = useCallback(
+    async (parentId: string | null) => {
+      if (isLoading) return;
+
+      const parentIndex = parentId
+        ? messages.findIndex((m) => m.id === parentId)
+        : -1;
+      // Fall back to the last user message if no parent was provided.
+      const anchorIndex =
+        parentIndex >= 0
+          ? parentIndex
+          : messages.map((m) => m.role).lastIndexOf("user");
+      if (anchorIndex < 0 || messages[anchorIndex].role !== "user") return;
+
+      const baseMessages = messages.slice(0, anchorIndex + 1);
+      dispatch({ type: "SET_MESSAGES", payload: baseMessages });
+      await streamAssistant(baseMessages, conversationIdRef.current, "overwrite");
+    },
+    [isLoading, messages, streamAssistant]
+  );
+
+  /**
+   * Replace a user message (identified by its parent `parentId`) with new
+   * text and re-stream the reply. `parentId` is the message before the edited
+   * one, per the assistant-ui edit contract (null = first message).
+   */
+  const editMessage = useCallback(
+    async (parentId: string | null, newText: string) => {
+      if (isLoading || !newText.trim()) return;
+
+      const keepUpToIndex = parentId
+        ? messages.findIndex((m) => m.id === parentId)
+        : -1;
+
+      const newUserMsg: ChatMessage = {
+        id: crypto.randomUUID(),
+        role: "user",
+        text: newText,
+      };
+
+      const baseMessages = [
+        ...messages.slice(0, keepUpToIndex + 1),
+        newUserMsg,
+      ];
+      dispatch({ type: "SET_MESSAGES", payload: baseMessages });
+      await streamAssistant(baseMessages, conversationIdRef.current, "overwrite");
+    },
+    [isLoading, messages, streamAssistant]
+  );
+
+  /** Record a 👍/👎 vote on an assistant message. */
+  const submitFeedback = useCallback(
+    (messageId: string, type: "positive" | "negative") => {
+      const vote: FeedbackVote = type === "positive" ? 1 : -1;
+      setFeedback((prev) => ({ ...prev, [messageId]: vote }));
+      const messageText = messages.find((m) => m.id === messageId)?.text;
+      void feedbackService.setFeedback(messageId, vote, {
+        userId: user?.id,
+        conversationId: conversationIdRef.current,
+        messageText,
+      });
+    },
+    [messages, user]
   );
 
   const handleSubmit = useCallback(
@@ -440,8 +578,13 @@ export const useChatSession = ({
     input,
     isLoading,
     isLoadingHistory,
+    feedback,
     setInput,
     sendMessage,
+    stopGeneration,
+    regenerate,
+    editMessage,
+    submitFeedback,
     handleSubmit,
   };
 };

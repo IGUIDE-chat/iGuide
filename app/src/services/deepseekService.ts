@@ -154,7 +154,8 @@ export const streamDeepSeekChat = async function* (
   newMessage: string,
   lang: string = "en",
   _conversationId?: string,
-  _userId?: string
+  _userId?: string,
+  signal?: AbortSignal
 ): AsyncGenerator<StreamChunk> {
   try {
     const useToolUseRag = isToolUseRagEnabled();
@@ -170,6 +171,7 @@ export const streamDeepSeekChat = async function* (
           userId: _userId,
           lang,
         }),
+        signal,
       });
 
       if (!response.ok) {
@@ -288,6 +290,7 @@ export const streamDeepSeekChat = async function* (
           stream: true,
           temperature: 1.0,
         }),
+        signal,
       });
     } else {
       // PROD: CF Function handles format translation
@@ -301,6 +304,7 @@ export const streamDeepSeekChat = async function* (
           stream: true,
           systemInstruction,
         }),
+        signal,
       });
     }
 
@@ -326,6 +330,10 @@ export const streamDeepSeekChat = async function* (
       }
     }
   } catch (error: unknown) {
+    // User-initiated stop: end the stream silently without an error message.
+    if (error instanceof DOMException && error.name === "AbortError") {
+      return;
+    }
     const msg = error instanceof Error ? error.message : "Unknown error";
     console.error("[DeepSeek] Stream error:", msg);
     yield { text: `\n(Error: ${msg})` };

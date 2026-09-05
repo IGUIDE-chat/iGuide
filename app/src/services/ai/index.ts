@@ -26,13 +26,15 @@ export const streamChatResponse: StreamChatResponseFn = (
   newMessage,
   lang,
   conversationId,
-  userId
+  userId,
+  signal
 ) => {
   return activeProvider.streamChatResponse(
     history,
     newMessage,
     lang,
     conversationId,
-    userId
+    userId,
+    signal
   );
 };

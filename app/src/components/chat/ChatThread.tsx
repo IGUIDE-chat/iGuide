@@ -10,6 +10,8 @@ import { UI_TEXT } from "../../i18n/uiText";
 import { ChatEmptyState } from "./ChatEmptyState";
 import { UserMessage } from "./messages/UserMessage";
 import { AssistantMessage } from "./messages/AssistantMessage";
+import { EditComposer } from "./messages/EditComposer";
+import { ImeSafeComposerTextarea } from "./adapters/ImeSafeComposerTextarea";
 import { ChatSessionContext } from "./ChatRuntimeProvider";
 
 interface ChatThreadProps {
@@ -17,71 +19,6 @@ interface ChatThreadProps {
 }
 
 const containerClass = "w-full max-w-3xl mx-auto px-4";
-
-const toTextareaValue = (
-  value: React.TextareaHTMLAttributes<HTMLTextAreaElement>["value"]
-) => {
-  if (Array.isArray(value)) {
-    return value.join(",");
-  }
-
-  return value?.toString() ?? "";
-};
-
-const isNativeInputComposing = (
-  event: React.ChangeEvent<HTMLTextAreaElement>
-) => event.nativeEvent instanceof InputEvent && event.nativeEvent.isComposing;
-
-const ImeSafeComposerTextarea = React.forwardRef<
-  HTMLTextAreaElement,
-  React.TextareaHTMLAttributes<HTMLTextAreaElement>
->(
-  (
-    { onChange, onCompositionEnd, onCompositionStart, value, ...props },
-    ref
-  ) => {
-    const isComposingRef = React.useRef(false);
-    const [compositionValue, setCompositionValue] = React.useState("");
-    const controlledValue = toTextareaValue(value);
-
-    const handleCompositionStart = (
-      event: React.CompositionEvent<HTMLTextAreaElement>
-    ) => {
-      isComposingRef.current = true;
-      setCompositionValue(event.currentTarget.value);
-      onCompositionStart?.(event);
-    };
-
-    const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-      if (isComposingRef.current || isNativeInputComposing(event)) {
-        setCompositionValue(event.currentTarget.value);
-      }
-
-      onChange?.(event);
-    };
-
-    const handleCompositionEnd = (
-      event: React.CompositionEvent<HTMLTextAreaElement>
-    ) => {
-      isComposingRef.current = false;
-      setCompositionValue(event.currentTarget.value);
-      onCompositionEnd?.(event);
-    };
-
-    return (
-      <textarea
-        {...props}
-        ref={ref}
-        value={isComposingRef.current ? compositionValue : controlledValue}
-        onChange={handleChange}
-        onCompositionEnd={handleCompositionEnd}
-        onCompositionStart={handleCompositionStart}
-      />
-    );
-  }
-);
-
-ImeSafeComposerTextarea.displayName = "ImeSafeComposerTextarea";
 
 /**
  * ChatThread — assistant-ui chat UI shell built on ThreadPrimitive and
@@ -131,7 +68,15 @@ export const ChatThread = ({ language }: ChatThreadProps) => {
           <div className="flex-col pt-14 pb-36">
             <ThreadPrimitive.Messages
               components={{
-                UserMessage: () => <UserMessage userRole={t.userRole} />,
+                UserMessage: () => (
+                  <UserMessage userRole={t.userRole} editLabel={t.editMessage} />
+                ),
+                EditComposer: () => (
+                  <EditComposer
+                    saveLabel={t.editSave}
+                    cancelLabel={t.editCancel}
+                  />
+                ),
                 AssistantMessage: () => (
                   <AssistantMessage
                     language={language}
@@ -168,31 +113,53 @@ export const ChatThread = ({ language }: ChatThreadProps) => {
                   render={<ImeSafeComposerTextarea />}
                   rows={1}
                 />
-                <ComposerPrimitive.Send
-                  aria-label="Send"
-                  className="
-                    absolute top-1/2 right-2 -translate-y-1/2 rounded-full
-                    bg-black p-2 text-white transition-all
-                    hover:opacity-80
-                    disabled:cursor-not-allowed disabled:bg-slate-100
-                    disabled:text-slate-300
-                  "
-                >
-                  <svg
-                    className="size-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
+                <AuiIf condition={({ thread }) => !thread.isRunning}>
+                  <ComposerPrimitive.Send
+                    aria-label="Send"
+                    className="
+                      absolute top-1/2 right-2 -translate-y-1/2 rounded-full
+                      bg-black p-2 text-white transition-all
+                      hover:opacity-80
+                      disabled:cursor-not-allowed disabled:bg-slate-100
+                      disabled:text-slate-300
+                    "
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 10l7-7m0 0l7 7m-7-7v18"
-                    />
-                  </svg>
-                </ComposerPrimitive.Send>
+                    <svg
+                      className="size-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 10l7-7m0 0l7 7m-7-7v18"
+                      />
+                    </svg>
+                  </ComposerPrimitive.Send>
+                </AuiIf>
+                <AuiIf condition={({ thread }) => thread.isRunning}>
+                  <ComposerPrimitive.Cancel
+                    aria-label={t.stopGenerating}
+                    title={t.stopGenerating}
+                    className="
+                      absolute top-1/2 right-2 -translate-y-1/2 rounded-full
+                      bg-black p-2 text-white transition-all
+                      hover:opacity-80
+                    "
+                  >
+                    <svg
+                      className="size-4"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <rect x="6" y="6" width="12" height="12" rx="1.5" />
+                    </svg>
+                  </ComposerPrimitive.Cancel>
+                </AuiIf>
               </ComposerPrimitive.Root>
               <div
                 className="

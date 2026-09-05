@@ -12,6 +12,7 @@ import {
   type ThreadMessageLike,
 } from "@assistant-ui/react";
 import { useChatSession } from "./useChatSession";
+import { type FeedbackVote } from "../../services/feedbackService";
 import {
   type ChatMessage,
   type Language,
@@ -132,7 +133,10 @@ const getToolCallParts = (
   });
 };
 
-const toAssistantThreadMessage = (msg: ChatMessage): ThreadMessageLike => {
+const toAssistantThreadMessage = (
+  msg: ChatMessage,
+  feedback: Record<string, FeedbackVote>
+): ThreadMessageLike => {
   const role = msg.role === "model" ? "assistant" : "user";
   const content: ThreadMessageLike["content"] =
     role === "assistant"
@@ -141,6 +145,12 @@ const toAssistantThreadMessage = (msg: ChatMessage): ThreadMessageLike => {
           { type: "text" as const, text: msg.text },
         ]
       : [{ type: "text" as const, text: msg.text }];
+
+  const vote = feedback[msg.id];
+  const submittedFeedback =
+    role === "assistant" && vote
+      ? ({ type: vote === 1 ? "positive" : "negative" } as const)
+      : undefined;
 
   return {
     id: msg.id,
@@ -152,6 +162,7 @@ const toAssistantThreadMessage = (msg: ChatMessage): ThreadMessageLike => {
         : ({ type: "complete", reason: "stop" } as const),
     }),
     metadata: {
+      ...(submittedFeedback && { submittedFeedback }),
       custom: {
         thinkingSteps: msg.thinkingSteps,
         isThinking: msg.isThinking,
@@ -202,7 +213,16 @@ export const ChatRuntimeProvider = ({
   onConversationCreated,
   children,
 }: ChatRuntimeProviderProps) => {
-  const { messages, isLoading, sendMessage } = useChatSession({
+  const {
+    messages,
+    isLoading,
+    feedback,
+    sendMessage,
+    stopGeneration,
+    regenerate,
+    editMessage,
+    submitFeedback,
+  } = useChatSession({
     language,
     currentConversationId,
     onConversationCreated,
@@ -211,7 +231,8 @@ export const ChatRuntimeProvider = ({
   const store = React.useMemo(
     () => ({
       messages,
-      convertMessage: toAssistantThreadMessage,
+      convertMessage: (msg: ChatMessage) =>
+        toAssistantThreadMessage(msg, feedback),
       isRunning: isLoading,
       onNew: async (message: AppendMessage) => {
         const text = getTextFromAppendMessage(message);
@@ -219,8 +240,42 @@ export const ChatRuntimeProvider = ({
           await sendMessage(text);
         }
       },
+      onEdit: async (message: AppendMessage) => {
+        const text = getTextFromAppendMessage(message);
+        if (text !== null) {
+          await editMessage(message.parentId, text);
+        }
+      },
+      onReload: async (parentId: string | null) => {
+        await regenerate(parentId);
+      },
+      onCancel: async () => {
+        stopGeneration();
+      },
+      adapters: {
+        feedback: {
+          submit: ({
+            message,
+            type,
+          }: {
+            message: { id: string };
+            type: "positive" | "negative";
+          }) => {
+            submitFeedback(message.id, type);
+          },
+        },
+      },
     }),
-    [messages, isLoading, sendMessage]
+    [
+      messages,
+      isLoading,
+      feedback,
+      sendMessage,
+      stopGeneration,
+      regenerate,
+      editMessage,
+      submitFeedback,
+    ]
   );
 
   const runtime = useExternalStoreRuntime(store);
