@@ -10,3 +10,12 @@
  * - true：合并 Google Reviews 数据到评论列表和统计中。
  */
 export const SHOW_GOOGLE_REVIEWS = false;
+
+/**
+ * 控制是否展示宿舍好评率（点赞占比）的 UI。
+ * - false（默认）：隐藏卡片角标、详情页主图角标以及评价区标题中的好评率。
+ * - true：正常展示好评率。
+ *
+ * 注意：此开关仅影响展示，不影响点赞数据的读写与统计。
+ */
+export const SHOW_POSITIVE_RATING = false;

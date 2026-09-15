@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { MessageSquare, ThumbsUp, User, X, Globe } from "lucide-react";
 import { Language } from "../../types";
 import { dormDetailTexts } from "./i18n/dormTexts";
+import { SHOW_POSITIVE_RATING } from "./constants/featureFlags";
 
 interface Comment {
   id: string;
@@ -144,7 +145,8 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
         {totalReviews > 0 && (
           <span className="text-[12px] font-medium text-slate-500 md:text-[13px]">
             {totalReviews} {language === "zh" ? "条评价" : "Reviews"}
-            {positivePercent !== null &&
+            {SHOW_POSITIVE_RATING &&
+              positivePercent !== null &&
               ` · ${positivePercent}${t.positiveRating}`}
           </span>
         )}
