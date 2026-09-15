@@ -23,14 +23,16 @@ interface AppShellProps {
 export const AppShell: React.FC<AppShellProps> = ({
   isSidebarOpen,
   sidebar,
-  mobileHeader: _mobileHeader,
+  mobileHeader,
   children,
   sidebarToggleButtonRef,
   mobileSidebarButtonRef,
   onToggleSidebar,
 }) => {
   const layout = useLayout();
-  const headerSlot = layout.mobileHeaderSlot;
+  // A page may override the mobile header via LayoutContext (e.g. DormDetail);
+  // otherwise fall back to the default header passed in by Layout.
+  const headerSlot = layout.mobileHeaderSlot ?? mobileHeader;
 
   return (
     <div
