@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { Language } from "../../types";
 import { dormDetailTexts } from "./i18n/dormTexts";
+import { SHOW_POSITIVE_RATING } from "./constants/featureFlags";
 
 interface DormDetailGalleryProps {
   heroImage: string;
@@ -95,7 +96,7 @@ export const DormDetailGallery: React.FC<DormDetailGalleryProps> = ({
             animate={{ scale: 1 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           />
-          {positivePercent !== null && (
+          {SHOW_POSITIVE_RATING && positivePercent !== null && (
             <motion.button
               type="button"
               initial={{ opacity: 0, x: 8 }}

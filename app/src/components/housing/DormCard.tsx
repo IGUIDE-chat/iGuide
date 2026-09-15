@@ -17,6 +17,7 @@ import {
   Wind,
 } from "lucide-react";
 import { formatPrice } from "./constants/pricing";
+import { SHOW_POSITIVE_RATING } from "./constants/featureFlags";
 import { Dorm } from "./types/index";
 import { Language } from "../../types";
 import {
@@ -405,7 +406,8 @@ const DormCard: React.FC<DormCardProps> = ({
             group-hover:scale-105
           "
         />
-        {positivePercent != null &&
+        {SHOW_POSITIVE_RATING &&
+          positivePercent != null &&
           totalReviews != null &&
           totalReviews > 0 && (
             <button
