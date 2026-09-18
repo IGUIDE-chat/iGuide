@@ -42,6 +42,8 @@ const LegacyDormRedirect: React.FC = () => {
   return <Navigate to={id ? `/dorms/${id}` : "/dorms"} replace />;
 };
 
+const NotFoundRedirect: React.FC = () => <Navigate to="/chat" replace />;
+
 export const AppRoutes: React.FC<AppRoutesProps> = ({
   language,
   currentConversationId,
@@ -93,7 +95,9 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({
           path="/dorms/:id"
           element={<DormDetailPage language={language} />}
         />
+        <Route path="/dorm" element={<LegacyDormRedirect />} />
         <Route path="/dorm/:id" element={<LegacyDormRedirect />} />
+        <Route path="*" element={<NotFoundRedirect />} />
       </Routes>
     </Suspense>
   );
