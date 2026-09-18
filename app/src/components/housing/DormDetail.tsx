@@ -74,10 +74,12 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
     saveComment,
     deleteComment,
     voteOnComment,
+    setCommentHidden,
     thumbsUp,
   } = useDormComments(dormId);
 
-  const totalReviews = comments.length;
+  // Hidden (moderated) comments are only in the list for admins — never count them.
+  const totalReviews = comments.filter((c) => !c.hidden).length;
   const positivePercent =
     totalReviews > 0 ? Math.round((thumbsUp / totalReviews) * 100) : null;
 
@@ -453,6 +455,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
             onSaveComment={saveComment}
             onDeleteComment={deleteComment}
             onVoteOnComment={voteOnComment}
+            onToggleCommentHidden={setCommentHidden}
           />
         </motion.div>
       </main>

@@ -20,6 +20,7 @@ const generateComment = (
     content: `${content}\n\n(数据由系统爬取自真实 Google Maps / Scraped from real Google Maps)`,
     dorm_vote,
     created_at: date.toISOString(),
+    hidden: false,
     upvotes,
     downvotes: 0,
     myVote: null,

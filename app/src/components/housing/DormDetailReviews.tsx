@@ -1,6 +1,14 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquare, ThumbsUp, User, X, Globe } from "lucide-react";
+import {
+  MessageSquare,
+  ThumbsUp,
+  User,
+  X,
+  Globe,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 import { Language } from "../../types";
 import { dormDetailTexts } from "./i18n/dormTexts";
 import { SHOW_POSITIVE_RATING } from "./constants/featureFlags";
@@ -14,6 +22,8 @@ interface Comment {
   display_name: string;
   upvotes: number;
   myVote: 1 | -1 | null;
+  /** Moderated comments — only admins receive these. */
+  hidden?: boolean;
 }
 
 interface DormDetailReviewsProps {
@@ -26,6 +36,7 @@ interface DormDetailReviewsProps {
   onSaveComment: (content: string, vote: 1 | -1 | null) => Promise<void>;
   onDeleteComment: (commentId: string) => void;
   onVoteOnComment: (commentId: string, vote: 1 | -1 | null) => void;
+  onToggleCommentHidden?: (commentId: string, hidden: boolean) => Promise<void>;
 }
 
 const isChinese = (text: string) => /[\u4e00-\u9fff]/.test(text);
@@ -42,11 +53,13 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
   onSaveComment,
   onDeleteComment,
   onVoteOnComment,
+  onToggleCommentHidden,
 }) => {
   const t = dormDetailTexts[language];
   const [commentContent, setCommentContent] = useState("");
   const [commentVote, setCommentVote] = useState<1 | -1 | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [showAllReviews, setShowAllReviews] = useState(false);
   const [translations, setTranslations] = useState<Record<string, string>>({});
   const [translating, setTranslating] = useState<Record<string, boolean>>({});
@@ -54,8 +67,10 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
     Record<string, boolean>
   >({});
 
-  const totalReviews = comments.length;
-  const thumbsUp = comments.filter((c) => c.dorm_vote === 1).length;
+  // Hidden comments are only sent to admins — keep them out of the ratings.
+  const visibleComments = comments.filter((c) => !c.hidden);
+  const totalReviews = visibleComments.length;
+  const thumbsUp = visibleComments.filter((c) => c.dorm_vote === 1).length;
   const positivePercent =
     totalReviews > 0 ? Math.round((thumbsUp / totalReviews) * 100) : null;
   const displayedComments = showAllReviews ? comments : comments.slice(0, 3);
@@ -63,10 +78,21 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
   const handleSubmit = async () => {
     if (!commentContent.trim()) return;
     setSubmitting(true);
+    setSubmitError(null);
     try {
       await onSaveComment(commentContent.trim(), commentVote);
       setCommentContent("");
       setCommentVote(null);
+    } catch (err) {
+      const hiddenByAdmin =
+        err instanceof Error && err.message === "COMMENT_HIDDEN";
+      setSubmitError(
+        hiddenByAdmin
+          ? t.commentHiddenError
+          : language === "zh"
+            ? "提交失败，请稍后再试"
+            : "Something went wrong. Please try again."
+      );
     } finally {
       setSubmitting(false);
     }
@@ -77,6 +103,18 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
       language === "zh" ? "确定要删除这条评论吗？" : "Delete this comment?";
     if (!window.confirm(msg)) return;
     onDeleteComment(commentId);
+  };
+
+  const handleToggleHidden = async (commentId: string, hidden: boolean) => {
+    if (!onToggleCommentHidden) return;
+    try {
+      await onToggleCommentHidden(commentId, hidden);
+    } catch (err) {
+      console.error("Error toggling comment visibility:", err);
+      window.alert(
+        language === "zh" ? "操作失败，请稍后再试" : "Action failed. Try again."
+      );
+    }
   };
 
   const handleTranslate = async (commentId: string, text: string) => {
@@ -275,6 +313,11 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
               md:text-[14px]
             "
           />
+          {submitError && (
+            <p className="mt-2 text-[12px] font-medium text-red-500">
+              {submitError}
+            </p>
+          )}
           <div className="mt-2.5 flex justify-end">
             <motion.button
               type="button"
@@ -315,11 +358,19 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ delay: i * 0.05, duration: 0.3 }}
-                  className="
-                    rounded-xl border border-white/60 bg-white/80 p-4
+                  className={`
+                    rounded-xl border p-4
                     shadow-[0_4px_20px_rgba(0,0,0,0.02)] backdrop-blur-md
                     md:rounded-2xl md:p-5
-                  "
+                    ${
+                      comment.hidden
+                        ? `
+                          border-dashed border-slate-300 bg-slate-100/70
+                          opacity-70
+                        `
+                        : "border-white/60 bg-white/80"
+                    }
+                  `}
                 >
                   <div className="mb-3 flex items-start justify-between">
                     <div className="flex items-center gap-2.5">
@@ -374,6 +425,46 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
                           </span>
                         </div>
                       )}
+                      {comment.hidden && (
+                        <div
+                          className="
+                            flex items-center gap-1 rounded-lg bg-slate-200/80
+                            px-2 py-1
+                          "
+                        >
+                          <EyeOff className="size-3 text-slate-500" />
+                          <span className="text-[11px] font-bold text-slate-500">
+                            {t.hiddenBadge}
+                          </span>
+                        </div>
+                      )}
+                      {user?.isAdmin &&
+                        onToggleCommentHidden &&
+                        !comment.id.startsWith("gm-") && (
+                          <motion.button
+                            type="button"
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() =>
+                              handleToggleHidden(comment.id, !comment.hidden)
+                            }
+                            className="
+                              p-1 text-slate-300 transition-colors
+                              hover:text-illini-blue
+                            "
+                            aria-label={
+                              comment.hidden ? t.unhideComment : t.hideComment
+                            }
+                            title={
+                              comment.hidden ? t.unhideComment : t.hideComment
+                            }
+                          >
+                            {comment.hidden ? (
+                              <Eye className="size-3.5" />
+                            ) : (
+                              <EyeOff className="size-3.5" />
+                            )}
+                          </motion.button>
+                        )}
                       {user && comment.user_id === user.id && (
                         <motion.button
                           type="button"

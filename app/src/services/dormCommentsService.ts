@@ -18,6 +18,8 @@ export interface DormComment {
   content: string;
   dorm_vote: 1 | -1 | null;
   created_at: string;
+  /** Moderation flag — hidden comments are only visible to admins. */
+  hidden: boolean;
   // Aggregated client-side from dorm_comment_votes:
   upvotes: number;
   downvotes: number;
@@ -37,6 +39,8 @@ interface RawComment {
   content: string;
   dorm_vote: number | null;
   created_at: string;
+  // Optional so the app keeps working before add_dorm_comment_hidden.sql runs.
+  hidden?: boolean | null;
   dorm_comment_votes: RawVote[];
 }
 
@@ -64,10 +68,17 @@ function aggregateComment(
     content: raw.content,
     dorm_vote: raw.dorm_vote as 1 | -1 | null,
     created_at: raw.created_at,
+    hidden: raw.hidden === true,
     upvotes,
     downvotes,
     myVote,
   };
+}
+
+/** Admins are flagged via Supabase user metadata (`is_admin` / `isAdmin`). */
+function isAdminUser(user: { user_metadata?: Record<string, unknown> } | null) {
+  const meta = user?.user_metadata;
+  return meta?.is_admin === true || meta?.isAdmin === true;
 }
 
 export interface DormCommentStats {
@@ -82,9 +93,16 @@ export const dormCommentsService = {
    * Fetch aggregate comment stats for all dorms (total count + thumbs up count).
    */
   async getAllDormStats(): Promise<Record<string, DormCommentStats>> {
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from("dorm_comments")
-      .select("dorm_id, dorm_vote");
+      .select("dorm_id, dorm_vote, hidden");
+
+    // Fall back if add_dorm_comment_hidden.sql has not been run yet (42703).
+    if (error?.code === "42703") {
+      ({ data, error } = await supabase
+        .from("dorm_comments")
+        .select("dorm_id, dorm_vote"));
+    }
 
     if (error) {
       console.error("Error fetching dorm comment stats:", error);
@@ -93,6 +111,8 @@ export const dormCommentsService = {
 
     const statsMap: Record<string, { total: number; up: number }> = {};
     for (const row of data ?? []) {
+      // Admins can read hidden rows — they must not skew the public counts.
+      if ((row as { hidden?: boolean }).hidden === true) continue;
       const id = row.dorm_id as string;
       if (!statsMap[id]) statsMap[id] = { total: 0, up: 0 };
       statsMap[id].total++;
@@ -130,8 +150,13 @@ export const dormCommentsService = {
     }
 
     const currentUserId = user?.id ?? null;
-    return (data as RawComment[]).map((raw) =>
-      aggregateComment(raw, currentUserId)
+    const isAdmin = isAdminUser(user);
+    return (
+      (data as RawComment[])
+        .map((raw) => aggregateComment(raw, currentUserId))
+        // RLS already withholds hidden rows from non-admins; filter again so a
+        // stale policy can never leak one into the dorm page.
+        .filter((comment) => isAdmin || !comment.hidden)
     );
   },
 
@@ -165,6 +190,10 @@ export const dormCommentsService = {
 
     if (error) {
       console.error("Error saving dorm comment:", error);
+      // RLS blocks edits to a comment an admin has hidden (42501).
+      if (error.code === "42501") {
+        throw new Error("COMMENT_HIDDEN");
+      }
       throw error;
     }
 
@@ -186,6 +215,25 @@ export const dormCommentsService = {
 
     if (error) {
       console.error("Error deleting dorm comment:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Admin-only: hide or un-hide a comment. Hidden comments stay in the table
+   * but are withheld from every non-admin reader by RLS.
+   */
+  async setCommentHidden(commentId: string, hidden: boolean): Promise<void> {
+    const user = await authService.getCurrentUser();
+    if (!isAdminUser(user)) throw new Error("Admin privileges required");
+
+    const { error } = await supabase
+      .from("dorm_comments")
+      .update({ hidden })
+      .eq("id", commentId);
+
+    if (error) {
+      console.error("Error updating dorm comment visibility:", error);
       throw error;
     }
   },

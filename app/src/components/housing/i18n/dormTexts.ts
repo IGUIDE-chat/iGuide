@@ -34,6 +34,10 @@ export interface DormDetailText {
   leaveComment: string;
   submitComment: string;
   deleteComment: string;
+  hideComment: string;
+  unhideComment: string;
+  hiddenBadge: string;
+  commentHiddenError: string;
   loginToComment: string;
   noComments: string;
   thumbsUpDorm: string;
@@ -101,6 +105,10 @@ export const dormDetailTexts: Record<Language, DormDetailText> = {
     leaveComment: "Leave a comment...",
     submitComment: "Submit",
     deleteComment: "Delete",
+    hideComment: "Hide",
+    unhideComment: "Unhide",
+    hiddenBadge: "Hidden",
+    commentHiddenError: "This comment was hidden by a moderator.",
     loginToComment: "Log in to leave a comment",
     noComments: "No comments yet",
     thumbsUpDorm: "Recommend",
@@ -155,6 +163,10 @@ export const dormDetailTexts: Record<Language, DormDetailText> = {
     leaveComment: "写下你的评论...",
     submitComment: "提交",
     deleteComment: "删除",
+    hideComment: "隐藏",
+    unhideComment: "取消隐藏",
+    hiddenBadge: "已隐藏",
+    commentHiddenError: "该评论已被管理员隐藏。",
     loginToComment: "登录后发表评论",
     noComments: "暂无评论",
     thumbsUpDorm: "推荐",

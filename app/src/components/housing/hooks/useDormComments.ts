@@ -97,6 +97,16 @@ export function useDormComments(dormId: string) {
     setComments((prev) => prev.filter((c) => c.id !== id));
   };
 
+  /** Admin-only: hide or un-hide a comment (moderation). */
+  const setCommentHidden = async (commentId: string, hidden: boolean) => {
+    // Google Reviews 模拟评论不在 Supabase 中，无法隐藏。
+    if (commentId.startsWith("gm-")) return;
+    await dormCommentsService.setCommentHidden(commentId, hidden);
+    setComments((prev) =>
+      prev.map((c) => (c.id === commentId ? { ...c, hidden } : c))
+    );
+  };
+
   const voteOnComment = async (commentId: string, vote: 1 | -1 | null) => {
     // Google Reviews 模拟评论不写 Supabase（防御性守卫）
     if (commentId.startsWith("gm-")) {
@@ -123,8 +133,10 @@ export function useDormComments(dormId: string) {
     );
   };
 
-  const thumbsUp = comments.filter((c) => c.dorm_vote === 1).length;
-  const thumbsDown = comments.filter((c) => c.dorm_vote === -1).length;
+  // Hidden comments are only present for admins; they must not move the counts.
+  const visible = comments.filter((c) => !c.hidden);
+  const thumbsUp = visible.filter((c) => c.dorm_vote === 1).length;
+  const thumbsDown = visible.filter((c) => c.dorm_vote === -1).length;
 
   return {
     comments,
@@ -135,5 +147,6 @@ export function useDormComments(dormId: string) {
     saveComment,
     deleteComment,
     voteOnComment,
+    setCommentHidden,
   };
 }
