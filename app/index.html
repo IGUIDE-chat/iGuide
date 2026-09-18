@@ -8,6 +8,15 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content"
     />
+    <!-- Set <html lang> from the browser locale before first paint; App.tsx
+         keeps it in sync afterwards. Mirrors HTML_LANG in src/i18n/uiText.ts. -->
+    <script>
+      document.documentElement.lang = (navigator.language || "zh-CN")
+        .toLowerCase()
+        .startsWith("zh")
+        ? "zh-CN"
+        : "en";
+    </script>
     <title>IlliniGuide - UIUC New Student Knowledge Base</title>
     <!-- DNS prefetch for critical external domains -->
     <link rel="dns-prefetch" href="https://api.mapbox.com" />

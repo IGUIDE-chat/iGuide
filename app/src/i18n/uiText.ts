@@ -7,6 +7,15 @@
 
 import { Language } from "../types";
 
+/**
+ * BCP 47 tag written to <html lang> for each supported UI language.
+ * Keep in sync with the pre-hydration snippet in index.html.
+ */
+export const HTML_LANG: Record<Language, string> = {
+  zh: "zh-CN",
+  en: "en",
+};
+
 export type UITextEntry = {
   appTitle: string;
   chatTab: string;

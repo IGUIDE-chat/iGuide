@@ -17,6 +17,7 @@ import { DormDataProvider } from "./components/housing/store/DormDataContext";
 import { DormUserInteractionProvider } from "./components/housing/store/DormUserInteractionContext";
 import { CompareProvider } from "./components/housing/store/CompareContext";
 import { Language } from "./types";
+import { HTML_LANG } from "./i18n/uiText";
 
 export default function App() {
   const { user, isLoading, isGuest, setIsGuest } = useAuth();
@@ -27,6 +28,12 @@ export default function App() {
     }
     return "zh";
   });
+
+  // Keep <html lang> in sync with the UI language so screen readers, SEO
+  // crawlers and browser "translate this page" prompts see the right locale.
+  useEffect(() => {
+    document.documentElement.lang = HTML_LANG[language];
+  }, [language]);
 
   // Load last conversation from localStorage on mount
   const [currentConversationId, setCurrentConversationId] = useState<
