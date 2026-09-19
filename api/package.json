@@ -18,7 +18,7 @@
     "style:fix": "prettier --write ."
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260610.1",
+    "@cloudflare/workers-types": "^5.20260916.1",
     "@types/node": "^25.9.2",
     "oxlint": "^1.69.0",
     "prettier": "^3.8.4",
