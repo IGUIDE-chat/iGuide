@@ -58,8 +58,6 @@ apps/web/
 |   |-- index.tsx
 |   |-- utils/
 |   `-- types.ts
-`-- tests/
-    `-- artifacts/
 ```
 
 ## Architecture Rules
