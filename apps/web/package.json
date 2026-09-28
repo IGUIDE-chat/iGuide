@@ -19,7 +19,8 @@
     "sync:qmd": "npx tsx scripts/sync-qmd-index.ts",
     "typecheck": "tsc --noEmit",
     "validate:dorm-data": "npx tsx scripts/validate-dorm-data.ts",
-    "postinstall": "git submodule update --init --recursive && git config --local include.path ../.gitconfig"
+    "postinstall": "git submodule update --init --recursive && git config --local include.path ../.gitconfig",
+    "doctor": "npx react-doctor@latest"
   },
   "dependencies": {
     "@assistant-ui/react": "^0.15.22",
