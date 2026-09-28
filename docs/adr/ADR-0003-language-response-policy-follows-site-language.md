@@ -66,7 +66,7 @@ The product may communicate this behavior through subtle UI affordances such as 
 ## Related
 
 - `.sisyphus/plans/hybrid-mcp-tools-ui.md`
-- `api/src/agent/prompts.ts`
-- `api/src/agent/loop.ts`
-- `app/src/i18n/uiText.ts`
-- `app/src/components/chat/ChatThread.tsx`
+- `apps/api/src/agent/prompts.ts`
+- `apps/api/src/agent/loop.ts`
+- `apps/app/src/i18n/uiText.ts`
+- `apps/app/src/components/chat/ChatThread.tsx`

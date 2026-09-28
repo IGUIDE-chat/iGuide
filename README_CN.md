@@ -10,34 +10,46 @@
 
 ## 仓库结构
 
-| 路径               | 作用                                                                                      |
-| :----------------- | :---------------------------------------------------------------------------------------- |
-| `app/`             | React 应用、Cloudflare Pages 相关内容、文档、迁移脚本，以及当前活跃的 UI 运行时。         |
-| `api/`             | Cloudflare Worker 层，负责 JWT 鉴权、Geo 路由、SSE 响应，以及服务端 tool-use 运行时入口。 |
-| `data_collection/` | Python 爬虫 / ETL 流水线，用于抓取、清洗和增量更新 UIUC 数据源。                          |
+| 路径                   | 作用                                                                                      |
+| :--------------------- | :---------------------------------------------------------------------------------------- |
+| `apps/app/`            | React 应用、Cloudflare Pages 相关内容、文档、迁移脚本，以及当前活跃的 UI 运行时。         |
+| `apps/api/`            | Cloudflare Worker 层，负责 JWT 鉴权、Geo 路由、SSE 响应，以及服务端 tool-use 运行时入口。 |
+| `tools/data-pipeline/` | Supabase 导入、embedding 维度校验与 schema 验证脚本。                                     |
+| `data_collection/`     | Python 爬虫 / ETL 流水线，用于抓取、清洗和增量更新 UIUC 数据源。                          |
+| `supabase/`            | SQL 迁移、RPC 函数与种子数据。                                                            |
 
 ## 统一开发入口
+
+### 安装依赖
+
+仓库是一个由 Vite+ 驱动的 pnpm workspace，统一在根目录管理：
+
+```bash
+pnpm install
+```
 
 ### 前端开发
 
 ```bash
-cd app
-pnpm install
-pnpm run dev
+pnpm run dev:app
 pnpm run typecheck
 ```
+
+`vp` 在根目录具备 workspace 感知能力：`vp dev` 与 `vp build` 会自行解析要运行的包，
+`vp -C apps/<package> <command>` 则在指定包内执行命令。批量任务使用 `vp run -r <task>`，
+也可以用 `--filter <package>` 只跑其中一个包。
 
 ### Supabase 宿舍数据
 
 先在 Supabase 中执行以下 SQL 迁移：
 
-- `scripts/migrations/create_dorms_table.sql`
-- `scripts/migrations/add_categorized_tags.sql`
+- `apps/app/scripts/migrations/create_dorms_table.sql`
+- `apps/app/scripts/migrations/add_categorized_tags.sql`
 
 然后执行初始化或重新同步：
 
 ```bash
-npx tsx scripts/seed-dorms-table.ts
+vp run --filter @iguide/app seed:dorms
 ```
 
 需要配置：
@@ -60,9 +72,7 @@ chmod +x run_all.sh
 ### API Worker 基础调试
 
 ```bash
-cd api
-pnpm install
-pnpm run dev
+pnpm run dev:api
 curl http://localhost:8787/health
 ```
 
@@ -251,11 +261,11 @@ Cloudflare Worker
 # Worker 健康检查
 curl http://localhost:8787/health
 
-# 前端类型检查
-cd app && pnpm run typecheck
+# 全 workspace 类型检查
+pnpm run typecheck
 
 # Worker 本地开发
-cd api && pnpm run dev
+pnpm run dev:api
 ```
 
 ### 技术栈汇总

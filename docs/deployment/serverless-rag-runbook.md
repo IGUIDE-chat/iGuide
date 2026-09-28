@@ -149,7 +149,7 @@ Complete list of all environment variables required for the serverless RAG deplo
 | `EMBEDDING_DIMENSIONS` | Embedding vector dimensions     | Yes      | `384`                   |
 | `USE_TOOL_USE_RAG`     | Feature flag for serverless RAG | Yes      | `false`                 |
 
-### Frontend Environment Variables (app/.env.local)
+### Frontend Environment Variables (apps/app/.env.local)
 
 | Variable                 | Description              | Required | Example Value                |
 | ------------------------ | ------------------------ | -------- | ---------------------------- |
@@ -160,7 +160,7 @@ Complete list of all environment variables required for the serverless RAG deplo
 | `VITE_USE_TOOL_USE_RAG`  | Frontend RAG toggle      | Yes      | `false`                      |
 | `VITE_API_GATEWAY_URL`   | API Gateway URL          | Yes      | `https://api.iguide.chat`    |
 
-### Server-side Variables (app/.env.local, NOT VITE_ prefixed)
+### Server-side Variables (apps/app/.env.local, NOT VITE_ prefixed)
 
 | Variable           | Description                | Required | Example Value    |
 | ------------------ | -------------------------- | -------- | ---------------- |
@@ -168,7 +168,7 @@ Complete list of all environment variables required for the serverless RAG deplo
 | `DEEPSEEK_API_KEY` | DeepSeek API (dev proxy)   | No       | `sk-abc123...`   |
 | `TAVILY_API_KEY`   | Tavily API (dev proxy)     | No       | `tvly-ghi789...` |
 
-### Data Import Variables (scripts/import-to-supabase.ts)
+### Data Import Variables (tools/data-pipeline/import-to-supabase.ts)
 
 | Variable                 | Description               | Required | Example Value                |
 | ------------------------ | ------------------------- | -------- | ---------------------------- |
@@ -183,7 +183,7 @@ Complete list of all environment variables required for the serverless RAG deplo
 
 ### Step 1: Configure wrangler.jsonc
 
-Verify the Worker configuration file at `api/wrangler.jsonc`:
+Verify the Worker configuration file at `apps/api/wrangler.jsonc`:
 
 ```json
 {
@@ -215,7 +215,7 @@ Verify the Worker configuration file at `api/wrangler.jsonc`:
 Run these commands to set all required secrets:
 
 ```bash
-cd api
+cd apps/api
 
 # Supabase configuration
 wrangler secret put SUPABASE_URL
@@ -389,20 +389,20 @@ export EMBEDDING_API_KEY="your-embedding-key"
 export EMBEDDING_MODEL="multilingual-e5-small"
 export EMBEDDING_DIMENSIONS="384"
 
-# Run import from JSONL
-npx tsx scripts/import-to-supabase.ts --source ./data/raw_crawl.jsonl
+# Run import from JSONL (relative paths resolve from the repository root)
+vp run --filter @iguide/data-pipeline import --source ./data/raw_crawl.jsonl
 
 # Or import from single markdown file
-npx tsx scripts/import-to-supabase.ts --source ./data/document.md
+vp run --filter @iguide/data-pipeline import --source ./data/document.md
 
 # Or import from directory
-npx tsx scripts/import-to-supabase.ts --source ./data/documents/
+vp run --filter @iguide/data-pipeline import --source ./data/documents/
 
 # Dry run to preview (no actual import)
-npx tsx scripts/import-to-supabase.ts --source ./data/raw_crawl.jsonl --dry-run
+vp run --filter @iguide/data-pipeline import --source ./data/raw_crawl.jsonl --dry-run
 
 # Limit to first N documents
-npx tsx scripts/import-to-supabase.ts --source ./data/raw_crawl.jsonl --limit 100
+vp run --filter @iguide/data-pipeline import --source ./data/raw_crawl.jsonl --limit 100
 ```
 
 ### Step 3: Verify Import
@@ -484,7 +484,7 @@ wrangler secret put EMBEDDING_FALLBACK_URL
 
 ### Step 1: Configure Environment
 
-Create `app/.env.local`:
+Create `apps/app/.env.local`:
 
 ```bash
 # Public Keys (VITE_ prefix)
@@ -504,15 +504,14 @@ TAVILY_API_KEY=your-tavily-key
 ### Step 2: Deploy to Cloudflare Pages
 
 ```bash
-cd app
-
-# Install dependencies
+# Install the whole workspace
 pnpm install
 
 # Build the application
 pnpm run build
 
 # Deploy to Pages
+cd apps/app
 wrangler pages deploy dist --project-name=iguide-app
 
 # Expected output:
@@ -558,7 +557,7 @@ curl -X POST https://staging-api.iguide.chat/chat \
 ### Step 2: Enable Serverless RAG
 
 ```bash
-cd api
+cd apps/api
 
 # Update the feature flag in wrangler.jsonc
 # Change: "USE_TOOL_USE_RAG": "true"
@@ -574,7 +573,7 @@ wrangler deploy --env production
 ### Step 3: Update Frontend
 
 ```bash
-cd app
+cd apps/app
 
 # Update frontend env
 echo 'VITE_USE_TOOL_USE_RAG=true' >> .env.local
@@ -604,7 +603,7 @@ curl -X POST https://api.iguide.chat/chat \
 If issues occur, immediately disable serverless RAG:
 
 ```bash
-cd api
+cd apps/api
 
 # Set the feature flag to false
 wrangler secret put USE_TOOL_USE_RAG
@@ -627,7 +626,7 @@ Or update `wrangler.jsonc`:
 Then redeploy frontend:
 
 ```bash
-cd app
+cd apps/app
 
 # Update frontend env
 echo 'VITE_USE_TOOL_USE_RAG=false' >> .env.local
@@ -723,7 +722,7 @@ curl -X POST https://api.iguide.chat/api/search \
 ### 7. Verify Frontend Env
 
 ```bash
-cd app
+cd apps/app
 grep VITE_USE_TOOL_USE_RAG .env.local
 ```
 
@@ -795,7 +794,7 @@ wrangler tail
 curl -I $BACKEND_URL
 
 # Reduce embedding batch size in import script
-# Edit scripts/import-to-supabase.ts: EMBEDDING_BATCH_SIZE = 16
+# Edit tools/data-pipeline/import-to-supabase.ts: EMBEDDING_BATCH_SIZE = 16
 ```
 
 ### Issue: SSE Streaming Problems
@@ -827,10 +826,10 @@ curl -N https://api.iguide.chat/chat \
 supabase db query "SELECT COUNT(*) FROM documents WHERE embedding IS NOT NULL;"
 
 # Verify similarity threshold in code
-# Check api/src/agent/loop.ts for score thresholds
+# Check apps/api/src/agent/loop.ts for score thresholds
 
 # Re-run import if embeddings missing
-npx tsx scripts/import-to-supabase.ts --source ./data/raw_crawl.jsonl
+vp run --filter @iguide/data-pipeline import --source ./data/raw_crawl.jsonl
 ```
 
 ### Issue: Auth Errors

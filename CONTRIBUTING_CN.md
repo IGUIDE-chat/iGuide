@@ -12,16 +12,16 @@
     ```
 
 2.  **安装依赖：**
-    主应用程序代码位于 `app/` 目录中。
+    仓库是一个 pnpm workspace，依赖统一在根目录安装。
 
     ```bash
-    cd app
     pnpm install
     ```
 
 3.  **启动开发服务器：**
     ```bash
-    pnpm run dev
+    pnpm run dev:app   # 前端
+    pnpm run dev:api   # Cloudflare Worker
     ```
 
 ## 🛠️ 开发工作流
@@ -38,9 +38,10 @@
     _(使用前缀，如 `fix/`, `feat/`, `docs/`, `refactor/`)_
 
 2.  **进行更改**：
-    - 遵循 `app/docs/FILE_RULES.md` 中的文件结构规则（如果有）或参考 `README.md`。
-    - 组件放入 `src/components`。
-    - 服务放入 `src/services`。
+
+- 主应用位于 `apps/app/`，遵循其中的文件结构规则或参考 `README.md`。
+- 组件放入 `apps/app/src/components`。
+- 服务放入 `apps/app/src/services`。
 
 3.  **提交**：
     编写清晰、描述性的提交信息。

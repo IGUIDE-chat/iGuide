@@ -10,7 +10,7 @@ Accepted
 
 ## Context
 
-The product is evolving from a single-RAG knowledge system into a function-call-first campus assistant with multiple information paths. The active runtime already centers on an internal tool registry in `api/`, with `search_knowledge_base`, `web_search`, `grep_docs`, and curated skills/tools acting as separate execution paths.
+The product is evolving from a single-RAG knowledge system into a function-call-first campus assistant with multiple information paths. The active runtime already centers on an internal tool registry in `apps/api/`, with `search_knowledge_base`, `web_search`, `grep_docs`, and curated skills/tools acting as separate execution paths.
 
 The main design tension is between structure and coverage. A heavily normalized, object-first schema across the whole campus domain would look clean on paper, but it would push the system toward a school-specific SIS-style backend, make ingestion brittle across institutions, and force many joins for tool calls. A pure source-first model would be easier to extend across schools, but it would weaken high-accuracy tasks that need complete, filterable indexes such as course lookup, housing comparison, campus location lookup, and academic calendar queries.
 

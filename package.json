@@ -2,13 +2,16 @@
   "name": "iguide",
   "private": true,
   "scripts": {
-    "dev:app": "pnpm --filter @iguide/app dev",
-    "dev:api": "pnpm --filter @iguide/api dev",
-    "build": "pnpm --filter @iguide/app build",
-    "typecheck": "pnpm --filter @iguide/app typecheck",
-    "lint": "pnpm -r --if-present lint",
-    "test": "pnpm -r --if-present test",
-    "prepare": "vp config"
+    "build": "vp run -r build",
+    "check": "vp check --fix",
+    "dev:app": "vp -C apps/app dev",
+    "dev:api": "vp -C apps/api run dev",
+    "fmt": "vp fmt",
+    "lint": "vp lint",
+    "prepare": "vp config",
+    "preview": "vp -C apps/app preview",
+    "test": "vp run -r test",
+    "typecheck": "vp run -r typecheck"
   },
   "devDependencies": {
     "vite": "catalog:",
