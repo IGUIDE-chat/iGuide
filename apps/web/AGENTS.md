@@ -13,6 +13,16 @@ For repo-wide rules (secrets, CI, Worker retrieval, data model), see the root
 - This file applies to `apps/web/`.
 - The active runtime entry is `src/index.tsx`.
 - The only active app-composition file is `src/App.tsx`.
+- `worker/index.ts` is the Worker entrypoint. It routes `/api/*` to
+  `worker/routes/**`, proxies `/about`, `/terms`, `/featureA`, `/featureB` to the
+  legacy landing site, and serves everything else from static assets.
+- The Worker is configured in `cloudflare.config.ts` (`cf/config`). The SPA
+  fallback is `assets.notFoundHandling: "single-page-application"`.
+- `vite.config.ts` registers `@cloudflare/vite-plugin` for `vite build` only, so
+  `vp dev` keeps using the Vite proxy for `/api/*` against `.env.local` secrets.
+- Two build outputs exist on purpose. `vp build` produces the SPA in `dist/`
+  (what CI's bundle scan reads); `cf build` produces the Worker plus its
+  static assets under `.cloudflare/output/`. `cf deploy` runs the latter.
 
 ## Core Principles
 
@@ -41,6 +51,10 @@ For repo-wide rules (secrets, CI, Worker retrieval, data model), see the root
 
 ## Practical Placement Rules
 
+- Server-side proxy routes belong in `worker/routes/<name>.ts`, exporting
+  `onRequestPost` / `onRequestOptions` typed as `RouteHandler` from
+  `worker/types.ts`. Never put them under `src/` — CI's secret scan greps
+  `src/**` and rejects `VITE_*API_KEY` patterns there.
 - Route-only composition belongs in `src/pages/**`.
 - Feature-local UI belongs next to that feature under `src/components/**`.
 - Shared layout belongs in `src/components/layout/**`.

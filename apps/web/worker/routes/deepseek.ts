@@ -1,22 +1,7 @@
+import type { RouteHandler } from "../types"
 import defaultSystemPrompt from "./prompts/deepseek-default-system.txt"
 import languageEnPrompt from "./prompts/language-en.txt"
 import languageZhPrompt from "./prompts/language-zh.txt"
-
-// Pages Functions ships no ambient type for the handler signature, so each
-// function file declares its own.
-type PagesFunction<T = unknown> = (context: {
-  request: Request
-  env: T
-  params: Record<string, string>
-  waitUntil: (promise: Promise<any>) => void
-  next: () => Promise<Response>
-  data: Record<string, unknown>
-}) => Promise<Response>
-
-interface Env {
-  DEEPSEEK_API_KEY?: string
-  VITE_DEEPSEEK_API_KEY?: string
-}
 
 interface ChatItem {
   role: "user" | "model"
@@ -65,7 +50,7 @@ function buildMessages(body: DeepSeekBody): Array<{ role: string; content: strin
   ]
 }
 
-export const onRequestPost: PagesFunction<Env> = async (context) => {
+export const onRequestPost: RouteHandler = async (context) => {
   const { request, env } = context
 
   try {

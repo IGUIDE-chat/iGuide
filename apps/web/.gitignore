@@ -1,5 +1,9 @@
 # files generated on build
 .vite
+dist
+
+# cf build output
+.cloudflare/
 
 # local debug artifacts
 .debug

@@ -1,24 +1,6 @@
-// Pages Functions ships no ambient type for the handler signature, so each
-// function file declares its own.
-type PagesFunction<T = unknown> = (context: {
-  request: Request
-  env: T
-  params: Record<string, string>
-  waitUntil: (promise: Promise<any>) => void
-  next: () => Promise<Response>
-  data: Record<string, unknown>
-}) => Promise<Response>
+import type { RouteHandler } from "../types"
 
-interface Env {
-  COZE_CLIENT_ID: string
-  COZE_PRIVATE_KEY: string // PEM body, not a filesystem path
-  COZE_BOT_ID: string
-  COZE_API_TOKEN?: string
-  VITE_COZE_API_KEY?: string
-  VITE_COZE_BOT_ID?: string
-}
-
-export const onRequestPost: PagesFunction<Env> = async (context) => {
+export const onRequestPost: RouteHandler = async (context) => {
   const { request, env } = context
 
   try {

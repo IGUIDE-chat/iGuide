@@ -1,9 +1,0 @@
-{
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "compatibility_date": "2026-09-08",
-  "name": "web",
-  "pages_build_output_dir": "dist",
-  "placement": {
-    "mode": "smart",
-  },
-}

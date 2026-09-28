@@ -25,7 +25,8 @@ apps/ai-agent/
 │   └── index.ts        # Main Worker entrypoint
 ├── package.json        # Scripts and dependencies
 ├── tsconfig.json       # TypeScript config
-├── wrangler.toml       # Worker configuration
+├── cloudflare.config.ts  # Worker configuration (cf/config)
+├── vite.config.ts        # Wires cf's build pipeline to Vite
 ├── .dev.vars.example   # Local env template (if present)
 └── README.md           # This file
 ```
@@ -161,7 +162,7 @@ This section only lists Worker-relevant configuration. For broader deployment se
 
 `EMBEDDING_FALLBACK_URL` must stay optional. Do not treat a VPS as a default dependency for this Worker.
 
-## Wrangler Setup
+## cf Setup
 
 ### Local vars
 
@@ -175,34 +176,34 @@ Then fill in real values for the required variables above.
 
 ### Production secrets
 
-Set secrets and vars with Wrangler:
+Set secrets with `cf`:
 
 ```bash
-vp -C apps/ai-agent exec wrangler secret put SUPABASE_URL
-vp -C apps/ai-agent exec wrangler secret put SUPABASE_ANON_KEY
-vp -C apps/ai-agent exec wrangler secret put SUPABASE_SERVICE_ROLE_KEY
-vp -C apps/ai-agent exec wrangler secret put DEEPSEEK_API_KEY
-vp -C apps/ai-agent exec wrangler secret put TAVILY_API_KEY
-vp -C apps/ai-agent exec wrangler secret put EMBEDDING_API_BASE_URL
-vp -C apps/ai-agent exec wrangler secret put EMBEDDING_API_KEY
-vp -C apps/ai-agent exec wrangler secret put EMBEDDING_MODEL
-vp -C apps/ai-agent exec wrangler secret put EMBEDDING_DIMENSIONS
+vp -C apps/ai-agent exec cf workers secrets update SUPABASE_URL
+vp -C apps/ai-agent exec cf workers secrets update SUPABASE_ANON_KEY
+vp -C apps/ai-agent exec cf workers secrets update SUPABASE_SERVICE_ROLE_KEY
+vp -C apps/ai-agent exec cf workers secrets update DEEPSEEK_API_KEY
+vp -C apps/ai-agent exec cf workers secrets update TAVILY_API_KEY
+vp -C apps/ai-agent exec cf workers secrets update EMBEDDING_API_BASE_URL
+vp -C apps/ai-agent exec cf workers secrets update EMBEDDING_API_KEY
 ```
 
-Optional fallback only:
+`EMBEDDING_MODEL` and `EMBEDDING_DIMENSIONS` are plain vars declared in
+`cloudflare.config.ts`, not secrets. `EMBEDDING_FALLBACK_URL` is optional:
 
 ```bash
-vp -C apps/ai-agent exec wrangler secret put EMBEDDING_FALLBACK_URL
+vp -C apps/ai-agent exec cf workers secrets update EMBEDDING_FALLBACK_URL
 ```
 
 ### Routes
 
-Configure `wrangler.toml` with the Worker route, for example:
+The `api.iguide.chat` hostname is a custom domain on the Worker, not a route
+pattern. Declare it under `domains` in `cloudflare.config.ts`:
 
-```toml
-routes = [
-  { pattern = "api.iguide.chat/*", zone_name = "iguide.chat" }
-]
+```ts
+worker: {
+  domains: ["api.iguide.chat"],
+}
 ```
 
 ## Deployment
@@ -213,25 +214,23 @@ routes = [
 vp -C apps/ai-agent run deploy
 ```
 
-If the project defines an environment-specific script, you can use that instead:
+`cf deploy` builds the Worker and uploads it in one step. Use
+`cf deploy --dry-run` first to validate `cloudflare.config.ts` and the bundle
+without touching the account.
 
-```bash
-vp -C apps/ai-agent run deploy:production
-```
+### Logs
 
-### Tail logs
-
-```bash
-vp -C apps/ai-agent run tail
-```
+`cf` has no equivalent of `wrangler tail`, so there is no `tail` script. Read
+Worker logs from the Cloudflare dashboard (observability is enabled in
+`cloudflare.config.ts`) or with `cf observability queries`.
 
 ## Worker-Specific Troubleshooting
 
 ### Worker not accessible
 
-1. Verify the route in `wrangler.toml`
+1. Verify the custom domain in `cloudflare.config.ts`
 2. Confirm Cloudflare DNS/proxy setup
-3. Check `pnpm run tail` for runtime errors
+3. Check Worker observability in the dashboard for runtime errors
 
 ### Auth errors
 

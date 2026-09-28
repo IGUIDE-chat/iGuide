@@ -20,25 +20,24 @@ function success(message: string): void {
   console.log(`✅ ${message}`)
 }
 
-function checkWranglerJsonc(): void {
-  const path = join(projectRoot, "apps/ai-agent/wrangler.jsonc")
+function checkWorkerEnv(): void {
+  const configPath = "apps/ai-agent/cloudflare.config.ts"
+  const path = join(projectRoot, configPath)
   try {
     const content = readFileSync(path, "utf-8")
-    const match = content.match(/"EMBEDDING_DIMENSIONS"\s*:\s*"(\d+)"/)
+    const match = content.match(/EMBEDDING_DIMENSIONS\s*:\s*bindings\.text\(\s*"(\d+)"/)
     if (!match) {
-      error(`apps/ai-agent/wrangler.jsonc: EMBEDDING_DIMENSIONS not found`)
+      error(`${configPath}: EMBEDDING_DIMENSIONS not found`)
       return
     }
     const dimensions = parseInt(match[1], 10)
     if (dimensions !== EXPECTED_DIMENSION) {
-      error(
-        `apps/ai-agent/wrangler.jsonc: EMBEDDING_DIMENSIONS=${dimensions}, expected ${EXPECTED_DIMENSION}`,
-      )
+      error(`${configPath}: EMBEDDING_DIMENSIONS=${dimensions}, expected ${EXPECTED_DIMENSION}`)
       return
     }
-    success(`apps/ai-agent/wrangler.jsonc: EMBEDDING_DIMENSIONS=${dimensions}`)
+    success(`${configPath}: EMBEDDING_DIMENSIONS=${dimensions}`)
   } catch (e) {
-    error(`apps/ai-agent/wrangler.jsonc: Failed to read - ${e}`)
+    error(`${configPath}: Failed to read - ${e}`)
   }
 }
 
@@ -99,7 +98,7 @@ function checkMigrationFiles(): void {
 function main(): void {
   console.log(`🔍 Validating embedding dimensions (expected: ${EXPECTED_DIMENSION})\n`)
 
-  checkWranglerJsonc()
+  checkWorkerEnv()
   checkEmbeddingConfig()
   checkMigrationFiles()
 

@@ -69,19 +69,26 @@ jobs:
             exit 1
           fi
 
-          echo "Verifying CF Pages Functions proxy files exist..."
+          echo "Verifying the web Worker proxy routes exist..."
           MISSING=0
-          for fn in apps/web/functions/api/deepseek.ts apps/web/functions/api/tavily.ts apps/web/functions/api/gemini.ts; do
+          for fn in apps/web/worker/routes/deepseek.ts apps/web/worker/routes/tavily.ts apps/web/worker/routes/gemini.ts; do
             if [ ! -f "$fn" ]; then
-              echo "❌ Missing CF Function proxy: $fn"
+              echo "❌ Missing web Worker route: $fn"
               MISSING=1
             else
               echo "✅ $fn"
             fi
           done
 
+          if [ ! -f apps/web/worker/index.ts ]; then
+            echo "❌ Missing web Worker entrypoint: apps/web/worker/index.ts"
+            MISSING=1
+          else
+            echo "✅ apps/web/worker/index.ts"
+          fi
+
           if [ "$MISSING" -eq 1 ]; then
-            echo "🔴 Required CF Function proxy files are missing!"
+            echo "🔴 Required web Worker route files are missing!"
             exit 1
           fi
 

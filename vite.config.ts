@@ -1,7 +1,13 @@
 import { defineConfig } from "vite-plus"
 
 // Generated output, vendored submodules and non-JS assets are not linted or formatted.
-const ignorePatterns = ["**/node_modules/**", "**/dist/**", "**/.wrangler/**", "data_collection/**"]
+const ignorePatterns = [
+  "**/node_modules/**",
+  "**/dist/**",
+  "**/.wrangler/**",
+  "**/.cloudflare/**",
+  "data_collection/**",
+]
 
 export default defineConfig({
   staged: {
@@ -27,7 +33,7 @@ export default defineConfig({
         env: { browser: true },
       },
       {
-        files: ["apps/web/functions/**"],
+        files: ["apps/web/worker/**"],
         env: { worker: true },
       },
       {

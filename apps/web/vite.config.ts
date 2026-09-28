@@ -4,10 +4,10 @@ import { mkdir, writeFile } from "node:fs/promises"
 import type { ClientRequest, IncomingMessage, OutgoingHttpHeaders } from "node:http"
 import path from "path"
 
+import { cloudflare } from "@cloudflare/vite-plugin"
 import react from "@vitejs/plugin-react"
 import { ViteMcp } from "vite-plugin-mcp"
-import { defineConfig, loadEnv } from "vite-plus"
-import { lazyPlugins } from "vite-plus"
+import { defineConfig, loadEnv, lazyPlugins } from "vite-plus"
 
 import { qmdSearchPlugin } from "./scripts/qmdSearchGateway"
 
@@ -126,7 +126,7 @@ function collectRequestBody(req: IncomingMessage, onEnd: (body: string) => void)
   })
 }
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode, command }) => {
   const env = loadEnv(mode, ".", "")
   return {
     server: {
@@ -270,7 +270,17 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
-    plugins: lazyPlugins(() => [qmdSearchPlugin(), react(), ViteMcp()]),
+    plugins: lazyPlugins(() => [
+      qmdSearchPlugin(),
+      react(),
+      ViteMcp(),
+      // `cf build` and `cf deploy` delegate to `vite build`, which needs the
+      // Cloudflare plugin to emit the Worker plus its static assets as Build
+      // Output. The dev server keeps the existing Vite proxy workflow below,
+      // so the plugin is only registered for builds. It is not hoisted out of
+      // `lazyPlugins`: that would defeat the point of the helper.
+      ...(command === "build" ? [cloudflare()] : []),
+    ]),
     define: {
       // Only inject public keys that are safe for frontend
       // NEVER inject sensitive API keys here

@@ -1,21 +1,4 @@
-// Pages Functions ships no ambient type for the handler signature, so each
-// function file declares its own.
-
-type PagesFunction<T = unknown> = (context: {
-  request: Request
-  env: T
-  params: Record<string, string>
-  waitUntil: (promise: Promise<any>) => void
-  next: () => Promise<Response>
-  data: Record<string, unknown>
-}) => Promise<Response>
-
-interface Env {
-  QMD_WORKER?: {
-    fetch: (request: Request | string, init?: RequestInit) => Promise<Response>
-  }
-  API_GATEWAY_URL?: string
-}
+import type { RouteHandler } from "../types"
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -23,7 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type",
 }
 
-export const onRequestPost: PagesFunction<Env> = async (context) => {
+export const onRequestPost: RouteHandler = async (context) => {
   const { request, env } = context
 
   try {
@@ -68,6 +51,6 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   }
 }
 
-export const onRequestOptions: PagesFunction = async () => {
+export const onRequestOptions: RouteHandler = async () => {
   return new Response(null, { status: 204, headers: corsHeaders })
 }

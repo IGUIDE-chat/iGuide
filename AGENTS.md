@@ -38,7 +38,7 @@ canonical rule set inside that package and wins over this file for `apps/web/**`
 A serverless-first UIUC knowledge platform.
 
 ```text
-Browser / Cloudflare Pages (apps/web)
+Browser / Cloudflare Workers Static Assets (apps/web)
   -> Cloudflare Worker (apps/ai-agent)  — JWT auth, geo routing, tool registry, agent loop, SSE
        -> Supabase (auth, Postgres, RLS, pgvector + FTS)
        -> DeepSeek API (inference)
@@ -53,7 +53,7 @@ optional self-hosted embedding endpoint only.
 
 | Path                   | Role                                                                                    |
 | :--------------------- | :-------------------------------------------------------------------------------------- |
-| `apps/web/`            | React 19 app (`@iguide/web`), Cloudflare Pages Functions, dorm migrations.              |
+| `apps/web/`            | React 19 app (`@iguide/web`), Worker API routes + static assets, dorm migrations.       |
 | `apps/ai-agent/`       | Cloudflare Worker gateway (`@iguide/ai-agent`) — tools, skills, MCP, agent loop, tests. |
 | `tools/data-pipeline/` | Supabase import, embedding-dimension check, v2 schema verification.                     |
 | `data_collection/`     | Python + C++17 crawler/ETL that harvests UIUC sources into the knowledge base.          |
@@ -66,7 +66,7 @@ optional self-hosted embedding endpoint only.
 pnpm install                  # once, from the repo root (workspace-wide)
 
 pnpm run dev:web              # Vite app  (vp -C apps/web dev)
-pnpm run dev:ai-agent         # Worker    (wrangler dev, http://localhost:8787)
+pnpm run dev:ai-agent         # Worker    (cf dev, http://localhost:8787)
 curl http://localhost:8787/health
 
 pnpm run lint                 # oxlint across the workspace
@@ -112,6 +112,9 @@ playwright install chromium && ./run_all.sh        # --fresh wipes crawl state
 cd dorm_scripts && bun install && bun run scrape:pch
 ```
 
+Both Cloudflare packages are configured in `cloudflare.config.ts` with
+`defineConfig` from `cf/config`; no `wrangler.*` config remains.
+
 ## Non-negotiable rules
 
 ### Secrets
@@ -123,10 +126,10 @@ cd dorm_scripts && bun install && bun run scrape:pch
 - Never put a secret literal in `apps/web/vite.config.ts` `define {}`. That block is
   compiled into the shipped bundle, and the bundle scan greps `apps/web/dist/assets/`.
 - Server-side keys live in `apps/web/.env.local` **without** the `VITE_` prefix
-  (dev proxy / Pages Functions) or as Wrangler secrets (`wrangler secret put`).
-- These Pages Function proxies must keep existing — the bundle scan asserts them:
-  `apps/web/functions/api/deepseek.ts`, `apps/web/functions/api/tavily.ts`,
-  `apps/web/functions/api/gemini.ts`.
+  (dev proxy / web Worker) or as Worker secrets (`cf workers secrets update <name>`).
+- These web Worker proxy routes must keep existing — CI asserts them:
+  `apps/web/worker/routes/deepseek.ts`, `apps/web/worker/routes/tavily.ts`,
+  `apps/web/worker/routes/gemini.ts`, plus the `apps/web/worker/index.ts` router.
 - Only public values are `VITE_`-prefixed: `VITE_SUPABASE_URL`,
   `VITE_SUPABASE_ANON_KEY`, `VITE_MAPBOX_TOKEN`, `VITE_COZE_BOT_ID`,
   `VITE_API_GATEWAY_URL` (defaults to `https://api.iguide.chat`),
@@ -145,6 +148,9 @@ cd dorm_scripts && bun install && bun run scrape:pch
 - Promote to `src/hooks|services|utils|types` only when shared across unrelated features.
 - `src/legacy/**` is quarantined: never import from it at runtime.
 - New pages go in `src/app/pageRegistry.ts` (registry) and `src/app/routes.tsx` (route).
+- `worker/**` is the web Worker: `worker/index.ts` routes `/api/*` and the
+  legacy landing prefixes, everything else falls through to static assets. Add
+  API endpoints under `worker/routes/`, never under `src/`.
 - Document the runtime tree that exists, not the target tree. Don't mix half-finished
   file moves with feature work.
 
@@ -250,11 +256,24 @@ semantic_weight=1.0, rrf_k=50)`: vector (`<=>`) and FTS (`websearch_to_tsquery`)
 5. Enable `USE_TOOL_USE_RAG=true` in staging; verify SSE, tool calls, and fallback.
 6. Promote to production.
 
-Rollback is one flag: set `USE_TOOL_USE_RAG=false` (Wrangler var or secret), redeploy
+Both apps deploy with `cf`:
+
+```bash
+vp run --filter @iguide/ai-agent deploy     # cf deploy — api.iguide.chat
+vp run --filter @iguide/web deploy         # cf deploy — SPA + Worker API routes
+vp run --filter @iguide/web deploy:dry-run # cf deploy --dry-run
+```
+
+`cf` has no `tail` and no `--env` equivalent, so live log streaming and the old
+`deploy:production` script are gone. `cf workers types` replaces
+`wrangler types`, and `cf workers secrets update <name>` replaces
+`wrangler secret put`.
+
+Rollback is one flag: set `USE_TOOL_USE_RAG=false` (Worker var or secret), redeploy
 the Worker, and set `VITE_USE_TOOL_USE_RAG=false` before rebuilding the frontend. No
 VPS is needed to restore service.
 
-Worker vars live in `apps/ai-agent/wrangler.jsonc`; required secrets include
+Worker vars live in `apps/ai-agent/cloudflare.config.ts`; required secrets include
 `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `DEEPSEEK_API_KEY`, `TAVILY_API_KEY`,
 `EMBEDDING_API_BASE_URL`, `EMBEDDING_API_KEY` (plus `SILICONFLOW_API_KEY`,
 `BACKEND_URL`, and `QMD_*` for the geo-routed legacy paths). Copy
