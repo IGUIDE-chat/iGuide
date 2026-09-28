@@ -7,7 +7,7 @@ import {
   fromThreadMessage,
   isChatMessage,
   isThreadMessageLike,
-} from "../messageAdapter"
+} from "../messageAdapter.ts"
 
 describe("messageAdapter", () => {
   const mockThinkingStep: ThinkingStep = {

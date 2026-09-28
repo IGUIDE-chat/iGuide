@@ -57,8 +57,6 @@ apps/web/
 |   |-- index.tsx
 |   |-- utils/
 |   `-- types.ts
-`-- tests/
-    `-- artifacts/
 ```
 
 ## 架构规范
