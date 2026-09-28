@@ -9,7 +9,7 @@ export default defineConfig({
   },
 
   // `vp dev`, `vp build`, and `vp preview` target the web app when run at the root.
-  defaultPackage: { dev: "./apps/app", build: "./apps/app", preview: "./apps/app" },
+  defaultPackage: { dev: "./apps/web", build: "./apps/web", preview: "./apps/web" },
   fmt: {
     semi: false,
     sortImports: true,
@@ -23,15 +23,15 @@ export default defineConfig({
     ignorePatterns,
     overrides: [
       {
-        files: ["apps/app/**"],
+        files: ["apps/web/**"],
         env: { browser: true },
       },
       {
-        files: ["apps/app/functions/**"],
+        files: ["apps/web/functions/**"],
         env: { worker: true },
       },
       {
-        files: ["apps/api/**"],
+        files: ["apps/ai-agent/**"],
         env: { worker: true },
         rules: { "no-console": "off" },
       },

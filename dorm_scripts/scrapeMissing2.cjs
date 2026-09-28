@@ -288,7 +288,7 @@ async function main() {
   }
 
   let fileContent = fs.readFileSync(
-    path.resolve(__dirname, "../app/src/components/housing/constants/googleReviews.ts"),
+    path.resolve(__dirname, "../web/src/components/housing/constants/googleReviews.ts"),
     "utf8",
   )
 
@@ -307,7 +307,7 @@ async function main() {
   fileContent = before + (needsComma ? ",\n" : "\n") + lines.join(",\n") + "\n" + after
 
   fs.writeFileSync(
-    path.resolve(__dirname, "../app/src/components/housing/constants/googleReviews.ts"),
+    path.resolve(__dirname, "../web/src/components/housing/constants/googleReviews.ts"),
     fileContent,
     "utf8",
   )

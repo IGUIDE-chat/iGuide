@@ -169,7 +169,7 @@ async function main() {
   console.log(`Total PCH reviews pulled: ${allCollected.length}`)
 
   let fileContent = fs.readFileSync(
-    path.resolve(__dirname, "../app/src/components/housing/constants/googleReviews.ts"),
+    path.resolve(__dirname, "../web/src/components/housing/constants/googleReviews.ts"),
     "utf8",
   )
 
@@ -186,7 +186,7 @@ async function main() {
   }
 
   fs.writeFileSync(
-    path.resolve(__dirname, "../app/src/components/housing/constants/googleReviews.ts"),
+    path.resolve(__dirname, "../web/src/components/housing/constants/googleReviews.ts"),
     fileContent,
     "utf8",
   )
