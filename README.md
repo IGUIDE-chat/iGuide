@@ -12,8 +12,8 @@ A three-layer UIUC knowledge platform split across the app, API gateway, and cra
 
 | Path                   | Role                                                                                           |
 | :--------------------- | :--------------------------------------------------------------------------------------------- |
-| `apps/app/`            | React app, Cloudflare Pages functions, docs, migrations, and active UI runtime.                |
-| `apps/api/`            | Cloudflare Worker gateway for JWT auth, geo routing, proxying, CORS, and health checks.        |
+| `apps/web/`            | React app, Cloudflare Pages functions, docs, migrations, and active UI runtime.                |
+| `apps/ai-agent/`       | Cloudflare Worker gateway for JWT auth, geo routing, proxying, CORS, and health checks.        |
 | `tools/data-pipeline/` | Supabase import, embedding-dimension, and schema verification scripts.                         |
 | `data_collection/`     | Python crawler/ETL pipeline for harvesting, cleaning, and incrementally updating UIUC sources. |
 | `supabase/`            | SQL migrations, RPC functions, and seed fixtures.                                              |
@@ -31,7 +31,7 @@ pnpm install
 ### App dev
 
 ```bash
-pnpm run dev:app
+pnpm run dev:web
 pnpm run typecheck
 ```
 
@@ -44,13 +44,13 @@ target one of them.
 
 Run the SQL migrations in Supabase:
 
-- `apps/app/scripts/migrations/create_dorms_table.sql`
-- `apps/app/scripts/migrations/add_categorized_tags.sql`
+- `apps/web/scripts/migrations/create_dorms_table.sql`
+- `apps/web/scripts/migrations/add_categorized_tags.sql`
 
 Then seed or resync data with:
 
 ```bash
-vp run --filter @iguide/app seed:dorms
+vp run --filter @iguide/web seed:dorms
 ```
 
 Requires `SUPABASE_URL` and `SUPABASE_SERVICE_KEY`.
@@ -70,7 +70,7 @@ chmod +x run_all.sh
 ### API gateway basics
 
 ```bash
-pnpm run dev:api
+pnpm run dev:ai-agent
 curl http://localhost:8787/health
 ```
 
@@ -254,7 +254,7 @@ curl http://localhost:8787/health
 pnpm run typecheck
 
 # Worker local dev
-pnpm run dev:api
+pnpm run dev:ai-agent
 ```
 
 ### Tech Stack Summary

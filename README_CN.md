@@ -12,8 +12,8 @@
 
 | 路径                   | 作用                                                                                      |
 | :--------------------- | :---------------------------------------------------------------------------------------- |
-| `apps/app/`            | React 应用、Cloudflare Pages 相关内容、文档、迁移脚本，以及当前活跃的 UI 运行时。         |
-| `apps/api/`            | Cloudflare Worker 层，负责 JWT 鉴权、Geo 路由、SSE 响应，以及服务端 tool-use 运行时入口。 |
+| `apps/web/`            | React 应用、Cloudflare Pages 相关内容、文档、迁移脚本，以及当前活跃的 UI 运行时。         |
+| `apps/ai-agent/`       | Cloudflare Worker 层，负责 JWT 鉴权、Geo 路由、SSE 响应，以及服务端 tool-use 运行时入口。 |
 | `tools/data-pipeline/` | Supabase 导入、embedding 维度校验与 schema 验证脚本。                                     |
 | `data_collection/`     | Python 爬虫 / ETL 流水线，用于抓取、清洗和增量更新 UIUC 数据源。                          |
 | `supabase/`            | SQL 迁移、RPC 函数与种子数据。                                                            |
@@ -31,7 +31,7 @@ pnpm install
 ### 前端开发
 
 ```bash
-pnpm run dev:app
+pnpm run dev:web
 pnpm run typecheck
 ```
 
@@ -43,13 +43,13 @@ pnpm run typecheck
 
 先在 Supabase 中执行以下 SQL 迁移：
 
-- `apps/app/scripts/migrations/create_dorms_table.sql`
-- `apps/app/scripts/migrations/add_categorized_tags.sql`
+- `apps/web/scripts/migrations/create_dorms_table.sql`
+- `apps/web/scripts/migrations/add_categorized_tags.sql`
 
 然后执行初始化或重新同步：
 
 ```bash
-vp run --filter @iguide/app seed:dorms
+vp run --filter @iguide/web seed:dorms
 ```
 
 需要配置：
@@ -72,7 +72,7 @@ chmod +x run_all.sh
 ### API Worker 基础调试
 
 ```bash
-pnpm run dev:api
+pnpm run dev:ai-agent
 curl http://localhost:8787/health
 ```
 
@@ -265,7 +265,7 @@ curl http://localhost:8787/health
 pnpm run typecheck
 
 # Worker 本地开发
-pnpm run dev:api
+pnpm run dev:ai-agent
 ```
 
 ### 技术栈汇总

@@ -30,16 +30,16 @@ release. Add a tool name to select part of the graph. For example, run
 
 # IlliniGuide — Agent Handbook
 
-This file is the repo-wide source of truth for agents. `apps/app/AGENTS.md` is the
-canonical rule set inside that package and wins over this file for `apps/app/**`.
+This file is the repo-wide source of truth for agents. `apps/web/AGENTS.md` is the
+canonical rule set inside that package and wins over this file for `apps/web/**`.
 
 ## What this is
 
 A serverless-first UIUC knowledge platform.
 
 ```text
-Browser / Cloudflare Pages (apps/app)
-  -> Cloudflare Worker (apps/api)  — JWT auth, geo routing, tool registry, agent loop, SSE
+Browser / Cloudflare Pages (apps/web)
+  -> Cloudflare Worker (apps/ai-agent)  — JWT auth, geo routing, tool registry, agent loop, SSE
        -> Supabase (auth, Postgres, RLS, pgvector + FTS)
        -> DeepSeek API (inference)
        -> Tavily API (live web fallback)
@@ -51,22 +51,22 @@ optional self-hosted embedding endpoint only.
 
 ## Repo map
 
-| Path                   | Role                                                                               |
-| :--------------------- | :--------------------------------------------------------------------------------- |
-| `apps/app/`            | React 19 app (`@iguide/app`), Cloudflare Pages Functions, dorm migrations.         |
-| `apps/api/`            | Cloudflare Worker gateway (`@iguide/api`) — tools, skills, MCP, agent loop, tests. |
-| `tools/data-pipeline/` | Supabase import, embedding-dimension check, v2 schema verification.                |
-| `data_collection/`     | Python + C++17 crawler/ETL that harvests UIUC sources into the knowledge base.     |
-| `dorm_scripts/`        | Isolated Puppeteer/Bun scrapers for dorm Google Maps reviews. Not in any package.  |
-| `supabase/migrations/` | Knowledge-base schema + retrieval RPCs (v2, source-first).                         |
+| Path                   | Role                                                                                    |
+| :--------------------- | :-------------------------------------------------------------------------------------- |
+| `apps/web/`            | React 19 app (`@iguide/web`), Cloudflare Pages Functions, dorm migrations.              |
+| `apps/ai-agent/`       | Cloudflare Worker gateway (`@iguide/ai-agent`) — tools, skills, MCP, agent loop, tests. |
+| `tools/data-pipeline/` | Supabase import, embedding-dimension check, v2 schema verification.                     |
+| `data_collection/`     | Python + C++17 crawler/ETL that harvests UIUC sources into the knowledge base.          |
+| `dorm_scripts/`        | Isolated Puppeteer/Bun scrapers for dorm Google Maps reviews. Not in any package.       |
+| `supabase/migrations/` | Knowledge-base schema + retrieval RPCs (v2, source-first).                              |
 
 ## Commands
 
 ```bash
 pnpm install                  # once, from the repo root (workspace-wide)
 
-pnpm run dev:app              # Vite app  (vp -C apps/app dev)
-pnpm run dev:api              # Worker    (wrangler dev, http://localhost:8787)
+pnpm run dev:web              # Vite app  (vp -C apps/web dev)
+pnpm run dev:ai-agent         # Worker    (wrangler dev, http://localhost:8787)
 curl http://localhost:8787/health
 
 pnpm run lint                 # oxlint across the workspace
@@ -88,16 +88,16 @@ Package-specific:
 
 ```bash
 # Worker tests (node --test, markdown loader)
-vp run --filter @iguide/api test
+vp run --filter @iguide/ai-agent test
 
 # Dorm data
-vp run --filter @iguide/app seed:dorms            # needs SUPABASE_URL + SUPABASE_SERVICE_KEY
-vp run --filter @iguide/app validate:dorm-data
-vp run --filter @iguide/app audit:dorm-media
+vp run --filter @iguide/web seed:dorms            # needs SUPABASE_URL + SUPABASE_SERVICE_KEY
+vp run --filter @iguide/web validate:dorm-data
+vp run --filter @iguide/web audit:dorm-media
 
 # QMD content pipeline
-vp run --filter @iguide/app generate:qmd-content
-vp run --filter @iguide/app sync:qmd
+vp run --filter @iguide/web generate:qmd-content
+vp run --filter @iguide/web sync:qmd
 
 # Knowledge-base import
 vp run --filter @iguide/data-pipeline import        # JSONL -> Supabase, with embeddings
@@ -108,7 +108,7 @@ vp run --filter @iguide/data-pipeline verify:schema
 cd data_collection && python -m venv .venv && .venv/bin/pip install -r requirements.txt
 playwright install chromium && ./run_all.sh        # --fresh wipes crawl state
 
-# Dorm scrapers (isolated from apps/app on purpose)
+# Dorm scrapers (isolated from apps/web on purpose)
 cd dorm_scripts && bun install && bun run scrape:pch
 ```
 
@@ -118,24 +118,24 @@ cd dorm_scripts && bun install && bun run scrape:pch
 
 - Never give a sensitive key a `VITE_` prefix. CI fails on `VITE_*API_KEY`,
   `VITE_*API_TOKEN`, `VITE_*SECRET`, `VITE_DEEPSEEK`, `VITE_TAVILY`, `VITE_COZE_API`,
-  `VITE_GOOGLE_API`, `VITE_GEMINI_API` in `apps/app/src/**`, and on hardcoded
+  `VITE_GOOGLE_API`, `VITE_GEMINI_API` in `apps/web/src/**`, and on hardcoded
   `tvly-` / `pat_` / `sk-<hex>` / `pk.eyJ…` literals.
-- Never put a secret literal in `apps/app/vite.config.ts` `define {}`. That block is
-  compiled into the shipped bundle, and the bundle scan greps `apps/app/dist/assets/`.
-- Server-side keys live in `apps/app/.env.local` **without** the `VITE_` prefix
+- Never put a secret literal in `apps/web/vite.config.ts` `define {}`. That block is
+  compiled into the shipped bundle, and the bundle scan greps `apps/web/dist/assets/`.
+- Server-side keys live in `apps/web/.env.local` **without** the `VITE_` prefix
   (dev proxy / Pages Functions) or as Wrangler secrets (`wrangler secret put`).
 - These Pages Function proxies must keep existing — the bundle scan asserts them:
-  `apps/app/functions/api/deepseek.ts`, `apps/app/functions/api/tavily.ts`,
-  `apps/app/functions/api/gemini.ts`.
+  `apps/web/functions/api/deepseek.ts`, `apps/web/functions/api/tavily.ts`,
+  `apps/web/functions/api/gemini.ts`.
 - Only public values are `VITE_`-prefixed: `VITE_SUPABASE_URL`,
   `VITE_SUPABASE_ANON_KEY`, `VITE_MAPBOX_TOKEN`, `VITE_COZE_BOT_ID`,
   `VITE_API_GATEWAY_URL` (defaults to `https://api.iguide.chat`),
   `VITE_USE_TOOL_USE_RAG`.
 - Set `LLM_REQUEST_DUMP=1` when debugging dev-proxy model calls; dumps land in
-  `apps/app/.debug/llm-requests/` with headers and API-key query params redacted.
+  `apps/web/.debug/llm-requests/` with headers and API-key query params redacted.
   `LLM_REQUEST_DUMP_INCLUDE_SECRETS=1` is a last resort.
 
-### Frontend placement (`apps/app`)
+### Frontend placement (`apps/web`)
 
 - `src/index.tsx` is the runtime entry; `src/App.tsx` is the only app-composition file.
 - `src/pages/**` stays thin — route-level orchestration only.
@@ -153,19 +153,19 @@ cd dorm_scripts && bun install && bun run scrape:pch
 - **Tool = executable interface. Skill = task template.** New low-level capability →
   new tool. Composing existing tools into a stable user task → new skill only. Don't
   invent a tool when a skill suffices.
-- Tool file: `apps/api/src/tools/<name>.ts`, shaped after
-  `apps/api/src/tools/search-knowledge-base.ts`, typed by `apps/api/src/tools/types.ts`.
-- Register it in `apps/api/src/index.ts` on the `ToolRegistry` (basic tools first,
+- Tool file: `apps/ai-agent/src/tools/<name>.ts`, shaped after
+  `apps/ai-agent/src/tools/search-knowledge-base.ts`, typed by `apps/ai-agent/src/tools/types.ts`.
+- Register it in `apps/ai-agent/src/index.ts` on the `ToolRegistry` (basic tools first,
   higher-level tools after). A file that is not registered is dead code.
-- Registry runtime contract (`apps/api/src/tools/registry.ts`): **max 5 tool calls per
+- Registry runtime contract (`apps/ai-agent/src/tools/registry.ts`): **max 5 tool calls per
   request, 10 s per call, results truncated at 4096 bytes**. Design tool output to
   survive truncation, and return structured `content` plus `metadata` — never a vague
   English error string, or the agent loop cannot act on it.
 - The `description` and parameter names in the tool schema are the model's only guide.
   A vague description means the model never calls the tool. Keep params simple and
   business-named.
-- Skill JSON: `apps/api/src/skills/<skill_id>.json`, imported and added to
-  `SKILL_CONFIGS` in `apps/api/src/tools/custom-skills.ts`. It surfaces through the
+- Skill JSON: `apps/ai-agent/src/skills/<skill_id>.json`, imported and added to
+  `SKILL_CONFIGS` in `apps/ai-agent/src/tools/custom-skills.ts`. It surfaces through the
   `custom_skills` tool; skills are not executors. Every name in `required_tools`
   must be a real registered tool.
 
@@ -174,7 +174,7 @@ cd dorm_scripts && bun install && bun run scrape:pch
 - Knowledge-base retrieval is the default. Web search is fallback/augmentation, used
   when local knowledge is insufficient.
 - Conversational turns (greetings, thanks, ok/bye, …) skip retrieval tools entirely —
-  see `apps/api/src/agent/retrieval-policy.ts`. Add patterns there, not in the tools.
+  see `apps/ai-agent/src/agent/retrieval-policy.ts`. Add patterns there, not in the tools.
 - Tool output is internal to the agent loop. Stream lightweight progress over SSE;
   never dump raw tool JSON into the user conversation.
 - Browser-side prompt-stuffing and client RAG orchestration are legacy behavior,
@@ -219,7 +219,7 @@ supabase/migrations/            knowledge base (run in order)
                                  location_or_service, housing + RLS
   003_search_functions.sql       hybrid_search, keyword_search, search_objects
 
-apps/app/scripts/migrations/     app/dorm data (dorm chain first)
+apps/web/scripts/migrations/     app/dorm data (dorm chain first)
   create_dorms_table.sql, add_categorized_tags.sql, then the add_*/fix_* follow-ups
 ```
 
@@ -254,10 +254,10 @@ Rollback is one flag: set `USE_TOOL_USE_RAG=false` (Wrangler var or secret), red
 the Worker, and set `VITE_USE_TOOL_USE_RAG=false` before rebuilding the frontend. No
 VPS is needed to restore service.
 
-Worker vars live in `apps/api/wrangler.jsonc`; required secrets include
+Worker vars live in `apps/ai-agent/wrangler.jsonc`; required secrets include
 `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `DEEPSEEK_API_KEY`, `TAVILY_API_KEY`,
 `EMBEDDING_API_BASE_URL`, `EMBEDDING_API_KEY` (plus `SILICONFLOW_API_KEY`,
 `BACKEND_URL`, and `QMD_*` for the geo-routed legacy paths). Copy
-`apps/api/.dev.vars.example` to `.dev.vars` for local Worker runs. The import
+`apps/ai-agent/.dev.vars.example` to `.dev.vars` for local Worker runs. The import
 pipeline instead uses `SUPABASE_SERVICE_KEY`; the Worker `Env` interface in
-`apps/api/src/index.ts` is the authoritative list.
+`apps/ai-agent/src/index.ts` is the authoritative list.

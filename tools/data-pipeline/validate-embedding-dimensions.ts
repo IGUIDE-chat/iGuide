@@ -21,46 +21,46 @@ function success(message: string): void {
 }
 
 function checkWranglerJsonc(): void {
-  const path = join(projectRoot, "apps/api/wrangler.jsonc")
+  const path = join(projectRoot, "apps/ai-agent/wrangler.jsonc")
   try {
     const content = readFileSync(path, "utf-8")
     const match = content.match(/"EMBEDDING_DIMENSIONS"\s*:\s*"(\d+)"/)
     if (!match) {
-      error(`apps/api/wrangler.jsonc: EMBEDDING_DIMENSIONS not found`)
+      error(`apps/ai-agent/wrangler.jsonc: EMBEDDING_DIMENSIONS not found`)
       return
     }
     const dimensions = parseInt(match[1], 10)
     if (dimensions !== EXPECTED_DIMENSION) {
       error(
-        `apps/api/wrangler.jsonc: EMBEDDING_DIMENSIONS=${dimensions}, expected ${EXPECTED_DIMENSION}`,
+        `apps/ai-agent/wrangler.jsonc: EMBEDDING_DIMENSIONS=${dimensions}, expected ${EXPECTED_DIMENSION}`,
       )
       return
     }
-    success(`apps/api/wrangler.jsonc: EMBEDDING_DIMENSIONS=${dimensions}`)
+    success(`apps/ai-agent/wrangler.jsonc: EMBEDDING_DIMENSIONS=${dimensions}`)
   } catch (e) {
-    error(`apps/api/wrangler.jsonc: Failed to read - ${e}`)
+    error(`apps/ai-agent/wrangler.jsonc: Failed to read - ${e}`)
   }
 }
 
 function checkEmbeddingConfig(): void {
-  const path = join(projectRoot, "apps/api/src/lib/embedding-config.ts")
+  const path = join(projectRoot, "apps/ai-agent/src/lib/embedding-config.ts")
   try {
     const content = readFileSync(path, "utf-8")
     const match = content.match(/DEFAULT_EMBEDDING_DIMENSIONS\s*=\s*(\d+)/)
     if (!match) {
-      error(`apps/api/src/lib/embedding-config.ts: DEFAULT_EMBEDDING_DIMENSIONS not found`)
+      error(`apps/ai-agent/src/lib/embedding-config.ts: DEFAULT_EMBEDDING_DIMENSIONS not found`)
       return
     }
     const dimensions = parseInt(match[1], 10)
     if (dimensions !== EXPECTED_DIMENSION) {
       error(
-        `apps/api/src/lib/embedding-config.ts: DEFAULT_EMBEDDING_DIMENSIONS=${dimensions}, expected ${EXPECTED_DIMENSION}`,
+        `apps/ai-agent/src/lib/embedding-config.ts: DEFAULT_EMBEDDING_DIMENSIONS=${dimensions}, expected ${EXPECTED_DIMENSION}`,
       )
       return
     }
-    success(`apps/api/src/lib/embedding-config.ts: DEFAULT_EMBEDDING_DIMENSIONS=${dimensions}`)
+    success(`apps/ai-agent/src/lib/embedding-config.ts: DEFAULT_EMBEDDING_DIMENSIONS=${dimensions}`)
   } catch (e) {
-    error(`apps/api/src/lib/embedding-config.ts: Failed to read - ${e}`)
+    error(`apps/ai-agent/src/lib/embedding-config.ts: Failed to read - ${e}`)
   }
 }
 
