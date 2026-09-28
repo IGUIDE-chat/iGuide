@@ -116,8 +116,8 @@ These facets should exist both as structured payload and as rendered searchable 
 ## Related
 
 - `docs/database/db-schema-v1.md`
-- `app/src/pages/courses/CoursesLandingPage.tsx`
-- `app/src/data/articles/registration101.ts`
-- `api/src/tools/search-knowledge-base.ts`
-- `scripts/import-to-supabase.ts`
+- `apps/app/src/pages/courses/CoursesLandingPage.tsx`
+- `apps/app/src/data/articles/registration101.ts`
+- `apps/api/src/tools/search-knowledge-base.ts`
+- `tools/data-pipeline/import-to-supabase.ts`
 - `supabase/migrations/001_create_documents.sql`

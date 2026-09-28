@@ -10,34 +10,47 @@ A three-layer UIUC knowledge platform split across the app, API gateway, and cra
 
 ## Monorepo Map
 
-| Path               | Role                                                                                           |
-| :----------------- | :--------------------------------------------------------------------------------------------- |
-| `app/`             | React app, Cloudflare Pages functions, docs, migrations, and active UI runtime.                |
-| `api/`             | Cloudflare Worker gateway for JWT auth, geo routing, proxying, CORS, and health checks.        |
-| `data_collection/` | Python crawler/ETL pipeline for harvesting, cleaning, and incrementally updating UIUC sources. |
+| Path                   | Role                                                                                           |
+| :--------------------- | :--------------------------------------------------------------------------------------------- |
+| `apps/app/`            | React app, Cloudflare Pages functions, docs, migrations, and active UI runtime.                |
+| `apps/api/`            | Cloudflare Worker gateway for JWT auth, geo routing, proxying, CORS, and health checks.        |
+| `tools/data-pipeline/` | Supabase import, embedding-dimension, and schema verification scripts.                         |
+| `data_collection/`     | Python crawler/ETL pipeline for harvesting, cleaning, and incrementally updating UIUC sources. |
+| `supabase/`            | SQL migrations, RPC functions, and seed fixtures.                                              |
 
 ## Unified Setup
+
+### Install
+
+The workspace is a pnpm workspace driven by Vite+ from the repository root:
+
+```bash
+pnpm install
+```
 
 ### App dev
 
 ```bash
-cd app
-pnpm install
-pnpm run dev
+pnpm run dev:app
 pnpm run typecheck
 ```
+
+`vp` is workspace-aware from the root. `vp dev` and `vp build` resolve the runnable
+package on their own, and `vp -C apps/<package> <command>` runs a command inside a
+single package. Recursive tasks use `vp run -r <task>`, or `--filter <package>` to
+target one of them.
 
 ### Supabase dorm data
 
 Run the SQL migrations in Supabase:
 
-- `scripts/migrations/create_dorms_table.sql`
-- `scripts/migrations/add_categorized_tags.sql`
+- `apps/app/scripts/migrations/create_dorms_table.sql`
+- `apps/app/scripts/migrations/add_categorized_tags.sql`
 
 Then seed or resync data with:
 
 ```bash
-npx tsx scripts/seed-dorms-table.ts
+vp run --filter @iguide/app seed:dorms
 ```
 
 Requires `SUPABASE_URL` and `SUPABASE_SERVICE_KEY`.
@@ -57,9 +70,7 @@ chmod +x run_all.sh
 ### API gateway basics
 
 ```bash
-cd api
-pnpm install
-pnpm run dev
+pnpm run dev:api
 curl http://localhost:8787/health
 ```
 
@@ -239,11 +250,11 @@ If the new tool-use path regresses, disable it by switching `USE_TOOL_USE_RAG=fa
 # Worker health
 curl http://localhost:8787/health
 
-# App typecheck
-cd app && pnpm run typecheck
+# Workspace typecheck (every package)
+pnpm run typecheck
 
 # Worker local dev
-cd api && pnpm run dev
+pnpm run dev:api
 ```
 
 ### Tech Stack Summary

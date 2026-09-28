@@ -78,6 +78,6 @@ Arbitrary user-added public third-party MCP services are supported with clear di
 ## Related
 
 - `.sisyphus/plans/hybrid-mcp-tools-ui.md`
-- `app/src/pages/profile/ProfilePage.tsx`
-- `app/src/components/profile/ProfileScreen.tsx`
+- `apps/app/src/pages/profile/ProfilePage.tsx`
+- `apps/app/src/components/profile/ProfileScreen.tsx`
 - `docs/development/custom-tool-and-skill-guide.md`

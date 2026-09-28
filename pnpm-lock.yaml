@@ -185,7 +185,7 @@ importers:
         specifier: 'catalog:'
         version: 0.3.3(@types/node@26.6.3)(esbuild@0.28.1)(jiti@2.7.0)(typescript@7.0.2)
 
-  api:
+  apps/api:
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^5.20260927.1
@@ -193,9 +193,6 @@ importers:
       '@types/node':
         specifier: ^26.6.3
         version: 26.6.3
-      prettier:
-        specifier: ^3.9.9
-        version: 3.9.9
       typescript:
         specifier: ^7.0.2
         version: 7.0.2
@@ -209,7 +206,7 @@ importers:
         specifier: ^4.141.0
         version: 4.141.0(@cloudflare/workers-types@5.20260927.1)(@types/node@26.6.3)
 
-  app:
+  apps/app:
     dependencies:
       '@assistant-ui/react':
         specifier: ^0.15.22
@@ -284,9 +281,6 @@ importers:
       postcss:
         specifier: ^8.5.28
         version: 8.5.28
-      prettier:
-        specifier: ^3.9.9
-        version: 3.9.9
       tailwindcss:
         specifier: ^4.3.3
         version: 4.3.3
@@ -308,6 +302,15 @@ importers:
       vite-plus:
         specifier: 'catalog:'
         version: 0.3.3(@types/node@26.6.3)(esbuild@0.28.1)(jiti@2.7.0)(typescript@7.0.2)
+
+  tools/data-pipeline:
+    devDependencies:
+      '@types/node':
+        specifier: ^26.6.3
+        version: 26.6.3
+      typescript:
+        specifier: ~7.0.2
+        version: 7.0.2
 
 packages:
 
@@ -3645,11 +3648,6 @@ packages:
   postcss@8.5.28:
     resolution: {integrity: sha512-RRuzqDtt5Y9h3quz5hWhK+TPnsmVs6WwSU6LkJMeY4HstUEDuYTG8UJSdawMRzmzAtV+KEoG8N3Qg2qLy5vM/A==}
     engines: {node: ^10 || ^12 || >=14}
-
-  prettier@3.9.9:
-    resolution: {integrity: sha512-Z/CJHIkdujO/OtN7nXUii0Rf3VT5SRuhjBA82Xvu2XhBUgX3nhP67T0LHceBdQLex7OOFGTox+Q5Yg8Jk2Qivg==}
-    engines: {node: '>=14'}
-    hasBin: true
 
   pretty-format@27.5.1:
     resolution: {integrity: sha512-Qb1gy5OrP5+zDf2Bvnzdl3jsTf1qXVMazbvCoKhtKqVs4/YK4ozX4gKQJJVyNe+cajNPn0KoC0MC3FUmaHWEmQ==}
@@ -7439,8 +7437,6 @@ snapshots:
       nanoid: 3.3.19
       picocolors: 1.1.1
       source-map-js: 1.2.1
-
-  prettier@3.9.9: {}
 
   pretty-format@27.5.1:
     dependencies:

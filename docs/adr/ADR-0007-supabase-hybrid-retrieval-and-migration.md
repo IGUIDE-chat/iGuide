@@ -12,7 +12,7 @@ Accepted
 
 The repo currently carries two retrieval worlds:
 
-- a newer Supabase-native hybrid retrieval path in `api/src/tools/search-knowledge-base.ts`, backed by `documents`, `document_chunks`, pgvector, and PostgreSQL full-text search
+- a newer Supabase-native hybrid retrieval path in `apps/api/src/tools/search-knowledge-base.ts`, backed by `documents`, `document_chunks`, pgvector, and PostgreSQL full-text search
 - an older QMD-based search path, still deployed as a standalone service/VPS boundary and fed by generated markdown plus QMD CLI indexing
 
 That split is operationally awkward and inconsistent with the repo's serverless-first direction. It also preserves different storage and indexing assumptions at the same time:
@@ -90,14 +90,14 @@ Supabase-native hybrid retrieval should remain grounded in:
 - `docs/adr/ADR-0004-hybrid-data-model.md`
 - `docs/adr/ADR-0006-source-first-base-layer.md`
 - `README.md`
-- `api/src/index.ts`
-- `api/src/tools/search-knowledge-base.ts`
-- `app/src/services/searchService.ts`
-- `app/src/services/chatRagService.ts`
-- `app/scripts/generate-qmd-markdown.ts`
-- `app/scripts/sync-qmd-index.ts`
-- `app/scripts/qmd-server.mjs`
-- `scripts/import-to-supabase.ts`
+- `apps/api/src/index.ts`
+- `apps/api/src/tools/search-knowledge-base.ts`
+- `apps/app/src/services/searchService.ts`
+- `apps/app/src/services/chatRagService.ts`
+- `apps/app/scripts/generate-qmd-markdown.ts`
+- `apps/app/scripts/sync-qmd-index.ts`
+- `apps/app/scripts/qmd-server.mjs`
+- `tools/data-pipeline/import-to-supabase.ts`
 - `supabase/migrations/001_create_documents.sql`
 - `supabase/migrations/002_chunks_and_rls.sql`
 - `supabase/migrations/003_search_functions.sql`

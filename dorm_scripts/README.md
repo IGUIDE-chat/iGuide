@@ -1,10 +1,10 @@
 # dorm_scripts
 
-This directory keeps scraping and dorm-review generation code out of `app/` so the app stays free of scraping-only dependencies like Puppeteer.
+This directory keeps scraping and dorm-review generation code out of `apps/app/` so the app stays free of scraping-only dependencies like Puppeteer.
 
 All scripts write to:
 
-`app/src/components/housing/constants/googleReviews.ts`
+`apps/app/src/components/housing/constants/googleReviews.ts`
 
 ## Included scripts
 
@@ -41,12 +41,12 @@ node scrapeMissing2.cjs
 python fetchReviewsGPT.py
 ```
 
-This requires `DEEPSEEK_API_KEY` or `VITE_DEEPSEEK_API_KEY` in `app/.env.local`.
+This requires `DEEPSEEK_API_KEY` or `VITE_DEEPSEEK_API_KEY` in `apps/app/.env.local`.
 
 ## Python note
 
-`fetchReviewsGPT.py` is separate from the Bun workflow and reads its API key from `app/.env.local`.
+`fetchReviewsGPT.py` is separate from the Bun workflow and reads its API key from `apps/app/.env.local`.
 
 ## Important
 
-`dorm_scripts/` is intentionally isolated. Don’t move these scripts back into `app/`.
+`dorm_scripts/` is intentionally isolated. Don’t move these scripts back into `apps/app/`.

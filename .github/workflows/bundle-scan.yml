@@ -21,10 +21,6 @@ jobs:
   bundle-scan:
     name: Bundle Secret Scan (dist)
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: app
-
     steps:
       - uses: actions/checkout@v7
         with:
@@ -62,7 +58,7 @@ jobs:
 
       - name: Scan compiled bundle for leaked secrets
         run: |
-          echo "Scanning dist/assets/ for leaked API keys..."
+          echo "Scanning apps/app/dist/assets/ for leaked API keys..."
           FOUND=0
 
           PATTERNS=(
@@ -77,7 +73,7 @@ jobs:
           )
 
           for pattern in "${PATTERNS[@]}"; do
-            matches=$(grep -rEn "$pattern" dist/assets/ 2>/dev/null || true)
+            matches=$(grep -rEn "$pattern" apps/app/dist/assets/ 2>/dev/null || true)
             if [ -n "$matches" ]; then
               echo "❌ Leaked secret found in bundle: $pattern"
               echo "$matches" | head -3 | sed 's/\(.\{80\}\).*/\1.../'
@@ -92,14 +88,14 @@ jobs:
             exit 1
           fi
 
-          echo "✅ Bundle is clean — no sensitive keys found in dist/assets/."
+          echo "✅ Bundle is clean — no sensitive keys found in apps/app/dist/assets/."
 
       - name: Verify CF Functions exist for sensitive APIs
         run: |
           echo "Verifying CF Pages Functions proxy files exist..."
           MISSING=0
 
-          for fn in functions/api/deepseek.ts functions/api/tavily.ts functions/api/gemini.ts; do
+          for fn in apps/app/functions/api/deepseek.ts apps/app/functions/api/tavily.ts apps/app/functions/api/gemini.ts; do
             if [ ! -f "$fn" ]; then
               echo "❌ Missing CF Function proxy: $fn"
               MISSING=1

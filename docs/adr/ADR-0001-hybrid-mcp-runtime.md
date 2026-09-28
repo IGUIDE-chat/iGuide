@@ -10,7 +10,7 @@ Accepted
 
 ## Context
 
-The current backend runtime is not a standard MCP server. In `api/`, each `/chat` request creates a fresh `ToolRegistry`, registers internal tools, and executes them through the existing request-scoped agent loop. Internal tools currently rely on direct `ToolDefinition.execute(args, ctx)` execution, local request context, current timeout/budget/truncation behavior, and existing SSE/fallback wiring.
+The current backend runtime is not a standard MCP server. In `apps/api/`, each `/chat` request creates a fresh `ToolRegistry`, registers internal tools, and executes them through the existing request-scoped agent loop. Internal tools currently rely on direct `ToolDefinition.execute(args, ctx)` execution, local request context, current timeout/budget/truncation behavior, and existing SSE/fallback wiring.
 
 We considered whether to replace this “MCP-style” internal runtime with a single real MCP client so that both internal tools and third-party MCP tools would share one execution model. That option looked superficially cleaner because it would unify tool invocation behind one abstraction.
 
@@ -61,6 +61,6 @@ The adapter may use a real MCP client internally for third-party Streamable HTTP
 ## Related
 
 - `.sisyphus/plans/hybrid-mcp-tools-ui.md`
-- `api/src/index.ts`
-- `api/src/tools/registry.ts`
-- `api/src/agent/loop.ts`
+- `apps/api/src/index.ts`
+- `apps/api/src/tools/registry.ts`
+- `apps/api/src/agent/loop.ts`
