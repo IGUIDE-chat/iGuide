@@ -2,7 +2,7 @@
  * @file ./src/services/searchService.ts
  * @description Global Shared Component / Module
  * @description_zh QMD 知识库搜索服务。通过 /api/search 代理查询 QMD daemon。
- * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
+ * @rules Follow the Colocation Principle. Rules: apps/app/AGENTS.md.
  */
 
 import type { SearchResult, SearchResponse, SearchMode } from "../types"

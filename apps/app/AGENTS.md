@@ -5,10 +5,8 @@ This file is the canonical short-form rule set for agents working in
 
 If this file and another project document disagree, follow this file first.
 
-For fuller explanations, see:
-
-- `docs/FILE_RULES.md`
-- `docs/ARCHITECTURE.md`
+For repo-wide rules (secrets, CI, Worker retrieval, data model), see the root
+[`AGENTS.md`](../../AGENTS.md).
 
 ## Scope
 

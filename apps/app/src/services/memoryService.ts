@@ -2,7 +2,7 @@
  * @file ./src/services/memoryService.ts
  * @description Service for managing AI persona (soul), user profile memory, and conversation memory.
  * @description_zh 管理 AI 人设（soul）、用户画像记忆、对话记忆的服务。
- * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
+ * @rules Follow the Colocation Principle. Rules: apps/app/AGENTS.md.
  */
 
 import { supabase } from "./supabase"

@@ -2,7 +2,7 @@
  * @file ./src/components/chat/ThinkingProcess.tsx
  * @description Chat (AI) Component / Module
  * @description_zh 此文件属于 Chat 业务域。展示 AI 思考过程的可折叠组件。
- * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
+ * @rules Follow the Colocation Principle. Rules: apps/app/AGENTS.md.
  */
 
 import { AnimatePresence, motion } from "framer-motion"

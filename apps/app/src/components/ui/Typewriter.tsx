@@ -2,7 +2,7 @@
  * @file ./src/components/ui/Typewriter.tsx
  * @description Global Shared Component / Module
  * @description_zh 统一的打字机组件，支持三种模式：animate（Framer Motion 逐字动画）、stream（逐字流式渲染）、static（静态渲染）。
- * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
+ * @rules Follow the Colocation Principle. Rules: apps/app/AGENTS.md.
  */
 
 import { motion } from "framer-motion"

@@ -2,7 +2,7 @@
  * @file ./src/services/deepseekService.ts
  * @description RAG-enhanced DeepSeek chat service.
  * @description_zh RAG 增强的 DeepSeek 聊天服务：QMD 检索 → Web 搜索 → DeepSeek 回答。
- * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
+ * @rules Follow the Colocation Principle. Rules: apps/app/AGENTS.md.
  */
 
 import type { StreamChunk, ChatHistoryItem } from "./ai/types"

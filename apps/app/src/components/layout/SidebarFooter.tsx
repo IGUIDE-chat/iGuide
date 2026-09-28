@@ -2,7 +2,7 @@
  * @file ./src/components/layout/SidebarFooter.tsx
  * @description Layout Component / Module
  * @description_zh 此文件属于 Layout 层，仅负责布局、导航。严禁在此处堆积业务逻辑。
- * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
+ * @rules Follow the Colocation Principle. Rules: apps/app/AGENTS.md.
  */
 
 import { AnimatePresence, motion } from "framer-motion"
