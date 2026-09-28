@@ -51,7 +51,6 @@ apps/web/
 |   |-- legacy/
 |   |   |-- auth/
 |   |   `-- components/
-|   |-- scripts/
 |   |-- services/
 |   |-- App.tsx
 |   |-- constants.ts
