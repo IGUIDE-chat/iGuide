@@ -3,7 +3,6 @@ import path from "path"
 import { cloudflare } from "@cloudflare/vite-plugin"
 import tailwindcss from "@tailwindcss/vite"
 import react from "@vitejs/plugin-react"
-import { ViteMcp } from "vite-plugin-mcp"
 import { defineConfig, loadEnv, lazyPlugins } from "vite-plus"
 
 export default defineConfig(({ mode }) => {
