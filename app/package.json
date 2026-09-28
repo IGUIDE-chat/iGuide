@@ -1,16 +1,16 @@
 {
   "name": "@iguide/app",
-  "private": true,
   "version": "0.0.0",
+  "private": true,
   "type": "module",
   "scripts": {
     "audit:dorm-media": "npx tsx scripts/audit-dorm-media.ts",
-    "build": "vite build",
-    "dev": "vite",
+    "build": "vp build",
+    "dev": "vp dev",
     "generate:qmd-content": "npx tsx scripts/generate-qmd-markdown.ts",
-    "lint:fix": "oxlint --fix src functions scripts",
-    "lint": "oxlint src functions scripts",
-    "preview": "vite preview",
+    "lint:fix": "vp lint --fix src functions scripts",
+    "lint": "vp lint src functions scripts",
+    "preview": "vp preview",
     "style:fix": "prettier --write . && pnpm run style:md:fix",
     "style:md:fix": "markdownlint-cli2 --fix \"**/*.md\" \"#node_modules\"",
     "style:md": "markdownlint-cli2 \"**/*.md\" \"#node_modules\"",
@@ -48,14 +48,14 @@
     "autoprefixer": "^10.6.1",
     "dotenv": "^18.0.4",
     "markdownlint-cli2": "^0.23.3",
-    "oxlint": "^1.85.0",
     "postcss": "^8.5.28",
     "prettier": "^3.9.9",
     "tailwindcss": "^4.3.3",
     "ts-morph": "^28.0.0",
     "ts-node": "^10.9.2",
     "typescript": "~7.0.2",
-    "vite": "^8.3.1",
-    "vite-plugin-mcp": "^0.3.2"
+    "vite": "catalog:",
+    "vite-plugin-mcp": "^0.3.2",
+    "vite-plus": "catalog:"
   }
 }

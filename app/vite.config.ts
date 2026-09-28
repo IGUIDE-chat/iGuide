@@ -1,30 +1,17 @@
 // [CONFIG] Vite build configuration and plugin setup.
 // [配置] Vite 构建配置和插件设置。
 import { mkdir, writeFile } from "node:fs/promises";
-import type {
-  ClientRequest,
-  IncomingMessage,
-  OutgoingHttpHeaders,
-} from "node:http";
+import type { ClientRequest, IncomingMessage, OutgoingHttpHeaders } from "node:http";
 import path from "path";
-import { defineConfig, loadEnv } from "vite";
+import { defineConfig, loadEnv } from "vite-plus";
 import react from "@vitejs/plugin-react";
 import { qmdSearchPlugin } from "./scripts/qmdSearchGateway";
 import { ViteMcp } from "vite-plugin-mcp";
+import { lazyPlugins } from "vite-plus";
 
 const TRUTHY_ENV_VALUES = new Set(["1", "true", "yes", "on"]);
-const SENSITIVE_HEADERS = new Set([
-  "authorization",
-  "cookie",
-  "proxy-authorization",
-  "x-api-key",
-]);
-const SENSITIVE_QUERY_KEYS = new Set([
-  "access_token",
-  "api_key",
-  "key",
-  "token",
-]);
+const SENSITIVE_HEADERS = new Set(["authorization", "cookie", "proxy-authorization", "x-api-key"]);
+const SENSITIVE_QUERY_KEYS = new Set(["access_token", "api_key", "key", "token"]);
 
 type DevEnv = Record<string, string>;
 
@@ -50,7 +37,7 @@ function redactHeaders(headers: OutgoingHttpHeaders, includeSecrets: boolean) {
     Object.entries(headers).map(([key, value]) => [
       key,
       SENSITIVE_HEADERS.has(key.toLowerCase()) ? "[REDACTED]" : value,
-    ])
+    ]),
   );
 }
 
@@ -93,9 +80,7 @@ async function dumpLlmRequest({
   const includeSecrets = isTruthyEnv(env.LLM_REQUEST_DUMP_INCLUDE_SECRETS);
   const timestamp = new Date().toISOString();
   const requestId = `${timestamp.replace(/[:.]/g, "-")}-${String(++llmDumpCounter).padStart(4, "0")}`;
-  const dumpDir = path.resolve(
-    env.LLM_REQUEST_DUMP_DIR || ".debug/llm-requests"
-  );
+  const dumpDir = path.resolve(env.LLM_REQUEST_DUMP_DIR || ".debug/llm-requests");
   const filePath = path.join(dumpDir, `${requestId}-${provider}.json`);
   const bodyJson = parseJsonBody(body);
 
@@ -117,9 +102,9 @@ async function dumpLlmRequest({
           bodyJson,
         },
         null,
-        2
+        2,
       ),
-      "utf8"
+      "utf8",
     );
 
     console.log(`[LLM dump] ${provider} request written to ${filePath}`);
@@ -129,10 +114,7 @@ async function dumpLlmRequest({
   }
 }
 
-function collectRequestBody(
-  req: IncomingMessage,
-  onEnd: (body: string) => void
-) {
+function collectRequestBody(req: IncomingMessage, onEnd: (body: string) => void) {
   const chunks: Buffer[] = [];
   req.on("data", (chunk: Buffer) => {
     chunks.push(chunk);
@@ -215,10 +197,7 @@ export default defineConfig(({ mode }) => {
                   delete parsed.model;
                   const newBody = JSON.stringify(parsed);
                   proxyReq.path = `/v1beta/models/${model}:generateContent?key=${apiKey}`;
-                  proxyReq.setHeader(
-                    "Content-Length",
-                    Buffer.byteLength(newBody)
-                  );
+                  proxyReq.setHeader("Content-Length", Buffer.byteLength(newBody));
                   void dumpLlmRequest({
                     env,
                     provider: "gemini",
@@ -262,10 +241,7 @@ export default defineConfig(({ mode }) => {
                   const parsed = JSON.parse(body);
                   if (!parsed.api_key) parsed.api_key = apiKey;
                   const newBody = JSON.stringify(parsed);
-                  proxyReq.setHeader(
-                    "Content-Length",
-                    Buffer.byteLength(newBody)
-                  );
+                  proxyReq.setHeader("Content-Length", Buffer.byteLength(newBody));
                   void dumpLlmRequest({
                     env,
                     provider: "tavily",
@@ -292,19 +268,13 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
-    plugins: [qmdSearchPlugin(), react(), ViteMcp()],
+    plugins: lazyPlugins(() => [qmdSearchPlugin(), react(), ViteMcp()]),
     define: {
       // Only inject public keys that are safe for frontend
       // NEVER inject sensitive API keys here
-      "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(
-        env.VITE_SUPABASE_URL
-      ),
-      "import.meta.env.VITE_SUPABASE_ANON_KEY": JSON.stringify(
-        env.VITE_SUPABASE_ANON_KEY
-      ),
-      "import.meta.env.VITE_MAPBOX_TOKEN": JSON.stringify(
-        env.VITE_MAPBOX_TOKEN || ""
-      ),
+      "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(env.VITE_SUPABASE_URL),
+      "import.meta.env.VITE_SUPABASE_ANON_KEY": JSON.stringify(env.VITE_SUPABASE_ANON_KEY),
+      "import.meta.env.VITE_MAPBOX_TOKEN": JSON.stringify(env.VITE_MAPBOX_TOKEN || ""),
     },
     build: {
       chunkSizeWarningLimit: 600,
@@ -312,11 +282,7 @@ export default defineConfig(({ mode }) => {
         output: {
           manualChunks(id) {
             if (id.includes("node_modules")) {
-              if (
-                id.includes("react") ||
-                id.includes("react-dom") ||
-                id.includes("react-router")
-              ) {
+              if (id.includes("react") || id.includes("react-dom") || id.includes("react-router")) {
                 return "vendor-react";
               }
               if (id.includes("framer-motion")) {

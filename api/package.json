@@ -1,10 +1,10 @@
 {
   "name": "@iguide/api",
   "version": "0.1.0",
-  "description": "Cloudflare Worker API Gateway for IlliniGuide",
-  "main": "src/index.ts",
-  "type": "module",
   "private": true,
+  "description": "Cloudflare Worker API Gateway for IlliniGuide",
+  "type": "module",
+  "main": "src/index.ts",
   "scripts": {
     "dev": "wrangler dev --config wrangler.jsonc",
     "deploy": "wrangler deploy",
@@ -12,17 +12,18 @@
     "tail": "wrangler tail",
     "test": "node --test --experimental-strip-types --loader ./src/test/loaders/md-loader.ts \"src/**/*.test.ts\"",
     "types": "wrangler types",
-    "lint": "oxlint src",
-    "lint:fix": "oxlint --fix src",
+    "lint": "vp lint src",
+    "lint:fix": "vp lint --fix src",
     "style": "prettier --check .",
     "style:fix": "prettier --write ."
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260927.1",
     "@types/node": "^26.6.3",
-    "oxlint": "^1.85.0",
     "prettier": "^3.9.9",
     "typescript": "^7.0.2",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
     "wrangler": "^4.141.0"
   }
 }

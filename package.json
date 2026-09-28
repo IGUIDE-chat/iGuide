@@ -7,7 +7,12 @@
     "build": "pnpm --filter @iguide/app build",
     "typecheck": "pnpm --filter @iguide/app typecheck",
     "lint": "pnpm -r --if-present lint",
-    "test": "pnpm -r --if-present test"
+    "test": "pnpm -r --if-present test",
+    "prepare": "vp config"
+  },
+  "devDependencies": {
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
   },
   "packageManager": "pnpm@12.7.0"
 }
