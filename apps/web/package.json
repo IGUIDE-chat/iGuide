@@ -34,11 +34,9 @@
     "@vitejs/plugin-react": "^6.1.1",
     "cf": "1.0.0-beta.5",
     "dotenv": "^18.0.4",
-    "markdownlint-cli2": "^0.23.3",
     "tailwindcss": "^4.3.3",
     "typescript": "~7.0.2",
     "vite": "catalog:",
-    "vite-plugin-mcp": "^0.3.2",
     "vite-plus": "catalog:"
   }
 }
