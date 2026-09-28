@@ -1,16 +1,14 @@
-import { makeAssistantToolUI } from "@assistant-ui/react";
+import { makeAssistantToolUI } from "@assistant-ui/react"
+
 import {
   ToolCard,
   getResultMetric,
   getStringArg,
   type SearchToolArgs,
   type ToolSummaryResult,
-} from "./toolUiHelpers";
+} from "./toolUiHelpers"
 
-export const WebSearchToolUI = makeAssistantToolUI<
-  SearchToolArgs,
-  ToolSummaryResult
->({
+export const WebSearchToolUI = makeAssistantToolUI<SearchToolArgs, ToolSummaryResult>({
   toolName: "web_search",
   render: ({ args, result, status }) => (
     <ToolCard
@@ -23,9 +21,9 @@ export const WebSearchToolUI = makeAssistantToolUI<
         result,
         ["sourceCount", "count", "sources", "results"],
         "Searching...",
-        "Completed"
+        "Completed",
       )}
       isLoading={status.type === "running"}
     />
   ),
-});
+})

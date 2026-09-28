@@ -68,6 +68,7 @@ This project uses assistant-ui for chat interfaces.
 Documentation: https://www.assistant-ui.com/llms-full.txt
 
 Key patterns:
+
 - Use AssistantRuntimeProvider at the app root
 - Thread component for full chat interface
 - AssistantModal for floating chat widget
@@ -76,6 +77,7 @@ Key patterns:
 ## Chat Components
 
 ### General Chat (`src/components/chat/**` + `src/pages/chat/ChatPage.tsx`)
+
 - Full-page general-purpose chat interface
 - Uses assistant-ui runtime (ChatRuntimeProvider, ChatThread)
 - Supports tool-use (SearchToolUI, WebSearchToolUI, GrepDocsToolUI)
@@ -83,6 +85,7 @@ Key patterns:
 - Route: `/chat`
 
 ### Housing Chat (`src/components/housing/AIChat.tsx`)
+
 - Housing/dorm-specific floating chat widget
 - Dorm mention detection and highlighting
 - Shows dorm cards with navigation to dorm details

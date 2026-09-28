@@ -3,56 +3,51 @@
  * @description Chat (AI) Component / Module
  */
 
-import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion"
+import { useEffect, useRef, useState } from "react"
 
 const TOOL_LABELS: Record<string, string> = {
   search_knowledge_base: "Searching knowledge base...",
   web_search: "Searching the web...",
   grep_docs: "Looking up documents...",
   custom_skills: "Running skill...",
-};
+}
 
 function getToolLabel(toolName: string): string {
-  return TOOL_LABELS[toolName] ?? `Running ${toolName}...`;
+  return TOOL_LABELS[toolName] ?? `Running ${toolName}...`
 }
 
 export interface ToolStatusProps {
-  toolName?: string;
-  status: "searching" | "done" | "idle";
-  summary?: string;
+  toolName?: string
+  status: "searching" | "done" | "idle"
+  summary?: string
 }
 
-export const ToolStatus: React.FC<ToolStatusProps> = ({
-  toolName,
-  status,
-  summary,
-}) => {
-  const [visible, setVisible] = useState(false);
-  const fadeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+export const ToolStatus: React.FC<ToolStatusProps> = ({ toolName, status, summary }) => {
+  const [visible, setVisible] = useState(false)
+  const fadeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     if (status === "searching") {
-      setVisible(true);
-      if (fadeTimer.current) clearTimeout(fadeTimer.current);
+      setVisible(true)
+      if (fadeTimer.current) clearTimeout(fadeTimer.current)
     } else if (status === "done") {
-      fadeTimer.current = setTimeout(() => setVisible(false), 1800);
+      fadeTimer.current = setTimeout(() => setVisible(false), 1800)
     } else {
-      setVisible(false);
+      setVisible(false)
     }
 
     return () => {
-      if (fadeTimer.current) clearTimeout(fadeTimer.current);
-    };
-  }, [status]);
+      if (fadeTimer.current) clearTimeout(fadeTimer.current)
+    }
+  }, [status])
 
   const label =
     status === "done"
-      ? (summary ??
-        (toolName ? `Done: ${TOOL_LABELS[toolName] ?? toolName}` : "Done"))
+      ? (summary ?? (toolName ? `Done: ${TOOL_LABELS[toolName] ?? toolName}` : "Done"))
       : toolName
         ? getToolLabel(toolName)
-        : "Working...";
+        : "Working..."
 
   return (
     <div aria-live="polite" data-testid="tool-status">
@@ -67,10 +62,7 @@ export const ToolStatus: React.FC<ToolStatusProps> = ({
           >
             {status === "searching" ? (
               <motion.div
-                className="
-                  size-3 rounded-full border-2 border-illini-orange
-                  border-t-transparent
-                "
+                className="border-illini-orange size-3 rounded-full border-2 border-t-transparent"
                 animate={{ rotate: 360 }}
                 transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
                 aria-hidden="true"
@@ -94,5 +86,5 @@ export const ToolStatus: React.FC<ToolStatusProps> = ({
         )}
       </AnimatePresence>
     </div>
-  );
-};
+  )
+}

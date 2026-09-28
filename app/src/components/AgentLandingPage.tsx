@@ -5,28 +5,26 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
+import { motion, AnimatePresence } from "framer-motion"
 // [PAGE] Landing page template for specific agents (Courses, Dorms, Resume).
 // [页面] 用于特定智能体（课程、宿舍、简历）的着陆页模板。
-import * as React from "react";
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Language } from "../types";
-import { UI_TEXT } from "../i18n/uiText";
-import {
-  mailingListService,
-  MailingListTopic,
-} from "../services/mailingListService";
+import * as React from "react"
+import { useState } from "react"
+
+import { UI_TEXT } from "../i18n/uiText"
+import { mailingListService, MailingListTopic } from "../services/mailingListService"
+import { Language } from "../types"
 
 interface AgentLandingPageProps {
-  type: "courses" | "dorms" | "resume";
-  language: Language;
+  type: "courses" | "dorms" | "resume"
+  language: Language
 }
 
 const AGENT_CONFIG = {
   courses: {
     icon: (
       <svg
-        className="size-10 text-illini-blue"
+        className="text-illini-blue size-10"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -44,7 +42,7 @@ const AGENT_CONFIG = {
   dorms: {
     icon: (
       <svg
-        className="size-10 text-illini-orange"
+        className="text-illini-orange size-10"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -77,70 +75,44 @@ const AGENT_CONFIG = {
     ),
     gradient: "from-emerald-500 to-teal-600",
   },
-};
+}
 
-export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
-  type,
-  language,
-}) => {
-  const t = UI_TEXT[language];
-  const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const config = AGENT_CONFIG[type];
+export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({ type, language }) => {
+  const t = UI_TEXT[language]
+  const [email, setEmail] = useState("")
+  const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const config = AGENT_CONFIG[type]
 
   const title =
-    type === "courses"
-      ? t.coursesTitle
-      : type === "dorms"
-        ? t.dormsTitle
-        : t.resumeTitle;
-  const desc =
-    type === "courses"
-      ? t.coursesDesc
-      : type === "dorms"
-        ? t.dormsDesc
-        : t.resumeDesc;
+    type === "courses" ? t.coursesTitle : type === "dorms" ? t.dormsTitle : t.resumeTitle
+  const desc = type === "courses" ? t.coursesDesc : type === "dorms" ? t.dormsDesc : t.resumeDesc
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-    setSubmitting(true);
-    setError(null);
+    e.preventDefault()
+    if (!email) return
+    setSubmitting(true)
+    setError(null)
 
-    const result = await mailingListService.subscribe(
-      email,
-      type as MailingListTopic
-    );
-    setSubmitting(false);
+    const result = await mailingListService.subscribe(email, type as MailingListTopic)
+    setSubmitting(false)
 
     if (result.success) {
-      setSubmitted(true);
+      setSubmitted(true)
     } else {
-      setError(
-        language === "zh"
-          ? "提交失败，请重试。"
-          : "Failed to submit. Please try again."
-      );
+      setError(language === "zh" ? "提交失败，请重试。" : "Failed to submit. Please try again.")
     }
-  };
+  }
 
   return (
     <div
-      className="
-        flex size-full items-center justify-center overflow-auto bg-white p-4
-        md:p-8
-      "
+      className="flex size-full items-center justify-center overflow-auto bg-white p-4 md:p-8"
     >
       <div className="relative w-full max-w-md text-center">
         {/* Icon - static, doesn't change with language */}
         <div
-          className="
-            mx-auto mb-4 flex size-16 items-center justify-center rounded-2xl
-            border border-slate-100 bg-slate-50 shadow-sm
-            md:mb-6 md:size-20
-          "
+          className="mx-auto mb-4 flex size-16 items-center justify-center rounded-2xl border border-slate-100 bg-slate-50 shadow-sm md:mb-6 md:size-20"
         >
           {config.icon}
         </div>
@@ -155,17 +127,12 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
             transition={{ duration: 0.2, ease: "easeOut" }}
           >
             {/* Title */}
-            <h1 className="mb-3 text-2xl font-bold tracking-tight text-slate-900">
-              {title}
-            </h1>
+            <h1 className="mb-3 text-2xl font-bold tracking-tight text-slate-900">{title}</h1>
 
             {/* Coming Soon Badge */}
             <div className="mb-5">
               <span
-                className="
-                  inline-block rounded-full bg-illini-orange px-3 py-1 text-xs
-                  font-semibold text-white
-                "
+                className="bg-illini-orange inline-block rounded-full px-3 py-1 text-xs font-semibold text-white"
               >
                 {t.comingSoon}
               </span>
@@ -173,9 +140,7 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
 
             {/* Description */}
             <p
-              className="
-                mx-auto mb-8 min-h-12 max-w-sm text-sm/relaxed text-slate-500
-              "
+              className="mx-auto mb-8 min-h-12 max-w-sm text-sm/relaxed text-slate-500"
             >
               {desc}
             </p>
@@ -191,13 +156,7 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
               onChange={(e) => setEmail(e.target.value)}
               placeholder={t.emailPlaceholder}
               required
-              className="
-                w-full rounded-full border border-slate-200 bg-white px-4 py-3
-                text-sm text-slate-900 placeholder-slate-400 shadow-sm
-                transition-all
-                focus:border-slate-300 focus:ring-2 focus:ring-illini-blue/10
-                focus:outline-none
-              "
+              className="focus:ring-illini-blue/10 w-full rounded-full border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 shadow-sm transition-all focus:border-slate-300 focus:ring-2 focus:outline-none"
             />
             <AnimatePresence mode="wait">
               <motion.button
@@ -208,39 +167,22 @@ export const AgentLandingPage: React.FC<AgentLandingPageProps> = ({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.15 }}
-                className="
-                  w-full rounded-full bg-illini-orange py-3 text-sm
-                  font-semibold text-white shadow-md transition-colors
-                  hover:bg-illini-orange/90
-                  active:scale-[0.98]
-                  disabled:opacity-60
-                "
+                className="bg-illini-orange hover:bg-illini-orange/90 w-full rounded-full py-3 text-sm font-semibold text-white shadow-md transition-colors active:scale-[0.98] disabled:opacity-60"
               >
-                {submitting
-                  ? language === "zh"
-                    ? "提交中…"
-                    : "Submitting…"
-                  : t.notifyMe}
+                {submitting ? (language === "zh" ? "提交中…" : "Submitting…") : t.notifyMe}
               </motion.button>
             </AnimatePresence>
-            {error && (
-              <p className="text-center text-xs text-red-500">{error}</p>
-            )}
+            {error && <p className="text-center text-xs text-red-500">{error}</p>}
           </form>
         ) : (
           <div
-            className="
-              mx-auto max-w-xs rounded-2xl border border-slate-100 bg-slate-50
-              p-5
-            "
+            className="mx-auto max-w-xs rounded-2xl border border-slate-100 bg-slate-50 p-5"
           >
             <span className="mb-2 block text-2xl">✅</span>
-            <p className="text-sm font-medium text-slate-600">
-              {t.emailSuccess}
-            </p>
+            <p className="text-sm font-medium text-slate-600">{t.emailSuccess}</p>
           </div>
         )}
       </div>
     </div>
-  );
-};
+  )
+}

@@ -5,12 +5,13 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { useEffect, useState } from "react";
-import { Typewriter } from "../ui/Typewriter";
-import { LibraryHistoryItem } from "../../types";
-import { libraryService } from "../../services/libraryService";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "../../services/supabase";
+import React, { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
+
+import { libraryService } from "../../services/libraryService"
+import { supabase } from "../../services/supabase"
+import { LibraryHistoryItem } from "../../types"
+import { Typewriter } from "../ui/Typewriter"
 import {
   BaseSidebar,
   SidebarItem,
@@ -20,19 +21,16 @@ import {
   groupByCategory,
   getCategoryOrder,
   TimeCategoryLabels,
-} from "./BaseSidebar";
+} from "./BaseSidebar"
 
 interface LibrarySidebarProps {
-  language: "en" | "zh";
-  currentArticleId?: string | null;
+  language: "en" | "zh"
+  currentArticleId?: string | null
 }
 
-export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
-  language,
-  currentArticleId,
-}) => {
-  const [history, setHistory] = useState<LibraryHistoryItem[]>([]);
-  const navigate = useNavigate();
+export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({ language, currentArticleId }) => {
+  const [history, setHistory] = useState<LibraryHistoryItem[]>([])
+  const navigate = useNavigate()
 
   const t = {
     en: {
@@ -61,7 +59,7 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
       unpin: "取消置顶",
       delete: "删除",
     },
-  }[language];
+  }[language]
 
   const categoryLabels: TimeCategoryLabels = {
     pinned: t.pinned,
@@ -69,16 +67,16 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
     yesterday: t.yesterday,
     thisWeek: t.thisWeek,
     older: t.older,
-  };
+  }
 
   const loadHistory = async () => {
-    const data = await libraryService.getHistory();
-    setHistory(data);
-  };
+    const data = await libraryService.getHistory()
+    setHistory(data)
+  }
 
   // Subscribe to reading_history changes for dynamic refresh
   useEffect(() => {
-    loadHistory();
+    loadHistory()
 
     const channel = supabase
       .channel("reading_history_changes")
@@ -90,68 +88,56 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
           table: "reading_history",
         },
         () => {
-          loadHistory();
-        }
+          loadHistory()
+        },
       )
-      .subscribe();
+      .subscribe()
 
     return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
+      supabase.removeChannel(channel)
+    }
+  }, [])
 
   const handleClearHistory = async () => {
     if (
       window.confirm(
-        language === "zh"
-          ? "确定要清空浏览记录吗？"
-          : "Are you sure you want to clear history?"
+        language === "zh" ? "确定要清空浏览记录吗？" : "Are you sure you want to clear history?",
       )
     ) {
-      await libraryService.clearHistory();
-      loadHistory();
+      await libraryService.clearHistory()
+      loadHistory()
     }
-  };
+  }
 
-  const handleTogglePin = async (
-    id: string,
-    isPinned: boolean,
-    e: React.MouseEvent
-  ) => {
-    e.stopPropagation();
+  const handleTogglePin = async (id: string, isPinned: boolean, e: React.MouseEvent) => {
+    e.stopPropagation()
     try {
-      await libraryService.togglePin(id, isPinned);
-      loadHistory();
+      await libraryService.togglePin(id, isPinned)
+      loadHistory()
     } catch (err) {
-      console.error("Failed to toggle pin:", err);
+      console.error("Failed to toggle pin:", err)
     }
-  };
+  }
 
   const handleDeleteClick = async (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
+    e.stopPropagation()
     if (
       window.confirm(
-        language === "zh"
-          ? "确定要删除这条记录吗？"
-          : "Are you sure you want to delete this item?"
+        language === "zh" ? "确定要删除这条记录吗？" : "Are you sure you want to delete this item?",
       )
     ) {
       try {
-        await libraryService.removeFromHistory(id);
-        loadHistory();
+        await libraryService.removeFromHistory(id)
+        loadHistory()
       } catch (err) {
-        console.error("Failed to delete item:", err);
+        console.error("Failed to delete item:", err)
       }
     }
-  };
+  }
 
-  const groupedHistory = groupByCategory(
-    history,
-    (item) => item.viewedAt,
-    categoryLabels
-  );
+  const groupedHistory = groupByCategory(history, (item) => item.viewedAt, categoryLabels)
 
-  const categoryOrder = getCategoryOrder(categoryLabels);
+  const categoryOrder = getCategoryOrder(categoryLabels)
 
   return (
     <BaseSidebar
@@ -159,19 +145,14 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
       header={
         <div className="mb-2 flex items-center justify-between px-3 py-2">
           <h3
-            className="
-              text-xs font-semibold tracking-wider text-slate-400 uppercase
-            "
+            className="text-xs font-semibold tracking-wider text-slate-400 uppercase"
           >
             {t.title}
           </h3>
           {history.length > 0 && (
             <button
               onClick={handleClearHistory}
-              className="
-                text-[10px] text-slate-500 transition-colors
-                hover:text-white
-              "
+              className="text-[10px] text-slate-500 transition-colors hover:text-white"
             >
               {t.clear}
             </button>
@@ -182,15 +163,13 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
       categoryOrder={categoryOrder}
       emptyState={<SidebarEmptyState message={t.empty} />}
       renderItem={(item) => {
-        const historyItem = item as LibraryHistoryItem;
+        const historyItem = item as LibraryHistoryItem
         return (
           <SidebarItem
             key={historyItem.id}
             id={historyItem.id}
             isActive={historyItem.articleId === currentArticleId}
-            onClick={() =>
-              navigate(`/library/article/${historyItem.articleId}`)
-            }
+            onClick={() => navigate(`/library/article/${historyItem.articleId}`)}
             activeBgClass="bg-white/10 text-white"
             inactiveBgClass="text-slate-300 hover:bg-white/5 hover:text-white"
           >
@@ -208,16 +187,11 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
                 </div>
               </div>
               <div
-                className="
-                  flex gap-0.5 opacity-0 transition-opacity
-                  group-hover:opacity-100
-                "
+                className="flex gap-0.5 opacity-0 transition-opacity group-hover:opacity-100"
               >
                 <PinButton
                   isPinned={historyItem.isPinned}
-                  onClick={(e) =>
-                    handleTogglePin(historyItem.id, historyItem.isPinned, e)
-                  }
+                  onClick={(e) => handleTogglePin(historyItem.id, historyItem.isPinned, e)}
                   label={historyItem.isPinned ? t.unpin : t.pin}
                 />
                 <DeleteButton
@@ -227,8 +201,8 @@ export const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
               </div>
             </div>
           </SidebarItem>
-        );
+        )
       }}
     />
-  );
-};
+  )
+}

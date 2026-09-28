@@ -5,35 +5,32 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { ArticleView } from "../../components/library/ArticleView";
-import { ARTICLES } from "../../constants";
-import { Language } from "../../types";
-import { libraryService } from "../../services/libraryService";
+import React, { useEffect } from "react"
+import { useNavigate, useParams } from "react-router-dom"
+
+import { ArticleView } from "../../components/library/ArticleView"
+import { ARTICLES } from "../../constants"
+import { libraryService } from "../../services/libraryService"
+import { Language } from "../../types"
 
 interface LibraryArticlePageProps {
-  language: Language;
+  language: Language
 }
 
-const LibraryArticlePage: React.FC<LibraryArticlePageProps> = ({
-  language,
-}) => {
-  const { articleId } = useParams<{ articleId: string }>();
-  const navigate = useNavigate();
+const LibraryArticlePage: React.FC<LibraryArticlePageProps> = ({ language }) => {
+  const { articleId } = useParams<{ articleId: string }>()
+  const navigate = useNavigate()
 
-  const article = ARTICLES.find((item) => item.id === articleId);
+  const article = ARTICLES.find((item) => item.id === articleId)
 
   useEffect(() => {
     if (article) {
-      libraryService.addToHistory(article);
+      libraryService.addToHistory(article)
     }
-  }, [article]);
+  }, [article])
 
   if (!article) {
-    return (
-      <div className="p-8 text-center text-slate-500">Article not found</div>
-    );
+    return <div className="p-8 text-center text-slate-500">Article not found</div>
   }
 
   return (
@@ -43,13 +40,13 @@ const LibraryArticlePage: React.FC<LibraryArticlePageProps> = ({
           article={article}
           onBack={() => navigate("/library")}
           onSearch={(query) => {
-            navigate(`/library?q=${encodeURIComponent(query)}`);
+            navigate(`/library?q=${encodeURIComponent(query)}`)
           }}
           language={language}
         />
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default LibraryArticlePage;
+export default LibraryArticlePage

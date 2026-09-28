@@ -5,10 +5,10 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { Dorm } from "../types/index";
-import { normalizeDorm } from "../../../utils/roomOptions";
-import { finalizeDormRecord } from "../../../utils/dormData";
-import { applyDormOfficialOverride } from "./dormOfficialOverrides";
+import { finalizeDormRecord } from "../../../utils/dormData"
+import { normalizeDorm } from "../../../utils/roomOptions"
+import { Dorm } from "../types/index"
+import { applyDormOfficialOverride } from "./dormOfficialOverrides"
 
 // Accurate UIUC dorm coordinates based on campus geography
 // Campus reference: Main Quad (40.1074, -88.2317), Engineering Quad (40.1130, -88.2280)
@@ -70,10 +70,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
       "Modern amenities",
     ],
     pros_zh: [],
-    cons: [
-      "Can be competitive to get into",
-      "Smaller room sizes in older wings",
-    ],
+    cons: ["Can be competitive to get into", "Smaller room sizes in older wings"],
     cons_zh: [],
     price: 14500,
     priceRange: "$$$$",
@@ -167,11 +164,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
       "One of the newest halls on campus offering premium amenities. Located near to ARC gym and Memorial Stadium. Known for being very social.",
     description_zh: "",
     imageUrl: "https://picsum.photos/800/600?random=2",
-    pros: [
-      "Very modern rooms",
-      "Close to the ARC (Gym)",
-      "Great social atmosphere",
-    ],
+    pros: ["Very modern rooms", "Close to the ARC (Gym)", "Great social atmosphere"],
     pros_zh: [],
     cons: ["Most expensive options", "Far from engineering quad"],
     cons_zh: [],
@@ -183,8 +176,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "1B1B",
         price: 15500,
         sqft: 140,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/NUGENT-1B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/NUGENT-1B1B.png",
         description: "Single room with semi-private bathroom",
         available: true,
       },
@@ -192,8 +184,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "2B1B",
         price: 15200,
         sqft: 220,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/NUGENT-2B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/NUGENT-2B1B.png",
         description: "Double room with semi-private bathroom",
         available: true,
       },
@@ -201,8 +192,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "4B2B",
         price: 14800,
         sqft: 450,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/NUGENT-4B2B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/NUGENT-4B2B.png",
         description: "Quad suite with 2 bathrooms",
         available: true,
       },
@@ -263,11 +253,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
       "Named after the first Native American graduate of UIUC. A modern hall in Ikenberry North with premium amenities near the ARC.",
     description_zh: "",
     imageUrl: "https://picsum.photos/800/600?random=2a",
-    pros: [
-      "Very modern rooms",
-      "Close to the ARC (Gym)",
-      "Great social atmosphere",
-    ],
+    pros: ["Very modern rooms", "Close to the ARC (Gym)", "Great social atmosphere"],
     pros_zh: [],
     cons: ["Most expensive options", "Far from engineering quad"],
     cons_zh: [],
@@ -279,8 +265,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "1B1B",
         price: 15500,
         sqft: 140,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/WASSAJA-1B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/WASSAJA-1B1B.png",
         description: "Single room with semi-private bathroom",
         available: true,
       },
@@ -288,8 +273,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "2B1B",
         price: 15200,
         sqft: 220,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/WASSAJA-2B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/WASSAJA-2B1B.png",
         description: "Double room with semi-private bathroom",
         available: true,
       },
@@ -297,8 +281,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "4B2B",
         price: 14800,
         sqft: 450,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/WASSAJA-4B2B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/WASSAJA-4B2B.png",
         description: "Quad suite with 2 bathrooms",
         available: true,
       },
@@ -373,8 +356,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "1B1B",
         price: 15500,
         sqft: 140,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/BOUSEFIELD-1B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/BOUSEFIELD-1B1B.png",
         description: "Single room with semi-private bathroom",
         available: true,
       },
@@ -382,8 +364,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "2B1B",
         price: 15200,
         sqft: 220,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/BOUSEFIELD-2B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/BOUSEFIELD-2B1B.png",
         description: "Double room with semi-private bathroom",
         available: true,
       },
@@ -391,8 +372,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "4B2B",
         price: 14800,
         sqft: 450,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/BOUSEFIELD-4B2B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/BOUSEFIELD-4B2B.png",
         description: "Quad suite with 2 bathrooms",
         available: true,
       },
@@ -450,11 +430,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
       'PAR is known for its diversity and famous late-night dining options. It features "Babcock" and "Carr" halls. A bit further south but well connected by bus.',
     description_zh: "",
     imageUrl: "https://picsum.photos/800/600?random=3",
-    pros: [
-      "Late night dining is a lifesaver",
-      "Very diverse community",
-      "Good bus access",
-    ],
+    pros: ["Late night dining is a lifesaver", "Very diverse community", "Good bus access"],
     pros_zh: [],
     cons: ["Far from Green Street", "Shared community bathrooms"],
     cons_zh: [],
@@ -627,11 +603,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
       "Home to the Unit One LLC, Allen is a hub for creative students. It features music practice rooms, a recording studio, and guest-in-residence programs.",
     description_zh: "",
     imageUrl: "https://picsum.photos/800/600?random=5",
-    pros: [
-      "Incredible community and programs",
-      "In-house dining hall",
-      "Creative atmosphere",
-    ],
+    pros: ["Incredible community and programs", "In-house dining hall", "Creative atmosphere"],
     pros_zh: [],
     cons: ["No Air Conditioning (usually)", "Older facilities"],
     cons_zh: [],
@@ -643,8 +615,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "1B1B",
         price: 8800,
         sqft: 105,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/ALLEN-1B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/ALLEN-1B1B.png",
         description: "Single room with community bathroom",
         available: true,
       },
@@ -652,8 +623,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "2B1B",
         price: 8500,
         sqft: 160,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/ALLEN-2B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/ALLEN-2B1B.png",
         description: "Double room with community bathroom",
         available: true,
       },
@@ -661,8 +631,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "3B1B",
         price: 8000,
         sqft: 220,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/ALLEN-3B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/ALLEN-3B1B.png",
         description: "Triple room with community bathroom",
         available: true,
       },
@@ -719,11 +688,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
       "A historic residence hall primarily for female-identified students. Known for its beautiful architecture and quiet, study-focused environment.",
     description_zh: "",
     imageUrl: "https://picsum.photos/800/600?random=6",
-    pros: [
-      "Very quiet and safe",
-      "Beautiful architecture",
-      "Close to Krannert Center",
-    ],
+    pros: ["Very quiet and safe", "Beautiful architecture", "Close to Krannert Center"],
     pros_zh: [],
     cons: ["No AC in many parts", "Less social party scene"],
     cons_zh: [],
@@ -735,8 +700,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "1B1B",
         price: 9000,
         sqft: 115,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/BUSEYEVANS-1B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/BUSEYEVANS-1B1B.png",
         description: "Single room with community bathroom",
         available: true,
       },
@@ -744,8 +708,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "2B1B",
         price: 8800,
         sqft: 170,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/BUSEYEVANS-2B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/BUSEYEVANS-2B1B.png",
         description: "Double room with community bathroom",
         available: true,
       },
@@ -753,8 +716,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "Studio",
         price: 9500,
         sqft: 140,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/BUSEYEVANS-Studio.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/BUSEYEVANS-Studio.png",
         description: "Private room with sink",
         available: true,
       },
@@ -815,11 +777,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
       'A substance-free hall in Ikenberry South. Part of the traditional "Six Pack" with good access to Ike Dining Hall.',
     description_zh: "",
     imageUrl: "https://picsum.photos/800/600?random=7",
-    pros: [
-      "Close to Ike Dining Hall",
-      "Substance-free environment",
-      "Social environment",
-    ],
+    pros: ["Close to Ike Dining Hall", "Substance-free environment", "Social environment"],
     pros_zh: [],
     cons: ["Older buildings", "Community bathrooms"],
     cons_zh: [],
@@ -831,8 +789,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "1B1B",
         price: 11500,
         sqft: 115,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/SNYDER-1B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/SNYDER-1B1B.png",
         description: "Single room with community bathroom",
         available: true,
       },
@@ -840,8 +797,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "2B1B",
         price: 11200,
         sqft: 175,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/SNYDER-2B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/SNYDER-2B1B.png",
         description: "Double room with community bathroom",
         available: true,
       },
@@ -849,8 +805,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "3B1B",
         price: 10800,
         sqft: 240,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/SNYDER-3B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/SNYDER-3B1B.png",
         description: "Triple room with community bathroom",
         available: true,
       },
@@ -921,8 +876,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "1B1B",
         price: 11500,
         sqft: 115,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/HOPKINS-1B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/HOPKINS-1B1B.png",
         description: "Single room with community bathroom",
         available: true,
       },
@@ -930,8 +884,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "2B1B",
         price: 11200,
         sqft: 175,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/HOPKINS-2B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/HOPKINS-2B1B.png",
         description: "Double room with community bathroom",
         available: true,
       },
@@ -939,8 +892,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "3B1B",
         price: 10800,
         sqft: 240,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/HOPKINS-3B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/HOPKINS-3B1B.png",
         description: "Triple room with community bathroom",
         available: true,
       },
@@ -999,11 +951,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
       "Located in Ikenberry North, Weston houses the Exploration LLC. It is extremely popular among freshmen and known for being very social.",
     description_zh: "",
     imageUrl: "https://picsum.photos/800/600?random=9",
-    pros: [
-      "Prime location in Ike North",
-      "Very social atmosphere",
-      "Exploration LLC support",
-    ],
+    pros: ["Prime location in Ike North", "Very social atmosphere", "Exploration LLC support"],
     pros_zh: [],
     cons: ["Loud on weekends", "Communal bathrooms"],
     cons_zh: [],
@@ -1015,8 +963,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "1B1B",
         price: 11800,
         sqft: 120,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/WESTON-1B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/WESTON-1B1B.png",
         description: "Single room with community bathroom",
         available: true,
       },
@@ -1024,8 +971,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "2B1B",
         price: 11500,
         sqft: 180,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/WESTON-2B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/WESTON-2B1B.png",
         description: "Double room with community bathroom",
         available: true,
       },
@@ -1033,8 +979,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "3B1B",
         price: 11000,
         sqft: 250,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/WESTON-3B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/WESTON-3B1B.png",
         description: "Triple room with community bathroom",
         available: true,
       },
@@ -1052,14 +997,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
     ac: true,
     dining: "inside",
     bathroomType: "semi-private",
-    tags: [
-      "Social",
-      "Transfer Cluster",
-      "Ike South",
-      "Elevator",
-      "Laundry",
-      "Study Rooms",
-    ],
+    tags: ["Social", "Transfer Cluster", "Ike South", "Elevator", "Laundry", "Study Rooms"],
     structuredTags: {
       elevator: true,
       laundry: true,
@@ -1083,11 +1021,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
       "A large residence hall in Ikenberry South. Features a Transfer Community and is known for being a very social hub with easy access to the quad.",
     description_zh: "",
     imageUrl: "https://picsum.photos/800/600?random=10",
-    pros: [
-      "Social vibe",
-      "Close to bus stops",
-      "Good location for Gies business",
-    ],
+    pros: ["Social vibe", "Close to bus stops", "Good location for Gies business"],
     pros_zh: [],
     cons: ["Elevators can be slow", "Older facilities"],
     cons_zh: [],
@@ -1099,8 +1033,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "1B1B",
         price: 11500,
         sqft: 115,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/SCOTT-1B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/SCOTT-1B1B.png",
         description: "Single room with community bathroom",
         available: true,
       },
@@ -1108,8 +1041,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "2B1B",
         price: 11200,
         sqft: 175,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/SCOTT-2B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/SCOTT-2B1B.png",
         description: "Double room with community bathroom",
         available: true,
       },
@@ -1117,8 +1049,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "3B1B",
         price: 10800,
         sqft: 240,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/SCOTT-3B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/SCOTT-3B1B.png",
         description: "Triple room with community bathroom",
         available: true,
       },
@@ -1189,8 +1120,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "1B1B",
         price: 6500,
         sqft: 100,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/TAPT-1B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/TAPT-1B1B.png",
         description: "Single room with community bathroom",
         available: true,
       },
@@ -1198,8 +1128,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "2B1B",
         price: 6200,
         sqft: 150,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/TAPT-2B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/TAPT-2B1B.png",
         description: "Double room with community bathroom",
         available: true,
       },
@@ -1207,8 +1136,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "3B1B",
         price: 5900,
         sqft: 200,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/TAPT-3B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/TAPT-3B1B.png",
         description: "Triple room with community bathroom",
         available: true,
       },
@@ -1277,8 +1205,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "1B1B",
         price: 6500,
         sqft: 100,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/VANDOREN-1B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/VANDOREN-1B1B.png",
         description: "Single room with community bathroom",
         available: true,
       },
@@ -1286,8 +1213,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "2B1B",
         price: 6200,
         sqft: 150,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/VANDOREN-2B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/VANDOREN-2B1B.png",
         description: "Double room with community bathroom",
         available: true,
       },
@@ -1295,8 +1221,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "3B1B",
         price: 5900,
         sqft: 200,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/VANDOREN-3B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/VANDOREN-3B1B.png",
         description: "Triple room with community bathroom",
         available: true,
       },
@@ -1355,11 +1280,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
       "Reserved for sophomores and above. Daniels offers single and double rooms with private or semi-private bathrooms. Very quiet and academically focused.",
     description_zh: "",
     imageUrl: "https://picsum.photos/800/600?random=11",
-    pros: [
-      "Private/Semi-private bathrooms",
-      "Quiet study environment",
-      "Close to Green St",
-    ],
+    pros: ["Private/Semi-private bathrooms", "Quiet study environment", "Close to Green St"],
     pros_zh: [],
     cons: ["No freshmen allowed", "Less social interaction"],
     cons_zh: [],
@@ -1371,8 +1292,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "1B1B",
         price: 14500,
         sqft: 135,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/DANIELS-1B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/DANIELS-1B1B.png",
         description: "Single room with private bathroom",
         available: true,
       },
@@ -1380,8 +1300,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "2B1B",
         price: 14200,
         sqft: 210,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/DANIELS-2B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/DANIELS-2B1B.png",
         description: "Double room with semi-private bathroom",
         available: true,
       },
@@ -1389,8 +1308,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "2B2B",
         price: 15500,
         sqft: 250,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/DANIELS-2B2B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/DANIELS-2B2B.png",
         description: "Double room with private bathroom",
         available: true,
       },
@@ -1398,8 +1316,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "Studio",
         price: 15200,
         sqft: 180,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/DANIELS-Studio.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/DANIELS-Studio.png",
         description: "Private studio with kitchenette",
         available: true,
       },
@@ -1459,11 +1376,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
       "Located near the library and psychology building. Sherman is popular for its single rooms and graduate student population. Very independent living style.",
     description_zh: "",
     imageUrl: "https://picsum.photos/800/600?random=12",
-    pros: [
-      "Single rooms available",
-      "Great central location",
-      "Mature atmosphere",
-    ],
+    pros: ["Single rooms available", "Great central location", "Mature atmosphere"],
     pros_zh: [],
     cons: ["Rooms are small", "No meal plan requirement (can be a pro)"],
     cons_zh: [],
@@ -1475,8 +1388,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "1B1B",
         price: 13000,
         sqft: 110,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/SHERMAN-1B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/SHERMAN-1B1B.png",
         description: "Single room with private bathroom",
         available: true,
       },
@@ -1484,8 +1396,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "2B1B",
         price: 12500,
         sqft: 190,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/SHERMAN-2B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/SHERMAN-2B1B.png",
         description: "Double room with semi-private bathroom",
         available: true,
       },
@@ -1493,8 +1404,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "Studio",
         price: 14000,
         sqft: 150,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/SHERMAN-Studio.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/SHERMAN-Studio.png",
         description: "Private studio with kitchenette",
         available: true,
       },
@@ -1553,11 +1463,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
       "Home to the Scholars (Leonard) and Sustainability (Shelden) communities. A quieter hall connected to Allen Hall, sharing dining facilities.",
     description_zh: "",
     imageUrl: "https://picsum.photos/800/600?random=13",
-    pros: [
-      "Quiet study environment",
-      "Connected to Allen dining",
-      "Close to CRCE gym",
-    ],
+    pros: ["Quiet study environment", "Connected to Allen dining", "Close to CRCE gym"],
     pros_zh: [],
     cons: ["No AC", "Older building architecture"],
     cons_zh: [],
@@ -1645,11 +1551,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
       "A popular Private Certified Housing option known for its social scene and amenities like an indoor pool. Often associated with Greek life.",
     description_zh: "",
     imageUrl: "https://picsum.photos/800/600?random=15",
-    pros: [
-      "Indoor pool",
-      "Larger rooms with semi-private baths",
-      "Social atmosphere",
-    ],
+    pros: ["Indoor pool", "Larger rooms with semi-private baths", "Social atmosphere"],
     pros_zh: [],
     cons: ["Can be expensive", "Food quality varies"],
     cons_zh: [],
@@ -1661,8 +1563,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "2B1B",
         price: 15000,
         sqft: 280,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/BROMLEY-2B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/BROMLEY-2B1B.png",
         description: "Double room with private bathroom",
         available: true,
       },
@@ -1670,8 +1571,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "2B2B",
         price: 15500,
         sqft: 320,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/BROMLEY-2B2B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/BROMLEY-2B2B.png",
         description: "Double room with private bathroom",
         available: true,
       },
@@ -1679,8 +1579,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "Suite",
         price: 15800,
         sqft: 400,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/BROMLEY-Suite.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/BROMLEY-Suite.png",
         description: "Suite with shared living area",
         available: true,
       },
@@ -1752,8 +1651,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "Studio",
         price: 14200,
         sqft: 200,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/ILLINITOWER-Studio.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/ILLINITOWER-Studio.png",
         description: "Studio with full kitchen",
         available: true,
       },
@@ -1761,8 +1659,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "1B1B",
         price: 13800,
         sqft: 180,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/ILLINITOWER-1B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/ILLINITOWER-1B1B.png",
         description: "Single bedroom with shared bathroom",
         available: true,
       },
@@ -1770,8 +1667,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "2B1B",
         price: 13500,
         sqft: 320,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/ILLINITOWER-2B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/ILLINITOWER-2B1B.png",
         description: "Two-bedroom with shared bathroom",
         available: true,
       },
@@ -1779,8 +1675,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "4B2B",
         price: 12800,
         sqft: 580,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/ILLINITOWER-4B2B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/ILLINITOWER-4B2B.png",
         description: "Four-bedroom suite with 2 baths",
         available: true,
       },
@@ -1851,8 +1746,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "1B1B",
         price: 12800,
         sqft: 125,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/NEWMAN-1B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/NEWMAN-1B1B.png",
         description: "Single room with shared bathroom",
         available: true,
       },
@@ -1860,8 +1754,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "2B1B",
         price: 12500,
         sqft: 190,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/NEWMAN-2B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/NEWMAN-2B1B.png",
         description: "Double room with shared bathroom",
         available: true,
       },
@@ -1869,8 +1762,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "Studio",
         price: 13500,
         sqft: 160,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/NEWMAN-Studio.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/NEWMAN-Studio.png",
         description: "Private studio with kitchenette",
         available: true,
       },
@@ -1878,8 +1770,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "2B2B",
         price: 13800,
         sqft: 240,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/NEWMAN-2B2B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/NEWMAN-2B2B.png",
         description: "Double room with private bathroom",
         available: true,
       },
@@ -1949,8 +1840,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "1B1B",
         price: 15000,
         sqft: 140,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/HENDRICK-1B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/HENDRICK-1B1B.png",
         description: "Single room with private bathroom",
         available: true,
       },
@@ -1958,8 +1848,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "2B1B",
         price: 14800,
         sqft: 250,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/HENDRICK-2B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/HENDRICK-2B1B.png",
         description: "Double room with private bathroom",
         available: true,
       },
@@ -1967,8 +1856,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "Studio",
         price: 15500,
         sqft: 180,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/HENDRICK-Studio.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/HENDRICK-Studio.png",
         description: "Private studio with kitchenette",
         available: true,
       },
@@ -2034,11 +1922,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
       "Modern facilities",
     ],
     pros_zh: [],
-    cons: [
-      "Far from engineering quad",
-      "Shared community bathrooms",
-      "Longer walk to classes",
-    ],
+    cons: ["Far from engineering quad", "Shared community bathrooms", "Longer walk to classes"],
     cons_zh: [],
     price: 11500,
     priceRange: "$$$",
@@ -2048,8 +1932,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "1B1B",
         price: 11800,
         sqft: 130,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/PRESBY-1B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/PRESBY-1B1B.png",
         description: "Single room with shared bathroom",
         available: true,
       },
@@ -2057,8 +1940,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "2B1B",
         price: 11200,
         sqft: 200,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/PRESBY-2B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/PRESBY-2B1B.png",
         description: "Double room with shared bathroom",
         available: true,
       },
@@ -2066,8 +1948,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "3B1B",
         price: 10800,
         sqft: 280,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/PRESBY-3B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/PRESBY-3B1B.png",
         description: "Triple room with shared bathroom",
         available: true,
       },
@@ -2126,18 +2007,9 @@ const RAW_UIUC_DORMS: Dorm[] = [
       "A recently renovated hall connecting to Presby. Features modern study spaces and proximity to campus recreation facilities. Popular for students who prefer a quieter environment.",
     description_zh: "",
     imageUrl: "https://picsum.photos/800/600?random=21",
-    pros: [
-      "Recently renovated (2012)",
-      "Modern study spaces",
-      "Quiet environment",
-      "Close to ARC",
-    ],
+    pros: ["Recently renovated (2012)", "Modern study spaces", "Quiet environment", "Close to ARC"],
     pros_zh: [],
-    cons: [
-      "No dining hall in building",
-      "Further from main quad",
-      "Community bathrooms",
-    ],
+    cons: ["No dining hall in building", "Further from main quad", "Community bathrooms"],
     cons_zh: [],
     price: 11800,
     priceRange: "$$$",
@@ -2147,8 +2019,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "1B1B",
         price: 12000,
         sqft: 135,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/ARMORY-1B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/ARMORY-1B1B.png",
         description: "Single room with shared bathroom",
         available: true,
       },
@@ -2156,8 +2027,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "2B1B",
         price: 11600,
         sqft: 205,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/ARMORY-2B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/ARMORY-2B1B.png",
         description: "Double room with shared bathroom",
         available: true,
       },
@@ -2165,8 +2035,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "3B1B",
         price: 11200,
         sqft: 285,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/ARMORY-3B1B.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/ARMORY-3B1B.png",
         description: "Triple room with shared bathroom",
         available: true,
       },
@@ -2174,8 +2043,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
         type: "Studio",
         price: 12500,
         sqft: 180,
-        imageUrl:
-          "https://housing.illinois.edu/Images/FloorPlans/ARMORY-Studio.png",
+        imageUrl: "https://housing.illinois.edu/Images/FloorPlans/ARMORY-Studio.png",
         description: "Private studio room",
         available: true,
       },
@@ -2183,7 +2051,7 @@ const RAW_UIUC_DORMS: Dorm[] = [
     lat: 40.1057022499472,
     lng: -88.2367063025306,
   },
-];
+]
 
 const _DORM_NAME_ZH_BY_ID: Record<string, string> = {
   isr: "Illinois Street Residence (ISR)",
@@ -2210,7 +2078,7 @@ const _DORM_NAME_ZH_BY_ID: Record<string, string> = {
   "eugene-field": "Eugene Field Hall",
   presby: "Presby Hall",
   armory: "Armory Hall",
-};
+}
 
 const _LOCATION_ZH: Record<Dorm["location"], string> = {
   Ikenberry: "Ikenberry",
@@ -2218,50 +2086,40 @@ const _LOCATION_ZH: Record<Dorm["location"], string> = {
   "PAR/FAR": "PAR/FAR",
   Campustown: "Campustown",
   "South Campus": "South Campus",
-};
+}
 
 const HOUSING_TYPE_ZH: Record<Dorm["housingType"], string> = {
   URH: "University Housing",
   PCH: "Private Certified Housing",
-};
+}
 
 const buildDefaultProsZh = (dorm: Dorm): string[] => [
   `位于${dorm.location}，日常通勤较方便`,
   dorm.ac ? "配备空调，夏季居住更舒适" : "房间无空调，建议准备风扇",
-  dorm.dining === "inside"
-    ? "食堂可达，用餐便利"
-    : "可选择周边餐饮，选择更灵活",
-];
+  dorm.dining === "inside" ? "食堂可达，用餐便利" : "可选择周边餐饮，选择更灵活",
+]
 
 const buildDefaultConsZh = (dorm: Dorm): string[] => [
   `年费用约 $${dorm.price.toLocaleString()}，请结合预算评估`,
-  dorm.housingType === "PCH"
-    ? "私营宿舍管理规则与校内宿舍存在差异"
-    : "高峰时段公共区域可能较拥挤",
+  dorm.housingType === "PCH" ? "私营宿舍管理规则与校内宿舍存在差异" : "高峰时段公共区域可能较拥挤",
   dorm.location === "Ikenberry" || dorm.location === "South Campus"
     ? "距离部分院系步行时间可能偏长"
     : "热门时段周边人流较多",
-];
+]
 
 const enrichDormZhContent = (dorm: Dorm): Dorm => {
   // User requested English names for Dorms and Locations even in Chinese mode
-  const nameZh = dorm.name; // Use English name
+  const nameZh = dorm.name // Use English name
 
   // Use English location name directly
-  const locationZh = dorm.location;
+  const locationZh = dorm.location
 
   const descriptionZh =
     dorm.description_zh?.trim() ||
-    `${nameZh}位于${locationZh}，属于${HOUSING_TYPE_ZH[dorm.housingType]}。年住宿费用约 $${dorm.price.toLocaleString()}，${dorm.ac ? "配有空调" : "未配备空调"}，${dorm.dining === "inside" ? "就近可使用食堂。" : "需前往附近区域就餐。"}`;
+    `${nameZh}位于${locationZh}，属于${HOUSING_TYPE_ZH[dorm.housingType]}。年住宿费用约 $${dorm.price.toLocaleString()}，${dorm.ac ? "配有空调" : "未配备空调"}，${dorm.dining === "inside" ? "就近可使用食堂。" : "需前往附近区域就餐。"}`
 
-  const prosZh =
-    dorm.pros_zh && dorm.pros_zh.length > 0
-      ? dorm.pros_zh
-      : buildDefaultProsZh(dorm);
-  const consZh =
-    dorm.cons_zh && dorm.cons_zh.length > 0
-      ? dorm.cons_zh
-      : buildDefaultConsZh(dorm);
+  const prosZh = dorm.pros_zh && dorm.pros_zh.length > 0 ? dorm.pros_zh : buildDefaultProsZh(dorm)
+  const consZh = dorm.cons_zh && dorm.cons_zh.length > 0 ? dorm.cons_zh : buildDefaultConsZh(dorm)
 
   return {
     ...dorm,
@@ -2270,13 +2128,13 @@ const enrichDormZhContent = (dorm: Dorm): Dorm => {
     pros_zh: prosZh,
     cons_zh: consZh,
     location_zh: locationZh,
-  };
-};
+  }
+}
 
 export const UIUC_DORMS: Dorm[] = RAW_UIUC_DORMS.map(applyDormOfficialOverride)
   .map(finalizeDormRecord)
   .map(enrichDormZhContent)
-  .map(normalizeDorm);
+  .map(normalizeDorm)
 
 // Export dorm IDs for individual routes
-export const DORM_IDS = UIUC_DORMS.map((dorm) => dorm.id);
+export const DORM_IDS = UIUC_DORMS.map((dorm) => dorm.id)

@@ -5,30 +5,23 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import {
-  DormOverride,
-  clean,
-  plan,
-  urhPage,
-  urls,
-} from "./dormOfficialOverrideUtils";
+import { DormOverride, clean, plan, urhPage, urls } from "./dormOfficialOverrideUtils"
 
-const twinXl = (value: Parameters<typeof plan>[0]) =>
-  plan({ bedSize: "Twin XL", ...value });
+const twinXl = (value: Parameters<typeof plan>[0]) => plan({ bedSize: "Twin XL", ...value })
 
 export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
   snyder: {
     website: urhPage("snyder"),
     address: "206 E. Peabody Dr.",
     imageUrl: clean(
-      "https://www.housing.illinois.edu/sites/default/files/styles/hero_image/public/paragraphs/hero/2023-01/Snyder-Exterior-1.jpg?h=2d298297&itok=BDi6vIp8"
+      "https://www.housing.illinois.edu/sites/default/files/styles/hero_image/public/paragraphs/hero/2023-01/Snyder-Exterior-1.jpg?h=2d298297&itok=BDi6vIp8",
     ),
     galleryImages: urls(
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/DSC05361_0.jpg?itok=sKHlXT9q",
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/DSC05366.jpg?itok=zu0iMjl0",
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/IkeStandard_top_classic_furniture.jpg?itok=yQtQt0DP",
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/Ikenberry-Commons-triple-Top.jpg?itok=kRvoGHei",
-      "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/Ikenberry%20Corner%20Triple%20Top.jpg?itok=gWASHrrS"
+      "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/Ikenberry%20Corner%20Triple%20Top.jpg?itok=gWASHrrS",
     ),
     dining: "nearby",
     diningNearbyDetail: "SDRP dining is a short walk from Snyder Hall.",
@@ -64,11 +57,11 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         sqft: 185,
         price: 14558,
         imageUrls: urls(
-          "https://www.housing.illinois.edu/sites/default/files/2023-01/snyder-double.pdf"
+          "https://www.housing.illinois.edu/sites/default/files/2023-01/snyder-double.pdf",
         ),
         photoUrls: urls(
           "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/IkeStandard_top_classic_furniture.jpg?itok=yQtQt0DP",
-          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/IkenberryStandard_iso_classic_furniture.jpg?itok=uCLIuQEC"
+          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/IkenberryStandard_iso_classic_furniture.jpg?itok=uCLIuQEC",
         ),
         description: "Standard double room.",
       }),
@@ -79,11 +72,11 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         sqft: 235,
         price: 13774,
         imageUrls: urls(
-          "https://www.housing.illinois.edu/sites/default/files/2023-01/snyder-triple.pdf"
+          "https://www.housing.illinois.edu/sites/default/files/2023-01/snyder-triple.pdf",
         ),
         photoUrls: urls(
           "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Ikenberry-Commons-triple-Top.jpg?itok=kRvoGHei",
-          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Ikenberry-Commons-triple-Iso.jpg?itok=l32nWyHk"
+          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Ikenberry-Commons-triple-Iso.jpg?itok=l32nWyHk",
         ),
         description: "Triple room.",
       }),
@@ -93,18 +86,17 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
     website: urhPage("hopkins"),
     address: "1208 S. First St.",
     imageUrl: clean(
-      "https://www.housing.illinois.edu/sites/default/files/styles/hero_image/public/paragraphs/hero/2023-01/HOPKINS-INT%20%281%29.jpg?h=086dfb23&itok=86Ir6OBA"
+      "https://www.housing.illinois.edu/sites/default/files/styles/hero_image/public/paragraphs/hero/2023-01/HOPKINS-INT%20%281%29.jpg?h=086dfb23&itok=86Ir6OBA",
     ),
     galleryImages: urls(
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/Hopkins-Lounge-1.jpg?itok=h3dfrhet",
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/DSC05357.jpg?itok=AHkO-gxv",
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/DSC05361.jpg?itok=j-JTNRql",
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/Ikenberry-Standard-Iso.jpg?itok=AA2OHSY1",
-      "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/Ike-Dining-2.jpg?itok=g58GHwDi"
+      "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/Ike-Dining-2.jpg?itok=g58GHwDi",
     ),
     dining: "nearby",
-    diningNearbyDetail:
-      "SDRP dining, library, and programs are a short walk from Hopkins.",
+    diningNearbyDetail: "SDRP dining, library, and programs are a short walk from Hopkins.",
     categorizedTags: {
       livingConditions: [],
       facilities: ["laundry", "studyLounge", "computerLab", "library"],
@@ -135,10 +127,10 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         sqft: 185,
         price: 14558,
         imageUrls: urls(
-          "https://www.housing.illinois.edu/sites/default/files/2023-01/hopkins-double.pdf"
+          "https://www.housing.illinois.edu/sites/default/files/2023-01/hopkins-double.pdf",
         ),
         photoUrls: urls(
-          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Ikenberry-Standard-Iso.jpg?itok=GPuiHdpQ"
+          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Ikenberry-Standard-Iso.jpg?itok=GPuiHdpQ",
         ),
         description: "Standard double room.",
       }),
@@ -149,11 +141,11 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         sqft: 235,
         price: 13774,
         imageUrls: urls(
-          "https://www.housing.illinois.edu/sites/default/files/2023-01/hopkins-triple.pdf"
+          "https://www.housing.illinois.edu/sites/default/files/2023-01/hopkins-triple.pdf",
         ),
         photoUrls: urls(
           "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Ikenberry-Commons-triple-iso-new-furniture.jpg?itok=3H__i25e",
-          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/IkeCornerTriple_top_new_furniture.jpg?itok=hOCv_BPL"
+          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/IkeCornerTriple_top_new_furniture.jpg?itok=hOCv_BPL",
         ),
         description: "Triple room or corner triple in Hopkins.",
       }),
@@ -163,18 +155,17 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
     website: urhPage("weston"),
     address: "204 E. Peabody Dr.",
     imageUrl: clean(
-      "https://www.housing.illinois.edu/sites/default/files/styles/hero_image/public/paragraphs/hero/2023-01/weston-hero.png.jpg?itok=uU0nQH5T"
+      "https://www.housing.illinois.edu/sites/default/files/styles/hero_image/public/paragraphs/hero/2023-01/weston-hero.png.jpg?itok=uU0nQH5T",
     ),
     galleryImages: urls(
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/Weston-Exterior-1.jpg?itok=_V616uYK",
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/DSC05489.jpg?itok=lvQs_K3r",
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/Ikenberry%20Standard%20Top_0.jpg?itok=3aAhcKdf",
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/Ikenberry-Commons-triple_top_new_furniture_0.jpg?itok=7Etlj5Bd",
-      "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/IkeCornerTriple_top_new_furniture_1.jpg?itok=szK0FGBf"
+      "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/IkeCornerTriple_top_new_furniture_1.jpg?itok=szK0FGBf",
     ),
     dining: "nearby",
-    diningNearbyDetail:
-      "SDRP dining and library spaces are just around the corner.",
+    diningNearbyDetail: "SDRP dining and library spaces are just around the corner.",
     categorizedTags: {
       livingConditions: [],
       facilities: ["laundry", "studyLounge", "computerLab", "library"],
@@ -207,11 +198,11 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         sqft: 185,
         price: 14558,
         imageUrls: urls(
-          "https://www.housing.illinois.edu/sites/default/files/2023-01/Weston_Double.pdf"
+          "https://www.housing.illinois.edu/sites/default/files/2023-01/Weston_Double.pdf",
         ),
         photoUrls: urls(
           "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Ikenberry%20Standard%20Top_0.jpg?itok=Fdg7FnMz",
-          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Ikenberry%20Standard%20Iso_0.jpg?itok=He8ZHWkX"
+          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Ikenberry%20Standard%20Iso_0.jpg?itok=He8ZHWkX",
         ),
         description: "Standard double room.",
       }),
@@ -222,11 +213,11 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         sqft: 235,
         price: 13774,
         imageUrls: urls(
-          "https://www.housing.illinois.edu/sites/default/files/2023-01/Weston_Triple_Reg.pdf"
+          "https://www.housing.illinois.edu/sites/default/files/2023-01/Weston_Triple_Reg.pdf",
         ),
         photoUrls: urls(
           "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Ikenberry-Commons-triple_top_new_furniture_0.jpg?itok=prm_Tjca",
-          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Ikenberry-Commons-triple_iso_new_furniture_0.jpg?itok=RUBf6yLh"
+          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Ikenberry-Commons-triple_iso_new_furniture_0.jpg?itok=RUBf6yLh",
         ),
         description: "Regular triple room.",
       }),
@@ -236,18 +227,17 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
     website: urhPage("scott"),
     address: "202 E. Peabody Dr.",
     imageUrl: clean(
-      "https://www.housing.illinois.edu/sites/default/files/styles/hero_image/public/paragraphs/hero/2023-01/Scott-3.jpg?h=c17ff48a&itok=jmGBLzoY"
+      "https://www.housing.illinois.edu/sites/default/files/styles/hero_image/public/paragraphs/hero/2023-01/Scott-3.jpg?h=c17ff48a&itok=jmGBLzoY",
     ),
     galleryImages: urls(
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/DSC05368.jpg?itok=gVVZOBft",
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/DSC05378.jpg?itok=ntofx6KB",
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/Ikenberry%20Standard%20Top.jpg?itok=I-fYgmLW",
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/Ikenberry-Commons-triple_top_new_furniture.jpg?itok=s8H-Yalv",
-      "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/IkeCornerTriple_top_new_furniture_0.jpg?itok=zkLKYpAw"
+      "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/IkeCornerTriple_top_new_furniture_0.jpg?itok=zkLKYpAw",
     ),
     dining: "nearby",
-    diningNearbyDetail:
-      "SDRP dining is a short walk; ARC is directly across the street.",
+    diningNearbyDetail: "SDRP dining is a short walk; ARC is directly across the street.",
     categorizedTags: {
       livingConditions: [],
       facilities: ["gym", "laundry", "studyLounge", "computerLab", "library"],
@@ -282,11 +272,11 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         sqft: 185,
         price: 14558,
         imageUrls: urls(
-          "https://www.housing.illinois.edu/sites/default/files/2023-01/scott-double.pdf"
+          "https://www.housing.illinois.edu/sites/default/files/2023-01/scott-double.pdf",
         ),
         photoUrls: urls(
           "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Ikenberry%20Standard%20Top.jpg?itok=2Aa6QQaR",
-          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Ikenberry%20Standard%20Iso.jpg?itok=zKQUC3XV"
+          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Ikenberry%20Standard%20Iso.jpg?itok=zKQUC3XV",
         ),
         description: "Standard double room.",
       }),
@@ -297,11 +287,11 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         sqft: 235,
         price: 13774,
         imageUrls: urls(
-          "https://www.housing.illinois.edu/sites/default/files/2023-01/scott-triple-corner.pdf"
+          "https://www.housing.illinois.edu/sites/default/files/2023-01/scott-triple-corner.pdf",
         ),
         photoUrls: urls(
           "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Ikenberry-Commons-triple_top_new_furniture.jpg?itok=9pBQoGA0",
-          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Ikenberry-Commons-triple_iso_new_furniture.jpg?itok=z8G-CVoj"
+          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Ikenberry-Commons-triple_iso_new_furniture.jpg?itok=z8G-CVoj",
         ),
         description: "Corner triple room.",
       }),
@@ -311,18 +301,17 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
     website: urhPage("taft-van-doren"),
     address: "1213 S. Fourth St.",
     imageUrl: clean(
-      "https://www.housing.illinois.edu/sites/default/files/styles/hero_image/public/paragraphs/hero/2023-01/TVD_0.jpg?h=2d298297&itok=9jI4JtCi"
+      "https://www.housing.illinois.edu/sites/default/files/styles/hero_image/public/paragraphs/hero/2023-01/TVD_0.jpg?h=2d298297&itok=9jI4JtCi",
     ),
     galleryImages: urls(
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/TVD-Exterior-3_0.jpg?itok=8OhzusXG",
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/DSC05337_1.jpg?itok=h-YKqdMo",
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/DSC05338_1.jpg?itok=nnP8NWRf",
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/IkeStandard_top_classic_furniture_0.jpg?itok=A2ZyYHM4",
-      "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/IkenberryStandard_iso_classic_furniture_0.jpg?itok=AOyeoVXO"
+      "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/IkenberryStandard_iso_classic_furniture_0.jpg?itok=AOyeoVXO",
     ),
     dining: "nearby",
-    diningNearbyDetail:
-      "Residents use nearby SDRP dining rather than an in-hall dining room.",
+    diningNearbyDetail: "Residents use nearby SDRP dining rather than an in-hall dining room.",
     categorizedTags: {
       livingConditions: ["noAc", "olderBuilding"],
       facilities: ["laundry", "studyLounge", "computerLab", "library"],
@@ -355,11 +344,11 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         sqft: 165,
         price: 14116,
         imageUrls: urls(
-          "https://www.housing.illinois.edu/sites/default/files/2023-01/tvd_double_0.pdf"
+          "https://www.housing.illinois.edu/sites/default/files/2023-01/tvd_double_0.pdf",
         ),
         photoUrls: urls(
           "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/IkeStandard_top_classic_furniture_0.jpg?itok=qr_d9qqI",
-          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/IkenberryStandard_iso_classic_furniture_0.jpg?itok=pgjywPxc"
+          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/IkenberryStandard_iso_classic_furniture_0.jpg?itok=pgjywPxc",
         ),
         description: "Taft double room.",
       }),
@@ -370,11 +359,11 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         sqft: 115,
         price: 16416,
         imageUrls: urls(
-          "https://www.housing.illinois.edu/sites/default/files/2023-01/tvd_double_0.pdf"
+          "https://www.housing.illinois.edu/sites/default/files/2023-01/tvd_double_0.pdf",
         ),
         photoUrls: urls(
           "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/DSC05270.jpg?itok=VS1yAG6d",
-          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/DSC05272.jpg?itok=bQVSoeiu"
+          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/DSC05272.jpg?itok=bQVSoeiu",
         ),
         description: "Taft larger single room.",
       }),
@@ -384,18 +373,17 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
     website: urhPage("taft-van-doren"),
     address: "1215 S. Fourth St.",
     imageUrl: clean(
-      "https://www.housing.illinois.edu/sites/default/files/styles/hero_image/public/paragraphs/hero/2023-01/TVD_0.jpg?h=2d298297&itok=9jI4JtCi"
+      "https://www.housing.illinois.edu/sites/default/files/styles/hero_image/public/paragraphs/hero/2023-01/TVD_0.jpg?h=2d298297&itok=9jI4JtCi",
     ),
     galleryImages: urls(
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/TVD-Exterior-3_0.jpg?itok=8OhzusXG",
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/DSC05333_1.jpg?itok=bmYQu4wV",
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/DSC05330_1.jpg?itok=WCF3TAUi",
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/IkeStandard_top_classic_furniture_0.jpg?itok=A2ZyYHM4",
-      "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/IkenberryStandard_iso_classic_furniture_0.jpg?itok=AOyeoVXO"
+      "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/IkenberryStandard_iso_classic_furniture_0.jpg?itok=AOyeoVXO",
     ),
     dining: "nearby",
-    diningNearbyDetail:
-      "Residents use nearby SDRP dining rather than an in-hall dining room.",
+    diningNearbyDetail: "Residents use nearby SDRP dining rather than an in-hall dining room.",
     categorizedTags: {
       livingConditions: ["noAc", "olderBuilding"],
       facilities: ["laundry", "studyLounge", "computerLab", "library"],
@@ -428,11 +416,11 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         sqft: 165,
         price: 14116,
         imageUrls: urls(
-          "https://www.housing.illinois.edu/sites/default/files/2023-01/tvd_double_0.pdf"
+          "https://www.housing.illinois.edu/sites/default/files/2023-01/tvd_double_0.pdf",
         ),
         photoUrls: urls(
           "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/IkeStandard_top_classic_furniture_0.jpg?itok=qr_d9qqI",
-          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/IkenberryStandard_iso_classic_furniture_0.jpg?itok=pgjywPxc"
+          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/IkenberryStandard_iso_classic_furniture_0.jpg?itok=pgjywPxc",
         ),
         description: "Van Doren double room.",
       }),
@@ -443,11 +431,11 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         sqft: 115,
         price: 16416,
         imageUrls: urls(
-          "https://www.housing.illinois.edu/sites/default/files/2023-01/tvd_double_0.pdf"
+          "https://www.housing.illinois.edu/sites/default/files/2023-01/tvd_double_0.pdf",
         ),
         photoUrls: urls(
           "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/DSC05270.jpg?itok=VS1yAG6d",
-          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/DSC05272.jpg?itok=bQVSoeiu"
+          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/DSC05272.jpg?itok=bQVSoeiu",
         ),
         description: "Van Doren larger single room.",
       }),
@@ -458,14 +446,14 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
     address: "1010 W. Green St.",
     ac: true,
     imageUrl: clean(
-      "https://www.housing.illinois.edu/sites/default/files/styles/hero_image/public/paragraphs/hero/2023-01/Daniels-Exterior-1.jpg?h=8d969fe4&itok=B--tR7_X"
+      "https://www.housing.illinois.edu/sites/default/files/styles/hero_image/public/paragraphs/hero/2023-01/Daniels-Exterior-1.jpg?h=8d969fe4&itok=B--tR7_X",
     ),
     galleryImages: urls(
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/Daniels-Interior-1.jpg?itok=bd__9zLO",
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/Daniels-Interior-2.jpg?itok=hZtMVrWg",
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/Daniels-Multipurpose-Room.jpg?itok=PAwOUEKE",
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/ground-floor08.jpg?itok=0LfwoOi0",
-      "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/DSC05305.jpg?itok=yUGDriCK"
+      "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/DSC05305.jpg?itok=yUGDriCK",
     ),
     location: "Campustown",
     dining: "nearby",
@@ -505,11 +493,11 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         sqft: 160,
         price: 9522,
         imageUrls: urls(
-          "https://www.housing.illinois.edu/sites/default/files/2023-01/daniels_single.pdf"
+          "https://www.housing.illinois.edu/sites/default/files/2023-01/daniels_single.pdf",
         ),
         photoUrls: urls(
           "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/Daniels-Interior-1.jpg?itok=bd__9zLO",
-          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/ground-floor08.jpg?itok=0LfwoOi0"
+          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/ground-floor08.jpg?itok=0LfwoOi0",
         ),
         description: "Single room with individual-use bathroom.",
       }),
@@ -520,11 +508,11 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         sqft: 140,
         price: 9140,
         imageUrls: urls(
-          "https://www.housing.illinois.edu/sites/default/files/2023-01/Daniels_single_shared.pdf"
+          "https://www.housing.illinois.edu/sites/default/files/2023-01/Daniels_single_shared.pdf",
         ),
         photoUrls: urls(
           "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/Daniels-Interior-2.jpg?itok=hZtMVrWg",
-          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/DSC05322.jpg?itok=kr4d1WpZ"
+          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/DSC05322.jpg?itok=kr4d1WpZ",
         ),
         description: "Single room with semi-private shared bathroom.",
       }),
@@ -535,11 +523,11 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         sqft: 200,
         price: 8340,
         imageUrls: urls(
-          "https://www.housing.illinois.edu/sites/default/files/2023-01/daniels_double.pdf"
+          "https://www.housing.illinois.edu/sites/default/files/2023-01/daniels_double.pdf",
         ),
         photoUrls: urls(
           "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/DSC05305.jpg?itok=yUGDriCK",
-          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/DSC05317.jpg?itok=-62tvtmt"
+          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/DSC05317.jpg?itok=-62tvtmt",
         ),
         description: "Double room with semi-private bathroom.",
       }),
@@ -549,14 +537,14 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
     website: urhPage("sherman"),
     address: "909 S. Fifth St.",
     imageUrl: clean(
-      "https://www.housing.illinois.edu/sites/default/files/styles/hero_image/public/paragraphs/hero/2023-01/DSC05302-2.jpg?h=041e7dc2&itok=EbnBKnn1"
+      "https://www.housing.illinois.edu/sites/default/files/styles/hero_image/public/paragraphs/hero/2023-01/DSC05302-2.jpg?h=041e7dc2&itok=EbnBKnn1",
     ),
     galleryImages: urls(
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/DSC05275.jpg?itok=gCT5YG8l",
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/DSC05279.jpg?itok=Z42UzE3h",
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/DSC05283.jpg?itok=eZsF9cBq",
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/sherman_single_top.png.jpg?itok=dwFia0p-",
-      "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/sherman_double_top.png.jpg?itok=-d4SAFkH"
+      "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/sherman_double_top.png.jpg?itok=-d4SAFkH",
     ),
     location: "Campustown",
     dining: "nearby",
@@ -595,11 +583,11 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         sqft: 120,
         price: 7212,
         imageUrls: urls(
-          "https://www.housing.illinois.edu/sites/default/files/2023-01/sherman-single-shared.pdf"
+          "https://www.housing.illinois.edu/sites/default/files/2023-01/sherman-single-shared.pdf",
         ),
         photoUrls: urls(
           "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/sherman_single_top.png.jpg?itok=dwFia0p-",
-          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/sherman_single_iso.png.jpg?itok=HZCfDHlX"
+          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/sherman_single_iso.png.jpg?itok=HZCfDHlX",
         ),
         description: "Single room with shared bathroom.",
       }),
@@ -610,11 +598,11 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         sqft: 180,
         price: 6906,
         imageUrls: urls(
-          "https://www.housing.illinois.edu/sites/default/files/2023-01/sherman-double-shared.pdf"
+          "https://www.housing.illinois.edu/sites/default/files/2023-01/sherman-double-shared.pdf",
         ),
         photoUrls: urls(
           "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/sherman_double_top.png.jpg?itok=-d4SAFkH",
-          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/sherman_hall_double_iso.png.jpg?itok=oSDwWgC2"
+          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/sherman_hall_double_iso.png.jpg?itok=oSDwWgC2",
         ),
         description: "Double room with shared bathroom.",
       }),
@@ -624,7 +612,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
     website: urhPage("lar"),
     address: "1003 S. Lincoln Ave.; 1005 S. Lincoln Ave.",
     imageUrl: clean(
-      "https://www.housing.illinois.edu/sites/default/files/styles/hero_image/public/paragraphs/hero/2023-01/LAR-EXT-1.jpg?h=2d298297&itok=V0TPMED5"
+      "https://www.housing.illinois.edu/sites/default/files/styles/hero_image/public/paragraphs/hero/2023-01/LAR-EXT-1.jpg?h=2d298297&itok=V0TPMED5",
     ),
     galleryImages: urls(
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/DSC05181.JPG.jpg?itok=4IBTjQr8",
@@ -632,7 +620,7 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/LAR-exterior-4.jpg?itok=2MP_150Z",
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/Lincoln%20Avenue%20Single%20Top.jpg?itok=-H-Eo_SJ",
       "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/Lincoln%20Avenue%20Double%20Top.jpg?itok=JLV98xi-",
-      "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/Lincoln%20Avenue%20Triple%20Top.jpg?itok=p25n43ZI"
+      "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_full/public/2023-01/Lincoln%20Avenue%20Triple%20Top.jpg?itok=p25n43ZI",
     ),
     categorizedTags: {
       livingConditions: [],
@@ -667,11 +655,11 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         sqft: 110,
         price: 16564,
         imageUrls: urls(
-          "https://www.housing.illinois.edu/sites/default/files/2023-01/lar_single.pdf"
+          "https://www.housing.illinois.edu/sites/default/files/2023-01/lar_single.pdf",
         ),
         photoUrls: urls(
           "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Lincoln%20Avenue%20Single%20Top.jpg?itok=dxJVEdos",
-          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Lincoln%20Avenue%20Single%20iso.jpg?itok=MxKgGX84"
+          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Lincoln%20Avenue%20Single%20iso.jpg?itok=MxKgGX84",
         ),
         description: "Single room.",
       }),
@@ -682,11 +670,11 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         sqft: 165,
         price: 14558,
         imageUrls: urls(
-          "https://www.housing.illinois.edu/sites/default/files/2023-01/lar_double_reg.pdf"
+          "https://www.housing.illinois.edu/sites/default/files/2023-01/lar_double_reg.pdf",
         ),
         photoUrls: urls(
           "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Lincoln%20Avenue%20Double%20Top.jpg?itok=Q6mqvCFg",
-          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Lincoln%20Avenue%20Double%20Iso.jpg?itok=YWnq3xCG"
+          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Lincoln%20Avenue%20Double%20Iso.jpg?itok=YWnq3xCG",
         ),
         description: "Regular double room.",
       }),
@@ -697,14 +685,14 @@ export const URH_OFFICIAL_OVERRIDES_SOUTH: Record<string, DormOverride> = {
         sqft: 220,
         price: 13774,
         imageUrls: urls(
-          "https://www.housing.illinois.edu/sites/default/files/2023-01/lar_triple.pdf"
+          "https://www.housing.illinois.edu/sites/default/files/2023-01/lar_triple.pdf",
         ),
         photoUrls: urls(
           "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Lincoln%20Avenue%20Triple%20Top.jpg?itok=i4YQbacj",
-          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Lincoln%20Avenue%20Triple%20iso.jpg?itok=Hk39KvoW"
+          "https://www.housing.illinois.edu/sites/default/files/styles/image_gallery_mobile/public/2023-01/Lincoln%20Avenue%20Triple%20iso.jpg?itok=Hk39KvoW",
         ),
         description: "Triple room.",
       }),
     ],
   },
-};
+}

@@ -3,8 +3,8 @@
  * @description Shared sidebar layout component with category grouping and animated list items.
  */
 
-import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion"
+import React from "react"
 
 export const sidebarItemAnimation = {
   layout: true,
@@ -17,30 +17,27 @@ export const sidebarItemAnimation = {
     damping: 30,
     opacity: { duration: 0.2 },
   },
-};
-
-export interface TimeCategoryLabels {
-  pinned: string;
-  today: string;
-  yesterday: string;
-  thisWeek: string;
-  older: string;
 }
 
-export const getTimeCategory = (
-  dateStr: string,
-  labels: TimeCategoryLabels
-): string => {
-  const date = new Date(dateStr);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+export interface TimeCategoryLabels {
+  pinned: string
+  today: string
+  yesterday: string
+  thisWeek: string
+  older: string
+}
 
-  if (diffDays === 0) return labels.today;
-  if (diffDays === 1) return labels.yesterday;
-  if (diffDays <= 7) return labels.thisWeek;
-  return labels.older;
-};
+export const getTimeCategory = (dateStr: string, labels: TimeCategoryLabels): string => {
+  const date = new Date(dateStr)
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+
+  if (diffDays === 0) return labels.today
+  if (diffDays === 1) return labels.yesterday
+  if (diffDays <= 7) return labels.thisWeek
+  return labels.older
+}
 
 export const getCategoryOrder = (labels: TimeCategoryLabels): string[] => [
   labels.pinned,
@@ -48,36 +45,34 @@ export const getCategoryOrder = (labels: TimeCategoryLabels): string[] => [
   labels.yesterday,
   labels.thisWeek,
   labels.older,
-];
+]
 
 export const groupByCategory = <T extends { isPinned: boolean }>(
   items: T[],
   getDate: (item: T) => string,
-  labels: TimeCategoryLabels
+  labels: TimeCategoryLabels,
 ): Record<string, T[]> => {
   return items.reduce(
     (groups, item) => {
-      const category = item.isPinned
-        ? labels.pinned
-        : getTimeCategory(getDate(item), labels);
+      const category = item.isPinned ? labels.pinned : getTimeCategory(getDate(item), labels)
 
-      if (!groups[category]) groups[category] = [];
-      groups[category].push(item);
-      return groups;
+      if (!groups[category]) groups[category] = []
+      groups[category].push(item)
+      return groups
     },
-    {} as Record<string, T[]>
-  );
-};
+    {} as Record<string, T[]>,
+  )
+}
 
 interface BaseSidebarProps {
-  header?: React.ReactNode;
-  groupedItems: Record<string, unknown[]>;
-  categoryOrder: string[];
-  renderItem: (item: unknown, index: number) => React.ReactNode;
-  emptyState?: React.ReactNode;
-  loadingState?: React.ReactNode;
-  isLoading?: boolean;
-  className?: string;
+  header?: React.ReactNode
+  groupedItems: Record<string, unknown[]>
+  categoryOrder: string[]
+  renderItem: (item: unknown, index: number) => React.ReactNode
+  emptyState?: React.ReactNode
+  loadingState?: React.ReactNode
+  isLoading?: boolean
+  className?: string
 }
 
 export const BaseSidebar: React.FC<BaseSidebarProps> = ({
@@ -90,17 +85,10 @@ export const BaseSidebar: React.FC<BaseSidebarProps> = ({
   isLoading = false,
   className = "",
 }) => {
-  const hasItems = Object.values(groupedItems).some(
-    (items) => items && items.length > 0
-  );
+  const hasItems = Object.values(groupedItems).some((items) => items && items.length > 0)
 
   return (
-    <div
-      className={`
-        flex h-full flex-col
-        ${className}
-      `}
-    >
+    <div className={`flex h-full flex-col ${className} `}>
       {header}
 
       <div className="no-scrollbar flex-1 overflow-y-auto px-2">
@@ -111,16 +99,13 @@ export const BaseSidebar: React.FC<BaseSidebarProps> = ({
         ) : (
           <div className="space-y-3">
             {categoryOrder.map((category) => {
-              const items = groupedItems[category];
-              if (!items || items.length === 0) return null;
+              const items = groupedItems[category]
+              if (!items || items.length === 0) return null
 
               return (
                 <div key={category}>
                   <h4
-                    className="
-                      mb-1.5 px-2 text-[10px] font-semibold tracking-wider
-                      text-slate-500 uppercase
-                    "
+                    className="mb-1.5 px-2 text-[10px] font-semibold tracking-wider text-slate-500 uppercase"
                   >
                     {category}
                   </h4>
@@ -130,22 +115,22 @@ export const BaseSidebar: React.FC<BaseSidebarProps> = ({
                     </AnimatePresence>
                   </div>
                 </div>
-              );
+              )
             })}
           </div>
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
 interface SidebarItemProps {
-  id: string;
-  isActive: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-  activeBgClass?: string;
-  inactiveBgClass?: string;
+  id: string
+  isActive: boolean
+  onClick: () => void
+  children: React.ReactNode
+  activeBgClass?: string
+  inactiveBgClass?: string
 }
 
 export const SidebarItem: React.FC<SidebarItemProps> = ({
@@ -158,39 +143,26 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
   <motion.div
     {...sidebarItemAnimation}
     onClick={onClick}
-    className={`
-      group relative cursor-pointer rounded-lg p-2 transition-all
-      ${isActive ? activeBgClass : inactiveBgClass}
-    `}
+    className={`group relative cursor-pointer rounded-lg p-2 transition-all ${isActive ? activeBgClass : inactiveBgClass} `}
   >
     {children}
   </motion.div>
-);
+)
 
 interface PinButtonProps {
-  isPinned: boolean;
-  onClick: (e: React.MouseEvent) => void;
-  label: string;
+  isPinned: boolean
+  onClick: (e: React.MouseEvent) => void
+  label: string
 }
 
-export const PinButton: React.FC<PinButtonProps> = ({
-  isPinned,
-  onClick,
-  label,
-}) => (
+export const PinButton: React.FC<PinButtonProps> = ({ isPinned, onClick, label }) => (
   <button
     onClick={onClick}
-    className="
-      rounded-md p-1 transition-colors
-      hover:bg-white/10
-    "
+    className="rounded-md p-1 transition-colors hover:bg-white/10"
     title={label}
   >
     <svg
-      className={`
-        size-3.5
-        ${isPinned ? "text-illini-orange" : "text-slate-400"}
-      `}
+      className={`size-3.5 ${isPinned ? "text-illini-orange" : "text-slate-400"} `}
       fill={isPinned ? "currentColor" : "none"}
       stroke="currentColor"
       viewBox="0 0 24 24"
@@ -203,31 +175,20 @@ export const PinButton: React.FC<PinButtonProps> = ({
       />
     </svg>
   </button>
-);
+)
 
 interface DeleteButtonProps {
-  onClick: (e: React.MouseEvent) => void;
-  label: string;
+  onClick: (e: React.MouseEvent) => void
+  label: string
 }
 
-export const DeleteButton: React.FC<DeleteButtonProps> = ({
-  onClick,
-  label,
-}) => (
+export const DeleteButton: React.FC<DeleteButtonProps> = ({ onClick, label }) => (
   <button
     onClick={onClick}
-    className="
-      rounded-md p-1 transition-colors
-      hover:bg-red-500/20
-    "
+    className="rounded-md p-1 transition-colors hover:bg-red-500/20"
     title={label}
   >
-    <svg
-      className="size-3.5 text-red-400"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
+    <svg className="size-3.5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -236,27 +197,22 @@ export const DeleteButton: React.FC<DeleteButtonProps> = ({
       />
     </svg>
   </button>
-);
+)
 
 export const SidebarLoadingSpinner: React.FC = () => (
   <div className="flex items-center justify-center py-8">
     <div
-      className="
-        size-5 animate-spin rounded-full border-2 border-illini-orange
-        border-t-transparent
-      "
+      className="border-illini-orange size-5 animate-spin rounded-full border-2 border-t-transparent"
     />
   </div>
-);
+)
 
 interface SidebarEmptyStateProps {
-  message: string;
+  message: string
 }
 
-export const SidebarEmptyState: React.FC<SidebarEmptyStateProps> = ({
-  message,
-}) => (
+export const SidebarEmptyState: React.FC<SidebarEmptyStateProps> = ({ message }) => (
   <div className="px-2 py-6 text-center">
     <p className="text-xs text-slate-500">{message}</p>
   </div>
-);
+)

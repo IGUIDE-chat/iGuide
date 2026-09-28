@@ -1,12 +1,15 @@
 # ADR-0007: Move hybrid retrieval toward a Supabase-native path and retire QMD from the primary production path
 
 ## Status
+
 Accepted
 
 ## Date
+
 2026-04-19
 
 ## Context
+
 The repo currently carries two retrieval worlds:
 
 - a newer Supabase-native hybrid retrieval path in `api/src/tools/search-knowledge-base.ts`, backed by `documents`, `document_chunks`, pgvector, and PostgreSQL full-text search
@@ -20,6 +23,7 @@ That split is operationally awkward and inconsistent with the repo's serverless-
 Research during this decision showed that QMD is valuable as a retrieval design reference, especially for chunking, fusion, and ranking ideas, but its implementation is not a clean fit for the Supabase-centered runtime.
 
 ## Decision
+
 Adopt a **Supabase-native hybrid retrieval path** as the long-term production retrieval backend and treat QMD as transitional infrastructure during migration.
 
 The migration stance is:
@@ -41,6 +45,7 @@ Supabase-native hybrid retrieval should remain grounded in:
 - async ingestion/indexing rather than local CLI reindexing as the primary operational model
 
 ## Alternatives Considered
+
 - **Keep QMD as a permanent primary retrieval subsystem alongside Supabase**  
   Plausible because QMD already works, supports hybrid retrieval, and remains wired into legacy flows. Rejected because it preserves a second operational stack, keeps the architecture split across incompatible storage models, and conflicts with the repo's serverless-first direction.
 
@@ -51,6 +56,7 @@ Supabase-native hybrid retrieval should remain grounded in:
   Plausible because the repo already has `documents`, `document_chunks`, and hybrid search RPCs. Rejected because ranking parity, ingestion parity, and legacy-flow compatibility still need staged validation.
 
 ## Consequences
+
 - **Benefits**
   - Aligns retrieval with the active Worker + Supabase production architecture.
   - Reduces long-term operational complexity by converging on one primary retrieval substrate.
@@ -73,12 +79,14 @@ Supabase-native hybrid retrieval should remain grounded in:
   - Retrieval tuning work must be treated as part of the migration, not as optional polish after cutover.
 
 ## Revisit Triggers
+
 - Supabase-native hybrid retrieval fails to reach acceptable ranking and coverage parity even after shadow comparison and tuning.
 - The product proves to need QMD-only capabilities that PostgreSQL/pgvector cannot reasonably reproduce without unacceptable complexity.
 - Operational constraints show that a dedicated retrieval sidecar remains materially safer or cheaper than unifying on Supabase.
 - The legacy browser-side QMD path is fully retired and a later ADR wants to narrow or supersede the migration stance.
 
 ## Related
+
 - `docs/adr/ADR-0004-hybrid-data-model.md`
 - `docs/adr/ADR-0006-source-first-base-layer.md`
 - `README.md`

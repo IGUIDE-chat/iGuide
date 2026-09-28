@@ -1,5 +1,5 @@
-import { buildToolResultContent, type ProviderMessage } from './messages.ts'
-import type { ToolResult } from '../tools/types.ts'
+import type { ToolResult } from "../tools/types.ts"
+import { buildToolResultContent, type ProviderMessage } from "./messages.ts"
 
 export interface ObservationError {
   code: string
@@ -7,14 +7,14 @@ export interface ObservationError {
   type?: string
 }
 
-export const Observation = Symbol('Observation')
+export const Observation = Symbol("Observation")
 
 export interface Observation {
   toolCallId: string
   toolName: string
   input: Record<string, unknown>
   output: unknown
-  status: 'success' | 'error'
+  status: "success" | "error"
   summary: string
   raw: string
   truncated: boolean
@@ -36,18 +36,13 @@ interface BuildObservationOptions {
 
 const textEncoder = new TextEncoder()
 
-export function buildObservation(
-  options: BuildObservationOptions
-): Observation {
+export function buildObservation(options: BuildObservationOptions): Observation {
   const parsedContent = parseJsonObject(options.result.content)
   const hasError = options.result.metadata?.error === true
-  const status = hasError ? 'error' : 'success'
+  const status = hasError ? "error" : "success"
   const truncated = options.result.truncated === true
   const byteCount = byteLength(options.result.content)
-  const originalByteCount = numberMetadata(
-    options.result.metadata?.original_bytes,
-    byteCount
-  )
+  const originalByteCount = numberMetadata(options.result.metadata?.original_bytes, byteCount)
   const truncatedByteCount = truncated
     ? numberMetadata(options.result.metadata?.truncated_bytes, byteCount)
     : null
@@ -69,7 +64,7 @@ export function buildObservation(
     originalByteCount,
     truncatedByteCount,
     providerMessage: {
-      role: 'tool',
+      role: "tool",
       tool_call_id: options.toolCallId,
       content: buildToolResultContent(options.result),
     },
@@ -81,15 +76,13 @@ function byteLength(value: string): number {
 }
 
 function numberMetadata(value: unknown, fallback: number): number {
-  return typeof value === 'number' ? value : fallback
+  return typeof value === "number" ? value : fallback
 }
 
 function parseJsonObject(value: string): Record<string, unknown> | null {
   try {
     const parsed = JSON.parse(value) as unknown
-    return parsed !== null &&
-      typeof parsed === 'object' &&
-      !Array.isArray(parsed)
+    return parsed !== null && typeof parsed === "object" && !Array.isArray(parsed)
       ? (parsed as Record<string, unknown>)
       : null
   } catch {
@@ -100,27 +93,24 @@ function parseJsonObject(value: string): Record<string, unknown> | null {
 function buildSummary(
   content: string,
   parsedContent: Record<string, unknown> | null,
-  hasError: boolean
+  hasError: boolean,
 ): string {
-  if (hasError && typeof parsedContent?.message === 'string') {
+  if (hasError && typeof parsedContent?.message === "string") {
     return parsedContent.message
   }
 
-  if (hasError && typeof parsedContent?.error === 'string') {
+  if (hasError && typeof parsedContent?.error === "string") {
     return parsedContent.error
   }
 
-  return content.split(/\r?\n/, 1)[0] ?? ''
+  return content.split(/\r?\n/, 1)[0] ?? ""
 }
 
 function buildObservationError(
   parsedContent: Record<string, unknown> | null,
-  summary: string
+  summary: string,
 ): ObservationError {
-  const code =
-    typeof parsedContent?.error === 'string'
-      ? parsedContent.error
-      : 'tool_error'
+  const code = typeof parsedContent?.error === "string" ? parsedContent.error : "tool_error"
 
   return {
     code,
@@ -141,9 +131,7 @@ export function observationToolName(observation: Observation): string {
   return observation.toolName
 }
 
-export function observationInput(
-  observation: Observation
-): Record<string, unknown> {
+export function observationInput(observation: Observation): Record<string, unknown> {
   return observation.input
 }
 
@@ -151,9 +139,7 @@ export function observationOutput(observation: Observation): unknown {
   return observation.output
 }
 
-export function observationStatus(
-  observation: Observation
-): Observation['status'] {
+export function observationStatus(observation: Observation): Observation["status"] {
   return observation.status
 }
 
@@ -169,8 +155,6 @@ export function observationTruncated(observation: Observation): boolean {
   return observation.truncated
 }
 
-export function observationError(
-  observation: Observation
-): ObservationError | null {
+export function observationError(observation: Observation): ObservationError | null {
   return observation.error
 }

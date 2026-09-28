@@ -1,47 +1,38 @@
-import type {
-  MCPConnection,
-  MCPDiscoveredTool,
-  MCPToolOverride,
-} from './types.ts'
+import type { ToolDefinition } from "../tools/types.ts"
 import type {
   MCPAdapterClient,
   MCPDiscoveryResult,
   MCPDiscoveredTool as AdapterDiscoveredTool,
   MCPTestResult,
-} from './adapter.ts'
-import { createMCPToolWrapper } from './adapter.ts'
-import { createMCPStore, type MCPStore } from './store.ts'
-import type { ToolDefinition } from '../tools/types.ts'
-import { StreamableHttpMCPClient } from './streamable-http-client.ts'
+} from "./adapter.ts"
+import { createMCPToolWrapper } from "./adapter.ts"
+import { createMCPStore, type MCPStore } from "./store.ts"
+import { StreamableHttpMCPClient } from "./streamable-http-client.ts"
+import type { MCPConnection, MCPDiscoveredTool, MCPToolOverride } from "./types.ts"
 
-type CreateConnectionInput = Pick<
-  MCPConnection,
-  'display_name' | 'endpoint_url' | 'transport'
-> &
-  Partial<Pick<MCPConnection, 'description'>>
+type CreateConnectionInput = Pick<MCPConnection, "display_name" | "endpoint_url" | "transport"> &
+  Partial<Pick<MCPConnection, "description">>
 
 type UpdateConnectionInput = Partial<
-  Pick<MCPConnection, 'display_name' | 'description' | 'is_enabled'>
+  Pick<MCPConnection, "display_name" | "description" | "is_enabled">
 >
 
-const CONNECTION_PREFIX = 'conn:'
-const TOOL_PREFIX = 'tool:'
-const OVERRIDE_PREFIX = 'override:'
+const CONNECTION_PREFIX = "conn:"
+const TOOL_PREFIX = "tool:"
+const OVERRIDE_PREFIX = "override:"
 
 function asEnvRecord(env?: unknown): Record<string, unknown> | undefined {
-  return env && typeof env === 'object'
-    ? (env as Record<string, unknown>)
-    : undefined
+  return env && typeof env === "object" ? (env as Record<string, unknown>) : undefined
 }
 
 function isMCPStore(value: unknown): value is MCPStore {
   return Boolean(
     value &&
-    typeof value === 'object' &&
-    'get' in value &&
-    'put' in value &&
-    'delete' in value &&
-    'list' in value
+    typeof value === "object" &&
+    "get" in value &&
+    "put" in value &&
+    "delete" in value &&
+    "list" in value,
   )
 }
 
@@ -65,11 +56,7 @@ function toolPrefix(connectionId: string): string {
   return `${TOOL_PREFIX}${connectionId}:`
 }
 
-function overrideKey(
-  connectionId: string,
-  ownerId: string,
-  toolName: string
-): string {
+function overrideKey(connectionId: string, ownerId: string, toolName: string): string {
   return `${OVERRIDE_PREFIX}${connectionId}:${ownerId}:${toolName}`
 }
 
@@ -79,29 +66,22 @@ function overridePrefix(connectionId: string, ownerId?: string): string {
     : `${OVERRIDE_PREFIX}${connectionId}:`
 }
 
-function isPlatformConnectionVisible(
-  connection: MCPConnection,
-  viewerId: string
-): boolean {
+function isPlatformConnectionVisible(connection: MCPConnection, viewerId: string): boolean {
   switch (connection.visibility) {
-    case 'global':
+    case "global":
       return true
-    case 'owner_only':
+    case "owner_only":
       return connection.owner_id === viewerId
-    case 'institution':
+    case "institution":
       return connection.institution_id === viewerId
   }
 }
 
-function createConnectionGroups(
-  ids: string[]
-): Record<string, MCPDiscoveredTool[]> {
+function createConnectionGroups(ids: string[]): Record<string, MCPDiscoveredTool[]> {
   return Object.fromEntries(ids.map((id) => [id, []]))
 }
 
-function createOverrideGroups(
-  ids: string[]
-): Record<string, MCPToolOverride[]> {
+function createOverrideGroups(ids: string[]): Record<string, MCPToolOverride[]> {
   return Object.fromEntries(ids.map((id) => [id, []]))
 }
 
@@ -121,17 +101,14 @@ export class MCPConnectionService {
     const user: MCPConnection[] = []
 
     for (const { value: connection } of records) {
-      if (connection.owner_type === 'platform') {
+      if (connection.owner_type === "platform") {
         if (isPlatformConnectionVisible(connection, viewerId)) {
           platform.push(connection)
         }
         continue
       }
 
-      if (
-        connection.owner_type === 'user' &&
-        connection.owner_id === viewerId
-      ) {
+      if (connection.owner_type === "user" && connection.owner_id === viewerId) {
         user.push(connection)
       }
     }
@@ -141,20 +118,18 @@ export class MCPConnectionService {
 
   async createUserConnection(
     viewerId: string,
-    input: CreateConnectionInput
+    input: CreateConnectionInput,
   ): Promise<MCPConnection> {
     const timestamp = new Date().toISOString()
     const connection: MCPConnection = {
       id: crypto.randomUUID(),
       owner_id: viewerId,
-      owner_type: 'user',
-      visibility: 'owner_only',
+      owner_type: "user",
+      visibility: "owner_only",
       display_name: input.display_name,
       endpoint_url: input.endpoint_url,
       transport: input.transport,
-      ...(input.description !== undefined
-        ? { description: input.description }
-        : {}),
+      ...(input.description !== undefined ? { description: input.description } : {}),
       is_enabled: true,
       last_test_status: null,
       created_at: timestamp,
@@ -165,16 +140,13 @@ export class MCPConnectionService {
     return connection
   }
 
-  async getByIdForViewer(
-    id: string,
-    viewerId: string
-  ): Promise<MCPConnection | null> {
+  async getByIdForViewer(id: string, viewerId: string): Promise<MCPConnection | null> {
     const connection = await this.store.get<MCPConnection>(connectionKey(id))
     if (!connection) {
       return null
     }
 
-    if (connection.owner_type === 'user') {
+    if (connection.owner_type === "user") {
       return connection.owner_id === viewerId ? connection : null
     }
 
@@ -184,10 +156,10 @@ export class MCPConnectionService {
   async updateUserConnection(
     id: string,
     viewerId: string,
-    patch: UpdateConnectionInput
+    patch: UpdateConnectionInput,
   ): Promise<MCPConnection | null> {
     const existing = await this.getByIdForViewer(id, viewerId)
-    if (!existing || existing.owner_type !== 'user') {
+    if (!existing || existing.owner_type !== "user") {
       return null
     }
 
@@ -203,7 +175,7 @@ export class MCPConnectionService {
 
   async deleteUserConnection(id: string, viewerId: string): Promise<boolean> {
     const existing = await this.getByIdForViewer(id, viewerId)
-    if (!existing || existing.owner_type !== 'user') {
+    if (!existing || existing.owner_type !== "user") {
       return false
     }
 
@@ -211,20 +183,16 @@ export class MCPConnectionService {
     return true
   }
 
-  async recordTestResult(
-    id: string,
-    viewerId: string,
-    result: MCPTestResult
-  ): Promise<void> {
+  async recordTestResult(id: string, viewerId: string, result: MCPTestResult): Promise<void> {
     const existing = await this.getByIdForViewer(id, viewerId)
-    if (!existing || existing.owner_type !== 'user') {
+    if (!existing || existing.owner_type !== "user") {
       return
     }
 
     const updated: MCPConnection = {
       ...existing,
       last_test_at: new Date().toISOString(),
-      last_test_status: result.success ? 'ok' : 'failed',
+      last_test_status: result.success ? "ok" : "failed",
       last_test_error: result.error_message ?? undefined,
       updated_at: new Date().toISOString(),
     }
@@ -235,10 +203,10 @@ export class MCPConnectionService {
   async recordDiscoveryResult(
     id: string,
     viewerId: string,
-    result: MCPDiscoveryResult
+    result: MCPDiscoveryResult,
   ): Promise<void> {
     const existing = await this.getByIdForViewer(id, viewerId)
-    if (!existing || existing.owner_type !== 'user') {
+    if (!existing || existing.owner_type !== "user") {
       return
     }
 
@@ -261,24 +229,18 @@ export class MCPDiscoveredToolService {
   }
 
   async listTools(connectionId: string): Promise<MCPDiscoveredTool[]> {
-    const records = await this.store.list<MCPDiscoveredTool>(
-      toolPrefix(connectionId)
-    )
+    const records = await this.store.list<MCPDiscoveredTool>(toolPrefix(connectionId))
     return records.map((record) => record.value)
   }
 
-  async listByConnectionIds(
-    connectionIds: string[]
-  ): Promise<Record<string, MCPDiscoveredTool[]>> {
+  async listByConnectionIds(connectionIds: string[]): Promise<Record<string, MCPDiscoveredTool[]>> {
     const groups = createConnectionGroups(connectionIds)
 
     await Promise.all(
       [...new Set(connectionIds)].map(async (connectionId) => {
-        const records = await this.store.list<MCPDiscoveredTool>(
-          toolPrefix(connectionId)
-        )
+        const records = await this.store.list<MCPDiscoveredTool>(toolPrefix(connectionId))
         groups[connectionId] = records.map((record) => record.value)
-      })
+      }),
     )
 
     return groups
@@ -286,11 +248,9 @@ export class MCPDiscoveredToolService {
 
   async replaceDiscoveredTools(
     connectionId: string,
-    tools: MCPDiscoveryResult['tools']
+    tools: MCPDiscoveryResult["tools"],
   ): Promise<void> {
-    const existing = await this.store.list<MCPDiscoveredTool>(
-      toolPrefix(connectionId)
-    )
+    const existing = await this.store.list<MCPDiscoveredTool>(toolPrefix(connectionId))
     await Promise.all(existing.map((record) => this.store.delete(record.key)))
 
     const discoveredAt = new Date().toISOString()
@@ -307,7 +267,7 @@ export class MCPDiscoveredToolService {
         }
 
         return this.store.put(key, record)
-      })
+      }),
     )
   }
 }
@@ -319,13 +279,8 @@ export class MCPToolOverrideService {
     this.store = resolveStore(env)
   }
 
-  async getDisabledToolNames(
-    connectionId: string,
-    viewerId: string
-  ): Promise<string[]> {
-    const records = await this.store.list<MCPToolOverride>(
-      overridePrefix(connectionId, viewerId)
-    )
+  async getDisabledToolNames(connectionId: string, viewerId: string): Promise<string[]> {
+    const records = await this.store.list<MCPToolOverride>(overridePrefix(connectionId, viewerId))
 
     return records
       .map((record) => record.value)
@@ -335,17 +290,17 @@ export class MCPToolOverrideService {
 
   async listOverridesByConnectionIds(
     connectionIds: string[],
-    viewerId: string
+    viewerId: string,
   ): Promise<Record<string, MCPToolOverride[]>> {
     const groups = createOverrideGroups(connectionIds)
 
     await Promise.all(
       [...new Set(connectionIds)].map(async (connectionId) => {
         const records = await this.store.list<MCPToolOverride>(
-          overridePrefix(connectionId, viewerId)
+          overridePrefix(connectionId, viewerId),
         )
         groups[connectionId] = records.map((record) => record.value)
-      })
+      }),
     )
 
     return groups
@@ -354,7 +309,7 @@ export class MCPToolOverrideService {
   async disableTool(
     connectionId: string,
     toolName: string,
-    viewerId: string
+    viewerId: string,
   ): Promise<MCPToolOverride> {
     const key = overrideKey(connectionId, viewerId, toolName)
     const existing = await this.store.get<MCPToolOverride>(key)
@@ -374,7 +329,7 @@ export class MCPToolOverrideService {
   async enableTool(
     connectionId: string,
     toolName: string,
-    viewerId: string
+    viewerId: string,
   ): Promise<MCPToolOverride | null> {
     const key = overrideKey(connectionId, viewerId, toolName)
     const existing = await this.store.get<MCPToolOverride>(key)
@@ -407,7 +362,7 @@ export interface RegisterRuntimeMCPToolsOptions {
 
 function toAdapterDiscoveredTool(
   connection: MCPConnection,
-  tool: MCPDiscoveredTool
+  tool: MCPDiscoveredTool,
 ): AdapterDiscoveredTool {
   return {
     url: connection.endpoint_url,
@@ -431,10 +386,7 @@ export async function registerRuntimeMCPTools({
   const overrides = new MCPToolOverrideService(resolvedStore)
   const visibleConnections = await connections.listForViewer(viewerId)
 
-  for (const connection of [
-    ...visibleConnections.platform,
-    ...visibleConnections.user,
-  ]) {
+  for (const connection of [...visibleConnections.platform, ...visibleConnections.user]) {
     if (!connection.is_enabled) {
       continue
     }
@@ -451,18 +403,10 @@ export async function registerRuntimeMCPTools({
           continue
         }
 
-        registry.register(
-          createMCPToolWrapper(
-            toAdapterDiscoveredTool(connection, tool),
-            client
-          )
-        )
+        registry.register(createMCPToolWrapper(toAdapterDiscoveredTool(connection, tool), client))
       }
     } catch (error) {
-      logger.error(
-        `Failed to load MCP tools for connection ${connection.id}`,
-        error
-      )
+      logger.error(`Failed to load MCP tools for connection ${connection.id}`, error)
     }
   }
 }

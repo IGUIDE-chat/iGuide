@@ -6,19 +6,12 @@
  */
 
 export interface PageRegistryItem {
-  id: string;
-  path: string;
-  componentPath: string;
-  ownerFeature:
-    | "chat"
-    | "library"
-    | "dorms"
-    | "courses"
-    | "resume"
-    | "profile"
-    | "router";
-  contexts: Array<"auth" | "housing" | "dorm-user-interaction" | "none">;
-  status: "active" | "redirect";
+  id: string
+  path: string
+  componentPath: string
+  ownerFeature: "chat" | "library" | "dorms" | "courses" | "resume" | "profile" | "router"
+  contexts: Array<"auth" | "housing" | "dorm-user-interaction" | "none">
+  status: "active" | "redirect"
 }
 
 export const PAGE_REGISTRY: PageRegistryItem[] = [
@@ -126,4 +119,4 @@ export const PAGE_REGISTRY: PageRegistryItem[] = [
     contexts: ["none"],
     status: "redirect",
   },
-];
+]

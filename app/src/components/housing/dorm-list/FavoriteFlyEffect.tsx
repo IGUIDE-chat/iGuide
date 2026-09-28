@@ -5,23 +5,21 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React from "react";
-import { motion } from "framer-motion";
-import {
-  DEFAULT_FAVORITES_TARGET,
-  DEFAULT_TOGGLE_TARGET,
-} from "./favoriteConstants";
+import { motion } from "framer-motion"
+import React from "react"
 
-export { DEFAULT_FAVORITES_TARGET, DEFAULT_TOGGLE_TARGET };
+import { DEFAULT_FAVORITES_TARGET, DEFAULT_TOGGLE_TARGET } from "./favoriteConstants"
 
-const FAVORITES_HEART_SCALE = 12 / 24;
+export { DEFAULT_FAVORITES_TARGET, DEFAULT_TOGGLE_TARGET }
+
+const FAVORITES_HEART_SCALE = 12 / 24
 
 interface FavoriteFlyEffectProps {
-  startX: number;
-  startY: number;
-  targetX: number;
-  targetY: number;
-  onComplete: () => void;
+  startX: number
+  startY: number
+  targetX: number
+  targetY: number
+  onComplete: () => void
 }
 
 export const FavoriteFlyEffect: React.FC<FavoriteFlyEffectProps> = ({
@@ -54,4 +52,4 @@ export const FavoriteFlyEffect: React.FC<FavoriteFlyEffectProps> = ({
       </svg>
     </div>
   </motion.div>
-);
+)

@@ -6,11 +6,7 @@ function encodeSSEEvent(type: string, payload: unknown): string {
   return `event: ${type}\ndata: ${JSON.stringify(payload)}\n\n`
 }
 
-async function writeEvent(
-  writer: SSEWriter,
-  type: string,
-  payload: unknown
-): Promise<void> {
+async function writeEvent(writer: SSEWriter, type: string, payload: unknown): Promise<void> {
   await writer.write(encodeSSEEvent(type, payload))
 }
 
@@ -33,9 +29,9 @@ export function createSSEStream(): {
 export async function sendToolStart(
   writer: SSEWriter,
   toolName: string,
-  args: Record<string, unknown>
+  args: Record<string, unknown>,
 ): Promise<void> {
-  await writeEvent(writer, 'tool_start', {
+  await writeEvent(writer, "tool_start", {
     name: toolName,
     args,
   })
@@ -44,10 +40,10 @@ export async function sendToolStart(
 export async function sendToolResult(
   writer: SSEWriter,
   toolName: string,
-  status: 'success' | 'error',
-  summary: string
+  status: "success" | "error",
+  summary: string,
 ): Promise<void> {
-  await writeEvent(writer, 'tool_result', {
+  await writeEvent(writer, "tool_result", {
     name: toolName,
     status,
     summary,
@@ -57,9 +53,9 @@ export async function sendToolResult(
 export async function sendContent(
   writer: SSEWriter,
   delta: string,
-  metadata?: Record<string, unknown>
+  metadata?: Record<string, unknown>,
 ): Promise<void> {
-  await writeEvent(writer, 'content', {
+  await writeEvent(writer, "content", {
     choices: [
       {
         delta: {
@@ -72,21 +68,15 @@ export async function sendContent(
   })
 }
 
-export async function sendFallback(
-  writer: SSEWriter,
-  reason: string
-): Promise<void> {
-  await writeEvent(writer, 'fallback', {
-    type: 'fallback',
+export async function sendFallback(writer: SSEWriter, reason: string): Promise<void> {
+  await writeEvent(writer, "fallback", {
+    type: "fallback",
     reason,
   })
 }
 
-export async function sendDone(
-  writer: SSEWriter,
-  usage: Record<string, unknown>
-): Promise<void> {
-  await writeEvent(writer, 'done', {
+export async function sendDone(writer: SSEWriter, usage: Record<string, unknown>): Promise<void> {
+  await writeEvent(writer, "done", {
     usage,
   })
 }
@@ -94,9 +84,9 @@ export async function sendDone(
 export async function emitAgentStep(
   writer: SSEWriter,
   stepIndex: number,
-  iterationCount: number
+  iterationCount: number,
 ): Promise<void> {
-  await writeEvent(writer, 'agent_step', {
+  await writeEvent(writer, "agent_step", {
     step: stepIndex,
     iterations: iterationCount,
   })
@@ -105,9 +95,9 @@ export async function emitAgentStep(
 export async function emitToolDecision(
   writer: SSEWriter,
   toolName: string,
-  reason: string
+  reason: string,
 ): Promise<void> {
-  await writeEvent(writer, 'tool_decision', {
+  await writeEvent(writer, "tool_decision", {
     name: toolName,
     reason,
   })
@@ -116,10 +106,10 @@ export async function emitToolDecision(
 export async function emitObservation(
   writer: SSEWriter,
   toolName: string,
-  status: 'success' | 'error',
-  summary: string
+  status: "success" | "error",
+  summary: string,
 ): Promise<void> {
-  await writeEvent(writer, 'observation', {
+  await writeEvent(writer, "observation", {
     name: toolName,
     status,
     summary,
@@ -129,19 +119,16 @@ export async function emitObservation(
 export async function emitToolBlocked(
   writer: SSEWriter,
   toolName: string,
-  reason: string
+  reason: string,
 ): Promise<void> {
-  await writeEvent(writer, 'tool_blocked', {
+  await writeEvent(writer, "tool_blocked", {
     name: toolName,
     reason,
   })
 }
 
-export async function emitFinalizing(
-  writer: SSEWriter,
-  stopReason: string
-): Promise<void> {
-  await writeEvent(writer, 'finalizing', {
+export async function emitFinalizing(writer: SSEWriter, stopReason: string): Promise<void> {
+  await writeEvent(writer, "finalizing", {
     reason: stopReason,
   })
 }

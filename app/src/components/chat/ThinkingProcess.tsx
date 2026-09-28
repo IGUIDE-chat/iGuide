@@ -5,14 +5,15 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { ThinkingStep } from "../../types";
+import { AnimatePresence, motion } from "framer-motion"
+import { useEffect, useRef, useState } from "react"
+
+import { ThinkingStep } from "../../types"
 
 interface ThinkingProcessProps {
-  steps: ThinkingStep[];
-  isThinking: boolean;
-  language?: "en" | "zh";
+  steps: ThinkingStep[]
+  isThinking: boolean
+  language?: "en" | "zh"
 }
 
 const stepIcons: Record<ThinkingStep["type"], string> = {
@@ -20,68 +21,57 @@ const stepIcons: Record<ThinkingStep["type"], string> = {
   searching: "🔍",
   tool_call: "⚙️",
   processing: "📝",
-};
+}
 
 const ThinkingDots = () => (
   <span className="ml-1 inline-flex items-center gap-0.5">
     {[0, 1, 2].map((i) => (
       <motion.span
         key={i}
-        className="size-1 rounded-full bg-illini-orange"
+        className="bg-illini-orange size-1 rounded-full"
         animate={{ opacity: [0.3, 1, 0.3] }}
         transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }}
       />
     ))}
   </span>
-);
+)
 
 export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({
   steps,
   isThinking,
   language = "zh",
 }) => {
-  const [isExpanded, setIsExpanded] = useState(true);
-  const wasThinking = useRef(true);
+  const [isExpanded, setIsExpanded] = useState(true)
+  const wasThinking = useRef(true)
 
   // Auto-collapse after thinking completes
   useEffect(() => {
     if (wasThinking.current && !isThinking) {
-      const timer = setTimeout(() => setIsExpanded(false), 1500);
-      return () => clearTimeout(timer);
+      const timer = setTimeout(() => setIsExpanded(false), 1500)
+      return () => clearTimeout(timer)
     }
-    wasThinking.current = isThinking;
-  }, [isThinking]);
+    wasThinking.current = isThinking
+  }, [isThinking])
 
-  if (steps.length === 0 && !isThinking) return null;
+  if (steps.length === 0 && !isThinking) return null
 
-  const latestStep = steps[steps.length - 1];
+  const latestStep = steps[steps.length - 1]
 
   return (
     <div className="mb-2">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         aria-expanded={isExpanded}
-        className="
-          group flex items-center gap-1.5 text-xs text-slate-500
-          transition-colors
-          hover:text-slate-700
-        "
+        className="group flex items-center gap-1.5 text-xs text-slate-500 transition-colors hover:text-slate-700"
       >
         {isThinking ? (
           <motion.div
-            className="
-              size-3.5 rounded-full border-2 border-illini-orange
-              border-t-transparent
-            "
+            className="border-illini-orange size-3.5 rounded-full border-2 border-t-transparent"
             animate={{ rotate: 360 }}
             transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
           />
         ) : (
-          <svg
-            className="size-3.5 text-green-500"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
+          <svg className="size-3.5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
             <path
               fillRule="evenodd"
               d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -105,20 +95,12 @@ export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({
           </span>
         )}
         <svg
-          className={`
-            size-3 transition-transform
-            ${isExpanded ? "rotate-180" : ""}
-          `}
+          className={`size-3 transition-transform ${isExpanded ? "rotate-180" : ""} `}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M19 9l-7 7-7-7"
-          />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
 
@@ -142,22 +124,14 @@ export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({
                 >
                   <span className="mt-px shrink-0">{stepIcons[step.type]}</span>
                   <div className="min-w-0">
-                    <span
-                      className={
-                        step.done ? "text-slate-400" : "text-slate-600"
-                      }
-                    >
+                    <span className={step.done ? "text-slate-400" : "text-slate-600"}>
                       {step.label}
                     </span>
                     {step.detail && (
-                      <p className="mt-0.5 max-w-md truncate text-slate-400">
-                        {step.detail}
-                      </p>
+                      <p className="mt-0.5 max-w-md truncate text-slate-400">{step.detail}</p>
                     )}
                   </div>
-                  {!step.done && isThinking && index === steps.length - 1 && (
-                    <ThinkingDots />
-                  )}
+                  {!step.done && isThinking && index === steps.length - 1 && <ThinkingDots />}
                 </motion.div>
               ))}
             </div>
@@ -165,5 +139,5 @@ export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({
         )}
       </AnimatePresence>
     </div>
-  );
-};
+  )
+}

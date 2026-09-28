@@ -7,9 +7,9 @@
 
 // Campus Landmarks for Map View
 export interface Landmark {
-  id: string;
-  name: string;
-  name_zh?: string;
+  id: string
+  name: string
+  name_zh?: string
   type:
     | "school"
     | "library"
@@ -19,10 +19,10 @@ export interface Landmark {
     | "dining"
     | "medical"
     | "service"
-    | "transport";
-  lat: number;
-  lng: number;
-  icon?: string;
+    | "transport"
+  lat: number
+  lng: number
+  icon?: string
 }
 
 export const CAMPUS_ZONES = {
@@ -162,7 +162,7 @@ export const CAMPUS_ZONES = {
       },
     },
   ],
-};
+}
 
 export const CAMPUS_LANDMARKS: Landmark[] = [
   {
@@ -303,4 +303,4 @@ export const CAMPUS_LANDMARKS: Landmark[] = [
     lat: 40.11043290801958,
     lng: -88.229839506289,
   },
-];
+]

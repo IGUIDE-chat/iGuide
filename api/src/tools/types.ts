@@ -8,10 +8,7 @@ export interface ToolDefinition {
   name: string
   description: string
   parameters: Record<string, unknown>
-  execute: (
-    args: Record<string, unknown>,
-    ctx: RequestContext
-  ) => Promise<ToolResult>
+  execute: (args: Record<string, unknown>, ctx: RequestContext) => Promise<ToolResult>
 }
 
 export interface ToolResult {
@@ -21,7 +18,7 @@ export interface ToolResult {
 }
 
 export interface OpenAITool {
-  type: 'function'
+  type: "function"
   function: {
     name: string
     description: string

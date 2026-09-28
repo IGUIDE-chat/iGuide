@@ -3,27 +3,24 @@
  * @description DormDetail header section - back button, title, location, tags, pricing cards
  */
 
-import React from "react";
-import { motion } from "framer-motion";
-import { MapPin, Snowflake, Utensils, Bath } from "lucide-react";
-import { Dorm, DormTag } from "./types/index";
-import { Language } from "../../types";
-import {
-  TAG_REGISTRY,
-  getHousingTypeMeta,
-  getLocalizedLabel,
-} from "./constants/metadata";
-import { getDetailTagDisplay } from "../../utils/tagLabels";
-import { getDormBathroomSummary } from "../../utils/roomOptions";
+import { motion } from "framer-motion"
+import { MapPin, Snowflake, Utensils, Bath } from "lucide-react"
+import React from "react"
+
+import { Language } from "../../types"
+import { getDormBathroomSummary } from "../../utils/roomOptions"
+import { getDetailTagDisplay } from "../../utils/tagLabels"
+import { TAG_REGISTRY, getHousingTypeMeta, getLocalizedLabel } from "./constants/metadata"
+import { Dorm, DormTag } from "./types/index"
 
 interface DormDetailHeaderProps {
-  dorm: Dorm;
-  language: Language;
-  dormName: string;
-  dormAddress: string | null;
-  dormLocation: string;
-  positiveTags: DormTag[];
-  fadeUp: any;
+  dorm: Dorm
+  language: Language
+  dormName: string
+  dormAddress: string | null
+  dormLocation: string
+  positiveTags: DormTag[]
+  fadeUp: any
 }
 
 export const DormDetailHeader: React.FC<DormDetailHeaderProps> = ({
@@ -35,8 +32,8 @@ export const DormDetailHeader: React.FC<DormDetailHeaderProps> = ({
   positiveTags,
   fadeUp,
 }) => {
-  const housingMeta = getHousingTypeMeta(dorm.housingType);
-  const bathroomLabel = getDormBathroomSummary(dorm, language);
+  const housingMeta = getHousingTypeMeta(dorm.housingType)
+  const bathroomLabel = getDormBathroomSummary(dorm, language)
   const diningLabel =
     dorm.dining === "inside"
       ? language === "zh"
@@ -48,39 +45,24 @@ export const DormDetailHeader: React.FC<DormDetailHeaderProps> = ({
           : "Dining Nearby"
         : language === "zh"
           ? "无食堂"
-          : "No Dining";
+          : "No Dining"
 
   return (
     <motion.div
       variants={fadeUp}
-      className="
-        flex flex-col justify-between gap-6
-        md:flex-row md:items-start md:gap-8
-      "
+      className="flex flex-col justify-between gap-6 md:flex-row md:items-start md:gap-8"
     >
       <div
-        className="
-          flex-1 space-y-3
-          md:space-y-4
-        "
+        className="flex-1 space-y-3 md:space-y-4"
       >
         <div className="flex flex-wrap items-center gap-2">
           <span
-            className="
-              rounded-full bg-slate-200/60 px-3 py-1 text-[11px] font-bold
-              text-slate-700
-              md:text-[12px]
-            "
+            className="rounded-full bg-slate-200/60 px-3 py-1 text-[11px] font-bold text-slate-700 md:text-[12px]"
           >
-            {getLocalizedLabel(housingMeta, language)} ({housingMeta.shortLabel}
-            )
+            {getLocalizedLabel(housingMeta, language)} ({housingMeta.shortLabel})
           </span>
           <span
-            className="
-              inline-flex items-center gap-1 rounded-full bg-slate-200/60 px-3
-              py-1 text-[11px] font-bold text-slate-700
-              md:text-[12px]
-            "
+            className="inline-flex items-center gap-1 rounded-full bg-slate-200/60 px-3 py-1 text-[11px] font-bold text-slate-700 md:text-[12px]"
           >
             <MapPin className="size-3" />
             {dormLocation}
@@ -88,26 +70,17 @@ export const DormDetailHeader: React.FC<DormDetailHeaderProps> = ({
         </div>
 
         <h1
-          className="
-            text-3xl font-extrabold tracking-tight text-illini-blue
-            md:text-4xl
-          "
+          className="text-illini-blue text-3xl font-extrabold tracking-tight md:text-4xl"
         >
           {dormName}
         </h1>
 
         {dormAddress && (
           <div
-            className="
-              flex items-start gap-1.5 text-[13px] font-medium text-slate-500
-              md:items-center md:text-[14px]
-            "
+            className="flex items-start gap-1.5 text-[13px] font-medium text-slate-500 md:items-center md:text-[14px]"
           >
             <MapPin
-              className="
-                mt-0.5 size-4 shrink-0
-                md:mt-0
-              "
+              className="mt-0.5 size-4 shrink-0 md:mt-0"
             />
             <span className="leading-tight">{dormAddress}</span>
           </div>
@@ -116,28 +89,20 @@ export const DormDetailHeader: React.FC<DormDetailHeaderProps> = ({
         {positiveTags.length > 0 && (
           <div className="flex flex-wrap gap-2 pt-1">
             {positiveTags.flatMap((tag, i) => {
-              const Icon = TAG_REGISTRY[tag]?.icon;
-              if (
-                tag === "llc" &&
-                (dorm.categorizedTags?.llcNames?.length ?? 0) > 1
-              ) {
+              const Icon = TAG_REGISTRY[tag]?.icon
+              if (tag === "llc" && (dorm.categorizedTags?.llcNames?.length ?? 0) > 1) {
                 return dorm.categorizedTags.llcNames!.map((llcName, j) => (
                   <motion.span
                     key={`llc-${j}`}
                     initial={{ opacity: 0, scale: 0.85 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.3 + (i + j) * 0.06 }}
-                    className="
-                      inline-flex items-center gap-1 rounded-full
-                      bg-illini-orange/10 px-3 py-1 text-[12px] font-bold
-                      text-illini-orange
-                      md:text-[13px]
-                    "
+                    className="bg-illini-orange/10 text-illini-orange inline-flex items-center gap-1 rounded-full px-3 py-1 text-[12px] font-bold md:text-[13px]"
                   >
                     {Icon && <Icon className="size-3.5" strokeWidth={1.5} />}
                     {llcName}
                   </motion.span>
-                ));
+                ))
               }
               return (
                 <motion.span
@@ -145,17 +110,12 @@ export const DormDetailHeader: React.FC<DormDetailHeaderProps> = ({
                   initial={{ opacity: 0, scale: 0.85 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.3 + i * 0.06 }}
-                  className="
-                    inline-flex items-center gap-1 rounded-full
-                    bg-illini-orange/10 px-3 py-1 text-[12px] font-bold
-                    text-illini-orange
-                    md:text-[13px]
-                  "
+                  className="bg-illini-orange/10 text-illini-orange inline-flex items-center gap-1 rounded-full px-3 py-1 text-[12px] font-bold md:text-[13px]"
                 >
                   {Icon && <Icon className="size-3.5" strokeWidth={1.5} />}
                   {getDetailTagDisplay(tag, dorm.categorizedTags, language)}
                 </motion.span>
-              );
+              )
             })}
           </div>
         )}
@@ -163,50 +123,27 @@ export const DormDetailHeader: React.FC<DormDetailHeaderProps> = ({
 
       {/* Hard Facts cards */}
       <div
-        className="
-          mt-2 flex w-full gap-2
-          md:mt-0 md:w-auto md:gap-3
-        "
+        className="mt-2 flex w-full gap-2 md:mt-0 md:w-auto md:gap-3"
       >
         {/* AC */}
         <div
-          className={`
-            flex h-[88px] min-w-[88px] flex-1 flex-col items-center
-            justify-center rounded-2xl border p-2 shadow-sm
-            md:h-[100px] md:min-w-[100px] md:flex-none md:p-3
-            ${
-              dorm.ac
-                ? "border-slate-100 bg-white"
-                : "border-amber-200 bg-amber-50"
-            }
-          `}
+          className={`flex h-[88px] min-w-[88px] flex-1 flex-col items-center justify-center rounded-2xl border p-2 shadow-sm md:h-[100px] md:min-w-[100px] md:flex-none md:p-3 ${dorm.ac ? "border-slate-100 bg-white" : "border-amber-200 bg-amber-50"} `}
         >
           <div className="relative mb-1.5">
             <Snowflake
-              className={`
-                size-5
-                md:size-6
-                ${dorm.ac ? "text-sky-400" : "text-slate-300"}
-              `}
+              className={`size-5 md:size-6 ${dorm.ac ? "text-sky-400" : "text-slate-300"} `}
               strokeWidth={1.5}
             />
             {!dorm.ac && (
               <div
-                className="
-                  pointer-events-none absolute inset-0 flex items-center
-                  justify-center
-                "
+                className="pointer-events-none absolute inset-0 flex items-center justify-center"
               >
                 <div className="h-[2px] w-[140%] rotate-45 rounded-full bg-red-400" />
               </div>
             )}
           </div>
           <span
-            className={`
-              text-center text-[11px] leading-tight font-bold
-              md:text-[12px]
-              ${dorm.ac ? "text-slate-700" : "text-amber-700"}
-            `}
+            className={`text-center text-[11px] leading-tight font-bold md:text-[12px] ${dorm.ac ? "text-slate-700" : "text-amber-700"} `}
           >
             {dorm.ac
               ? language === "zh"
@@ -218,11 +155,7 @@ export const DormDetailHeader: React.FC<DormDetailHeaderProps> = ({
           </span>
           {!dorm.ac && (
             <span
-              className="
-                mt-1 rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px]
-                leading-none font-semibold text-amber-500
-                md:text-[10px]
-              "
+              className="mt-1 rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] leading-none font-semibold text-amber-500 md:text-[10px]"
             >
               {language === "zh" ? "注意" : "Note"}
             </span>
@@ -231,25 +164,14 @@ export const DormDetailHeader: React.FC<DormDetailHeaderProps> = ({
 
         {/* Dining */}
         <div
-          className="
-            flex h-[88px] min-w-[88px] flex-1 flex-col items-center
-            justify-center rounded-2xl border border-slate-100 bg-white p-2
-            shadow-sm
-            md:h-[100px] md:min-w-[100px] md:flex-none md:p-3
-          "
+          className="flex h-[88px] min-w-[88px] flex-1 flex-col items-center justify-center rounded-2xl border border-slate-100 bg-white p-2 shadow-sm md:h-[100px] md:min-w-[100px] md:flex-none md:p-3"
         >
           <Utensils
-            className="
-              mb-1.5 size-5 shrink-0 text-[#52C41A]
-              md:size-6
-            "
+            className="mb-1.5 size-5 shrink-0 text-[#52C41A] md:size-6"
             strokeWidth={1.5}
           />
           <span
-            className="
-              text-center text-[11px] leading-tight font-bold text-slate-700
-              md:text-[12px]
-            "
+            className="text-center text-[11px] leading-tight font-bold text-slate-700 md:text-[12px]"
           >
             {diningLabel}
           </span>
@@ -257,30 +179,19 @@ export const DormDetailHeader: React.FC<DormDetailHeaderProps> = ({
 
         {/* Bathroom */}
         <div
-          className="
-            flex h-[88px] min-w-[88px] flex-1 flex-col items-center
-            justify-center rounded-2xl border border-slate-100 bg-white p-2
-            shadow-sm
-            md:h-[100px] md:min-w-[100px] md:flex-none md:p-3
-          "
+          className="flex h-[88px] min-w-[88px] flex-1 flex-col items-center justify-center rounded-2xl border border-slate-100 bg-white p-2 shadow-sm md:h-[100px] md:min-w-[100px] md:flex-none md:p-3"
         >
           <Bath
-            className="
-              mb-1.5 size-5 shrink-0 text-[#1890FF]
-              md:size-6
-            "
+            className="mb-1.5 size-5 shrink-0 text-[#1890FF] md:size-6"
             strokeWidth={1.5}
           />
           <span
-            className="
-              text-center text-[11px] leading-tight font-bold text-slate-700
-              md:text-[12px]
-            "
+            className="text-center text-[11px] leading-tight font-bold text-slate-700 md:text-[12px]"
           >
             {bathroomLabel}
           </span>
         </div>
       </div>
     </motion.div>
-  );
-};
+  )
+}

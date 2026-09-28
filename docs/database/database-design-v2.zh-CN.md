@@ -129,6 +129,7 @@ sources -> source_snapshots -> artifacts -> chunks
 ### 默认路由指引
 
 #### Stable domains
+
 通常适合 local-first：
 
 - courses
@@ -138,6 +139,7 @@ sources -> source_snapshots -> artifacts -> chunks
 - academic calendar items
 
 #### Volatile domains
+
 不应默认把数据库归档副本当作当前真相：
 
 - news
@@ -265,6 +267,7 @@ source 层是所有 source-derived knowledge 的**规范持久化形态**。
 - `course_offering`
 
 #### `course`
+
 表示稳定的 catalog 事实。
 
 典型 must-have fields：
@@ -295,6 +298,7 @@ source 层是所有 source-derived knowledge 的**规范持久化形态**。
 - `attribute_labels[]`
 
 #### `course_offering`
+
 表示某个学期特定开课事实。
 
 典型 must-have fields：
@@ -529,16 +533,19 @@ QMD 应被视为 **transitional infrastructure**，而不是未来的 canonical 
 ### Migration stance
 
 #### Short term
+
 - 保持 QMD 作为 sidecar 继续运行
 - 保留兼容性与回滚安全
 - 用它做 parity comparison
 
 #### Medium term
+
 - 把 ingestion 镜像写入 Supabase-native path
 - 对比 retrieval quality 与 ranking behavior
 - 调优 chunking、weighting、ranking 与 fallback 行为
 
 #### Long term
+
 - 当 parity 达到可接受水平后，让 QMD 退出 primary production retrieval path
 
 ### Migration principle
@@ -595,6 +602,7 @@ repo 中已经存在：
 系统必须区别对待 volatile domains 与 stable domains。
 
 ### Stable domains
+
 通常为 local-first：
 
 - courses
@@ -604,6 +612,7 @@ repo 中已经存在：
 - academic calendar items
 
 ### Volatile domains
+
 通常为 live-first 或 local-with-live-verify：
 
 - news

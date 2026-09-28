@@ -3,26 +3,23 @@
  * @description Chat (AI) Component / Module
  */
 
-import {
-  MessagePrimitive,
-  ActionBarPrimitive,
-  useAuiState,
-} from "@assistant-ui/react";
-import { ThinkingProcess } from "../ThinkingProcess";
-import { Typewriter } from "../../ui/Typewriter";
-import { ThinkingStep } from "../../../types";
+import { MessagePrimitive, ActionBarPrimitive, useAuiState } from "@assistant-ui/react"
+
+import { ThinkingStep } from "../../../types"
+import { Typewriter } from "../../ui/Typewriter"
+import { ThinkingProcess } from "../ThinkingProcess"
 
 interface AssistantMessageMeta {
-  thinkingSteps?: ThinkingStep[];
-  isThinking?: boolean;
-  followUpQuestions?: string[];
-  isStreaming?: boolean;
+  thinkingSteps?: ThinkingStep[]
+  isThinking?: boolean
+  followUpQuestions?: string[]
+  isStreaming?: boolean
 }
 
 interface AssistantMessageProps {
-  language?: "en" | "zh";
-  botName?: string;
-  onFollowUpClick?: (text: string) => void;
+  language?: "en" | "zh"
+  botName?: string
+  onFollowUpClick?: (text: string) => void
 }
 
 export const AssistantMessage: React.FC<AssistantMessageProps> = ({
@@ -32,31 +29,20 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
 }) => {
   // `useMessage` was removed in @assistant-ui/react 0.15; the message state
   // now lives behind the Aui store, so read the two slices this component uses.
-  const messageId = useAuiState((s) => s.message.id);
-  const meta = useAuiState(
-    (s) => s.message.metadata.custom as AssistantMessageMeta
-  );
+  const messageId = useAuiState((s) => s.message.id)
+  const meta = useAuiState((s) => s.message.metadata.custom as AssistantMessageMeta)
 
   return (
     <MessagePrimitive.Root className="flex w-full border-b border-transparent py-6">
       <div
-        className="
-          mx-auto flex w-full max-w-3xl flex-col gap-4 px-4
-          md:flex-row
-        "
+        className="mx-auto flex w-full max-w-3xl flex-col gap-4 px-4 md:flex-row"
       >
         {/* Avatar — hidden on mobile */}
         <div
-          className="
-            relative flex hidden shrink-0 flex-col items-end
-            md:flex
-          "
+          className="relative flex hidden shrink-0 flex-col items-end md:flex"
         >
           <div
-            className="
-              flex size-6 items-center justify-center rounded-sm
-              bg-illini-orange font-serif text-xs font-bold text-white shadow-sm
-            "
+            className="bg-illini-orange flex size-6 items-center justify-center rounded-sm font-serif text-xs font-bold text-white shadow-sm"
           >
             I
           </div>
@@ -71,10 +57,7 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
           >
             <ActionBarPrimitive.Copy
               aria-label="Copy message"
-              className="
-                rounded-md p-1.5 text-slate-500 transition-colors
-                hover:bg-slate-100 hover:text-slate-700
-              "
+              className="rounded-md p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -94,10 +77,7 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
             </ActionBarPrimitive.Copy>
             <ActionBarPrimitive.Reload
               aria-label="Regenerate response"
-              className="
-                rounded-md p-1.5 text-slate-500 transition-colors
-                hover:bg-slate-100 hover:text-slate-700
-              "
+              className="rounded-md p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -119,10 +99,7 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
 
           {/* Bot name label */}
           <div
-            className="
-              mb-1 hidden text-xs font-semibold text-slate-900
-              md:block
-            "
+            className="mb-1 hidden text-xs font-semibold text-slate-900 md:block"
           >
             {botName}
           </div>
@@ -141,14 +118,11 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
               fall through to assistant-ui's registered Tool UI renderers. */}
           <div
             aria-live="polite"
-            className="
-              prose prose-slate prose-sm max-w-none leading-relaxed
-              text-slate-800
-            "
+            className="prose prose-slate prose-sm max-w-none leading-relaxed text-slate-800"
           >
             <MessagePrimitive.Parts>
               {({ part }) => {
-                if (part.type !== "text") return null;
+                if (part.type !== "text") return null
 
                 return (
                   <>
@@ -160,60 +134,38 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
                         a: ({ node: _node, ...props }) => (
                           <a
                             {...props}
-                            className="
-                              text-illini-orange
-                              hover:underline
-                            "
+                            className="text-illini-orange hover:underline"
                             target="_blank"
                             rel="noopener noreferrer"
                           />
                         ),
-                        code: ({
-                          node: _node,
-                          className,
-                          children,
-                          ...props
-                        }) => {
-                          const isInline = !className;
+                        code: ({ node: _node, className, children, ...props }) => {
+                          const isInline = !className
                           return isInline ? (
                             <code
-                              className="
-                                rounded-sm bg-slate-100 px-1 py-0.5 text-xs
-                              "
+                              className="rounded-sm bg-slate-100 px-1 py-0.5 text-xs"
                               {...props}
                             >
                               {children}
                             </code>
                           ) : (
                             <code
-                              className="
-                                block overflow-x-auto rounded-sm bg-slate-100
-                                p-2 text-xs
-                              "
+                              className="block overflow-x-auto rounded-sm bg-slate-100 p-2 text-xs"
                               {...props}
                             >
                               {children}
                             </code>
-                          );
+                          )
                         },
                         ul: ({ node: _node, ...props }) => (
-                          <ul
-                            className="list-inside list-disc space-y-1"
-                            {...props}
-                          />
+                          <ul className="list-inside list-disc space-y-1" {...props} />
                         ),
                         ol: ({ node: _node, ...props }) => (
-                          <ol
-                            className="list-inside list-decimal space-y-1"
-                            {...props}
-                          />
+                          <ol className="list-inside list-decimal space-y-1" {...props} />
                         ),
                         p: ({ node: _node, ...props }) => (
                           <p
-                            className="
-                              mb-2
-                              last:mb-0
-                            "
+                            className="mb-2 last:mb-0"
                             {...props}
                           />
                         ),
@@ -221,10 +173,7 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
                           <img
                             {...props}
                             alt={alt ?? ""}
-                            className="
-                              my-2 h-auto max-w-full rounded-lg border
-                              border-slate-200 shadow-sm
-                            "
+                            className="my-2 h-auto max-w-full rounded-lg border border-slate-200 shadow-sm"
                             loading="lazy"
                           />
                         ),
@@ -234,7 +183,7 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
                     {part.status.type === "running" && (
                       <span className="ml-1 inline-flex items-center align-middle">
                         <svg
-                          className="size-3.5 animate-spin text-illini-orange"
+                          className="text-illini-orange size-3.5 animate-spin"
                           xmlns="http://www.w3.org/2000/svg"
                           fill="none"
                           viewBox="0 0 24 24"
@@ -258,7 +207,7 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
                       </span>
                     )}
                   </>
-                );
+                )
               }}
             </MessagePrimitive.Parts>
           </div>
@@ -268,31 +217,23 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
             <div className="mt-3 flex flex-wrap gap-2">
               {meta.followUpQuestions.slice(0, 3).map((question) => {
                 const displayText =
-                  question.length > 50
-                    ? `${question.substring(0, 47)}...`
-                    : question;
+                  question.length > 50 ? `${question.substring(0, 47)}...` : question
                 return (
                   <button
                     key={question}
                     type="button"
                     onClick={() => onFollowUpClick?.(question)}
                     title={question}
-                    className="
-                      rounded-full border border-slate-200 bg-slate-100 px-3
-                      py-1.5 text-xs transition-colors
-                      hover:border-illini-blue hover:bg-illini-blue
-                      hover:text-white
-                      disabled:cursor-not-allowed disabled:opacity-50
-                    "
+                    className="hover:border-illini-blue hover:bg-illini-blue rounded-full border border-slate-200 bg-slate-100 px-3 py-1.5 text-xs transition-colors hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     💡 {displayText}
                   </button>
-                );
+                )
               })}
             </div>
           )}
         </div>
       </div>
     </MessagePrimitive.Root>
-  );
-};
+  )
+}

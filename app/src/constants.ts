@@ -5,12 +5,12 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
+import { UI_TEXT as I18N_UI_TEXT } from "./i18n/uiText"
 // [ROOT] Global constants and static library metadata.
-import { Article, Category, Language } from "./types";
-import { UI_TEXT as I18N_UI_TEXT } from "./i18n/uiText";
+import { Article, Category, Language } from "./types"
 
 /** @deprecated Use UI_TEXT from './i18n/uiText' directly. */
-export const UI_TEXT = I18N_UI_TEXT;
+export const UI_TEXT = I18N_UI_TEXT
 
 export const CATEGORIES: Category[] = [
   {
@@ -61,24 +61,19 @@ export const CATEGORIES: Category[] = [
     label_zh: "安全与健康",
     description_zh: "校医院、夜间陪走与紧急联系方式。",
   },
-];
+]
 
-export { ARTICLES } from "./data/articles";
+export { ARTICLES } from "./data/articles"
 
 export const getArticleText = (article: Article, lang: Language) => ({
   title: lang === "zh" && article.title_zh ? article.title_zh : article.title,
-  summary:
-    lang === "zh" && article.summary_zh ? article.summary_zh : article.summary,
-  content:
-    lang === "zh" && article.content_zh ? article.content_zh : article.content,
+  summary: lang === "zh" && article.summary_zh ? article.summary_zh : article.summary,
+  content: lang === "zh" && article.content_zh ? article.content_zh : article.content,
   tags: lang === "zh" && article.tags_zh ? article.tags_zh : article.tags,
-});
+})
 
 export const getCategoryText = (category: Category, lang: Language) => ({
-  label:
-    lang === "zh" && category.label_zh ? category.label_zh : category.label,
+  label: lang === "zh" && category.label_zh ? category.label_zh : category.label,
   description:
-    lang === "zh" && category.description_zh
-      ? category.description_zh
-      : category.description,
-});
+    lang === "zh" && category.description_zh ? category.description_zh : category.description,
+})

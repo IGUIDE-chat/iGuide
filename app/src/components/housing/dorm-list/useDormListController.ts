@@ -5,21 +5,19 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Dorm } from "../types/index";
-import { getPriceRangeFromData } from "../constants/pricing";
-import { useDormData } from "../store/DormDataContext";
-import { useHousingFilters } from "../store/HousingContext";
-import { useSharedDormInteraction } from "../store/DormUserInteractionContext";
-import { useLayout } from "../../../contexts/LayoutContext";
-import { Language } from "../../../types";
-import { filterAndSortDorms, normalizePriceRange } from "./filtering";
-import { DormListText } from "./types";
-import {
-  DEFAULT_FAVORITES_TARGET,
-  DEFAULT_TOGGLE_TARGET,
-} from "./favoriteConstants";
+import { useLayoutEffect, useMemo, useRef, useState } from "react"
+import { useNavigate } from "react-router-dom"
+
+import { useLayout } from "../../../contexts/LayoutContext"
+import { Language } from "../../../types"
+import { getPriceRangeFromData } from "../constants/pricing"
+import { useDormData } from "../store/DormDataContext"
+import { useSharedDormInteraction } from "../store/DormUserInteractionContext"
+import { useHousingFilters } from "../store/HousingContext"
+import { Dorm } from "../types/index"
+import { DEFAULT_FAVORITES_TARGET, DEFAULT_TOGGLE_TARGET } from "./favoriteConstants"
+import { filterAndSortDorms, normalizePriceRange } from "./filtering"
+import { DormListText } from "./types"
 
 const DORM_LIST_TEXT: Record<Language, DormListText> = {
   en: {
@@ -51,29 +49,24 @@ const DORM_LIST_TEXT: Record<Language, DormListText> = {
     noDormsInArea: "该区域暂无宿舍",
     panToSeeDorms: "请移动或缩放地图查看其他区域的宿舍",
   },
-};
+}
 
 export const useDormListController = (language: Language) => {
-  const navigate = useNavigate();
-  const { dorms: allDorms } = useDormData();
-  const {
-    isSidebarOpen,
-    favoritesIconRef,
-    sidebarToggleButtonRef,
-    mobileSidebarButtonRef,
-  } = useLayout();
-  const { toggleFavorite, addToHistory, favorites } =
-    useSharedDormInteraction();
+  const navigate = useNavigate()
+  const { dorms: allDorms } = useDormData()
+  const { isSidebarOpen, favoritesIconRef, sidebarToggleButtonRef, mobileSidebarButtonRef } =
+    useLayout()
+  const { toggleFavorite, addToHistory, favorites } = useSharedDormInteraction()
   const [flyingHeart, setFlyingHeart] = useState<{
-    x: number;
-    y: number;
-    targetX: number;
-    targetY: number;
-  } | null>(null);
-  const [hoveredDormId, setHoveredDormId] = useState<string | null>(null);
-  const [isCarouselHovering, setIsCarouselHovering] = useState(false);
-  const [visibleInMap, setVisibleInMap] = useState<Dorm[]>([]);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+    x: number
+    y: number
+    targetX: number
+    targetY: number
+  } | null>(null)
+  const [hoveredDormId, setHoveredDormId] = useState<string | null>(null)
+  const [isCarouselHovering, setIsCarouselHovering] = useState(false)
+  const [visibleInMap, setVisibleInMap] = useState<Dorm[]>([])
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   const {
     searchTerm,
@@ -97,21 +90,18 @@ export const useDormListController = (language: Language) => {
     requireAc,
     bathroomTypeFilters,
     clearAllFilters,
-  } = useHousingFilters();
+  } = useHousingFilters()
 
-  const t = DORM_LIST_TEXT[language];
-  const isMapView = viewMode === "map";
-  const isListView = !isMapView;
-  const priceLimits = useMemo<[number, number]>(
-    () => getPriceRangeFromData(allDorms),
-    [allDorms]
-  );
-  const favoritesSet = useMemo(() => new Set(favorites), [favorites]);
+  const t = DORM_LIST_TEXT[language]
+  const isMapView = viewMode === "map"
+  const isListView = !isMapView
+  const priceLimits = useMemo<[number, number]>(() => getPriceRangeFromData(allDorms), [allDorms])
+  const favoritesSet = useMemo(() => new Set(favorites), [favorites])
 
   const hasPriceFilter = useMemo(
     () => priceRange[0] !== priceLimits[0] || priceRange[1] !== priceLimits[1],
-    [priceRange, priceLimits]
-  );
+    [priceRange, priceLimits],
+  )
 
   const hasActiveFilters = useMemo(
     () =>
@@ -138,8 +128,8 @@ export const useDormListController = (language: Language) => {
       livingConditionFilters.length,
       locationFilters.length,
       requireAc,
-    ]
-  );
+    ],
+  )
 
   const activeFilterCount = useMemo(
     () =>
@@ -166,13 +156,13 @@ export const useDormListController = (language: Language) => {
       livingConditionFilters.length,
       locationFilters.length,
       requireAc,
-    ]
-  );
+    ],
+  )
 
   const normalizedPriceRange = useMemo<[number, number]>(
     () => normalizePriceRange(priceRange, priceLimits),
-    [priceRange, priceLimits]
-  );
+    [priceRange, priceLimits],
+  )
 
   const filteredDorms = useMemo(
     () =>
@@ -206,62 +196,61 @@ export const useDormListController = (language: Language) => {
       requireAc,
       searchTerm,
       sortBy,
-    ]
-  );
+    ],
+  )
 
   useLayoutEffect(() => {
     if (viewMode !== "map" || filteredDorms.length === 0) {
-      setIsCarouselHovering(false);
+      setIsCarouselHovering(false)
     }
-  }, [viewMode, filteredDorms.length]);
+  }, [viewMode, filteredDorms.length])
 
   useLayoutEffect(() => {
     if (viewMode !== "map" || filteredDorms.length === 0) {
-      setVisibleInMap((current) => (current.length === 0 ? current : []));
+      setVisibleInMap((current) => (current.length === 0 ? current : []))
     }
-  }, [viewMode, filteredDorms.length]);
+  }, [viewMode, filteredDorms.length])
 
   const handleViewDetails = (dorm: Dorm) => {
-    addToHistory(dorm);
-    navigate(`/dorms/${dorm.id}`);
-  };
+    addToHistory(dorm)
+    navigate(`/dorms/${dorm.id}`)
+  }
 
   const handleMapNoResultAction = () => {
     if (hasPriceFilter) {
-      setPriceRange(priceLimits);
-      return;
+      setPriceRange(priceLimits)
+      return
     }
-    clearAllFilters();
-  };
+    clearAllFilters()
+  }
 
   const handleToggleFavorite = (dorm: Dorm, event?: React.MouseEvent) => {
-    const wasNotFavorite = !favoritesSet.has(dorm.id);
+    const wasNotFavorite = !favoritesSet.has(dorm.id)
 
     if (wasNotFavorite && event) {
-      let targetX: number;
-      let targetY: number;
+      let targetX: number
+      let targetY: number
 
       if (isSidebarOpen && favoritesIconRef?.current) {
-        const rect = favoritesIconRef.current.getBoundingClientRect();
-        targetX = rect.left + rect.width / 2;
-        targetY = rect.top + rect.height / 2;
+        const rect = favoritesIconRef.current.getBoundingClientRect()
+        targetX = rect.left + rect.width / 2
+        targetY = rect.top + rect.height / 2
       } else if (isSidebarOpen) {
-        targetX = DEFAULT_FAVORITES_TARGET.x;
-        targetY = DEFAULT_FAVORITES_TARGET.y;
+        targetX = DEFAULT_FAVORITES_TARGET.x
+        targetY = DEFAULT_FAVORITES_TARGET.y
       } else {
-        const isMobile =
-          typeof window !== "undefined" && window.innerWidth < 768;
+        const isMobile = typeof window !== "undefined" && window.innerWidth < 768
         const toggleElement = isMobile
           ? mobileSidebarButtonRef?.current
-          : sidebarToggleButtonRef?.current;
+          : sidebarToggleButtonRef?.current
 
         if (toggleElement) {
-          const rect = toggleElement.getBoundingClientRect();
-          targetX = rect.left + rect.width / 2;
-          targetY = rect.top + rect.height / 2;
+          const rect = toggleElement.getBoundingClientRect()
+          targetX = rect.left + rect.width / 2
+          targetY = rect.top + rect.height / 2
         } else {
-          targetX = DEFAULT_TOGGLE_TARGET.x;
-          targetY = DEFAULT_TOGGLE_TARGET.y;
+          targetX = DEFAULT_TOGGLE_TARGET.x
+          targetY = DEFAULT_TOGGLE_TARGET.y
         }
       }
 
@@ -270,11 +259,11 @@ export const useDormListController = (language: Language) => {
         y: event.clientY,
         targetX,
         targetY,
-      });
+      })
     }
 
-    void toggleFavorite(dorm.id, dorm.name, dorm.name_zh);
-  };
+    void toggleFavorite(dorm.id, dorm.name, dorm.name_zh)
+  }
 
   return {
     t,
@@ -306,5 +295,5 @@ export const useDormListController = (language: Language) => {
     handleViewDetails,
     handleMapNoResultAction,
     handleToggleFavorite,
-  };
-};
+  }
+}

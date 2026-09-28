@@ -1,13 +1,9 @@
-import test from 'node:test'
-import assert from 'node:assert/strict'
+import assert from "node:assert/strict"
+import test from "node:test"
 
-import type {
-  MCPConnection,
-  MCPDiscoveredTool,
-  MCPToolOverride,
-} from './types.ts'
-import type { MCPDiscoveryResult, MCPTestResult } from './adapter.ts'
-import { maybeHandleIntegrationsRoute } from './routes.ts'
+import type { MCPDiscoveryResult, MCPTestResult } from "./adapter.ts"
+import { maybeHandleIntegrationsRoute } from "./routes.ts"
+import type { MCPConnection, MCPDiscoveredTool, MCPToolOverride } from "./types.ts"
 
 interface MockServices {
   connections: {
@@ -17,52 +13,43 @@ interface MockServices {
     }>
     createUserConnection: (
       viewerId: string,
-      input: Record<string, unknown>
+      input: Record<string, unknown>,
     ) => Promise<MCPConnection>
-    getByIdForViewer: (
-      id: string,
-      viewerId: string
-    ) => Promise<MCPConnection | null>
+    getByIdForViewer: (id: string, viewerId: string) => Promise<MCPConnection | null>
     updateUserConnection: (
       id: string,
       viewerId: string,
-      patch: Record<string, unknown>
+      patch: Record<string, unknown>,
     ) => Promise<MCPConnection | null>
     deleteUserConnection: (id: string, viewerId: string) => Promise<boolean>
-    recordTestResult: (
-      id: string,
-      viewerId: string,
-      result: MCPTestResult
-    ) => Promise<void>
+    recordTestResult: (id: string, viewerId: string, result: MCPTestResult) => Promise<void>
     recordDiscoveryResult: (
       id: string,
       viewerId: string,
-      result: MCPDiscoveryResult
+      result: MCPDiscoveryResult,
     ) => Promise<void>
   }
   tools: {
-    listByConnectionIds: (
-      connectionIds: string[]
-    ) => Promise<Record<string, MCPDiscoveredTool[]>>
+    listByConnectionIds: (connectionIds: string[]) => Promise<Record<string, MCPDiscoveredTool[]>>
     replaceDiscoveredTools: (
       connectionId: string,
-      tools: MCPDiscoveryResult['tools']
+      tools: MCPDiscoveryResult["tools"],
     ) => Promise<void>
   }
   overrides: {
     disableTool: (
       connectionId: string,
       toolName: string,
-      viewerId: string
+      viewerId: string,
     ) => Promise<MCPToolOverride>
     enableTool: (
       connectionId: string,
       toolName: string,
-      viewerId: string
+      viewerId: string,
     ) => Promise<MCPToolOverride | null>
     listOverridesByConnectionIds: (
       connectionIds: string[],
-      viewerId: string
+      viewerId: string,
     ) => Promise<Record<string, MCPToolOverride[]>>
   }
   client: {
@@ -72,18 +59,18 @@ interface MockServices {
 }
 
 const baseConnection: MCPConnection = {
-  id: 'conn_user_1',
-  owner_id: 'user-123',
-  owner_type: 'user',
-  visibility: 'owner_only',
-  display_name: 'Example MCP',
-  endpoint_url: 'https://example.com/mcp',
-  transport: 'streamable_http',
-  description: 'demo',
+  id: "conn_user_1",
+  owner_id: "user-123",
+  owner_type: "user",
+  visibility: "owner_only",
+  display_name: "Example MCP",
+  endpoint_url: "https://example.com/mcp",
+  transport: "streamable_http",
+  description: "demo",
   is_enabled: true,
   last_test_status: null,
-  created_at: '2026-04-18T00:00:00.000Z',
-  updated_at: '2026-04-18T00:00:00.000Z',
+  created_at: "2026-04-18T00:00:00.000Z",
+  updated_at: "2026-04-18T00:00:00.000Z",
 }
 
 function createServices(overrides: Partial<MockServices> = {}): MockServices {
@@ -94,11 +81,9 @@ function createServices(overrides: Partial<MockServices> = {}): MockServices {
         ...baseConnection,
         display_name: String(input.display_name),
         endpoint_url: String(input.endpoint_url),
-        description:
-          typeof input.description === 'string' ? input.description : undefined,
+        description: typeof input.description === "string" ? input.description : undefined,
       }),
-      getByIdForViewer: async (id) =>
-        id === baseConnection.id ? baseConnection : null,
+      getByIdForViewer: async (id) => (id === baseConnection.id ? baseConnection : null),
       updateUserConnection: async (id, _viewerId, patch) =>
         id === baseConnection.id
           ? {
@@ -114,12 +99,12 @@ function createServices(overrides: Partial<MockServices> = {}): MockServices {
       listByConnectionIds: async () => ({
         [baseConnection.id]: [
           {
-            id: 'tool-1',
+            id: "tool-1",
             connection_id: baseConnection.id,
-            name: 'search_docs',
-            description: 'Search docs',
-            input_schema: { type: 'object' },
-            discovered_at: '2026-04-18T00:00:00.000Z',
+            name: "search_docs",
+            description: "Search docs",
+            input_schema: { type: "object" },
+            discovered_at: "2026-04-18T00:00:00.000Z",
           },
         ],
       }),
@@ -127,23 +112,23 @@ function createServices(overrides: Partial<MockServices> = {}): MockServices {
     },
     overrides: {
       disableTool: async (connectionId, toolName, viewerId) => ({
-        id: 'override-1',
+        id: "override-1",
         connection_id: connectionId,
         tool_name: toolName,
         owner_id: viewerId,
         is_disabled: true,
-        created_at: '2026-04-18T00:00:00.000Z',
+        created_at: "2026-04-18T00:00:00.000Z",
       }),
       enableTool: async () => null,
       listOverridesByConnectionIds: async () => ({
         [baseConnection.id]: [
           {
-            id: 'override-1',
+            id: "override-1",
             connection_id: baseConnection.id,
-            tool_name: 'search_docs',
+            tool_name: "search_docs",
             owner_id: baseConnection.owner_id,
             is_disabled: true,
-            created_at: '2026-04-18T00:00:00.000Z',
+            created_at: "2026-04-18T00:00:00.000Z",
           },
         ],
       }),
@@ -162,9 +147,9 @@ function createServices(overrides: Partial<MockServices> = {}): MockServices {
         tools: [
           {
             url: baseConnection.endpoint_url,
-            name: 'search_docs',
-            description: 'Search docs',
-            parameters: { type: 'object' },
+            name: "search_docs",
+            description: "Search docs",
+            parameters: { type: "object" },
           },
         ],
       }),
@@ -178,18 +163,18 @@ function requireResponse(response: Response | null): Response {
   return response
 }
 
-test('GET /integrations returns platform/user sections and phase1 disclaimers', async () => {
+test("GET /integrations returns platform/user sections and phase1 disclaimers", async () => {
   const platformConnection: MCPConnection = {
     ...baseConnection,
-    id: 'conn_platform_1',
-    owner_id: 'platform',
-    owner_type: 'platform',
-    visibility: 'global',
-    display_name: 'Platform MCP',
+    id: "conn_platform_1",
+    owner_id: "platform",
+    owner_type: "platform",
+    visibility: "global",
+    display_name: "Platform MCP",
   }
 
   const response = await maybeHandleIntegrationsRoute(
-    new Request('https://api.example.com/integrations'),
+    new Request("https://api.example.com/integrations"),
     createServices({
       connections: {
         ...createServices().connections,
@@ -199,121 +184,117 @@ test('GET /integrations returns platform/user sections and phase1 disclaimers', 
         }),
       },
     }),
-    'user-123'
+    "user-123",
   )
 
   const resolved = requireResponse(response)
   assert.equal(resolved.status, 200)
   const body = (await resolved.json()) as any
   assert.deepEqual(body.phase1_limitations, [
-    'Streamable HTTP only',
-    'Credential-protected third-party MCP endpoints are not supported',
-    'Stdio and legacy SSE transports are not supported',
-    'Marketplace/template flows are not available in phase 1',
-    'Arbitrary public third-party MCP quality is not guaranteed by the platform',
+    "Streamable HTTP only",
+    "Credential-protected third-party MCP endpoints are not supported",
+    "Stdio and legacy SSE transports are not supported",
+    "Marketplace/template flows are not available in phase 1",
+    "Arbitrary public third-party MCP quality is not guaranteed by the platform",
   ])
-  assert.equal(body.platform[0].owner_type, 'platform')
-  assert.equal(body.user[0].owner_type, 'user')
+  assert.equal(body.platform[0].owner_type, "platform")
+  assert.equal(body.user[0].owner_type, "user")
   assert.ok(Array.isArray(body.platform[0].tools))
   assert.ok(Array.isArray(body.user[0].tools))
   assert.ok(Array.isArray(body.user[0].overrides))
 })
 
-test('POST /integrations rejects credential fields', async () => {
+test("POST /integrations rejects credential fields", async () => {
   const response = await maybeHandleIntegrationsRoute(
-    new Request('https://api.example.com/integrations', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    new Request("https://api.example.com/integrations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        display_name: 'Blocked',
-        endpoint_url: 'https://example.com/mcp',
-        transport: 'streamable_http',
-        api_key: 'secret',
+        display_name: "Blocked",
+        endpoint_url: "https://example.com/mcp",
+        transport: "streamable_http",
+        api_key: "secret",
       }),
     }),
     createServices(),
-    'user-123'
+    "user-123",
   )
 
   const resolved = requireResponse(response)
   assert.equal(resolved.status, 400)
   const body = (await resolved.json()) as any
   assert.match(body.error, /credential/i)
-  assert.equal(body.failure_reason, 'auth_required')
+  assert.equal(body.failure_reason, "auth_required")
 })
 
-test('POST /integrations rejects unsupported transports with failure classification', async () => {
+test("POST /integrations rejects unsupported transports with failure classification", async () => {
   const response = await maybeHandleIntegrationsRoute(
-    new Request('https://api.example.com/integrations', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    new Request("https://api.example.com/integrations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        display_name: 'Legacy SSE',
-        endpoint_url: 'https://example.com/sse',
-        transport: 'sse',
+        display_name: "Legacy SSE",
+        endpoint_url: "https://example.com/sse",
+        transport: "sse",
       }),
     }),
     createServices(),
-    'user-123'
+    "user-123",
   )
 
   const resolved = requireResponse(response)
   assert.equal(resolved.status, 400)
   const body = (await resolved.json()) as any
-  assert.equal(body.failure_reason, 'unsupported_transport')
+  assert.equal(body.failure_reason, "unsupported_transport")
   assert.match(body.error, /streamable_http/i)
 })
 
-test('POST /integrations rejects credentialed endpoint URLs with failure classification', async () => {
+test("POST /integrations rejects credentialed endpoint URLs with failure classification", async () => {
   const response = await maybeHandleIntegrationsRoute(
-    new Request('https://api.example.com/integrations', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    new Request("https://api.example.com/integrations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        display_name: 'Credentialed MCP',
-        endpoint_url: 'https://user:pass@example.com/mcp',
-        transport: 'streamable_http',
+        display_name: "Credentialed MCP",
+        endpoint_url: "https://user:pass@example.com/mcp",
+        transport: "streamable_http",
       }),
     }),
     createServices(),
-    'user-123'
+    "user-123",
   )
 
   const resolved = requireResponse(response)
   assert.equal(resolved.status, 400)
   const body = (await resolved.json()) as any
-  assert.equal(body.failure_reason, 'auth_required')
+  assert.equal(body.failure_reason, "auth_required")
   assert.match(body.error, /credential|auth/i)
 })
 
-test('PUT on a platform-owned connection returns 403', async () => {
+test("PUT on a platform-owned connection returns 403", async () => {
   const platformConnection: MCPConnection = {
     ...baseConnection,
-    id: 'conn_platform_1',
-    owner_id: 'platform',
-    owner_type: 'platform',
-    visibility: 'global',
+    id: "conn_platform_1",
+    owner_id: "platform",
+    owner_type: "platform",
+    visibility: "global",
   }
 
   const services = createServices({
     connections: {
       ...createServices().connections,
-      getByIdForViewer: async (id) =>
-        id === platformConnection.id ? platformConnection : null,
+      getByIdForViewer: async (id) => (id === platformConnection.id ? platformConnection : null),
     },
   })
 
   const response = await maybeHandleIntegrationsRoute(
-    new Request(
-      `https://api.example.com/integrations/${platformConnection.id}`,
-      {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ is_enabled: false }),
-      }
-    ),
+    new Request(`https://api.example.com/integrations/${platformConnection.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ is_enabled: false }),
+    }),
     services,
-    'user-123'
+    "user-123",
   )
 
   const resolved = requireResponse(response)
@@ -322,7 +303,7 @@ test('PUT on a platform-owned connection returns 403', async () => {
   assert.match(body.error, /platform/i)
 })
 
-test('POST /integrations/:id/test returns MCPTestResult and persists it', async () => {
+test("POST /integrations/:id/test returns MCPTestResult and persists it", async () => {
   let recordedResult: MCPTestResult | null = null
   const services = createServices({
     connections: {
@@ -334,14 +315,11 @@ test('POST /integrations/:id/test returns MCPTestResult and persists it', async 
   })
 
   const response = await maybeHandleIntegrationsRoute(
-    new Request(
-      `https://api.example.com/integrations/${baseConnection.id}/test`,
-      {
-        method: 'POST',
-      }
-    ),
+    new Request(`https://api.example.com/integrations/${baseConnection.id}/test`, {
+      method: "POST",
+    }),
     services,
-    'user-123'
+    "user-123",
   )
 
   const resolved = requireResponse(response)

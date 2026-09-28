@@ -1,24 +1,24 @@
-import { UIUC_DORMS } from "../src/components/housing/constants/dormData";
+import { UIUC_DORMS } from "../src/components/housing/constants/dormData"
 import {
   hasPeopleishFilename,
   isLikelyLowQualityMediaUrl,
   normalizeOfficialMediaUrl,
-} from "../src/components/housing/constants/dormOfficialOverrideUtils";
+} from "../src/components/housing/constants/dormOfficialOverrideUtils"
 
 interface MediaEntry {
-  dormId: string;
-  slot: string;
-  url: string;
+  dormId: string
+  slot: string
+  url: string
 }
 
 function collectEntries() {
-  const entries: MediaEntry[] = [];
+  const entries: MediaEntry[] = []
 
   for (const dorm of UIUC_DORMS) {
-    entries.push({ dormId: dorm.id, slot: "imageUrl", url: dorm.imageUrl });
+    entries.push({ dormId: dorm.id, slot: "imageUrl", url: dorm.imageUrl })
 
     for (const [index, url] of (dorm.galleryImages ?? []).entries()) {
-      entries.push({ dormId: dorm.id, slot: `galleryImages[${index}]`, url });
+      entries.push({ dormId: dorm.id, slot: `galleryImages[${index}]`, url })
     }
 
     for (const [planIndex, planValue] of (dorm.floorPlans ?? []).entries()) {
@@ -27,7 +27,7 @@ function collectEntries() {
           dormId: dorm.id,
           slot: `floorPlans[${planIndex}].photoUrls[${photoIndex}]`,
           url,
-        });
+        })
       }
 
       for (const [imageIndex, url] of (planValue.imageUrls ?? []).entries()) {
@@ -35,45 +35,45 @@ function collectEntries() {
           dormId: dorm.id,
           slot: `floorPlans[${planIndex}].imageUrls[${imageIndex}]`,
           url,
-        });
+        })
       }
     }
   }
 
-  return entries;
+  return entries
 }
 
 async function main() {
-  const entries = collectEntries();
+  const entries = collectEntries()
   const suspicious = entries
     .map((entry) => {
-      const candidate = normalizeOfficialMediaUrl(entry.url);
+      const candidate = normalizeOfficialMediaUrl(entry.url)
       return {
         ...entry,
         candidate,
         lowQuality: isLikelyLowQualityMediaUrl(entry.url),
         peopleCue: hasPeopleishFilename(entry.url),
-      };
+      }
     })
-    .filter((entry) => entry.lowQuality || entry.peopleCue);
+    .filter((entry) => entry.lowQuality || entry.peopleCue)
 
   if (suspicious.length === 0) {
-    console.log(`Dorm media audit passed for ${entries.length} media URLs.`);
-    return;
+    console.log(`Dorm media audit passed for ${entries.length} media URLs.`)
+    return
   }
 
-  const checked = [];
+  const checked = []
   for (const entry of suspicious) {
-    let headStatus: number | "ERR" | undefined;
+    let headStatus: number | "ERR" | undefined
     if (entry.lowQuality && entry.candidate !== entry.url) {
       try {
         const response = await fetch(entry.candidate, {
           method: "HEAD",
           redirect: "follow",
-        });
-        headStatus = response.status;
+        })
+        headStatus = response.status
       } catch {
-        headStatus = "ERR";
+        headStatus = "ERR"
       }
     }
 
@@ -87,14 +87,14 @@ async function main() {
         ...(entry.lowQuality ? ["low-quality-pattern"] : []),
         ...(entry.peopleCue ? ["people-filename-cue"] : []),
       ],
-    });
+    })
   }
 
-  console.error(JSON.stringify(checked, null, 2));
-  process.exit(1);
+  console.error(JSON.stringify(checked, null, 2))
+  process.exit(1)
 }
 
 main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+  console.error(error)
+  process.exit(1)
+})

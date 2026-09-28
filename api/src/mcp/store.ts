@@ -1,12 +1,8 @@
 export interface KVNamespaceLike {
-  get(key: string, type: 'text'): Promise<string | null>
+  get(key: string, type: "text"): Promise<string | null>
   put(key: string, value: string): Promise<void>
   delete(key: string): Promise<void>
-  list(options?: {
-    prefix?: string
-    cursor?: string
-    limit?: number
-  }): Promise<{
+  list(options?: { prefix?: string; cursor?: string; limit?: number }): Promise<{
     keys: Array<{ name: string }>
     list_complete: boolean
     cursor?: string
@@ -32,8 +28,8 @@ export interface MCPStoreOptions {
   namespace?: string
 }
 
-const DEFAULT_NAMESPACE = 'mcp'
-const DEFAULT_BINDING_NAME = 'KV'
+const DEFAULT_NAMESPACE = "mcp"
+const DEFAULT_BINDING_NAME = "KV"
 
 const globalScope = globalThis as typeof globalThis & {
   __mcpStoreMap__?: Map<string, string>
@@ -73,9 +69,7 @@ class MapMCPStore implements MCPStore {
   }
 
   async get<T>(key: string): Promise<T | null> {
-    return deserialize<T>(
-      this.storage.get(buildKey(this.namespace, key)) ?? null
-    )
+    return deserialize<T>(this.storage.get(buildKey(this.namespace, key)) ?? null)
   }
 
   async put<T>(key: string, value: T): Promise<void> {
@@ -115,7 +109,7 @@ class KVMCPStore implements MCPStore {
   }
 
   async get<T>(key: string): Promise<T | null> {
-    const value = await this.kv.get(buildKey(this.namespace, key), 'text')
+    const value = await this.kv.get(buildKey(this.namespace, key), "text")
     return deserialize<T>(value)
   }
 
@@ -148,7 +142,7 @@ class KVMCPStore implements MCPStore {
 
     const records = await Promise.all(
       keys.sort().map(async (qualifiedKey) => {
-        const value = await this.kv.get(qualifiedKey, 'text')
+        const value = await this.kv.get(qualifiedKey, "text")
         if (value === null) {
           return null
         }
@@ -157,12 +151,10 @@ class KVMCPStore implements MCPStore {
           key: qualifiedKey.slice(`${this.namespace}:`.length),
           value: JSON.parse(value) as T,
         }
-      })
+      }),
     )
 
-    return records.filter(
-      (record): record is MCPStoreRecord<T> => record !== null
-    )
+    return records.filter((record): record is MCPStoreRecord<T> => record !== null)
   }
 }
 
@@ -174,7 +166,7 @@ function resolveKV(options?: MCPStoreOptions): KVNamespaceLike | null {
   const bindingName = options?.bindingName ?? DEFAULT_BINDING_NAME
   const maybeKV = options?.env?.[bindingName]
 
-  if (!maybeKV || typeof maybeKV !== 'object') {
+  if (!maybeKV || typeof maybeKV !== "object") {
     return null
   }
 

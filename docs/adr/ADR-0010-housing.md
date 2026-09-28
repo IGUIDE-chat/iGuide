@@ -1,12 +1,15 @@
 # ADR-0010: Model `housing` as a single object level with listing-first identity and light option facets
 
 ## Status
+
 Accepted
 
 ## Date
+
 2026-04-19
 
 ## Context
+
 `housing` is one of the approved object-first domains in the hybrid campus assistant model. It supports high-value user tasks such as comparing dorms, finding family or graduate housing, checking whether a residence has singles or doubles, understanding meal-plan requirements, and locating official application pages.
 
 At the same time, the product is not trying to become a full housing assignment platform, a bed inventory system, or a room-by-room facilities database. The model needs to give the assistant a stable, filterable directory of official housing listings without collapsing into a building-only schema on one side or an exploded room-option graph on the other.
@@ -14,11 +17,13 @@ At the same time, the product is not trying to become a full housing assignment 
 The object also needs to remain source-grounded under ADR-0006. Housing records should be explainable through official housing pages, listing pages, PDFs, and related source evidence rather than being treated as free-floating facts.
 
 ## Decision
+
 Model the housing domain with exactly **one first-class object level**:
 
 - **`housing`** for independently discoverable official housing listings or destinations
 
 Do not introduce separate first-class runtime objects or normalized relation tables for:
+
 - room options
 - contract options
 - bathroom variants
@@ -30,6 +35,7 @@ Do not introduce separate first-class runtime objects or normalized relation tab
 Instead, keep housing attributes and sub-options as **light searchable facets and nested explanatory option facets inside the same object**.
 
 `housing` is responsible for answering:
+
 - what housing listing this is
 - what kind of housing it represents
 - who it is for when that is known
@@ -37,6 +43,7 @@ Instead, keep housing attributes and sub-options as **light searchable facets an
 - what official source evidence and application links explain it
 
 ### Identity rule
+
 Use one object row per **independently discoverable official housing listing or destination**.
 
 This means a `housing` record may represent a residence hall, apartment complex, housing community, family housing listing, graduate housing listing, or another official housing destination that users can discover, compare, or apply to independently.
@@ -44,6 +51,7 @@ This means a `housing` record may represent a residence hall, apartment complex,
 Do **not** promote every internal variation to its own `housing` record. If something is mainly an attribute or configuration of another housing listing—such as single versus double, bathroom style, contract variation, meal-plan variation, or price tier—it should remain a facet or nested option inside that parent housing record.
 
 ### Must-have fields
+
 Every `housing` record should have a stable minimum shape:
 
 - identity and scope root:
@@ -65,12 +73,14 @@ Every `housing` record should have a stable minimum shape:
   - `primary_artifact_id`
 
 The must-have fields are intentionally enough to support high-confidence questions like:
+
 - what this dorm or housing listing is
 - whether it is residence-hall, apartment, graduate, family, or another housing type
 - where the official housing page is
 - whether the assistant can ground the answer in a trusted source
 
 ### Optional searchable facets
+
 When available, `housing` may also include optional facets that improve filtering and retrieval quality without creating more object levels:
 
 - location and listing context:
@@ -104,9 +114,11 @@ When available, `housing` may also include optional facets that improve filterin
 These facets should remain optional. Missing room-type, pricing, or map precision should not prevent a valid `housing` object from existing.
 
 ### Nested option facets
+
 `housing` may also carry nested explanatory option facets when they help answer within-listing comparison questions without creating a second object level.
 
 Examples include:
+
 - `room_options`
 - `contract_options`
 - `pricing_options`
@@ -114,7 +126,9 @@ Examples include:
 These nested option fields exist to explain and compare variants **inside one housing listing**, not to create standalone object identity for every internal configuration.
 
 ### Explicit non-goals
+
 Do not use `housing` to model:
+
 - realtime vacancy or bed availability
 - waitlists or assignment workflow state
 - student-specific eligibility or placement outcomes
@@ -125,6 +139,7 @@ Do not use `housing` to model:
 If future product requirements need that level of housing workflow or inventory logic, they should be handled by a later ADR rather than stretching this object beyond a lightweight assistant-facing housing directory.
 
 ## Alternatives Considered
+
 - **Model housing as pure building-level records only**  
   Plausible because residence halls and apartments are easy to understand as physical places. Rejected because some important official housing choices are presented as independent listings or communities rather than a single building, and a building-only identity rule would blur real user-facing housing choices.
 
@@ -135,6 +150,7 @@ If future product requirements need that level of housing workflow or inventory 
   Plausible because it makes some comparisons feel more direct. Rejected because it creates many near-duplicate rows, makes assistant reasoning noisier, and treats attribute-like differences as if they were independent housing destinations.
 
 ## Consequences
+
 - **Benefits**
   - Gives the assistant a stable structured index for high-value housing comparison and discovery questions.
   - Preserves portability across schools where some housing is building-based and some is listing/community-based.
@@ -157,12 +173,14 @@ If future product requirements need that level of housing workflow or inventory 
   - Housing records should represent independently discoverable listings or destinations, not every internal configuration.
 
 ## Revisit Triggers
+
 - Product requirements repeatedly demand assignment workflows, vacancy tracking, or per-room inventory modeling.
 - Multiple schools provide reliable structured housing-option feeds that justify promoting some nested option facets into stronger shared objects.
 - User behavior shows the listing-first model cannot answer important housing comparison questions accurately enough.
 - The tool layer gains strong enough structured filtering that a stronger second-level housing option model becomes clearly worth the complexity.
 
 ## Related
+
 - `docs/adr/ADR-0004-hybrid-data-model.md`
 - `docs/adr/ADR-0006-source-first-base-layer.md`
 - `docs/adr/ADR-0008-academic-calendar-item.md`

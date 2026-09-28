@@ -1,12 +1,15 @@
 # ADR-0009: Model `location_or_service` as a single object level with light place and service facets
 
 ## Status
+
 Accepted
 
 ## Date
+
 2026-04-19
 
 ## Context
+
 `location_or_service` is one of the approved object-first domains in the hybrid campus assistant model. It sits at the intersection of navigation, facility lookup, service discovery, and map-aware question answering. Users do not only ask where a building is. They also ask where they can print, where advising is, where to pick up an ID, where to get help, and whether a destination is open or usable.
 
 At the same time, the product is not trying to become a full campus GIS, indoor navigation system, room inventory database, or institutional org chart. The model needs to give the assistant a stable, filterable index of user-queryable campus destinations without expanding into deeply normalized facility, room, service-unit, and map graph structures.
@@ -14,11 +17,13 @@ At the same time, the product is not trying to become a full campus GIS, indoor 
 The object also needs to remain source-grounded under ADR-0006. Place and service records should remain explainable through official location pages, directory entries, map-derived source artifacts, and related source evidence rather than being treated as free-floating facts.
 
 ## Decision
+
 Model the place-and-service domain with exactly **one first-class object level**:
 
 - **`location_or_service`** for user-queryable campus destinations that represent either a place, a service entry point, or both.
 
 Do not introduce separate first-class runtime objects or normalized relation tables for:
+
 - buildings versus service points
 - room inventory
 - indoor map nodes
@@ -29,6 +34,7 @@ Do not introduce separate first-class runtime objects or normalized relation tab
 Instead, keep place and service expression as **light searchable facets inside the same object**.
 
 `location_or_service` is responsible for answering:
+
 - what this place or service entry is
 - where it is
 - what users can do there
@@ -36,11 +42,13 @@ Instead, keep place and service expression as **light searchable facets inside t
 - what official source evidence, map reference, or contact information explains it
 
 ### Identity rule
+
 Use one object row per **user-queryable destination**.
 
 That means a building and a service entry may become separate `location_or_service` records when they are genuinely distinct destinations users search for, navigate to, or compare independently. Do not force every service into its parent building object if that service behaves like its own practical destination.
 
 ### Must-have fields
+
 Every `location_or_service` should have a stable minimum shape:
 
 - identity and scope root:
@@ -66,6 +74,7 @@ Every `location_or_service` should have a stable minimum shape:
   - `primary_artifact_id`
 
 The must-have fields are intentionally enough to support high-confidence questions like:
+
 - where the main library is
 - where to find advising
 - where students can print
@@ -73,6 +82,7 @@ The must-have fields are intentionally enough to support high-confidence questio
 - what official page or map entry describes a destination
 
 ### Optional searchable facets
+
 When available, `location_or_service` may also include optional facets that improve filtering and retrieval quality without creating more object levels:
 
 - map/provider facets:
@@ -100,10 +110,13 @@ When available, `location_or_service` may also include optional facets that impr
 These facets should remain optional. Missing map precision or missing service metadata should not prevent a valid `location_or_service` object from existing.
 
 ### Relationship to map data and source artifacts
+
 Map providers such as Google Maps should be treated as source/artifact inputs rather than as a separate object model. For example, a map-derived record may enter the source-first base layer as a source snapshot plus a `map_place` artifact, then project into `location_or_service` when it represents a stable user-facing destination.
 
 ### Explicit non-goals
+
 Do not use `location_or_service` to model:
+
 - full indoor navigation
 - room-by-room inventory
 - desk / counter / office-suite level graphs by default
@@ -115,6 +128,7 @@ Do not use `location_or_service` to model:
 If future product requirements need that level of map or facility modeling, they should be handled by a later ADR rather than stretching this object beyond a lightweight assistant-facing destination index.
 
 ## Alternatives Considered
+
 - **Model only pure locations and keep all service expression in source retrieval**  
   Plausible because buildings and map points are easier to normalize than services. Rejected because many real user questions are about service destinations such as advising, printing, dining, and help centers rather than just buildings, and a pure-location object would be too weak for assistant use.
 
@@ -125,6 +139,7 @@ If future product requirements need that level of map or facility modeling, they
   Plausible because some campuses expose detailed map, service, and building metadata. Rejected because the assistant currently needs a practical destination index, not a complete map/facility platform.
 
 ## Consequences
+
 - **Benefits**
   - Gives the assistant a stable structured index for high-value location and service-destination questions.
   - Keeps place and service lookup inside one object level, which aligns better with assistant Q&A and navigation behavior.
@@ -147,12 +162,14 @@ If future product requirements need that level of map or facility modeling, they
   - Map/provider data should enter through the source-first base layer before projection into `location_or_service`.
 
 ## Revisit Triggers
+
 - Product requirements repeatedly demand indoor navigation, room-level routing, or occupancy-aware answers.
 - Multiple schools provide reliable structured service/location feeds that justify splitting place and service into stronger shared objects.
 - User behavior shows that the single-object model cannot answer important destination questions accurately enough.
 - Tooling gains strong enough structured spatial and service filtering that a separate graph-like model becomes clearly worth the complexity.
 
 ## Related
+
 - `docs/adr/ADR-0004-hybrid-data-model.md`
 - `docs/adr/ADR-0005-course-domain.md`
 - `docs/adr/ADR-0006-source-first-base-layer.md`

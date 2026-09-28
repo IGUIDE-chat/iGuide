@@ -1,69 +1,71 @@
 // [CONFIG] Vite build configuration and plugin setup.
 // [配置] Vite 构建配置和插件设置。
-import { mkdir, writeFile } from "node:fs/promises";
-import type { ClientRequest, IncomingMessage, OutgoingHttpHeaders } from "node:http";
-import path from "path";
-import { defineConfig, loadEnv } from "vite-plus";
-import react from "@vitejs/plugin-react";
-import { qmdSearchPlugin } from "./scripts/qmdSearchGateway";
-import { ViteMcp } from "vite-plugin-mcp";
-import { lazyPlugins } from "vite-plus";
+import { mkdir, writeFile } from "node:fs/promises"
+import type { ClientRequest, IncomingMessage, OutgoingHttpHeaders } from "node:http"
+import path from "path"
 
-const TRUTHY_ENV_VALUES = new Set(["1", "true", "yes", "on"]);
-const SENSITIVE_HEADERS = new Set(["authorization", "cookie", "proxy-authorization", "x-api-key"]);
-const SENSITIVE_QUERY_KEYS = new Set(["access_token", "api_key", "key", "token"]);
+import react from "@vitejs/plugin-react"
+import { ViteMcp } from "vite-plugin-mcp"
+import { defineConfig, loadEnv } from "vite-plus"
+import { lazyPlugins } from "vite-plus"
 
-type DevEnv = Record<string, string>;
+import { qmdSearchPlugin } from "./scripts/qmdSearchGateway"
+
+const TRUTHY_ENV_VALUES = new Set(["1", "true", "yes", "on"])
+const SENSITIVE_HEADERS = new Set(["authorization", "cookie", "proxy-authorization", "x-api-key"])
+const SENSITIVE_QUERY_KEYS = new Set(["access_token", "api_key", "key", "token"])
+
+type DevEnv = Record<string, string>
 
 interface LlmRequestDumpInput {
-  env: DevEnv;
-  provider: string;
-  localPath?: string;
-  upstreamUrl: string;
-  proxyReq: ClientRequest;
-  body: string;
+  env: DevEnv
+  provider: string
+  localPath?: string
+  upstreamUrl: string
+  proxyReq: ClientRequest
+  body: string
 }
 
-let llmDumpCounter = 0;
+let llmDumpCounter = 0
 
 function isTruthyEnv(value: string | undefined) {
-  return TRUTHY_ENV_VALUES.has((value || "").trim().toLowerCase());
+  return TRUTHY_ENV_VALUES.has((value || "").trim().toLowerCase())
 }
 
 function redactHeaders(headers: OutgoingHttpHeaders, includeSecrets: boolean) {
-  if (includeSecrets) return headers;
+  if (includeSecrets) return headers
 
   return Object.fromEntries(
     Object.entries(headers).map(([key, value]) => [
       key,
       SENSITIVE_HEADERS.has(key.toLowerCase()) ? "[REDACTED]" : value,
     ]),
-  );
+  )
 }
 
 function redactUrl(rawUrl: string, includeSecrets: boolean) {
-  if (includeSecrets) return rawUrl;
+  if (includeSecrets) return rawUrl
 
   try {
-    const url = new URL(rawUrl);
+    const url = new URL(rawUrl)
     for (const key of SENSITIVE_QUERY_KEYS) {
       if (url.searchParams.has(key)) {
-        url.searchParams.set(key, "[REDACTED]");
+        url.searchParams.set(key, "[REDACTED]")
       }
     }
-    return url.toString();
+    return url.toString()
   } catch {
-    return rawUrl;
+    return rawUrl
   }
 }
 
 function parseJsonBody(body: string) {
-  if (!body.trim()) return null;
+  if (!body.trim()) return null
 
   try {
-    return JSON.parse(body) as unknown;
+    return JSON.parse(body) as unknown
   } catch {
-    return null;
+    return null
   }
 }
 
@@ -75,17 +77,17 @@ async function dumpLlmRequest({
   proxyReq,
   body,
 }: LlmRequestDumpInput) {
-  if (!isTruthyEnv(env.LLM_REQUEST_DUMP)) return;
+  if (!isTruthyEnv(env.LLM_REQUEST_DUMP)) return
 
-  const includeSecrets = isTruthyEnv(env.LLM_REQUEST_DUMP_INCLUDE_SECRETS);
-  const timestamp = new Date().toISOString();
-  const requestId = `${timestamp.replace(/[:.]/g, "-")}-${String(++llmDumpCounter).padStart(4, "0")}`;
-  const dumpDir = path.resolve(env.LLM_REQUEST_DUMP_DIR || ".debug/llm-requests");
-  const filePath = path.join(dumpDir, `${requestId}-${provider}.json`);
-  const bodyJson = parseJsonBody(body);
+  const includeSecrets = isTruthyEnv(env.LLM_REQUEST_DUMP_INCLUDE_SECRETS)
+  const timestamp = new Date().toISOString()
+  const requestId = `${timestamp.replace(/[:.]/g, "-")}-${String(++llmDumpCounter).padStart(4, "0")}`
+  const dumpDir = path.resolve(env.LLM_REQUEST_DUMP_DIR || ".debug/llm-requests")
+  const filePath = path.join(dumpDir, `${requestId}-${provider}.json`)
+  const bodyJson = parseJsonBody(body)
 
   try {
-    await mkdir(dumpDir, { recursive: true });
+    await mkdir(dumpDir, { recursive: true })
     await writeFile(
       filePath,
       JSON.stringify(
@@ -105,27 +107,27 @@ async function dumpLlmRequest({
         2,
       ),
       "utf8",
-    );
+    )
 
-    console.log(`[LLM dump] ${provider} request written to ${filePath}`);
+    console.log(`[LLM dump] ${provider} request written to ${filePath}`)
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    console.warn(`[LLM dump] Failed to write ${provider} request: ${message}`);
+    const message = error instanceof Error ? error.message : String(error)
+    console.warn(`[LLM dump] Failed to write ${provider} request: ${message}`)
   }
 }
 
 function collectRequestBody(req: IncomingMessage, onEnd: (body: string) => void) {
-  const chunks: Buffer[] = [];
+  const chunks: Buffer[] = []
   req.on("data", (chunk: Buffer) => {
-    chunks.push(chunk);
-  });
+    chunks.push(chunk)
+  })
   req.on("end", () => {
-    onEnd(Buffer.concat(chunks).toString("utf8"));
-  });
+    onEnd(Buffer.concat(chunks).toString("utf8"))
+  })
 }
 
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, ".", "");
+  const env = loadEnv(mode, ".", "")
   return {
     server: {
       proxy: {
@@ -149,9 +151,9 @@ export default defineConfig(({ mode }) => {
                   upstreamUrl: `https://api.coze.com${proxyReq.path}`,
                   proxyReq,
                   body,
-                });
-              });
-            });
+                })
+              })
+            })
           },
         },
         // DeepSeek chat proxy — in dev, injects Authorization header server-side (key never in bundle)
@@ -161,9 +163,9 @@ export default defineConfig(({ mode }) => {
           rewrite: () => "/chat/completions",
           configure: (proxy) => {
             proxy.on("proxyReq", (proxyReq, req) => {
-              const apiKey = env.DEEPSEEK_API_KEY;
+              const apiKey = env.DEEPSEEK_API_KEY
               if (apiKey) {
-                proxyReq.setHeader("Authorization", `Bearer ${apiKey}`);
+                proxyReq.setHeader("Authorization", `Bearer ${apiKey}`)
               }
               collectRequestBody(req, (body) => {
                 void dumpLlmRequest({
@@ -173,9 +175,9 @@ export default defineConfig(({ mode }) => {
                   upstreamUrl: "https://api.deepseek.com/chat/completions",
                   proxyReq,
                   body,
-                });
-              });
-            });
+                })
+              })
+            })
           },
         },
         // Gemini proxy — in dev, injects API key server-side (key never in bundle)
@@ -184,20 +186,20 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           configure: (proxy) => {
             proxy.on("proxyReq", (proxyReq, req) => {
-              const apiKey = env.GOOGLE_API_KEY;
-              if (!apiKey) return;
-              let body = "";
+              const apiKey = env.GOOGLE_API_KEY
+              if (!apiKey) return
+              let body = ""
               req.on("data", (chunk: Buffer) => {
-                body += chunk.toString();
-              });
+                body += chunk.toString()
+              })
               req.on("end", () => {
                 try {
-                  const parsed = JSON.parse(body);
-                  const model = parsed.model || "gemini-1.5-flash";
-                  delete parsed.model;
-                  const newBody = JSON.stringify(parsed);
-                  proxyReq.path = `/v1beta/models/${model}:generateContent?key=${apiKey}`;
-                  proxyReq.setHeader("Content-Length", Buffer.byteLength(newBody));
+                  const parsed = JSON.parse(body)
+                  const model = parsed.model || "gemini-1.5-flash"
+                  delete parsed.model
+                  const newBody = JSON.stringify(parsed)
+                  proxyReq.path = `/v1beta/models/${model}:generateContent?key=${apiKey}`
+                  proxyReq.setHeader("Content-Length", Buffer.byteLength(newBody))
                   void dumpLlmRequest({
                     env,
                     provider: "gemini",
@@ -205,8 +207,8 @@ export default defineConfig(({ mode }) => {
                     upstreamUrl: `https://generativelanguage.googleapis.com${proxyReq.path}`,
                     proxyReq,
                     body: newBody,
-                  });
-                  proxyReq.write(newBody);
+                  })
+                  proxyReq.write(newBody)
                 } catch {
                   /* pass through as-is */
                   void dumpLlmRequest({
@@ -216,10 +218,10 @@ export default defineConfig(({ mode }) => {
                     upstreamUrl: `https://generativelanguage.googleapis.com${proxyReq.path}`,
                     proxyReq,
                     body,
-                  });
+                  })
                 }
-              });
-            });
+              })
+            })
           },
         },
         // Tavily search proxy — in dev, injects API key server-side (key never in bundle)
@@ -230,18 +232,18 @@ export default defineConfig(({ mode }) => {
           configure: (proxy) => {
             proxy.on("proxyReq", (proxyReq, req) => {
               // Inject API key into the forwarded request body
-              const apiKey = env.TAVILY_API_KEY;
-              if (!apiKey) return;
-              let body = "";
+              const apiKey = env.TAVILY_API_KEY
+              if (!apiKey) return
+              let body = ""
               req.on("data", (chunk: Buffer) => {
-                body += chunk.toString();
-              });
+                body += chunk.toString()
+              })
               req.on("end", () => {
                 try {
-                  const parsed = JSON.parse(body);
-                  if (!parsed.api_key) parsed.api_key = apiKey;
-                  const newBody = JSON.stringify(parsed);
-                  proxyReq.setHeader("Content-Length", Buffer.byteLength(newBody));
+                  const parsed = JSON.parse(body)
+                  if (!parsed.api_key) parsed.api_key = apiKey
+                  const newBody = JSON.stringify(parsed)
+                  proxyReq.setHeader("Content-Length", Buffer.byteLength(newBody))
                   void dumpLlmRequest({
                     env,
                     provider: "tavily",
@@ -249,8 +251,8 @@ export default defineConfig(({ mode }) => {
                     upstreamUrl: `https://api.tavily.com${proxyReq.path}`,
                     proxyReq,
                     body: newBody,
-                  });
-                  proxyReq.write(newBody);
+                  })
+                  proxyReq.write(newBody)
                 } catch {
                   /* pass through as-is */
                   void dumpLlmRequest({
@@ -260,10 +262,10 @@ export default defineConfig(({ mode }) => {
                     upstreamUrl: `https://api.tavily.com${proxyReq.path}`,
                     proxyReq,
                     body,
-                  });
+                  })
                 }
-              });
-            });
+              })
+            })
           },
         },
       },
@@ -283,16 +285,16 @@ export default defineConfig(({ mode }) => {
           manualChunks(id) {
             if (id.includes("node_modules")) {
               if (id.includes("react") || id.includes("react-dom") || id.includes("react-router")) {
-                return "vendor-react";
+                return "vendor-react"
               }
               if (id.includes("framer-motion")) {
-                return "vendor-motion";
+                return "vendor-motion"
               }
               if (id.includes("@supabase")) {
-                return "vendor-supabase";
+                return "vendor-supabase"
               }
               if (id.includes("mapbox-gl")) {
-                return "vendor-mapbox";
+                return "vendor-mapbox"
               }
             }
           },
@@ -304,5 +306,5 @@ export default defineConfig(({ mode }) => {
         "@": path.resolve(__dirname, "./src"),
       },
     },
-  };
-});
+  }
+})

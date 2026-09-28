@@ -5,76 +5,76 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { Language } from "../types";
+import { Language } from "../types"
 
 export type UITextEntry = {
-  appTitle: string;
-  chatTab: string;
-  libraryTab: string;
-  welcomeTitle: string;
-  welcomeSubtitle: string;
-  suggestions: Array<{ icon: string; text: string }>;
-  inputPlaceholder: string;
-  searchPlaceholder: string;
-  searchTitle: string;
-  clear: string;
-  noResults: string;
-  backToCategories: string;
-  backToBrowse: string;
-  readGuide: string;
-  relatedTopics: string;
-  updated: string;
-  knowledgeBaseTitle: string;
-  knowledgeBaseSubtitle: string;
-  emptyCategory: string;
-  highTraffic: string;
-  highTrafficMsg: string;
-  goToLibrary: string;
-  botName: string;
-  userRole: string;
-  aiError: string;
-  providerCloud: string;
-  providerLocal: string;
-  providerCoze: string;
-  localModelDesc: string;
-  downloadingModel: string;
-  modelReady: string;
-  webGpuError: string;
-  initLocal: string;
-  loginTitle: string;
-  loginSubtitle: string;
-  loginSwitch: string;
-  registerSwitch: string;
-  googleLogin: string;
-  microsoftLogin: string;
-  orEmail: string;
-  emailLabel: string;
-  passwordLabel: string;
-  loginAction: string;
-  registerAction: string;
-  processing: string;
-  noAccount: string;
-  hasAccount: string;
-  registerNow: string;
-  loginNow: string;
-  guestMode: string;
-  loginError: string;
-  registerError: string;
-  genericError: string;
-  coursesTab: string;
-  dormsTab: string;
-  resumeTab: string;
-  comingSoon: string;
-  notifyMe: string;
-  emailPlaceholder: string;
-  emailSuccess: string;
-  coursesTitle: string;
-  coursesDesc: string;
-  dormsTitle: string;
-  dormsDesc: string;
-  resumeTitle: string;
-  resumeDesc: string;
-};
+  appTitle: string
+  chatTab: string
+  libraryTab: string
+  welcomeTitle: string
+  welcomeSubtitle: string
+  suggestions: Array<{ icon: string; text: string }>
+  inputPlaceholder: string
+  searchPlaceholder: string
+  searchTitle: string
+  clear: string
+  noResults: string
+  backToCategories: string
+  backToBrowse: string
+  readGuide: string
+  relatedTopics: string
+  updated: string
+  knowledgeBaseTitle: string
+  knowledgeBaseSubtitle: string
+  emptyCategory: string
+  highTraffic: string
+  highTrafficMsg: string
+  goToLibrary: string
+  botName: string
+  userRole: string
+  aiError: string
+  providerCloud: string
+  providerLocal: string
+  providerCoze: string
+  localModelDesc: string
+  downloadingModel: string
+  modelReady: string
+  webGpuError: string
+  initLocal: string
+  loginTitle: string
+  loginSubtitle: string
+  loginSwitch: string
+  registerSwitch: string
+  googleLogin: string
+  microsoftLogin: string
+  orEmail: string
+  emailLabel: string
+  passwordLabel: string
+  loginAction: string
+  registerAction: string
+  processing: string
+  noAccount: string
+  hasAccount: string
+  registerNow: string
+  loginNow: string
+  guestMode: string
+  loginError: string
+  registerError: string
+  genericError: string
+  coursesTab: string
+  dormsTab: string
+  resumeTab: string
+  comingSoon: string
+  notifyMe: string
+  emailPlaceholder: string
+  emailSuccess: string
+  coursesTitle: string
+  coursesDesc: string
+  dormsTitle: string
+  dormsDesc: string
+  resumeTitle: string
+  resumeDesc: string
+}
 
 export const UI_TEXT: Record<Language, UITextEntry> = {
   en: {
@@ -164,8 +164,7 @@ export const UI_TEXT: Record<Language, UITextEntry> = {
     chatTab: "AI 助手",
     libraryTab: "知识库",
     welcomeTitle: "欢迎来到 UIUC",
-    welcomeSubtitle:
-      "我是你的校园助手。关于宿舍、交通、选课和生活，随时可以问我。",
+    welcomeSubtitle: "我是你的校园助手。关于宿舍、交通、选课和生活，随时可以问我。",
     suggestions: [
       { icon: "💉", text: "新生需要打哪些疫苗？" },
       { icon: "✈️", text: "怎么从奥黑尔机场到学校？" },
@@ -183,8 +182,7 @@ export const UI_TEXT: Record<Language, UITextEntry> = {
     relatedTopics: "相关话题",
     updated: "更新于",
     knowledgeBaseTitle: "新生知识库",
-    knowledgeBaseSubtitle:
-      "由学长学姐整理的实用指南，从住宿到校园生活一站式覆盖。",
+    knowledgeBaseSubtitle: "由学长学姐整理的实用指南，从住宿到校园生活一站式覆盖。",
     emptyCategory: "该分类下暂无文章。",
     highTraffic: "当前请求较多",
     highTrafficMsg: "我现在有点忙不过来。你可以先去知识库查看已验证内容。",
@@ -234,4 +232,4 @@ export const UI_TEXT: Record<Language, UITextEntry> = {
     resumeTitle: "简历助手",
     resumeDesc: "快速生成用于实习和求职的简历，并获得可执行的优化建议。",
   },
-};
+}

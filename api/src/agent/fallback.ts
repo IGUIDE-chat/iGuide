@@ -1,7 +1,4 @@
-export type FallbackReason =
-  | 'tool_timeout'
-  | 'tool_failure'
-  | 'max_iterations_exceeded'
+export type FallbackReason = "tool_timeout" | "tool_failure" | "max_iterations_exceeded"
 
 export interface FallbackEvent {
   timestamp: string
@@ -27,7 +24,7 @@ interface WithFallbackOptions<T> {
 function createFallbackEvent(
   query: string,
   reason: FallbackReason,
-  level: 1 | 2 | 3
+  level: 1 | 2 | 3,
 ): FallbackEvent {
   return {
     timestamp: new Date().toISOString(),
@@ -43,12 +40,9 @@ export function logFallbackEvent(event: FallbackEvent): void {
 
 export async function withFallback<T>(
   fn: () => Promise<T>,
-  options: WithFallbackOptions<T>
+  options: WithFallbackOptions<T>,
 ): Promise<T> {
-  const emit = async (
-    reason: FallbackReason,
-    level: 1 | 2 | 3
-  ): Promise<void> => {
+  const emit = async (reason: FallbackReason, level: 1 | 2 | 3): Promise<void> => {
     const event = createFallbackEvent(options.query, reason, level)
     logFallbackEvent(event)
     await options.onFallbackEvent?.(event)
@@ -59,7 +53,7 @@ export async function withFallback<T>(
   try {
     initialResult = await fn()
   } catch (error) {
-    const reason = options.onError?.(error) ?? 'tool_failure'
+    const reason = options.onError?.(error) ?? "tool_failure"
     await emit(reason, 1)
     try {
       const retryResult = await options.retryOnce(reason)

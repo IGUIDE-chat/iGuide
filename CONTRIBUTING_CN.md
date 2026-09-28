@@ -5,6 +5,7 @@
 ## 🚀 快速开始
 
 1.  **克隆仓库：**
+
     ```bash
     git clone https://github.com/a2751012962/Ask.git
     cd Ask
@@ -12,6 +13,7 @@
 
 2.  **安装依赖：**
     主应用程序代码位于 `app/` 目录中。
+
     ```bash
     cd app
     pnpm install
@@ -28,10 +30,12 @@
 
 1.  **创建分支**：
     始终为你的工作创建一个新分支。不要直接推送到 `main` 分支。
+
     ```bash
     git checkout -b feature/your-feature-name
     ```
-    *(使用前缀，如 `fix/`, `feat/`, `docs/`, `refactor/`)*
+
+    _(使用前缀，如 `fix/`, `feat/`, `docs/`, `refactor/`)_
 
 2.  **进行更改**：
     - 遵循 `app/docs/FILE_RULES.md` 中的文件结构规则（如果有）或参考 `README.md`。
@@ -52,6 +56,7 @@
 ## 📋 团队角色与任务
 
 查阅 [TEAM_ROLES.md](./TEAM_ROLES.md) 以查看：
+
 - 每个人的职责。
 - "待分配任务 (Pending Assignments)" 池中的可用任务。
 - 翻译任务分配。

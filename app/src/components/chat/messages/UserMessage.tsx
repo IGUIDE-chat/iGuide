@@ -3,10 +3,10 @@
  * @description Chat (AI) Component / Module
  */
 
-import { MessagePrimitive } from "@assistant-ui/react";
+import { MessagePrimitive } from "@assistant-ui/react"
 
 interface UserMessageProps {
-  userRole?: string;
+  userRole?: string
 }
 
 export function UserMessage({ userRole = "You" }: UserMessageProps) {
@@ -15,10 +15,7 @@ export function UserMessage({ userRole = "You" }: UserMessageProps) {
       <div className="mx-auto flex w-full max-w-3xl flex-row-reverse gap-4 px-4">
         <div className="relative flex shrink-0 flex-col items-end">
           <div
-            className="
-              flex size-6 items-center justify-center rounded-lg bg-slate-200
-              text-slate-500
-            "
+            className="flex size-6 items-center justify-center rounded-lg bg-slate-200 text-slate-500"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -37,19 +34,14 @@ export function UserMessage({ userRole = "You" }: UserMessageProps) {
         </div>
 
         <div className="flex flex-1 flex-col items-end overflow-hidden pt-0.5">
-          <div className="mb-1 text-xs font-semibold text-slate-900">
-            {userRole}
-          </div>
+          <div className="mb-1 text-xs font-semibold text-slate-900">{userRole}</div>
           <div
-            className="
-              prose prose-slate prose-sm max-w-none leading-relaxed
-              whitespace-pre-wrap text-slate-800
-            "
+            className="prose prose-slate prose-sm max-w-none leading-relaxed whitespace-pre-wrap text-slate-800"
           >
             <MessagePrimitive.Parts />
           </div>
         </div>
       </div>
     </MessagePrimitive.Root>
-  );
+  )
 }

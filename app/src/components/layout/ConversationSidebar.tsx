@@ -5,13 +5,14 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import * as React from "react";
-import { useEffect, useState } from "react";
-import { Typewriter } from "../ui/Typewriter";
-import { ConversationSummary } from "../../types";
-import { conversationService } from "../../services/conversationService";
-import { localConversationService } from "../../services/localConversationService";
-import { useAuth } from "../../contexts/AuthContext";
+import * as React from "react"
+import { useEffect, useState } from "react"
+
+import { useAuth } from "../../contexts/AuthContext"
+import { conversationService } from "../../services/conversationService"
+import { localConversationService } from "../../services/localConversationService"
+import { ConversationSummary } from "../../types"
+import { Typewriter } from "../ui/Typewriter"
 import {
   BaseSidebar,
   SidebarItem,
@@ -22,13 +23,13 @@ import {
   groupByCategory,
   getCategoryOrder,
   TimeCategoryLabels,
-} from "./BaseSidebar";
+} from "./BaseSidebar"
 
 interface ConversationSidebarProps {
-  currentConversationId: string | null;
-  onSelectConversation: (conversationId: string | null) => void;
-  onNewConversation: () => void;
-  language: "en" | "zh";
+  currentConversationId: string | null
+  onSelectConversation: (conversationId: string | null) => void
+  onNewConversation: () => void
+  language: "en" | "zh"
 }
 
 export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
@@ -37,9 +38,9 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
   onNewConversation,
   language,
 }) => {
-  const { user } = useAuth();
-  const [conversations, setConversations] = useState<ConversationSummary[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuth()
+  const [conversations, setConversations] = useState<ConversationSummary[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   const t = {
     en: {
@@ -66,7 +67,7 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
       thisWeek: "本周",
       older: "更早",
     },
-  }[language];
+  }[language]
 
   const categoryLabels: TimeCategoryLabels = {
     pinned: t.pinned,
@@ -74,20 +75,20 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
     yesterday: t.yesterday,
     thisWeek: t.thisWeek,
     older: t.older,
-  };
+  }
 
   // ... (keep usage of hooks)
 
   // ... (keep loadConversations and other handlers)
 
   const loadConversations = async () => {
-    setIsLoading(true);
+    setIsLoading(true)
     try {
       // Use local service if not logged in
-      const service = user ? conversationService : localConversationService;
-      const { data, error } = await service.getUserConversations();
+      const service = user ? conversationService : localConversationService
+      const { data, error } = await service.getUserConversations()
 
-      if (error) throw error;
+      if (error) throw error
 
       if (data) {
         const summaries: ConversationSummary[] = data.map((conv) => ({
@@ -96,79 +97,74 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
           updatedAt: conv.updated_at,
           isPinned: conv.is_pinned,
           messageCount: conv.messages?.length || 0,
-        }));
-        setConversations(summaries);
+        }))
+        setConversations(summaries)
       }
     } catch (error) {
-      console.error("Failed to load conversations:", error);
+      console.error("Failed to load conversations:", error)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   // Reload conversations when user changes OR when a new conversation is created/selected
   useEffect(() => {
-    loadConversations();
-  }, [user, currentConversationId]);
+    loadConversations()
+  }, [user, currentConversationId])
 
   const handleTogglePin = async (
     conversationId: string,
     isPinned: boolean,
-    e: React.MouseEvent
+    e: React.MouseEvent,
   ) => {
-    e.stopPropagation();
+    e.stopPropagation()
 
     try {
-      const service = user ? conversationService : localConversationService;
-      const { error } = await service.togglePinConversation(
-        conversationId,
-        !isPinned
-      );
-      if (error) throw error;
+      const service = user ? conversationService : localConversationService
+      const { error } = await service.togglePinConversation(conversationId, !isPinned)
+      if (error) throw error
 
       // Reload conversations
-      loadConversations();
+      loadConversations()
     } catch (error) {
-      console.error("Failed to toggle pin:", error);
+      console.error("Failed to toggle pin:", error)
     }
-  };
+  }
 
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(
-    null
-  );
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null)
 
   const handleDeleteClick = (conversationId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setShowDeleteConfirm(conversationId);
-  };
+    e.stopPropagation()
+    setShowDeleteConfirm(conversationId)
+  }
 
   const confirmDelete = async () => {
-    if (!showDeleteConfirm) return;
+    if (!showDeleteConfirm) return
 
     try {
-      const service = user ? conversationService : localConversationService;
-      const { error } = await service.deleteConversation(showDeleteConfirm);
-      if (error) throw error;
+      const service = user ? conversationService : localConversationService
+      const { error } = await service.deleteConversation(showDeleteConfirm)
+      if (error) throw error
 
       if (showDeleteConfirm === currentConversationId) {
-        onNewConversation();
+        onNewConversation()
       }
 
-      loadConversations();
+      loadConversations()
     } catch (error) {
-      console.error("Failed to delete conversation:", error);
+      console.error("Failed to delete conversation:", error)
     } finally {
-      setShowDeleteConfirm(null);
+      setShowDeleteConfirm(null)
     }
-  };
+  }
 
   const groupedConversations = groupByCategory(
     conversations,
     (conv) => conv.updatedAt,
-    categoryLabels
-  );
+    categoryLabels,
+  )
 
-  const categoryOrder = getCategoryOrder(categoryLabels);
+  const categoryOrder = getCategoryOrder(categoryLabels)
 
   return (
     <>
@@ -180,7 +176,7 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
         loadingState={<SidebarLoadingSpinner />}
         emptyState={<SidebarEmptyState message={t.noConversations} />}
         renderItem={(item) => {
-          const conv = item as ConversationSummary;
+          const conv = item as ConversationSummary
           return (
             <SidebarItem
               key={conv.id}
@@ -193,17 +189,11 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
               <div className="relative overflow-hidden">
                 <div className="pr-1">
                   <div
-                    className={`
-                      truncate text-xs font-medium
-                      ${
-                        conv.id === currentConversationId
-                          ? "text-white"
-                          : `
-                            text-slate-300
-                            group-hover:text-white
-                          `
-                      }
-                    `}
+                    className={`truncate text-xs font-medium ${
+                      conv.id === currentConversationId
+                        ? "text-white"
+                        : `text-slate-300 group-hover:text-white`
+                    } `}
                   >
                     <Typewriter text={conv.title} mode="animate" />
                   </div>
@@ -215,54 +205,36 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                 </div>
 
                 <div
-                  className={`
-                    absolute inset-y-0 right-0 flex w-24 items-center
-                    justify-end gap-0.5 bg-linear-to-l to-transparent px-2
-                    opacity-0 transition-all duration-200
-                    group-hover:opacity-100
-                    ${
-                      conv.id === currentConversationId
-                        ? "from-[#454545] via-[#454545]"
-                        : "from-[#2E2E2E] via-[#2E2E2E]"
-                    }
-                  `}
+                  className={`absolute inset-y-0 right-0 flex w-24 items-center justify-end gap-0.5 bg-linear-to-l to-transparent px-2 opacity-0 transition-all duration-200 group-hover:opacity-100 ${
+                    conv.id === currentConversationId
+                      ? "from-[#454545] via-[#454545]"
+                      : "from-[#2E2E2E] via-[#2E2E2E]"
+                  } `}
                 >
                   <PinButton
                     isPinned={conv.isPinned}
                     onClick={(e) => handleTogglePin(conv.id, conv.isPinned, e)}
                     label={conv.isPinned ? t.unpin : t.pin}
                   />
-                  <DeleteButton
-                    onClick={(e) => handleDeleteClick(conv.id, e)}
-                    label={t.delete}
-                  />
+                  <DeleteButton onClick={(e) => handleDeleteClick(conv.id, e)} label={t.delete} />
                 </div>
               </div>
             </SidebarItem>
-          );
+          )
         }}
       />
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div
-          className="
-            fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4
-            backdrop-blur-sm
-          "
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
         >
           <div
-            className="
-              animate-scale-in w-full max-w-sm overflow-hidden rounded-xl border
-              border-white/10 bg-[#1E1E1E] shadow-2xl
-            "
+            className="animate-scale-in w-full max-w-sm overflow-hidden rounded-xl border border-white/10 bg-[#1E1E1E] shadow-2xl"
           >
             <div className="p-5 text-center">
               <div
-                className="
-                  mx-auto mb-4 flex size-12 items-center justify-center
-                  rounded-full bg-red-500/10
-                "
+                className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-red-500/10"
               >
                 <svg
                   className="size-6 text-red-500"
@@ -282,28 +254,18 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
                 {language === "zh" ? "删除对话?" : "Delete Conversation?"}
               </h3>
               <p className="mb-6 text-sm text-slate-400">
-                {language === "zh"
-                  ? "此操作无法撤销。"
-                  : "This action cannot be undone."}
+                {language === "zh" ? "此操作无法撤销。" : "This action cannot be undone."}
               </p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowDeleteConfirm(null)}
-                  className="
-                    flex-1 rounded-lg bg-white/5 px-4 py-2 text-sm font-medium
-                    text-slate-300 transition-colors
-                    hover:bg-white/10
-                  "
+                  className="flex-1 rounded-lg bg-white/5 px-4 py-2 text-sm font-medium text-slate-300 transition-colors hover:bg-white/10"
                 >
                   {language === "zh" ? "取消" : "Cancel"}
                 </button>
                 <button
                   onClick={confirmDelete}
-                  className="
-                    flex-1 rounded-lg bg-red-500 px-4 py-2 text-sm font-medium
-                    text-white transition-colors
-                    hover:bg-red-600
-                  "
+                  className="flex-1 rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-600"
                 >
                   {language === "zh" ? "删除" : "Delete"}
                 </button>
@@ -313,5 +275,5 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
         </div>
       )}
     </>
-  );
-};
+  )
+}

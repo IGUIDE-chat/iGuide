@@ -17,7 +17,7 @@ export const AMENITIES = [
     label: { en: "Gym Nearby", zh: "附近健身房" },
     icon: "Dumbbell",
   },
-] as const;
+] as const
 
 export const ROOM_TYPES = [
   { id: "1B1B", label: { en: "Single (1B1B)", zh: "一居一卫 (1B1B)" } },
@@ -28,7 +28,7 @@ export const ROOM_TYPES = [
   { id: "4B2B", label: { en: "Quad (4B2B)", zh: "四居两卫 (4B2B)" } },
   { id: "Suite", label: { en: "Suite", zh: "Suite" } },
   { id: "Cluster", label: { en: "Cluster", zh: "Cluster" } },
-] as const;
+] as const
 
 // New filter constants for structured tags
 export const AMENITY_OPTIONS = [
@@ -39,14 +39,14 @@ export const AMENITY_OPTIONS = [
   "Parking",
   "Gym Nearby",
   "Pool",
-] as const;
+] as const
 
 export const COMMUNITY_OPTIONS = [
   "Gender-Inclusive",
   "Quiet Floors",
   "Substance-Free",
   "Pet-Friendly",
-] as const;
+] as const
 
 export const LLC_OPTIONS = [
   "Engineering LLC",
@@ -60,7 +60,7 @@ export const LLC_OPTIONS = [
   "Scholars LLC",
   "Focus LLC",
   "Exploration LLC",
-] as const;
+] as const
 
 // Proximity filter options
 export const PROXIMITY_OPTIONS = [
@@ -70,4 +70,4 @@ export const PROXIMITY_OPTIONS = [
   "Near ARC/CRCE",
   "Near Green Street",
   "Near Ikenberry Dining",
-] as const;
+] as const

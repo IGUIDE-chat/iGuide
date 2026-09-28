@@ -5,74 +5,74 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { Language } from "../../../types";
+import { Language } from "../../../types"
 
 export interface DormDetailText {
-  dormNotFound: string;
-  backToDorms: string;
-  backToBrowse: string;
-  campus: string;
-  about: string;
-  prosAndCons: string;
-  good: string;
-  notSoGood: string;
-  quickStats: string;
-  housingType: string;
-  diningHall: string;
-  onSite: string;
-  nearby: string;
-  annualPrice: string;
-  illiniTip: string;
-  tipWithAc: string;
-  tipWithoutAc: string;
-  saved: string;
-  save: string;
-  viewingHistory: string;
-  favorites: string;
-  ratingsAndReviews: string;
-  commentsTitle: string;
-  leaveComment: string;
-  submitComment: string;
-  deleteComment: string;
-  hideComment: string;
-  unhideComment: string;
-  hiddenBadge: string;
-  commentHiddenError: string;
-  loginToComment: string;
-  noComments: string;
-  thumbsUpDorm: string;
-  thumbsDownDorm: string;
+  dormNotFound: string
+  backToDorms: string
+  backToBrowse: string
+  campus: string
+  about: string
+  prosAndCons: string
+  good: string
+  notSoGood: string
+  quickStats: string
+  housingType: string
+  diningHall: string
+  onSite: string
+  nearby: string
+  annualPrice: string
+  illiniTip: string
+  tipWithAc: string
+  tipWithoutAc: string
+  saved: string
+  save: string
+  viewingHistory: string
+  favorites: string
+  ratingsAndReviews: string
+  commentsTitle: string
+  leaveComment: string
+  submitComment: string
+  deleteComment: string
+  hideComment: string
+  unhideComment: string
+  hiddenBadge: string
+  commentHiddenError: string
+  loginToComment: string
+  noComments: string
+  thumbsUpDorm: string
+  thumbsDownDorm: string
   // New keys for redesigned layout
-  amenities: string;
-  floorPlansDesc: string;
-  comparePlans: string;
-  compareAdd: string;
-  available: string;
-  sqft: string;
-  yr: string;
-  mo: string;
-  communalBath: string;
-  privateBath: string;
-  semiPrivateBath: string;
-  priceRange: string;
-  shareExp: string;
-  loginPrompt: string;
-  loginBtn: string;
-  recommended: string;
-  helpful: string;
-  viewAllReviews: string;
-  viewWebsite: string;
-  positiveRating: string;
-  bedSize: string;
-  address: string;
+  amenities: string
+  floorPlansDesc: string
+  comparePlans: string
+  compareAdd: string
+  available: string
+  sqft: string
+  yr: string
+  mo: string
+  communalBath: string
+  privateBath: string
+  semiPrivateBath: string
+  priceRange: string
+  shareExp: string
+  loginPrompt: string
+  loginBtn: string
+  recommended: string
+  helpful: string
+  viewAllReviews: string
+  viewWebsite: string
+  positiveRating: string
+  bedSize: string
+  address: string
 }
 
 export interface AiChatText {
-  title: string;
-  subtitle: string;
-  placeholder: string;
-  thinking: string;
-  initialMessage: string;
+  title: string
+  subtitle: string
+  placeholder: string
+  thinking: string
+  initialMessage: string
 }
 
 export const dormDetailTexts: Record<Language, DormDetailText> = {
@@ -92,10 +92,8 @@ export const dormDetailTexts: Record<Language, DormDetailText> = {
     nearby: "Nearby",
     annualPrice: "Annual Price",
     illiniTip: "Illini Tip",
-    tipWithAc:
-      "This dorm has A/C, which is a lifesaver in August and September!",
-    tipWithoutAc:
-      "Bring a box fan! It gets hot in early fall, but the community here is worth it.",
+    tipWithAc: "This dorm has A/C, which is a lifesaver in August and September!",
+    tipWithoutAc: "Bring a box fan! It gets hot in early fall, but the community here is worth it.",
     saved: "Saved to Favorites",
     save: "Save to Favorites",
     viewingHistory: "Viewing History",
@@ -194,7 +192,7 @@ export const dormDetailTexts: Record<Language, DormDetailText> = {
     bedSize: "床型",
     address: "地址",
   },
-};
+}
 
 export const aiChatTexts: Record<Language, AiChatText> = {
   en: {
@@ -213,4 +211,4 @@ export const aiChatTexts: Record<Language, AiChatText> = {
     initialMessage:
       "你好！我是你的 UIUC 住宿助手。我可以根据你的专业、生活方式和预算推荐宿舍。你可以问我“工科学生更适合哪栋宿舍？”或“哪里吃饭更方便？”。",
   },
-};
+}

@@ -12,10 +12,7 @@
     },
     "cloudflare-docs": {
       "type": "local",
-      "command": [
-        "mcp-remote",
-        "https://docs.mcp.cloudflare.com/mcp"
-      ]
+      "command": ["mcp-remote", "https://docs.mcp.cloudflare.com/mcp"]
     },
     "cloudflare-worker-builds": {
       "type": "remote",

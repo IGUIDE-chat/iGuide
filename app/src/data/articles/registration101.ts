@@ -7,14 +7,13 @@
 
 // [DATA] Article content for Course Registration guide.
 // [数据] 选课入门（Registration 101）指南的文章内容。
-import { Article } from "../../types";
+import { Article } from "../../types"
 
 export const registration101: Article = {
   id: "registration-101",
   category: "academics",
   title: "Course Registration Survival Guide",
-  summary:
-    "Using Enterprise, Course Explorer, and what to do if a class is full.",
+  summary: "Using Enterprise, Course Explorer, and what to do if a class is full.",
   content: `
 ### Registration Tips
 
@@ -24,13 +23,7 @@ export const registration101: Article = {
 
 **Gen Eds:** Don't just take "easy" classes. Take something interesting!
   `,
-  tags: [
-    "registration",
-    "classes",
-    "academics",
-    "course explorer",
-    "enterprise",
-  ],
+  tags: ["registration", "classes", "academics", "course explorer", "enterprise"],
   title_zh: "选课生存指南",
   summary_zh: "Enterprise 使用技巧，以及课满了该怎么办。",
   content_zh: `
@@ -44,4 +37,4 @@ export const registration101: Article = {
   `,
   tags_zh: ["选课", "课程", "学术", "Course Explorer", "Enterprise"],
   lastUpdated: "2024-01-10",
-};
+}

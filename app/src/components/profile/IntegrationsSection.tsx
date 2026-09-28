@@ -4,40 +4,41 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import React, { useState } from "react";
-import { Language } from "../../types";
+import React, { useState } from "react"
+
+import { Language } from "../../types"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface DiscoveredTool {
-  name: string;
-  description: string;
-  enabled: boolean;
+  name: string
+  description: string
+  enabled: boolean
 }
 
 interface PlatformConnection {
-  id: string;
-  name: string;
-  status: "ok" | "error" | "unknown";
-  toolCount: number;
-  url: string;
+  id: string
+  name: string
+  status: "ok" | "error" | "unknown"
+  toolCount: number
+  url: string
 }
 
 interface UserConnection {
-  id: string;
-  name: string;
-  description: string;
-  status: "ok" | "error" | "unknown";
-  url: string;
-  is_enabled: boolean;
-  tools: DiscoveredTool[];
+  id: string
+  name: string
+  description: string
+  status: "ok" | "error" | "unknown"
+  url: string
+  is_enabled: boolean
+  tools: DiscoveredTool[]
 }
 
 type TestResult =
   | { state: "idle" }
   | { state: "loading" }
   | { state: "success"; tools: Array<{ name: string; description: string }> }
-  | { state: "failure"; reason: MockFailureReason };
+  | { state: "failure"; reason: MockFailureReason }
 
 type MockFailureReason =
   | "unreachable"
@@ -46,50 +47,50 @@ type MockFailureReason =
   | "no_tools_discovered"
   | "timeout"
   | "unsupported_transport"
-  | "unknown";
+  | "unknown"
 
 // ─── Mock async functions ─────────────────────────────────────────────────────
 
 const MOCK_TOOLS = [
   { name: "search_campus", description: "Search campus info" },
   { name: "get_events", description: "Get campus events" },
-];
+]
 
 async function mockTestConnection(url: string): Promise<{
-  ok: boolean;
-  tools?: typeof MOCK_TOOLS;
-  reason?: MockFailureReason;
+  ok: boolean
+  tools?: typeof MOCK_TOOLS
+  reason?: MockFailureReason
 }> {
-  await new Promise((r) => setTimeout(r, 1500));
-  const normalizedUrl = url.toLowerCase();
+  await new Promise((r) => setTimeout(r, 1500))
+  const normalizedUrl = url.toLowerCase()
   if (normalizedUrl.includes("auth") || normalizedUrl.includes("private")) {
-    return { ok: false, reason: "auth_required" };
+    return { ok: false, reason: "auth_required" }
   }
   if (normalizedUrl.includes("invalid") || normalizedUrl.includes("broken")) {
-    return { ok: false, reason: "invalid_mcp_response" };
+    return { ok: false, reason: "invalid_mcp_response" }
   }
   if (normalizedUrl.includes("empty") || normalizedUrl.includes("notools")) {
-    return { ok: false, reason: "no_tools_discovered" };
+    return { ok: false, reason: "no_tools_discovered" }
   }
   if (normalizedUrl.includes("timeout") || normalizedUrl.includes("slow")) {
-    return { ok: false, reason: "timeout" };
+    return { ok: false, reason: "timeout" }
   }
   if (normalizedUrl.includes("sse") || normalizedUrl.includes("stdio")) {
-    return { ok: false, reason: "unsupported_transport" };
+    return { ok: false, reason: "unsupported_transport" }
   }
   if (normalizedUrl.includes("fail") || normalizedUrl.includes("down")) {
-    return { ok: false, reason: "unreachable" };
+    return { ok: false, reason: "unreachable" }
   }
-  return { ok: true, tools: MOCK_TOOLS };
+  return { ok: true, tools: MOCK_TOOLS }
 }
 
 async function mockSaveConnection(data: {
-  name: string;
-  url: string;
-  description: string;
-  tools: typeof MOCK_TOOLS;
+  name: string
+  url: string
+  description: string
+  tools: typeof MOCK_TOOLS
 }): Promise<UserConnection> {
-  await new Promise((r) => setTimeout(r, 800));
+  await new Promise((r) => setTimeout(r, 800))
   return {
     id: `user-${Date.now()}`,
     name: data.name,
@@ -98,11 +99,11 @@ async function mockSaveConnection(data: {
     status: "ok",
     is_enabled: true,
     tools: data.tools.map((t) => ({ ...t, enabled: true })),
-  };
+  }
 }
 
 async function mockDeleteConnection(_id: string): Promise<void> {
-  await new Promise((r) => setTimeout(r, 500));
+  await new Promise((r) => setTimeout(r, 500))
 }
 
 // ─── Static data ──────────────────────────────────────────────────────────────
@@ -115,30 +116,28 @@ const PLATFORM_CONNECTIONS: PlatformConnection[] = [
     toolCount: 3,
     url: "https://mcp.illinois.edu/campus-tools",
   },
-];
+]
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
 interface IntegrationsSectionProps {
-  language: Language;
+  language: Language
 }
 
-export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
-  language,
-}) => {
+export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({ language }) => {
   // ── State ──────────────────────────────────────────────────────────────────
-  const [userConnections, setUserConnections] = useState<UserConnection[]>([]);
+  const [userConnections, setUserConnections] = useState<UserConnection[]>([])
 
   // Add form
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [addName, setAddName] = useState("");
-  const [addUrl, setAddUrl] = useState("");
-  const [addDesc, setAddDesc] = useState("");
-  const [testResult, setTestResult] = useState<TestResult>({ state: "idle" });
-  const [isSaving, setIsSaving] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [addName, setAddName] = useState("")
+  const [addUrl, setAddUrl] = useState("")
+  const [addDesc, setAddDesc] = useState("")
+  const [testResult, setTestResult] = useState<TestResult>({ state: "idle" })
+  const [isSaving, setIsSaving] = useState(false)
 
   // Details panel
-  const [detailsId, setDetailsId] = useState<string | null>(null);
+  const [detailsId, setDetailsId] = useState<string | null>(null)
 
   // ── i18n ───────────────────────────────────────────────────────────────────
   const t = {
@@ -183,16 +182,13 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
       testFailure: "Connection test blocked",
       failureReasonLabel: "Failure reason",
       failureReasonDescriptions: {
-        unreachable:
-          "The endpoint could not be reached from the current network path.",
+        unreachable: "The endpoint could not be reached from the current network path.",
         auth_required:
           "The endpoint appears to require credentials, which phase 1 intentionally does not support.",
         invalid_mcp_response:
           "The server responded, but not with a valid MCP tool-discovery payload.",
-        no_tools_discovered:
-          "The server responded without any discoverable tools.",
-        timeout:
-          "The endpoint did not respond before the phase-1 timeout budget.",
+        no_tools_discovered: "The server responded without any discoverable tools.",
+        timeout: "The endpoint did not respond before the phase-1 timeout budget.",
         unsupported_transport:
           "This looks like a non-Streamable HTTP endpoint, which phase 1 blocks.",
         unknown: "The endpoint failed for an uncategorized reason.",
@@ -258,12 +254,10 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
       failureReasonDescriptions: {
         unreachable: "当前网络路径无法访问该端点。",
         auth_required: "该端点似乎需要凭证，而第一阶段刻意不支持此能力。",
-        invalid_mcp_response:
-          "服务器有响应，但返回的不是有效的 MCP 工具发现结果。",
+        invalid_mcp_response: "服务器有响应，但返回的不是有效的 MCP 工具发现结果。",
         no_tools_discovered: "服务器响应成功，但没有发现任何工具。",
         timeout: "该端点在第一阶段的超时预算内没有完成响应。",
-        unsupported_transport:
-          "这看起来不是 Streamable HTTP 端点，因此会被第一阶段拦截。",
+        unsupported_transport: "这看起来不是 Streamable HTTP 端点，因此会被第一阶段拦截。",
         unknown: "该端点因未分类原因失败。",
       },
       saveConnection: "保存连接",
@@ -284,101 +278,80 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
       enabled: "已启用",
       disabled: "已禁用",
     },
-  }[language];
+  }[language]
 
   // ── Helpers ────────────────────────────────────────────────────────────────
 
   const statusDot = (status: "ok" | "error" | "unknown", dimmed = false) => {
-    const base = "size-2 rounded-full inline-block";
+    const base = "size-2 rounded-full inline-block"
     if (status === "ok")
-      return (
-        <span
-          className={`
-            ${base}
-            ${dimmed ? "bg-emerald-300" : "bg-emerald-400"}
-          `}
-        />
-      );
+      return <span className={` ${base} ${dimmed ? "bg-emerald-300" : "bg-emerald-400"} `} />
     if (status === "error")
-      return (
-        <span
-          className={`
-            ${base}
-            ${dimmed ? "bg-red-300" : "bg-red-400"}
-          `}
-        />
-      );
-    return (
-      <span
-        className={`
-          ${base}
-          bg-slate-300
-        `}
-      />
-    );
-  };
+      return <span className={` ${base} ${dimmed ? "bg-red-300" : "bg-red-400"} `} />
+    return <span className={` ${base} bg-slate-300`} />
+  }
 
   const statusLabel = (status: "ok" | "error" | "unknown") => {
-    if (status === "ok") return t.statusOk;
-    if (status === "error") return t.statusError;
-    return t.statusUnknown;
-  };
+    if (status === "ok") return t.statusOk
+    if (status === "error") return t.statusError
+    return t.statusUnknown
+  }
 
-  const toolCount = (conn: UserConnection) => conn.tools.length;
+  const toolCount = (conn: UserConnection) => conn.tools.length
 
   const getFailureReasonDescription = (reason: MockFailureReason) =>
-    t.failureReasonDescriptions[reason] ?? t.failureReasonDescriptions.unknown;
+    t.failureReasonDescriptions[reason] ?? t.failureReasonDescriptions.unknown
 
   // ── Add form handlers ──────────────────────────────────────────────────────
 
   const handleOpenAdd = () => {
-    setShowAddForm(true);
-    setAddName("");
-    setAddUrl("");
-    setAddDesc("");
-    setTestResult({ state: "idle" });
-  };
+    setShowAddForm(true)
+    setAddName("")
+    setAddUrl("")
+    setAddDesc("")
+    setTestResult({ state: "idle" })
+  }
 
   const handleCancelAdd = () => {
-    setShowAddForm(false);
-    setTestResult({ state: "idle" });
-  };
+    setShowAddForm(false)
+    setTestResult({ state: "idle" })
+  }
 
   const handleTest = async () => {
-    if (!addUrl.trim()) return;
-    setTestResult({ state: "loading" });
-    const result = await mockTestConnection(addUrl.trim());
+    if (!addUrl.trim()) return
+    setTestResult({ state: "loading" })
+    const result = await mockTestConnection(addUrl.trim())
     if (result.ok && result.tools) {
-      setTestResult({ state: "success", tools: result.tools });
+      setTestResult({ state: "success", tools: result.tools })
     } else {
-      setTestResult({ state: "failure", reason: result.reason ?? "unknown" });
+      setTestResult({ state: "failure", reason: result.reason ?? "unknown" })
     }
-  };
+  }
 
   const handleSave = async () => {
-    if (testResult.state !== "success") return;
-    setIsSaving(true);
+    if (testResult.state !== "success") return
+    setIsSaving(true)
     const conn = await mockSaveConnection({
       name: addName.trim(),
       url: addUrl.trim(),
       description: addDesc.trim(),
       tools: testResult.tools,
-    });
-    setUserConnections((prev) => [...prev, conn]);
-    setIsSaving(false);
-    setShowAddForm(false);
-    setTestResult({ state: "idle" });
-  };
+    })
+    setUserConnections((prev) => [...prev, conn])
+    setIsSaving(false)
+    setShowAddForm(false)
+    setTestResult({ state: "idle" })
+  }
 
   // ── Details panel handlers ─────────────────────────────────────────────────
 
-  const _detailsConn = userConnections.find((c) => c.id === detailsId) ?? null;
+  const _detailsConn = userConnections.find((c) => c.id === detailsId) ?? null
 
   const handleToggleConnection = (id: string) => {
     setUserConnections((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, is_enabled: !c.is_enabled } : c))
-    );
-  };
+      prev.map((c) => (c.id === id ? { ...c, is_enabled: !c.is_enabled } : c)),
+    )
+  }
 
   const handleToggleTool = (connId: string, toolName: string) => {
     setUserConnections((prev) =>
@@ -386,33 +359,27 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
         c.id === connId
           ? {
               ...c,
-              tools: c.tools.map((t) =>
-                t.name === toolName ? { ...t, enabled: !t.enabled } : t
-              ),
+              tools: c.tools.map((t) => (t.name === toolName ? { ...t, enabled: !t.enabled } : t)),
             }
-          : c
-      )
-    );
-  };
+          : c,
+      ),
+    )
+  }
 
   const handleTestAgain = async (id: string) => {
-    const conn = userConnections.find((c) => c.id === id);
-    if (!conn) return;
+    const conn = userConnections.find((c) => c.id === id)
+    if (!conn) return
+    setUserConnections((prev) => prev.map((c) => (c.id === id ? { ...c, status: "unknown" } : c)))
+    const result = await mockTestConnection(conn.url)
     setUserConnections((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, status: "unknown" } : c))
-    );
-    const result = await mockTestConnection(conn.url);
-    setUserConnections((prev) =>
-      prev.map((c) =>
-        c.id === id ? { ...c, status: result.ok ? "ok" : "error" } : c
-      )
-    );
-  };
+      prev.map((c) => (c.id === id ? { ...c, status: result.ok ? "ok" : "error" } : c)),
+    )
+  }
 
   const handleRefreshDiscovery = async (id: string) => {
-    const conn = userConnections.find((c) => c.id === id);
-    if (!conn) return;
-    const result = await mockTestConnection(conn.url);
+    const conn = userConnections.find((c) => c.id === id)
+    if (!conn) return
+    const result = await mockTestConnection(conn.url)
     if (result.ok && result.tools) {
       setUserConnections((prev) =>
         prev.map((c) =>
@@ -422,31 +389,27 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                 status: "ok",
                 tools: result.tools!.map((t) => ({ ...t, enabled: true })),
               }
-            : c
-        )
-      );
+            : c,
+        ),
+      )
     }
-  };
+  }
 
   const handleDelete = async (id: string) => {
-    if (!confirm(t.confirmDelete)) return;
-    await mockDeleteConnection(id);
-    setUserConnections((prev) => prev.filter((c) => c.id !== id));
-    if (detailsId === id) setDetailsId(null);
-  };
+    if (!confirm(t.confirmDelete)) return
+    await mockDeleteConnection(id)
+    setUserConnections((prev) => prev.filter((c) => c.id !== id))
+    if (detailsId === id) setDetailsId(null)
+  }
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
     <div
-      className="
-        mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm
-      "
+      className="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
     >
       <h3
-        className="
-          mb-4 flex items-center gap-2 text-base font-bold text-slate-900
-        "
+        className="mb-4 flex items-center gap-2 text-base font-bold text-slate-900"
       >
         <span>🔌</span> {t.title}
       </h3>
@@ -455,9 +418,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
       <div className="mb-5 rounded-lg border border-amber-200 bg-amber-50 p-3">
         <div className="mb-1.5 flex items-start gap-2">
           <span className="mt-0.5 shrink-0 text-amber-500">⚠️</span>
-          <p className="text-xs font-semibold text-amber-800">
-            {t.bannerTitle}
-          </p>
+          <p className="text-xs font-semibold text-amber-800">{t.bannerTitle}</p>
         </div>
         <ul className="list-disc space-y-1 pl-6 text-xs/relaxed text-amber-700">
           {t.bannerBullets.map((bullet) => (
@@ -470,9 +431,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
       <div className="mb-5">
         <div className="mb-2 flex items-center justify-between">
           <div>
-            <p className="text-sm font-semibold text-slate-700">
-              {t.platformTitle}
-            </p>
+            <p className="text-sm font-semibold text-slate-700">{t.platformTitle}</p>
             <p className="text-xs text-slate-400">{t.platformDesc}</p>
           </div>
         </div>
@@ -480,17 +439,12 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
           {PLATFORM_CONNECTIONS.map((conn) => (
             <div
               key={conn.id}
-              className="
-                flex items-center justify-between rounded-lg border
-                border-slate-100 bg-slate-50 px-3 py-2.5
-              "
+              className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-3 py-2.5"
             >
               <div className="flex min-w-0 items-center gap-2.5">
                 {statusDot(conn.status)}
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-slate-800">
-                    {conn.name}
-                  </p>
+                  <p className="truncate text-sm font-medium text-slate-800">{conn.name}</p>
                   <p className="truncate text-xs text-slate-400">{conn.url}</p>
                 </div>
               </div>
@@ -498,9 +452,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                 <span className="text-xs text-slate-500">
                   {conn.toolCount} {conn.toolCount === 1 ? t.tool : t.tools}
                 </span>
-                <p className="text-xs font-medium text-emerald-600">
-                  {statusLabel(conn.status)}
-                </p>
+                <p className="text-xs font-medium text-emerald-600">{statusLabel(conn.status)}</p>
               </div>
             </div>
           ))}
@@ -517,10 +469,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
           {!showAddForm && (
             <button
               onClick={handleOpenAdd}
-              className="
-                text-xs font-medium text-illini-orange transition-colors
-                hover:text-illini-blue
-              "
+              className="text-illini-orange hover:text-illini-blue text-xs font-medium transition-colors"
             >
               {t.add}
             </button>
@@ -530,9 +479,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
         {/* Add Connection Form */}
         {showAddForm && (
           <div className="mb-3 rounded-lg border border-slate-200 bg-slate-50 p-4">
-            <p className="mb-3 text-sm font-semibold text-slate-700">
-              {t.addTitle}
-            </p>
+            <p className="mb-3 text-sm font-semibold text-slate-700">{t.addTitle}</p>
 
             {/* Display Name */}
             <div className="mb-2.5">
@@ -544,12 +491,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                 value={addName}
                 onChange={(e) => setAddName(e.target.value)}
                 placeholder={t.displayNamePlaceholder}
-                className="
-                  w-full rounded-lg border border-slate-200 bg-white px-3 py-2
-                  text-sm text-slate-700 placeholder-slate-300
-                  focus:border-illini-orange focus:ring-2
-                  focus:ring-illini-orange/30 focus:outline-none
-                "
+                className="focus:border-illini-orange focus:ring-illini-orange/30 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder-slate-300 focus:ring-2 focus:outline-none"
               />
             </div>
 
@@ -562,16 +504,11 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                 type="url"
                 value={addUrl}
                 onChange={(e) => {
-                  setAddUrl(e.target.value);
-                  setTestResult({ state: "idle" });
+                  setAddUrl(e.target.value)
+                  setTestResult({ state: "idle" })
                 }}
                 placeholder={t.endpointUrlPlaceholder}
-                className="
-                  w-full rounded-lg border border-slate-200 bg-white px-3 py-2
-                  text-sm text-slate-700 placeholder-slate-300
-                  focus:border-illini-orange focus:ring-2
-                  focus:ring-illini-orange/30 focus:outline-none
-                "
+                className="focus:border-illini-orange focus:ring-illini-orange/30 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder-slate-300 focus:ring-2 focus:outline-none"
               />
             </div>
 
@@ -585,55 +522,35 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                 value={addDesc}
                 onChange={(e) => setAddDesc(e.target.value)}
                 placeholder={t.descriptionPlaceholder}
-                className="
-                  w-full rounded-lg border border-slate-200 bg-white px-3 py-2
-                  text-sm text-slate-700 placeholder-slate-300
-                  focus:border-illini-orange focus:ring-2
-                  focus:ring-illini-orange/30 focus:outline-none
-                "
+                className="focus:border-illini-orange focus:ring-illini-orange/30 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder-slate-300 focus:ring-2 focus:outline-none"
               />
             </div>
 
             {/* Transport (read-only) */}
             <div className="mb-3">
-              <label className="mb-1 block text-xs font-medium text-slate-500">
-                {t.transport}
-              </label>
+              <label className="mb-1 block text-xs font-medium text-slate-500">{t.transport}</label>
               <div
-                className="
-                  rounded-lg border border-slate-100 bg-white px-3 py-2 text-sm
-                  text-slate-400
-                "
+                className="rounded-lg border border-slate-100 bg-white px-3 py-2 text-sm text-slate-400"
               >
                 {t.transportValue}
               </div>
-              <p className="mt-1 text-[11px] text-slate-400">
-                {t.transportHint}
-              </p>
+              <p className="mt-1 text-[11px] text-slate-400">{t.transportHint}</p>
             </div>
 
             {/* Test result message */}
             {testResult.state === "success" && (
               <div
-                className="
-                  mb-3 flex items-start gap-2 rounded-lg border
-                  border-emerald-200 bg-emerald-50 px-3 py-2
-                "
+                className="mb-3 flex items-start gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2"
               >
                 <span className="mt-0.5 text-emerald-500">✓</span>
                 <div>
-                  <p className="text-xs font-medium text-emerald-700">
-                    {t.testSuccess}
+                  <p className="text-xs font-medium text-emerald-700">{t.testSuccess}</p>
+                  <p className="text-xs text-emerald-600">
+                    {t.testSuccessDetailPrefix}: {t.testSuccessOutcome}; {testResult.tools.length}{" "}
+                    {testResult.tools.length === 1 ? t.tool : t.tools} {t.discoveredLabel}.
                   </p>
                   <p className="text-xs text-emerald-600">
-                    {t.testSuccessDetailPrefix}: {t.testSuccessOutcome};{" "}
-                    {testResult.tools.length}{" "}
-                    {testResult.tools.length === 1 ? t.tool : t.tools}{" "}
-                    {t.discoveredLabel}.
-                  </p>
-                  <p className="text-xs text-emerald-600">
-                    {testResult.tools.length}{" "}
-                    {testResult.tools.length === 1 ? t.tool : t.tools}:{" "}
+                    {testResult.tools.length} {testResult.tools.length === 1 ? t.tool : t.tools}:{" "}
                     {testResult.tools.map((t) => t.name).join(", ")}
                   </p>
                 </div>
@@ -641,16 +558,11 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
             )}
             {testResult.state === "failure" && (
               <div
-                className="
-                  mb-3 flex items-start gap-2 rounded-lg border border-red-200
-                  bg-red-50 px-3 py-2
-                "
+                className="mb-3 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2"
               >
                 <span className="mt-0.5 text-red-500">✕</span>
                 <div>
-                  <p className="text-xs font-medium text-red-700">
-                    {t.testFailure}
-                  </p>
+                  <p className="text-xs font-medium text-red-700">{t.testFailure}</p>
                   <p className="text-xs font-medium text-red-600">
                     {t.failureReasonLabel}: <code>{testResult.reason}</code>
                   </p>
@@ -665,23 +577,14 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
             <div className="flex items-center gap-2">
               <button
                 onClick={handleCancelAdd}
-                className="
-                  rounded-full bg-slate-100 px-3 py-1 text-xs font-medium
-                  text-slate-500 transition-colors
-                  hover:bg-slate-200
-                "
+                className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-200"
               >
                 {t.cancel}
               </button>
               <button
                 onClick={handleTest}
                 disabled={!addUrl.trim() || testResult.state === "loading"}
-                className="
-                  rounded-full bg-slate-100 px-3 py-1 text-xs font-medium
-                  text-slate-600 transition-colors
-                  hover:bg-slate-200
-                  disabled:opacity-40
-                "
+                className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-200 disabled:opacity-40"
               >
                 {testResult.state === "loading" ? t.testing : t.testConnection}
               </button>
@@ -689,12 +592,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                 <button
                   onClick={handleSave}
                   disabled={!addName.trim() || isSaving}
-                  className="
-                    rounded-full bg-illini-orange px-3 py-1 text-xs font-medium
-                    text-white transition-colors
-                    hover:bg-illini-blue
-                    disabled:opacity-40
-                  "
+                  className="bg-illini-orange hover:bg-illini-blue rounded-full px-3 py-1 text-xs font-medium text-white transition-colors disabled:opacity-40"
                 >
                   {isSaving ? t.saving : t.saveConnection}
                 </button>
@@ -706,10 +604,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
         {/* Empty state */}
         {userConnections.length === 0 && !showAddForm && (
           <div
-            className="
-              rounded-lg border border-dashed border-slate-200 bg-slate-50 px-4
-              py-5 text-center
-            "
+            className="rounded-lg border border-dashed border-slate-200 bg-slate-50 px-4 py-5 text-center"
           >
             <p className="text-sm text-slate-500">{t.emptyState}</p>
             <p className="mt-0.5 text-xs text-slate-400">{t.emptyHint}</p>
@@ -723,70 +618,45 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
               <div key={conn.id}>
                 {/* Card row */}
                 <button
-                  onClick={() =>
-                    setDetailsId(detailsId === conn.id ? null : conn.id)
-                  }
-                  className="
-                    flex w-full items-center justify-between rounded-lg border
-                    border-slate-100 bg-slate-50 px-3 py-2.5 text-left
-                    transition-colors
-                    hover:bg-slate-100
-                  "
+                  onClick={() => setDetailsId(detailsId === conn.id ? null : conn.id)}
+                  className="flex w-full items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-3 py-2.5 text-left transition-colors hover:bg-slate-100"
                 >
                   <div className="flex min-w-0 items-center gap-2.5">
                     {statusDot(conn.status, !conn.is_enabled)}
                     <div className="min-w-0">
                       <p
-                        className={`
-                          truncate text-sm font-medium
-                          ${conn.is_enabled ? "text-slate-800" : "text-slate-400"}`}
+                        className={`truncate text-sm font-medium ${conn.is_enabled ? "text-slate-800" : "text-slate-400"}`}
                       >
                         {conn.name}
                       </p>
-                      <p className="truncate text-xs text-slate-400">
-                        {conn.url}
-                      </p>
+                      <p className="truncate text-xs text-slate-400">{conn.url}</p>
                     </div>
                   </div>
                   <div className="ml-3 flex shrink-0 items-center gap-2">
                     <div className="text-right">
                       <span className="text-xs text-slate-500">
-                        {toolCount(conn)}{" "}
-                        {toolCount(conn) === 1 ? t.tool : t.tools}
+                        {toolCount(conn)} {toolCount(conn) === 1 ? t.tool : t.tools}
                       </span>
                       <p
-                        className={`
-                          text-xs font-medium
-                          ${conn.is_enabled ? "text-emerald-600" : "text-slate-400"}`}
+                        className={`text-xs font-medium ${conn.is_enabled ? "text-emerald-600" : "text-slate-400"}`}
                       >
-                        {conn.is_enabled
-                          ? statusLabel(conn.status)
-                          : t.disabled}
+                        {conn.is_enabled ? statusLabel(conn.status) : t.disabled}
                       </p>
                     </div>
-                    <span className="text-slate-300">
-                      {detailsId === conn.id ? "▲" : "▼"}
-                    </span>
+                    <span className="text-slate-300">{detailsId === conn.id ? "▲" : "▼"}</span>
                   </div>
                 </button>
 
                 {/* Details panel (inline expansion) */}
                 {detailsId === conn.id && (
                   <div
-                    className="
-                      mt-1 rounded-lg border border-slate-200 bg-white p-4
-                    "
+                    className="mt-1 rounded-lg border border-slate-200 bg-white p-4"
                   >
                     <div className="mb-3 flex items-center justify-between">
-                      <p className="text-sm font-semibold text-slate-700">
-                        {t.detailsTitle}
-                      </p>
+                      <p className="text-sm font-semibold text-slate-700">{t.detailsTitle}</p>
                       <button
                         onClick={() => setDetailsId(null)}
-                        className="
-                          text-xs text-slate-400
-                          hover:text-slate-600
-                        "
+                        className="text-xs text-slate-400 hover:text-slate-600"
                       >
                         {t.close}
                       </button>
@@ -794,40 +664,24 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
 
                     {/* Meta */}
                     <div
-                      className="
-                        mb-3 space-y-1.5 rounded-lg border border-slate-100
-                        bg-slate-50 px-3 py-2.5
-                      "
+                      className="mb-3 space-y-1.5 rounded-lg border border-slate-100 bg-slate-50 px-3 py-2.5"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-xs text-slate-400">
-                          {t.connectionName}
-                        </span>
-                        <span className="text-xs font-medium text-slate-700">
-                          {conn.name}
-                        </span>
+                        <span className="text-xs text-slate-400">{t.connectionName}</span>
+                        <span className="text-xs font-medium text-slate-700">{conn.name}</span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-xs text-slate-400">
-                          {t.connectionUrl}
-                        </span>
+                        <span className="text-xs text-slate-400">{t.connectionUrl}</span>
                         <span
-                          className="
-                            max-w-[180px] truncate text-xs text-slate-500
-                          "
+                          className="max-w-[180px] truncate text-xs text-slate-500"
                         >
                           {conn.url}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-xs text-slate-400">
-                          {t.connectionStatus}
-                        </span>
+                        <span className="text-xs text-slate-400">{t.connectionStatus}</span>
                         <span
-                          className="
-                            flex items-center gap-1.5 text-xs font-medium
-                            text-slate-700
-                          "
+                          className="flex items-center gap-1.5 text-xs font-medium text-slate-700"
                         >
                           {statusDot(conn.status)}
                           {statusLabel(conn.status)}
@@ -837,28 +691,19 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
 
                     {/* Enable/disable toggle */}
                     <div
-                      className="
-                        mb-3 flex items-center justify-between rounded-lg border
-                        border-slate-100 bg-slate-50 px-3 py-2.5
-                      "
+                      className="mb-3 flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-3 py-2.5"
                     >
                       <span className="text-xs font-medium text-slate-600">
                         {t.enableConnection}
                       </span>
                       <button
                         onClick={() => handleToggleConnection(conn.id)}
-                        className={`
-                          relative inline-flex h-5 w-9 items-center rounded-full
-                          transition-colors
-                          ${conn.is_enabled ? "bg-illini-orange" : "bg-slate-200"}`}
+                        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${conn.is_enabled ? "bg-illini-orange" : "bg-slate-200"}`}
                         role="switch"
                         aria-checked={conn.is_enabled}
                       >
                         <span
-                          className={`
-                            inline-block size-3.5 rounded-full bg-white
-                            shadow-sm transition-transform
-                            ${conn.is_enabled ? "translate-x-4" : "translate-x-1"}`}
+                          className={`inline-block size-3.5 rounded-full bg-white shadow-sm transition-transform ${conn.is_enabled ? "translate-x-4" : "translate-x-1"}`}
                         />
                       </button>
                     </div>
@@ -872,39 +717,24 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                         {conn.tools.map((tool) => (
                           <div
                             key={tool.name}
-                            className="
-                              flex items-center justify-between rounded-lg
-                              border border-slate-100 bg-slate-50 px-3 py-2
-                            "
+                            className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-3 py-2"
                           >
                             <div className="min-w-0">
                               <p
-                                className={`
-                                  text-xs font-medium
-                                  ${tool.enabled ? "text-slate-700" : "text-slate-400 line-through"}`}
+                                className={`text-xs font-medium ${tool.enabled ? "text-slate-700" : "text-slate-400 line-through"}`}
                               >
                                 {tool.name}
                               </p>
-                              <p className="truncate text-xs text-slate-400">
-                                {tool.description}
-                              </p>
+                              <p className="truncate text-xs text-slate-400">{tool.description}</p>
                             </div>
                             <button
-                              onClick={() =>
-                                handleToggleTool(conn.id, tool.name)
-                              }
-                              className={`
-                                relative ml-3 inline-flex h-5 w-9 shrink-0
-                                items-center rounded-full transition-colors
-                                ${tool.enabled ? "bg-illini-orange" : "bg-slate-200"}`}
+                              onClick={() => handleToggleTool(conn.id, tool.name)}
+                              className={`relative ml-3 inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${tool.enabled ? "bg-illini-orange" : "bg-slate-200"}`}
                               role="switch"
                               aria-checked={tool.enabled}
                             >
                               <span
-                                className={`
-                                  inline-block size-3.5 rounded-full bg-white
-                                  shadow-sm transition-transform
-                                  ${tool.enabled ? "translate-x-4" : "translate-x-1"}`}
+                                className={`inline-block size-3.5 rounded-full bg-white shadow-sm transition-transform ${tool.enabled ? "translate-x-4" : "translate-x-1"}`}
                               />
                             </button>
                           </div>
@@ -916,31 +746,19 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
                     <div className="flex flex-wrap gap-2">
                       <button
                         onClick={() => void handleTestAgain(conn.id)}
-                        className="
-                          rounded-full bg-slate-100 px-3 py-1 text-xs
-                          font-medium text-slate-500 transition-colors
-                          hover:bg-slate-200
-                        "
+                        className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-200"
                       >
                         {t.testAgain}
                       </button>
                       <button
                         onClick={() => void handleRefreshDiscovery(conn.id)}
-                        className="
-                          rounded-full bg-slate-100 px-3 py-1 text-xs
-                          font-medium text-slate-500 transition-colors
-                          hover:bg-slate-200
-                        "
+                        className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-200"
                       >
                         {t.refreshDiscovery}
                       </button>
                       <button
                         onClick={() => void handleDelete(conn.id)}
-                        className="
-                          rounded-full bg-red-50 px-3 py-1 text-xs font-medium
-                          text-red-500 transition-colors
-                          hover:bg-red-100
-                        "
+                        className="rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-500 transition-colors hover:bg-red-100"
                       >
                         {t.deleteConnection}
                       </button>
@@ -953,5 +771,5 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({
         )}
       </div>
     </div>
-  );
-};
+  )
+}

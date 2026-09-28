@@ -1,18 +1,15 @@
 // API Gateway Worker for api.iguide.chat
 // Handles: Auth verification, Geo-IP routing, LLM selection, Backend proxy
 
-import { runStreamingAgentLoop } from './agent/loop'
-import { createSSEStream } from './agent/stream'
-import { createCustomSkillsTool } from './tools/custom-skills'
-import { createGrepDocsTool } from './tools/grep-docs'
-import { ToolRegistry } from './tools/registry'
-import { createSearchKnowledgeBaseTool } from './tools/search-knowledge-base'
-import { createWebSearchTool } from './tools/web-search'
-import {
-  createMCPRouteServices,
-  maybeHandleIntegrationsRoute,
-} from './mcp/routes'
-import { registerRuntimeMCPTools } from './mcp/service'
+import { runStreamingAgentLoop } from "./agent/loop"
+import { createSSEStream } from "./agent/stream"
+import { createMCPRouteServices, maybeHandleIntegrationsRoute } from "./mcp/routes"
+import { registerRuntimeMCPTools } from "./mcp/service"
+import { createCustomSkillsTool } from "./tools/custom-skills"
+import { createGrepDocsTool } from "./tools/grep-docs"
+import { ToolRegistry } from "./tools/registry"
+import { createSearchKnowledgeBaseTool } from "./tools/search-knowledge-base"
+import { createWebSearchTool } from "./tools/web-search"
 
 interface Env {
   SUPABASE_URL: string
@@ -50,15 +47,15 @@ async function fetchQmd(
   baseUrl: string,
   body: string,
   apiKey: string,
-  timeoutMs: number
+  timeoutMs: number,
 ): Promise<Response> {
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), timeoutMs)
   try {
     const res = await fetch(`${baseUrl}/api/search`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
       },
       body,
@@ -71,21 +68,17 @@ async function fetchQmd(
 }
 
 export default {
-  async fetch(
-    request: Request,
-    env: Env,
-    ctx: ExecutionContext
-  ): Promise<Response> {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     // CORS headers
     const corsHeaders = {
-      'Access-Control-Allow-Origin': '*', // TODO: Change to your frontend domain in production
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      'Access-Control-Max-Age': '86400',
+      "Access-Control-Allow-Origin": "*", // TODO: Change to your frontend domain in production
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+      "Access-Control-Max-Age": "86400",
     }
 
     // Handle preflight requests
-    if (request.method === 'OPTIONS') {
+    if (request.method === "OPTIONS") {
       return new Response(null, {
         status: 204,
         headers: corsHeaders,
@@ -98,116 +91,103 @@ export default {
 
       // 1. Geo-IP Detection
       const cf = (request as { cf?: { country?: string } }).cf
-      const country = cf?.country || 'US'
-      const isCN = country === 'CN'
-      const region = isCN ? 'CN' : 'Global'
+      const country = cf?.country || "US"
+      const isCN = country === "CN"
+      const region = isCN ? "CN" : "Global"
 
       console.log(`Request from ${country}, region: ${region}`)
 
       // 2. Auth Verification (JWT)
-      const authHeader = request.headers.get('Authorization')
-      let userId = 'anonymous'
+      const authHeader = request.headers.get("Authorization")
+      let userId = "anonymous"
       let isAuthenticated = false
 
-      if (authHeader && authHeader.startsWith('Bearer ')) {
+      if (authHeader && authHeader.startsWith("Bearer ")) {
         try {
-          const token = authHeader.replace('Bearer ', '')
+          const token = authHeader.replace("Bearer ", "")
 
           // Verify JWT with Supabase
-          const supabaseResponse = await fetch(
-            `${env.SUPABASE_URL}/auth/v1/user`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                apikey: env.SUPABASE_ANON_KEY,
-              },
-            }
-          )
+          const supabaseResponse = await fetch(`${env.SUPABASE_URL}/auth/v1/user`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              apikey: env.SUPABASE_ANON_KEY,
+            },
+          })
 
           if (supabaseResponse.ok) {
-            const userData =
-              (await supabaseResponse.json()) as SupabaseUserResponse
+            const userData = (await supabaseResponse.json()) as SupabaseUserResponse
             userId = userData.id || userId
             isAuthenticated = true
             console.log(`Authenticated user: ${userId}`)
           } else {
-            console.warn('Invalid token')
-            return new Response(
-              JSON.stringify({ error: 'Invalid or expired token' }),
-              {
-                status: 401,
-                headers: {
-                  ...corsHeaders,
-                  'Content-Type': 'application/json',
-                },
-              }
-            )
-          }
-        } catch (err) {
-          console.error('Auth error:', err)
-          return new Response(
-            JSON.stringify({ error: 'Authentication failed' }),
-            {
-              status: 500,
+            console.warn("Invalid token")
+            return new Response(JSON.stringify({ error: "Invalid or expired token" }), {
+              status: 401,
               headers: {
                 ...corsHeaders,
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
               },
-            }
-          )
+            })
+          }
+        } catch (err) {
+          console.error("Auth error:", err)
+          return new Response(JSON.stringify({ error: "Authentication failed" }), {
+            status: 500,
+            headers: {
+              ...corsHeaders,
+              "Content-Type": "application/json",
+            },
+          })
         }
       }
 
       // 3. Rate limiting for search (per-IP, 20 req/min)
       const pathname = url.pathname
-      if (pathname === '/api/search' || pathname === '/search') {
-        const ip = request.headers.get('CF-Connecting-IP') || 'unknown'
+      if (pathname === "/api/search" || pathname === "/search") {
+        const ip = request.headers.get("CF-Connecting-IP") || "unknown"
         const minute = Math.floor(Date.now() / 60000)
         const rateLimitKey = `https://rate-limit/${ip}:${minute}`
         const cacheStore = caches.default
         const cachedCount = await cacheStore.match(new Request(rateLimitKey))
         let count = cachedCount ? parseInt(await cachedCount.text()) : 0
         if (count >= 20) {
-          return new Response(
-            JSON.stringify({ error: 'Rate limited, try again later' }),
-            {
-              status: 429,
-              headers: {
-                ...corsHeaders,
-                'Content-Type': 'application/json',
-                'Retry-After': '30',
-              },
-            }
-          )
+          return new Response(JSON.stringify({ error: "Rate limited, try again later" }), {
+            status: 429,
+            headers: {
+              ...corsHeaders,
+              "Content-Type": "application/json",
+              "Retry-After": "30",
+            },
+          })
         }
         count++
         ctx.waitUntil(
           cacheStore.put(
             new Request(rateLimitKey),
             new Response(String(count), {
-              headers: { 'Cache-Control': 'max-age=60' },
-            })
-          )
+              headers: { "Cache-Control": "max-age=60" },
+            }),
+          ),
         )
       }
 
       // Health check endpoint
-      if (pathname === '/health' || pathname === '/api/health') {
+      if (pathname === "/health" || pathname === "/api/health") {
         return new Response(
           JSON.stringify({
-            status: 'ok',
+            status: "ok",
             region,
             country,
             authenticated: isAuthenticated,
             timestamp: new Date().toISOString(),
-            version: '1.0.0',
+            version: "1.0.0",
           }),
           {
             headers: {
               ...corsHeaders,
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
-          }
+          },
         )
       }
 
@@ -215,53 +195,47 @@ export default {
         request,
         mcpServices,
         userId,
-        corsHeaders
+        corsHeaders,
       )
       if (integrationsResponse) {
         return integrationsResponse
       }
 
       // Chat endpoint - proxy to VPS backend
-      if (pathname === '/chat' || pathname === '/api/chat') {
-        if (request.method !== 'POST') {
-          return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      if (pathname === "/chat" || pathname === "/api/chat") {
+        if (request.method !== "POST") {
+          return new Response(JSON.stringify({ error: "Method not allowed" }), {
             status: 405,
             headers: {
               ...corsHeaders,
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
           })
         }
 
         // Check USE_TOOL_USE_RAG feature flag
-        if (env.USE_TOOL_USE_RAG === 'true') {
+        if (env.USE_TOOL_USE_RAG === "true") {
           const body = (await request.json()) as ChatRequestBody
           const message =
-            typeof body.message === 'string'
+            typeof body.message === "string"
               ? body.message
-              : typeof body.newMessage === 'string'
+              : typeof body.newMessage === "string"
                 ? body.newMessage
-                : ''
+                : ""
 
           if (!message.trim()) {
-            return new Response(
-              JSON.stringify({ error: 'Message is required' }),
-              {
-                status: 400,
-                headers: {
-                  ...corsHeaders,
-                  'Content-Type': 'application/json',
-                },
-              }
-            )
+            return new Response(JSON.stringify({ error: "Message is required" }), {
+              status: 400,
+              headers: {
+                ...corsHeaders,
+                "Content-Type": "application/json",
+              },
+            })
           }
 
           const history = Array.isArray(body.history)
             ? body.history.flatMap((entry) => {
-                if (
-                  typeof entry?.role !== 'string' ||
-                  typeof entry?.content !== 'string'
-                ) {
+                if (typeof entry?.role !== "string" || typeof entry?.content !== "string") {
                   return []
                 }
 
@@ -288,9 +262,9 @@ export default {
           const { stream, writer } = createSSEStream()
           const responseHeaders = {
             ...corsHeaders,
-            'Content-Type': 'text/event-stream',
-            'Cache-Control': 'no-cache',
-            Connection: 'keep-alive',
+            "Content-Type": "text/event-stream",
+            "Cache-Control": "no-cache",
+            Connection: "keep-alive",
           }
 
           const envRecord = env as unknown as Record<string, string>
@@ -304,7 +278,7 @@ export default {
             lang: body.lang,
             writer,
           }).catch(async (error) => {
-            console.error('Streaming agent loop error:', error)
+            console.error("Streaming agent loop error:", error)
           })
 
           ctx.waitUntil(runPromise)
@@ -317,27 +291,27 @@ export default {
 
         // Forward request to VPS backend
         const backendResponse = await fetch(env.BACKEND_URL, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-            'X-User-Region': region,
-            'X-User-Country': country,
-            'X-User-ID': userId,
-            'X-Authenticated': isAuthenticated.toString(),
+            "Content-Type": "application/json",
+            "X-User-Region": region,
+            "X-User-Country": country,
+            "X-User-ID": userId,
+            "X-Authenticated": isAuthenticated.toString(),
           },
           body: await request.text(),
         })
 
         // Handle streaming response (SSE)
-        const contentType = backendResponse.headers.get('content-type') || ''
-        if (contentType.includes('text/event-stream')) {
+        const contentType = backendResponse.headers.get("content-type") || ""
+        if (contentType.includes("text/event-stream")) {
           return new Response(backendResponse.body, {
             status: backendResponse.status,
             headers: {
               ...corsHeaders,
-              'Content-Type': 'text/event-stream',
-              'Cache-Control': 'no-cache',
-              Connection: 'keep-alive',
+              "Content-Type": "text/event-stream",
+              "Cache-Control": "no-cache",
+              Connection: "keep-alive",
             },
           })
         }
@@ -348,17 +322,17 @@ export default {
           status: backendResponse.status,
           headers: {
             ...corsHeaders,
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
         })
       }
 
       // QMD Search endpoint - dual-node with fallback
-      if (pathname === '/api/search' || pathname === '/search') {
-        if (request.method !== 'POST') {
-          return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      if (pathname === "/api/search" || pathname === "/search") {
+        if (request.method !== "POST") {
+          return new Response(JSON.stringify({ error: "Method not allowed" }), {
             status: 405,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
           })
         }
 
@@ -367,7 +341,7 @@ export default {
           ? [env.QMD_CN_URL, env.QMD_US_URL]
           : [env.QMD_US_URL, env.QMD_CN_URL]
 
-        let qmdRegion = isCN ? 'cn' : 'us'
+        let qmdRegion = isCN ? "cn" : "us"
         let res: Response | null = null
 
         // Try primary node
@@ -376,9 +350,7 @@ export default {
             res = await fetchQmd(primaryUrl, body, env.QMD_API_KEY, 15000)
             if (!res.ok) res = null
           } catch {
-            console.warn(
-              `[QMD] Primary node (${qmdRegion}) failed, trying fallback`
-            )
+            console.warn(`[QMD] Primary node (${qmdRegion}) failed, trying fallback`)
             res = null
           }
         }
@@ -386,7 +358,7 @@ export default {
         // Fallback to secondary node
         if (!res && fallbackUrl) {
           try {
-            qmdRegion = isCN ? 'us' : 'cn'
+            qmdRegion = isCN ? "us" : "cn"
             res = await fetchQmd(fallbackUrl, body, env.QMD_API_KEY, 15000)
           } catch (err) {
             const fallbackMsg = err instanceof Error ? err.message : String(err)
@@ -400,50 +372,47 @@ export default {
             status: 200,
             headers: {
               ...corsHeaders,
-              'Content-Type': 'application/json',
-              'X-QMD-Region': qmdRegion,
+              "Content-Type": "application/json",
+              "X-QMD-Region": qmdRegion,
             },
           })
         }
 
-        return new Response(
-          JSON.stringify({ error: 'QMD search unavailable on all nodes' }),
-          {
-            status: 503,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          }
-        )
+        return new Response(JSON.stringify({ error: "QMD search unavailable on all nodes" }), {
+          status: 503,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        })
       }
 
       // 404 for unknown paths
       return new Response(
         JSON.stringify({
-          error: 'Not found',
+          error: "Not found",
           path: pathname,
-          availableEndpoints: ['/health', '/chat', '/api/search'],
+          availableEndpoints: ["/health", "/chat", "/api/search"],
         }),
         {
           status: 404,
           headers: {
             ...corsHeaders,
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
-        }
+        },
       )
     } catch (error) {
-      console.error('Worker error:', error)
+      console.error("Worker error:", error)
       const errorMsg = error instanceof Error ? error.message : String(error)
       return new Response(
         JSON.stringify({
-          error: 'Internal server error',
+          error: "Internal server error",
           message: errorMsg,
         }),
         {
           status: 500,
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
-        }
+        },
       )
     }
   },

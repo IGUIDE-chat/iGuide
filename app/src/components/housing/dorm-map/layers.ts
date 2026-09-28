@@ -15,21 +15,17 @@ export const buildZonesFillLayer = (showZones: boolean) => ({
   layout: {
     visibility: showZones ? "visible" : "none",
   },
-});
+})
 
 export const buildZonesLabelLayer = (
   showZones: boolean,
   showZoneLabels: boolean,
-  isChinese: boolean
+  isChinese: boolean,
 ) => ({
   id: "zones-label",
   type: "symbol" as const,
   layout: {
-    "text-field": [
-      "coalesce",
-      ["get", isChinese ? "name_zh" : "name"],
-      ["get", "name"],
-    ],
+    "text-field": ["coalesce", ["get", isChinese ? "name_zh" : "name"], ["get", "name"]],
     "text-font": ["DIN Offc Pro Bold", "Arial Unicode MS Bold"],
     "text-size": 13,
     "text-transform": "uppercase",
@@ -46,20 +42,13 @@ export const buildZonesLabelLayer = (
     "text-halo-width": 3,
     "text-opacity": 0.9,
   },
-});
+})
 
-export const buildLandmarksLayer = (
-  showLandmarks: boolean,
-  isChinese: boolean
-) => ({
+export const buildLandmarksLayer = (showLandmarks: boolean, isChinese: boolean) => ({
   id: "landmarks-layer",
   type: "symbol" as const,
   layout: {
-    "text-field": [
-      "coalesce",
-      ["get", isChinese ? "name_zh" : "name"],
-      ["get", "name"],
-    ],
+    "text-field": ["coalesce", ["get", isChinese ? "name_zh" : "name"], ["get", "name"]],
     "text-font": ["DIN Offc Pro Bold", "Arial Unicode MS Bold"],
     "text-size": 12,
     "text-offset": [0, 1.4],
@@ -99,7 +88,7 @@ export const buildLandmarksLayer = (
     "icon-opacity": 1,
     "text-opacity": 1,
   },
-});
+})
 
 export const CLUSTERS_LAYER = {
   id: "clusters",
@@ -112,7 +101,7 @@ export const CLUSTERS_LAYER = {
     "circle-stroke-color": "#dddddd",
     "circle-pitch-alignment": "map",
   },
-};
+}
 
 export const CLUSTER_COUNT_LAYER = {
   id: "cluster-count",
@@ -125,7 +114,7 @@ export const CLUSTER_COUNT_LAYER = {
     "text-allow-overlap": true,
   },
   paint: { "text-color": "#222222" },
-};
+}
 
 export const UNCLUSTERED_LAYER = {
   id: "unclustered-point",
@@ -150,4 +139,4 @@ export const UNCLUSTERED_LAYER = {
     "text-color": ["case", ["get", "isActive"], "#ffffff", "#222222"],
     "icon-opacity": 1,
   },
-};
+}

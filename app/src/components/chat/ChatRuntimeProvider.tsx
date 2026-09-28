@@ -3,122 +3,102 @@
  * @description Chat (AI) Component / Module
  */
 
-import * as React from "react";
 import {
   AssistantRuntimeProvider,
   useExternalStoreRuntime,
   useAui,
   type AppendMessage,
   type ThreadMessageLike,
-} from "@assistant-ui/react";
-import { useChatSession } from "./useChatSession";
-import {
-  type ChatMessage,
-  type Language,
-  type ThinkingStep,
-} from "../../types";
-import { ChatErrorBoundary } from "./ChatErrorBoundary";
-import { GrepDocsToolUI, SearchToolUI, WebSearchToolUI } from "./tools";
+} from "@assistant-ui/react"
+import * as React from "react"
+
+import { type ChatMessage, type Language, type ThinkingStep } from "../../types"
+import { ChatErrorBoundary } from "./ChatErrorBoundary"
+import { GrepDocsToolUI, SearchToolUI, WebSearchToolUI } from "./tools"
+import { useChatSession } from "./useChatSession"
 
 interface ChatRuntimeProviderProps {
-  language: Language;
-  currentConversationId: string | null;
-  onConversationCreated: (id: string) => void;
-  children: React.ReactNode;
+  language: Language
+  currentConversationId: string | null
+  onConversationCreated: (id: string) => void
+  children: React.ReactNode
 }
 
 interface ChatSessionContextValue {
-  appendMessage: (text: string) => void;
+  appendMessage: (text: string) => void
 }
 
-export const ChatSessionContext =
-  React.createContext<ChatSessionContextValue | null>(null);
+export const ChatSessionContext = React.createContext<ChatSessionContextValue | null>(null)
 
 const getTextFromAppendMessage = (message: AppendMessage): string | null => {
-  const textPart = message.content.find((part) => part.type === "text");
+  const textPart = message.content.find((part) => part.type === "text")
 
   if (textPart && textPart.type === "text") {
-    return textPart.text;
+    return textPart.text
   }
 
-  return null;
-};
+  return null
+}
 
-const TOOL_NAMES = [
-  "search_knowledge_base",
-  "web_search",
-  "grep_docs",
-] as const;
+const TOOL_NAMES = ["search_knowledge_base", "web_search", "grep_docs"] as const
 
-type ToolName = (typeof TOOL_NAMES)[number];
+type ToolName = (typeof TOOL_NAMES)[number]
 
 type ToolCallPart = Extract<
-  ThreadMessageLike["content"] extends string
-    ? never
-    : ThreadMessageLike["content"][number],
+  ThreadMessageLike["content"] extends string ? never : ThreadMessageLike["content"][number],
   { type: "tool-call" }
->;
+>
 
 const isToolName = (value: string | undefined): value is ToolName =>
-  !!value && TOOL_NAMES.includes(value as ToolName);
+  !!value && TOOL_NAMES.includes(value as ToolName)
 
 const getToolNameFromLabel = (label: string) => {
-  const [, candidate] = label.split(":");
-  const toolName = candidate?.trim();
+  const [, candidate] = label.split(":")
+  const toolName = candidate?.trim()
 
-  return isToolName(toolName) ? toolName : undefined;
-};
+  return isToolName(toolName) ? toolName : undefined
+}
 
 const parseJsonObject = (value: string | undefined) => {
-  if (!value) return {};
+  if (!value) return {}
 
   try {
-    const parsed = JSON.parse(value);
+    const parsed = JSON.parse(value)
     return parsed && typeof parsed === "object" && !Array.isArray(parsed)
       ? (parsed as Record<string, unknown>)
-      : {};
+      : {}
   } catch {
-    return {};
+    return {}
   }
-};
+}
 
 const parseToolResult = (detail: string | undefined) => {
-  if (!detail) return undefined;
-  const [status, ...summaryParts] = detail.split(" — ");
-  const summary = summaryParts.join(" — ");
+  if (!detail) return undefined
+  const [status, ...summaryParts] = detail.split(" — ")
+  const summary = summaryParts.join(" — ")
 
   return {
     ...(status && { status }),
     summary: summary || detail,
-  };
-};
+  }
+}
 
-const getToolResultStep = (
-  steps: ThinkingStep[],
-  toolName: ToolName,
-  startIndex: number
-) =>
+const getToolResultStep = (steps: ThinkingStep[], toolName: ToolName, startIndex: number) =>
   steps
     .slice(startIndex + 1)
-    .find(
-      (step) =>
-        step.type === "processing" &&
-        getToolNameFromLabel(step.label) === toolName
-    );
+    .find((step) => step.type === "processing" && getToolNameFromLabel(step.label) === toolName)
 
-const getToolCallParts = (
-  steps: ThinkingStep[] | undefined
-): ToolCallPart[] => {
-  if (!steps?.length) return [];
+const getToolCallParts = (steps: ThinkingStep[] | undefined): ToolCallPart[] => {
+  if (!steps?.length) return []
 
   return steps.flatMap((step, index) => {
-    if (step.type !== "tool_call") return [];
+    if (step.type !== "tool_call") return []
 
-    const toolName = getToolNameFromLabel(step.label);
-    if (!toolName) return [];
+    const toolName = getToolNameFromLabel(step.label)
+    if (!toolName) return []
 
-    const resultStep = getToolResultStep(steps, toolName, index);
-    const result = parseToolResult(resultStep?.detail);
+    const resultStep = getToolResultStep(steps, toolName, index)
+    const result = parseToolResult(resultStep?.detail)
 
     return [
       {
@@ -128,19 +108,16 @@ const getToolCallParts = (
         args: parseJsonObject(step.detail) as ToolCallPart["args"],
         ...(result && { result }),
       },
-    ];
-  });
-};
+    ]
+  })
+}
 
 const toAssistantThreadMessage = (msg: ChatMessage): ThreadMessageLike => {
-  const role = msg.role === "model" ? "assistant" : "user";
+  const role = msg.role === "model" ? "assistant" : "user"
   const content: ThreadMessageLike["content"] =
     role === "assistant"
-      ? [
-          ...getToolCallParts(msg.thinkingSteps),
-          { type: "text" as const, text: msg.text },
-        ]
-      : [{ type: "text" as const, text: msg.text }];
+      ? [...getToolCallParts(msg.thinkingSteps), { type: "text" as const, text: msg.text }]
+      : [{ type: "text" as const, text: msg.text }]
 
   return {
     id: msg.id,
@@ -159,26 +136,24 @@ const toAssistantThreadMessage = (msg: ChatMessage): ThreadMessageLike => {
         isStreaming: msg.isStreaming,
       },
     },
-  };
-};
+  }
+}
 
 const AppendMessageInner = ({ children }: { children: React.ReactNode }) => {
-  const api = useAui();
+  const api = useAui()
   const appendMessage = React.useCallback(
     (text: string) => {
       api.thread().append({
         role: "user",
         content: [{ type: "text", text }],
-      });
+      })
     },
-    [api]
-  );
+    [api],
+  )
   return (
-    <ChatSessionContext.Provider value={{ appendMessage }}>
-      {children}
-    </ChatSessionContext.Provider>
-  );
-};
+    <ChatSessionContext.Provider value={{ appendMessage }}>{children}</ChatSessionContext.Provider>
+  )
+}
 
 /**
  * ChatRuntimeProvider — route-level assistant-ui runtime provider.
@@ -206,7 +181,7 @@ export const ChatRuntimeProvider = ({
     language,
     currentConversationId,
     onConversationCreated,
-  });
+  })
 
   const store = React.useMemo(
     () => ({
@@ -214,16 +189,16 @@ export const ChatRuntimeProvider = ({
       convertMessage: toAssistantThreadMessage,
       isRunning: isLoading,
       onNew: async (message: AppendMessage) => {
-        const text = getTextFromAppendMessage(message);
+        const text = getTextFromAppendMessage(message)
         if (text) {
-          await sendMessage(text);
+          await sendMessage(text)
         }
       },
     }),
-    [messages, isLoading, sendMessage]
-  );
+    [messages, isLoading, sendMessage],
+  )
 
-  const runtime = useExternalStoreRuntime(store);
+  const runtime = useExternalStoreRuntime(store)
 
   return (
     <ChatErrorBoundary>
@@ -234,5 +209,5 @@ export const ChatRuntimeProvider = ({
         <AppendMessageInner>{children}</AppendMessageInner>
       </AssistantRuntimeProvider>
     </ChatErrorBoundary>
-  );
-};
+  )
+}

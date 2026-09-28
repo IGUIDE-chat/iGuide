@@ -1,10 +1,22 @@
+import type { ToolRegistry } from "../tools/registry.ts"
+import type { OpenAITool, RequestContext, ToolResult } from "../tools/types.ts"
+import { executeToolAction } from "./actions.ts"
+import { DEFAULT_MAX_ITERATIONS, evaluateStopCondition } from "./bounds.ts"
 import {
   logFallbackEvent,
   withFallback,
   type FallbackEvent,
   type FallbackReason,
-} from './fallback.ts'
-import { DEFAULT_MAX_ITERATIONS, evaluateStopCondition } from './bounds.ts'
+} from "./fallback.ts"
+import {
+  buildProviderMessages,
+  convertObservationToMessage,
+  type ProviderMessage,
+  type ProviderToolCall,
+} from "./messages.ts"
+import type { Observation } from "./observation.ts"
+import { buildSystemPrompt } from "./prompts.ts"
+import { shouldEnableRetrievalTools } from "./retrieval-policy.ts"
 import {
   sendContent,
   sendDone,
@@ -14,19 +26,7 @@ import {
   emitAgentStep,
   emitObservation,
   emitFinalizing,
-} from './stream.ts'
-import { buildSystemPrompt } from './prompts.ts'
-import { shouldEnableRetrievalTools } from './retrieval-policy.ts'
-import {
-  buildProviderMessages,
-  convertObservationToMessage,
-  type ProviderMessage,
-  type ProviderToolCall,
-} from './messages.ts'
-import { executeToolAction } from './actions.ts'
-import type { Observation } from './observation.ts'
-import type { ToolRegistry } from '../tools/registry.ts'
-import type { OpenAITool, RequestContext, ToolResult } from '../tools/types.ts'
+} from "./stream.ts"
 
 export interface AgentLoopOptions {
   message: string
@@ -59,7 +59,7 @@ type DeepSeekToolCall = ProviderToolCall
 
 interface DeepSeekChoice {
   message?: {
-    role: 'assistant'
+    role: "assistant"
     content: string | null
     reasoning_content?: string | null
     tool_calls?: DeepSeekToolCall[] | null
@@ -70,7 +70,7 @@ interface DeepSeekChoice {
 interface DeepSeekStreamDeltaToolCall {
   index: number
   id?: string
-  type?: 'function'
+  type?: "function"
   function?: {
     name?: string
     arguments?: string
@@ -79,7 +79,7 @@ interface DeepSeekStreamDeltaToolCall {
 
 interface DeepSeekStreamChoice {
   delta?: {
-    role?: 'assistant'
+    role?: "assistant"
     content?: string | null
     reasoning_content?: string | null
     tool_calls?: DeepSeekStreamDeltaToolCall[] | null
@@ -118,7 +118,7 @@ interface ProviderConfig {
 interface StreamingToolCallAccumulator {
   id: string
   index: number
-  type: 'function'
+  type: "function"
   function: {
     name: string
     arguments: string
@@ -168,9 +168,7 @@ function detectRegion(region?: string, env?: Record<string, string>): string {
     .filter(Boolean)
     .map((value) => value!.toUpperCase())
 
-  return candidates.some((value) => value === 'CN' || value === 'CHINA')
-    ? 'CN'
-    : 'Global'
+  return candidates.some((value) => value === "CN" || value === "CHINA") ? "CN" : "Global"
 }
 
 function getProviderConfig(options: {
@@ -181,31 +179,31 @@ function getProviderConfig(options: {
   const deepSeekKey = options.env.DEEPSEEK_API_KEY
   const siliconFlowKey = options.env.SILICONFLOW_API_KEY
 
-  if (detectedRegion === 'CN' && siliconFlowKey) {
+  if (detectedRegion === "CN" && siliconFlowKey) {
     return {
-      endpoint: 'https://api.siliconflow.cn/v1/chat/completions',
+      endpoint: "https://api.siliconflow.cn/v1/chat/completions",
       apiKey: siliconFlowKey,
-      region: 'CN',
+      region: "CN",
     }
   }
 
   if (deepSeekKey) {
     return {
-      endpoint: 'https://api.deepseek.com/chat/completions',
+      endpoint: "https://api.deepseek.com/chat/completions",
       apiKey: deepSeekKey,
-      region: 'Global',
+      region: "Global",
     }
   }
 
   if (siliconFlowKey) {
     return {
-      endpoint: 'https://api.siliconflow.cn/v1/chat/completions',
+      endpoint: "https://api.siliconflow.cn/v1/chat/completions",
       apiKey: siliconFlowKey,
       region: detectedRegion,
     }
   }
 
-  throw new Error('No DeepSeek-compatible API key configured')
+  throw new Error("No DeepSeek-compatible API key configured")
 }
 
 function buildSupabaseHeaders(env: Record<string, string>): HeadersInit | null {
@@ -232,31 +230,31 @@ async function fetchSingleColumn(options: {
   const headers = buildSupabaseHeaders(options.env)
 
   if (!supabaseUrl || !headers) {
-    return ''
+    return ""
   }
 
   const endpoint = new URL(`${supabaseUrl}/rest/v1/${options.table}`)
-  endpoint.searchParams.set('select', options.column)
-  endpoint.searchParams.set('user_id', `eq.${options.userId}`)
-  endpoint.searchParams.set('limit', '1')
+  endpoint.searchParams.set("select", options.column)
+  endpoint.searchParams.set("user_id", `eq.${options.userId}`)
+  endpoint.searchParams.set("limit", "1")
 
   try {
     const response = await fetch(endpoint.toString(), { headers })
     if (!response.ok) {
-      return ''
+      return ""
     }
 
     const payload = (await response.json()) as Array<Record<string, unknown>>
     const value = payload[0]?.[options.column]
-    return typeof value === 'string' ? value : ''
+    return typeof value === "string" ? value : ""
   } catch {
-    return ''
+    return ""
   }
 }
 
 async function getUserMemoryBlock(
   userId: string | undefined,
-  env: Record<string, string>
+  env: Record<string, string>,
 ): Promise<string | undefined> {
   if (!userId) {
     return undefined
@@ -265,14 +263,14 @@ async function getUserMemoryBlock(
   const [soul, userMemory] = await Promise.all([
     fetchSingleColumn({
       env,
-      table: 'user_souls',
-      column: 'soul_prompt',
+      table: "user_souls",
+      column: "soul_prompt",
       userId,
     }),
     fetchSingleColumn({
       env,
-      table: 'user_memories',
-      column: 'memory_text',
+      table: "user_memories",
+      column: "memory_text",
       userId,
     }),
   ])
@@ -285,15 +283,15 @@ async function getUserMemoryBlock(
     sections.push(`### Remembered User Facts\n${userMemory}`)
   }
 
-  return sections.length > 0 ? sections.join('\n\n') : undefined
+  return sections.length > 0 ? sections.join("\n\n") : undefined
 }
 
 function buildIterationLimitMessage(lang?: string): string {
-  if (lang === 'zh') {
-    return '我已经达到本轮可用的最大工具调用次数，下面的回答可能不完整。'
+  if (lang === "zh") {
+    return "我已经达到本轮可用的最大工具调用次数，下面的回答可能不完整。"
   }
 
-  return 'I reached the maximum tool-call iterations for this turn, so the answer below may be incomplete.'
+  return "I reached the maximum tool-call iterations for this turn, so the answer below may be incomplete."
 }
 
 async function callDeepSeek(options: {
@@ -303,13 +301,13 @@ async function callDeepSeek(options: {
   tools?: OpenAITool[]
 }): Promise<DeepSeekResponse> {
   const response = await fetch(options.provider.endpoint, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       Authorization: `Bearer ${options.provider.apiKey}`,
     },
     body: JSON.stringify({
-      model: 'deepseek-chat',
+      model: "deepseek-chat",
       messages: options.messages,
       tools: options.tools ?? options.registry.toOpenAITools(),
       stream: false,
@@ -318,9 +316,7 @@ async function callDeepSeek(options: {
 
   if (!response.ok) {
     const errorText = await response.text()
-    throw new Error(
-      `DeepSeek API returned ${response.status}${errorText ? `: ${errorText}` : ''}`
-    )
+    throw new Error(`DeepSeek API returned ${response.status}${errorText ? `: ${errorText}` : ""}`)
   }
 
   return (await response.json()) as DeepSeekResponse
@@ -333,13 +329,13 @@ async function callDeepSeekStream(options: {
   tools?: OpenAITool[]
 }): Promise<ReadableStreamDefaultReader<Uint8Array>> {
   const response = await fetch(options.provider.endpoint, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       Authorization: `Bearer ${options.provider.apiKey}`,
     },
     body: JSON.stringify({
-      model: 'deepseek-chat',
+      model: "deepseek-chat",
       messages: options.messages,
       tools: options.tools ?? options.registry.toOpenAITools(),
       stream: true,
@@ -351,35 +347,31 @@ async function callDeepSeekStream(options: {
 
   if (!response.ok) {
     const errorText = await response.text()
-    throw new Error(
-      `DeepSeek API returned ${response.status}${errorText ? `: ${errorText}` : ''}`
-    )
+    throw new Error(`DeepSeek API returned ${response.status}${errorText ? `: ${errorText}` : ""}`)
   }
 
   if (!response.body) {
-    throw new Error('DeepSeek streaming response missing body')
+    throw new Error("DeepSeek streaming response missing body")
   }
 
   return response.body.getReader()
 }
 
-function createToolCallAccumulator(
-  index: number
-): StreamingToolCallAccumulator {
+function createToolCallAccumulator(index: number): StreamingToolCallAccumulator {
   return {
     id: `tool_call_${index}`,
     index,
-    type: 'function',
+    type: "function",
     function: {
-      name: '',
-      arguments: '',
+      name: "",
+      arguments: "",
     },
   }
 }
 
 function accumulateStreamingToolCalls(
   accumulators: Map<number, StreamingToolCallAccumulator>,
-  deltaToolCalls: DeepSeekStreamDeltaToolCall[] | null | undefined
+  deltaToolCalls: DeepSeekStreamDeltaToolCall[] | null | undefined,
 ): void {
   if (!deltaToolCalls || deltaToolCalls.length === 0) {
     return
@@ -387,8 +379,7 @@ function accumulateStreamingToolCalls(
 
   for (const deltaToolCall of deltaToolCalls) {
     const accumulator =
-      accumulators.get(deltaToolCall.index) ||
-      createToolCallAccumulator(deltaToolCall.index)
+      accumulators.get(deltaToolCall.index) || createToolCallAccumulator(deltaToolCall.index)
 
     if (deltaToolCall.id) {
       accumulator.id = deltaToolCall.id
@@ -411,7 +402,7 @@ function accumulateStreamingToolCalls(
 }
 
 function finalizeStreamingToolCalls(
-  accumulators: Map<number, StreamingToolCallAccumulator>
+  accumulators: Map<number, StreamingToolCallAccumulator>,
 ): DeepSeekToolCall[] {
   return Array.from(accumulators.values())
     .sort((a, b) => a.index - b.index)
@@ -430,25 +421,25 @@ async function readDeepSeekStreamingResponse(options: {
   writer: WritableStreamDefaultWriter<string>
 }): Promise<ParsedStreamResponse> {
   const decoder = new TextDecoder()
-  let buffer = ''
-  let content = ''
+  let buffer = ""
+  let content = ""
   let finishReason: string | null = null
   let latestUsage: DeepSeekUsage | undefined
   const toolCallAccumulators = new Map<number, StreamingToolCallAccumulator>()
 
   const processChunk = async (chunkText: string): Promise<void> => {
     const lines = chunkText
-      .split('\n')
+      .split("\n")
       .map((line) => line.trim())
       .filter(Boolean)
 
     for (const line of lines) {
-      if (!line.startsWith('data: ')) {
+      if (!line.startsWith("data: ")) {
         continue
       }
 
       const payload = line.slice(6)
-      if (payload === '[DONE]') {
+      if (payload === "[DONE]") {
         continue
       }
 
@@ -472,7 +463,7 @@ async function readDeepSeekStreamingResponse(options: {
         continue
       }
 
-      if (typeof delta.content === 'string' && delta.content.length > 0) {
+      if (typeof delta.content === "string" && delta.content.length > 0) {
         content += delta.content
         await sendContent(options.writer, delta.content)
       }
@@ -489,8 +480,8 @@ async function readDeepSeekStreamingResponse(options: {
     }
 
     buffer += decoder.decode(value, { stream: true })
-    const events = buffer.split('\n\n')
-    buffer = events.pop() || ''
+    const events = buffer.split("\n\n")
+    buffer = events.pop() || ""
 
     for (const eventText of events) {
       if (!eventText.trim()) {
@@ -516,42 +507,40 @@ async function readDeepSeekStreamingResponse(options: {
 function observationToToolResult(observation: Observation): ToolResult {
   return {
     content: observation.raw,
-    metadata: observation.status === 'error' ? { error: true } : undefined,
+    metadata: observation.status === "error" ? { error: true } : undefined,
     truncated: observation.truncated ? true : undefined,
   }
 }
 
 function buildSimplifiedRetryMessages(
   messages: ChatCompletionMessage[],
-  reason: FallbackReason
+  reason: FallbackReason,
 ): ChatCompletionMessage[] {
   const [systemMessage, ...rest] = messages
   const trimmedContext = rest.slice(-4)
   const retryInstruction =
-    reason === 'tool_timeout'
-      ? 'Fallback retry: tool requests timed out. Retry with one tool only and minimal context.'
-      : 'Fallback retry: tool use failed. Retry with one tool only and minimal context.'
+    reason === "tool_timeout"
+      ? "Fallback retry: tool requests timed out. Retry with one tool only and minimal context."
+      : "Fallback retry: tool use failed. Retry with one tool only and minimal context."
 
   return [
     systemMessage,
     {
-      role: 'system',
+      role: "system",
       content: retryInstruction,
     },
     ...trimmedContext,
   ]
 }
 
-function buildDirectFallbackMessages(
-  messages: ChatCompletionMessage[]
-): ChatCompletionMessage[] {
+function buildDirectFallbackMessages(messages: ChatCompletionMessage[]): ChatCompletionMessage[] {
   return [
     messages[0],
     ...messages.slice(-4),
     {
-      role: 'user',
+      role: "user",
       content:
-        'Tool access is unavailable. Answer directly without tools using general knowledge, be explicit about uncertainty, and keep helping the user.',
+        "Tool access is unavailable. Answer directly without tools using general knowledge, be explicit about uncertainty, and keep helping the user.",
     },
   ]
 }
@@ -579,14 +568,14 @@ async function executeStreamingToolCalls(options: {
       options.writer,
       observation.toolName,
       observation.status,
-      observation.summary
+      observation.summary,
     )
 
     await sendToolResult(
       options.writer,
       observation.toolName,
       observation.status,
-      observation.summary
+      observation.summary,
     )
 
     toolResults.push({
@@ -628,13 +617,10 @@ async function runStreamingIteration(options: {
   })
 
   const usage = {
-    prompt_tokens:
-      options.usage.prompt_tokens + (streamResponse.usage?.prompt_tokens ?? 0),
+    prompt_tokens: options.usage.prompt_tokens + (streamResponse.usage?.prompt_tokens ?? 0),
     completion_tokens:
-      options.usage.completion_tokens +
-      (streamResponse.usage?.completion_tokens ?? 0),
-    total_tokens:
-      options.usage.total_tokens + (streamResponse.usage?.total_tokens ?? 0),
+      options.usage.completion_tokens + (streamResponse.usage?.completion_tokens ?? 0),
+    total_tokens: options.usage.total_tokens + (streamResponse.usage?.total_tokens ?? 0),
   }
 
   const toolCalls = streamResponse.toolCalls
@@ -666,24 +652,20 @@ async function runStreamingIteration(options: {
   const nextMessages = [
     ...options.messages,
     {
-      role: 'assistant' as const,
+      role: "assistant" as const,
       content: streamResponse.content,
       tool_calls: toolCalls,
     },
-    ...toolResults.map((toolResult) =>
-      convertObservationToMessage(toolResult.observation)
-    ),
+    ...toolResults.map((toolResult) => convertObservationToMessage(toolResult.observation)),
   ]
 
   const executedToolCalls = [
     ...options.executedToolCalls,
-    ...toolResults.map(
-      (toolResult): AgentLoopToolCall => ({
-        name: toolResult.observation.toolName,
-        args: toolResult.observation.input,
-        result: observationToToolResult(toolResult.observation),
-      })
-    ),
+    ...toolResults.map((toolResult): AgentLoopToolCall => ({
+      name: toolResult.observation.toolName,
+      args: toolResult.observation.input,
+      result: observationToToolResult(toolResult.observation),
+    })),
   ]
 
   return {
@@ -715,8 +697,7 @@ async function runDirectFallbackResponse(options: {
   iterations: number
   reason: FallbackReason
 }): Promise<StreamingIterationOutcome> {
-  const disclaimer =
-    "I couldn't search our knowledge base. Here's what I know generally..."
+  const disclaimer = "I couldn't search our knowledge base. Here's what I know generally..."
   await sendContent(options.writer, `${disclaimer}\n\n`, {
     fallback: true,
     fallbackLevel: 2,
@@ -739,15 +720,10 @@ async function runDirectFallbackResponse(options: {
       toolCalls: options.executedToolCalls,
       iterations: options.iterations,
       usage: {
-        prompt_tokens:
-          options.usage.prompt_tokens +
-          (streamResponse.usage?.prompt_tokens ?? 0),
+        prompt_tokens: options.usage.prompt_tokens + (streamResponse.usage?.prompt_tokens ?? 0),
         completion_tokens:
-          options.usage.completion_tokens +
-          (streamResponse.usage?.completion_tokens ?? 0),
-        total_tokens:
-          options.usage.total_tokens +
-          (streamResponse.usage?.total_tokens ?? 0),
+          options.usage.completion_tokens + (streamResponse.usage?.completion_tokens ?? 0),
+        total_tokens: options.usage.total_tokens + (streamResponse.usage?.total_tokens ?? 0),
       },
       metadata: {
         fallback: true,
@@ -760,7 +736,7 @@ async function runDirectFallbackResponse(options: {
       "I couldn't search our knowledge base. Here's what I know generally... I may be missing specifics, but you can share more details and I'll do my best to help."
     await sendContent(
       options.writer,
-      "I may be missing specifics, but you can share more details and I'll do my best to help."
+      "I may be missing specifics, but you can share more details and I'll do my best to help.",
     )
     return {
       content: genericContent,
@@ -776,9 +752,7 @@ async function runDirectFallbackResponse(options: {
   }
 }
 
-export async function runAgentLoop(
-  options: AgentLoopOptions
-): Promise<AgentLoopResult> {
+export async function runAgentLoop(options: AgentLoopOptions): Promise<AgentLoopResult> {
   const maxIterations = options.maxIterations ?? DEFAULT_MAX_ITERATIONS
   const userMemory = await getUserMemoryBlock(options.userId, options.env)
   const provider = getProviderConfig({
@@ -807,7 +781,7 @@ export async function runAgentLoop(
     completion_tokens: 0,
   }
   let iterations = 0
-  let lastAssistantContent = ''
+  let lastAssistantContent = ""
 
   for (let index = 0; index < maxIterations; index += 1) {
     iterations = index + 1
@@ -822,12 +796,10 @@ export async function runAgentLoop(
 
     const responseMessage = data.choices?.[0]?.message
     if (!responseMessage) {
-      throw new Error(
-        data.error?.message || 'DeepSeek response missing message'
-      )
+      throw new Error(data.error?.message || "DeepSeek response missing message")
     }
 
-    const assistantContent = responseMessage.content ?? ''
+    const assistantContent = responseMessage.content ?? ""
     if (assistantContent) {
       lastAssistantContent = assistantContent
     }
@@ -838,7 +810,7 @@ export async function runAgentLoop(
       maxIterations,
       toolCalls,
     })
-    if (responseStop.shouldStop && responseStop.reason === 'final_answer') {
+    if (responseStop.shouldStop && responseStop.reason === "final_answer") {
       return {
         content: assistantContent || lastAssistantContent,
         toolCalls: executedToolCalls,
@@ -852,7 +824,7 @@ export async function runAgentLoop(
     }
 
     messages.push({
-      role: 'assistant',
+      role: "assistant",
       content: responseMessage.content,
       tool_calls: toolCalls,
     })
@@ -892,7 +864,7 @@ export async function runAgentLoop(
       messages.push(convertObservationToMessage(toolResult.observation))
     }
 
-    if (toolStop.shouldStop && toolStop.reason !== 'max_iterations') {
+    if (toolStop.shouldStop && toolStop.reason !== "max_iterations") {
       return {
         content: assistantContent || lastAssistantContent,
         toolCalls: executedToolCalls,
@@ -912,19 +884,17 @@ export async function runAgentLoop(
     maxIterations,
     toolCalls: [
       {
-        id: 'max_iterations',
-        type: 'function',
+        id: "max_iterations",
+        type: "function",
         function: {
-          name: 'max_iterations',
-          arguments: '{}',
+          name: "max_iterations",
+          arguments: "{}",
         },
       },
     ],
   })
   const disclaimer = buildIterationLimitMessage(options.lang)
-  const content = lastAssistantContent
-    ? `${lastAssistantContent}\n\n${disclaimer}`
-    : disclaimer
+  const content = lastAssistantContent ? `${lastAssistantContent}\n\n${disclaimer}` : disclaimer
 
   return {
     content,
@@ -940,7 +910,7 @@ export async function runAgentLoop(
 }
 
 export async function runStreamingAgentLoop(
-  options: StreamingAgentLoopOptions
+  options: StreamingAgentLoopOptions,
 ): Promise<AgentLoopResult> {
   const maxIterations = options.maxIterations ?? DEFAULT_MAX_ITERATIONS
   const userMemory = await getUserMemoryBlock(options.userId, options.env)
@@ -971,7 +941,7 @@ export async function runStreamingAgentLoop(
     total_tokens: 0,
   }
   let iterations = 0
-  let lastAssistantContent = ''
+  let lastAssistantContent = ""
   let doneSent = false
 
   try {
@@ -1006,9 +976,7 @@ export async function runStreamingAgentLoop(
             const allowedTools = options.registry
               .toOpenAITools()
               .filter((tool) =>
-                simplifiedTools.length === 0
-                  ? false
-                  : simplifiedTools.includes(tool.function.name)
+                simplifiedTools.length === 0 ? false : simplifiedTools.includes(tool.function.name),
               )
             return runStreamingIteration({
               provider,
@@ -1038,8 +1006,8 @@ export async function runStreamingAgentLoop(
               await sendFallback(options.writer, event.failure_reason)
             }
           },
-          onError: () => 'tool_failure',
-        }
+          onError: () => "tool_failure",
+        },
       )
 
       usage.prompt_tokens = iterationOutcome.usage.prompt_tokens
@@ -1051,10 +1019,8 @@ export async function runStreamingAgentLoop(
       }
 
       if (!iterationOutcome.nextMessages) {
-        const stopReason = iterationOutcome.metadata?.stopReason as
-          | string
-          | undefined
-        await emitFinalizing(options.writer, stopReason ?? 'complete')
+        const stopReason = iterationOutcome.metadata?.stopReason as string | undefined
+        await emitFinalizing(options.writer, stopReason ?? "complete")
         await sendDone(options.writer, iterationOutcome.usage)
         doneSent = true
         return {
@@ -1074,7 +1040,7 @@ export async function runStreamingAgentLoop(
     logFallbackEvent({
       timestamp: new Date().toISOString(),
       query: options.message,
-      failure_reason: 'max_iterations_exceeded',
+      failure_reason: "max_iterations_exceeded",
       fallback_level: 2,
     })
 
@@ -1083,11 +1049,11 @@ export async function runStreamingAgentLoop(
       maxIterations,
       toolCalls: [
         {
-          id: 'max_iterations',
-          type: 'function',
+          id: "max_iterations",
+          type: "function",
           function: {
-            name: 'max_iterations',
-            arguments: '{}',
+            name: "max_iterations",
+            arguments: "{}",
           },
         },
       ],
@@ -1097,8 +1063,8 @@ export async function runStreamingAgentLoop(
       ? `${lastAssistantContent}\n\n${disclaimer}`
       : disclaimer
 
-    await emitFinalizing(options.writer, 'max_iterations')
-    await sendFallback(options.writer, 'max_iterations_exceeded')
+    await emitFinalizing(options.writer, "max_iterations")
+    await sendFallback(options.writer, "max_iterations_exceeded")
     await sendDone(options.writer, usage)
     doneSent = true
 
@@ -1113,11 +1079,11 @@ export async function runStreamingAgentLoop(
         fallbackReason: maxIterationStop.fallbackReason,
         fallback: true,
         fallbackLevel: 2,
-        reason: 'max_iterations_exceeded',
+        reason: "max_iterations_exceeded",
       },
     }
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error'
+    const message = error instanceof Error ? error.message : "Unknown error"
     await sendContent(options.writer, `\n(Error: ${message})`)
     if (!doneSent) {
       await sendDone(options.writer, {

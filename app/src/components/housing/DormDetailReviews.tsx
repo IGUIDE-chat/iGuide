@@ -1,47 +1,39 @@
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  MessageSquare,
-  ThumbsUp,
-  User,
-  X,
-  Globe,
-  Eye,
-  EyeOff,
-} from "lucide-react";
-import { Language } from "../../types";
-import { dormDetailTexts } from "./i18n/dormTexts";
-import { SHOW_POSITIVE_RATING } from "./constants/featureFlags";
+import { motion, AnimatePresence } from "framer-motion"
+import { MessageSquare, ThumbsUp, User, X, Globe, Eye, EyeOff } from "lucide-react"
+import React, { useState } from "react"
+
+import { Language } from "../../types"
+import { SHOW_POSITIVE_RATING } from "./constants/featureFlags"
+import { dormDetailTexts } from "./i18n/dormTexts"
 
 interface Comment {
-  id: string;
-  user_id: string;
-  content: string;
-  dorm_vote: 1 | -1 | null;
-  created_at: string;
-  display_name: string;
-  upvotes: number;
-  myVote: 1 | -1 | null;
+  id: string
+  user_id: string
+  content: string
+  dorm_vote: 1 | -1 | null
+  created_at: string
+  display_name: string
+  upvotes: number
+  myVote: 1 | -1 | null
   /** Moderated comments — only admins receive these. */
-  hidden?: boolean;
+  hidden?: boolean
 }
 
 interface DormDetailReviewsProps {
-  comments: Comment[];
-  commentsLoading: boolean;
-  user: any;
-  language: Language;
-  fadeUp: any;
-  onRequestLogin: () => void;
-  onSaveComment: (content: string, vote: 1 | -1 | null) => Promise<void>;
-  onDeleteComment: (commentId: string) => void;
-  onVoteOnComment: (commentId: string, vote: 1 | -1 | null) => void;
-  onToggleCommentHidden?: (commentId: string, hidden: boolean) => Promise<void>;
+  comments: Comment[]
+  commentsLoading: boolean
+  user: any
+  language: Language
+  fadeUp: any
+  onRequestLogin: () => void
+  onSaveComment: (content: string, vote: 1 | -1 | null) => Promise<void>
+  onDeleteComment: (commentId: string) => void
+  onVoteOnComment: (commentId: string, vote: 1 | -1 | null) => void
+  onToggleCommentHidden?: (commentId: string, hidden: boolean) => Promise<void>
 }
 
-const isChinese = (text: string) => /[\u4e00-\u9fff]/.test(text);
-const detectLang = (text: string): "zh" | "en" =>
-  isChinese(text) ? "zh" : "en";
+const isChinese = (text: string) => /[\u4e00-\u9fff]/.test(text)
+const detectLang = (text: string): "zh" | "en" => (isChinese(text) ? "zh" : "en")
 
 export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
   comments,
@@ -55,85 +47,78 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
   onVoteOnComment,
   onToggleCommentHidden,
 }) => {
-  const t = dormDetailTexts[language];
-  const [commentContent, setCommentContent] = useState("");
-  const [commentVote, setCommentVote] = useState<1 | -1 | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
-  const [showAllReviews, setShowAllReviews] = useState(false);
-  const [translations, setTranslations] = useState<Record<string, string>>({});
-  const [translating, setTranslating] = useState<Record<string, boolean>>({});
-  const [translateErrors, setTranslateErrors] = useState<
-    Record<string, boolean>
-  >({});
+  const t = dormDetailTexts[language]
+  const [commentContent, setCommentContent] = useState("")
+  const [commentVote, setCommentVote] = useState<1 | -1 | null>(null)
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [showAllReviews, setShowAllReviews] = useState(false)
+  const [translations, setTranslations] = useState<Record<string, string>>({})
+  const [translating, setTranslating] = useState<Record<string, boolean>>({})
+  const [translateErrors, setTranslateErrors] = useState<Record<string, boolean>>({})
 
   // Hidden comments are only sent to admins — keep them out of the ratings.
-  const visibleComments = comments.filter((c) => !c.hidden);
-  const totalReviews = visibleComments.length;
-  const thumbsUp = visibleComments.filter((c) => c.dorm_vote === 1).length;
-  const positivePercent =
-    totalReviews > 0 ? Math.round((thumbsUp / totalReviews) * 100) : null;
-  const displayedComments = showAllReviews ? comments : comments.slice(0, 3);
+  const visibleComments = comments.filter((c) => !c.hidden)
+  const totalReviews = visibleComments.length
+  const thumbsUp = visibleComments.filter((c) => c.dorm_vote === 1).length
+  const positivePercent = totalReviews > 0 ? Math.round((thumbsUp / totalReviews) * 100) : null
+  const displayedComments = showAllReviews ? comments : comments.slice(0, 3)
 
   const handleSubmit = async () => {
-    if (!commentContent.trim()) return;
-    setSubmitting(true);
-    setSubmitError(null);
+    if (!commentContent.trim()) return
+    setSubmitting(true)
+    setSubmitError(null)
     try {
-      await onSaveComment(commentContent.trim(), commentVote);
-      setCommentContent("");
-      setCommentVote(null);
+      await onSaveComment(commentContent.trim(), commentVote)
+      setCommentContent("")
+      setCommentVote(null)
     } catch (err) {
-      const hiddenByAdmin =
-        err instanceof Error && err.message === "COMMENT_HIDDEN";
+      const hiddenByAdmin = err instanceof Error && err.message === "COMMENT_HIDDEN"
       setSubmitError(
         hiddenByAdmin
           ? t.commentHiddenError
           : language === "zh"
             ? "提交失败，请稍后再试"
-            : "Something went wrong. Please try again."
-      );
+            : "Something went wrong. Please try again.",
+      )
     } finally {
-      setSubmitting(false);
+      setSubmitting(false)
     }
-  };
+  }
 
   const handleDeleteComment = (commentId: string) => {
-    const msg =
-      language === "zh" ? "确定要删除这条评论吗？" : "Delete this comment?";
-    if (!window.confirm(msg)) return;
-    onDeleteComment(commentId);
-  };
+    const msg = language === "zh" ? "确定要删除这条评论吗？" : "Delete this comment?"
+    if (!window.confirm(msg)) return
+    onDeleteComment(commentId)
+  }
 
   const handleToggleHidden = async (commentId: string, hidden: boolean) => {
-    if (!onToggleCommentHidden) return;
+    if (!onToggleCommentHidden) return
     try {
-      await onToggleCommentHidden(commentId, hidden);
+      await onToggleCommentHidden(commentId, hidden)
     } catch (err) {
-      console.error("Error toggling comment visibility:", err);
-      window.alert(
-        language === "zh" ? "操作失败，请稍后再试" : "Action failed. Try again."
-      );
+      console.error("Error toggling comment visibility:", err)
+      window.alert(language === "zh" ? "操作失败，请稍后再试" : "Action failed. Try again.")
     }
-  };
+  }
 
   const handleTranslate = async (commentId: string, text: string) => {
     if (translations[commentId]) {
       setTranslations((prev) => {
-        const next = { ...prev };
-        delete next[commentId];
-        return next;
-      });
-      return;
+        const next = { ...prev }
+        delete next[commentId]
+        return next
+      })
+      return
     }
-    setTranslating((prev) => ({ ...prev, [commentId]: true }));
+    setTranslating((prev) => ({ ...prev, [commentId]: true }))
     setTranslateErrors((prev) => {
-      const next = { ...prev };
-      delete next[commentId];
-      return next;
-    });
+      const next = { ...prev }
+      delete next[commentId]
+      return next
+    })
     try {
-      const targetLang = language === "zh" ? "English" : "中文";
+      const targetLang = language === "zh" ? "English" : "中文"
       const res = await fetch("/api/deepseek", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -146,24 +131,21 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
             { role: "user", content: text },
           ],
         }),
-      });
+      })
       if (res.ok) {
-        const data = (await res.json()) as Record<string, unknown>;
-        const choices = data.choices as
-          | Array<{ message?: { content?: string } }>
-          | undefined;
-        const translated =
-          choices?.[0]?.message?.content ?? (data.reply as string) ?? text;
-        setTranslations((prev) => ({ ...prev, [commentId]: translated }));
+        const data = (await res.json()) as Record<string, unknown>
+        const choices = data.choices as Array<{ message?: { content?: string } }> | undefined
+        const translated = choices?.[0]?.message?.content ?? (data.reply as string) ?? text
+        setTranslations((prev) => ({ ...prev, [commentId]: translated }))
       } else {
-        setTranslateErrors((prev) => ({ ...prev, [commentId]: true }));
+        setTranslateErrors((prev) => ({ ...prev, [commentId]: true }))
       }
     } catch {
-      setTranslateErrors((prev) => ({ ...prev, [commentId]: true }));
+      setTranslateErrors((prev) => ({ ...prev, [commentId]: true }))
     } finally {
-      setTranslating((prev) => ({ ...prev, [commentId]: false }));
+      setTranslating((prev) => ({ ...prev, [commentId]: false }))
     }
-  };
+  }
 
   return (
     <motion.section
@@ -173,10 +155,7 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
     >
       <div className="mb-2 flex items-center justify-between">
         <h3
-          className="
-            text-[16px] font-bold text-slate-900
-            md:text-[18px]
-          "
+          className="text-[16px] font-bold text-slate-900 md:text-[18px]"
         >
           {t.ratingsAndReviews}
         </h3>
@@ -193,43 +172,22 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
       {!user ? (
         <motion.div
           whileHover={{ scale: 1.005 }}
-          className="
-            flex flex-col items-center justify-between gap-4 rounded-xl border
-            border-illini-blue/10 bg-white/60 p-5
-            shadow-[0_4px_20px_rgba(0,0,0,0.02)] backdrop-blur-md
-            sm:flex-row
-            md:rounded-2xl md:p-6
-          "
+          className="border-illini-blue/10 flex flex-col items-center justify-between gap-4 rounded-xl border bg-white/60 p-5 shadow-[0_4px_20px_rgba(0,0,0,0.02)] backdrop-blur-md sm:flex-row md:rounded-2xl md:p-6"
         >
           <div
-            className="
-              flex w-full items-center gap-3
-              sm:w-auto
-            "
+            className="flex w-full items-center gap-3 sm:w-auto"
           >
             <div
-              className="
-                flex size-10 shrink-0 items-center justify-center rounded-full
-                bg-illini-blue/5
-                md:size-12
-              "
+              className="bg-illini-blue/5 flex size-10 shrink-0 items-center justify-center rounded-full md:size-12"
             >
               <MessageSquare
-                className="
-                  size-5 text-illini-blue
-                  md:size-6
-                "
+                className="text-illini-blue size-5 md:size-6"
               />
             </div>
             <div>
-              <h4 className="text-[14px] font-bold text-slate-900 md:text-[15px]">
-                {t.shareExp}
-              </h4>
+              <h4 className="text-[14px] font-bold text-slate-900 md:text-[15px]">{t.shareExp}</h4>
               <p
-                className="
-                  mt-0.5 text-[12px] font-medium text-slate-500
-                  md:text-[13px]
-                "
+                className="mt-0.5 text-[12px] font-medium text-slate-500 md:text-[13px]"
               >
                 {t.loginPrompt}
               </p>
@@ -240,28 +198,16 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={onRequestLogin}
-            className="
-              w-full rounded-xl bg-illini-blue px-5 py-2.5 text-[13px] font-bold
-              text-white shadow-sm transition-colors
-              hover:bg-illini-blue/90
-              sm:w-auto
-              md:text-[14px]
-            "
+            className="bg-illini-blue hover:bg-illini-blue/90 w-full rounded-xl px-5 py-2.5 text-[13px] font-bold text-white shadow-sm transition-colors sm:w-auto md:text-[14px]"
           >
             {t.loginBtn}
           </motion.button>
         </motion.div>
       ) : (
         <div
-          className="
-            rounded-xl border border-white/60 bg-white/80 p-4
-            shadow-[0_4px_20px_rgba(0,0,0,0.02)] backdrop-blur-md
-            md:rounded-2xl md:p-5
-          "
+          className="rounded-xl border border-white/60 bg-white/80 p-4 shadow-[0_4px_20px_rgba(0,0,0,0.02)] backdrop-blur-md md:rounded-2xl md:p-5"
         >
-          <h4 className="mb-3 text-[14px] font-bold text-slate-900 md:text-[15px]">
-            {t.shareExp}
-          </h4>
+          <h4 className="mb-3 text-[14px] font-bold text-slate-900 md:text-[15px]">{t.shareExp}</h4>
           <div className="mb-3 flex gap-2">
             {([1, -1] as const).map((vote) => (
               <motion.button
@@ -269,32 +215,17 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
                 type="button"
                 whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.94 }}
-                onClick={() =>
-                  setCommentVote(commentVote === vote ? null : vote)
-                }
-                className={`
-                  flex items-center gap-1.5 rounded-lg border px-3 py-1.5
-                  text-[12px] font-semibold transition-colors
-                  ${
-                    commentVote === vote && vote === 1
-                      ? `
-                        border-illini-orange/30 bg-illini-orange/10
-                        text-illini-orange
-                      `
-                      : commentVote === vote && vote === -1
-                        ? "border-red-200 bg-red-50 text-red-600"
-                        : `
-                          border-slate-200 bg-white text-slate-500
-                          hover:border-slate-300
-                        `
-                  }
-                `}
+                onClick={() => setCommentVote(commentVote === vote ? null : vote)}
+                className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[12px] font-semibold transition-colors ${
+                  commentVote === vote && vote === 1
+                    ? `border-illini-orange/30 bg-illini-orange/10 text-illini-orange`
+                    : commentVote === vote && vote === -1
+                      ? "border-red-200 bg-red-50 text-red-600"
+                      : `border-slate-200 bg-white text-slate-500 hover:border-slate-300`
+                } `}
               >
                 <ThumbsUp
-                  className={`
-                    size-3.5
-                    ${vote === -1 ? "rotate-180" : ""}
-                    ${commentVote === vote && vote === 1 ? "fill-illini-orange/20" : ""}`}
+                  className={`size-3.5 ${vote === -1 ? "rotate-180" : ""} ${commentVote === vote && vote === 1 ? "fill-illini-orange/20" : ""}`}
                 />
                 {vote === 1 ? t.thumbsUpDorm : t.thumbsDownDorm}
               </motion.button>
@@ -305,18 +236,10 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
             onChange={(e) => setCommentContent(e.target.value)}
             placeholder={t.leaveComment}
             rows={3}
-            className="
-              w-full resize-none rounded-xl border border-slate-200 bg-white/50
-              px-3 py-2.5 text-[13px] font-medium placeholder-slate-400
-              transition-colors
-              focus:border-illini-blue/40 focus:outline-none
-              md:text-[14px]
-            "
+            className="focus:border-illini-blue/40 w-full resize-none rounded-xl border border-slate-200 bg-white/50 px-3 py-2.5 text-[13px] font-medium placeholder-slate-400 transition-colors focus:outline-none md:text-[14px]"
           />
           {submitError && (
-            <p className="mt-2 text-[12px] font-medium text-red-500">
-              {submitError}
-            </p>
+            <p className="mt-2 text-[12px] font-medium text-red-500">{submitError}</p>
           )}
           <div className="mt-2.5 flex justify-end">
             <motion.button
@@ -325,13 +248,7 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
               onClick={handleSubmit}
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
-              className="
-                rounded-xl bg-illini-blue px-5 py-2 text-[13px] font-bold
-                text-white transition-colors
-                hover:bg-illini-blue/90
-                disabled:opacity-40
-                md:text-[14px]
-              "
+              className="bg-illini-blue hover:bg-illini-blue/90 rounded-xl px-5 py-2 text-[13px] font-bold text-white transition-colors disabled:opacity-40 md:text-[14px]"
             >
               {submitting ? "..." : t.submitComment}
             </motion.button>
@@ -344,9 +261,7 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
           {language === "zh" ? "加载中..." : "Loading..."}
         </div>
       ) : comments.length === 0 ? (
-        <p className="py-6 text-center text-[13px] text-slate-400">
-          {t.noComments}
-        </p>
+        <p className="py-6 text-center text-[13px] text-slate-400">{t.noComments}</p>
       ) : (
         <>
           <div className="mt-4 space-y-3">
@@ -358,51 +273,34 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ delay: i * 0.05, duration: 0.3 }}
-                  className={`
-                    rounded-xl border p-4
-                    shadow-[0_4px_20px_rgba(0,0,0,0.02)] backdrop-blur-md
-                    md:rounded-2xl md:p-5
-                    ${
-                      comment.hidden
-                        ? `
-                          border-dashed border-slate-300 bg-slate-100/70
-                          opacity-70
-                        `
-                        : "border-white/60 bg-white/80"
-                    }
-                  `}
+                  className={`rounded-xl border p-4 shadow-[0_4px_20px_rgba(0,0,0,0.02)] backdrop-blur-md md:rounded-2xl md:p-5 ${
+                    comment.hidden
+                      ? `border-dashed border-slate-300 bg-slate-100/70 opacity-70`
+                      : "border-white/60 bg-white/80"
+                  } `}
                 >
                   <div className="mb-3 flex items-start justify-between">
                     <div className="flex items-center gap-2.5">
                       <div
-                        className="
-                          flex size-8 items-center justify-center rounded-full
-                          border border-slate-200 bg-slate-100
-                        "
+                        className="flex size-8 items-center justify-center rounded-full border border-slate-200 bg-slate-100"
                       >
                         <User className="size-4 text-slate-400" />
                       </div>
                       <div>
                         <div
-                          className="
-                            text-[13px] leading-tight font-bold text-slate-900
-                            md:text-[14px]
-                          "
+                          className="text-[13px] leading-tight font-bold text-slate-900 md:text-[14px]"
                         >
                           {comment.display_name}
                         </div>
                         <div
-                          className="
-                            mt-0.5 text-[11px] font-medium text-slate-500
-                            md:text-[12px]
-                          "
+                          className="mt-0.5 text-[11px] font-medium text-slate-500 md:text-[12px]"
                         >
                           {new Date(comment.created_at).toLocaleDateString(
                             language === "zh" ? "zh-CN" : "en-US",
                             {
                               year: "numeric",
                               month: "short",
-                            }
+                            },
                           )}
                         </div>
                       </div>
@@ -410,27 +308,19 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
                     <div className="flex items-center gap-2">
                       {comment.dorm_vote === 1 && (
                         <div
-                          className="
-                            flex items-center gap-1 rounded-lg
-                            bg-illini-orange/10 px-2 py-1
-                          "
+                          className="bg-illini-orange/10 flex items-center gap-1 rounded-lg px-2 py-1"
                         >
                           <ThumbsUp
-                            className="
-                              size-3 fill-illini-orange text-illini-orange
-                            "
+                            className="fill-illini-orange text-illini-orange size-3"
                           />
-                          <span className="text-[11px] font-bold text-illini-orange">
+                          <span className="text-illini-orange text-[11px] font-bold">
                             {t.recommended}
                           </span>
                         </div>
                       )}
                       {comment.hidden && (
                         <div
-                          className="
-                            flex items-center gap-1 rounded-lg bg-slate-200/80
-                            px-2 py-1
-                          "
+                          className="flex items-center gap-1 rounded-lg bg-slate-200/80 px-2 py-1"
                         >
                           <EyeOff className="size-3 text-slate-500" />
                           <span className="text-[11px] font-bold text-slate-500">
@@ -438,42 +328,28 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
                           </span>
                         </div>
                       )}
-                      {user?.isAdmin &&
-                        onToggleCommentHidden &&
-                        !comment.id.startsWith("gm-") && (
-                          <motion.button
-                            type="button"
-                            whileTap={{ scale: 0.9 }}
-                            onClick={() =>
-                              handleToggleHidden(comment.id, !comment.hidden)
-                            }
-                            className="
-                              p-1 text-slate-300 transition-colors
-                              hover:text-illini-blue
-                            "
-                            aria-label={
-                              comment.hidden ? t.unhideComment : t.hideComment
-                            }
-                            title={
-                              comment.hidden ? t.unhideComment : t.hideComment
-                            }
-                          >
-                            {comment.hidden ? (
-                              <Eye className="size-3.5" />
-                            ) : (
-                              <EyeOff className="size-3.5" />
-                            )}
-                          </motion.button>
-                        )}
+                      {user?.isAdmin && onToggleCommentHidden && !comment.id.startsWith("gm-") && (
+                        <motion.button
+                          type="button"
+                          whileTap={{ scale: 0.9 }}
+                          onClick={() => handleToggleHidden(comment.id, !comment.hidden)}
+                          className="hover:text-illini-blue p-1 text-slate-300 transition-colors"
+                          aria-label={comment.hidden ? t.unhideComment : t.hideComment}
+                          title={comment.hidden ? t.unhideComment : t.hideComment}
+                        >
+                          {comment.hidden ? (
+                            <Eye className="size-3.5" />
+                          ) : (
+                            <EyeOff className="size-3.5" />
+                          )}
+                        </motion.button>
+                      )}
                       {user && comment.user_id === user.id && (
                         <motion.button
                           type="button"
                           whileTap={{ scale: 0.9 }}
                           onClick={() => handleDeleteComment(comment.id)}
-                          className="
-                            p-1 text-slate-300 transition-colors
-                            hover:text-red-400
-                          "
+                          className="p-1 text-slate-300 transition-colors hover:text-red-400"
                           aria-label={t.deleteComment}
                         >
                           <X className="size-3.5" />
@@ -484,28 +360,19 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
                   {translations[comment.id] ? (
                     <>
                       <p
-                        className="
-                          text-[13px] leading-relaxed font-medium text-slate-600
-                          md:text-[14px]
-                        "
+                        className="text-[13px] leading-relaxed font-medium text-slate-600 md:text-[14px]"
                       >
                         {translations[comment.id]}
                       </p>
                       <p
-                        className="
-                          mt-1.5 border-l-2 border-slate-200 pl-3 text-[12px]
-                          leading-relaxed text-slate-400
-                        "
+                        className="mt-1.5 border-l-2 border-slate-200 pl-3 text-[12px] leading-relaxed text-slate-400"
                       >
                         {comment.content}
                       </p>
                     </>
                   ) : (
                     <p
-                      className="
-                        text-[13px] leading-relaxed font-medium text-slate-600
-                        md:text-[14px]
-                      "
+                      className="text-[13px] leading-relaxed font-medium text-slate-600 md:text-[14px]"
                     >
                       {comment.content}
                     </p>
@@ -518,41 +385,24 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
                     </p>
                   )}
                   <div
-                    className="
-                      mt-4 flex items-center gap-4 border-t border-slate-100/50
-                      pt-3
-                    "
+                    className="mt-4 flex items-center gap-4 border-t border-slate-100/50 pt-3"
                   >
                     <motion.button
                       type="button"
                       whileTap={{ scale: 0.88 }}
-                      onClick={() =>
-                        onVoteOnComment(
-                          comment.id,
-                          comment.myVote === 1 ? null : 1
-                        )
-                      }
-                      className={`
-                        group flex items-center gap-1.5 transition-colors
-                        ${
-                          comment.myVote === 1
-                            ? "text-illini-orange"
-                            : `
-                              text-slate-400
-                              hover:text-illini-orange
-                            `
-                        }
-                      `}
+                      onClick={() => onVoteOnComment(comment.id, comment.myVote === 1 ? null : 1)}
+                      className={`group flex items-center gap-1.5 transition-colors ${
+                        comment.myVote === 1
+                          ? "text-illini-orange"
+                          : `hover:text-illini-orange text-slate-400`
+                      } `}
                     >
                       <ThumbsUp
-                        className={`
-                          size-3.5
-                          ${
-                            comment.myVote === 1
-                              ? "fill-illini-orange/20"
-                              : "group-hover:fill-illini-orange/20"
-                          }
-                        `}
+                        className={`size-3.5 ${
+                          comment.myVote === 1
+                            ? "fill-illini-orange/20"
+                            : "group-hover:fill-illini-orange/20"
+                        } `}
                       />
                       <span className="text-[12px] font-semibold">
                         {t.helpful}
@@ -562,16 +412,9 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
                     {detectLang(comment.content) !== language && (
                       <button
                         type="button"
-                        onClick={() =>
-                          handleTranslate(comment.id, comment.content)
-                        }
+                        onClick={() => handleTranslate(comment.id, comment.content)}
                         disabled={translating[comment.id]}
-                        className="
-                          flex items-center gap-1 text-[12px] font-semibold
-                          text-slate-400 transition-colors
-                          hover:text-illini-blue
-                          disabled:opacity-50
-                        "
+                        className="hover:text-illini-blue flex items-center gap-1 text-[12px] font-semibold text-slate-400 transition-colors disabled:opacity-50"
                       >
                         <Globe className="size-3.5" />
                         {translating[comment.id]
@@ -599,13 +442,7 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => setShowAllReviews(!showAllReviews)}
-              className="
-                w-full rounded-xl border border-white/50 bg-white/40 py-3
-                text-[13px] font-semibold text-slate-500 backdrop-blur-md
-                transition-colors
-                hover:bg-white/60 hover:text-slate-800
-                md:text-[14px]
-              "
+              className="w-full rounded-xl border border-white/50 bg-white/40 py-3 text-[13px] font-semibold text-slate-500 backdrop-blur-md transition-colors hover:bg-white/60 hover:text-slate-800 md:text-[14px]"
             >
               {showAllReviews
                 ? language === "zh"
@@ -617,5 +454,5 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
         </>
       )}
     </motion.section>
-  );
-};
+  )
+}

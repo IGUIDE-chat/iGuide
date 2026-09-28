@@ -5,20 +5,17 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
-import { supabase, type Message } from "./supabase";
-import { authService } from "./authService";
-import { ChatMessage } from "../types";
+import { ChatMessage } from "../types"
+import { authService } from "./authService"
+import { supabase, type Message } from "./supabase"
 
 export const conversationService = {
   /**
    * Create a new conversation
    */
-  async createConversation(
-    cozeConversationId?: string,
-    title: string = "新对话"
-  ) {
-    const user = await authService.getCurrentUser();
-    if (!user) throw new Error("User not authenticated");
+  async createConversation(cozeConversationId?: string, title: string = "新对话") {
+    const user = await authService.getCurrentUser()
+    if (!user) throw new Error("User not authenticated")
 
     const { data, error } = await supabase
       .from("conversations")
@@ -28,17 +25,17 @@ export const conversationService = {
         title,
       })
       .select()
-      .single();
+      .single()
 
-    return { data, error };
+    return { data, error }
   },
 
   /**
    * Get all conversations for current user
    */
   async getUserConversations() {
-    const user = await authService.getCurrentUser();
-    if (!user) throw new Error("User not authenticated");
+    const user = await authService.getCurrentUser()
+    if (!user) throw new Error("User not authenticated")
 
     const { data, error } = await supabase
       .from("conversations")
@@ -56,30 +53,27 @@ export const conversationService = {
           role,
           created_at
         )
-      `
+      `,
       )
       .eq("user_id", user.id)
       .order("is_pinned", { ascending: false })
-      .order("updated_at", { ascending: false });
+      .order("updated_at", { ascending: false })
 
-    return { data, error };
+    return { data, error }
   },
 
   /**
    * Get a specific conversation with all messages
    */
   async getConversation(conversationId: string) {
-    const user = await authService.getCurrentUser();
-    if (!user) throw new Error("User not authenticated");
+    const user = await authService.getCurrentUser()
+    if (!user) throw new Error("User not authenticated")
 
     // Validate UUID format to prevent "invalid input syntax" errors
-    const uuidRegex =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
     if (!uuidRegex.test(conversationId)) {
-      console.warn(
-        `[Suspicious ID] Blocked non-UUID conversation check: ${conversationId}`
-      );
-      return { data: null, error: new Error("Invalid conversation ID format") };
+      console.warn(`[Suspicious ID] Blocked non-UUID conversation check: ${conversationId}`)
+      return { data: null, error: new Error("Invalid conversation ID format") }
     }
 
     const { data: conversation, error: convError } = await supabase
@@ -87,10 +81,10 @@ export const conversationService = {
       .select("*")
       .eq("id", conversationId)
       .eq("user_id", user.id)
-      .single();
+      .single()
 
     if (convError || !conversation) {
-      return { data: null, error: convError || new Error("Access denied") };
+      return { data: null, error: convError || new Error("Access denied") }
     }
 
     // Update last_viewed_at asynchronously (no need to await)
@@ -99,19 +93,19 @@ export const conversationService = {
       .update({ last_viewed_at: new Date().toISOString() })
       .eq("id", conversationId)
       .then(({ error }) => {
-        if (error) console.error("Failed to update last_viewed_at:", error);
-      });
+        if (error) console.error("Failed to update last_viewed_at:", error)
+      })
 
     const { data: messages, error: msgError } = await supabase
       .from("messages")
       .select("*")
       .eq("conversation_id", conversationId)
-      .order("created_at", { ascending: true });
+      .order("created_at", { ascending: true })
 
     return {
       data: { conversation, messages: messages || [] },
       error: msgError,
-    };
+    }
   },
 
   /**
@@ -127,30 +121,27 @@ export const conversationService = {
         follow_up_questions: message.followUpQuestions || null,
       })
       .select()
-      .single();
+      .single()
 
     // Update conversation's updated_at timestamp
     await supabase
       .from("conversations")
       .update({ updated_at: new Date().toISOString() })
-      .eq("id", conversationId);
+      .eq("id", conversationId)
 
-    return { data, error };
+    return { data, error }
   },
 
   /**
    * Update conversation's Coze conversation ID
    */
-  async updateCozeConversationId(
-    conversationId: string,
-    cozeConversationId: string
-  ) {
+  async updateCozeConversationId(conversationId: string, cozeConversationId: string) {
     const { data, error } = await supabase
       .from("conversations")
       .update({ coze_conversation_id: cozeConversationId })
-      .eq("id", conversationId);
+      .eq("id", conversationId)
 
-    return { data, error };
+    return { data, error }
   },
 
   /**
@@ -160,21 +151,18 @@ export const conversationService = {
     const { data, error } = await supabase
       .from("conversations")
       .update({ title })
-      .eq("id", conversationId);
+      .eq("id", conversationId)
 
-    return { data, error };
+    return { data, error }
   },
 
   /**
    * Delete a conversation and all its messages
    */
   async deleteConversation(conversationId: string) {
-    const { error } = await supabase
-      .from("conversations")
-      .delete()
-      .eq("id", conversationId);
+    const { error } = await supabase.from("conversations").delete().eq("id", conversationId)
 
-    return { error };
+    return { error }
   },
 
   /**
@@ -184,9 +172,9 @@ export const conversationService = {
     const { data, error } = await supabase
       .from("conversations")
       .update({ is_pinned: isPinned })
-      .eq("id", conversationId);
+      .eq("id", conversationId)
 
-    return { data, error };
+    return { data, error }
   },
 
   /**
@@ -198,6 +186,6 @@ export const conversationService = {
       role: msg.role as "user" | "model",
       text: msg.content,
       followUpQuestions: msg.follow_up_questions || undefined,
-    }));
+    }))
   },
-};
+}

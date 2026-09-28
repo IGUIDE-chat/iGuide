@@ -124,6 +124,7 @@ object-layer 只适合高价值、可稳定结构化、对精确索引要求高�
 也就是说，我们更鼓励这三层分工：
 
 ### 1. fetcher / crawler
+
 负责：
 
 - 抓页面
@@ -134,6 +135,7 @@ object-layer 只适合高价值、可稳定结构化、对精确索引要求高�
 这一层的目标是“拿到东西”，不是直接产出 object。
 
 ### 2. normalizer / artifact builder
+
 负责：
 
 - 清洗正文
@@ -144,6 +146,7 @@ object-layer 只适合高价值、可稳定结构化、对精确索引要求高�
 这一层的目标是“把内容变成可消费的标准输入”。
 
 ### 3. extractor / projector
+
 负责：
 
 - 从 artifact 中识别 object candidate
@@ -175,6 +178,7 @@ source ingest
 这里面最关键的是两步：
 
 ### extractor
+
 从 artifact 中提取“可能成为 object 的结构化候选”。
 
 例如：
@@ -184,6 +188,7 @@ source ingest
 - 从地图/目录 artifact 提取一个 `location_or_service` candidate
 
 ### projector
+
 把 candidate 投影成 object-layer 里的正式记录。
 
 这里通常会顺带做：
@@ -293,11 +298,13 @@ source ingest
 如果只讲工作边界变化，可以理解成下面这几点：
 
 ### 以前更像
+
 - 抓内容
 - 整理 corpus
 - 产出 Markdown/JSONL 供检索或人工浏览
 
 ### 现在更像
+
 - 维护 source ingest 的稳定性
 - 维护 snapshot/artifact 的质量
 - 为 extractor / projector 提供可信输入

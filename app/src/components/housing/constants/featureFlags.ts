@@ -9,7 +9,7 @@
  * - false（默认）：隐藏 Google Reviews，评论列表和统计数据仅显示 Supabase 真实用户评论。
  * - true：合并 Google Reviews 数据到评论列表和统计中。
  */
-export const SHOW_GOOGLE_REVIEWS = false;
+export const SHOW_GOOGLE_REVIEWS = false
 
 /**
  * 控制是否展示宿舍好评率（点赞占比）的 UI。
@@ -18,4 +18,4 @@ export const SHOW_GOOGLE_REVIEWS = false;
  *
  * 注意：此开关仅影响展示，不影响点赞数据的读写与统计。
  */
-export const SHOW_POSITIVE_RATING = false;
+export const SHOW_POSITIVE_RATING = false

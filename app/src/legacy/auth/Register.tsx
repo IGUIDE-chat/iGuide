@@ -7,73 +7,65 @@
 
 // [LEGACY/UNUSED] Old register component. Replaced by LoginScreen.tsx.
 // [遗留/未使用] 旧的注册组件。已被 LoginScreen.tsx 取代。
-import React, { useState } from "react";
-import { useAuth } from "./AuthContext";
+import React, { useState } from "react"
+
+import { useAuth } from "./AuthContext"
 
 interface RegisterProps {
-  onSwitchToLogin: () => void;
+  onSwitchToLogin: () => void
 }
 
 export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
-  const { register, isLoading } = useAuth();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [acceptTerms, setAcceptTerms] = useState(false);
-  const [error, setError] = useState("");
+  const { register, isLoading } = useAuth()
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [acceptTerms, setAcceptTerms] = useState(false)
+  const [error, setError] = useState("")
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
+    e.preventDefault()
+    setError("")
 
     // Validation
     if (!name || !email || !password || !confirmPassword) {
-      setError("Please fill in all fields");
-      return;
+      setError("Please fill in all fields")
+      return
     }
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
+      setError("Passwords do not match")
+      return
     }
 
     if (password.length < 6) {
-      setError("Password must be at least 6 characters");
-      return;
+      setError("Password must be at least 6 characters")
+      return
     }
 
     if (!acceptTerms) {
-      setError("Please accept the terms of service");
-      return;
+      setError("Please accept the terms of service")
+      return
     }
 
-    const success = await register(name, email, password);
+    const success = await register(name, email, password)
     if (!success) {
-      setError("Email already registered");
+      setError("Email already registered")
     }
-  };
+  }
 
   return (
     <div
-      className="
-        flex min-h-screen items-center justify-center bg-linear-to-br
-        from-illini-blue via-slate-800 to-illini-orange/20 p-4
-      "
+      className="from-illini-blue to-illini-orange/20 flex min-h-screen items-center justify-center bg-linear-to-br via-slate-800 p-4"
     >
       {/* Background decoration */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div
-          className="
-            absolute top-1/4 -left-20 size-96 rounded-full bg-illini-orange/10
-            blur-3xl
-          "
+          className="bg-illini-orange/10 absolute top-1/4 -left-20 size-96 rounded-full blur-3xl"
         ></div>
         <div
-          className="
-            absolute -right-20 bottom-1/4 size-96 rounded-full bg-illini-blue/10
-            blur-3xl
-          "
+          className="bg-illini-blue/10 absolute -right-20 bottom-1/4 size-96 rounded-full blur-3xl"
         ></div>
       </div>
 
@@ -86,22 +78,14 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
 
         {/* Register Card */}
         <div
-          className="
-            rounded-2xl border border-white/20 bg-white/95 p-8 shadow-2xl
-            backdrop-blur-sm
-          "
+          className="rounded-2xl border border-white/20 bg-white/95 p-8 shadow-2xl backdrop-blur-sm"
         >
-          <h2 className="mb-6 text-2xl font-bold text-slate-900">
-            Create Account
-          </h2>
+          <h2 className="mb-6 text-2xl font-bold text-slate-900">Create Account</h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Name Field */}
             <div>
-              <label
-                htmlFor="name"
-                className="mb-2 block text-sm font-medium text-slate-700"
-              >
+              <label htmlFor="name" className="mb-2 block text-sm font-medium text-slate-700">
                 Full Name
               </label>
               <input
@@ -109,12 +93,7 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="
-                  w-full rounded-lg border border-slate-200 bg-slate-50 px-4
-                  py-3 text-slate-900 placeholder-slate-400 transition-all
-                  focus:border-illini-blue focus:ring-2
-                  focus:ring-illini-blue/50 focus:outline-none
-                "
+                className="focus:border-illini-blue focus:ring-illini-blue/50 w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 placeholder-slate-400 transition-all focus:ring-2 focus:outline-none"
                 placeholder="John Doe"
                 autoFocus
               />
@@ -122,10 +101,7 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
 
             {/* Email Field */}
             <div>
-              <label
-                htmlFor="email"
-                className="mb-2 block text-sm font-medium text-slate-700"
-              >
+              <label htmlFor="email" className="mb-2 block text-sm font-medium text-slate-700">
                 Email Address
               </label>
               <input
@@ -133,22 +109,14 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="
-                  w-full rounded-lg border border-slate-200 bg-slate-50 px-4
-                  py-3 text-slate-900 placeholder-slate-400 transition-all
-                  focus:border-illini-blue focus:ring-2
-                  focus:ring-illini-blue/50 focus:outline-none
-                "
+                className="focus:border-illini-blue focus:ring-illini-blue/50 w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 placeholder-slate-400 transition-all focus:ring-2 focus:outline-none"
                 placeholder="your.email@illinois.edu"
               />
             </div>
 
             {/* Password Field */}
             <div>
-              <label
-                htmlFor="password"
-                className="mb-2 block text-sm font-medium text-slate-700"
-              >
+              <label htmlFor="password" className="mb-2 block text-sm font-medium text-slate-700">
                 Password
               </label>
               <input
@@ -156,12 +124,7 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="
-                  w-full rounded-lg border border-slate-200 bg-slate-50 px-4
-                  py-3 text-slate-900 placeholder-slate-400 transition-all
-                  focus:border-illini-blue focus:ring-2
-                  focus:ring-illini-blue/50 focus:outline-none
-                "
+                className="focus:border-illini-blue focus:ring-illini-blue/50 w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 placeholder-slate-400 transition-all focus:ring-2 focus:outline-none"
                 placeholder="••••••••"
               />
             </div>
@@ -179,12 +142,7 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="
-                  w-full rounded-lg border border-slate-200 bg-slate-50 px-4
-                  py-3 text-slate-900 placeholder-slate-400 transition-all
-                  focus:border-illini-blue focus:ring-2
-                  focus:ring-illini-blue/50 focus:outline-none
-                "
+                className="focus:border-illini-blue focus:ring-illini-blue/50 w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 placeholder-slate-400 transition-all focus:ring-2 focus:outline-none"
                 placeholder="••••••••"
               />
             </div>
@@ -196,28 +154,18 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
                 type="checkbox"
                 checked={acceptTerms}
                 onChange={(e) => setAcceptTerms(e.target.checked)}
-                className="
-                  mt-1 size-4 rounded-sm border-slate-300 bg-slate-50
-                  text-illini-blue
-                  focus:ring-illini-blue/50
-                "
+                className="text-illini-blue focus:ring-illini-blue/50 mt-1 size-4 rounded-sm border-slate-300 bg-slate-50"
               />
               <label htmlFor="terms" className="ml-2 text-sm text-slate-600">
                 I agree to the{" "}
                 <span
-                  className="
-                    cursor-pointer text-illini-blue
-                    hover:underline
-                  "
+                  className="text-illini-blue cursor-pointer hover:underline"
                 >
                   Terms of Service
                 </span>{" "}
                 and{" "}
                 <span
-                  className="
-                    cursor-pointer text-illini-blue
-                    hover:underline
-                  "
+                  className="text-illini-blue cursor-pointer hover:underline"
                 >
                   Privacy Policy
                 </span>
@@ -227,10 +175,7 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
             {/* Error Message */}
             {error && (
               <div
-                className="
-                  rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm
-                  text-red-700
-                "
+                className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
               >
                 {error}
               </div>
@@ -240,12 +185,7 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
             <button
               type="submit"
               disabled={isLoading}
-              className="
-                w-full rounded-lg bg-illini-orange px-4 py-3 font-semibold
-                text-white shadow-lg transition-all duration-200
-                hover:bg-illini-orange/90 hover:shadow-xl
-                disabled:cursor-not-allowed disabled:opacity-50
-              "
+              className="bg-illini-orange hover:bg-illini-orange/90 w-full rounded-lg px-4 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isLoading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -279,10 +219,7 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
               Already have an account?{" "}
               <button
                 onClick={onSwitchToLogin}
-                className="
-                  font-semibold text-illini-blue transition-colors
-                  hover:text-illini-blue/80
-                "
+                className="text-illini-blue hover:text-illini-blue/80 font-semibold transition-colors"
               >
                 Sign In
               </button>
@@ -298,5 +235,5 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}

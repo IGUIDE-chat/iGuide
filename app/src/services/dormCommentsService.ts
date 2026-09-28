@@ -5,58 +5,55 @@
  * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
  */
 
+import { authService } from "./authService"
 // [SERVICE] Manages dorm comments and comment votes with Supabase.
 // [服务] 管理宿舍评论和评论投票（Supabase）。
-import { supabase } from "./supabase";
-import { authService } from "./authService";
+import { supabase } from "./supabase"
 
 export interface DormComment {
-  id: string;
-  dorm_id: string;
-  user_id: string;
-  display_name: string;
-  content: string;
-  dorm_vote: 1 | -1 | null;
-  created_at: string;
+  id: string
+  dorm_id: string
+  user_id: string
+  display_name: string
+  content: string
+  dorm_vote: 1 | -1 | null
+  created_at: string
   /** Moderation flag — hidden comments are only visible to admins. */
-  hidden: boolean;
+  hidden: boolean
   // Aggregated client-side from dorm_comment_votes:
-  upvotes: number;
-  downvotes: number;
-  myVote: 1 | -1 | null;
+  upvotes: number
+  downvotes: number
+  myVote: 1 | -1 | null
 }
 
 interface RawVote {
-  vote: number;
-  user_id: string;
+  vote: number
+  user_id: string
 }
 
 interface RawComment {
-  id: string;
-  dorm_id: string;
-  user_id: string;
-  display_name: string;
-  content: string;
-  dorm_vote: number | null;
-  created_at: string;
+  id: string
+  dorm_id: string
+  user_id: string
+  display_name: string
+  content: string
+  dorm_vote: number | null
+  created_at: string
   // Optional so the app keeps working before add_dorm_comment_hidden.sql runs.
-  hidden?: boolean | null;
-  dorm_comment_votes: RawVote[];
+  hidden?: boolean | null
+  dorm_comment_votes: RawVote[]
 }
 
-function aggregateComment(
-  raw: RawComment,
-  currentUserId: string | null
-): DormComment {
-  let upvotes = 0;
-  let downvotes = 0;
-  let myVote: 1 | -1 | null = null;
+function aggregateComment(raw: RawComment, currentUserId: string | null): DormComment {
+  let upvotes = 0
+  let downvotes = 0
+  let myVote: 1 | -1 | null = null
 
   for (const v of raw.dorm_comment_votes) {
-    if (v.vote === 1) upvotes++;
-    else if (v.vote === -1) downvotes++;
+    if (v.vote === 1) upvotes++
+    else if (v.vote === -1) downvotes++
     if (currentUserId && v.user_id === currentUserId) {
-      myVote = v.vote as 1 | -1;
+      myVote = v.vote as 1 | -1
     }
   }
 
@@ -72,20 +69,20 @@ function aggregateComment(
     upvotes,
     downvotes,
     myVote,
-  };
+  }
 }
 
 /** Admins are flagged via Supabase user metadata (`is_admin` / `isAdmin`). */
 function isAdminUser(user: { user_metadata?: Record<string, unknown> } | null) {
-  const meta = user?.user_metadata;
-  return meta?.is_admin === true || meta?.isAdmin === true;
+  const meta = user?.user_metadata
+  return meta?.is_admin === true || meta?.isAdmin === true
 }
 
 export interface DormCommentStats {
-  dormId: string;
-  totalComments: number;
-  thumbsUp: number;
-  positivePercent: number | null;
+  dormId: string
+  totalComments: number
+  thumbsUp: number
+  positivePercent: number | null
 }
 
 export const dormCommentsService = {
@@ -93,71 +90,66 @@ export const dormCommentsService = {
    * Fetch aggregate comment stats for all dorms (total count + thumbs up count).
    */
   async getAllDormStats(): Promise<Record<string, DormCommentStats>> {
-    let { data, error } = await supabase
-      .from("dorm_comments")
-      .select("dorm_id, dorm_vote, hidden");
+    let { data, error } = await supabase.from("dorm_comments").select("dorm_id, dorm_vote, hidden")
 
     // Fall back if add_dorm_comment_hidden.sql has not been run yet (42703).
     if (error?.code === "42703") {
-      ({ data, error } = await supabase
-        .from("dorm_comments")
-        .select("dorm_id, dorm_vote"));
+      ;({ data, error } = await supabase.from("dorm_comments").select("dorm_id, dorm_vote"))
     }
 
     if (error) {
-      console.error("Error fetching dorm comment stats:", error);
-      return {};
+      console.error("Error fetching dorm comment stats:", error)
+      return {}
     }
 
-    const statsMap: Record<string, { total: number; up: number }> = {};
+    const statsMap: Record<string, { total: number; up: number }> = {}
     for (const row of data ?? []) {
       // Admins can read hidden rows — they must not skew the public counts.
-      if ((row as { hidden?: boolean }).hidden === true) continue;
-      const id = row.dorm_id as string;
-      if (!statsMap[id]) statsMap[id] = { total: 0, up: 0 };
-      statsMap[id].total++;
-      if (row.dorm_vote === 1) statsMap[id].up++;
+      if ((row as { hidden?: boolean }).hidden === true) continue
+      const id = row.dorm_id as string
+      if (!statsMap[id]) statsMap[id] = { total: 0, up: 0 }
+      statsMap[id].total++
+      if (row.dorm_vote === 1) statsMap[id].up++
     }
 
-    const result: Record<string, DormCommentStats> = {};
+    const result: Record<string, DormCommentStats> = {}
     for (const [dormId, s] of Object.entries(statsMap)) {
       result[dormId] = {
         dormId,
         totalComments: s.total,
         thumbsUp: s.up,
-        positivePercent:
-          s.total > 0 ? Math.round((s.up / s.total) * 100) : null,
-      };
+        positivePercent: s.total > 0 ? Math.round((s.up / s.total) * 100) : null,
+      }
     }
-    return result;
+    return result
   },
 
   /**
    * Fetch all comments + vote counts + current user's vote for one dorm.
    */
   async getComments(dormId: string): Promise<DormComment[]> {
-    const user = await authService.getCurrentUser();
+    const user = await authService.getCurrentUser()
 
     const { data, error } = await supabase
       .from("dorm_comments")
       .select(`*, dorm_comment_votes(vote, user_id)`)
       .eq("dorm_id", dormId)
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
 
     if (error) {
-      console.error("Error fetching dorm comments:", error);
-      return [];
+      console.error("Error fetching dorm comments:", error)
+      return []
     }
 
-    const currentUserId = user?.id ?? null;
-    const isAdmin = isAdminUser(user);
+    const currentUserId = user?.id ?? null
+    const isAdmin = isAdminUser(user)
     return (
       (data as RawComment[])
         .map((raw) => aggregateComment(raw, currentUserId))
         // RLS already withholds hidden rows from non-admins; filter again so a
         // stale policy can never leak one into the dorm page.
         .filter((comment) => isAdmin || !comment.hidden)
-    );
+    )
   },
 
   /**
@@ -166,12 +158,12 @@ export const dormCommentsService = {
   async saveComment(
     dormId: string,
     content: string,
-    dormVote: 1 | -1 | null
+    dormVote: 1 | -1 | null,
   ): Promise<DormComment> {
-    const user = await authService.getCurrentUser();
-    if (!user) throw new Error("User not authenticated");
+    const user = await authService.getCurrentUser()
+    if (!user) throw new Error("User not authenticated")
 
-    const display_name = user.email?.split("@")[0] ?? "Anonymous";
+    const display_name = user.email?.split("@")[0] ?? "Anonymous"
 
     const { data, error } = await supabase
       .from("dorm_comments")
@@ -183,39 +175,39 @@ export const dormCommentsService = {
           content,
           dorm_vote: dormVote,
         },
-        { onConflict: "dorm_id,user_id" }
+        { onConflict: "dorm_id,user_id" },
       )
       .select(`*, dorm_comment_votes(vote, user_id)`)
-      .single();
+      .single()
 
     if (error) {
-      console.error("Error saving dorm comment:", error);
+      console.error("Error saving dorm comment:", error)
       // RLS blocks edits to a comment an admin has hidden (42501).
       if (error.code === "42501") {
-        throw new Error("COMMENT_HIDDEN");
+        throw new Error("COMMENT_HIDDEN")
       }
-      throw error;
+      throw error
     }
 
-    return aggregateComment(data as RawComment, user.id);
+    return aggregateComment(data as RawComment, user.id)
   },
 
   /**
    * Delete own comment.
    */
   async deleteComment(commentId: string): Promise<void> {
-    const user = await authService.getCurrentUser();
-    if (!user) throw new Error("User not authenticated");
+    const user = await authService.getCurrentUser()
+    if (!user) throw new Error("User not authenticated")
 
     const { error } = await supabase
       .from("dorm_comments")
       .delete()
       .eq("id", commentId)
-      .eq("user_id", user.id);
+      .eq("user_id", user.id)
 
     if (error) {
-      console.error("Error deleting dorm comment:", error);
-      throw error;
+      console.error("Error deleting dorm comment:", error)
+      throw error
     }
   },
 
@@ -224,17 +216,14 @@ export const dormCommentsService = {
    * but are withheld from every non-admin reader by RLS.
    */
   async setCommentHidden(commentId: string, hidden: boolean): Promise<void> {
-    const user = await authService.getCurrentUser();
-    if (!isAdminUser(user)) throw new Error("Admin privileges required");
+    const user = await authService.getCurrentUser()
+    if (!isAdminUser(user)) throw new Error("Admin privileges required")
 
-    const { error } = await supabase
-      .from("dorm_comments")
-      .update({ hidden })
-      .eq("id", commentId);
+    const { error } = await supabase.from("dorm_comments").update({ hidden }).eq("id", commentId)
 
     if (error) {
-      console.error("Error updating dorm comment visibility:", error);
-      throw error;
+      console.error("Error updating dorm comment visibility:", error)
+      throw error
     }
   },
 
@@ -242,32 +231,32 @@ export const dormCommentsService = {
    * Upsert a vote on a comment. Pass null to remove the vote.
    */
   async voteOnComment(commentId: string, vote: 1 | -1 | null): Promise<void> {
-    const user = await authService.getCurrentUser();
-    if (!user) throw new Error("User not authenticated");
+    const user = await authService.getCurrentUser()
+    if (!user) throw new Error("User not authenticated")
 
     if (vote === null) {
       const { error } = await supabase
         .from("dorm_comment_votes")
         .delete()
         .eq("comment_id", commentId)
-        .eq("user_id", user.id);
+        .eq("user_id", user.id)
 
       if (error) {
-        console.error("Error removing comment vote:", error);
-        throw error;
+        console.error("Error removing comment vote:", error)
+        throw error
       }
     } else {
       const { error } = await supabase
         .from("dorm_comment_votes")
         .upsert(
           { comment_id: commentId, user_id: user.id, vote },
-          { onConflict: "comment_id,user_id" }
-        );
+          { onConflict: "comment_id,user_id" },
+        )
 
       if (error) {
-        console.error("Error saving comment vote:", error);
-        throw error;
+        console.error("Error saving comment vote:", error)
+        throw error
       }
     }
   },
-};
+}
