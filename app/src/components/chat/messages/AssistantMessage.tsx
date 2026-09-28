@@ -6,7 +6,7 @@
 import {
   MessagePrimitive,
   ActionBarPrimitive,
-  useMessage,
+  useAuiState,
 } from "@assistant-ui/react";
 import { ThinkingProcess } from "../ThinkingProcess";
 import { Typewriter } from "../../ui/Typewriter";
@@ -30,8 +30,12 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
   botName = "iGuide",
   onFollowUpClick,
 }) => {
-  const message = useMessage();
-  const meta = message.metadata?.custom as AssistantMessageMeta | undefined;
+  // `useMessage` was removed in @assistant-ui/react 0.15; the message state
+  // now lives behind the Aui store, so read the two slices this component uses.
+  const messageId = useAuiState((s) => s.message.id);
+  const meta = useAuiState(
+    (s) => s.message.metadata.custom as AssistantMessageMeta
+  );
 
   return (
     <MessagePrimitive.Root className="flex w-full border-b border-transparent py-6">
@@ -126,7 +130,7 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
           {/* Thinking process */}
           {(meta?.thinkingSteps?.length || meta?.isThinking) && (
             <ThinkingProcess
-              key={message.id}
+              key={messageId}
               steps={meta?.thinkingSteps ?? []}
               isThinking={!!meta?.isThinking}
               language={language}
