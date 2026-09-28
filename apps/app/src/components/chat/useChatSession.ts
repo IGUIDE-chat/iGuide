@@ -2,7 +2,7 @@
  * @file ./src/components/chat/useChatSession.ts
  * @description Chat Behavioral Hook / Module
  * @description_zh 这是一个聊天行为 hook（Orchestrator）。管理会话状态和消息处理逻辑。
- * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
+ * @rules Follow the Colocation Principle. Rules: apps/app/AGENTS.md.
  */
 
 import { useCallback, useEffect, useReducer, useState } from "react"

@@ -1,7 +1,7 @@
 /**
  * @file ./src/components/profile/IntegrationsSection.tsx
  * @description Profile feature UI — MCP integrations with add/test/save/details interactions (Task 8)
- * @rules See docs/FILE_RULES.md. Follow the Colocation Principle.
+ * @rules Follow the Colocation Principle. Rules: apps/app/AGENTS.md.
  */
 
 import React, { useState } from "react"

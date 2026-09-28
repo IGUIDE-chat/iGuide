@@ -4,14 +4,13 @@ A comprehensive, zero-cost architecture knowledge base for new UIUC students fea
 
 ## Setup
 
-See [docs/CHATFLOW_SETUP.md](docs/CHATFLOW_SETUP.md) for Coze configuration.
+Coze configuration lives in `.env.local`; see `.env.local.example` for the exact
+variables (`VITE_COZE_BOT_ID`, `COZE_API_TOKEN`).
 
 ## File Structure
 
 ```text
 apps/app/
-|-- docs/
-|   `-- diagrams/
 |-- functions/
 |   `-- api/
 |-- public/
@@ -79,7 +78,7 @@ apps/app/
 - New pages must be registered in `src/app/pageRegistry.ts`.
 - Route changes must be made in `src/app/routes.tsx`.
 
-Reference: `docs/FILE_RULES.md`
+Rule set: [`AGENTS.md`](AGENTS.md).
 
 ## Database & Data Management
 

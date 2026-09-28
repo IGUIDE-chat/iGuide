@@ -9,7 +9,7 @@ If this file conflicts with project-level rules, follow:
 
 1. `AGENTS.md`
 2. this file
-3. `docs/DORM_DATA_AUDIT.md`
+3. `DORM_DATA_AUDIT.md` (this module's audit log)
 
 ## Scope
 
@@ -62,7 +62,7 @@ Never bypass these helpers when changing floor-plan shape or derived room data.
 All uncertain, missing, removed, or source-limited dorm facts MUST be recorded
 in:
 
-- `docs/DORM_DATA_AUDIT.md`
+- `DORM_DATA_AUDIT.md` (this directory)
 
 ## Non-Negotiable Rules
 
@@ -72,7 +72,7 @@ in:
    room names.
 3. NEVER keep a stale value just because the UI already supports it.
    If the current value cannot be source-backed, remove it and record the gap in
-   `docs/DORM_DATA_AUDIT.md`.
+   `DORM_DATA_AUDIT.md`.
 4. ALWAYS keep `tags`, `structuredTags`, and `categorizedTags` synchronized.
    `categorizedTags` is the structured source; legacy `tags` must still be kept
    in sync for the current app and DB.
@@ -125,7 +125,7 @@ product requirements change:
 For these records:
 
 - merge source-backed differences carefully
-- record hall-specific caveats in `docs/DORM_DATA_AUDIT.md`
+- record hall-specific caveats in `DORM_DATA_AUDIT.md`
 - do not split them into new IDs ad hoc
 
 ## Required Sync Chain
@@ -144,7 +144,7 @@ behavior, review all of these together:
 - `src/components/housing/edit-panel/MediaTab.tsx`
 - `scripts/seed-dorms-table.ts`
 - `scripts/validate-dorm-data.ts`
-- `docs/DORM_DATA_AUDIT.md`
+- `DORM_DATA_AUDIT.md`
 
 Do not change only the static JSON shape and assume admin or seed will keep up.
 
@@ -184,7 +184,7 @@ npm run build
 
 - Update the relevant override file.
 - Keep or remove the value based on source certainty.
-- Record any ambiguity in `docs/DORM_DATA_AUDIT.md`.
+- Record any ambiguity in `DORM_DATA_AUDIT.md`.
 - Run validation.
 
 ### Safe floor-plan schema change
@@ -204,6 +204,6 @@ npm run build
 - Old DB/storage compatibility paths still exist.
   If you do not update both read and write paths, admin edits can silently
   regress data shape.
-- `docs/DORM_DATA_AUDIT.md` is part of the contract, not optional narrative.
+- `DORM_DATA_AUDIT.md` is part of the contract, not optional narrative.
   If information is uncertain or unavailable, write that down there instead of
   inventing a value.

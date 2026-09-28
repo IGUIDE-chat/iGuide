@@ -4,14 +4,12 @@
 
 ## 环境配置
 
-Coze配置说明请参见 [docs/CHATFLOW_SETUP.md](docs/CHATFLOW_SETUP.md)。
+Coze 配置见 `.env.local`，变量清单参考 `.env.local.example`（`VITE_COZE_BOT_ID`、`COZE_API_TOKEN`）。
 
 ## 目录结构
 
 ```text
 apps/app/
-|-- docs/
-|   `-- diagrams/
 |-- functions/
 |   `-- api/
 |-- public/
@@ -79,7 +77,7 @@ apps/app/
 - 新增页面须在 `src/app/pageRegistry.ts` 中注册。
 - 路由变更须在 `src/app/routes.tsx` 中进行。
 
-参考文档：`docs/FILE_RULES.md`
+规则集：[`AGENTS.md`](AGENTS.md)。
 
 ## 数据库与数据管理
 
