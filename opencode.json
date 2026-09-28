@@ -10,18 +10,29 @@
       "type": "remote",
       "url": "https://mcp.supabase.com/mcp?project_ref=zscloyvslqtvgfsargpe&features=docs%2Cdatabase%2Cdevelopment%2Cbranching"
     },
-    "cloudflare-docs": {
-      "type": "local",
-      "command": ["mcp-remote", "https://docs.mcp.cloudflare.com/mcp"]
+    "cloudflare": {
+      "type": "remote",
+      "url": "https://mcp.cloudflare.com/mcp",
+      "oauth": {}
     },
-    "cloudflare-worker-builds": {
+    "cloudflare-docs": {
+      "type": "remote",
+      "url": "https://docs.mcp.cloudflare.com/mcp"
+    },
+    "cloudflare-bindings": {
+      "type": "remote",
+      "url": "https://bindings.mcp.cloudflare.com/mcp",
+      "oauth": {}
+    },
+    "cloudflare-builds": {
       "type": "remote",
       "url": "https://builds.mcp.cloudflare.com/mcp",
       "oauth": {}
     },
     "cloudflare-observability": {
       "type": "remote",
-      "url": "https://observability.mcp.cloudflare.com/mcp"
+      "url": "https://observability.mcp.cloudflare.com/mcp",
+      "oauth": {}
     },
     "cloudflare-dns": {
       "type": "remote",
