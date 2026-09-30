@@ -8,6 +8,7 @@ import { useLayout } from "../../contexts/LayoutContext"
 import { dormService } from "../../services/dormService"
 import { Language } from "../../types"
 import { getStorageBathroomScope, normalizeFloorPlan } from "../../utils/roomOptions"
+import { SHOW_COMMENTS } from "./constants/featureFlags"
 import { TAG_REGISTRY } from "./constants/metadata"
 import { DormDetailFloorPlans } from "./DormDetailFloorPlans"
 import { DormDetailGallery } from "./DormDetailGallery"
@@ -347,18 +348,20 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
             onLightboxOpen={(images, index) => setLightbox({ images, index })}
           />
 
-          <DormDetailReviews
-            comments={comments}
-            commentsLoading={commentsLoading}
-            user={user}
-            language={language}
-            fadeUp={fadeUp}
-            onRequestLogin={requestLogin}
-            onSaveComment={saveComment}
-            onDeleteComment={deleteComment}
-            onVoteOnComment={voteOnComment}
-            onToggleCommentHidden={setCommentHidden}
-          />
+          {SHOW_COMMENTS && (
+            <DormDetailReviews
+              comments={comments}
+              commentsLoading={commentsLoading}
+              user={user}
+              language={language}
+              fadeUp={fadeUp}
+              onRequestLogin={requestLogin}
+              onSaveComment={saveComment}
+              onDeleteComment={deleteComment}
+              onVoteOnComment={voteOnComment}
+              onToggleCommentHidden={setCommentHidden}
+            />
+          )}
         </motion.div>
       </main>
 

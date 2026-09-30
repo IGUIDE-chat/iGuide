@@ -13,3 +13,12 @@ export const SHOW_GOOGLE_REVIEWS = false
  * 注意：此开关仅影响展示，不影响点赞数据的读写与统计。
  */
 export const SHOW_POSITIVE_RATING = false
+
+/**
+ * 控制是否展示宿舍详情页的评论区（#reviews）。
+ * - false（当前）：隐藏整个评论区（列表、发表/编辑、投票、管理员隐藏操作）。
+ * - true：正常展示评论区。
+ *
+ * 注意：此开关仅影响展示，不影响评论数据的读写与统计。
+ */
+export const SHOW_COMMENTS = false
