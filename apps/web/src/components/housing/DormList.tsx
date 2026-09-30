@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom"
 
 import { useAuth } from "../../contexts/AuthContext"
 import { Language } from "../../types"
+import { SHOW_COMMENTS } from "./constants/featureFlags"
 import DormGrid from "./dorm-list/DormGrid"
 import DormListHeader from "./dorm-list/DormListHeader"
 import { DormListMapPane } from "./dorm-list/DormListMapPane"
@@ -92,7 +93,7 @@ const DormList: React.FC<DormListProps> = ({ language }) => {
               onToggleFavorite={controller.handleToggleFavorite}
               onViewDetails={controller.handleViewDetails}
               onHoverDorm={controller.setHoveredDormId}
-              onRatingClick={handleRatingClick}
+              onRatingClick={SHOW_COMMENTS ? handleRatingClick : undefined}
               compareIds={compareIds}
               onToggleCompare={(dorm) => toggleCompare(dorm.id)}
               language={language}

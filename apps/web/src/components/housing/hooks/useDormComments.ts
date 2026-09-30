@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react"
 
 import { useAuth } from "../../../contexts/AuthContext"
 import { dormCommentsService, DormComment } from "../../../services/dormCommentsService"
-import { SHOW_GOOGLE_REVIEWS } from "../constants/featureFlags"
+import { SHOW_COMMENTS, SHOW_GOOGLE_REVIEWS } from "../constants/featureFlags"
 
 const GUEST_VOTES_KEY = "guest_comment_votes"
 
@@ -28,9 +28,10 @@ function setGuestVote(commentId: string, vote: 1 | -1 | null) {
 export function useDormComments(dormId: string) {
   const { user } = useAuth()
   const [comments, setComments] = useState<DormComment[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(SHOW_COMMENTS)
 
   const load = useCallback(async () => {
+    if (!SHOW_COMMENTS) return
     setLoading(true)
     let data = await dormCommentsService.getComments(dormId)
 
@@ -64,6 +65,7 @@ export function useDormComments(dormId: string) {
   }, [load])
 
   const saveComment = async (content: string, dormVote: 1 | -1 | null) => {
+    if (!SHOW_COMMENTS) return
     const saved = await dormCommentsService.saveComment(dormId, content, dormVote)
     setComments((prev) => {
       const without = prev.filter((c) => c.user_id !== saved.user_id)
@@ -72,6 +74,7 @@ export function useDormComments(dormId: string) {
   }
 
   const deleteComment = async (id: string) => {
+    if (!SHOW_COMMENTS) return
     await dormCommentsService.deleteComment(id)
     setComments((prev) => prev.filter((c) => c.id !== id))
   }
@@ -81,12 +84,13 @@ export function useDormComments(dormId: string) {
    * Reviews fixture rather than Supabase, so they have no row to update.
    */
   const setCommentHidden = async (commentId: string, hidden: boolean) => {
-    if (commentId.startsWith("gm-")) return
+    if (!SHOW_COMMENTS || commentId.startsWith("gm-")) return
     await dormCommentsService.setCommentHidden(commentId, hidden)
     setComments((prev) => prev.map((c) => (c.id === commentId ? { ...c, hidden } : c)))
   }
 
   const voteOnComment = async (commentId: string, vote: 1 | -1 | null) => {
+    if (!SHOW_COMMENTS) return
     if (commentId.startsWith("gm-")) {
       if (!user) setGuestVote(commentId, vote)
     } else if (user) {

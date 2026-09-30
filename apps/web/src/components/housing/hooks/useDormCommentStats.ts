@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react"
 
 import { dormCommentsService, DormCommentStats } from "../../../services/dormCommentsService"
-import { SHOW_GOOGLE_REVIEWS } from "../constants/featureFlags"
+import { SHOW_COMMENTS, SHOW_GOOGLE_REVIEWS } from "../constants/featureFlags"
 
 export function useDormCommentStats() {
   const [stats, setStats] = useState<Record<string, DormCommentStats>>({})
 
   useEffect(() => {
+    if (!SHOW_COMMENTS) return
     dormCommentsService.getAllDormStats().then(async (data) => {
       const updatedStats = { ...data }
       if (SHOW_GOOGLE_REVIEWS) {

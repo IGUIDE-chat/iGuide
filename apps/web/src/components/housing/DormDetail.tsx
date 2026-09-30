@@ -107,7 +107,7 @@ const DormDetail: React.FC<DormDetailProps> = ({ language = "en" }) => {
   }, [dorm?.id])
 
   useEffect(() => {
-    if (location.hash === "#reviews" && dorm) {
+    if (SHOW_COMMENTS && location.hash === "#reviews" && dorm) {
       const el = document.getElementById("reviews")
       if (el) {
         setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "start" }), 300)
