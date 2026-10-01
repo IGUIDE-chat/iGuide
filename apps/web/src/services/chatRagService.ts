@@ -16,6 +16,27 @@ const viteEnv = (
 const IS_DEV = Boolean(viteEnv?.DEV)
 const QMD_RESULT_LIMIT = 5
 const WEB_RESULT_LIMIT = 3
+// A healthy knowledge-base search answers in ~1s. When every QMD node is down
+// the gateway only gives up after ~15s, so cap the wait and fall back to web
+// results, then skip QMD for a while instead of paying the timeout each turn.
+const QMD_TIMEOUT_MS = 5_000
+const QMD_COOLDOWN_MS = 60_000
+let qmdUnavailableUntil = 0
+
+const withTimeout = <T>(promise: Promise<T>, ms: number): Promise<T> =>
+  new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(`timed out after ${ms}ms`)), ms)
+    promise.then(
+      (value) => {
+        clearTimeout(timer)
+        resolve(value)
+      },
+      (error: unknown) => {
+        clearTimeout(timer)
+        reject(error)
+      },
+    )
+  })
 const INTERNAL_DORM_ROUTE = "/dorms"
 const INTERNAL_ARTICLE_ROUTE = "/library/article"
 const GENERIC_QUERY_TOKENS = new Set(["uiuc", "illinois", "university", "student", "campus"])
@@ -125,6 +146,8 @@ export interface ChatRAGResult {
   context: string
   hasQMD: boolean
   hasWeb: boolean
+  /** The knowledge base did not answer (down, erroring, or cooling down). */
+  qmdUnavailable: boolean
 }
 
 export function isToolUseRagEnabled(): boolean {
@@ -441,37 +464,35 @@ function buildWebBlocks(results: WebSearchResult[]): RankedContextBlock[] {
 
 export async function fetchChatRAGContext(query: string, lang: string): Promise<ChatRAGResult> {
   if (isToolUseRagEnabled()) {
-    return { context: "", hasQMD: false, hasWeb: false }
+    return { context: "", hasQMD: false, hasWeb: false, qmdUnavailable: false }
   }
 
   const normalized = normalizeWhitespace(query).toLowerCase()
   if (!normalized) {
-    return { context: "", hasQMD: false, hasWeb: false }
+    return { context: "", hasQMD: false, hasWeb: false, qmdUnavailable: false }
   }
 
   const queries = await buildSearchQueries(query, lang)
   const primaryQuery = queries[0] ?? normalizeWhitespace(query)
   const englishQuery = queries.find((candidate) => candidate !== primaryQuery) ?? null
 
-  const qmdSearches = [
-    quickSearch(primaryQuery, (lang === "zh" ? "zh" : "en") as "en" | "zh", QMD_RESULT_LIMIT)
-      .then((response) => response.results)
-      .catch((error) => {
-        console.warn("[RAG] QMD search failed:", error)
-        return [] as SearchResult[]
-      }),
+  const qmdQueries: Array<[string, "en" | "zh"]> = [
+    [primaryQuery, lang === "zh" ? "zh" : "en"],
+    ...(englishQuery ? [[englishQuery, "en"] as [string, "en"]] : []),
   ]
-
-  if (englishQuery) {
-    qmdSearches.push(
-      quickSearch(englishQuery, "en", QMD_RESULT_LIMIT)
-        .then((response) => response.results)
-        .catch((error) => {
-          console.warn("[RAG] English QMD search failed:", error)
-          return [] as SearchResult[]
-        }),
-    )
-  }
+  const skipQmd = Date.now() < qmdUnavailableUntil
+  let qmdFailures = 0
+  const qmdSearches = skipQmd
+    ? []
+    : qmdQueries.map(([q, queryLang]) =>
+        withTimeout(quickSearch(q, queryLang, QMD_RESULT_LIMIT), QMD_TIMEOUT_MS)
+          .then((response) => response.results)
+          .catch((error) => {
+            console.warn(`[RAG] QMD search failed (${queryLang}):`, error)
+            qmdFailures++
+            return [] as SearchResult[]
+          }),
+      )
 
   const [qmdResults, webResults] = await Promise.all([
     Promise.all(qmdSearches).then((nested) => mergeQmdResults(nested.flat())),
@@ -484,12 +505,17 @@ export async function fetchChatRAGContext(query: string, lang: string): Promise<
     }),
   ])
 
+  const qmdUnavailable = skipQmd || (qmdSearches.length > 0 && qmdFailures === qmdSearches.length)
+  if (qmdUnavailable && !skipQmd) {
+    qmdUnavailableUntil = Date.now() + QMD_COOLDOWN_MS
+  }
+
   const rankedBlocks = [...buildQmdBlocks(qmdResults), ...buildWebBlocks(webResults)].sort(
     (a, b) => b.priority - a.priority,
   )
 
   if (!rankedBlocks.length) {
-    return { context: "", hasQMD: false, hasWeb: false }
+    return { context: "", hasQMD: false, hasWeb: false, qmdUnavailable }
   }
 
   const context =
@@ -502,5 +528,6 @@ export async function fetchChatRAGContext(query: string, lang: string): Promise<
     context,
     hasQMD: qmdResults.length > 0,
     hasWeb: webResults.length > 0,
+    qmdUnavailable,
   }
 }

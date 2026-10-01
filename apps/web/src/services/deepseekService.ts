@@ -59,6 +59,7 @@ interface RAGResult {
   context: string
   hasQMD: boolean
   hasWeb: boolean
+  qmdUnavailable: boolean
 }
 
 async function fetchRAGContext(query: string, lang: string): Promise<RAGResult> {
@@ -164,6 +165,18 @@ export const streamDeepSeekChat = async function* (
       userMemory = chatCtx.userMemory
       conversationMemory = chatCtx.conversationMemory
 
+      if (ragResult.qmdUnavailable) {
+        yield {
+          text: "",
+          thinkingStep: {
+            type: "searching",
+            label:
+              lang === "zh"
+                ? "知识库暂不可用，已改用网页搜索"
+                : "Knowledge base unavailable, using web search",
+          },
+        }
+      }
       if (ragResult.hasQMD) {
         yield {
           text: "",
