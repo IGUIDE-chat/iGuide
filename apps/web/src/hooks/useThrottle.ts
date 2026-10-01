@@ -8,6 +8,9 @@ export const useThrottle = <T extends (...args: any[]) => void>(callback: T, del
     (...args: any[]) => {
       const now = Date.now()
       if (now - lastRun.current >= delay) {
+        // A trailing call can still be pending when its timer fires late (e.g. a
+        // busy render). Drop it, or it would replay older args after these.
+        if (timeoutRef.current) clearTimeout(timeoutRef.current)
         lastRun.current = now
         callback(...args)
       } else {
