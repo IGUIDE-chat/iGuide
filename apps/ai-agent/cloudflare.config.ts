@@ -5,6 +5,14 @@ import { bindings, defineConfig } from "cf/config"
  * @see https://developers.cloudflare.com/workers/configuration/secrets/
  */
 
+// TODO(deploy): Workers Builds for this Worker is still configured with the
+// pre-9478f98 setup (root `apps/ai-agent`, deploy `npx wrangler deploy`). There
+// is no wrangler config here any more, so the next build that touches `src/`
+// will fail or deploy the wrong thing. Switch it to match the `web` Worker:
+// root `/`, build `pnpm install --frozen-lockfile`, deploy
+// `cd apps/ai-agent && npx cf deploy`. api.iguide.chat still runs the
+// 2026-09-28 version, so verify main on a preview version before switching.
+
 export default defineConfig({
   worker: {
     name: "ai-agent",

@@ -33,6 +33,7 @@
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.62.0",
     "@cloudflare/workers-types": "^5.20260927.1",
+    "@iguide/vite-bin": "workspace:*",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/geojson": "^7946.0.16",
     "@types/node": "^26.6.3",
