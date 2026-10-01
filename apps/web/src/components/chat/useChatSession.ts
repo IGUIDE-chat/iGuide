@@ -55,6 +55,11 @@ const CONNECTION_ERROR = {
   zh: "连接失败，请重试。",
 } as const
 
+// The 💡 follow-up section header. The prompt specifies the Chinese wording, but
+// in English mode the model translates it ("💡 You might also be interested in:").
+const FOLLOW_UP_HEADER =
+  /\n+[^\n]*💡[^\n]*(?:[你您]可能还想|you (?:might|may) also|related questions|want to know more)[^\n]*(?:\n|$)/i
+
 const LOGGED_IN_ID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 const generateSmartTitle = (text: string, language: Language): string => {
@@ -303,7 +308,7 @@ export const useChatSession = ({
           fullText = INVALID_RESPONSE[language]
         }
 
-        const followUpHeaderMatch = fullText.match(/\n+.*💡.*[你您]可能还想.*[:：\n]/)
+        const followUpHeaderMatch = fullText.match(FOLLOW_UP_HEADER)
         if (followUpHeaderMatch && (!followUpQuestions || followUpQuestions.length === 0)) {
           const splitIndex = followUpHeaderMatch.index!
           const followUpText = fullText.substring(splitIndex + followUpHeaderMatch[0].length)
