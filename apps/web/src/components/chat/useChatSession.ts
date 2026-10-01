@@ -93,7 +93,13 @@ export const useChatSession = ({
     [user?.id],
   )
 
+  // The reply currently streaming. Cleared before the final message is written,
+  // so a throttled update that fires afterwards cannot overwrite it with the raw
+  // stream text (which still contains the 💡 follow-up section).
+  const streamingMessageIdRef = useRef<string | null>(null)
+
   const updateMessageText = useCallback((id: string, text: string, steps: ThinkingStep[]) => {
+    if (streamingMessageIdRef.current !== id) return
     dispatch({
       type: "UPDATE_MESSAGE",
       payload: {
@@ -213,6 +219,7 @@ export const useChatSession = ({
 
       try {
         const aiMsgId = crypto.randomUUID()
+        streamingMessageIdRef.current = aiMsgId
         const thinkingStartedAt = Date.now()
         dispatch({
           type: "ADD_MESSAGE",
@@ -390,6 +397,7 @@ export const useChatSession = ({
           thinkingEndedAt,
         }
 
+        streamingMessageIdRef.current = null
         dispatch({ type: "REPLACE_MESSAGE", payload: aiMsg })
 
         if (conversationId && aiMsg.text.trim()) {
@@ -410,6 +418,7 @@ export const useChatSession = ({
           },
         })
       } finally {
+        streamingMessageIdRef.current = null
         setIsLoading(false)
       }
     },
