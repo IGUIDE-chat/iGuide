@@ -1,8 +1,14 @@
-import { MessagePrimitive, ActionBarPrimitive, useAuiState } from "@assistant-ui/react"
+import { ActionBarPrimitive, MessagePrimitive, useAuiState } from "@assistant-ui/react"
+import { motion } from "framer-motion"
+import { ArrowUpRight, RotateCcw } from "lucide-react"
+import * as React from "react"
 
 import { ThinkingStep } from "../../../types"
-import { Typewriter } from "../../ui/Typewriter"
+import { BrandMark } from "../../ui/branding/BrandMark"
 import { ThinkingProcess } from "../ThinkingProcess"
+import { MarkdownText } from "./MarkdownContent"
+import { MarkdownLabelsContext } from "./markdownLabels"
+import { MessageCopyButton } from "./MessageCopyButton"
 
 interface AssistantMessageMeta {
   thinkingSteps?: ThinkingStep[]
@@ -14,80 +20,62 @@ interface AssistantMessageMeta {
 interface AssistantMessageProps {
   language?: "en" | "zh"
   botName?: string
+  copyLabel: string
+  copiedLabel: string
+  regenerateLabel: string
   onFollowUpClick?: (text: string) => void
 }
+
+// Stable identity: a new object here would remount the Text part on every
+// streaming update and restart the smooth reveal from scratch. Tool-call parts
+// fall through to the Tool UIs registered in ChatRuntimeProvider.
+const partComponents = { Text: MarkdownText }
+
+const TypingDots = () => (
+  <div className="flex h-6 items-center gap-1" aria-hidden="true">
+    {[0, 1, 2].map((i) => (
+      <motion.span
+        key={i}
+        className="size-1.5 rounded-full bg-slate-400"
+        animate={{ y: [0, -3, 0], opacity: [0.4, 1, 0.4] }}
+        transition={{ duration: 0.9, repeat: Infinity, delay: i * 0.15 }}
+      />
+    ))}
+  </div>
+)
+
+const actionButtonClass =
+  "flex size-7 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
 
 export const AssistantMessage: React.FC<AssistantMessageProps> = ({
   language = "zh",
   botName = "iGuide",
+  copyLabel,
+  copiedLabel,
+  regenerateLabel,
   onFollowUpClick,
 }) => {
   // Message state comes from the Aui store, not a per-message hook.
   const messageId = useAuiState((s) => s.message.id)
   const meta = useAuiState((s) => s.message.metadata.custom as AssistantMessageMeta)
+  const hasText = useAuiState((s) =>
+    s.message.parts.some((part) => part.type === "text" && part.text.length > 0),
+  )
+
+  const showThinking = !!(meta?.thinkingSteps?.length || meta?.isThinking)
+  const showTypingDots = !!meta?.isStreaming && !hasText && !showThinking
+  const followUps = meta?.followUpQuestions?.slice(0, 3) ?? []
+  const labels = React.useMemo(() => ({ copyLabel, copiedLabel }), [copyLabel, copiedLabel])
 
   return (
-    <MessagePrimitive.Root className="flex w-full border-b border-transparent py-6">
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 px-4 md:flex-row">
-        <div className="relative flex hidden shrink-0 flex-col items-end md:flex">
-          <div className="bg-illini-orange flex size-6 items-center justify-center rounded-sm font-serif text-xs font-bold text-white shadow-sm">
-            I
-          </div>
-        </div>
+    <MessagePrimitive.Root className="group/msg flex w-full py-4">
+      <div className="mx-auto flex w-full max-w-3xl gap-3 px-4">
+        <BrandMark className="hidden size-6 shrink-0 rounded-md md:flex" iconClassName="text-xs" />
 
-        <div className="relative flex-1 overflow-hidden pt-0.5">
-          <ActionBarPrimitive.Root
-            hideWhenRunning
-            autohide="not-last"
-            className="absolute top-0 right-0 flex gap-1"
-          >
-            <ActionBarPrimitive.Copy
-              aria-label="Copy message"
-              className="rounded-md p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-              </svg>
-            </ActionBarPrimitive.Copy>
-            <ActionBarPrimitive.Reload
-              aria-label="Regenerate response"
-              className="rounded-md p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <polyline points="23 4 23 10 17 10" />
-                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
-              </svg>
-            </ActionBarPrimitive.Reload>
-          </ActionBarPrimitive.Root>
+        <div className="min-w-0 flex-1 pt-0.5">
+          <span className="sr-only">{botName}</span>
 
-          {/* Bot name label */}
-          <div className="mb-1 hidden text-xs font-semibold text-slate-900 md:block">{botName}</div>
-
-          {/* Thinking process */}
-          {(meta?.thinkingSteps?.length || meta?.isThinking) && (
+          {showThinking && (
             <ThinkingProcess
               key={messageId}
               steps={meta?.thinkingSteps ?? []}
@@ -96,119 +84,48 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
             />
           )}
 
-          {/* Message parts — text uses the existing markdown renderer; tool calls
-              fall through to assistant-ui's registered Tool UI renderers. */}
-          <div
-            aria-live="polite"
-            className="prose prose-slate prose-sm max-w-none leading-relaxed text-slate-800"
+          {showTypingDots ? (
+            <TypingDots />
+          ) : (
+            <div aria-live="polite">
+              <MarkdownLabelsContext.Provider value={labels}>
+                <MessagePrimitive.Parts components={partComponents} />
+              </MarkdownLabelsContext.Provider>
+            </div>
+          )}
+
+          {/* Hover actions — always visible on touch screens */}
+          <ActionBarPrimitive.Root
+            hideWhenRunning
+            className="mt-1.5 -ml-1.5 flex items-center gap-0.5 transition-opacity focus-within:opacity-100 md:opacity-0 md:group-hover/msg:opacity-100"
           >
-            <MessagePrimitive.Parts>
-              {({ part }) => {
-                if (part.type !== "text") return null
+            <MessageCopyButton label={copyLabel} />
+            <ActionBarPrimitive.Reload
+              aria-label={regenerateLabel}
+              title={regenerateLabel}
+              className={actionButtonClass}
+            >
+              <RotateCcw className="size-3.5" />
+            </ActionBarPrimitive.Reload>
+          </ActionBarPrimitive.Root>
 
-                return (
-                  <>
-                    <Typewriter
-                      text={part.text}
-                      mode="static"
-                      markdown
-                      markdownComponents={{
-                        a: ({ node: _node, ...props }) => (
-                          <a
-                            {...props}
-                            className="text-illini-orange hover:underline"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          />
-                        ),
-                        code: ({ node: _node, className, children, ...props }) => {
-                          const isInline = !className
-                          return isInline ? (
-                            <code
-                              className="rounded-sm bg-slate-100 px-1 py-0.5 text-xs"
-                              {...props}
-                            >
-                              {children}
-                            </code>
-                          ) : (
-                            <code
-                              className="block overflow-x-auto rounded-sm bg-slate-100 p-2 text-xs"
-                              {...props}
-                            >
-                              {children}
-                            </code>
-                          )
-                        },
-                        ul: ({ node: _node, ...props }) => (
-                          <ul className="list-inside list-disc space-y-1" {...props} />
-                        ),
-                        ol: ({ node: _node, ...props }) => (
-                          <ol className="list-inside list-decimal space-y-1" {...props} />
-                        ),
-                        p: ({ node: _node, ...props }) => (
-                          <p className="mb-2 last:mb-0" {...props} />
-                        ),
-                        img: ({ node: _node, alt, ...props }) => (
-                          <img
-                            {...props}
-                            alt={alt ?? ""}
-                            className="my-2 h-auto max-w-full rounded-lg border border-slate-200 shadow-sm"
-                            loading="lazy"
-                          />
-                        ),
-                      }}
-                    />
-
-                    {part.status.type === "running" && (
-                      <span className="ml-1 inline-flex items-center align-middle">
-                        <svg
-                          className="text-illini-orange size-3.5 animate-spin"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          aria-label="Loading"
-                          role="img"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          />
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          />
-                        </svg>
-                      </span>
-                    )}
-                  </>
-                )
-              }}
-            </MessagePrimitive.Parts>
-          </div>
-
-          {/* Follow-up chips */}
-          {meta?.followUpQuestions && meta.followUpQuestions.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-2">
-              {meta.followUpQuestions.slice(0, 3).map((question) => {
-                const displayText =
-                  question.length > 50 ? `${question.substring(0, 47)}...` : question
-                return (
-                  <button
-                    key={question}
-                    type="button"
-                    onClick={() => onFollowUpClick?.(question)}
-                    title={question}
-                    className="hover:border-illini-blue hover:bg-illini-blue rounded-full border border-slate-200 bg-slate-100 px-3 py-1.5 text-xs transition-colors hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    💡 {displayText}
-                  </button>
-                )
-              })}
+          {followUps.length > 0 && !meta?.isStreaming && (
+            <div className="mt-3 flex flex-col items-start gap-1.5">
+              {followUps.map((question, index) => (
+                <motion.button
+                  key={question}
+                  type="button"
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2, delay: index * 0.06 }}
+                  onClick={() => onFollowUpClick?.(question)}
+                  title={question}
+                  className="group/chip hover:border-illini-orange/40 flex max-w-full items-center gap-2 rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-left text-[13px] text-slate-600 shadow-xs transition-all hover:bg-orange-50/60 hover:text-slate-900"
+                >
+                  <span className="truncate">{question}</span>
+                  <ArrowUpRight className="group-hover/chip:text-illini-orange size-3.5 shrink-0 text-slate-400 transition-transform group-hover/chip:translate-x-0.5 group-hover/chip:-translate-y-0.5" />
+                </motion.button>
+              ))}
             </div>
           )}
         </div>

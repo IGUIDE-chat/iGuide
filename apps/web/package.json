@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@assistant-ui/react": "^0.15.22",
+    "@assistant-ui/react-markdown": "0.14.17",
     "@headlessui/react": "^2.2.10",
     "@supabase/supabase-js": "^2.117.2",
     "framer-motion": "^13.4.4",

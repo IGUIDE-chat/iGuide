@@ -26,6 +26,11 @@ export type UITextEntry = {
   botName: string
   userRole: string
   aiError: string
+  copyLabel: string
+  copiedLabel: string
+  regenerateLabel: string
+  scrollToBottom: string
+  composerHint: string
   providerCloud: string
   providerLocal: string
   providerCoze: string
@@ -107,6 +112,11 @@ export const UI_TEXT: Record<Language, UITextEntry> = {
     botName: "UIUC Guide",
     userRole: "You",
     aiError: "AI can make mistakes. Please check important info.",
+    copyLabel: "Copy",
+    copiedLabel: "Copied",
+    regenerateLabel: "Regenerate response",
+    scrollToBottom: "Scroll to latest",
+    composerHint: "Enter to send · Shift + Enter for a new line",
     providerCloud: "Cloud (Coze)",
     providerLocal: "Local (Free)",
     providerCoze: "Coze (Agent)",
@@ -183,6 +193,11 @@ export const UI_TEXT: Record<Language, UITextEntry> = {
     botName: "UIUC 助手",
     userRole: "你",
     aiError: "AI 可能会出错，请核对重要信息。",
+    copyLabel: "复制",
+    copiedLabel: "已复制",
+    regenerateLabel: "重新生成",
+    scrollToBottom: "回到最新",
+    composerHint: "Enter 发送 · Shift + Enter 换行",
     providerCloud: "云端 (Coze)",
     providerLocal: "本地 (免费)",
     providerCoze: "Coze (智能体)",

@@ -1,7 +1,9 @@
 import { AnimatePresence, motion } from "framer-motion"
-import { useEffect, useRef, useState } from "react"
+import { ChevronRight } from "lucide-react"
+import { useState } from "react"
 
 import { ThinkingStep } from "../../types"
+import { TextShimmer } from "../ui/TextShimmer"
 
 interface ThinkingProcessProps {
   steps: ThinkingStep[]
@@ -9,125 +11,58 @@ interface ThinkingProcessProps {
   language?: "en" | "zh"
 }
 
-const stepIcons: Record<ThinkingStep["type"], string> = {
-  reasoning: "💭",
-  searching: "🔍",
-  tool_call: "⚙️",
-  processing: "📝",
-}
-
-const ThinkingDots = () => (
-  <span className="ml-1 inline-flex items-center gap-0.5">
-    {[0, 1, 2].map((i) => (
-      <motion.span
-        key={i}
-        className="bg-illini-orange size-1 rounded-full"
-        animate={{ opacity: [0.3, 1, 0.3] }}
-        transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }}
-      />
-    ))}
-  </span>
-)
-
+// Collapsed by default: one line showing the current step while thinking,
+// and a step count once done. Expanding reveals the full step list.
 export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({
   steps,
   isThinking,
   language = "zh",
 }) => {
-  const [isExpanded, setIsExpanded] = useState(true)
-  const wasThinking = useRef(true)
-
-  useEffect(() => {
-    if (wasThinking.current && !isThinking) {
-      const timer = setTimeout(() => setIsExpanded(false), 1500)
-      return () => clearTimeout(timer)
-    }
-    wasThinking.current = isThinking
-  }, [isThinking])
+  const [isExpanded, setIsExpanded] = useState(false)
 
   if (steps.length === 0 && !isThinking) return null
 
-  const latestStep = steps[steps.length - 1]
+  const zh = language === "zh"
+  const currentLabel = steps[steps.length - 1]?.label ?? (zh ? "思考中..." : "Thinking...")
+  const doneLabel = zh
+    ? `已思考 ${steps.length} 步`
+    : `Thought for ${steps.length} step${steps.length === 1 ? "" : "s"}`
 
   return (
     <div className="mb-2">
       <button
+        type="button"
         onClick={() => setIsExpanded(!isExpanded)}
         aria-expanded={isExpanded}
-        className="group flex items-center gap-1.5 text-xs text-slate-500 transition-colors hover:text-slate-700"
+        disabled={steps.length === 0}
+        className="group flex max-w-full items-center gap-1 py-0.5 text-[13px] text-slate-400 transition-colors hover:text-slate-700"
       >
         {isThinking ? (
-          <motion.div
-            className="border-illini-orange size-3.5 rounded-full border-2 border-t-transparent"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
-          />
+          <TextShimmer className="truncate">{currentLabel}</TextShimmer>
         ) : (
-          <svg className="size-3.5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-            <path
-              fillRule="evenodd"
-              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-              clipRule="evenodd"
-            />
-          </svg>
+          <span className="truncate">{doneLabel}</span>
         )}
-        <span className="font-medium">
-          {isThinking
-            ? language === "zh"
-              ? "思考中"
-              : "Thinking"
-            : language === "zh"
-              ? "思考完成"
-              : "Done thinking"}
-        </span>
-        {isThinking && latestStep && (
-          <span className="text-slate-400">
-            · {latestStep.label}
-            <ThinkingDots />
-          </span>
-        )}
-        <svg
-          className={`size-3 transition-transform ${isExpanded ? "rotate-180" : ""} `}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
+        <ChevronRight
+          className={`size-3.5 shrink-0 transition-transform ${isExpanded ? "rotate-90" : ""} `}
+        />
       </button>
 
       <AnimatePresence initial={false}>
         {isExpanded && steps.length > 0 && (
-          <motion.div
+          <motion.ul
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="overflow-hidden"
+            className="mt-1 space-y-1 overflow-hidden border-l border-slate-200 pl-3 text-[13px] text-slate-500"
           >
-            <div className="mt-2 ml-1 space-y-1.5 border-l-2 border-slate-200 pl-3">
-              {steps.map((step, index) => (
-                <motion.div
-                  key={step.id}
-                  initial={{ opacity: 0, x: -8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.2, delay: index * 0.05 }}
-                  className="flex items-start gap-1.5 text-xs text-slate-500"
-                >
-                  <span className="mt-px shrink-0">{stepIcons[step.type]}</span>
-                  <div className="min-w-0">
-                    <span className={step.done ? "text-slate-400" : "text-slate-600"}>
-                      {step.label}
-                    </span>
-                    {step.detail && (
-                      <p className="mt-0.5 max-w-md truncate text-slate-400">{step.detail}</p>
-                    )}
-                  </div>
-                  {!step.done && isThinking && index === steps.length - 1 && <ThinkingDots />}
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
+            {steps.map((step) => (
+              <li key={step.id}>
+                {step.label}
+                {step.detail && <span className="ml-1.5 text-slate-400">{step.detail}</span>}
+              </li>
+            ))}
+          </motion.ul>
         )}
       </AnimatePresence>
     </div>
