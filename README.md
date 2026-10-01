@@ -12,7 +12,7 @@ A three-layer UIUC knowledge platform split across the app, API gateway, and cra
 
 | Path                   | Role                                                                                           |
 | :--------------------- | :--------------------------------------------------------------------------------------------- |
-| `apps/web/`            | React app, Cloudflare Pages functions, docs, migrations, and active UI runtime.                |
+| `apps/web/`            | React app, web Worker (`worker/`), docs, migrations, and active UI runtime.                    |
 | `apps/ai-agent/`       | Cloudflare Worker gateway for JWT auth, geo routing, proxying, CORS, and health checks.        |
 | `tools/data-pipeline/` | Supabase import, embedding-dimension, and schema verification scripts.                         |
 | `data_collection/`     | Python crawler/ETL pipeline for harvesting, cleaning, and incrementally updating UIUC sources. |
@@ -173,7 +173,7 @@ A serverless-first stack uses Cloudflare Worker as the agent runtime, Supabase a
 
 ### Operational Simplicity
 
-- Cloudflare Pages hosts the frontend.
+- The `web` Cloudflare Worker serves the frontend (Workers Static Assets) and its `/api/*` proxies.
 - Cloudflare Worker hosts the API gateway, MCP-style tool registry, and agent loop.
 - Supabase hosts auth, structured memory, conversations, pgvector, and full-text retrieval.
 - Hosted APIs keep model inference, web search, and embeddings off self-managed infrastructure.
@@ -183,7 +183,7 @@ A serverless-first stack uses Cloudflare Worker as the agent runtime, Supabase a
 ### Default Production Topology
 
 ```text
-Browser / Cloudflare Pages
+Browser / web Worker (static assets)
   -> Cloudflare Worker
     -> Supabase
     -> DeepSeek API
@@ -262,7 +262,7 @@ pnpm run dev:ai-agent
 - **Supabase:** Auth, Postgres, and RLS.
 - **Supabase pgvector + PostgreSQL FTS:** Unified knowledge retrieval.
 - **Cloudflare Workers:** Edge gateway, tool registry, agent loop, and SSE runtime.
-- **Cloudflare Pages:** Frontend hosting.
+- **Cloudflare Workers Static Assets:** Frontend hosting (`web` Worker).
 - **DeepSeek API:** Hosted model inference.
 - **Managed Embedding API:** Default embedding generation path.
 - **Optional self-hosted embedding endpoint:** Explicit fallback only.

@@ -11,8 +11,6 @@ variables (`VITE_COZE_BOT_ID`, `COZE_API_TOKEN`).
 
 ```text
 apps/web/
-|-- functions/
-|   `-- api/
 |-- public/
 |-- scripts/
 |   `-- migrations/
