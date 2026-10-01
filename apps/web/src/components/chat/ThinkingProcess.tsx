@@ -52,13 +52,19 @@ export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({
   const [isExpanded, setIsExpanded] = useState(false)
   const now = useNow(isThinking && startedAt !== undefined)
 
-  if (steps.length === 0 && !isThinking) return null
+  // With no steps (nothing retrieved), still show how long thinking took.
+  if (steps.length === 0 && !isThinking && endedAt === undefined) return null
 
   const zh = language === "zh"
   const currentLabel = steps[steps.length - 1]?.label ?? (zh ? "思考中..." : "Thinking...")
-  const doneLabel = zh
-    ? `已思考 ${steps.length} 步`
-    : `Thought for ${steps.length} step${steps.length === 1 ? "" : "s"}`
+  const doneLabel =
+    steps.length === 0
+      ? zh
+        ? "已思考"
+        : "Thought"
+      : zh
+        ? `已思考 ${steps.length} 步`
+        : `Thought for ${steps.length} step${steps.length === 1 ? "" : "s"}`
 
   // Steps are stamped when they are emitted (e.g. "knowledge base retrieved"
   // arrives once retrieval finishes), so a step's cost is the gap since the
@@ -91,9 +97,11 @@ export const ThinkingProcess: React.FC<ThinkingProcessProps> = ({
         {totalMs !== undefined && (isThinking || endedAt !== undefined) && (
           <span className="shrink-0 tabular-nums">· {formatDuration(totalMs)}</span>
         )}
-        <ChevronRight
-          className={`size-3.5 shrink-0 transition-transform ${isExpanded ? "rotate-90" : ""} `}
-        />
+        {steps.length > 0 && (
+          <ChevronRight
+            className={`size-3.5 shrink-0 transition-transform ${isExpanded ? "rotate-90" : ""} `}
+          />
+        )}
       </button>
 
       <AnimatePresence initial={false}>

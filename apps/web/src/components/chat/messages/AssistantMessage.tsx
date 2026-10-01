@@ -64,7 +64,11 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
     s.message.parts.some((part) => part.type === "text" && part.text.length > 0),
   )
 
-  const showThinking = !!(meta?.thinkingSteps?.length || meta?.isThinking)
+  const showThinking = !!(
+    meta?.thinkingSteps?.length ||
+    meta?.isThinking ||
+    meta?.thinkingEndedAt !== undefined
+  )
   const showTypingDots = !!meta?.isStreaming && !hasText && !showThinking
   const followUps = meta?.followUpQuestions?.slice(0, 3) ?? []
   const labels = React.useMemo(() => ({ copyLabel, copiedLabel }), [copyLabel, copiedLabel])
