@@ -10,11 +10,6 @@ allowBuilds:
 catalog:
   vite: npm:@voidzero-dev/vite-plus-core@0.3.3
   vite-plus: 0.3.3
-minimumReleaseAgeExclude:
-  - "@cloudflare/vite-plugin@1.62.0"
-  - wrangler@4.143.0
-  - "@cloudflare/codemods@0.2.1"
-  - cf@1.0.0-beta.5
 overrides:
   vite@*: "catalog:"
 peerDependencyRules:

@@ -4,7 +4,6 @@ import { defineConfig } from "vite-plus"
 const ignorePatterns = [
   "**/node_modules/**",
   "**/dist/**",
-  "**/.wrangler/**",
   "**/.cloudflare/**",
   "data_collection/**",
 ]
