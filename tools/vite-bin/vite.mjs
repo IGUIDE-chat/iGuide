@@ -10,6 +10,11 @@ import path from "node:path"
 const require = createRequire(import.meta.url)
 const vp = path.join(path.dirname(require.resolve("vite-plus/package.json")), "bin", "vp")
 
-const result = spawnSync(process.execPath, [vp, ...process.argv.slice(2)], { stdio: "inherit" })
+// Bare `vite` starts the dev server, but bare `vp` only prints help; `cf dev`
+// delegates as a bare `npx vite`, so default to `dev` like vite does.
+const args = process.argv.slice(2)
+const result = spawnSync(process.execPath, [vp, ...(args.length ? args : ["dev"])], {
+  stdio: "inherit",
+})
 if (result.error) throw result.error
 process.exit(result.status ?? 1)
