@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useReducer, useState } from "react"
+import { useCallback, useEffect, useReducer, useRef, useState } from "react"
 
 import { useAuth } from "../../contexts/AuthContext"
 import { useThrottle } from "../../hooks/useThrottle"
@@ -81,6 +81,12 @@ export const useChatSession = ({
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingHistory, setIsLoadingHistory] = useState(false)
+  // Which conversation (per user) the `messages` state currently represents.
+  const inMemoryConversationRef = useRef<string | null>(null)
+  const conversationKey = useCallback(
+    (conversationId: string) => `${user?.id ?? "guest"}:${conversationId}`,
+    [user?.id],
+  )
 
   const updateMessageText = useCallback((id: string, text: string, steps: ThinkingStep[]) => {
     dispatch({
@@ -130,7 +136,15 @@ export const useChatSession = ({
     }
 
     if (!currentConversationId) {
+      inMemoryConversationRef.current = null
       dispatch({ type: "SET_MESSAGES", payload: [] })
+      return
+    }
+
+    // State already holds this conversation (we just streamed into it). A reload
+    // would swap in stored copies that have new ids and no thinking steps, which
+    // makes the finished reply lose its steps and remount.
+    if (inMemoryConversationRef.current === conversationKey(currentConversationId)) {
       return
     }
 
@@ -142,8 +156,9 @@ export const useChatSession = ({
       return
     }
 
+    inMemoryConversationRef.current = conversationKey(currentConversationId)
     void loadConversation(currentConversationId)
-  }, [currentConversationId, isLoading, loadConversation, user])
+  }, [currentConversationId, isLoading, loadConversation, user, conversationKey])
 
   const sendMessage = useCallback(
     async (text: string) => {
@@ -182,6 +197,7 @@ export const useChatSession = ({
       }
 
       if (conversationId) {
+        inMemoryConversationRef.current = conversationKey(conversationId)
         try {
           const service = user ? conversationService : localConversationService
           await service.saveMessage(conversationId, userMsg)
@@ -380,6 +396,7 @@ export const useChatSession = ({
       }
     },
     [
+      conversationKey,
       currentConversationId,
       isLoading,
       language,
