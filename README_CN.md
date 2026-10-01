@@ -12,7 +12,7 @@
 
 | 路径                   | 作用                                                                                      |
 | :--------------------- | :---------------------------------------------------------------------------------------- |
-| `apps/web/`            | React 应用、Cloudflare Pages 相关内容、文档、迁移脚本，以及当前活跃的 UI 运行时。         |
+| `apps/web/`            | React 应用、web Worker（`worker/`）、文档、迁移脚本，以及当前活跃的 UI 运行时。           |
 | `apps/ai-agent/`       | Cloudflare Worker 层，负责 JWT 鉴权、Geo 路由、SSE 响应，以及服务端 tool-use 运行时入口。 |
 | `tools/data-pipeline/` | Supabase 导入、embedding 维度校验与 schema 验证脚本。                                     |
 | `data_collection/`     | Python 爬虫 / ETL 流水线，用于抓取、清洗和增量更新 UIUC 数据源。                          |
@@ -184,7 +184,7 @@ curl http://localhost:8787/health
 
 ### 运维简化带来的收益
 
-- Cloudflare Pages 承载前端。
+- `web` Cloudflare Worker 承载前端（Workers Static Assets）和 `/api/*` 代理。
 - Cloudflare Worker 承载 API、工具注册层与 agent loop。
 - Supabase 统一承载鉴权、结构化记忆、对话存储、pgvector 与全文检索。
 - 模型推理、网页搜索、embedding 全部优先走托管 API，减少自维护基础设施。
@@ -194,7 +194,7 @@ curl http://localhost:8787/health
 ### 默认生产拓扑
 
 ```text
-浏览器 / Cloudflare Pages
+浏览器 / web Worker（静态资源）
   -> Cloudflare Worker
     -> Supabase
     -> DeepSeek API
@@ -273,7 +273,7 @@ pnpm run dev:ai-agent
 - **Supabase：** 鉴权、Postgres、RLS。
 - **Supabase pgvector + PostgreSQL 全文检索：** 统一知识检索层。
 - **Cloudflare Workers：** 边缘网关、工具注册层、agent loop、SSE 运行时。
-- **Cloudflare Pages：** 前端托管。
+- **Cloudflare Workers Static Assets：** 前端托管（`web` Worker）。
 - **DeepSeek API：** 托管模型推理。
 - **托管 Embedding API：** 默认向量生成路径。
 - **可选自建 embedding endpoint：** 仅在明确启用时作为 fallback。

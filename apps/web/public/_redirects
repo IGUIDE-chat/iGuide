@@ -1,5 +1,0 @@
-# Landing page routes are proxied via Pages Functions (functions/about, functions/terms, etc.)
-# _redirects cannot 200-proxy to external domains, so we use Functions instead.
-
-# SPA fallback for main app routes (must be last)
-/* /index.html 200

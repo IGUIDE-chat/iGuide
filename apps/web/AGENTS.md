@@ -14,8 +14,7 @@ For repo-wide rules (secrets, CI, Worker retrieval, data model), see the root
 - The active runtime entry is `src/index.tsx`.
 - The only active app-composition file is `src/App.tsx`.
 - `worker/index.ts` is the Worker entrypoint. It routes `/api/*` to
-  `worker/routes/**`, proxies `/about`, `/terms`, `/featureA`, `/featureB` to the
-  legacy landing site, and serves everything else from static assets.
+  `worker/routes/**` and serves everything else from static assets.
 - The Worker is configured in `cloudflare.config.ts` (`cf/config`). The SPA
   fallback is `assets.notFoundHandling: "single-page-application"`.
 - `vite.config.ts` registers `@cloudflare/vite-plugin` for `vite build` only, so

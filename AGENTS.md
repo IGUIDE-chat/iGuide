@@ -165,9 +165,9 @@ fails in a project that doesn't use Wrangler, don't fall back to Wrangler
 - Promote to `src/hooks|services|utils|types` only when shared across unrelated features.
 - `src/legacy/**` is quarantined: never import from it at runtime.
 - New pages go in `src/app/pageRegistry.ts` (registry) and `src/app/routes.tsx` (route).
-- `worker/**` is the web Worker: `worker/index.ts` routes `/api/*` and the
-  legacy landing prefixes, everything else falls through to static assets. Add
-  API endpoints under `worker/routes/`, never under `src/`.
+- `worker/**` is the web Worker: `worker/index.ts` routes `/api/*`, everything
+  else is served from static assets. Add API endpoints under `worker/routes/`,
+  never under `src/`.
 - Document the runtime tree that exists, not the target tree. Don't mix half-finished
   file moves with feature work.
 

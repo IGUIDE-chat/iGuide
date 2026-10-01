@@ -10,8 +10,6 @@ Coze 配置见 `.env.local`，变量清单参考 `.env.local.example`（`VITE_CO
 
 ```text
 apps/web/
-|-- functions/
-|   `-- api/
 |-- public/
 |-- scripts/
 |   `-- migrations/

@@ -159,4 +159,4 @@ jobs:
         if: github.event_name == 'push'
         run: |
           echo "✅ All CI checks passed."
-          echo " → Cloudflare Pages will auto-deploy this push."
+          echo " → The web Worker deploys from main via Cloudflare Workers Builds."
