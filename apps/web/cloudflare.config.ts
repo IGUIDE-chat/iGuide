@@ -36,14 +36,10 @@ export default defineConfig({
       QMD_CN_URL: bindings.secret(),
       QMD_US_URL: bindings.secret(),
 
-      // Legacy VPS chat backend, only used while USE_TOOL_USE_RAG is "false".
-      BACKEND_URL: bindings.secret(),
-
       // The knowledge base index is built at 384 dimensions; changing this
       // requires re-embedding every document.
       EMBEDDING_DIMENSIONS: bindings.text("384"),
       EMBEDDING_MODEL: bindings.text("multilingual-e5-small"),
-      USE_TOOL_USE_RAG: bindings.text("false"),
     },
   },
 })

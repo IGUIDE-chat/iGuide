@@ -30,11 +30,6 @@ export interface Env {
   SUPABASE_URL: string
   SUPABASE_ANON_KEY: string
 
-  // Legacy VPS chat backend. Only read when USE_TOOL_USE_RAG is not "true", so
-  // it stays unset on the serverless-first deployment.
-  BACKEND_URL?: string
-  USE_TOOL_USE_RAG: string
-
   // Embeddings backing the knowledge-base tool.
   SILICONFLOW_API_KEY: string
   EMBEDDING_API_BASE_URL: string

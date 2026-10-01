@@ -86,9 +86,9 @@ async function runAgentStream(options: {
 }
 
 /**
- * POST /api/chat. With `USE_TOOL_USE_RAG === "true"` the tool-use agent loop
- * answers as SSE; otherwise the request is proxied to the legacy backend so the
- * flag stays a live rollback switch.
+ * POST /api/chat. The browser only calls this endpoint when
+ * `VITE_USE_TOOL_USE_RAG` is `true`, so the tool-use agent loop is the single
+ * answer: it retrieves through the Worker's own tools and streams SSE.
  */
 export const onRequestPost: RouteHandler = async (context) => {
   const { request, env, waitUntil } = context
@@ -102,42 +102,5 @@ export const onRequestPost: RouteHandler = async (context) => {
   const region = country === "CN" ? "CN" : "Global"
   const { userId, isAuthenticated } = identity.identity
 
-  if (env.USE_TOOL_USE_RAG === "true") {
-    return runAgentStream({ request, env, userId, isAuthenticated, region, waitUntil })
-  }
-
-  if (!env.BACKEND_URL) {
-    return json(
-      {
-        error: "Chat backend not configured",
-        detail: "Set USE_TOOL_USE_RAG=true or provide BACKEND_URL",
-      },
-      503,
-    )
-  }
-
-  const backendResponse = await fetch(env.BACKEND_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-User-Region": region,
-      "X-User-Country": country,
-      "X-User-ID": userId,
-      "X-Authenticated": isAuthenticated.toString(),
-    },
-    body: await request.text(),
-  })
-
-  const contentType = backendResponse.headers.get("content-type") || ""
-  if (contentType.includes("text/event-stream")) {
-    return new Response(backendResponse.body, {
-      status: backendResponse.status,
-      headers: streamHeaders(),
-    })
-  }
-
-  return new Response(await backendResponse.text(), {
-    status: backendResponse.status,
-    headers: { "Content-Type": "application/json" },
-  })
+  return runAgentStream({ request, env, userId, isAuthenticated, region, waitUntil })
 }

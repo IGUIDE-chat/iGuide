@@ -68,7 +68,7 @@ export default {
       }
     }
 
-    if (url.pathname === "/api" || url.pathname.startsWith("/api/")) {
+    if (url.pathname.startsWith("/api/")) {
       return json(
         { error: "Not found", path: url.pathname, availableEndpoints: AVAILABLE_ENDPOINTS },
         404,

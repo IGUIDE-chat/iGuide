@@ -83,9 +83,9 @@ supports SSE chat responses.
 - JWT auth via Supabase tokens.
 - Geo-IP routing for CN vs global traffic on `/api/search`.
 - Health check at `/api/health` and streaming tool-use responses from `/api/chat`.
-- Core production env vars now include: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `DEEPSEEK_API_KEY`, `TAVILY_API_KEY`, `USE_TOOL_USE_RAG`, `EMBEDDING_API_BASE_URL`, `EMBEDDING_API_KEY`, `EMBEDDING_MODEL`, `EMBEDDING_DIMENSIONS`.
+- Core production env vars now include: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `DEEPSEEK_API_KEY`, `TAVILY_API_KEY`, `EMBEDDING_API_BASE_URL`, `EMBEDDING_API_KEY`, `EMBEDDING_MODEL`, `EMBEDDING_DIMENSIONS`.
 - `EMBEDDING_FALLBACK_URL` is optional and should only be configured when you explicitly want a self-hosted fallback path.
-- `BACKEND_URL` is optional: it is only read while `USE_TOOL_USE_RAG` is not `"true"`, so a serverless-only deployment does not need it.
+- `/api/chat` always runs the Worker's tool-use agent. Copy `apps/web/.dev.vars.example` to `apps/web/.dev.vars` for local runs; the template covers every field of the Worker's `Env` interface.
 
 ## Placement Rules
 
@@ -206,7 +206,7 @@ web Worker
 #### Frontend / App
 
 - Configure the app to call the Cloudflare Worker chat endpoint.
-- Treat browser-side RAG orchestration as legacy behavior behind `USE_TOOL_USE_RAG=false` only.
+- Browser-side RAG orchestration is legacy behavior, selected at build time with `VITE_USE_TOOL_USE_RAG=false`. The default is `true`, which sends chat to the Worker.
 
 #### Cloudflare Worker
 
@@ -217,7 +217,6 @@ Required secrets / vars:
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `DEEPSEEK_API_KEY`
 - `TAVILY_API_KEY`
-- `USE_TOOL_USE_RAG`
 - `EMBEDDING_API_BASE_URL`
 - `EMBEDDING_API_KEY`
 - `EMBEDDING_MODEL`
@@ -237,15 +236,15 @@ Optional:
 
 1. Deploy Supabase schema and RPC functions.
 2. Configure and validate the managed embedding provider.
-3. Deploy the Cloudflare Worker with `USE_TOOL_USE_RAG=false` first.
+3. Deploy the Cloudflare Worker and confirm `/api/health` and `/api/chat` SSE.
 4. Load data into Supabase and validate hybrid retrieval.
-5. Enable tool-use in staging with `USE_TOOL_USE_RAG=true`.
+5. Build the frontend with `VITE_USE_TOOL_USE_RAG=true` in staging.
 6. Verify SSE responses, tool calls, fallback behavior, and benchmark quality.
 7. Promote to production.
 
 ### Rollback Rule
 
-If the new tool-use path regresses, disable it by switching `USE_TOOL_USE_RAG=false`. The default rollback target is the legacy frontend-driven path. Do not require a VPS to restore service.
+If the tool-use path regresses, set `VITE_USE_TOOL_USE_RAG=false` and rebuild the frontend. That reroutes the browser to `/api/deepseek` and `/api/search`, which the same Worker serves, so restoring service needs neither a Worker redeploy nor a VPS.
 
 ### Validation Examples
 

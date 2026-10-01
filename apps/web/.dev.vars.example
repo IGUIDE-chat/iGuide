@@ -1,0 +1,38 @@
+# ===========================================
+# Worker secrets for local development
+# ===========================================
+# Copy to `.dev.vars` and fill in real values. `.dev.vars` is gitignored;
+# this template is not. `vp dev` reads `.dev.vars` for the Worker and
+# `.env.local` for the Vite build, so they are filled separately.
+#
+# Every name below is a member of `Env` in `apps/web/worker/types.ts`.
+# `ASSETS` is bound by Cloudflare and is not set here.
+# Placeholders only — never commit a real key or URL.
+
+# Supabase: verifies caller JWTs for /api/chat and /api/integrations.
+SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
+SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+
+# Embeddings behind the knowledge-base tool.
+SILICONFLOW_API_KEY=YOUR_SILICONFLOW_API_KEY
+EMBEDDING_API_BASE_URL=https://api.siliconflow.cn/v1
+EMBEDDING_API_KEY=YOUR_EMBEDDING_API_KEY
+# These two have defaults in cloudflare.config.ts (multilingual-e5-small / 384).
+# The index is built at 384 dimensions; changing it requires re-embedding.
+# EMBEDDING_MODEL=multilingual-e5-small
+# EMBEDDING_DIMENSIONS=384
+# Optional self-hosted fallback endpoint.
+# EMBEDDING_FALLBACK_URL=https://YOUR_FALLBACK_EMBEDDING_HOST
+
+# QMD knowledge-base nodes. The nearest region wins, the other is failover.
+QMD_CN_URL=https://YOUR_CN_QMD_NODE
+QMD_US_URL=https://YOUR_US_QMD_NODE
+QMD_API_KEY=YOUR_QMD_API_KEY
+
+# Optional provider keys. Each route reports a clear 500 when its key is
+# missing, so set only the ones whose features you use.
+# DEEPSEEK_API_KEY=YOUR_DEEPSEEK_API_KEY
+# Deprecated alias for DEEPSEEK_API_KEY, still accepted as a fallback.
+# VITE_DEEPSEEK_API_KEY=YOUR_DEEPSEEK_API_KEY
+# TAVILY_API_KEY=YOUR_TAVILY_API_KEY
+# GOOGLE_API_KEY=YOUR_GOOGLE_API_KEY

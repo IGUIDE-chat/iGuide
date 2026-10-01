@@ -89,13 +89,12 @@ curl http://localhost:5173/api/health
   - `SUPABASE_SERVICE_ROLE_KEY`
   - `DEEPSEEK_API_KEY`
   - `TAVILY_API_KEY`
-  - `USE_TOOL_USE_RAG`
   - `EMBEDDING_API_BASE_URL`
   - `EMBEDDING_API_KEY`
   - `EMBEDDING_MODEL`
   - `EMBEDDING_DIMENSIONS`
 - `EMBEDDING_FALLBACK_URL` 是可选项，只有在你明确启用自建 embedding fallback 时才需要配置。
-- `BACKEND_URL` 是可选项：只有当 `USE_TOOL_USE_RAG` 不为 `"true"` 时才会读取，纯 serverless 部署无需配置。
+- `/api/chat` 始终运行 Worker 内的 tool-use agent。本地运行时把 `apps/web/.dev.vars.example` 复制为 `apps/web/.dev.vars`；该模板覆盖了 Worker `Env` 接口的全部字段。
 
 ## 代码组织规则
 
@@ -214,7 +213,7 @@ web Worker
 #### 前端 / App
 
 - 前端应直接调用 Cloudflare Worker 的聊天接口。
-- 浏览器侧 RAG 编排只应在 `USE_TOOL_USE_RAG=false` 的遗留模式下保留。
+- 浏览器侧 RAG 编排属于遗留行为，在构建时通过 `VITE_USE_TOOL_USE_RAG=false` 切换。默认值为 `true`，即由 Worker 处理对话。
 
 #### Cloudflare Worker
 
@@ -225,7 +224,6 @@ web Worker
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `DEEPSEEK_API_KEY`
 - `TAVILY_API_KEY`
-- `USE_TOOL_USE_RAG`
 - `EMBEDDING_API_BASE_URL`
 - `EMBEDDING_API_KEY`
 - `EMBEDDING_MODEL`
@@ -245,15 +243,15 @@ web Worker
 
 1. 先部署 Supabase schema 和 RPC 函数。
 2. 配置并验证托管 embedding provider。
-3. 先以 `USE_TOOL_USE_RAG=false` 部署 Cloudflare Worker。
+3. 部署 Cloudflare Worker，并确认 `/api/health` 与 `/api/chat` 的 SSE 响应。
 4. 将数据导入 Supabase，并验证混合检索结果。
-5. 在 staging 中将 `USE_TOOL_USE_RAG=true` 打开。
+5. 在 staging 中以 `VITE_USE_TOOL_USE_RAG=true` 构建前端。
 6. 验证 SSE、tool call、fallback 行为以及 benchmark 质量。
 7. 再推广到生产环境。
 
 ### 回滚原则
 
-如果新的 tool-use 路径出现回归，直接把 `USE_TOOL_USE_RAG=false` 切回即可。默认回滚目标是旧的前端驱动路径，不应要求依赖 VPS 才能恢复服务。
+如果 tool-use 路径出现回归，把 `VITE_USE_TOOL_USE_RAG` 设为 `false` 并重新构建前端即可。浏览器会改用同一 Worker 提供的 `/api/deepseek` 与 `/api/search`，恢复服务既不需要重新部署 Worker，也不需要依赖 VPS。
 
 ### 验证示例
 
