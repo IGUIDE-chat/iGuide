@@ -13,7 +13,11 @@ export type RouteHandler<TEnv = Env> = (context: {
   waitUntil: (promise: Promise<unknown>) => void
 }) => Promise<Response>
 
-/** Bindings the web Worker reads. Secrets are supplied by `.dev.vars` locally and by `cf workers secrets` in production. */
+/**
+ * Bindings the web Worker reads. Secrets come from `.dev.vars` locally and from
+ * `cf workers secrets` in production; plain values are declared in
+ * `cloudflare.config.ts`.
+ */
 export interface Env {
   /** Workers Static Assets binding; used for the SPA fallback. */
   ASSETS: Fetcher
@@ -21,9 +25,26 @@ export interface Env {
   VITE_DEEPSEEK_API_KEY?: string
   TAVILY_API_KEY?: string
   GOOGLE_API_KEY?: string
-  API_GATEWAY_URL?: string
-  /** Optional service binding to the geo-routed search Worker. */
-  QMD_WORKER?: {
-    fetch: (request: Request | string, init?: RequestInit) => Promise<Response>
-  }
+
+  // Supabase: resolves the caller's identity for /api/chat and /api/integrations.
+  SUPABASE_URL: string
+  SUPABASE_ANON_KEY: string
+
+  // Legacy VPS chat backend. Only read when USE_TOOL_USE_RAG is not "true", so
+  // it stays unset on the serverless-first deployment.
+  BACKEND_URL?: string
+  USE_TOOL_USE_RAG: string
+
+  // Embeddings backing the knowledge-base tool.
+  SILICONFLOW_API_KEY: string
+  EMBEDDING_API_BASE_URL: string
+  EMBEDDING_API_KEY: string
+  EMBEDDING_MODEL: string
+  EMBEDDING_DIMENSIONS: string
+  EMBEDDING_FALLBACK_URL?: string
+
+  // QMD search nodes. The nearest node is primary; the other is the failover.
+  QMD_CN_URL: string
+  QMD_US_URL: string
+  QMD_API_KEY: string
 }

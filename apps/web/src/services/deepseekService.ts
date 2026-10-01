@@ -16,9 +16,9 @@ const viteEnv = (
   }
 ).env
 const IS_DEV = Boolean(viteEnv?.DEV)
-const CHAT_ENDPOINT = IS_DEV
-  ? "/api/chat"
-  : `${viteEnv?.VITE_API_GATEWAY_URL || "https://api.iguide.chat"}/chat`
+// The Worker serves the SPA and the chat API from one origin, so the endpoint
+// is the same relative path in dev and in production.
+const CHAT_ENDPOINT = "/api/chat"
 
 async function _fetchQMDContext(query: string, lang: string): Promise<string[]> {
   try {

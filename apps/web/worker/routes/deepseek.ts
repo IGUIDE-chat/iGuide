@@ -1,7 +1,7 @@
 import type { RouteHandler } from "../types"
-import defaultSystemPrompt from "./prompts/deepseek-default-system.txt"
-import languageEnPrompt from "./prompts/language-en.txt"
-import languageZhPrompt from "./prompts/language-zh.txt"
+import defaultSystemPrompt from "./prompts/deepseek-default-system.txt" with { type: "text" }
+import languageEnPrompt from "./prompts/language-en.txt" with { type: "text" }
+import languageZhPrompt from "./prompts/language-zh.txt" with { type: "text" }
 
 interface ChatItem {
   role: "user" | "model"

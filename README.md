@@ -6,14 +6,13 @@ English | [中文](./README_CN.md)
 
 ## English Version
 
-A three-layer UIUC knowledge platform split across the app, API gateway, and crawler/ETL pipeline.
+A UIUC knowledge platform built on a React app, a single Cloudflare Worker that serves both the SPA and every API endpoint, and a crawler/ETL pipeline.
 
 ## Monorepo Map
 
 | Path                   | Role                                                                                           |
 | :--------------------- | :--------------------------------------------------------------------------------------------- |
-| `apps/web/`            | React app, web Worker (`worker/`), docs, migrations, and active UI runtime.                    |
-| `apps/ai-agent/`       | Cloudflare Worker gateway for JWT auth, geo routing, proxying, CORS, and health checks.        |
+| `apps/web/`            | React app and its Cloudflare Worker: static assets, agent loop, tools, MCP, and `/api/*`.      |
 | `tools/data-pipeline/` | Supabase import, embedding-dimension, and schema verification scripts.                         |
 | `data_collection/`     | Python crawler/ETL pipeline for harvesting, cleaning, and incrementally updating UIUC sources. |
 | `supabase/`            | SQL migrations, RPC functions, and seed fixtures.                                              |
@@ -67,22 +66,26 @@ chmod +x run_all.sh
 ./run_all.sh
 ```
 
-### API gateway basics
+### Worker and API basics
 
 ```bash
-pnpm run dev:ai-agent
-curl http://localhost:8787/health
+pnpm run dev:web
+curl http://localhost:5173/api/health
 ```
 
-The gateway verifies Supabase JWTs, routes by Geo-IP, hosts the server-side tool-use runtime, and supports SSE chat responses.
+The Worker serves the SPA and the whole API surface from one origin. It verifies
+Supabase JWTs, routes by Geo-IP, hosts the server-side tool-use runtime, and
+supports SSE chat responses.
 
-## API Gateway Notes
+## API Notes
 
+- Every endpoint lives under `/api/*`, so the browser only makes same-origin calls.
 - JWT auth via Supabase tokens.
-- Geo-IP routing for CN vs global traffic.
-- CORS handling, health check, and streaming tool-use responses.
+- Geo-IP routing for CN vs global traffic on `/api/search`.
+- Health check at `/api/health` and streaming tool-use responses from `/api/chat`.
 - Core production env vars now include: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `DEEPSEEK_API_KEY`, `TAVILY_API_KEY`, `USE_TOOL_USE_RAG`, `EMBEDDING_API_BASE_URL`, `EMBEDDING_API_KEY`, `EMBEDDING_MODEL`, `EMBEDDING_DIMENSIONS`.
 - `EMBEDDING_FALLBACK_URL` is optional and should only be configured when you explicitly want a self-hosted fallback path.
+- `BACKEND_URL` is optional: it is only read while `USE_TOOL_USE_RAG` is not `"true"`, so a serverless-only deployment does not need it.
 
 ## Placement Rules
 
@@ -173,8 +176,9 @@ A serverless-first stack uses Cloudflare Worker as the agent runtime, Supabase a
 
 ### Operational Simplicity
 
-- The `web` Cloudflare Worker serves the frontend (Workers Static Assets) and its `/api/*` proxies.
-- Cloudflare Worker hosts the API gateway, MCP-style tool registry, and agent loop.
+- A single `web` Cloudflare Worker serves the frontend (Workers Static Assets) and every
+  `/api/*` endpoint, so there is no separate gateway host and no cross-origin hop.
+- That same Worker hosts the MCP-style tool registry and the agent loop.
 - Supabase hosts auth, structured memory, conversations, pgvector, and full-text retrieval.
 - Hosted APIs keep model inference, web search, and embeddings off self-managed infrastructure.
 
@@ -183,18 +187,17 @@ A serverless-first stack uses Cloudflare Worker as the agent runtime, Supabase a
 ### Default Production Topology
 
 ```text
-Browser / web Worker (static assets)
-  -> Cloudflare Worker
-    -> Supabase
-    -> DeepSeek API
-    -> Tavily API
-    -> Managed Embedding API
+Browser -> web Worker (static assets + /api/*)
+  -> Supabase
+  -> DeepSeek API
+  -> Tavily API
+  -> Managed Embedding API
 ```
 
 Optional only:
 
 ```text
-Cloudflare Worker
+web Worker
   -> EMBEDDING_FALLBACK_URL (self-hosted embedding endpoint)
 ```
 
@@ -248,13 +251,13 @@ If the new tool-use path regresses, disable it by switching `USE_TOOL_USE_RAG=fa
 
 ```bash
 # Worker health
-curl http://localhost:8787/health
+curl http://localhost:5173/api/health
 
 # Workspace typecheck (every package)
 pnpm run typecheck
 
-# Worker local dev
-pnpm run dev:ai-agent
+# SPA and Worker local dev
+pnpm run dev:web
 ```
 
 ### Tech Stack Summary

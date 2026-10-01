@@ -14,9 +14,15 @@ For repo-wide rules (secrets, CI, Worker retrieval, data model), see the root
 - The active runtime entry is `src/index.tsx`.
 - The only active app-composition file is `src/App.tsx`.
 - `worker/index.ts` is the Worker entrypoint. It routes `/api/*` to
-  `worker/routes/**` and serves everything else from static assets.
+  `worker/routes/**` and serves everything else from static assets, so the SPA
+  and the whole API surface share one origin.
+- That Worker also hosts the agent runtime: the streaming tool-use loop
+  (`worker/agent/`), its tool registry (`worker/tools/`), skills
+  (`worker/skills/`), the MCP connection router (`worker/mcp/`), and the
+  Supabase/embedding helpers (`worker/lib/`).
 - The Worker is configured in `cloudflare.config.ts` (`cf/config`). The SPA
-  fallback is `assets.notFoundHandling: "single-page-application"`.
+  fallback is `assets.notFoundHandling: "single-page-application"`, and
+  `assets.runWorkerFirst: ["/api/*"]` sends only API traffic through the Worker.
 - `vite.config.ts` registers `@cloudflare/vite-plugin` for `vite build` only, so
   `vp dev` keeps using the Vite proxy for `/api/*` against `.env.local` secrets.
 - Two build outputs exist on purpose. `vp build` produces the SPA in `dist/`

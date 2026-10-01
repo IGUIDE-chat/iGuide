@@ -185,33 +185,6 @@ importers:
         specifier: 'catalog:'
         version: 0.3.3(@types/node@26.6.3)(esbuild@0.28.1)(jiti@2.7.0)(typescript@7.0.2)
 
-  apps/ai-agent:
-    devDependencies:
-      '@cloudflare/vite-plugin':
-        specifier: ^1.62.0
-        version: 1.62.0(@types/node@26.6.3)(@voidzero-dev/vite-plus-core@0.3.3(@types/node@26.6.3)(esbuild@0.28.1)(jiti@2.7.0)(typescript@7.0.2))(wrangler@4.143.0(@cloudflare/workers-types@5.20260927.1)(@types/node@26.6.3))
-      '@cloudflare/workers-types':
-        specifier: ^5.20260927.1
-        version: 5.20260927.1
-      '@iguide/vite-bin':
-        specifier: workspace:*
-        version: link:../../tools/vite-bin
-      '@types/node':
-        specifier: ^26.6.3
-        version: 26.6.3
-      cf:
-        specifier: 1.0.0-beta.5
-        version: 1.0.0-beta.5(@types/node@26.6.3)
-      typescript:
-        specifier: ^7.0.2
-        version: 7.0.2
-      vite:
-        specifier: 'catalog:'
-        version: '@voidzero-dev/vite-plus-core@0.3.3(@types/node@26.6.3)(esbuild@0.28.1)(jiti@2.7.0)(typescript@7.0.2)'
-      vite-plus:
-        specifier: 'catalog:'
-        version: 0.3.3(@types/node@26.6.3)(esbuild@0.28.1)(jiti@2.7.0)(typescript@7.0.2)
-
   apps/web:
     dependencies:
       '@assistant-ui/react':

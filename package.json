@@ -5,7 +5,6 @@
     "build": "vp run -r build",
     "check": "vp check --fix",
     "dev:web": "vp -C apps/web dev",
-    "dev:ai-agent": "vp -C apps/ai-agent run dev",
     "fmt": "vp fmt",
     "lint": "vp lint",
     "prepare": "vp config",

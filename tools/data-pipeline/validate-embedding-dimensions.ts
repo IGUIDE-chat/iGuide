@@ -21,7 +21,7 @@ function success(message: string): void {
 }
 
 function checkWorkerEnv(): void {
-  const configPath = "apps/ai-agent/cloudflare.config.ts"
+  const configPath = "apps/web/cloudflare.config.ts"
   const path = join(projectRoot, configPath)
   try {
     const content = readFileSync(path, "utf-8")
@@ -42,24 +42,24 @@ function checkWorkerEnv(): void {
 }
 
 function checkEmbeddingConfig(): void {
-  const path = join(projectRoot, "apps/ai-agent/src/lib/embedding-config.ts")
+  const path = join(projectRoot, "apps/web/worker/lib/embedding-config.ts")
   try {
     const content = readFileSync(path, "utf-8")
     const match = content.match(/DEFAULT_EMBEDDING_DIMENSIONS\s*=\s*(\d+)/)
     if (!match) {
-      error(`apps/ai-agent/src/lib/embedding-config.ts: DEFAULT_EMBEDDING_DIMENSIONS not found`)
+      error(`apps/web/worker/lib/embedding-config.ts: DEFAULT_EMBEDDING_DIMENSIONS not found`)
       return
     }
     const dimensions = parseInt(match[1], 10)
     if (dimensions !== EXPECTED_DIMENSION) {
       error(
-        `apps/ai-agent/src/lib/embedding-config.ts: DEFAULT_EMBEDDING_DIMENSIONS=${dimensions}, expected ${EXPECTED_DIMENSION}`,
+        `apps/web/worker/lib/embedding-config.ts: DEFAULT_EMBEDDING_DIMENSIONS=${dimensions}, expected ${EXPECTED_DIMENSION}`,
       )
       return
     }
-    success(`apps/ai-agent/src/lib/embedding-config.ts: DEFAULT_EMBEDDING_DIMENSIONS=${dimensions}`)
+    success(`apps/web/worker/lib/embedding-config.ts: DEFAULT_EMBEDDING_DIMENSIONS=${dimensions}`)
   } catch (e) {
-    error(`apps/ai-agent/src/lib/embedding-config.ts: Failed to read - ${e}`)
+    error(`apps/web/worker/lib/embedding-config.ts: Failed to read - ${e}`)
   }
 }
 

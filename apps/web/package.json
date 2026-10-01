@@ -11,7 +11,7 @@
     "lint": "vp lint",
     "lint:fix": "vp lint --fix",
     "preview": "vp preview",
-    "typecheck": "tsc --noEmit",
+    "test": "node --test --experimental-strip-types --experimental-import-text \"worker/**/*.test.ts\"",
     "postinstall": "git submodule update --init --recursive && git config --local include.path ../.gitconfig",
     "doctor": "npx react-doctor@latest"
   },

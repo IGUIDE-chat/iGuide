@@ -1,9 +1,9 @@
+import languageDefaultInstruction from "../routes/agent-prompts/language-default.txt" with { type: "text" }
+import languageEnInstruction from "../routes/agent-prompts/language-en.txt" with { type: "text" }
+import languageZhInstruction from "../routes/agent-prompts/language-zh.txt" with { type: "text" }
+import memoryExtractionInstructions from "../routes/agent-prompts/memory-extraction.txt" with { type: "text" }
+import systemPromptTemplate from "../routes/agent-prompts/system.txt" with { type: "text" }
 import { fillPromptTemplate, joinPromptSections } from "./promptComposition.ts"
-import languageDefaultInstruction from "./prompts/language-default.md"
-import languageEnInstruction from "./prompts/language-en.md"
-import languageZhInstruction from "./prompts/language-zh.md"
-import memoryExtractionInstructions from "./prompts/memory-extraction.md"
-import systemPromptTemplate from "./prompts/system.md"
 
 const MEMORY_EXTRACTION_INSTRUCTIONS = memoryExtractionInstructions.trim()
 const SYSTEM_PROMPT_TEMPLATE = systemPromptTemplate.trim()

@@ -32,11 +32,9 @@ export default defineConfig({
         env: { browser: true },
       },
       {
+        // The Worker is console-heavy by design: agent-loop diagnostics and tool
+        // call traces are only visible in Workers Logs.
         files: ["apps/web/worker/**"],
-        env: { worker: true },
-      },
-      {
-        files: ["apps/ai-agent/**"],
         env: { worker: true },
         rules: { "no-console": "off" },
       },

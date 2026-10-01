@@ -6,17 +6,16 @@
 
 ## 中文版
 
-这是一个围绕 UIUC 校园信息构建的多模块仓库，主要由前端应用、Cloudflare Worker API 层，以及爬虫 / ETL 流水线组成。
+这是一个围绕 UIUC 校园信息构建的多模块仓库，主要由 React 前端、同时承载 SPA 与全部接口的单一 Cloudflare Worker，以及爬虫 / ETL 流水线组成。
 
 ## 仓库结构
 
-| 路径                   | 作用                                                                                      |
-| :--------------------- | :---------------------------------------------------------------------------------------- |
-| `apps/web/`            | React 应用、web Worker（`worker/`）、文档、迁移脚本，以及当前活跃的 UI 运行时。           |
-| `apps/ai-agent/`       | Cloudflare Worker 层，负责 JWT 鉴权、Geo 路由、SSE 响应，以及服务端 tool-use 运行时入口。 |
-| `tools/data-pipeline/` | Supabase 导入、embedding 维度校验与 schema 验证脚本。                                     |
-| `data_collection/`     | Python 爬虫 / ETL 流水线，用于抓取、清洗和增量更新 UIUC 数据源。                          |
-| `supabase/`            | SQL 迁移、RPC 函数与种子数据。                                                            |
+| 路径                   | 作用                                                                                  |
+| :--------------------- | :------------------------------------------------------------------------------------ |
+| `apps/web/`            | React 应用及其 Cloudflare Worker：静态资源、agent loop、工具注册层、MCP 与 `/api/*`。 |
+| `tools/data-pipeline/` | Supabase 导入、embedding 维度校验与 schema 验证脚本。                                 |
+| `data_collection/`     | Python 爬虫 / ETL 流水线，用于抓取、清洗和增量更新 UIUC 数据源。                      |
+| `supabase/`            | SQL 迁移、RPC 函数与种子数据。                                                        |
 
 ## 统一开发入口
 
@@ -72,17 +71,18 @@ chmod +x run_all.sh
 ### API Worker 基础调试
 
 ```bash
-pnpm run dev:ai-agent
-curl http://localhost:8787/health
+pnpm run dev:web
+curl http://localhost:5173/api/health
 ```
 
-这个 Worker 负责校验 Supabase JWT、根据 Geo-IP 执行路由、承载服务端 tool-use 运行时，并输出 SSE 聊天流。
+这个 Worker 在同一个源上同时提供 SPA 与全部接口，负责校验 Supabase JWT、根据 Geo-IP 执行路由、承载服务端 tool-use 运行时，并输出 SSE 聊天流。
 
 ## API Worker 说明
 
+- 所有接口都位于 `/api/*` 之下，浏览器只发起同源请求。
 - 使用 Supabase token 做 JWT 鉴权。
-- 基于 Geo-IP 区分中国大陆与全球流量。
-- 提供 CORS、健康检查和流式 tool-use 响应。
+- 基于 Geo-IP 区分中国大陆与全球流量，作用于 `/api/search`。
+- 提供 `/api/health` 健康检查，以及 `/api/chat` 的流式 tool-use 响应。
 - 生产环境核心变量包括：
   - `SUPABASE_URL`
   - `SUPABASE_ANON_KEY`
@@ -95,6 +95,7 @@ curl http://localhost:8787/health
   - `EMBEDDING_MODEL`
   - `EMBEDDING_DIMENSIONS`
 - `EMBEDDING_FALLBACK_URL` 是可选项，只有在你明确启用自建 embedding fallback 时才需要配置。
+- `BACKEND_URL` 是可选项：只有当 `USE_TOOL_USE_RAG` 不为 `"true"` 时才会读取，纯 serverless 部署无需配置。
 
 ## 代码组织规则
 
@@ -184,8 +185,8 @@ curl http://localhost:8787/health
 
 ### 运维简化带来的收益
 
-- `web` Cloudflare Worker 承载前端（Workers Static Assets）和 `/api/*` 代理。
-- Cloudflare Worker 承载 API、工具注册层与 agent loop。
+- 单一的 `web` Cloudflare Worker 同时承载前端（Workers Static Assets）与全部 `/api/*` 接口，因此不再有独立的网关域名，也不存在跨源跳转。
+- 同一个 Worker 还承载 API、工具注册层与 agent loop。
 - Supabase 统一承载鉴权、结构化记忆、对话存储、pgvector 与全文检索。
 - 模型推理、网页搜索、embedding 全部优先走托管 API，减少自维护基础设施。
 
@@ -194,18 +195,17 @@ curl http://localhost:8787/health
 ### 默认生产拓扑
 
 ```text
-浏览器 / web Worker（静态资源）
-  -> Cloudflare Worker
-    -> Supabase
-    -> DeepSeek API
-    -> Tavily API
-    -> 托管 Embedding API
+浏览器 -> web Worker（静态资源 + /api/*）
+  -> Supabase
+  -> DeepSeek API
+  -> Tavily API
+  -> 托管 Embedding API
 ```
 
 仅在需要时：
 
 ```text
-Cloudflare Worker
+web Worker
   -> EMBEDDING_FALLBACK_URL（自建 embedding fallback）
 ```
 
@@ -259,20 +259,20 @@ Cloudflare Worker
 
 ```bash
 # Worker 健康检查
-curl http://localhost:8787/health
+curl http://localhost:5173/api/health
 
 # 全 workspace 类型检查
 pnpm run typecheck
 
-# Worker 本地开发
-pnpm run dev:ai-agent
+# SPA 与 Worker 本地开发
+pnpm run dev:web
 ```
 
 ### 技术栈汇总
 
 - **Supabase：** 鉴权、Postgres、RLS。
 - **Supabase pgvector + PostgreSQL 全文检索：** 统一知识检索层。
-- **Cloudflare Workers：** 边缘网关、工具注册层、agent loop、SSE 运行时。
+- **Cloudflare Workers：** 单 Worker 承载静态资源、`/api/*` 接口、工具注册层、agent loop 与 SSE 运行时。
 - **Cloudflare Workers Static Assets：** 前端托管（`web` Worker）。
 - **DeepSeek API：** 托管模型推理。
 - **托管 Embedding API：** 默认向量生成路径。

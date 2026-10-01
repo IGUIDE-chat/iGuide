@@ -1,8 +1,7 @@
 import type { SearchResult, SearchResponse, SearchMode } from "../types"
 
-const SEARCH_ENDPOINT = import.meta.env.PROD
-  ? (import.meta.env.VITE_API_GATEWAY_URL || "https://api.iguide.chat") + "/api/search"
-  : "/api/search"
+// Same Worker as the SPA, so search is same-origin in dev and production alike.
+const SEARCH_ENDPOINT = "/api/search"
 
 const sessionCache = new Map<string, { data: SearchResponse; ts: number }>()
 const SESSION_CACHE_TTL = 5 * 60 * 1000
@@ -18,12 +17,11 @@ function getSessionCache(key: string): SearchResponse | null {
 }
 
 /**
- * Search the QMD knowledge base via the local/prod gateway.
+ * Search the QMD knowledge base through this app's own Worker.
  *
- * In local Vite runs, /api/search is handled by the Vite-side
- * QMD gateway plugin.
- * In production, the API gateway is expected to route the request
- * to the appropriate QMD backend.
+ * In local Vite runs, /api/search is served by the Vite-side QMD gateway
+ * plugin. In production the Worker picks the QMD node nearest the caller and
+ * reports which one answered in the X-QMD-Region header.
  */
 export async function searchKnowledgeBase(
   query: string,

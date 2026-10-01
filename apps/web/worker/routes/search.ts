@@ -1,56 +1,107 @@
+import { json } from "../auth"
 import type { RouteHandler } from "../types"
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
-}
+/** Per-IP ceiling for knowledge-base search, enforced through the edge cache. */
+const RATE_LIMIT = 20
+const QMD_TIMEOUT_MS = 15_000
 
-export const onRequestPost: RouteHandler = async (context) => {
-  const { request, env } = context
-
+async function fetchQmd(baseUrl: string, body: string, apiKey: string): Promise<Response> {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), QMD_TIMEOUT_MS)
   try {
-    let res: Response
-
-    if (env.QMD_WORKER) {
-      // Service Binding: direct Worker-to-Worker call (no network hop)
-      res = await env.QMD_WORKER.fetch(
-        new Request("https://api-gateway/api/search", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: request.body,
-        }),
-      )
-    } else if (env.API_GATEWAY_URL) {
-      res = await fetch(`${env.API_GATEWAY_URL}/api/search`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: request.body,
-      })
-    } else {
-      return new Response(JSON.stringify({ error: "No search backend configured" }), {
-        status: 503,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      })
-    }
-
-    const data = await res.text()
-    return new Response(data, {
-      status: res.status,
+    return await fetch(`${baseUrl}/api/search`, {
+      method: "POST",
       headers: {
-        ...corsHeaders,
         "Content-Type": "application/json",
-        "X-QMD-Region": res.headers.get("X-QMD-Region") || "unknown",
+        ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
       },
+      body,
+      signal: controller.signal,
     })
-  } catch (e: any) {
-    return new Response(JSON.stringify({ error: "QMD search unavailable", detail: e?.message }), {
-      status: 503,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    })
+  } finally {
+    clearTimeout(timer)
   }
 }
 
-export const onRequestOptions: RouteHandler = async () => {
-  return new Response(null, { status: 204, headers: corsHeaders })
+/**
+ * Records one search against the caller's per-minute budget and returns a 429
+ * once that budget is spent. The counter lives in `caches.default` rather than
+ * the isolate's memory so the limit holds across concurrent requests.
+ */
+async function consumeRateLimit(
+  request: Request,
+  waitUntil: (promise: Promise<unknown>) => void,
+): Promise<Response | null> {
+  const ip = request.headers.get("CF-Connecting-IP") || "unknown"
+  const minute = Math.floor(Date.now() / 60000)
+  const key = new Request(`https://rate-limit/${ip}:${minute}`)
+
+  // The DOM lib types `caches` as plain CacheStorage, hiding the Workers-only
+  // `default` cache that `caches.default` refers to at runtime.
+  const cacheStore = (caches as CacheStorage & { default: Cache }).default
+  const cachedCount = await cacheStore.match(key)
+  const count = cachedCount ? parseInt(await cachedCount.text()) : 0
+
+  if (count >= RATE_LIMIT) {
+    return json({ error: "Rate limited, try again later" }, 429, { "Retry-After": "30" })
+  }
+
+  waitUntil(
+    cacheStore.put(
+      key,
+      new Response(String(count + 1), { headers: { "Cache-Control": "max-age=60" } }),
+    ),
+  )
+
+  return null
+}
+
+/**
+ * POST /api/search. Queries the QMD knowledge base, preferring the node nearest
+ * the caller and failing over to the other region. `X-QMD-Region` reports which
+ * node answered so the UI can show the source.
+ */
+export const onRequestPost: RouteHandler = async ({ request, env, waitUntil }) => {
+  const limited = await consumeRateLimit(request, waitUntil)
+  if (limited) return limited
+
+  // `cf` is a Workers-only field that the DOM lib types loosely, so narrow it.
+  const cfCountry = request.cf?.country
+  const isCN = cfCountry === "CN"
+  const body = await request.text()
+  const [primaryUrl, fallbackUrl] = isCN
+    ? [env.QMD_CN_URL, env.QMD_US_URL]
+    : [env.QMD_US_URL, env.QMD_CN_URL]
+
+  let qmdRegion = isCN ? "cn" : "us"
+  let res: Response | null = null
+
+  if (primaryUrl) {
+    try {
+      res = await fetchQmd(primaryUrl, body, env.QMD_API_KEY)
+      if (!res.ok) res = null
+    } catch {
+      console.warn(`[QMD] Primary node (${qmdRegion}) failed, trying fallback`)
+      res = null
+    }
+  }
+
+  if (!res && fallbackUrl) {
+    try {
+      qmdRegion = isCN ? "us" : "cn"
+      res = await fetchQmd(fallbackUrl, body, env.QMD_API_KEY)
+    } catch (error) {
+      const fallbackMsg = error instanceof Error ? error.message : String(error)
+      console.error(`[QMD] Fallback node also failed:`, fallbackMsg)
+    }
+  }
+
+  if (res?.ok) {
+    return new Response(await res.text(), {
+      status: 200,
+      headers: { "Content-Type": "application/json", "X-QMD-Region": qmdRegion },
+    })
+  }
+
+  return json({ error: "QMD search unavailable on all nodes" }, 503)
 }

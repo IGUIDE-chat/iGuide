@@ -69,9 +69,9 @@ jobs:
             exit 1
           fi
 
-          echo "Verifying the web Worker proxy routes exist..."
+          echo "Verifying the web Worker API routes exist..."
           MISSING=0
-          for fn in apps/web/worker/routes/deepseek.ts apps/web/worker/routes/tavily.ts apps/web/worker/routes/gemini.ts; do
+          for fn in apps/web/worker/routes/chat.ts apps/web/worker/routes/deepseek.ts apps/web/worker/routes/gemini.ts apps/web/worker/routes/health.ts apps/web/worker/routes/integrations.ts apps/web/worker/routes/search.ts apps/web/worker/routes/tavily.ts; do
             if [ ! -f "$fn" ]; then
               echo "❌ Missing web Worker route: $fn"
               MISSING=1
