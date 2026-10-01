@@ -193,6 +193,9 @@ importers:
       '@cloudflare/workers-types':
         specifier: ^5.20260927.1
         version: 5.20260927.1
+      '@iguide/vite-bin':
+        specifier: workspace:*
+        version: link:../../tools/vite-bin
       '@types/node':
         specifier: ^26.6.3
         version: 26.6.3
@@ -257,6 +260,9 @@ importers:
       '@cloudflare/workers-types':
         specifier: ^5.20260927.1
         version: 5.20260927.1
+      '@iguide/vite-bin':
+        specifier: workspace:*
+        version: link:../../tools/vite-bin
       '@tailwindcss/postcss':
         specifier: ^4.3.3
         version: 4.3.3
@@ -314,6 +320,12 @@ importers:
       typescript:
         specifier: ~7.0.2
         version: 7.0.2
+
+  tools/vite-bin:
+    dependencies:
+      vite-plus:
+        specifier: 'catalog:'
+        version: 0.3.3(@types/node@26.6.3)(esbuild@0.28.1)(jiti@2.7.0)(typescript@7.0.2)
 
 packages:
 
