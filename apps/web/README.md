@@ -4,8 +4,8 @@ A comprehensive, zero-cost architecture knowledge base for new UIUC students fea
 
 ## Setup
 
-Coze configuration lives in `.env.local`; see `.env.local.example` for the exact
-variables (`VITE_COZE_BOT_ID`, `COZE_API_TOKEN`).
+Environment variables live in `.env.local`; see `.env.local.example` for the
+exact list of variables.
 
 ## File Structure
 
@@ -107,6 +107,6 @@ LLM_REQUEST_DUMP=1 pnpm run dev
 ```
 
 The dev server writes JSON files under `.debug/llm-requests/` for local proxy
-requests to DeepSeek, Gemini, Coze, and Tavily. Sensitive headers and API-key
+requests to DeepSeek, Gemini, and Tavily. Sensitive headers and API-key
 query params are redacted by default; set `LLM_REQUEST_DUMP_INCLUDE_SECRETS=1`
 only when you explicitly need raw local credentials in the dump.

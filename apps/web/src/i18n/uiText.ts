@@ -33,7 +33,6 @@ export type UITextEntry = {
   composerHint: string
   providerCloud: string
   providerLocal: string
-  providerCoze: string
   localModelDesc: string
   downloadingModel: string
   modelReady: string
@@ -117,9 +116,8 @@ export const UI_TEXT: Record<Language, UITextEntry> = {
     regenerateLabel: "Regenerate response",
     scrollToBottom: "Scroll to latest",
     composerHint: "Enter to send · Shift + Enter for a new line",
-    providerCloud: "Cloud (Coze)",
+    providerCloud: "Cloud",
     providerLocal: "Local (Free)",
-    providerCoze: "Coze (Agent)",
     localModelDesc: "Runs in your browser. Needs ~1GB download.",
     downloadingModel: "Downloading model...",
     modelReady: "Model ready",
@@ -198,9 +196,8 @@ export const UI_TEXT: Record<Language, UITextEntry> = {
     regenerateLabel: "重新生成",
     scrollToBottom: "回到最新",
     composerHint: "Enter 发送 · Shift + Enter 换行",
-    providerCloud: "云端 (Coze)",
+    providerCloud: "云端",
     providerLocal: "本地 (免费)",
-    providerCoze: "Coze (智能体)",
     localModelDesc: "在浏览器本地运行，首次需要下载约 1GB 模型。",
     downloadingModel: "正在下载模型...",
     modelReady: "模型已就绪",

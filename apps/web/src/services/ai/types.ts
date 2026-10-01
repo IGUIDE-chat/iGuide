@@ -22,6 +22,6 @@ export type StreamChatResponseFn = (
 ) => AsyncGenerator<StreamChunk>
 
 export interface AIProvider {
-  id: "coze" | "gemini" | "deepseek"
+  id: "gemini" | "deepseek"
   streamChatResponse: StreamChatResponseFn
 }

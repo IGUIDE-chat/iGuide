@@ -17,12 +17,6 @@ export type RouteHandler<TEnv = Env> = (context: {
 export interface Env {
   /** Workers Static Assets binding; used for the SPA fallback. */
   ASSETS: Fetcher
-  COZE_CLIENT_ID?: string
-  COZE_PRIVATE_KEY?: string
-  COZE_BOT_ID?: string
-  COZE_API_TOKEN?: string
-  VITE_COZE_API_KEY?: string
-  VITE_COZE_BOT_ID?: string
   DEEPSEEK_API_KEY?: string
   VITE_DEEPSEEK_API_KEY?: string
   TAVILY_API_KEY?: string

@@ -1,11 +1,9 @@
-import { cozeProvider } from "./providers/cozeProvider"
 import { deepseekProvider } from "./providers/deepseekProvider"
 import { geminiProvider } from "./providers/geminiProvider"
 import { StreamChatResponseFn } from "./types"
 
 const providerKey = "deepseek"
 const providers = {
-  coze: cozeProvider,
   gemini: geminiProvider,
   deepseek: deepseekProvider,
 }

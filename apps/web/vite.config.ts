@@ -136,26 +136,6 @@ export default defineConfig(({ mode, command }) => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/chat/, ""),
         },
-        "/api/coze": {
-          target: "https://api.coze.com",
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/coze/, ""),
-          secure: false,
-          configure: (proxy) => {
-            proxy.on("proxyReq", (proxyReq, req) => {
-              collectRequestBody(req, (body) => {
-                void dumpLlmRequest({
-                  env,
-                  provider: "coze",
-                  localPath: req.url,
-                  upstreamUrl: `https://api.coze.com${proxyReq.path}`,
-                  proxyReq,
-                  body,
-                })
-              })
-            })
-          },
-        },
         // DeepSeek chat proxy — in dev, injects Authorization header server-side (key never in bundle)
         "/api/deepseek-raw": {
           target: "https://api.deepseek.com",

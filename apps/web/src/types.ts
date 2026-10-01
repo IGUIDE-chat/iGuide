@@ -1,5 +1,5 @@
 export type Language = "en" | "zh"
-export type AIProvider = "cloud" | "local" | "coze"
+export type AIProvider = "cloud" | "local"
 
 export interface Article {
   id: string

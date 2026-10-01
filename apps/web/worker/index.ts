@@ -1,4 +1,3 @@
-import * as chat from "./routes/chat"
 import * as deepseek from "./routes/deepseek"
 import * as gemini from "./routes/gemini"
 import * as search from "./routes/search"
@@ -11,7 +10,7 @@ import type { Env, RouteHandler } from "./types"
  * method answers 405, matching the Pages Functions behaviour this replaces.
  */
 const API_ROUTES: Record<string, Partial<Record<string, RouteHandler>>> = {
-  "/api/chat": { POST: chat.onRequestPost },
+  // The agent loop handler lands at "/api/chat" when apps/ai-agent merges in.
   "/api/deepseek": { POST: deepseek.onRequestPost },
   "/api/gemini": { POST: gemini.onRequestPost, OPTIONS: gemini.onRequestOptions },
   "/api/search": { POST: search.onRequestPost, OPTIONS: search.onRequestOptions },

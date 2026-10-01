@@ -4,7 +4,7 @@
 
 ## 环境配置
 
-Coze 配置见 `.env.local`，变量清单参考 `.env.local.example`（`VITE_COZE_BOT_ID`、`COZE_API_TOKEN`）。
+环境变量配置见 `.env.local`，变量清单参考 `.env.local.example`。
 
 ## 目录结构
 

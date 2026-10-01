@@ -24,8 +24,6 @@ export default defineConfig({
       DEEPSEEK_API_KEY: bindings.secret(),
       TAVILY_API_KEY: bindings.secret(),
       GOOGLE_API_KEY: bindings.secret(),
-      COZE_API_TOKEN: bindings.secret(),
-      COZE_BOT_ID: bindings.secret(),
     },
   },
 })
