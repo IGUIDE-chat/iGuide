@@ -44,6 +44,10 @@ export interface ChatMessage {
   followUpQuestions?: string[]
   thinkingSteps?: ThinkingStep[]
   isThinking?: boolean
+  /** When the assistant started working on this reply (ms since epoch). */
+  thinkingStartedAt?: number
+  /** When the first reply text arrived, i.e. thinking finished (ms since epoch). */
+  thinkingEndedAt?: number
 }
 
 export interface ConversationSummary {

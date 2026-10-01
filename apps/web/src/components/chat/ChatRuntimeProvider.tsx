@@ -129,6 +129,8 @@ const toAssistantThreadMessage = (msg: ChatMessage): ThreadMessageLike => {
         isThinking: msg.isThinking,
         followUpQuestions: msg.followUpQuestions,
         isStreaming: msg.isStreaming,
+        thinkingStartedAt: msg.thinkingStartedAt,
+        thinkingEndedAt: msg.thinkingEndedAt,
       },
     },
   }

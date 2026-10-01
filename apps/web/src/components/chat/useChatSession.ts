@@ -208,6 +208,7 @@ export const useChatSession = ({
 
       try {
         const aiMsgId = crypto.randomUUID()
+        const thinkingStartedAt = Date.now()
         dispatch({
           type: "ADD_MESSAGE",
           payload: {
@@ -216,12 +217,13 @@ export const useChatSession = ({
             text: "",
             isStreaming: true,
             isThinking: true,
+            thinkingStartedAt,
             thinkingSteps: [
               {
-                id: `step-${Date.now()}-init`,
+                id: `step-${thinkingStartedAt}-init`,
                 type: "processing" as const,
                 label: language === "zh" ? "理解问题..." : "Understanding...",
-                timestamp: Date.now(),
+                timestamp: thinkingStartedAt,
                 done: false,
               },
             ],
@@ -241,6 +243,7 @@ export const useChatSession = ({
 
         let fullText = ""
         let followUpQuestions: string[] | undefined
+        let thinkingEndedAt: number | undefined
         const thinkingSteps: ThinkingStep[] = []
 
         for await (const chunk of stream) {
@@ -271,6 +274,14 @@ export const useChatSession = ({
             if (fullText === chunk.text && thinkingSteps.length > 0) {
               thinkingSteps.forEach((s) => {
                 s.done = true
+              })
+            }
+            if (thinkingEndedAt === undefined) {
+              // Unthrottled, so the recorded end of thinking is the first token.
+              thinkingEndedAt = Date.now()
+              dispatch({
+                type: "UPDATE_MESSAGE",
+                payload: { id: aiMsgId, updates: { thinkingEndedAt } },
               })
             }
             throttledUpdateMessageText(aiMsgId, fullText, thinkingSteps)
@@ -370,6 +381,8 @@ export const useChatSession = ({
           isThinking: false,
           followUpQuestions,
           thinkingSteps: thinkingSteps.length > 0 ? thinkingSteps : undefined,
+          thinkingStartedAt,
+          thinkingEndedAt,
         }
 
         dispatch({ type: "REPLACE_MESSAGE", payload: aiMsg })

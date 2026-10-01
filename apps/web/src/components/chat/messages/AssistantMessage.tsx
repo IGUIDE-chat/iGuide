@@ -15,6 +15,8 @@ interface AssistantMessageMeta {
   isThinking?: boolean
   followUpQuestions?: string[]
   isStreaming?: boolean
+  thinkingStartedAt?: number
+  thinkingEndedAt?: number
 }
 
 interface AssistantMessageProps {
@@ -80,6 +82,8 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
               key={messageId}
               steps={meta?.thinkingSteps ?? []}
               isThinking={!!meta?.isThinking}
+              startedAt={meta?.thinkingStartedAt}
+              endedAt={meta?.thinkingEndedAt}
               language={language}
             />
           )}
