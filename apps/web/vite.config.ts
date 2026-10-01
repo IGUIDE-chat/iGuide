@@ -271,7 +271,7 @@ export default defineConfig(({ mode, command }) => {
       },
     },
     plugins: lazyPlugins(() => [
-      qmdSearchPlugin(),
+      qmdSearchPlugin({ forceMode: env.QMD_SEARCH_MODE }),
       react(),
       ViteMcp(),
       // `cf build` and `cf deploy` delegate to `vite build`, which needs the

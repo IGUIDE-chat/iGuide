@@ -108,11 +108,12 @@ try {
   // QMD CLI not available (e.g. CI/CD build environment) — plugin will be a no-op
 }
 
+function isSearchMode(mode: unknown): mode is SearchMode {
+  return mode === "bm25" || mode === "vector" || mode === "hybrid"
+}
+
 function normalizeMode(mode: unknown): SearchMode {
-  if (mode === "bm25" || mode === "vector" || mode === "hybrid") {
-    return mode
-  }
-  return "hybrid"
+  return isSearchMode(mode) ? mode : "hybrid"
 }
 
 function normalizeLang(lang: unknown): "en" | "zh" {
@@ -157,7 +158,7 @@ function matchesLang(filePath: string, lang: "en" | "zh") {
   return true
 }
 
-async function queryQmd(body: SearchRequest): Promise<QmdSearchResult[]> {
+async function queryQmd(body: SearchRequest, forceMode?: SearchMode): Promise<QmdSearchResult[]> {
   if (!QMD_CLI) {
     throw new Error("QMD CLI is not available in this environment.")
   }
@@ -167,7 +168,7 @@ async function queryQmd(body: SearchRequest): Promise<QmdSearchResult[]> {
   }
 
   const lang = normalizeLang(body.lang)
-  const mode = normalizeMode(body.mode)
+  const mode = forceMode ?? normalizeMode(body.mode)
   const limit = normalizeLimit(body.limit)
   const candidateLimit = Math.max(limit * 3, limit)
   const command = commandForMode(mode)
@@ -207,7 +208,7 @@ function sendJson(res: ServerResponse, status: number, payload: unknown) {
   res.end(JSON.stringify(payload))
 }
 
-async function handleQmdSearch(req: IncomingMessage, res: ServerResponse) {
+async function handleQmdSearch(req: IncomingMessage, res: ServerResponse, forceMode?: SearchMode) {
   if (req.method !== "POST") {
     sendJson(res, 405, { error: "Method not allowed." })
     return
@@ -216,7 +217,7 @@ async function handleQmdSearch(req: IncomingMessage, res: ServerResponse) {
   try {
     const rawBody = await readBody(req)
     const body = rawBody ? (JSON.parse(rawBody) as SearchRequest) : {}
-    const results = await queryQmd(body)
+    const results = await queryQmd(body, forceMode)
     sendJson(res, 200, results)
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unexpected search error."
@@ -224,11 +225,18 @@ async function handleQmdSearch(req: IncomingMessage, res: ServerResponse) {
   }
 }
 
-function attachMiddleware(middlewares: {
-  use: (
-    handler: (req: IncomingMessage, res: ServerResponse, next: () => void) => void | Promise<void>,
-  ) => void
-}) {
+function attachMiddleware(
+  forceMode: SearchMode | undefined,
+  middlewares: {
+    use: (
+      handler: (
+        req: IncomingMessage,
+        res: ServerResponse,
+        next: () => void,
+      ) => void | Promise<void>,
+    ) => void
+  },
+) {
   middlewares.use(async (req, res, next) => {
     const url = req.url ? new URL(req.url, "http://localhost") : null
     if (!url || url.pathname !== "/api/search") {
@@ -236,18 +244,24 @@ function attachMiddleware(middlewares: {
       return
     }
 
-    await handleQmdSearch(req, res)
+    await handleQmdSearch(req, res, forceMode)
   })
 }
 
-export function qmdSearchPlugin(): Plugin {
+/**
+ * @param options.forceMode Overrides the client-requested search mode. Hybrid
+ *   `qmd query` reloads local models per request (~60s on CPU), so set
+ *   QMD_SEARCH_MODE=bm25 in .env.local for a responsive local dev loop.
+ */
+export function qmdSearchPlugin(options: { forceMode?: string } = {}): Plugin {
+  const forceMode = isSearchMode(options.forceMode) ? options.forceMode : undefined
   return {
     name: "qmd-search-gateway",
     configureServer(server) {
-      attachMiddleware(server.middlewares)
+      attachMiddleware(forceMode, server.middlewares)
     },
     configurePreviewServer(server) {
-      attachMiddleware(server.middlewares)
+      attachMiddleware(forceMode, server.middlewares)
     },
   }
 }
