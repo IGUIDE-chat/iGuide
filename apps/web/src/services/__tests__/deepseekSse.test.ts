@@ -206,3 +206,76 @@ test("ignores unknown events", () => {
 
   assert.equal(chunks.length, 0)
 })
+
+function parseSourceEvent(payload: unknown) {
+  const state = createSSEParserState()
+  parseDeepSeekSSELine("event: source-url", state, "en")
+  return parseDeepSeekSSELine(`data: ${JSON.stringify(payload)}`, state, "en")
+}
+
+test("source-url event: yields a source chunk with id, url, title, and snippet", () => {
+  const chunks = parseSourceEvent({
+    sourceId: "https://housing.illinois.edu/rates",
+    url: "https://housing.illinois.edu/rates",
+    title: "Room and Board Rates",
+    snippet: "Rates for the 2026-27 academic year…",
+  })
+
+  assert.deepEqual(chunks, [
+    {
+      text: "",
+      source: {
+        id: "https://housing.illinois.edu/rates",
+        url: "https://housing.illinois.edu/rates",
+        title: "Room and Board Rates",
+        snippet: "Rates for the 2026-27 academic year…",
+      },
+    },
+  ])
+})
+
+test("source-url event: falls back to the hostname when the title is missing or blank", () => {
+  const missing = parseSourceEvent({
+    sourceId: "https://housing.illinois.edu/rates",
+    url: "https://housing.illinois.edu/rates",
+  })
+  const blank = parseSourceEvent({ url: "https://www.illinois.edu/about", title: "   " })
+
+  assert.equal(missing.length, 1)
+  assert.equal(missing[0].source?.title, "housing.illinois.edu")
+  assert.ok(!("snippet" in (missing[0].source ?? {})), "absent snippet stays absent")
+  assert.equal(blank[0].source?.title, "www.illinois.edu")
+})
+
+test("source-url event: sourceId falls back to the url", () => {
+  const chunks = parseSourceEvent({ url: "https://illinois.edu/", title: "Illinois" })
+
+  assert.equal(chunks[0].source?.id, "https://illinois.edu/")
+})
+
+test("source-url event: ignores non-http(s) and unparseable URLs", () => {
+  for (const url of [
+    "javascript:alert(1)",
+    "data:text/html,hi",
+    "ftp://illinois.edu/file",
+    "not a url",
+    "",
+  ]) {
+    assert.deepEqual(parseSourceEvent({ sourceId: url, url, title: "x" }), [], url)
+  }
+})
+
+test("source-url event: ignores payloads without a string url", () => {
+  assert.deepEqual(parseSourceEvent({ title: "No URL" }), [])
+  assert.deepEqual(parseSourceEvent({ url: 42, title: "Numeric URL" }), [])
+  assert.deepEqual(parseSourceEvent(null), [])
+})
+
+test("source-url event: an invalid payload never falls through to legacy delta parsing", () => {
+  const chunks = parseSourceEvent({
+    url: "javascript:alert(1)",
+    choices: [{ delta: { content: "injected text" } }],
+  })
+
+  assert.deepEqual(chunks, [])
+})
