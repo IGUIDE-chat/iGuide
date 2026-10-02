@@ -24,14 +24,14 @@ test("tool_start event: parses legacy payload with tool field", () => {
 
   parseDeepSeekSSELine("event: tool_start", state, "en")
   const chunks = parseDeepSeekSSELine(
-    'data: {"tool":"search_knowledge_base","args":{"query":"dorms"}}',
+    'data: {"tool":"web_search","args":{"query":"dorms"}}',
     state,
     "en",
   )
 
   assert.equal(chunks.length, 1)
   assert.equal(chunks[0].thinkingStep?.type, "tool_call")
-  assert.equal(chunks[0].thinkingStep?.label, "Calling tool: search_knowledge_base")
+  assert.equal(chunks[0].thinkingStep?.label, "Calling tool: web_search")
 })
 
 test("tool_start event: uses Chinese locale labels", () => {
@@ -68,14 +68,14 @@ test("tool_result event: parses legacy payload with tool field", () => {
 
   parseDeepSeekSSELine("event: tool_result", state, "en")
   const chunks = parseDeepSeekSSELine(
-    'data: {"tool":"grep_docs","status":"success","summary":"found 5 matches"}',
+    'data: {"tool":"web_search","status":"success","summary":"found 5 matches"}',
     state,
     "en",
   )
 
   assert.equal(chunks.length, 1)
   assert.equal(chunks[0].thinkingStep?.type, "processing")
-  assert.equal(chunks[0].thinkingStep?.label, "Tool finished: grep_docs")
+  assert.equal(chunks[0].thinkingStep?.label, "Tool finished: web_search")
   assert.equal(chunks[0].thinkingStep?.detail, "success — found 5 matches")
 })
 

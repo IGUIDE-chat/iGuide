@@ -9,7 +9,7 @@ import * as React from "react"
 
 import { type ChatMessage, type Language, type ThinkingStep } from "../../types"
 import { ChatErrorBoundary } from "./ChatErrorBoundary"
-import { GrepDocsToolUI, SearchToolUI, WebSearchToolUI } from "./tools"
+import { WebSearchToolUI } from "./tools"
 import { useChatSession } from "./useChatSession"
 
 interface ChatRuntimeProviderProps {
@@ -35,7 +35,7 @@ const getTextFromAppendMessage = (message: AppendMessage): string | null => {
   return null
 }
 
-const TOOL_NAMES = ["search_knowledge_base", "web_search", "grep_docs"] as const
+const TOOL_NAMES = ["web_search"] as const
 
 type ToolName = (typeof TOOL_NAMES)[number]
 
@@ -198,9 +198,7 @@ export const ChatRuntimeProvider = ({
   return (
     <ChatErrorBoundary>
       <AssistantRuntimeProvider runtime={runtime}>
-        <SearchToolUI />
         <WebSearchToolUI />
-        <GrepDocsToolUI />
         <AppendMessageInner>{children}</AppendMessageInner>
       </AssistantRuntimeProvider>
     </ChatErrorBoundary>
