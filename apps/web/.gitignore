@@ -4,6 +4,7 @@ dist
 
 # cf build output
 .cloudflare/
+worker-configuration.d.ts
 
 # local debug artifacts
 .debug
