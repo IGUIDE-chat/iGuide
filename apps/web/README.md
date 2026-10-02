@@ -1,112 +1,94 @@
-# IlliniGuide - UIUC Knowledge Base
+# @iguide/web
 
-A comprehensive, zero-cost architecture knowledge base for new UIUC students featuring static content delivery and an AI-powered campus assistant.
+English | [中文](README_CN.md)
+
+The IlliniGuide (iGuide) web app, live at <https://iguide.chat>: a React SPA plus one Cloudflare
+Worker that serves it and handles every `/api/*` route on the same origin. For the product and the
+overall architecture, see the root [README](../../README.md). For where code belongs, see
+[AGENTS.md](AGENTS.md) (package rules) and the root [AGENTS.md](../../AGENTS.md) (repo-wide rules).
+
+## What lives here
+
+- `src/`: the React SPA. Entry `src/index.tsx`, composition `src/App.tsx`, routes `src/app/routes.tsx`.
+- `worker/`: the Worker, entry `worker/index.ts`, configured in `cloudflare.config.ts`. It serves
+  `/api/chat` (the tool-use agent; Tavily web search is its only retrieval source), the provider
+  proxies, `/api/health` and `/api/integrations*`.
+- `scripts/`: the dorm database SQL (`scripts/migrations/*.sql`, `scripts/*.sql`) and the dorm data
+  scripts below. Two unused leftovers from the removed QMD knowledge base are also still here:
+  `scripts/qmd-server.mjs` (the search server behind the old `/api/search` route) and
+  `scripts/generate-handbook-ocr.py` (an OCR generator for QMD content). Nothing references them.
 
 ## Setup
 
-Environment variables live in `.env.local`; see `.env.local.example` for the
-exact list of variables.
+Install the workspace once from the repo root with `pnpm install`. Then, in `apps/web/`, copy the two
+env templates. Git ignores both real files.
 
-## File Structure
+- `.env.local.example` → `.env.local`: read by the Vite build and shipped to the browser. Only
+  `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` and `VITE_MAPBOX_TOKEN` are used from it.
+- `.dev.vars.example` → `.dev.vars`: Worker secrets for `pnpm run dev`. `Env` requires
+  `SUPABASE_URL` and `SUPABASE_ANON_KEY`. The template marks the rest optional, but `/api/chat` gives
+  no answer without `DEEPSEEK_API_KEY`, and web search needs `TAVILY_API_KEY`. `GOOGLE_API_KEY` only
+  feeds the `/api/gemini` proxy, which nothing calls. In production, set them from `apps/web/` with
+  `pnpm exec cf workers secrets update <NAME> --worker uiuc`.
 
-```text
-apps/web/
-|-- public/
-|-- scripts/
-|   `-- migrations/
-|-- src/
-|   |-- app/
-|   |-- components/
-|   |   |-- ui/
-|   |   |   `-- branding/
-|   |   |-- chat/
-|   |   |-- housing/
-|   |   |   |-- constants/
-|   |   |   |-- dorm-detail/
-|   |   |   |   `-- sections/
-|   |   |   |-- dorm-list/
-|   |   |   |-- dorm-map/
-|   |   |   |-- edit-panel/
-|   |   |   |-- filter-modal/
-|   |   |   |-- hooks/
-|   |   |   |-- i18n/
-|   |   |   |-- store/
-|   |   |   `-- types/
-|   |   `-- layout/
-|   |-- constants/
-|   |-- contexts/
-|   |-- data/
-|   |   `-- articles/
-|   |-- hooks/
-|   |-- i18n/
-|   |-- pages/
-|   |   |-- chat/
-|   |   |-- courses/
-|   |   |-- dorms/
-|   |   |-- library/
-|   |   |-- profile/
-|   |   `-- resume/
-|   |-- legacy/
-|   |   |-- auth/
-|   |   `-- components/
-|   |-- services/
-|   |-- App.tsx
-|   |-- constants.ts
-|   |-- index.css
-|   |-- index.tsx
-|   |-- utils/
-|   `-- types.ts
+## Commands (from `apps/web/`)
+
+| Command                   | What it does                                                                               |
+| ------------------------- | ------------------------------------------------------------------------------------------ |
+| `pnpm run dev`            | `vp dev`: Vite with the Worker running behind it. Root equivalent: `pnpm run dev:web`.     |
+| `pnpm run build`          | `vp build`: builds the SPA and the Worker.                                                 |
+| `pnpm run deploy`         | `cf deploy --prebuilt`: deploys the existing build output without rebuilding; build first. |
+| `pnpm run build:preview`  | `vp build --mode preview`. Run it with `CLOUDFLARE_PREVIEW_BUILD=true` (see below).        |
+| `pnpm run deploy:preview` | `cf previews deploy --prebuilt`: deploys that preview build.                               |
+
+`cf previews deploy --prebuilt` only accepts Build Output flagged as a Preview build, and the build
+sets that flag only when `CLOUDFLARE_PREVIEW_BUILD=true` is in the environment. Without it the deploy
+stops with "Build Output was not created by a Preview build". So run
+`CLOUDFLARE_PREVIEW_BUILD=true pnpm run build:preview` (in PowerShell, set
+`$env:CLOUDFLARE_PREVIEW_BUILD = "true"` first), or use `pnpm exec cf previews deploy` without
+`--prebuilt`, which builds with the flag set and deploys in one step.
+
+Lint with `pnpm run lint` and check formatting with `pnpm exec vp fmt --check` (the `fmt` script
+rewrites files). From the repo root, `pnpm exec vp check` runs format, lint and type checks
+(`pnpm run check` does the same and applies fixes).
+
+## Dorm database
+
+Run the SQL by hand in the Supabase SQL editor. Core dorm schema, in this order:
+
+1. `scripts/migrations/create_dorms_table.sql`. On a fresh project, delete its last line first: it
+   comments on a `dorm_overrides` table that no tracked SQL creates, and the SQL editor then rolls back
+   the whole file.
+2. `scripts/migrations/add_categorized_tags.sql` (safe to rerun)
+3. `scripts/migrations/add_dorm_address.sql` and `scripts/migrations/add_dorm_website.sql`, which add
+   the `address`, `address_zh` and `website` columns the seed writes
+
+Feature SQL, after the core schema:
+
+- `scripts/migrations/create_storage_bucket.sql`: the `dorm-images` storage bucket.
+- `add_dorm_edit_history.sql`, then `fix_dorm_edit_history_rls.sql`; `add_dorm_comments.sql`, then
+  `add_dorm_comment_hidden.sql`; `add_floor_plan_bed_size.sql`; `add_soul_and_memory.sql` (all in
+  `scripts/migrations/`).
+- `scripts/create_dorm_user_features.sql`: dorm favorites and viewing history.
+
+The tracked SQL does not create every table the app uses. Create `conversations`, `messages`,
+`reading_history`, `user_profiles` and `mailing_list` yourself. `scripts/optimize_rls_policies.sql` and
+`scripts/fix_function_security.sql` assume some of them already exist. Known conflict:
+`add_categorized_tags.sql` limits `bathroom_type` to `communal`, `semi-private` and `private`, but the
+seed writes `individual-use` for four dorms. Until that constraint changes, the seed fails on a
+database built only from this SQL.
+
+## Dorm data scripts
+
+`tsx` is not a dependency, so run the scripts with `pnpm dlx tsx`, from `apps/web/`:
+
+```sh
+pnpm dlx tsx scripts/validate-dorm-data.ts   # offline check of the bundled dataset
+pnpm dlx tsx scripts/audit-dorm-media.ts     # sends HEAD requests to suspicious media URLs
+SUPABASE_URL=<url> SUPABASE_SERVICE_KEY=<service-role-key> pnpm dlx tsx scripts/seed-dorms-table.ts
 ```
 
-## Architecture Rules
-
-- `src/App.tsx` is the only active app-composition entry in this package.
-- Route-level orchestration belongs in `src/pages/**` and page-local hooks.
-- `src/components/**` should stay presentation-first and feature-local.
-- `src/components/ui/**` is for business-agnostic shared UI only.
-- `src/legacy/**` stores isolated unused reference code; active runtime modules must not import from it.
-- A small number of active display components may remain at `src/components/` root until a stable documented subtree exists.
-- Active runtime code must not import from reserved legacy boundaries:
-  - `src/legacy/**`
-  - `src/components/housing/legacy/**`
-  - `legacy/projects/**`
-- New pages must be registered in `src/app/pageRegistry.ts`.
-- Route changes must be made in `src/app/routes.tsx`.
-
-Rule set: [`AGENTS.md`](AGENTS.md).
-
-## Database & Data Management
-
-The application uses Supabase for database and storage.
-To initialize or update the housing data:
-
-1. Create the `dorms` table and run necessary migrations: `scripts/migrations/create_dorms_table.sql` and `scripts/migrations/add_categorized_tags.sql`
-   The second migration also adds the admin editor columns (`application_fee`, `dining_nearby_detail`, categorized tag fields) and is safe to rerun on fresh, partial, or already-migrated databases.
-2. Seed the database using the provided script (requires `SUPABASE_URL` and `SUPABASE_SERVICE_KEY` environment variables):
-   ```bash
-   pnpm run seed:dorms
-   ```
-   _This script merges any local static data with existing database overrides into a unified `dorms` table._
-
-## Commands
-
-```bash
-pnpm install        # from the repository root, installs the whole workspace
-pnpm run dev:web
-pnpm run typecheck
-pnpm run build
-```
-
-## Local LLM Request Dumps
-
-When debugging local dev-server proxy calls to model providers, enable request
-dumps before starting Vite:
-
-```bash
-LLM_REQUEST_DUMP=1 pnpm run dev
-```
-
-The dev server writes JSON files under `.debug/llm-requests/` for local proxy
-requests to DeepSeek, Gemini, and Tavily. Sensitive headers and API-key
-query params are redacted by default; set `LLM_REQUEST_DUMP_INCLUDE_SECRETS=1`
-only when you explicitly need raw local credentials in the dump.
+The seed reads both variables from the shell, not from env files (in PowerShell, set them first with
+`$env:NAME = "..."`). `SUPABASE_SERVICE_KEY` is a service-role key that bypasses RLS. The seed upserts
+the bundled `UIUC_DORMS` into `dorms` by `id`. It keeps stored images, gallery and floor-plan media,
+merges tags with stored ones, and never deletes rows. It does not read the archived `dorm_overrides`.
