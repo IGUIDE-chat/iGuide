@@ -1,202 +1,178 @@
-# IlliniGuide Monorepo
+# IlliniGuide 🌽 — Your UIUC campus guide, in English and 中文
 
-English | [中文](./README_CN.md)
+<p align="center">
+  <a href="https://iguide.chat"><img src="https://img.shields.io/badge/live-iguide.chat-E84A27?style=flat-square" alt="Live site"></a>
+  <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-22.18%2B%20%7C%2024.11%2B-339933?style=flat-square&logo=node.js&logoColor=white" alt="Node 22.18+ or 24.11+"></a>
+  <a href="https://pnpm.io"><img src="https://img.shields.io/badge/pnpm-12.7.0-F69220?style=flat-square&logo=pnpm&logoColor=white" alt="pnpm 12.7.0"></a>
+</p>
 
----
+IlliniGuide (iGuide) is a campus assistant for students at the University of Illinois Urbana-Champaign, built with new students in mind and live at [iguide.chat](https://iguide.chat). Ask it about housing, courses, buses, or campus services in a streaming chat, read a bilingual library of campus guides, or explore residence halls on a map and compare them side by side. The React app and every `/api/*` endpoint ship together as one Cloudflare Worker, with Supabase for accounts, saved chats, favorites, and dorm data.
 
-## English Version
+**Grounded, not guessed.** The chat agent's one retrieval tool is a Tavily web search limited to official `illinois.edu` pages; past that, it answers from general knowledge and says when it's unsure. Every run is bounded (at most 3 agent iterations, 5 tool calls, and 10 s per tool call), provider keys never leave the Worker, and nobody has to sign in: guests keep their chats and favorites in the browser, and signed-in users store them in Supabase instead (guest data isn't carried over when you sign in).
 
-A UIUC knowledge platform built on a React app and a single Cloudflare Worker that serves both the SPA and every API endpoint.
+[Website](https://iguide.chat) · [AGENTS.md](AGENTS.md) · [Issues](https://github.com/IGUIDE-chat/iGuide/issues) · [中文](README_CN.md)
 
-## Monorepo Map
+## What you can do
 
-| Path            | Role                                                                                      |
-| :-------------- | :---------------------------------------------------------------------------------------- |
-| `apps/web/`     | React app and its Cloudflare Worker: static assets, agent loop, tools, MCP, and `/api/*`. |
-| `dorm_scripts/` | Standalone Puppeteer/Bun review scrapers.                                                 |
+- **Chat** — answers stream in as Markdown, with a collapsible "thinking" timeline that times each step, a card for each web search, and copy buttons. Past chats sit in the sidebar, grouped by date, with pin and delete.
+- **Library** — 10 guides in 6 categories (housing, academics, transportation, food, social life, safety and health), searchable by title and tag. Signed-in users also get a reading history.
+- **Dorms** — the bundled dataset covers 23 halls (19 University Housing, 4 Private Certified Housing). Search, sort, and filter by zone, type, price, beds, bathrooms, A/C, facilities, and lifestyle; browse a Mapbox map with campus zones and landmarks; compare up to 4 halls; save favorites; and open galleries and floor plans. A floating dorm assistant answers questions on every dorm page.
+- **Two languages** — every page, article, and dorm label exists in English and Simplified Chinese. The app starts in your browser's language, and you can switch from the sidebar.
+- **Optional accounts** — sign in with Google, Microsoft, or email through Supabase Auth. The Profile page lets you edit your display name, the AI persona, and the AI's memory of you.
+- **Admin editing** — admins (`user_metadata.is_admin`) edit dorm content, tags, and photos in place, with an edit history they can restore from.
 
-## Unified Setup
+Not live yet: **Courses** and **Resume** are "coming soon" pages with an email waitlist, dorm reviews are built but switched off (`SHOW_COMMENTS = false`), and the Profile → Integrations panel is a UI mock. The persona and memory you edit on the Profile page don't reach the model: the app doesn't send its Supabase token to `/api/chat`, so the agent answers every chat as a guest. Memory only flows one way for now: the model still tags what it learns about you, and the app saves those notes for signed-in users, but nothing reads them back. The chat can still show up to three follow-up question chips, but `/api/chat` no longer asks the model for them, so they rarely appear.
 
-### Install
+## Quick start
 
-The workspace is a pnpm workspace driven by Vite+ from the repository root:
+You need Node 22.18+ or 24.11+ (what both `vite-plus` and the `cf` CLI accept) and pnpm. The repo pins `pnpm@12.7.0` through `packageManager`.
 
 ```bash
+git clone https://github.com/IGUIDE-chat/iGuide.git
+cd iGuide
 pnpm install
+cp apps/web/.env.local.example apps/web/.env.local   # public VITE_ values for the SPA
+cp apps/web/.dev.vars.example apps/web/.dev.vars     # Worker secrets for local runs
 ```
 
-### App dev
+Before you start the server, uncomment and set `DEEPSEEK_API_KEY` in `.dev.vars`. DeepSeek is the only model provider, and although the template lists the key as optional, chat gets no answer without it. Set `TAVILY_API_KEY` there too, or every web search returns an error to the model, which can then answer only from general knowledge. The server-side `DEEPSEEK_API_KEY`, `TAVILY_API_KEY`, `SUPABASE_URL`, and `SUPABASE_ANON_KEY` entries in `.env.local` aren't read by any repo code; the Worker reads `.dev.vars`. Leave any other value you don't have empty rather than keeping its placeholder: without a Supabase URL and key, sign-in and sync are off and dorms load from bundled data; without `VITE_MAPBOX_TOKEN`, the map shows a notice.
 
 ```bash
 pnpm run dev:web
-pnpm run typecheck
 ```
 
-`vp` is workspace-aware from the root. `vp dev` and `vp build` resolve the runnable
-package on their own, and `vp -C apps/<package> <command>` runs a command inside a
-single package. Recursive tasks use `vp run -r <task>`, or `--filter <package>` to
-target one of them.
-
-### Supabase dorm data
-
-Run the SQL migrations in Supabase:
-
-- `apps/web/scripts/migrations/create_dorms_table.sql`
-- `apps/web/scripts/migrations/add_categorized_tags.sql`
-
-Then seed or resync data with:
+`dev:web` runs the real Worker behind the Vite dev server, so the SPA and `/api/*` share one origin, as they do in production. Check the Worker from a second terminal (5173 is Vite's default port; use the URL `dev:web` prints):
 
 ```bash
-vp run --filter @iguide/web seed:dorms
-```
-
-Requires `SUPABASE_URL` and `SUPABASE_SERVICE_KEY`.
-
-### Crawler setup
-
-```bash
-cd data_collection
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-playwright install chromium
-chmod +x run_all.sh
-./run_all.sh
-```
-
-### Worker and API basics
-
-```bash
-pnpm run dev:web
 curl http://localhost:5173/api/health
 ```
 
-The Worker serves the SPA and the whole API surface from one origin. It verifies
-Supabase JWTs, hosts the server-side tool-use runtime, and supports SSE chat
-responses.
+## How it fits together
 
-## API Notes
-
-- Every endpoint lives under `/api/*`, so the browser only makes same-origin calls.
-- JWT auth via Supabase tokens.
-- Health check at `/api/health` and streaming tool-use responses from `/api/chat`.
-- Core production env vars now include: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `DEEPSEEK_API_KEY`, `TAVILY_API_KEY`.
-- `/api/chat` always runs the Worker's tool-use agent. Copy `apps/web/.dev.vars.example` to `apps/web/.dev.vars` for local runs; the template covers every field of the Worker's `Env` interface.
-
-## Placement Rules
-
-- `src/App.tsx` is the only active app-composition entry.
-- Keep route orchestration thin in `src/pages/**`.
-- Keep feature UI in `src/components/<feature>/**`.
-- Keep shared UI in `src/components/ui/**` only.
-- Keep legacy code isolated in `src/legacy/**` and do not import from it at runtime.
-- Register new pages in `src/app/pageRegistry.ts` and route changes in `src/app/routes.tsx`.
-
-## Retrieval and Tool-Use Policy
-
-1. The browser sends the user message to the Cloudflare Worker.
-2. The Worker runs the server-side DeepSeek agent loop.
-3. The agent chooses tools dynamically:
-   - `web_search` for Tavily-backed live web search
-   - `custom_skills` for curated higher-level campus tasks
-4. Tavily web search is the only retrieval source.
-
----
-
-## Architecture Overview
-
-### One-liner
-
-A serverless-first stack uses Cloudflare Worker as the agent runtime, Supabase as the user-data layer, and managed APIs for model inference and web search.
-
-### Runtime Split
-
-#### Layer 1 — Edge Layer
-
-- Cloudflare Worker is the public entrypoint and the primary control plane.
-- It verifies Supabase JWTs, applies rate limits, exposes SSE chat responses, and runs the tool-use agent loop.
-- It also hosts the MCP-style tool registry used by the model.
-
-#### Layer 2 — User Data Layer
-
-- Supabase Auth handles sign-up, login, OAuth, and password recovery.
-- PostgreSQL stores chat history.
-- RLS keeps each user scoped to their own records.
-- Async logging writes conversations after the main response path completes.
-
-#### Layer 3 — External Intelligence Services
-
-- DeepSeek provides hosted model inference.
-- Tavily provides hosted live web search, and is the only retrieval source.
-
-### Why Serverless-First Matters
-
-- The default production path does not require a dedicated VPS.
-- Cloudflare Worker + Supabase keep the control plane and data plane managed.
-
-### Operational Simplicity
-
-- A single `web` Cloudflare Worker serves the frontend (Workers Static Assets) and every
-  `/api/*` endpoint, so there is no separate gateway host and no cross-origin hop.
-- That same Worker hosts the MCP-style tool registry and the agent loop.
-- Supabase hosts auth, structured memory, and conversations.
-- Hosted APIs keep model inference and web search off self-managed infrastructure.
-
-## Deployment and Configuration Quick Reference
-
-### Default Production Topology
+- [`apps/web/src`](apps/web/src) is the React 19 SPA: react-router 7, Tailwind CSS 4, assistant-ui for chat, Mapbox GL for the dorm map, and supabase-js for auth and user data.
+- [`apps/web/worker`](apps/web/worker) is the Cloudflare Worker (named `uiuc`). It routes `/api/*` and serves the SPA's static assets for every other path. It also hosts the tool-use [agent loop](apps/web/worker/agent), its [tools](apps/web/worker/tools) and [skills](apps/web/worker/skills), and an experimental [MCP client](apps/web/worker/mcp) for user-registered servers (in memory only, with no UI yet).
+- [`apps/web/scripts/migrations`](apps/web/scripts/migrations) is the dorm SQL chain (dorms, edit history, the photo bucket, persona and memory tables) that you run by hand in the Supabase SQL editor, together with [`apps/web/scripts/create_dorm_user_features.sql`](apps/web/scripts/create_dorm_user_features.sql) for dorm favorites and viewing history.
+- [`tools/vite-bin`](tools/vite-bin) gives `cf build` a `vite` bin that forwards to the pinned Vite+, so builds don't download an unpinned Vite.
 
 ```text
-Browser -> web Worker (static assets + /api/*)
-  -> Supabase
-  -> DeepSeek API
-  -> Tavily API
+Browser ──same origin──> Worker "uiuc" (apps/web/worker)
+                           ├─ /api/chat         tool-use agent on DeepSeek,
+                           │                    ≤3 iterations, ≤5 tool calls
+                           │                      ├─ web_search ─> Tavily (illinois.edu only)
+                           │                      └─ custom_skills, MCP tools (experimental)
+                           ├─ /api/deepseek     DeepSeek proxy behind the switched-off review translate button
+                           ├─ /api/tavily       Tavily proxy that no client calls
+                           ├─ /api/gemini       Gemini proxy that no client calls
+                           ├─ /api/health, /api/integrations/*
+                           ├─ any other /api/*  404 JSON listing the available endpoints
+                           └─ everything else ─> static assets (the SPA)
 ```
 
-### Required Configuration
+`/api/chat` is the only chat path: the chat page and the floating dorm assistant both post to it and read back an SSE stream. Greetings, thanks, and other small talk run without tools. When an agent iteration fails, it retries once with at most one tool, then answers without tools.
 
-#### Frontend / App
+Nothing needs loading for retrieval: the agent's only source is a Tavily search at question time. [`tests/fixtures/`](tests/fixtures) still holds `seed-data.sql` and `golden-queries.json` from the removed knowledge-base schema; nothing reads them.
 
-- Configure the app to call the Cloudflare Worker chat endpoint.
+## Security
 
-#### Cloudflare Worker
+- Anything `VITE_`-prefixed or injected through Vite `define` is public browser data, and so is anything under `apps/web/src`. In the SPA, only the Supabase URL and anon key and the Mapbox token use that prefix; never put a provider key in `src` or in a `VITE_` variable in `.env.local`. The one other `VITE_` name is server-side: the Worker still accepts a legacy `VITE_DEEPSEEK_API_KEY` secret as a fallback for `/api/deepseek` (not `/api/chat`). Set `DEEPSEEK_API_KEY` instead.
+- Provider keys (DeepSeek, Tavily, Google) and the Worker's Supabase URL and anon key are Worker secrets. Keep them in `apps/web/.dev.vars` locally; in production, set them from `apps/web` with `pnpm exec cf workers secrets update <NAME> --worker uiuc` (the CLI then asks for the secret type and value). Git ignores `.env*` and `.dev.vars*`; only the `.example` templates are tracked.
+- Guests are allowed. `/api/chat` and `/api/integrations` accept requests without a token, but a Bearer token that Supabase rejects gets a 401. Every tokenless caller shares one `anonymous` identity, so an MCP server registered without a token is loaded into every guest chat. There's no `KV` binding yet, so the MCP registry lives in Worker isolate memory and registrations don't last.
+- `/api/deepseek`, `/api/tavily`, and `/api/gemini` take no auth at all and relay any request with the Worker's own keys; `/api/deepseek` forwards caller-supplied `messages` as-is, and `/api/tavily` and `/api/gemini` send `Access-Control-Allow-Origin: *`, so any website can call them. The keys stay hidden, but anyone can spend their quota.
+- The Worker doesn't rate-limit any endpoint.
+- Supabase RLS is on, and dorm writes require `user_metadata.is_admin`.
 
-Required secrets / vars:
+## Documentation
 
-- `SUPABASE_URL`
-- `SUPABASE_ANON_KEY`
-- `DEEPSEEK_API_KEY`
-- `TAVILY_API_KEY`
+| Goal                                           | Start here                                                                                                                                                                                                                                   |
+| ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Learn the repo rules, commands, and data model | [AGENTS.md](AGENTS.md)                                                                                                                                                                                                                       |
+| Work on the React app or the Worker            | [apps/web/AGENTS.md](apps/web/AGENTS.md)                                                                                                                                                                                                     |
+| Change the agent's prompt or loop              | [apps/web/worker/routes/agent-prompts](apps/web/worker/routes/agent-prompts) · [apps/web/worker/agent](apps/web/worker/agent)                                                                                                                |
+| Add an agent tool or skill                     | [apps/web/worker/tools](apps/web/worker/tools) · [apps/web/worker/skills](apps/web/worker/skills)                                                                                                                                            |
+| Configure secrets and the Worker               | [apps/web/.dev.vars.example](apps/web/.dev.vars.example) · [apps/web/.env.local.example](apps/web/.env.local.example) · [apps/web/cloudflare.config.ts](apps/web/cloudflare.config.ts)                                                       |
+| Set up dorm tables and seed data               | [apps/web/scripts/migrations](apps/web/scripts/migrations) · [apps/web/scripts/create_dorm_user_features.sql](apps/web/scripts/create_dorm_user_features.sql) · [apps/web/scripts/seed-dorms-table.ts](apps/web/scripts/seed-dorms-table.ts) |
+| See what runs on pull requests                 | [.github/workflows/react-doctor.yml](.github/workflows/react-doctor.yml)                                                                                                                                                                     |
 
-### Minimal Deployment Flow
+## Development
 
-1. Deploy the Supabase auth and user-data schema.
-2. Deploy the Cloudflare Worker and confirm `/api/health` and `/api/chat` SSE.
-3. Build the frontend in staging.
-4. Verify SSE responses, tool calls, and fallback behavior.
-5. Promote to production.
-
-### Rollback Rule
-
-Redeploy the previous Worker build. There is no second chat path to fall back to.
-
-### Validation Examples
+The repository is a pnpm workspace driven by [Vite+](https://viteplus.dev) (`vp`). `pnpm-workspace.yaml` lists `apps/*`, `packages/*`, and `tools/*`, which today means two packages: `@iguide/web` (`apps/web`) and `@iguide/vite-bin` (`tools/vite-bin`). Dependencies use the `workspace:` and `catalog:` protocols, so plain `npm install` is not supported. `pnpm install` also sets up a pre-commit hook that runs `vp check --fix` on staged files.
 
 ```bash
-# Worker health
-curl http://localhost:5173/api/health
-
-# Workspace typecheck (every package)
-pnpm run typecheck
-
-# SPA and Worker local dev
-pnpm run dev:web
+pnpm run dev:web     # Vite dev server with the Worker behind it
+pnpm run check       # format, lint, and type-check, with fixes
+pnpm run fmt         # Oxfmt, writes in place
+pnpm run lint        # Oxlint, type-aware and type-checked
+pnpm run build       # production build of apps/web
+pnpm run preview     # serve the production build locally
 ```
 
-### Tech Stack Summary
+`pnpm run test` and `pnpm run typecheck` still exist, but no package defines those tasks, so both run nothing; type checking happens inside `vp lint`. The Worker and SPA tests are `node:test` files that no script runs yet, so run them from `apps/web` with Node:
 
-- **Supabase:** Auth, Postgres, and RLS.
-- **Cloudflare Workers:** Edge gateway, tool registry, agent loop, and SSE runtime.
-- **Cloudflare Workers Static Assets:** Frontend hosting (`web` Worker).
-- **DeepSeek API:** Hosted model inference.
-- **Tavily API:** The only retrieval source.
+```bash
+cd apps/web
+node --test "worker/**/*.test.ts" "src/**/*.test.ts"
+```
+
+Two of those files, `worker/agent/loop.test.ts` and `worker/agent/loop.baseline.test.ts`, fail under plain Node today because the agent loop imports its `.txt` prompts as text modules; the rest pass.
+
+There's no CI test workflow. [React Doctor](.github/workflows/react-doctor.yml) reviews pull requests and pushes to `main` that touch `apps/web` and reports without failing the check. Run `pnpm run check`, the tests above, and `pnpm run build` yourself before you push.
+
+## Deploy
+
+One Worker serves the SPA and the whole API, so it's the only thing to deploy. It's configured in [`apps/web/cloudflare.config.ts`](apps/web/cloudflare.config.ts) and deployed with the `cf` CLI, a dev dependency of `apps/web` only. The config pins a Cloudflare `accountId` and the custom domain `iguide.chat`, and mirrors the dashboard by enabling the `workers.dev` subdomain and Preview URLs. A fork must change `accountId` and `domains` before it deploys.
+
+To deploy by hand:
+
+```bash
+cd apps/web
+pnpm exec cf build    # Worker + SPA assets as Build Output
+pnpm run deploy       # cf deploy --prebuilt
+```
+
+To try a branch first, deploy a Worker Preview instead. `cf previews deploy` names the preview after the current Git branch. `--prebuilt` accepts only Build Output flagged as a Preview build, and `vp build` sets that flag only when `CLOUDFLARE_PREVIEW_BUILD=true` is in the environment (in PowerShell, run `$env:CLOUDFLARE_PREVIEW_BUILD = "true"` first); without it, the deploy stops with "Build Output was not created by a Preview build":
+
+```bash
+cd apps/web
+CLOUDFLARE_PREVIEW_BUILD=true pnpm run build:preview   # vp build --mode preview
+pnpm run deploy:preview                                # cf previews deploy --prebuilt
+```
+
+Alternatively, `pnpm exec cf previews deploy` (without `--prebuilt`) builds with the flag set and deploys in one step.
+
+Roll out in this order:
+
+1. Create the `conversations`, `messages`, `reading_history`, `user_profiles`, and `mailing_list` tables yourself: the tracked SQL doesn't create them, and the dorm chain's `add_soul_and_memory.sql` references `conversations`. Then run the dorm chain in `apps/web/scripts/migrations/`, starting with `create_dorms_table.sql`, and `apps/web/scripts/create_dorm_user_features.sql` (favorites and viewing history). On a fresh project, delete the last line of `create_dorms_table.sql` first: it comments on a `dorm_overrides` table that no tracked SQL creates, and that error rolls back the whole file in the SQL editor.
+2. Seed the dorms table. The script reads `SUPABASE_URL` and `SUPABASE_SERVICE_KEY` from the shell, not from `.env` files.
+
+   ```bash
+   cd apps/web && pnpm dlx tsx scripts/seed-dorms-table.ts
+   ```
+
+   On a database built only from the tracked SQL, the seed fails: `add_categorized_tags.sql` adds `chk_bathroom_type`, which allows only `communal`, `semi-private`, and `private`, but the seed writes `individual-use` for four dorms, and one rejected row fails the whole upsert. Widen the constraint before you seed:
+
+   ```sql
+   ALTER TABLE public.dorms DROP CONSTRAINT chk_bathroom_type;
+   ALTER TABLE public.dorms ADD CONSTRAINT chk_bathroom_type
+     CHECK (bathroom_type IN ('communal', 'individual-use', 'semi-private', 'private'));
+   ```
+
+3. Set the Worker secrets. `Env` in [`worker/types.ts`](apps/web/worker/types.ts) requires only `SUPABASE_URL` and `SUPABASE_ANON_KEY` (Cloudflare binds `ASSETS`), but chat needs `DEEPSEEK_API_KEY` and search needs `TAVILY_API_KEY`.
+4. Deploy a preview (see above), check `/api/health` on it, and verify streaming, tool calls, and fallback.
+5. Deploy to production (`pnpm exec cf build`, then `pnpm run deploy`) and check `/api/health` on `iguide.chat`.
+
+**Rollback.** There's no second chat path to fall back to, so roll back the Worker itself. The quickest way points traffic back at an earlier uploaded version without rebuilding:
+
+```bash
+cd apps/web
+pnpm exec cf workers versions list --worker-id uiuc
+pnpm exec cf workers deployments create --worker uiuc --strategy percentage \
+  --versions '[{"version_id":"<last good version id>","percentage":100}]'
+```
+
+If you need to rebuild instead, check out the last good commit and run `cf build` and `deploy` as above. That also redeploys that commit's `cloudflare.config.ts`.
+
+## Community
+
+Report bugs and request features in [GitHub Issues](https://github.com/IGUIDE-chat/iGuide/issues). Pull requests are welcome; run `pnpm run check` and the tests in [Development](#development) before opening one. AI-assisted PRs are welcome too, as long as the agent follows [AGENTS.md](AGENTS.md) (and [apps/web/AGENTS.md](apps/web/AGENTS.md) inside `apps/web`).
+
+<a href="https://github.com/IGUIDE-chat/iGuide/graphs/contributors"><img src="https://contrib.rocks/image?repo=IGUIDE-chat/iGuide" alt="Contributors"></a>
