@@ -2,15 +2,8 @@
   "name": "iguide",
   "private": true,
   "scripts": {
-    "build": "vp run -r build",
-    "check": "vp check --fix",
     "dev:web": "vp -C apps/web dev",
-    "fmt": "vp fmt",
-    "lint": "vp lint",
-    "prepare": "vp config",
-    "preview": "vp -C apps/web preview",
-    "test": "vp run -r test",
-    "typecheck": "vp run -r typecheck"
+    "prepare": "vp config"
   },
   "devDependencies": {
     "vite": "catalog:",

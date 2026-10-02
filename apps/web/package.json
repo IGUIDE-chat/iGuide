@@ -4,16 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "vp build",
-    "build:preview": "vp build --mode preview",
-    "deploy": "cf deploy --prebuilt",
-    "deploy:preview": "cf previews deploy --prebuilt",
-    "dev": "vp dev",
-    "doctor": "npx react-doctor@latest",
-    "fmt": "vp fmt",
-    "fmt:fix": "vp fmt --fix",
-    "lint": "vp lint",
-    "lint:fix": "vp lint --fix"
+    "dev": "vp dev"
   },
   "dependencies": {
     "@assistant-ui/react": "^0.15.22",
