@@ -1,3 +1,4 @@
+import { Typewriter } from "@iguide/ui"
 import { motion, AnimatePresence } from "framer-motion"
 import { MessageCircle, X, Send, Sparkles, Loader2 } from "lucide-react"
 import React, { useState, useRef, useEffect } from "react"
@@ -8,7 +9,6 @@ import remarkGfm from "remark-gfm"
 import { streamChatResponse } from "../../services/ai"
 import { Language } from "../../types"
 import { isDormMention, findMentionedDorms } from "../../utils/housingUtils"
-import { Typewriter } from "../ui/Typewriter"
 import { aiChatTexts } from "./i18n/dormTexts"
 import { ChatMessage } from "./types/index"
 

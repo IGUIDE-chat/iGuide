@@ -2,6 +2,9 @@
 /* [根组件] 全局样式和 Tailwind CSS 指令。 */
 @import "tailwindcss";
 
+/* Workspace UI packages sit outside this app's root, so Tailwind won't find their classes on its own. */
+@source "../../../packages/ui/src";
+
 @theme {
   --color-illini-blue: #13294b;
   --color-illini-orange: #ff5f05;

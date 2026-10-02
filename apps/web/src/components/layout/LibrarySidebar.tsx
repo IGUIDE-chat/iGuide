@@ -1,10 +1,10 @@
+import { Typewriter } from "@iguide/ui"
 import React, { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { libraryService } from "../../services/libraryService"
 import { supabase } from "../../services/supabase"
 import { LibraryHistoryItem } from "../../types"
-import { Typewriter } from "../ui/Typewriter"
 import {
   BaseSidebar,
   SidebarItem,

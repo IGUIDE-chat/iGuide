@@ -1,3 +1,4 @@
+import { Typewriter } from "@iguide/ui"
 import { AnimatePresence, motion } from "framer-motion"
 import { Clock, Heart, Trash2 } from "lucide-react"
 import React, { useMemo } from "react"
@@ -7,7 +8,6 @@ import { Language } from "../../types"
 import { useDormData } from "../housing/store/DormDataContext"
 import { useSharedDormInteraction } from "../housing/store/DormUserInteractionContext"
 import { Dorm } from "../housing/types/index"
-import { Typewriter } from "../ui/Typewriter"
 
 interface DormSidebarProps {
   language: Language
