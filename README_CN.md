@@ -49,9 +49,10 @@ curl http://localhost:5173/api/health
 
 ## 整体架构
 
-- [`apps/web/src`](apps/web/src) 是 React 19 SPA：react-router 7、Tailwind CSS 4、负责聊天的 assistant-ui、负责宿舍地图的 Mapbox GL，以及负责鉴权和用户数据的 supabase-js。
+- [`apps/web/src`](apps/web/src) 是 React 19 SPA 外壳：react-router 7、Tailwind CSS 4、负责聊天的 assistant-ui，以及负责鉴权和用户数据的 supabase-js。
+- [`packages/dorm`](packages/dorm) 是独立成 workspace 包的宿舍功能：列表、Mapbox GL 地图、详情、对比和评论，以及宿舍 SQL 迁移链、数据脚本和评论爬虫。Web 应用通过一个适配文件在 `/dorms/*` 懒加载它，其他页面不会加载宿舍代码，也不会查询宿舍表。共享的 UI 基础组件在 [`packages/ui`](packages/ui) 中。
 - [`apps/web/worker`](apps/web/worker) 是 Cloudflare Worker（名为 `uiuc`）。它负责路由 `/api/*`，其他所有路径都返回 SPA 的静态资源。它还承载 tool-use [agent 循环](apps/web/worker/agent)、配套的[工具](apps/web/worker/tools)和[技能](apps/web/worker/skills)，以及一个面向用户自行注册服务器的实验性 [MCP 客户端](apps/web/worker/mcp)（仅存于内存，暂无 UI）。
-- [`apps/web/scripts/migrations`](apps/web/scripts/migrations) 是宿舍 SQL 迁移链（宿舍、编辑历史、照片 bucket、人设和记忆表），需要在 Supabase SQL 编辑器中手动执行，并配合 [`apps/web/scripts/create_dorm_user_features.sql`](apps/web/scripts/create_dorm_user_features.sql) 实现宿舍收藏和浏览历史。
+- SQL 需要在 Supabase SQL 编辑器中手动执行：先执行 [`packages/dorm/scripts`](packages/dorm/README_CN.md#宿舍数据库) 中的宿舍迁移链（宿舍、编辑历史、照片 bucket、收藏和浏览历史），再执行 [`apps/web/scripts/migrations`](apps/web/scripts/migrations) 中的人设和记忆表。
 - [`tools/vite-bin`](tools/vite-bin) 为 `cf build` 提供一个转发到已锁定版本 Vite+ 的 `vite` bin，这样构建时就不会下载未锁定版本的 Vite。
 
 ```text
@@ -83,15 +84,15 @@ Browser ──same origin──> Worker "uiuc" (apps/web/worker)
 
 ## 文档
 
-| 目标                           | 从这里开始                                                                                                                                                                                                                                   |
-| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 了解仓库规则、命令和数据模型   | [AGENTS.md](AGENTS.md)                                                                                                                                                                                                                       |
-| 开发 React 应用或 Worker       | [apps/web/AGENTS.md](apps/web/AGENTS.md)                                                                                                                                                                                                     |
-| 修改 agent 的提示词或循环      | [apps/web/worker/routes/agent-prompts](apps/web/worker/routes/agent-prompts) · [apps/web/worker/agent](apps/web/worker/agent)                                                                                                                |
-| 添加 agent 工具或技能          | [apps/web/worker/tools](apps/web/worker/tools) · [apps/web/worker/skills](apps/web/worker/skills)                                                                                                                                            |
-| 配置 secrets 和 Worker         | [apps/web/.dev.vars.example](apps/web/.dev.vars.example) · [apps/web/.env.local.example](apps/web/.env.local.example) · [apps/web/cloudflare.config.ts](apps/web/cloudflare.config.ts)                                                       |
-| 创建宿舍表并导入种子数据       | [apps/web/scripts/migrations](apps/web/scripts/migrations) · [apps/web/scripts/create_dorm_user_features.sql](apps/web/scripts/create_dorm_user_features.sql) · [apps/web/scripts/seed-dorms-table.ts](apps/web/scripts/seed-dorms-table.ts) |
-| 查看 pull request 上会运行什么 | [.github/workflows/react-doctor.yml](.github/workflows/react-doctor.yml)                                                                                                                                                                     |
+| 目标                           | 从这里开始                                                                                                                                                                             |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 了解仓库规则、命令和数据模型   | [AGENTS.md](AGENTS.md)                                                                                                                                                                 |
+| 开发 React 应用或 Worker       | [apps/web/AGENTS.md](apps/web/AGENTS.md)                                                                                                                                               |
+| 修改 agent 的提示词或循环      | [apps/web/worker/routes/agent-prompts](apps/web/worker/routes/agent-prompts) · [apps/web/worker/agent](apps/web/worker/agent)                                                          |
+| 添加 agent 工具或技能          | [apps/web/worker/tools](apps/web/worker/tools) · [apps/web/worker/skills](apps/web/worker/skills)                                                                                      |
+| 配置 secrets 和 Worker         | [apps/web/.dev.vars.example](apps/web/.dev.vars.example) · [apps/web/.env.local.example](apps/web/.env.local.example) · [apps/web/cloudflare.config.ts](apps/web/cloudflare.config.ts) |
+| 修改宿舍页面、SQL 或种子数据   | [packages/dorm](packages/dorm/README_CN.md)                                                                                                                                            |
+| 查看 pull request 上会运行什么 | [.github/workflows/react-doctor.yml](.github/workflows/react-doctor.yml)                                                                                                               |
 
 ## 开发
 
@@ -141,11 +142,11 @@ pnpm run deploy:preview                                # cf previews deploy --pr
 
 按以下顺序上线：
 
-1. 自己创建 `conversations`、`messages`、`reading_history`、`user_profiles` 和 `mailing_list` 表：仓库中的 SQL 不会创建它们，而宿舍迁移链中的 `add_soul_and_memory.sql` 会引用 `conversations`。然后从 `create_dorms_table.sql` 开始执行 `apps/web/scripts/migrations/` 中的宿舍迁移链，并执行 `apps/web/scripts/create_dorm_user_features.sql`（收藏和浏览历史）。在全新项目上，请先删掉 `create_dorms_table.sql` 的最后一行：它给一张仓库里没有任何 SQL 创建的 `dorm_overrides` 表加注释，这个错误会让 SQL 编辑器回滚整个文件。
+1. 自己创建 `conversations`、`messages`、`reading_history`、`user_profiles` 和 `mailing_list` 表：仓库中的 SQL 不会创建它们，而 `apps/web/scripts/migrations/add_soul_and_memory.sql` 会引用 `conversations`。从 `create_dorms_table.sql` 开始执行 `packages/dorm/scripts/migrations/` 中的宿舍迁移链，并执行 `packages/dorm/scripts/create_dorm_user_features.sql`（收藏和浏览历史），然后执行 `add_soul_and_memory.sql`。在全新项目上，请先删掉 `create_dorms_table.sql` 的最后一行：它给一张仓库里没有任何 SQL 创建的 `dorm_overrides` 表加注释，这个错误会让 SQL 编辑器回滚整个文件。
 2. 为宿舍表导入种子数据。该脚本从 shell 读取 `SUPABASE_URL` 和 `SUPABASE_SERVICE_KEY`，而不是从 `.env` 文件读取。
 
    ```bash
-   cd apps/web && pnpm dlx tsx scripts/seed-dorms-table.ts
+   cd packages/dorm && pnpm run seed
    ```
 
    如果数据库只由仓库中的 SQL 建成，导入种子数据会失败：`add_categorized_tags.sql` 添加的 `chk_bathroom_type` 只允许 `communal`、`semi-private` 和 `private`，但种子脚本会为四栋宿舍写入 `individual-use`，而只要有一行被拒绝，整个 upsert 就会失败。导入前请先放宽这个约束：

@@ -49,9 +49,10 @@ curl http://localhost:5173/api/health
 
 ## How it fits together
 
-- [`apps/web/src`](apps/web/src) is the React 19 SPA: react-router 7, Tailwind CSS 4, assistant-ui for chat, Mapbox GL for the dorm map, and supabase-js for auth and user data.
+- [`apps/web/src`](apps/web/src) is the React 19 SPA shell: react-router 7, Tailwind CSS 4, assistant-ui for chat, and supabase-js for auth and user data.
+- [`packages/dorm`](packages/dorm) is the dorm feature as its own workspace package: list, Mapbox GL map, detail, compare, and reviews, plus the dorm SQL chain, data scripts, and review scrapers. The web app mounts it lazily at `/dorms/*` through one adapter, so no other page loads dorm code or queries dorm tables. Shared UI primitives live in [`packages/ui`](packages/ui).
 - [`apps/web/worker`](apps/web/worker) is the Cloudflare Worker (named `uiuc`). It routes `/api/*` and serves the SPA's static assets for every other path. It also hosts the tool-use [agent loop](apps/web/worker/agent), its [tools](apps/web/worker/tools) and [skills](apps/web/worker/skills), and an experimental [MCP client](apps/web/worker/mcp) for user-registered servers (in memory only, with no UI yet).
-- [`apps/web/scripts/migrations`](apps/web/scripts/migrations) is the dorm SQL chain (dorms, edit history, the photo bucket, persona and memory tables) that you run by hand in the Supabase SQL editor, together with [`apps/web/scripts/create_dorm_user_features.sql`](apps/web/scripts/create_dorm_user_features.sql) for dorm favorites and viewing history.
+- SQL runs by hand in the Supabase SQL editor: the dorm chain in [`packages/dorm/scripts`](packages/dorm/README.md#dorm-database) (dorms, edit history, the photo bucket, favorites and viewing history), then the persona and memory tables in [`apps/web/scripts/migrations`](apps/web/scripts/migrations).
 - [`tools/vite-bin`](tools/vite-bin) gives `cf build` a `vite` bin that forwards to the pinned Vite+, so builds don't download an unpinned Vite.
 
 ```text
@@ -83,15 +84,15 @@ Nothing needs loading for retrieval: the agent's only source is a Tavily search 
 
 ## Documentation
 
-| Goal                                           | Start here                                                                                                                                                                                                                                   |
-| ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Learn the repo rules, commands, and data model | [AGENTS.md](AGENTS.md)                                                                                                                                                                                                                       |
-| Work on the React app or the Worker            | [apps/web/AGENTS.md](apps/web/AGENTS.md)                                                                                                                                                                                                     |
-| Change the agent's prompt or loop              | [apps/web/worker/routes/agent-prompts](apps/web/worker/routes/agent-prompts) · [apps/web/worker/agent](apps/web/worker/agent)                                                                                                                |
-| Add an agent tool or skill                     | [apps/web/worker/tools](apps/web/worker/tools) · [apps/web/worker/skills](apps/web/worker/skills)                                                                                                                                            |
-| Configure secrets and the Worker               | [apps/web/.dev.vars.example](apps/web/.dev.vars.example) · [apps/web/.env.local.example](apps/web/.env.local.example) · [apps/web/cloudflare.config.ts](apps/web/cloudflare.config.ts)                                                       |
-| Set up dorm tables and seed data               | [apps/web/scripts/migrations](apps/web/scripts/migrations) · [apps/web/scripts/create_dorm_user_features.sql](apps/web/scripts/create_dorm_user_features.sql) · [apps/web/scripts/seed-dorms-table.ts](apps/web/scripts/seed-dorms-table.ts) |
-| See what runs on pull requests                 | [.github/workflows/react-doctor.yml](.github/workflows/react-doctor.yml)                                                                                                                                                                     |
+| Goal                                           | Start here                                                                                                                                                                             |
+| ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Learn the repo rules, commands, and data model | [AGENTS.md](AGENTS.md)                                                                                                                                                                 |
+| Work on the React app or the Worker            | [apps/web/AGENTS.md](apps/web/AGENTS.md)                                                                                                                                               |
+| Change the agent's prompt or loop              | [apps/web/worker/routes/agent-prompts](apps/web/worker/routes/agent-prompts) · [apps/web/worker/agent](apps/web/worker/agent)                                                          |
+| Add an agent tool or skill                     | [apps/web/worker/tools](apps/web/worker/tools) · [apps/web/worker/skills](apps/web/worker/skills)                                                                                      |
+| Configure secrets and the Worker               | [apps/web/.dev.vars.example](apps/web/.dev.vars.example) · [apps/web/.env.local.example](apps/web/.env.local.example) · [apps/web/cloudflare.config.ts](apps/web/cloudflare.config.ts) |
+| Work on dorm pages, SQL, or seed data          | [packages/dorm](packages/dorm/README.md)                                                                                                                                               |
+| See what runs on pull requests                 | [.github/workflows/react-doctor.yml](.github/workflows/react-doctor.yml)                                                                                                               |
 
 ## Development
 
@@ -141,11 +142,11 @@ Alternatively, `pnpm exec cf previews deploy` (without `--prebuilt`) builds with
 
 Roll out in this order:
 
-1. Create the `conversations`, `messages`, `reading_history`, `user_profiles`, and `mailing_list` tables yourself: the tracked SQL doesn't create them, and the dorm chain's `add_soul_and_memory.sql` references `conversations`. Then run the dorm chain in `apps/web/scripts/migrations/`, starting with `create_dorms_table.sql`, and `apps/web/scripts/create_dorm_user_features.sql` (favorites and viewing history). On a fresh project, delete the last line of `create_dorms_table.sql` first: it comments on a `dorm_overrides` table that no tracked SQL creates, and that error rolls back the whole file in the SQL editor.
+1. Create the `conversations`, `messages`, `reading_history`, `user_profiles`, and `mailing_list` tables yourself: the tracked SQL doesn't create them, and `apps/web/scripts/migrations/add_soul_and_memory.sql` references `conversations`. Run the dorm chain in `packages/dorm/scripts/migrations/`, starting with `create_dorms_table.sql`, and `packages/dorm/scripts/create_dorm_user_features.sql` (favorites and viewing history), then `add_soul_and_memory.sql`. On a fresh project, delete the last line of `create_dorms_table.sql` first: it comments on a `dorm_overrides` table that no tracked SQL creates, and that error rolls back the whole file in the SQL editor.
 2. Seed the dorms table. The script reads `SUPABASE_URL` and `SUPABASE_SERVICE_KEY` from the shell, not from `.env` files.
 
    ```bash
-   cd apps/web && pnpm dlx tsx scripts/seed-dorms-table.ts
+   cd packages/dorm && pnpm run seed
    ```
 
    On a database built only from the tracked SQL, the seed fails: `add_categorized_tags.sql` adds `chk_bathroom_type`, which allows only `communal`, `semi-private`, and `private`, but the seed writes `individual-use` for four dorms, and one rejected row fails the whole upsert. Widen the constraint before you seed:

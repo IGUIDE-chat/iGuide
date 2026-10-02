@@ -13,8 +13,11 @@ overall architecture, see the root [README](../../README.md). For where code bel
 - `worker/`: the Worker, entry `worker/index.ts`, configured in `cloudflare.config.ts`. It serves
   `/api/chat` (the tool-use agent; Tavily web search is its only retrieval source), the provider
   proxies, `/api/health` and `/api/integrations*`.
-- `scripts/`: the dorm database SQL (`scripts/migrations/*.sql`, `scripts/*.sql`) and the dorm data
-  scripts below. Two unused leftovers from the removed QMD knowledge base are also still here:
+- `src/pages/dorms/DormRoute.tsx`: the only file that touches the dorm feature. The feature itself
+  (UI, state, dorm SQL, data scripts) lives in [`packages/dorm`](../../packages/dorm) and is
+  lazy-loaded at `/dorms/*`.
+- `scripts/`: the chat persona and memory SQL (`scripts/migrations/add_soul_and_memory.sql`) and the
+  RLS fixes `scripts/optimize_rls_policies.sql` and `scripts/fix_function_security.sql`. Two unused leftovers from the removed QMD knowledge base are also still here:
   `scripts/qmd-server.mjs` (the search server behind the old `/api/search` route) and
   `scripts/generate-handbook-ocr.py` (an OCR generator for QMD content). Nothing references them.
 
@@ -52,43 +55,13 @@ Lint with `pnpm run lint` and check formatting with `pnpm exec vp fmt --check` (
 rewrites files). From the repo root, `pnpm exec vp check` runs format, lint and type checks
 (`pnpm run check` does the same and applies fixes).
 
-## Dorm database
+## Database
 
-Run the SQL by hand in the Supabase SQL editor. Core dorm schema, in this order:
-
-1. `scripts/migrations/create_dorms_table.sql`. On a fresh project, delete its last line first: it
-   comments on a `dorm_overrides` table that no tracked SQL creates, and the SQL editor then rolls back
-   the whole file.
-2. `scripts/migrations/add_categorized_tags.sql` (safe to rerun)
-3. `scripts/migrations/add_dorm_address.sql` and `scripts/migrations/add_dorm_website.sql`, which add
-   the `address`, `address_zh` and `website` columns the seed writes
-
-Feature SQL, after the core schema:
-
-- `scripts/migrations/create_storage_bucket.sql`: the `dorm-images` storage bucket.
-- `add_dorm_edit_history.sql`, then `fix_dorm_edit_history_rls.sql`; `add_dorm_comments.sql`, then
-  `add_dorm_comment_hidden.sql`; `add_floor_plan_bed_size.sql`; `add_soul_and_memory.sql` (all in
-  `scripts/migrations/`).
-- `scripts/create_dorm_user_features.sql`: dorm favorites and viewing history.
+Run the SQL by hand in the Supabase SQL editor. Dorm tables, storage and seed data are set up from
+[`packages/dorm`](../../packages/dorm/README.md#dorm-database); run that chain first.
 
 The tracked SQL does not create every table the app uses. Create `conversations`, `messages`,
-`reading_history`, `user_profiles` and `mailing_list` yourself. `scripts/optimize_rls_policies.sql` and
-`scripts/fix_function_security.sql` assume some of them already exist. Known conflict:
-`add_categorized_tags.sql` limits `bathroom_type` to `communal`, `semi-private` and `private`, but the
-seed writes `individual-use` for four dorms. Until that constraint changes, the seed fails on a
-database built only from this SQL.
-
-## Dorm data scripts
-
-`tsx` is not a dependency, so run the scripts with `pnpm dlx tsx`, from `apps/web/`:
-
-```sh
-pnpm dlx tsx scripts/validate-dorm-data.ts   # offline check of the bundled dataset
-pnpm dlx tsx scripts/audit-dorm-media.ts     # sends HEAD requests to suspicious media URLs
-SUPABASE_URL=<url> SUPABASE_SERVICE_KEY=<service-role-key> pnpm dlx tsx scripts/seed-dorms-table.ts
-```
-
-The seed reads both variables from the shell, not from env files (in PowerShell, set them first with
-`$env:NAME = "..."`). `SUPABASE_SERVICE_KEY` is a service-role key that bypasses RLS. The seed upserts
-the bundled `UIUC_DORMS` into `dorms` by `id`. It keeps stored images, gallery and floor-plan media,
-merges tags with stored ones, and never deletes rows. It does not read the archived `dorm_overrides`.
+`reading_history`, `user_profiles` and `mailing_list` yourself. Then run
+`scripts/migrations/add_soul_and_memory.sql`, which references `conversations`.
+`scripts/optimize_rls_policies.sql` and `scripts/fix_function_security.sql` assume some of those
+tables already exist.

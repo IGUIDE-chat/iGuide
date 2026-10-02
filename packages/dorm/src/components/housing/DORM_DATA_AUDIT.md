@@ -20,7 +20,7 @@ Rules:
 - Never fill a gap with a plausible guess. Leave the field empty and log it here.
 - Prefer official sources: housing.illinois.edu, the Office of Housing, the
   University Housing directory, and the dorm's own published materials.
-- Google Maps review scrapers (`dorm_scripts/`) are not authoritative for dorm
+- Google Maps review scrapers (`packages/dorm/scrapers/`) are not authoritative for dorm
   facts; they only supply review text.
 - When a fact is later resolved or corrected, keep the old entry and append the
   resolution — the history is the point.

@@ -13,7 +13,10 @@ Worker，Worker 负责托管 SPA，并在同源下处理所有 `/api/*` 路由�
 - `worker/`：Worker，入口 `worker/index.ts`，配置在 `cloudflare.config.ts`。它提供 `/api/chat`
   （tool-use 智能体，唯一的检索来源是 Tavily 网页搜索）、各模型服务代理、`/api/health` 和
   `/api/integrations*`。
-- `scripts/`：宿舍数据库 SQL（`scripts/migrations/*.sql`、`scripts/*.sql`）以及下文的宿舍数据脚本。
+- `src/pages/dorms/DormRoute.tsx`：唯一接触宿舍功能的文件。功能本身（UI、状态、宿舍 SQL、数据脚本）在
+  [`packages/dorm`](../../packages/dorm) 中，在 `/dorms/*` 懒加载。
+- `scripts/`：聊天人设和记忆的 SQL（`scripts/migrations/add_soul_and_memory.sql`），以及 RLS 修复脚本
+  `scripts/optimize_rls_policies.sql` 和 `scripts/fix_function_security.sql`。
   这里还留着两个已移除的 QMD 知识库的遗留文件，均未被使用：`scripts/qmd-server.mjs`（原
   `/api/search` 路由背后的搜索服务）和 `scripts/generate-handbook-ocr.py`（为 QMD 内容生成 OCR
   文本的脚本）。没有任何地方引用它们。
@@ -50,41 +53,12 @@ by a Preview build"。所以请运行 `CLOUDFLARE_PREVIEW_BUILD=true pnpm run bu
 用 `pnpm run lint` 做 lint，用 `pnpm exec vp fmt --check` 只检查格式（`fmt` 脚本会直接改写文件）。
 在仓库根目录，`pnpm exec vp check` 会运行格式、lint 和类型检查（`pnpm run check` 做同样的检查并自动修复）。
 
-## 宿舍数据库
+## 数据库
 
-在 Supabase SQL 编辑器中手动执行 SQL。宿舍核心表结构，按以下顺序：
-
-1. `scripts/migrations/create_dorms_table.sql`。在全新项目上，请先删掉它的最后一行：它给一张仓库里没有任何
-   SQL 创建的 `dorm_overrides` 表加注释，SQL 编辑器会因此回滚整个文件。
-2. `scripts/migrations/add_categorized_tags.sql`（可重复执行）
-3. `scripts/migrations/add_dorm_address.sql` 和 `scripts/migrations/add_dorm_website.sql`，它们添加
-   seed 脚本会写入的 `address`、`address_zh` 和 `website` 列
-
-功能相关 SQL，在核心表结构之后执行：
-
-- `scripts/migrations/create_storage_bucket.sql`：`dorm-images` 存储桶。
-- `add_dorm_edit_history.sql`，然后 `fix_dorm_edit_history_rls.sql`；`add_dorm_comments.sql`，然后
-  `add_dorm_comment_hidden.sql`；`add_floor_plan_bed_size.sql`；`add_soul_and_memory.sql`（都在
-  `scripts/migrations/` 下）。
-- `scripts/create_dorm_user_features.sql`：宿舍收藏和浏览记录。
+在 Supabase SQL 编辑器中手动执行 SQL。宿舍表、存储桶和种子数据按
+[`packages/dorm`](../../packages/dorm/README_CN.md#宿舍数据库) 中的步骤设置，请先执行那条迁移链。
 
 仓库里的 SQL 并不会创建应用用到的所有表。`conversations`、`messages`、`reading_history`、
-`user_profiles` 和 `mailing_list` 需要自行创建。`scripts/optimize_rls_policies.sql` 和
-`scripts/fix_function_security.sql` 假定其中部分表已存在。已知冲突：`add_categorized_tags.sql` 把
-`bathroom_type` 限定为 `communal`、`semi-private` 和 `private`，但 seed 脚本会为四栋宿舍写入
-`individual-use`。在该约束修改之前，只用这些 SQL 建出的数据库会导致 seed 失败。
-
-## 宿舍数据脚本
-
-`tsx` 不是依赖项，所以在 `apps/web/` 中用 `pnpm dlx tsx` 运行这些脚本：
-
-```sh
-pnpm dlx tsx scripts/validate-dorm-data.ts   # 离线校验内置数据集
-pnpm dlx tsx scripts/audit-dorm-media.ts     # 对可疑的媒体 URL 发送 HEAD 请求
-SUPABASE_URL=<url> SUPABASE_SERVICE_KEY=<service-role-key> pnpm dlx tsx scripts/seed-dorms-table.ts
-```
-
-seed 脚本从 shell 环境读取这两个变量，不读取 env 文件（PowerShell 中先用 `$env:NAME = "..."`
-设置）。`SUPABASE_SERVICE_KEY` 是会绕过 RLS 的 service-role 密钥。seed 脚本按 `id` 把内置的
-`UIUC_DORMS` upsert 到 `dorms` 表。它保留已存储的图片、图集和户型图媒体，把标签与已存储的标签合并，
-且从不删除行。它不会读取已归档的 `dorm_overrides`。
+`user_profiles` 和 `mailing_list` 需要自行创建。然后执行引用了 `conversations` 的
+`scripts/migrations/add_soul_and_memory.sql`。`scripts/optimize_rls_policies.sql` 和
+`scripts/fix_function_security.sql` 假定其中部分表已存在。

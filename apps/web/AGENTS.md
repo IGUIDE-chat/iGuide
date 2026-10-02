@@ -63,8 +63,15 @@ For repo-wide rules (secrets, CI, Worker retrieval, data model), see the root
 - Route-only composition belongs in `src/pages/**`.
 - Feature-local UI belongs next to that feature under `src/components/**`.
 - Shared layout belongs in `src/components/layout/**`.
-- Shared dumb UI belongs in `src/components/ui/**`.
+- Shared dumb UI belongs in `src/components/ui/**`; primitives that a feature
+  package also needs belong in `packages/ui` (`@iguide/ui`).
 - Shared persistence and external integrations belong in `src/services/**`.
+- Dorm (housing) code belongs in `packages/dorm`, not `src/`. This app reaches
+  it only through `src/pages/dorms/DormRoute.tsx`, which imports from
+  `@iguide/dorm` and never from the package's internal paths. Shell code
+  (`App.tsx`, `src/components/layout/**`) must not import dorm code; a feature
+  that needs shell space fills `useLayout().setSidebarSlot` or
+  `setMobileHeaderSlot` from inside its own route.
 
 ## Verification
 
@@ -72,9 +79,10 @@ For structure-affecting changes:
 
 1. Run `npm run typecheck` when TypeScript boundaries moved.
 2. Run `npm run build` for renamed imports, route changes, or moved modules.
-3. Run `npm run validate:dorm-data` when changing dorm data contracts.
-4. Run `npm run audit:dorm-media` when changing dorm media sourcing or media
-   validation.
+3. Run `pnpm run validate:data` in `packages/dorm/` when changing dorm data
+   contracts.
+4. Run `pnpm run audit:media` in `packages/dorm/` when changing dorm media
+   sourcing or media validation.
 5. Only require `npm run verify:architecture` if the script exists in
    `package.json`.
 
@@ -101,11 +109,12 @@ Key patterns:
 - Conversation management with persistent IDs
 - Route: `/chat`
 
-### Housing Chat (`src/components/housing/AIChat.tsx`)
+### Housing Chat (`packages/dorm/src/components/housing/AIChat.tsx`)
 
 - Housing/dorm-specific floating chat widget
 - Dorm mention detection and highlighting
 - Shows dorm cards with navigation to dorm details
-- Uses housing-specific i18n and streamChatResponse
+- Uses housing-specific i18n and this app's streamChatResponse, lent through
+  `configureDormServices` in `src/pages/dorms/DormRoute.tsx`
 - Embedded in DormDetailPage and DormListPage
 - Domain-specific to housing module per Colocation Principle

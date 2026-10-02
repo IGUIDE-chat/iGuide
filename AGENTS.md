@@ -9,10 +9,11 @@ A UIUC knowledge platform with a React 19 frontend and Cloudflare Worker gateway
 Supabase provides auth and Postgres; DeepSeek handles inference and Tavily
 supplies web search.
 
-| Path            | Role                                                                     |
-| :-------------- | :----------------------------------------------------------------------- |
-| `apps/web/`     | Frontend and Worker: SPA, static assets, agent loop, tools, skills, MCP. |
-| `dorm_scripts/` | Standalone Puppeteer/Bun review scrapers.                                |
+| Path             | Role                                                                        |
+| :--------------- | :-------------------------------------------------------------------------- |
+| `apps/web/`      | Frontend and Worker: SPA, static assets, agent loop, tools, skills, MCP.    |
+| `packages/dorm/` | Dorm feature (`@iguide/dorm`): UI, state, dorm SQL, data scripts, scrapers. |
+| `packages/ui/`   | Business-agnostic UI primitives shared by the app and feature packages.     |
 
 <!--VITE PLUS START-->
 
@@ -105,8 +106,10 @@ Paths below are relative to `apps/web/`:
 
 - Enable RLS and grants in each new table's migration: `anon` and `authenticated`
   receive `select`; writes use the service key.
-- Apply the dorm chain in `apps/web/scripts/migrations/`, starting with
+- Apply the dorm chain in `packages/dorm/scripts/migrations/`, starting with
   `create_dorms_table.sql`, then `add_categorized_tags.sql`, then follow-ups.
+  Chat-owned SQL (`add_soul_and_memory.sql`) stays in
+  `apps/web/scripts/migrations/`.
 
 ## Deploy
 
