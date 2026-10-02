@@ -5,7 +5,7 @@ import {
   createSSEStream,
   sendToolStart,
   sendToolResult,
-  sendSourceUrl,
+  sendSourceUrls,
   sendContent,
   sendFallback,
   sendDone,
@@ -430,11 +430,13 @@ test("existing tool_result test still passes (backward compat)", async () => {
 test("source-url payload mirrors the AI SDK source-url part", async () => {
   const { writer, events } = createTestWriterPair()
 
-  await sendSourceUrl(writer, {
-    url: "https://housing.illinois.edu/rates",
-    title: "Room and Board Rates",
-    snippet: "Rates for the 2026-27 academic year…",
-  })
+  await sendSourceUrls(writer, [
+    {
+      url: "https://housing.illinois.edu/rates",
+      title: "Room and Board Rates",
+      snippet: "Rates for the 2026-27 academic year…",
+    },
+  ])
   await writer.close()
 
   const parsed = await events
@@ -451,7 +453,7 @@ test("source-url payload mirrors the AI SDK source-url part", async () => {
 test("source-url payload omits snippet when the source has none", async () => {
   const { writer, events } = createTestWriterPair()
 
-  await sendSourceUrl(writer, { url: "https://illinois.edu/", title: "illinois.edu" })
+  await sendSourceUrls(writer, [{ url: "https://illinois.edu/", title: "illinois.edu" }])
   await writer.close()
 
   const parsed = await events
@@ -460,4 +462,34 @@ test("source-url payload omits snippet when the source has none", async () => {
     url: "https://illinois.edu/",
     title: "illinois.edu",
   })
+})
+
+test("source-url events keep the order of the sources", async () => {
+  const { writer, events } = createTestWriterPair()
+
+  await sendSourceUrls(writer, [
+    { url: "https://housing.illinois.edu/a", title: "A" },
+    { url: "https://housing.illinois.edu/b", title: "B" },
+    { url: "https://housing.illinois.edu/c", title: "C" },
+  ])
+  await writer.close()
+
+  const parsed = await events
+  assert.deepEqual(
+    parsed.map((event) => [event.event, (event.data as { title: string }).title]),
+    [
+      ["source-url", "A"],
+      ["source-url", "B"],
+      ["source-url", "C"],
+    ],
+  )
+})
+
+test("no source-url event is written for an empty source list", async () => {
+  const { writer, events } = createTestWriterPair()
+
+  await sendSourceUrls(writer, [])
+  await writer.close()
+
+  assert.equal((await events).length, 0)
 })

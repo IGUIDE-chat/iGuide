@@ -53,16 +53,29 @@ export async function sendToolResult(
 }
 
 /**
- * One page the model read, shaped like the AI SDK `source-url` stream part.
- * The URL doubles as `sourceId` so repeated hits on a page collapse client-side.
+ * One `source-url` event per page the model read, shaped like the AI SDK
+ * `source-url` stream part and written as a single chunk so they stay in
+ * order. The URL doubles as `sourceId` so repeated hits on a page collapse
+ * client-side.
  */
-export async function sendSourceUrl(writer: SSEWriter, source: ToolSource): Promise<void> {
-  await writeEvent(writer, "source-url", {
-    sourceId: source.url,
-    url: source.url,
-    title: source.title,
-    ...(source.snippet ? { snippet: source.snippet } : {}),
-  })
+export async function sendSourceUrls(
+  writer: SSEWriter,
+  sources: readonly ToolSource[],
+): Promise<void> {
+  if (sources.length === 0) return
+
+  await writer.write(
+    sources
+      .map((source) =>
+        encodeSSEEvent("source-url", {
+          sourceId: source.url,
+          url: source.url,
+          title: source.title,
+          ...(source.snippet ? { snippet: source.snippet } : {}),
+        }),
+      )
+      .join(""),
+  )
 }
 
 export async function sendContent(
