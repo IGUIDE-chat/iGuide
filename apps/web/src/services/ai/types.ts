@@ -1,3 +1,5 @@
+import type { MessageSource } from "../../types"
+
 export interface StreamChunk {
   text: string
   followUpQuestions?: string[]
@@ -6,6 +8,8 @@ export interface StreamChunk {
     label: string
     detail?: string
   }
+  /** A page the agent read, from the Worker's `source-url` event. */
+  source?: MessageSource
 }
 
 export interface ChatHistoryItem {

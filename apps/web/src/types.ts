@@ -36,6 +36,16 @@ export interface ThinkingStep {
   done: boolean
 }
 
+/** A web page the agent read while answering (mirrors the AI SDK `source-url` part). */
+export interface MessageSource {
+  /** Stable id; the Worker uses the URL. */
+  id: string
+  url: string
+  title: string
+  /** Short excerpt of the page, for the citation preview. */
+  snippet?: string
+}
+
 export interface ChatMessage {
   id: string
   role: "user" | "model"

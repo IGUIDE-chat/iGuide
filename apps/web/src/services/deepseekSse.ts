@@ -1,3 +1,4 @@
+import type { MessageSource } from "../types"
 import type { StreamChunk } from "./ai/types"
 
 type StreamLanguage = "en" | "zh"
@@ -19,6 +20,19 @@ interface WorkerContentPayload {
   delta?: string
   content?: string
 }
+
+interface WorkerSourceUrlPayload {
+  sourceId?: unknown
+  url?: unknown
+  title?: unknown
+  snippet?: unknown
+}
+
+/**
+ * Events whose payload never carries a legacy `choices[].delta`, so a payload
+ * the Worker handler rejects must not fall through to `parseLegacyDelta`.
+ */
+const EVENTS_WITHOUT_LEGACY_FALLBACK = new Set(["done", "source-url"])
 
 export interface SSEParserState {
   currentEvent: string
@@ -51,6 +65,35 @@ function stringifyDetail(value: unknown): string | undefined {
 
 function getWorkerToolName(payload: WorkerToolStartPayload | WorkerToolResultPayload) {
   return payload.name ?? payload.tool ?? "unknown"
+}
+
+/**
+ * Validates a `source-url` payload. The URL becomes a link in the UI, so only
+ * http(s) is accepted; anything malformed yields `null` and no chunk.
+ */
+function parseSourceUrl(payload: unknown): MessageSource | null {
+  if (payload === null || typeof payload !== "object") return null
+
+  const data = payload as WorkerSourceUrlPayload
+  if (typeof data.url !== "string") return null
+
+  let parsed: URL
+  try {
+    parsed = new URL(data.url)
+  } catch {
+    return null
+  }
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return null
+
+  const title = typeof data.title === "string" ? data.title.trim() : ""
+  const snippet = typeof data.snippet === "string" ? data.snippet.trim() : ""
+
+  return {
+    id: typeof data.sourceId === "string" && data.sourceId ? data.sourceId : data.url,
+    url: data.url,
+    title: title || parsed.hostname,
+    ...(snippet ? { snippet } : {}),
+  }
 }
 
 function parseLegacyDelta(
@@ -136,6 +179,11 @@ function parseWorkerEvent(
     return text ? [{ text }] : []
   }
 
+  if (eventName === "source-url") {
+    const source = parseSourceUrl(payload)
+    return source ? [{ text: "", source }] : []
+  }
+
   return []
 }
 
@@ -163,7 +211,7 @@ export function parseDeepSeekSSELine(
 
     if (state.currentEvent) {
       const workerChunks = parseWorkerEvent(state.currentEvent, payload, lang)
-      if (workerChunks.length || state.currentEvent === "done") {
+      if (workerChunks.length || EVENTS_WITHOUT_LEGACY_FALLBACK.has(state.currentEvent)) {
         return workerChunks
       }
     }
