@@ -9,7 +9,6 @@ export default defineConfig({
     placement: {
       mode: "smart",
     },
-    domains: ["iguide.chat"],
     // Mirror the Dashboard settings for this Worker: its workers.dev subdomain
     // and Preview URLs are both enabled. `iguide.chat` stays a custom domain,
     // but its Production-only routing (Dashboard-owned `enabled` /
