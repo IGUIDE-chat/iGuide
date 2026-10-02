@@ -6,16 +6,14 @@
 
 ## 中文版
 
-这是一个围绕 UIUC 校园信息构建的多模块仓库，主要由 React 前端、同时承载 SPA 与全部接口的单一 Cloudflare Worker，以及爬虫 / ETL 流水线组成。
+这是一个围绕 UIUC 校园信息构建的多模块仓库，主要由 React 前端和同时承载 SPA 与全部接口的单一 Cloudflare Worker 组成。
 
 ## 仓库结构
 
-| 路径                   | 作用                                                                                  |
-| :--------------------- | :------------------------------------------------------------------------------------ |
-| `apps/web/`            | React 应用及其 Cloudflare Worker：静态资源、agent loop、工具注册层、MCP 与 `/api/*`。 |
-| `tools/data-pipeline/` | Supabase 导入、embedding 维度校验与 schema 验证脚本。                                 |
-| `data_collection/`     | Python 爬虫 / ETL 流水线，用于抓取、清洗和增量更新 UIUC 数据源。                      |
-| `supabase/`            | SQL 迁移、RPC 函数与种子数据。                                                        |
+| 路径            | 作用                                                                                  |
+| :-------------- | :------------------------------------------------------------------------------------ |
+| `apps/web/`     | React 应用及其 Cloudflare Worker：静态资源、agent loop、工具注册层、MCP 与 `/api/*`。 |
+| `dorm_scripts/` | 独立的 Puppeteer / Bun 评价抓取脚本。                                                 |
 
 ## 统一开发入口
 
@@ -81,7 +79,6 @@ curl http://localhost:5173/api/health
 
 - 所有接口都位于 `/api/*` 之下，浏览器只发起同源请求。
 - 使用 Supabase token 做 JWT 鉴权。
-- 基于 Geo-IP 区分中国大陆与全球流量，作用于 `/api/search`。
 - 提供 `/api/health` 健康检查，以及 `/api/chat` 的流式 tool-use 响应。
 - 生产环境核心变量包括：
   - `SUPABASE_URL`
@@ -89,11 +86,6 @@ curl http://localhost:5173/api/health
   - `SUPABASE_SERVICE_ROLE_KEY`
   - `DEEPSEEK_API_KEY`
   - `TAVILY_API_KEY`
-  - `EMBEDDING_API_BASE_URL`
-  - `EMBEDDING_API_KEY`
-  - `EMBEDDING_MODEL`
-  - `EMBEDDING_DIMENSIONS`
-- `EMBEDDING_FALLBACK_URL` 是可选项，只有在你明确启用自建 embedding fallback 时才需要配置。
 - `/api/chat` 始终运行 Worker 内的 tool-use agent。本地运行时把 `apps/web/.dev.vars.example` 复制为 `apps/web/.dev.vars`；该模板覆盖了 Worker `Env` 接口的全部字段。
 
 ## 代码组织规则
@@ -110,12 +102,9 @@ curl http://localhost:5173/api/health
 1. 浏览器把用户消息发送到 Cloudflare Worker。
 2. Worker 在服务端运行 DeepSeek agent loop。
 3. 模型按需选择工具：
-   - `search_knowledge_base`：调用 Supabase 混合检索
    - `web_search`：调用 Tavily 进行实时网页搜索
-   - `grep_docs`：做精确文本匹配
    - `custom_skills`：执行更高层的校园场景技能
-4. 知识库检索仍然是默认路径；网页搜索只在本地知识不足时作为补充或回退。
-5. 前端 prompt-stuffing 和浏览器侧检索编排属于遗留路径，只应在 feature flag 下保留。
+4. Tavily 网页搜索是唯一的检索来源。
 
 ---
 
@@ -123,7 +112,7 @@ curl http://localhost:5173/api/health
 
 ### 一句话概括
 
-这是一个 **serverless-first** 的架构：Cloudflare Worker 负责 agent 运行时与请求控制，Supabase 负责统一的数据与检索层，模型推理、网页搜索和 embedding 由托管 API 提供。
+这是一个 **serverless-first** 的架构：Cloudflare Worker 负责 agent 运行时与请求控制，Supabase 负责用户数据层，模型推理与网页搜索由托管 API 提供。
 
 ### 运行时分层
 
@@ -136,58 +125,25 @@ curl http://localhost:5173/api/health
 
 - Supabase Auth 负责注册、登录、OAuth 和密码找回。
 - PostgreSQL 保存聊天记录。
-- Supabase pgvector + PostgreSQL 全文检索构成知识库的统一检索能力。
 - RLS（行级安全）确保用户只能访问自己的数据。
 - 异步日志在主响应完成后写入对话数据。
 
 #### 第三层：外部智能服务层
 
 - DeepSeek 提供托管模型推理。
-- Tavily 提供托管网页搜索。
-- 托管 embedding API 是 query / document 向量化的默认路径。
-- 可选的自建 embedding fallback 可以配置，但**不属于默认生产路径**。
-
-### 混合检索流程
-
-#### Extract（抽取）
-
-- 使用 `httpx` 抓取 HTML。
-- 使用 MD5 哈希跳过未变化页面。
-- 抓取状态由爬虫流水线维护。
-
-#### Transform（转换）
-
-- 使用 Trafilatura 清洗页面内容。
-- 按 Markdown 标题拆分，而不是按原始字符数硬切。
-- 给每个 chunk 注入来源元数据，保留课程、页面、宿舍等上下文。
-
-#### Load（入库）
-
-- 知识库存入 Supabase PostgreSQL。
-- 使用 pgvector 做语义检索。
-- 使用 PostgreSQL 全文检索做精确匹配和关键词检索。
-- embedding 维度由 `EMBEDDING_DIMENSIONS` 统一约束。
-
-#### Query（查询）
-
-- 先通过配置好的 embedding provider 生成查询向量。
-- 再通过 Supabase RPC 并行执行向量检索和全文检索。
-- 使用 RRF 融合结果。
-- 模型再决定是否继续调用网页搜索、grep 或自定义技能。
+- Tavily 提供托管网页搜索，并且是唯一的检索来源。
 
 ### 为什么强调 Serverless-First
 
 - 默认生产路径不依赖专用 VPS。
 - Cloudflare Worker + Supabase 把控制面和数据面都交给托管平台。
-- 托管 embedding API 显著降低了运维成本，同时保留足够的检索质量。
-- 如果未来在成本或可用性上有特殊需求，仍然可以显式启用自建 fallback，但它不是默认依赖。
 
 ### 运维简化带来的收益
 
 - 单一的 `web` Cloudflare Worker 同时承载前端（Workers Static Assets）与全部 `/api/*` 接口，因此不再有独立的网关域名，也不存在跨源跳转。
 - 同一个 Worker 还承载 API、工具注册层与 agent loop。
-- Supabase 统一承载鉴权、结构化记忆、对话存储、pgvector 与全文检索。
-- 模型推理、网页搜索、embedding 全部优先走托管 API，减少自维护基础设施。
+- Supabase 统一承载鉴权、结构化记忆与对话存储。
+- 模型推理与网页搜索全部优先走托管 API，减少自维护基础设施。
 
 ## 部署与配置快速参考
 
@@ -198,14 +154,6 @@ curl http://localhost:5173/api/health
   -> Supabase
   -> DeepSeek API
   -> Tavily API
-  -> 托管 Embedding API
-```
-
-仅在需要时：
-
-```text
-web Worker
-  -> EMBEDDING_FALLBACK_URL（自建 embedding fallback）
 ```
 
 ### 必要配置
@@ -213,7 +161,6 @@ web Worker
 #### 前端 / App
 
 - 前端应直接调用 Cloudflare Worker 的聊天接口。
-- 浏览器侧 RAG 编排属于遗留行为，在构建时通过 `VITE_USE_TOOL_USE_RAG=false` 切换。默认值为 `true`，即由 Worker 处理对话。
 
 #### Cloudflare Worker
 
@@ -224,34 +171,18 @@ web Worker
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `DEEPSEEK_API_KEY`
 - `TAVILY_API_KEY`
-- `EMBEDDING_API_BASE_URL`
-- `EMBEDDING_API_KEY`
-- `EMBEDDING_MODEL`
-- `EMBEDDING_DIMENSIONS`
-
-可选变量：
-
-- `EMBEDDING_FALLBACK_URL`
-
-#### Supabase
-
-- 启用 `pgvector`。
-- 执行检索相关 migrations。
-- 在启用新路径前，验证 documents / chunks 表和 RPC 函数是否可用。
 
 ### 最小部署流程
 
-1. 先部署 Supabase schema 和 RPC 函数。
-2. 配置并验证托管 embedding provider。
-3. 部署 Cloudflare Worker，并确认 `/api/health` 与 `/api/chat` 的 SSE 响应。
-4. 将数据导入 Supabase，并验证混合检索结果。
-5. 在 staging 中以 `VITE_USE_TOOL_USE_RAG=true` 构建前端。
-6. 验证 SSE、tool call、fallback 行为以及 benchmark 质量。
-7. 再推广到生产环境。
+1. 先部署 Supabase 的鉴权与用户数据 schema。
+2. 部署 Cloudflare Worker，并确认 `/api/health` 与 `/api/chat` 的 SSE 响应。
+3. 在 staging 中构建前端。
+4. 验证 SSE、tool call 与 fallback 行为。
+5. 再推广到生产环境。
 
 ### 回滚原则
 
-如果 tool-use 路径出现回归，把 `VITE_USE_TOOL_USE_RAG` 设为 `false` 并重新构建前端即可。浏览器会改用同一 Worker 提供的 `/api/deepseek` 与 `/api/search`，恢复服务既不需要重新部署 Worker，也不需要依赖 VPS。
+重新部署上一个 Worker 构建即可。当前没有第二条对话路径可供回退。
 
 ### 验证示例
 
@@ -269,11 +200,7 @@ pnpm run dev:web
 ### 技术栈汇总
 
 - **Supabase：** 鉴权、Postgres、RLS。
-- **Supabase pgvector + PostgreSQL 全文检索：** 统一知识检索层。
 - **Cloudflare Workers：** 单 Worker 承载静态资源、`/api/*` 接口、工具注册层、agent loop 与 SSE 运行时。
 - **Cloudflare Workers Static Assets：** 前端托管（`web` Worker）。
 - **DeepSeek API：** 托管模型推理。
-- **托管 Embedding API：** 默认向量生成路径。
-- **可选自建 embedding endpoint：** 仅在明确启用时作为 fallback。
-- **httpx + Trafilatura：** 抓取与清洗。
-- **Tavily API：** 网页搜索补充能力。
+- **Tavily API：** 唯一的检索来源。

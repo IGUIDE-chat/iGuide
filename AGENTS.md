@@ -6,15 +6,13 @@ These rules apply repository-wide. `apps/web/AGENTS.md` takes precedence within
 ## Project
 
 A UIUC knowledge platform with a React 19 frontend and Cloudflare Worker gateway.
-Supabase provides auth, Postgres, RLS, and vector/full-text search; DeepSeek handles
-inference, Tavily supplies web search, and a managed API generates embeddings.
+Supabase provides auth and Postgres; DeepSeek handles inference and Tavily
+supplies web search.
 
-| Path                   | Role                                                                     |
-| :--------------------- | :----------------------------------------------------------------------- |
-| `apps/web/`            | Frontend and Worker: SPA, static assets, agent loop, tools, skills, MCP. |
-| `tools/data-pipeline/` | Supabase import, embedding validation, and schema verification.          |
-| `dorm_scripts/`        | Standalone Puppeteer/Bun review scrapers.                                |
-| `supabase/migrations/` | Source-first knowledge-base schema and retrieval RPCs.                   |
+| Path            | Role                                                                     |
+| :-------------- | :----------------------------------------------------------------------- |
+| `apps/web/`     | Frontend and Worker: SPA, static assets, agent loop, tools, skills, MCP. |
+| `dorm_scripts/` | Standalone Puppeteer/Bun review scrapers.                                |
 
 <!--VITE PLUS START-->
 
@@ -58,9 +56,6 @@ pnpm run test                 # package test scripts
 pnpm run build
 
 vp run --filter @iguide/web test
-vp run --filter @iguide/data-pipeline import
-vp run --filter @iguide/data-pipeline validate:embeddings
-vp run --filter @iguide/data-pipeline verify:schema
 ```
 
 Run checks and relevant package scripts before delivery. CI requires lint,
@@ -70,7 +65,7 @@ typecheck, tests, build, and source/bundle secret scans to pass.
 
 - Treat `VITE_` variables and Vite `define` values as public browser data.
 - Keep server keys in `apps/web/.env.local` with unprefixed names or in Worker
-  secrets (`cf workers secrets update <name>`). Imports use `SUPABASE_SERVICE_KEY`.
+  secrets (`cf workers secrets update <name>`).
 - Preserve the CI-required web Worker router (`apps/web/worker/index.ts`) and
   proxy routes (`worker/routes/deepseek.ts`, `tavily.ts`, `gemini.ts`).
 - For dev-proxy debugging, set `LLM_REQUEST_DUMP=1`; redacted dumps go to
@@ -93,7 +88,7 @@ Paths below are relative to `apps/web/`:
 ## Worker tools and retrieval
 
 - Use tools for executable capabilities and skills for tasks that compose tools.
-- Add tools under `apps/web/worker/tools/`, following `search-knowledge-base.ts`
+- Add tools under `apps/web/worker/tools/`, following `web-search.ts`
   and `types.ts`; register them on `ToolRegistry` in `apps/web/worker/routes/chat.ts`.
 - Add skill JSON under `apps/web/worker/skills/` and include it in `SKILL_CONFIGS`
   in `apps/web/worker/tools/custom-skills.ts`. Each `required_tools` entry names a
@@ -101,36 +96,19 @@ Paths below are relative to `apps/web/`:
 - The registry allows 5 calls per request, 10 seconds per call, and 4096-byte
   results. Return compact `content` and `metadata`, including structured errors.
   Give schemas clear descriptions and business-named parameters.
-- Retrieve from the knowledge base first; use web search when local knowledge is
-  insufficient. Handle conversational turns in `worker/agent/retrieval-policy.ts`.
+- Tavily web search is the only retrieval source. Handle conversational turns in
+  `worker/agent/retrieval-policy.ts`.
 - Keep tool output internal to the agent loop; stream lightweight SSE progress.
   Implement new retrieval in the Worker.
 
 ## Data and migrations
 
-```text
-sources -> source_snapshots -> artifacts -> chunks
-```
-
-- Project domain objects from artifacts, including official feeds stored as
-  `normalized_json` / `object_payload`. Carry `source_id`, `source_snapshot_id`,
-  and `primary_artifact_id` on projections.
-- `raw_crawl.jsonl` is the crawl input (`url`, `title`, `content`, `links`,
-  `timestamp`); knowledge-base Markdown is derived content.
-- Use crawler categories as weak metadata for triage and Worker-side filtering.
 - Enable RLS and grants in each new table's migration: `anon` and `authenticated`
   receive `select`; writes use the service key.
-- Apply `supabase/migrations/` numerically and use the next prefix for additions.
-  SQL files define the schema.
-- Apply the separate dorm chain in `apps/web/scripts/migrations/`, starting with
+- Apply the dorm chain in `apps/web/scripts/migrations/`, starting with
   `create_dorms_table.sql`, then `add_categorized_tags.sql`, then follow-ups.
-- Embeddings use `multilingual-e5-small` with 384 dimensions. Match
-  `EMBEDDING_DIMENSIONS` to `chunks.embedding` and run `validate:embeddings` after
-  changes. `EMBEDDING_FALLBACK_URL` is an optional self-hosted endpoint.
-- Retrieval uses vector/FTS fusion in `hybrid_search`; `keyword_search` handles
-  embedding-provider failures. See `supabase/migrations/003_search_functions.sql`.
 
-## Deploy and rollback
+## Deploy
 
 One Worker serves the SPA and every `/api/*` route, so it is the only thing to
 deploy. It uses `cloudflare.config.ts` and the `cf` CLI; check `cf --help` for
@@ -142,13 +120,6 @@ copy `apps/web/.dev.vars.example` to `.dev.vars` and fill the values `Env` requi
 vp run --filter @iguide/web deploy
 ```
 
-`/api/chat` always runs the Worker's tool-use agent and streams SSE. The
-frontend chooses between that path and the legacy browser-side RAG with the
-build-time `VITE_USE_TOOL_USE_RAG` flag, which defaults to `true` in
-`apps/web/.env.local.example`. Apply migrations, verify 384-dimensional
-embeddings, and import data first, then verify `/api/health`, SSE, tool calls,
-and retrieval fallback in staging before production.
-
-To roll back, set `VITE_USE_TOOL_USE_RAG=false` and rebuild the frontend. That
-only reroutes the browser to `/api/deepseek` and `/api/search`, both of which the
-same Worker serves, so no Worker redeploy and no external backend is involved.
+`/api/chat` is the only chat path: it runs the Worker's tool-use agent and
+streams SSE. Verify `/api/health`, SSE, and tool calls in staging before
+production.

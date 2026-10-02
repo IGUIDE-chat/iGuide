@@ -6,16 +6,14 @@ English | [中文](./README_CN.md)
 
 ## English Version
 
-A UIUC knowledge platform built on a React app, a single Cloudflare Worker that serves both the SPA and every API endpoint, and a crawler/ETL pipeline.
+A UIUC knowledge platform built on a React app and a single Cloudflare Worker that serves both the SPA and every API endpoint.
 
 ## Monorepo Map
 
-| Path                   | Role                                                                                           |
-| :--------------------- | :--------------------------------------------------------------------------------------------- |
-| `apps/web/`            | React app and its Cloudflare Worker: static assets, agent loop, tools, MCP, and `/api/*`.      |
-| `tools/data-pipeline/` | Supabase import, embedding-dimension, and schema verification scripts.                         |
-| `data_collection/`     | Python crawler/ETL pipeline for harvesting, cleaning, and incrementally updating UIUC sources. |
-| `supabase/`            | SQL migrations, RPC functions, and seed fixtures.                                              |
+| Path            | Role                                                                                      |
+| :-------------- | :---------------------------------------------------------------------------------------- |
+| `apps/web/`     | React app and its Cloudflare Worker: static assets, agent loop, tools, MCP, and `/api/*`. |
+| `dorm_scripts/` | Standalone Puppeteer/Bun review scrapers.                                                 |
 
 ## Unified Setup
 
@@ -81,10 +79,8 @@ supports SSE chat responses.
 
 - Every endpoint lives under `/api/*`, so the browser only makes same-origin calls.
 - JWT auth via Supabase tokens.
-- Geo-IP routing for CN vs global traffic on `/api/search`.
 - Health check at `/api/health` and streaming tool-use responses from `/api/chat`.
-- Core production env vars now include: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `DEEPSEEK_API_KEY`, `TAVILY_API_KEY`, `EMBEDDING_API_BASE_URL`, `EMBEDDING_API_KEY`, `EMBEDDING_MODEL`, `EMBEDDING_DIMENSIONS`.
-- `EMBEDDING_FALLBACK_URL` is optional and should only be configured when you explicitly want a self-hosted fallback path.
+- Core production env vars now include: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `DEEPSEEK_API_KEY`, `TAVILY_API_KEY`.
 - `/api/chat` always runs the Worker's tool-use agent. Copy `apps/web/.dev.vars.example` to `apps/web/.dev.vars` for local runs; the template covers every field of the Worker's `Env` interface.
 
 ## Placement Rules
@@ -101,12 +97,9 @@ supports SSE chat responses.
 1. The browser sends the user message to the Cloudflare Worker.
 2. The Worker runs the server-side DeepSeek agent loop.
 3. The agent chooses tools dynamically:
-   - `search_knowledge_base` for Supabase hybrid retrieval
    - `web_search` for Tavily-backed live web search
-   - `grep_docs` for exact text lookup
    - `custom_skills` for curated higher-level campus tasks
-4. Knowledge-base retrieval stays the default path. Web search is fallback or augmentation when local knowledge is insufficient.
-5. Frontend prompt-stuffing and browser-side retrieval orchestration are legacy behavior behind a feature flag only.
+4. Tavily web search is the only retrieval source.
 
 ---
 
@@ -114,7 +107,7 @@ supports SSE chat responses.
 
 ### One-liner
 
-A serverless-first stack uses Cloudflare Worker as the agent runtime, Supabase as the unified knowledge and user-data layer, and managed APIs for model inference, web search, and embeddings.
+A serverless-first stack uses Cloudflare Worker as the agent runtime, Supabase as the user-data layer, and managed APIs for model inference and web search.
 
 ### Runtime Split
 
@@ -128,59 +121,26 @@ A serverless-first stack uses Cloudflare Worker as the agent runtime, Supabase a
 
 - Supabase Auth handles sign-up, login, OAuth, and password recovery.
 - PostgreSQL stores chat history.
-- Supabase pgvector + full-text search power the knowledge base.
 - RLS keeps each user scoped to their own records.
 - Async logging writes conversations after the main response path completes.
 
 #### Layer 3 — External Intelligence Services
 
 - DeepSeek provides hosted model inference.
-- Tavily provides hosted live web search.
-- A managed embedding API is the default path for query/document vector generation.
-- An optional self-hosted embedding fallback can be configured, but it is not part of the default production path.
-
-### Hybrid Retrieval Pipeline
-
-#### Extract
-
-- Fetch HTML with `httpx`.
-- Hash content with MD5 and skip unchanged pages.
-- Track crawler state in the crawler pipeline.
-
-#### Transform
-
-- Clean pages with Trafilatura.
-- Split content by Markdown headers instead of raw character counts.
-- Inject source metadata into each chunk to preserve course and page context.
-
-#### Load
-
-- Store the knowledge base in Supabase PostgreSQL.
-- Use pgvector for semantic retrieval.
-- Use PostgreSQL full-text search for exact and keyword matches.
-- Keep embeddings at a fixed dimension configured by `EMBEDDING_DIMENSIONS`.
-
-#### Query
-
-- Generate the query embedding through the configured embedding provider.
-- Run vector search and full-text search in parallel through Supabase RPC functions.
-- Fuse results with RRF.
-- Let the model decide whether to call web search, grep, or custom skills after retrieval.
+- Tavily provides hosted live web search, and is the only retrieval source.
 
 ### Why Serverless-First Matters
 
 - The default production path does not require a dedicated VPS.
 - Cloudflare Worker + Supabase keep the control plane and data plane managed.
-- Managed embedding APIs reduce ops burden while preserving retrieval quality.
-- A fallback self-hosted embedding endpoint remains optional for cost or availability reasons.
 
 ### Operational Simplicity
 
 - A single `web` Cloudflare Worker serves the frontend (Workers Static Assets) and every
   `/api/*` endpoint, so there is no separate gateway host and no cross-origin hop.
 - That same Worker hosts the MCP-style tool registry and the agent loop.
-- Supabase hosts auth, structured memory, conversations, pgvector, and full-text retrieval.
-- Hosted APIs keep model inference, web search, and embeddings off self-managed infrastructure.
+- Supabase hosts auth, structured memory, and conversations.
+- Hosted APIs keep model inference and web search off self-managed infrastructure.
 
 ## Deployment and Configuration Quick Reference
 
@@ -191,14 +151,6 @@ Browser -> web Worker (static assets + /api/*)
   -> Supabase
   -> DeepSeek API
   -> Tavily API
-  -> Managed Embedding API
-```
-
-Optional only:
-
-```text
-web Worker
-  -> EMBEDDING_FALLBACK_URL (self-hosted embedding endpoint)
 ```
 
 ### Required Configuration
@@ -206,7 +158,6 @@ web Worker
 #### Frontend / App
 
 - Configure the app to call the Cloudflare Worker chat endpoint.
-- Browser-side RAG orchestration is legacy behavior, selected at build time with `VITE_USE_TOOL_USE_RAG=false`. The default is `true`, which sends chat to the Worker.
 
 #### Cloudflare Worker
 
@@ -214,37 +165,20 @@ Required secrets / vars:
 
 - `SUPABASE_URL`
 - `SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY`
 - `DEEPSEEK_API_KEY`
 - `TAVILY_API_KEY`
-- `EMBEDDING_API_BASE_URL`
-- `EMBEDDING_API_KEY`
-- `EMBEDDING_MODEL`
-- `EMBEDDING_DIMENSIONS`
-
-Optional:
-
-- `EMBEDDING_FALLBACK_URL`
-
-#### Supabase
-
-- Enable `pgvector`.
-- Run the retrieval-related migrations.
-- Validate the documents/chunks tables and RPC functions before enabling the new path.
 
 ### Minimal Deployment Flow
 
-1. Deploy Supabase schema and RPC functions.
-2. Configure and validate the managed embedding provider.
-3. Deploy the Cloudflare Worker and confirm `/api/health` and `/api/chat` SSE.
-4. Load data into Supabase and validate hybrid retrieval.
-5. Build the frontend with `VITE_USE_TOOL_USE_RAG=true` in staging.
-6. Verify SSE responses, tool calls, fallback behavior, and benchmark quality.
-7. Promote to production.
+1. Deploy the Supabase auth and user-data schema.
+2. Deploy the Cloudflare Worker and confirm `/api/health` and `/api/chat` SSE.
+3. Build the frontend in staging.
+4. Verify SSE responses, tool calls, and fallback behavior.
+5. Promote to production.
 
 ### Rollback Rule
 
-If the tool-use path regresses, set `VITE_USE_TOOL_USE_RAG=false` and rebuild the frontend. That reroutes the browser to `/api/deepseek` and `/api/search`, which the same Worker serves, so restoring service needs neither a Worker redeploy nor a VPS.
+Redeploy the previous Worker build. There is no second chat path to fall back to.
 
 ### Validation Examples
 
@@ -262,11 +196,7 @@ pnpm run dev:web
 ### Tech Stack Summary
 
 - **Supabase:** Auth, Postgres, and RLS.
-- **Supabase pgvector + PostgreSQL FTS:** Unified knowledge retrieval.
 - **Cloudflare Workers:** Edge gateway, tool registry, agent loop, and SSE runtime.
 - **Cloudflare Workers Static Assets:** Frontend hosting (`web` Worker).
 - **DeepSeek API:** Hosted model inference.
-- **Managed Embedding API:** Default embedding generation path.
-- **Optional self-hosted embedding endpoint:** Explicit fallback only.
-- **httpx + Trafilatura:** Crawling and cleaning.
-- **Tavily API:** Web fallback.
+- **Tavily API:** The only retrieval source.
