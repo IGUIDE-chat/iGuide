@@ -5,11 +5,13 @@ import React, {
   useEffect,
   useCallback,
   useMemo,
+  useRef,
   ReactNode,
 } from "react"
 
 import { dormService } from "../../../services/dormService"
 import { Dorm } from "../types/index"
+import { useRetainedState } from "./retainedState"
 
 interface DormDataContextType {
   dorms: Dorm[]
@@ -21,8 +23,11 @@ interface DormDataContextType {
 const DormDataContext = createContext<DormDataContextType | undefined>(undefined)
 
 export const DormDataProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [dorms, setDorms] = useState<Dorm[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  // null until the first load finishes, so a later visit to /dorms reuses the list instead of refetching.
+  const [loadedDorms, setDorms] = useRetainedState<Dorm[] | null>("dorms", null)
+  const dorms = useMemo(() => loadedDorms ?? [], [loadedDorms])
+  const [isLoading, setIsLoading] = useState(loadedDorms === null)
+  const needsInitialLoad = useRef(loadedDorms === null)
 
   const loadDorms = useCallback(async () => {
     setIsLoading(true)
@@ -43,6 +48,8 @@ export const DormDataProvider: React.FC<{ children: ReactNode }> = ({ children }
   }, [])
 
   useEffect(() => {
+    if (!needsInitialLoad.current) return
+    needsInitialLoad.current = false
     void loadDorms()
   }, [loadDorms])
 

@@ -2,6 +2,7 @@ import React, { createContext, useCallback, useContext, useMemo, useState, React
 
 import { Dorm } from "../types/index"
 import { useDormData } from "./DormDataContext"
+import { useRetainedState } from "./retainedState"
 
 const MAX_COMPARE = 4
 
@@ -19,7 +20,7 @@ const CompareContext = createContext<CompareContextType | undefined>(undefined)
 
 export const CompareProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { getDormById } = useDormData()
-  const [compareIds, setCompareIds] = useState<string[]>([])
+  const [compareIds, setCompareIds] = useRetainedState<string[]>("compare.ids", [])
   const [isCompareOpen, setIsCompareOpen] = useState(false)
 
   const toggleCompare = useCallback((dormId: string) => {

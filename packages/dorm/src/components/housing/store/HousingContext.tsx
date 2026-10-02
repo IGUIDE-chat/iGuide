@@ -9,6 +9,7 @@ import {
   FilterOption,
 } from "../types/index"
 import { useDormData } from "./DormDataContext"
+import { useRetainedState } from "./retainedState"
 
 interface HousingFiltersContextType {
   searchTerm: string
@@ -60,24 +61,54 @@ const HousingMapUiContext = createContext<HousingMapUiContextType | undefined>(u
 
 export const HousingProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { dorms } = useDormData()
-  const [searchTerm, setSearchTerm] = useState("")
+  const [searchTerm, setSearchTerm] = useRetainedState("housing.searchTerm", "")
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
-  const [activeFilters, setActiveFilters] = useState<FilterOption[]>([])
-  const [priceRange, setPriceRange] = useState<[number, number]>(getPriceRangeFromData(dorms))
-  const [locationFilters, setLocationFilters] = useState<string[]>([])
-  const [bedCountFilters, setBedCountFilters] = useState<BedCountFilter[]>([])
-  const [bathroomCountFilters, setBathroomCountFilters] = useState<BathroomCountFilter[]>([])
-  const [housingTypeDetails, setHousingTypeDetails] = useState<"ALL" | "URH" | "PCH">("ALL")
-  const [viewMode, setViewMode] = useState<"list" | "map">("map")
-  const [sortBy, setSortBy] = useState("name-asc")
-  const [showZones, setShowZones] = useState(true)
-  const [showZoneLabels, setShowZoneLabels] = useState(true)
-  const [showLandmarks, setShowLandmarks] = useState(true)
-  const [livingConditionFilters, setLivingConditionFilters] = useState<DormTag[]>([])
-  const [facilityFilters, setFacilityFilters] = useState<DormTag[]>([])
-  const [lifestyleFilters, setLifestyleFilters] = useState<DormTag[]>([])
-  const [requireAc, setRequireAc] = useState(false)
-  const [bathroomTypeFilters, setBathroomTypeFilters] = useState<BathroomScope[]>([])
+  const [activeFilters, setActiveFilters] = useRetainedState<FilterOption[]>(
+    "housing.activeFilters",
+    [],
+  )
+  const [priceRange, setPriceRange] = useRetainedState<[number, number]>(
+    "housing.priceRange",
+    getPriceRangeFromData(dorms),
+  )
+  const [locationFilters, setLocationFilters] = useRetainedState<string[]>(
+    "housing.locationFilters",
+    [],
+  )
+  const [bedCountFilters, setBedCountFilters] = useRetainedState<BedCountFilter[]>(
+    "housing.bedCountFilters",
+    [],
+  )
+  const [bathroomCountFilters, setBathroomCountFilters] = useRetainedState<BathroomCountFilter[]>(
+    "housing.bathroomCountFilters",
+    [],
+  )
+  const [housingTypeDetails, setHousingTypeDetails] = useRetainedState<"ALL" | "URH" | "PCH">(
+    "housing.housingTypeDetails",
+    "ALL",
+  )
+  const [viewMode, setViewMode] = useRetainedState<"list" | "map">("housing.viewMode", "map")
+  const [sortBy, setSortBy] = useRetainedState("housing.sortBy", "name-asc")
+  const [showZones, setShowZones] = useRetainedState("housing.showZones", true)
+  const [showZoneLabels, setShowZoneLabels] = useRetainedState("housing.showZoneLabels", true)
+  const [showLandmarks, setShowLandmarks] = useRetainedState("housing.showLandmarks", true)
+  const [livingConditionFilters, setLivingConditionFilters] = useRetainedState<DormTag[]>(
+    "housing.livingConditionFilters",
+    [],
+  )
+  const [facilityFilters, setFacilityFilters] = useRetainedState<DormTag[]>(
+    "housing.facilityFilters",
+    [],
+  )
+  const [lifestyleFilters, setLifestyleFilters] = useRetainedState<DormTag[]>(
+    "housing.lifestyleFilters",
+    [],
+  )
+  const [requireAc, setRequireAc] = useRetainedState("housing.requireAc", false)
+  const [bathroomTypeFilters, setBathroomTypeFilters] = useRetainedState<BathroomScope[]>(
+    "housing.bathroomTypeFilters",
+    [],
+  )
 
   const clearAllFilters = useCallback(() => {
     setSearchTerm("")
