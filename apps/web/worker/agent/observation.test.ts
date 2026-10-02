@@ -156,3 +156,120 @@ test("buildObservation handles empty successful output", () => {
   assert.ok(observation.providerMessage)
   assert.equal(observation.providerMessage.content, "")
 })
+
+const RATES = {
+  url: "https://housing.illinois.edu/rates",
+  title: "Room and Board Rates",
+  snippet: "Rates for 2026-27.",
+}
+const DINING = { url: "https://housing.illinois.edu/dining", title: "Dining" }
+
+function searchContent(...urls: string[]): string {
+  return urls.map((url) => `## Page\nSource: ${url}\n\nBody\n---`).join("\n")
+}
+
+test("buildObservation keeps validated sources in order and hides them from the model", () => {
+  const content = searchContent(RATES.url, DINING.url)
+  const observation = buildObservation({
+    toolCallId: "call_sources",
+    toolName: "web_search",
+    input: { query: "UIUC housing rates" },
+    result: { content, metadata: { sources: [RATES, DINING] } },
+    stepIndex: 0,
+  })
+
+  assert.deepEqual(observation.sources, [RATES, DINING])
+  assert.equal(
+    observation.providerMessage?.content,
+    content,
+    "sources-only metadata must leave the tool message as plain content",
+  )
+})
+
+test("buildObservation drops sources whose URL the byte limit cut from the content", () => {
+  const cut = "https://housing.illinois.edu/contracts"
+  const observation = buildObservation({
+    toolCallId: "call_truncated_sources",
+    toolName: "web_search",
+    input: { query: "UIUC housing" },
+    result: {
+      content: `${searchContent(RATES.url, DINING.url)}\n## Contracts\nSource: ${cut.slice(0, 30)}\n...[truncated]`,
+      metadata: {
+        sources: [RATES, DINING, { url: cut, title: "Contracts" }],
+        original_bytes: 9000,
+        truncated_bytes: 4096,
+      },
+      truncated: true,
+    },
+    stepIndex: 0,
+  })
+
+  assert.deepEqual(
+    observation.sources?.map((source) => source.url),
+    [RATES.url, DINING.url],
+  )
+  assert.deepEqual(JSON.parse(observation.providerMessage?.content ?? ""), {
+    content: observation.raw,
+    metadata: { original_bytes: 9000, truncated_bytes: 4096 },
+    truncated: true,
+  })
+})
+
+test("buildObservation does not treat a longer URL in the content as a mention of its prefix", () => {
+  const observation = buildObservation({
+    toolCallId: "call_prefix",
+    toolName: "web_search",
+    input: { query: "dining" },
+    result: {
+      content: searchContent(`${DINING.url}-hours`),
+      metadata: { sources: [{ url: `${DINING.url}-hours`, title: "Hours" }, DINING] },
+    },
+    stepIndex: 0,
+  })
+
+  assert.deepEqual(
+    observation.sources?.map((source) => source.url),
+    [`${DINING.url}-hours`],
+  )
+})
+
+test("buildObservation omits sources on error results", () => {
+  const observation = buildObservation({
+    toolCallId: "call_error_sources",
+    toolName: "web_search",
+    input: { query: "UIUC housing" },
+    result: {
+      content: `${JSON.stringify({ error: "upstream_failed" })}\n${searchContent(RATES.url)}`,
+      metadata: { error: true, sources: [RATES] },
+    },
+    stepIndex: 0,
+  })
+
+  assert.equal(observation.status, "error")
+  assert.ok(!("sources" in observation), "error observations carry no sources field")
+})
+
+test("buildObservation rejects malformed and non-http sources and omits an empty list", () => {
+  const malformed = [
+    null,
+    "https://housing.illinois.edu/rates",
+    { url: RATES.url },
+    { url: RATES.url, title: 7 },
+    { url: RATES.url, title: "Rates", snippet: 1 },
+    { url: "javascript:alert(1)", title: "XSS" },
+    { url: "not a url", title: "Bad" },
+  ]
+  const observation = buildObservation({
+    toolCallId: "call_malformed",
+    toolName: "web_search",
+    input: { query: "UIUC housing" },
+    result: {
+      content: `${searchContent(RATES.url)}\njavascript:alert(1)\nnot a url`,
+      metadata: { sources: malformed },
+    },
+    stepIndex: 0,
+  })
+
+  assert.equal(observation.status, "success")
+  assert.ok(!("sources" in observation), "no valid sources leaves the field absent")
+})

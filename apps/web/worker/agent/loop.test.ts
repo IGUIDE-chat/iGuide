@@ -8,6 +8,7 @@ import {
 } from "../test/utils/mockProvider.ts"
 import { createStubTool } from "../test/utils/stubTools.ts"
 import { ToolRegistry } from "../tools/registry.ts"
+import { createWebSearchTool } from "../tools/web-search.ts"
 import { runStreamingAgentLoop } from "./loop.ts"
 
 interface ProviderRequestBody {
@@ -629,6 +630,267 @@ test("streaming allows tools for substantive query", async () => {
 
     const requestBody = parseRequestBody(mockFetch.requests[0])
     assert.ok(requestBody.tools && requestBody.tools.length > 0, "Should have tools")
+  } finally {
+    globalThis.fetch = originalFetch
+  }
+})
+
+interface SourceUrlPayload {
+  sourceId: string
+  url: string
+  title: string
+  snippet?: string
+}
+
+interface TavilyResultFixture {
+  title: string
+  url: string
+  content: string
+  score: number
+}
+
+const TAVILY_SEARCH_URL = "https://api.tavily.com/search"
+
+/** Answers Tavily with `results`; everything else goes to the provider mock. */
+function routeTavily(providerFetch: typeof fetch, results: TavilyResultFixture[]): typeof fetch {
+  return (async (input: Parameters<typeof fetch>[0], init?: RequestInit) => {
+    const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url
+    if (url === TAVILY_SEARCH_URL) {
+      return new Response(JSON.stringify({ results }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })
+    }
+    return providerFetch(input, init)
+  }) as typeof fetch
+}
+
+function sourcePayloads(events: ParsedSSEEvent[]): SourceUrlPayload[] {
+  return events.filter((e) => e.event === "source-url").map((e) => e.data as SourceUrlPayload)
+}
+
+function toolMessageContents(request: RecordedProviderRequest): string[] {
+  return (parseRequestBody(request).messages ?? [])
+    .filter((message) => message.role === "tool")
+    .map((message) => message.content ?? "")
+}
+
+test("streaming emits source-url events right after tool_result, in result order", async () => {
+  const rates = {
+    url: "https://housing.illinois.edu/rates",
+    title: "Room and Board Rates",
+    snippet: "Rates for 2026-27.",
+  }
+  const dining = { url: "https://housing.illinois.edu/dining", title: "Dining" }
+  const mockFetch = createMockProviderFetch([
+    {
+      content: "Let me search...",
+      toolCalls: [{ name: "web_search", arguments: { query: "UIUC housing rates" } }],
+      stream: true,
+    },
+    { content: "Rates are listed on the housing site.", stream: true },
+  ])
+
+  const originalFetch = globalThis.fetch
+  globalThis.fetch = mockFetch
+
+  try {
+    const registry = new ToolRegistry()
+    registry.register(
+      createStubTool({
+        name: "web_search",
+        description: "Search the web",
+        content: `Source: ${rates.url}\nRates for 2026-27.\n---\nSource: ${dining.url}\nDining info.`,
+        metadata: { sources: [rates, dining] },
+      }),
+    )
+    const { writer, events } = createWriterWithStream()
+
+    await runStreamingAgentLoop({
+      message: "What are the UIUC housing rates?",
+      history: [],
+      registry,
+      env: createTestEnv(),
+      writer,
+    })
+
+    const parsed = await events
+    const eventNames = parsed.map((e) => e.event)
+    const toolResultIndex = eventNames.indexOf("tool_result")
+    assert.ok(toolResultIndex >= 0, "Should have tool_result event")
+    assert.deepEqual(
+      eventNames.slice(toolResultIndex, toolResultIndex + 3),
+      ["tool_result", "source-url", "source-url"],
+      "source-url events follow their tool_result directly",
+    )
+    assert.ok(
+      eventNames.indexOf("source-url") < eventNames.lastIndexOf("content"),
+      "sources arrive before the answer text",
+    )
+
+    assert.deepEqual(sourcePayloads(parsed), [
+      { sourceId: rates.url, url: rates.url, title: rates.title, snippet: rates.snippet },
+      { sourceId: dining.url, url: dining.url, title: dining.title },
+    ])
+
+    const [toolMessage] = toolMessageContents(mockFetch.requests[1])
+    assert.ok(toolMessage.includes(rates.url), "model still reads the tool content")
+    assert.ok(!toolMessage.includes('"sources"'), "sources metadata is not sent to the model")
+  } finally {
+    globalThis.fetch = originalFetch
+  }
+})
+
+test("streaming web_search sources skip non-http results and fall back to the hostname", async () => {
+  const providerFetch = createMockProviderFetch([
+    {
+      content: "Let me search...",
+      toolCalls: [{ name: "web_search", arguments: { query: "UIUC housing rates" } }],
+      stream: true,
+    },
+    { content: "Here are the rates.", stream: true },
+  ])
+  const ratesContent = `Rates  for\n\n2026-27 ${"x".repeat(400)}`
+
+  const originalFetch = globalThis.fetch
+  globalThis.fetch = routeTavily(providerFetch, [
+    { url: "https://www.illinois.edu/housing", title: "", content: "Short page.", score: 0.5 },
+    {
+      url: "https://housing.illinois.edu/rates",
+      title: "  Room and Board Rates ",
+      content: ratesContent,
+      score: 0.9,
+    },
+    { url: "ftp://illinois.edu/rates.pdf", title: "FTP mirror", content: "binary", score: 0.99 },
+  ])
+
+  try {
+    const registry = new ToolRegistry()
+    createWebSearchTool(registry)
+    const { writer, events } = createWriterWithStream()
+
+    await runStreamingAgentLoop({
+      message: "What are the UIUC housing rates?",
+      history: [],
+      registry,
+      env: { ...createTestEnv(), TAVILY_API_KEY: "test-tavily-key" },
+      writer,
+    })
+
+    const sources = sourcePayloads(await events)
+    assert.deepEqual(
+      sources.map((source) => [source.url, source.title]),
+      [
+        ["https://housing.illinois.edu/rates", "Room and Board Rates"],
+        ["https://www.illinois.edu/housing", "www.illinois.edu"],
+      ],
+      "sorted by priority, ftp dropped, empty title replaced by hostname",
+    )
+
+    const snippet = sources[0].snippet ?? ""
+    assert.ok(snippet.startsWith("Rates for 2026-27 xxx"), "whitespace is collapsed")
+    assert.equal(Array.from(snippet).length, 240, "snippet is cut to 240 characters")
+    assert.ok(snippet.endsWith("…"), "a cut snippet ends with an ellipsis")
+    assert.equal(sources[1].snippet, "Short page.")
+  } finally {
+    globalThis.fetch = originalFetch
+  }
+})
+
+test("streaming web_search drops sources the 4096-byte result limit cut off", async () => {
+  const visible = "https://www.illinois.edu/housing"
+  const cut = "https://housing.illinois.edu/contracts"
+  const providerFetch = createMockProviderFetch([
+    {
+      content: "Let me search...",
+      toolCalls: [{ name: "web_search", arguments: { query: "UIUC housing contracts" } }],
+      stream: true,
+    },
+    { content: "Here is what I found.", stream: true },
+  ])
+
+  const originalFetch = globalThis.fetch
+  // Sized so the registry's cut lands inside the third result's `Source:` URL.
+  globalThis.fetch = routeTavily(providerFetch, [
+    {
+      url: "https://housing.illinois.edu/rates",
+      title: "Room and Board Rates",
+      content: "r".repeat(3915),
+      score: 0.9,
+    },
+    { url: visible, title: "", content: "Short page.", score: 0.8 },
+    { url: cut, title: "Contracts", content: "c".repeat(500), score: 0.7 },
+  ])
+
+  try {
+    const registry = new ToolRegistry()
+    createWebSearchTool(registry)
+    const { writer, events } = createWriterWithStream()
+
+    await runStreamingAgentLoop({
+      message: "How do UIUC housing contracts work?",
+      history: [],
+      registry,
+      env: { ...createTestEnv(), TAVILY_API_KEY: "test-tavily-key" },
+      writer,
+    })
+
+    const [toolMessage] = toolMessageContents(providerFetch.requests[1])
+    const { content, truncated } = JSON.parse(toolMessage) as {
+      content: string
+      truncated: boolean
+    }
+    assert.equal(truncated, true, "fixture must exceed the registry byte limit")
+    assert.ok(content.includes(visible), "fixture keeps the second result's URL")
+    assert.ok(!content.includes(cut), "fixture cuts the third result's URL")
+
+    assert.deepEqual(
+      sourcePayloads(await events).map((source) => source.url),
+      ["https://housing.illinois.edu/rates", visible],
+    )
+  } finally {
+    globalThis.fetch = originalFetch
+  }
+})
+
+test("streaming emits no source-url events when the tool errors", async () => {
+  const mockFetch = createMockProviderFetch([
+    {
+      content: "Let me search...",
+      toolCalls: [{ name: "web_search", arguments: { query: "UIUC housing" } }],
+      stream: true,
+    },
+    { content: "The search failed, but I can still help.", stream: true },
+  ])
+
+  const originalFetch = globalThis.fetch
+  globalThis.fetch = mockFetch
+
+  try {
+    const url = "https://housing.illinois.edu/rates"
+    const registry = new ToolRegistry()
+    registry.register(
+      createStubTool({
+        name: "web_search",
+        description: "Search that reports an error",
+        content: `Partial failure.\nSource: ${url}`,
+        metadata: { error: true, sources: [{ url, title: "Rates" }] },
+      }),
+    )
+    const { writer, events } = createWriterWithStream()
+
+    await runStreamingAgentLoop({
+      message: "What are the UIUC housing rates?",
+      history: [],
+      registry,
+      env: createTestEnv(),
+      writer,
+    })
+
+    const parsed = await events
+    const toolResult = parsed.find((e) => e.event === "tool_result")
+    assert.equal((toolResult?.data as { status?: string } | undefined)?.status, "error")
+    assert.equal(sourcePayloads(parsed).length, 0, "error results stream no sources")
   } finally {
     globalThis.fetch = originalFetch
   }

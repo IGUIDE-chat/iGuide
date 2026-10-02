@@ -5,6 +5,7 @@ import {
   createSSEStream,
   sendToolStart,
   sendToolResult,
+  sendSourceUrl,
   sendContent,
   sendFallback,
   sendDone,
@@ -424,4 +425,39 @@ test("existing tool_result test still passes (backward compat)", async () => {
   assert.ok(!("tool" in payload), "tool_result must NOT have 'tool' field")
   assert.equal(payload.status, "success")
   assert.equal(payload.summary, "2 results")
+})
+
+test("source-url payload mirrors the AI SDK source-url part", async () => {
+  const { writer, events } = createTestWriterPair()
+
+  await sendSourceUrl(writer, {
+    url: "https://housing.illinois.edu/rates",
+    title: "Room and Board Rates",
+    snippet: "Rates for the 2026-27 academic year…",
+  })
+  await writer.close()
+
+  const parsed = await events
+  assert.equal(parsed.length, 1)
+  assert.equal(parsed[0].event, "source-url")
+  assert.deepEqual(parsed[0].data, {
+    sourceId: "https://housing.illinois.edu/rates",
+    url: "https://housing.illinois.edu/rates",
+    title: "Room and Board Rates",
+    snippet: "Rates for the 2026-27 academic year…",
+  })
+})
+
+test("source-url payload omits snippet when the source has none", async () => {
+  const { writer, events } = createTestWriterPair()
+
+  await sendSourceUrl(writer, { url: "https://illinois.edu/", title: "illinois.edu" })
+  await writer.close()
+
+  const parsed = await events
+  assert.deepEqual(parsed[0].data, {
+    sourceId: "https://illinois.edu/",
+    url: "https://illinois.edu/",
+    title: "illinois.edu",
+  })
 })
