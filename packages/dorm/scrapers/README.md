@@ -1,10 +1,12 @@
-# dorm_scripts
+# scrapers
 
-This directory keeps scraping and dorm-review generation code out of `apps/web/` so the app stays free of scraping-only dependencies like Puppeteer.
+Scraping and dorm-review generation code for `@iguide/dorm`. It has its own
+`package.json` and is not a workspace member, so scraping-only dependencies
+like Puppeteer stay out of both the app and the package.
 
 All scripts write to:
 
-`apps/web/src/components/housing/constants/googleReviews.ts`
+`packages/dorm/src/components/housing/constants/googleReviews.ts`
 
 ## Included scripts
 
@@ -17,7 +19,7 @@ All scripts write to:
 Run Bun from inside this directory:
 
 ```bash
-cd dorm_scripts
+cd packages/dorm/scrapers
 bun install
 ```
 
@@ -49,4 +51,4 @@ This requires `DEEPSEEK_API_KEY` or `VITE_DEEPSEEK_API_KEY` in `apps/web/.env.lo
 
 ## Important
 
-`dorm_scripts/` is intentionally isolated. Don’t move these scripts back into `apps/web/`.
+`scrapers/` is intentionally isolated. Don’t add it to the workspace or move these scripts into `src/`.

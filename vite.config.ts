@@ -39,7 +39,7 @@ export default defineConfig({
         rules: { "no-console": "off" },
       },
       {
-        files: ["tools/**"],
+        files: ["tools/**", "packages/dorm/scrapers/**"],
         env: { node: true },
       },
     ],
