@@ -4,7 +4,6 @@ import * as deepseek from "./routes/deepseek"
 import * as gemini from "./routes/gemini"
 import * as health from "./routes/health"
 import * as integrations from "./routes/integrations"
-import * as search from "./routes/search"
 import * as tavily from "./routes/tavily"
 import type { Env, RouteHandler } from "./types"
 
@@ -19,7 +18,6 @@ import type { Env, RouteHandler } from "./types"
 const API_ROUTES: Record<string, Partial<Record<string, RouteHandler>>> = {
   "/api/chat": { POST: chat.onRequestPost },
   "/api/deepseek": { POST: deepseek.onRequestPost },
-  "/api/search": { POST: search.onRequestPost },
   "/api/gemini": { POST: gemini.onRequestPost, OPTIONS: gemini.onRequestOptions },
   "/api/health": { GET: health.onRequestGet },
   "/api/tavily": { POST: tavily.onRequestPost, OPTIONS: tavily.onRequestOptions },

@@ -3,7 +3,7 @@
   "name": "Find Dorms by Criteria",
   "description": "Find dorm options that match a student's budget, location, and amenity preferences",
   "prompt_template": "Find UIUC dorm options that match these criteria: price range {{price_range}}, preferred location {{location}}, desired amenities {{amenities}}. Return the strongest matches with trade-offs.",
-  "required_tools": ["search_knowledge_base"],
+  "required_tools": ["web_search"],
   "output_format": "ranked_recommendations",
   "parameters": {
     "price_range": {

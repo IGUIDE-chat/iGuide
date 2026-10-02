@@ -697,7 +697,7 @@ async function runDirectFallbackResponse(options: {
   iterations: number
   reason: FallbackReason
 }): Promise<StreamingIterationOutcome> {
-  const disclaimer = "I couldn't search our knowledge base. Here's what I know generally..."
+  const disclaimer = "I couldn't search the web for that. Here's what I know generally..."
   await sendContent(options.writer, `${disclaimer}\n\n`, {
     fallback: true,
     fallbackLevel: 2,
@@ -733,7 +733,7 @@ async function runDirectFallbackResponse(options: {
     }
   } catch {
     const genericContent =
-      "I couldn't search our knowledge base. Here's what I know generally... I may be missing specifics, but you can share more details and I'll do my best to help."
+      "I couldn't search the web for that. Here's what I know generally... I may be missing specifics, but you can share more details and I'll do my best to help."
     await sendContent(
       options.writer,
       "I may be missing specifics, but you can share more details and I'll do my best to help.",

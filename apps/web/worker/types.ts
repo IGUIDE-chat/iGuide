@@ -25,21 +25,10 @@ export interface Env {
   VITE_DEEPSEEK_API_KEY?: string
   TAVILY_API_KEY?: string
   GOOGLE_API_KEY?: string
+  /** SiliconFlow also serves as the DeepSeek-compatible provider for CN traffic. */
+  SILICONFLOW_API_KEY?: string
 
   // Supabase: resolves the caller's identity for /api/chat and /api/integrations.
   SUPABASE_URL: string
   SUPABASE_ANON_KEY: string
-
-  // Embeddings backing the knowledge-base tool.
-  SILICONFLOW_API_KEY: string
-  EMBEDDING_API_BASE_URL: string
-  EMBEDDING_API_KEY: string
-  EMBEDDING_MODEL: string
-  EMBEDDING_DIMENSIONS: string
-  EMBEDDING_FALLBACK_URL?: string
-
-  // QMD search nodes. The nearest node is primary; the other is the failover.
-  QMD_CN_URL: string
-  QMD_US_URL: string
-  QMD_API_KEY: string
 }
