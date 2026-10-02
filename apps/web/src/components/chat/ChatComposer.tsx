@@ -46,6 +46,9 @@ export const ChatComposer = ({ placeholder, hint, isRunning, onSend }: ChatCompo
         onChange={(event) => setValue(event.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
+        // Typing is what this page is for, and the composer took focus on load
+        // before the shadcn migration too.
+        // react-doctor-disable-next-line react-doctor/no-autofocus
         autoFocus
         rows={1}
         className="field-sizing-content max-h-52 min-h-10 w-full resize-none bg-transparent px-3 pt-2 pb-1 text-[15px] leading-relaxed text-slate-900 placeholder-slate-400 focus:outline-none"
