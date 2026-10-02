@@ -233,12 +233,14 @@ body {
   margin: 0.75rem 0;
 }
 
-.prose a {
+/* Citation numbers are shadcn components rendered as links (they carry a
+   `data-slot`); leave them to their own classes. */
+.prose a:not([data-slot]) {
   color: #ff5f05;
   text-decoration: none;
 }
 
-.prose a:hover {
+.prose a:not([data-slot]):hover {
   text-decoration: underline;
 }
 
@@ -338,9 +340,9 @@ body {
    Fill mode must be `backwards`, not `both`: `both` keeps every finished
    animation alive and leaves `filter: blur(0)` on each of thousands of spans,
    which made scrolling a long chat drop frames.
-   Only animate while the reply is still being revealed (data-status set by
-   MarkdownTextPrimitive): the chat reloads messages from storage after each
-   reply, remounting every span, and those must not fade in a second time. */
+   Only animate while the reply is still streaming (data-status set by
+   MarkdownContent): replies loaded from storage mount every span at once, and
+   those must not fade in. */
 @keyframes fade-seg-in {
   from {
     opacity: 0;

@@ -31,6 +31,8 @@ export type UITextEntry = {
   regenerateLabel: string
   scrollToBottom: string
   composerHint: string
+  /** `{count}` is replaced with the number of sources. */
+  sourcesCount: string
   providerCloud: string
   providerLocal: string
   localModelDesc: string
@@ -116,6 +118,7 @@ export const UI_TEXT: Record<Language, UITextEntry> = {
     regenerateLabel: "Regenerate response",
     scrollToBottom: "Scroll to latest",
     composerHint: "Enter to send · Shift + Enter for a new line",
+    sourcesCount: "{count} sources",
     providerCloud: "Cloud",
     providerLocal: "Local (Free)",
     localModelDesc: "Runs in your browser. Needs ~1GB download.",
@@ -196,6 +199,7 @@ export const UI_TEXT: Record<Language, UITextEntry> = {
     regenerateLabel: "重新生成",
     scrollToBottom: "回到最新",
     composerHint: "Enter 发送 · Shift + Enter 换行",
+    sourcesCount: "{count} 个来源",
     providerCloud: "云端",
     providerLocal: "本地 (免费)",
     localModelDesc: "在浏览器本地运行，首次需要下载约 1GB 模型。",

@@ -1,37 +1,36 @@
-import { ActionBarPrimitive, MessagePrimitive, useAuiState } from "@assistant-ui/react"
 import { motion } from "framer-motion"
-import { ArrowUpRight, RotateCcw } from "lucide-react"
+import { RotateCcw } from "lucide-react"
 import * as React from "react"
 
-import { ThinkingStep } from "../../../types"
+import { Suggestion, Suggestions } from "@/components/ai-elements/suggestion"
+import { Button } from "@/components/ui/button"
+
+import type { ChatMessage, Language } from "../../../types"
 import { BrandMark } from "../../ui/branding/BrandMark"
 import { ThinkingProcess } from "../ThinkingProcess"
-import { MarkdownText } from "./MarkdownContent"
-import { MarkdownLabelsContext } from "./markdownLabels"
+import { MarkdownContent } from "./MarkdownContent"
 import { MessageCopyButton } from "./MessageCopyButton"
+import { MessageSources } from "./MessageSources"
 
-interface AssistantMessageMeta {
-  thinkingSteps?: ThinkingStep[]
-  isThinking?: boolean
-  followUpQuestions?: string[]
-  isStreaming?: boolean
-  thinkingStartedAt?: number
-  thinkingEndedAt?: number
-}
-
-interface AssistantMessageProps {
-  language?: "en" | "zh"
-  botName?: string
+export interface AssistantMessageLabels {
+  botName: string
   copyLabel: string
   copiedLabel: string
   regenerateLabel: string
-  onFollowUpClick?: (text: string) => void
+  /** `{count}` is replaced with the number of sources. */
+  sourcesCount: string
 }
 
-// Stable identity: a new object here would remount the Text part on every
-// streaming update and restart the smooth reveal from scratch. Tool-call parts
-// fall through to the Tool UIs registered in ChatRuntimeProvider.
-const partComponents = { Text: MarkdownText }
+interface AssistantMessageProps {
+  message: ChatMessage
+  language: Language
+  labels: AssistantMessageLabels
+  onFollowUpClick: (text: string) => void
+  /** Regenerate is not implemented yet; the button only shows once a handler is passed. */
+  onRegenerate?: () => void
+}
+
+const NO_SOURCES: never[] = []
 
 const TypingDots = () => (
   <div className="flex h-6 items-center gap-1" aria-hidden="true">
@@ -46,48 +45,49 @@ const TypingDots = () => (
   </div>
 )
 
-const actionButtonClass =
-  "flex size-7 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
-
-export const AssistantMessage: React.FC<AssistantMessageProps> = ({
-  language = "zh",
-  botName = "iGuide",
-  copyLabel,
-  copiedLabel,
-  regenerateLabel,
+/**
+ * One assistant reply. While it thinks, the header shows the current step and
+ * a timer; once the answer starts, the sources pill replaces that line (when
+ * the reply used any sources). Links to those sources render as numbered
+ * citations, and follow-up questions sit underneath as chips.
+ */
+export const AssistantMessage = React.memo(function AssistantMessage({
+  message,
+  language,
+  labels,
   onFollowUpClick,
-}) => {
-  // Message state comes from the Aui store, not a per-message hook.
-  const messageId = useAuiState((s) => s.message.id)
-  const meta = useAuiState((s) => s.message.metadata.custom as AssistantMessageMeta)
-  const hasText = useAuiState((s) =>
-    s.message.parts.some((part) => part.type === "text" && part.text.length > 0),
-  )
-
-  const showThinking = !!(
-    meta?.thinkingSteps?.length ||
-    meta?.isThinking ||
-    meta?.thinkingEndedAt !== undefined
-  )
-  const showTypingDots = !!meta?.isStreaming && !hasText && !showThinking
-  const followUps = meta?.followUpQuestions?.slice(0, 3) ?? []
-  const labels = React.useMemo(() => ({ copyLabel, copiedLabel }), [copyLabel, copiedLabel])
+  onRegenerate,
+}: AssistantMessageProps) {
+  const hasText = message.text.length > 0
+  const sources = message.sources ?? NO_SOURCES
+  const showSources = hasText && sources.length > 0
+  const showThinking =
+    !showSources &&
+    !!(message.thinkingSteps?.length || message.isThinking || message.thinkingEndedAt !== undefined)
+  const showTypingDots = !!message.isStreaming && !hasText && !showThinking
+  const followUps = message.isStreaming ? [] : (message.followUpQuestions?.slice(0, 3) ?? [])
 
   return (
-    <MessagePrimitive.Root className="group/msg flex w-full py-4">
+    <div data-message-id={message.id} className="group/msg flex w-full py-4">
       <div className="mx-auto flex w-full max-w-3xl gap-3 px-4">
         <BrandMark className="hidden size-6 shrink-0 rounded-md md:flex" iconClassName="text-xs" />
 
         <div className="min-w-0 flex-1 pt-0.5">
-          <span className="sr-only">{botName}</span>
+          <span className="sr-only">{labels.botName}</span>
+
+          {showSources && (
+            <MessageSources
+              sources={sources}
+              label={labels.sourcesCount.replace("{count}", String(sources.length))}
+            />
+          )}
 
           {showThinking && (
             <ThinkingProcess
-              key={messageId}
-              steps={meta?.thinkingSteps ?? []}
-              isThinking={!!meta?.isThinking}
-              startedAt={meta?.thinkingStartedAt}
-              endedAt={meta?.thinkingEndedAt}
+              steps={message.thinkingSteps ?? []}
+              isThinking={!!message.isThinking}
+              startedAt={message.thinkingStartedAt}
+              endedAt={message.thinkingEndedAt}
               language={language}
             />
           )}
@@ -96,48 +96,51 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = ({
             <TypingDots />
           ) : (
             <div aria-live="polite">
-              <MarkdownLabelsContext.Provider value={labels}>
-                <MessagePrimitive.Parts components={partComponents} />
-              </MarkdownLabelsContext.Provider>
+              <MarkdownContent
+                text={message.text}
+                isStreaming={!!message.isStreaming}
+                sources={sources}
+                copyLabel={labels.copyLabel}
+                copiedLabel={labels.copiedLabel}
+              />
             </div>
           )}
 
-          {/* Hover actions — always visible on touch screens */}
-          <ActionBarPrimitive.Root
-            hideWhenRunning
-            className="mt-1.5 -ml-1.5 flex items-center gap-0.5 transition-opacity focus-within:opacity-100 md:opacity-0 md:group-hover/msg:opacity-100"
-          >
-            <MessageCopyButton label={copyLabel} />
-            <ActionBarPrimitive.Reload
-              aria-label={regenerateLabel}
-              title={regenerateLabel}
-              className={actionButtonClass}
-            >
-              <RotateCcw className="size-3.5" />
-            </ActionBarPrimitive.Reload>
-          </ActionBarPrimitive.Root>
-
-          {followUps.length > 0 && !meta?.isStreaming && (
-            <div className="mt-3 flex flex-col items-start gap-1.5">
-              {followUps.map((question, index) => (
-                <motion.button
-                  key={question}
+          {!message.isStreaming && hasText && (
+            // Hover actions — always visible on touch screens
+            <div className="mt-1.5 -ml-1.5 flex items-center gap-0.5 transition-opacity focus-within:opacity-100 md:opacity-0 md:group-hover/msg:opacity-100">
+              <MessageCopyButton text={message.text} label={labels.copyLabel} />
+              {onRegenerate && (
+                <Button
                   type="button"
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.2, delay: index * 0.06 }}
-                  onClick={() => onFollowUpClick?.(question)}
-                  title={question}
-                  className="group/chip hover:border-illini-orange/40 flex max-w-full items-center gap-2 rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-left text-[13px] text-slate-600 shadow-xs transition-all hover:bg-orange-50/60 hover:text-slate-900"
+                  variant="ghost"
+                  size="icon"
+                  aria-label={labels.regenerateLabel}
+                  title={labels.regenerateLabel}
+                  onClick={onRegenerate}
+                  className="size-7 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700"
                 >
-                  <span className="truncate">{question}</span>
-                  <ArrowUpRight className="group-hover/chip:text-illini-orange size-3.5 shrink-0 text-slate-400 transition-transform group-hover/chip:translate-x-0.5 group-hover/chip:-translate-y-0.5" />
-                </motion.button>
-              ))}
+                  <RotateCcw className="size-3.5" />
+                </Button>
+              )}
             </div>
+          )}
+
+          {followUps.length > 0 && (
+            <Suggestions className="mt-3">
+              {followUps.map((question) => (
+                <Suggestion
+                  key={question}
+                  suggestion={question}
+                  onClick={onFollowUpClick}
+                  title={question}
+                  className="h-8 border-slate-200 bg-white text-[13px] font-normal text-slate-600 shadow-xs hover:border-orange-200 hover:bg-orange-50/60 hover:text-slate-900"
+                />
+              ))}
+            </Suggestions>
           )}
         </div>
       </div>
-    </MessagePrimitive.Root>
+    </div>
   )
-}
+})

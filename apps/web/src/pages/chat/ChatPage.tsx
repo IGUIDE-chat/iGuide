@@ -1,6 +1,6 @@
 import React from "react"
 
-import { ChatRuntimeProvider } from "../../components/chat/ChatRuntimeProvider"
+import { ChatErrorBoundary } from "../../components/chat/ChatErrorBoundary"
 import { ChatThread } from "../../components/chat/ChatThread"
 import { Language } from "../../types"
 
@@ -16,13 +16,13 @@ const ChatPage: React.FC<ChatPageProps> = ({
   onConversationCreated,
 }) => {
   return (
-    <ChatRuntimeProvider
-      language={language}
-      currentConversationId={currentConversationId}
-      onConversationCreated={onConversationCreated}
-    >
-      <ChatThread language={language} />
-    </ChatRuntimeProvider>
+    <ChatErrorBoundary>
+      <ChatThread
+        language={language}
+        currentConversationId={currentConversationId}
+        onConversationCreated={onConversationCreated}
+      />
+    </ChatErrorBoundary>
   )
 }
 
