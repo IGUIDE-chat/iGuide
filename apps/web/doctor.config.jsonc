@@ -1,0 +1,26 @@
+{
+  "$schema": "https://react.doctor/schema/config.json",
+  "ignore": {
+    // Files the shadcn CLI copied in (see AGENTS.md). They keep upstream's
+    // patterns so a later `shadcn add --overwrite` stays a drop-in update;
+    // real bugs in them are fixed in place and marked "Local change".
+    "overrides": [
+      {
+        // badgeVariants / buttonVariants are shadcn's shared API: other shadcn
+        // components import them from these files.
+        "files": ["src/components/ui/badge.tsx", "src/components/ui/button.tsx"],
+        "rules": ["react-doctor/only-export-components"],
+      },
+      {
+        // `setApi` is Embla's documented way to hand the carousel API to a
+        // parent; AI Elements' InlineCitationCarousel relies on it.
+        "files": ["src/components/ui/carousel.tsx"],
+        "rules": [
+          "react-doctor/no-pass-data-to-parent",
+          "react-doctor/no-pass-live-state-to-parent",
+          "react-doctor/no-prop-callback-in-effect",
+        ],
+      },
+    ],
+  },
+}
