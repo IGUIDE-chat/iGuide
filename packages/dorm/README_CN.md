@@ -54,12 +54,12 @@ configureDormServices({ supabase, streamChatResponse }) // 在 DormRoutes 渲染
 
 ## 宿舍数据脚本
 
-`tsx` 不是依赖项，所以这些脚本通过 `pnpm dlx tsx` 运行。在本目录下执行：
+`tsx` 不是依赖项，所以在 `packages/dorm/` 中用 `vp dlx tsx` 运行这些脚本：
 
 ```sh
-pnpm run validate:data   # 离线校验内置数据集
-pnpm run audit:media     # 对可疑的媒体 URL 发送 HEAD 请求
-SUPABASE_URL=<url> SUPABASE_SERVICE_KEY=<service-role-key> pnpm run seed
+vp dlx tsx scripts/validate-dorm-data.ts   # 离线校验内置数据集
+vp dlx tsx scripts/audit-dorm-media.ts     # 对可疑的媒体 URL 发送 HEAD 请求
+SUPABASE_URL=<url> SUPABASE_SERVICE_KEY=<service-role-key> vp dlx tsx scripts/seed-dorms-table.ts
 ```
 
 seed 脚本从 shell 环境读取这两个变量，不读取 env 文件（PowerShell 中先用 `$env:NAME = "..."`

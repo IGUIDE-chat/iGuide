@@ -77,14 +77,17 @@ For repo-wide rules (secrets, CI, Worker retrieval, data model), see the root
 
 For structure-affecting changes:
 
-1. Run `npm run typecheck` when TypeScript boundaries moved.
-2. Run `npm run build` for renamed imports, route changes, or moved modules.
-3. Run `pnpm run validate:data` in `packages/dorm/` when changing dorm data
-   contracts.
-4. Run `pnpm run audit:media` in `packages/dorm/` when changing dorm media
-   sourcing or media validation.
-5. Only require `npm run verify:architecture` if the script exists in
-   `package.json`.
+1. Run `vp check` when TypeScript boundaries moved: it type-checks, lints, and
+   formats in one pass (`vp check --fix` to apply fixes).
+2. Run `vp build` for renamed imports, route changes, or moved modules.
+3. Run `vp dlx tsx scripts/validate-dorm-data.ts` from `packages/dorm/` when
+   changing dorm data contracts.
+4. Run `vp dlx tsx scripts/audit-dorm-media.ts` from `packages/dorm/` when
+   changing dorm media sourcing or media validation.
+5. Run the Worker and SPA suites from `apps/web` with
+   `node --test "worker/**/*.test.ts" "src/**/*.test.ts"`. They are `node:test`
+   files, and `vp test` (Vitest) cannot start in this app: the Cloudflare Vite
+   plugin rejects Vitest's `ssr` environment.
 
 ## assistant-ui
 

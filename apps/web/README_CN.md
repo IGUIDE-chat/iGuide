@@ -23,35 +23,35 @@ Worker，Worker 负责托管 SPA，并在同源下处理所有 `/api/*` 路由�
 
 ## 环境配置
 
-先在仓库根目录执行一次 `pnpm install` 安装整个 workspace。然后在 `apps/web/` 中复制两个环境变量模板。
+先在仓库根目录执行一次 `vp install` 安装整个 workspace。然后在 `apps/web/` 中复制两个环境变量模板。
 两个实际文件都已被 Git 忽略。
 
 - `.env.local.example` → `.env.local`：由 Vite 构建读取并打包进浏览器端。其中只用到
   `VITE_SUPABASE_URL`、`VITE_SUPABASE_ANON_KEY` 和 `VITE_MAPBOX_TOKEN`。
-- `.dev.vars.example` → `.dev.vars`：`pnpm run dev` 时 Worker 使用的密钥。`Env` 要求必须有
+- `.dev.vars.example` → `.dev.vars`：`vp dev` 时 Worker 使用的密钥。`Env` 要求必须有
   `SUPABASE_URL` 和 `SUPABASE_ANON_KEY`。模板把其余的标为可选，但没有 `DEEPSEEK_API_KEY` 时
   `/api/chat` 不会给出回答，网页搜索需要 `TAVILY_API_KEY`。`GOOGLE_API_KEY` 只供没有任何调用方的
   `/api/gemini` 代理使用。生产环境在 `apps/web/` 中用
-  `pnpm exec cf workers secrets update <NAME> --worker uiuc` 设置。
+  `vp exec cf workers secrets update <NAME> --worker uiuc` 设置。
 
 ## 命令（在 `apps/web/` 中运行）
 
-| 命令                      | 作用                                                                               |
-| ------------------------- | ---------------------------------------------------------------------------------- |
-| `pnpm run dev`            | `vp dev`：启动 Vite，Worker 在其后运行。根目录等价命令：`pnpm run dev:web`。       |
-| `pnpm run build`          | `vp build`：构建 SPA 和 Worker。                                                   |
-| `pnpm run deploy`         | `cf deploy --prebuilt`：直接部署已有构建产物，不会重新构建，请先 build。           |
-| `pnpm run build:preview`  | `vp build --mode preview`。需带上 `CLOUDFLARE_PREVIEW_BUILD=true` 运行（见下文）。 |
-| `pnpm run deploy:preview` | `cf previews deploy --prebuilt`：部署上面的预览构建。                              |
+| 命令                                    | 作用                                                              |
+| --------------------------------------- | ----------------------------------------------------------------- |
+| `vp dev`                                | 启动 Vite，Worker 在其后运行。在仓库根目录运行同一条命令也可以。  |
+| `vp build`                              | 构建 SPA 和 Worker。                                              |
+| `vp exec cf deploy --prebuilt`          | 直接部署已有构建产物，不会重新构建，请先 build。                  |
+| `vp build --mode preview`               | 预览构建。需带上 `CLOUDFLARE_PREVIEW_BUILD=true` 运行（见下文）。 |
+| `vp exec cf previews deploy --prebuilt` | 部署上面的预览构建。                                              |
 
 `cf previews deploy --prebuilt` 只接受标记为预览构建（Preview build）的构建产物，而构建只有在环境中
 有 `CLOUDFLARE_PREVIEW_BUILD=true` 时才会打上这个标记。否则部署会报错 "Build Output was not created
-by a Preview build"。所以请运行 `CLOUDFLARE_PREVIEW_BUILD=true pnpm run build:preview`（PowerShell
+by a Preview build"。所以请运行 `CLOUDFLARE_PREVIEW_BUILD=true vp build --mode preview`（PowerShell
 中先执行 `$env:CLOUDFLARE_PREVIEW_BUILD = "true"`），或者直接运行不带 `--prebuilt` 的
-`pnpm exec cf previews deploy`，它会带着该标记构建并一步完成部署。
+`vp exec cf previews deploy`，它会带着该标记构建并一步完成部署。
 
-用 `pnpm run lint` 做 lint，用 `pnpm exec vp fmt --check` 只检查格式（`fmt` 脚本会直接改写文件）。
-在仓库根目录，`pnpm exec vp check` 会运行格式、lint 和类型检查（`pnpm run check` 做同样的检查并自动修复）。
+用 `vp lint` 做 lint，用 `vp fmt --check` 只检查格式（`vp fmt` 会直接改写文件）。在仓库根目录，
+`vp check` 会运行格式、lint 和类型检查（`vp check --fix` 做同样的检查并自动修复）。
 
 ## 数据库
 

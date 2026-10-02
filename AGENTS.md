@@ -47,20 +47,24 @@ release. Add a tool name to select part of the graph. For example, run
 
 ```bash
 vp install                    # workspace dependencies
-pnpm run dev:web              # SPA and Worker together, including /api/*
+vp dev                        # SPA and Worker together, including /api/*
 curl http://localhost:5173/api/health
 
-pnpm run check                # format, lint, and typecheck with fixes
-pnpm run lint
-pnpm run typecheck
-pnpm run test                 # package test scripts
-pnpm run build
+vp check --fix                # format, lint, and typecheck with fixes
+vp lint
+vp build
 
-vp run --filter @iguide/web test
+# Worker and SPA suites are node:test files
+(cd apps/web && node --test "worker/**/*.test.ts" "src/**/*.test.ts")
 ```
 
-Run checks and relevant package scripts before delivery. CI requires lint,
-typecheck, tests, build, and source/bundle secret scans to pass.
+Run from the repo root: `dev`, `build`, and `preview` resolve to `apps/web`
+through `defaultPackage` in the root `vite.config.ts`, and `cf` and `tsx`
+commands run through `vp exec cf` and `vp dlx tsx` from `apps/web`.
+
+Run checks before delivery; `package.json` defines no validation scripts, so
+`vp check` and the `node --test` run above are the whole local gate. CI
+requires lint, typecheck, tests, build, and source/bundle secret scans to pass.
 
 ## Secrets
 
@@ -120,7 +124,8 @@ in `apps/web/worker/types.ts` defines required configuration. For local runs,
 copy `apps/web/.dev.vars.example` to `.dev.vars` and fill the values `Env` requires.
 
 ```bash
-vp run --filter @iguide/web deploy
+vp -C apps/web exec cf build           # Worker + SPA assets as Build Output
+vp -C apps/web exec cf deploy --prebuilt
 ```
 
 `/api/chat` is the only chat path: it runs the Worker's tool-use agent and

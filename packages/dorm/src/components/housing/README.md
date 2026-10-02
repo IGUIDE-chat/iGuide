@@ -160,22 +160,23 @@ Do not change only the static JSON shape and assume admin or seed will keep up.
 
 ## Validation and Checks
 
-When you change housing data or contracts, run:
+When you change housing data or contracts, run, from `packages/dorm/`
+(`tsx` is not a dependency, so it is fetched on demand):
 
 ```bash
-npm run validate:dorm-data
+vp dlx tsx scripts/validate-dorm-data.ts
 ```
 
 Run this too when media sourcing or media quality rules changed:
 
 ```bash
-npm run audit:dorm-media
+vp dlx tsx scripts/audit-dorm-media.ts
 ```
 
 Run this when imports, types, or UI structure changed:
 
 ```bash
-npm run build
+vp build
 ```
 
 ## Safe Edit Patterns

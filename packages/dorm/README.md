@@ -63,12 +63,12 @@ fails on a database built only from this SQL.
 
 ## Dorm data scripts
 
-`tsx` is not a dependency, so the scripts run through `pnpm dlx tsx`. Run them from this directory:
+`tsx` is not a dependency, so run the scripts with `vp dlx tsx`, from `packages/dorm/`:
 
 ```sh
-pnpm run validate:data   # offline check of the bundled dataset
-pnpm run audit:media     # sends HEAD requests to suspicious media URLs
-SUPABASE_URL=<url> SUPABASE_SERVICE_KEY=<service-role-key> pnpm run seed
+vp dlx tsx scripts/validate-dorm-data.ts   # offline check of the bundled dataset
+vp dlx tsx scripts/audit-dorm-media.ts     # sends HEAD requests to suspicious media URLs
+SUPABASE_URL=<url> SUPABASE_SERVICE_KEY=<service-role-key> vp dlx tsx scripts/seed-dorms-table.ts
 ```
 
 The seed reads both variables from the shell, not from env files (in PowerShell, set them first with
