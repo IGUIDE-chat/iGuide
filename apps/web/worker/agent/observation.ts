@@ -1,4 +1,4 @@
-import type { ToolResult } from "../tools/types.ts"
+import type { ToolResult, ToolSource } from "../tools/types.ts"
 import { buildToolResultContent, type ProviderMessage } from "./messages.ts"
 
 export interface ObservationError {
@@ -24,6 +24,11 @@ export interface Observation {
   originalByteCount?: number
   truncatedByteCount?: number | null
   providerMessage?: ProviderMessage
+  /**
+   * Pages the model actually read: the tool's `metadata.sources` minus any whose
+   * URL was cut from `raw` by the registry's byte limit. Absent on errors.
+   */
+  sources?: ToolSource[]
 }
 
 interface BuildObservationOptions {
@@ -48,6 +53,9 @@ export function buildObservation(options: BuildObservationOptions): Observation 
     : null
   const summary = buildSummary(options.result.content, parsedContent, hasError)
   const error = hasError ? buildObservationError(parsedContent, summary) : null
+  const sources = hasError
+    ? []
+    : readVisibleSources(options.result.metadata?.sources, options.result.content)
 
   return createObservation({
     toolCallId: options.toolCallId,
@@ -66,13 +74,92 @@ export function buildObservation(options: BuildObservationOptions): Observation 
     providerMessage: {
       role: "tool",
       tool_call_id: options.toolCallId,
-      content: buildToolResultContent(options.result),
+      content: buildToolResultContent(withoutSourcesMetadata(options.result)),
     },
+    ...(sources.length > 0 ? { sources } : {}),
   })
 }
 
 function byteLength(value: string): number {
   return textEncoder.encode(value).length
+}
+
+/**
+ * Sources are UI-only: `buildToolResultContent` would otherwise serialize them
+ * into the tool message, re-sending every snippet (including pages the byte
+ * limit cut) to the model.
+ */
+function withoutSourcesMetadata(result: ToolResult): ToolResult {
+  if (!result.metadata || !("sources" in result.metadata)) {
+    return result
+  }
+
+  const metadata = { ...result.metadata }
+  delete metadata.sources
+
+  return {
+    ...result,
+    metadata: Object.keys(metadata).length > 0 ? metadata : undefined,
+  }
+}
+
+function readVisibleSources(value: unknown, content: string): ToolSource[] {
+  if (!Array.isArray(value)) return []
+
+  const sources: ToolSource[] = []
+  const seen = new Set<string>()
+
+  for (const entry of value) {
+    const source = toToolSource(entry)
+    if (!source || seen.has(source.url) || !mentionsUrl(content, source.url)) continue
+
+    seen.add(source.url)
+    sources.push(source)
+  }
+
+  return sources
+}
+
+function toToolSource(value: unknown): ToolSource | null {
+  if (value === null || typeof value !== "object") return null
+
+  const { url, title, snippet } = value as Record<string, unknown>
+  if (typeof url !== "string" || typeof title !== "string" || !isHttpUrl(url)) return null
+  if (snippet !== undefined && typeof snippet !== "string") return null
+
+  return {
+    url,
+    title,
+    ...(snippet ? { snippet } : {}),
+  }
+}
+
+function isHttpUrl(value: string): boolean {
+  try {
+    const { protocol } = new URL(value)
+    return protocol === "http:" || protocol === "https:"
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Characters after a URL that end it. Anything else (`/`, `-`, letters, ...)
+ * means the match is a prefix of a longer URL, which is a different page.
+ */
+const URL_TERMINATORS = /[\s)\]}>"'<,;]/
+
+/** True when `content` contains `url` as a whole URL, not only as a prefix. */
+function mentionsUrl(content: string, url: string): boolean {
+  let index = content.indexOf(url)
+
+  while (index !== -1) {
+    const next = content[index + url.length]
+    if (next === undefined || URL_TERMINATORS.test(next)) return true
+    index = content.indexOf(url, index + 1)
+  }
+
+  return false
 }
 
 function numberMetadata(value: unknown, fallback: number): number {

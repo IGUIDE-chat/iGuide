@@ -1,14 +1,19 @@
 import type { ToolRegistry } from "./registry"
-import { ToolDefinition, ToolResult, RequestContext } from "./types"
+import type { RequestContext, ToolDefinition, ToolResult, ToolSource } from "./types"
+
+interface TavilyResult {
+  title: string
+  url: string
+  content: string
+  score: number
+}
 
 interface TavilyResponse {
-  results?: Array<{
-    title: string
-    url: string
-    content: string
-    score: number
-  }>
+  results?: TavilyResult[]
 }
+
+/** Longest citation preview, in characters, including the trailing ellipsis. */
+const SNIPPET_MAX_CHARS = 240
 
 interface WebSearchArgs {
   query: string
@@ -38,14 +43,7 @@ function getResultPriority(url: string, score: number): number {
   return priority
 }
 
-function formatResults(
-  results: Array<{
-    title: string
-    url: string
-    content: string
-    score: number
-  }>,
-): string {
+function formatResults(results: TavilyResult[]): string {
   if (results.length === 0) {
     return "No results found for the search query."
   }
@@ -53,6 +51,54 @@ function formatResults(
   return results
     .map((result) => `## ${result.title}\nSource: ${result.url}\n\n${result.content}\n---`)
     .join("\n")
+}
+
+function toSnippet(content: unknown): string | undefined {
+  if (typeof content !== "string") return undefined
+
+  const collapsed = content.replace(/\s+/g, " ").trim()
+  // Count code points, not UTF-16 units, so the cut never splits a surrogate pair.
+  const chars = Array.from(collapsed)
+  if (chars.length === 0) return undefined
+  if (chars.length <= SNIPPET_MAX_CHARS) return collapsed
+
+  return `${chars
+    .slice(0, SNIPPET_MAX_CHARS - 1)
+    .join("")
+    .trimEnd()}…`
+}
+
+/**
+ * Citation metadata for the results in `formatResults` order. The URL is kept
+ * verbatim (not normalized) so it matches the `Source:` line the model reads.
+ */
+function buildSources(results: TavilyResult[]): ToolSource[] {
+  const sources: ToolSource[] = []
+  const seen = new Set<string>()
+
+  for (const result of results) {
+    if (typeof result.url !== "string" || seen.has(result.url)) continue
+
+    let hostname: string
+    try {
+      const parsed = new URL(result.url)
+      if (parsed.protocol !== "http:" && parsed.protocol !== "https:") continue
+      hostname = parsed.hostname
+    } catch {
+      continue
+    }
+
+    seen.add(result.url)
+    const title = typeof result.title === "string" ? result.title.trim() : ""
+    const snippet = toSnippet(result.content)
+    sources.push({
+      url: result.url,
+      title: title || hostname,
+      ...(snippet ? { snippet } : {}),
+    })
+  }
+
+  return sources
 }
 
 export function createWebSearchTool(registry: ToolRegistry): ToolDefinition {
@@ -122,6 +168,7 @@ export function createWebSearchTool(registry: ToolRegistry): ToolDefinition {
 
         return {
           content: formatResults(sorted),
+          metadata: { sources: buildSources(sorted) },
         }
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error)

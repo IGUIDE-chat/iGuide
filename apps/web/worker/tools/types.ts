@@ -16,6 +16,18 @@ export interface ToolResult {
   truncated?: boolean
 }
 
+/**
+ * A page a retrieval tool handed to the model, returned as `metadata.sources`.
+ * The agent loop streams the ones the model actually saw to the browser as
+ * `source-url` events; they are never sent back to the model.
+ */
+export interface ToolSource {
+  url: string
+  title: string
+  /** Short plain-text excerpt for the citation preview. */
+  snippet?: string
+}
+
 export interface OpenAITool {
   type: "function"
   function: {

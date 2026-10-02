@@ -1,3 +1,5 @@
+import type { ToolSource } from "../tools/types.ts"
+
 const textEncoder = new TextEncoder()
 
 type SSEWriter = WritableStreamDefaultWriter<string>
@@ -47,6 +49,19 @@ export async function sendToolResult(
     name: toolName,
     status,
     summary,
+  })
+}
+
+/**
+ * One page the model read, shaped like the AI SDK `source-url` stream part.
+ * The URL doubles as `sourceId` so repeated hits on a page collapse client-side.
+ */
+export async function sendSourceUrl(writer: SSEWriter, source: ToolSource): Promise<void> {
+  await writeEvent(writer, "source-url", {
+    sourceId: source.url,
+    url: source.url,
+    title: source.title,
+    ...(source.snippet ? { snippet: source.snippet } : {}),
   })
 }
 

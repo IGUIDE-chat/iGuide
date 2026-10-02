@@ -21,6 +21,7 @@ import {
   sendContent,
   sendDone,
   sendFallback,
+  sendSourceUrl,
   sendToolResult,
   sendToolStart,
   emitAgentStep,
@@ -537,6 +538,10 @@ async function executeStreamingToolCalls(options: {
       observation.status,
       observation.summary,
     )
+
+    for (const source of observation.sources ?? []) {
+      await sendSourceUrl(options.writer, source)
+    }
 
     toolResults.push({
       toolCall,
