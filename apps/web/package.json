@@ -5,16 +5,14 @@
   "type": "module",
   "scripts": {
     "build": "vp build",
-    "build:worker": "cf build",
-    "deploy": "cf deploy",
+    "deploy": "cf deploy --prebuilt",
     "dev": "vp dev",
+    "doctor": "npx react-doctor@latest",
     "lint": "vp lint",
     "lint:fix": "vp lint --fix",
-    "preview": "vp preview",
-    "typecheck": "tsc --noEmit",
-    "test": "node --test --experimental-strip-types --experimental-import-text \"worker/**/*.test.ts\"",
-    "postinstall": "git submodule update --init --recursive && git config --local include.path ../.gitconfig",
-    "doctor": "npx react-doctor@latest"
+    "fmt": "vp fmt",
+    "fmt:fix": "vp fmt --fix",
+    "preview": "cf previews deploy --prebuilt"
   },
   "dependencies": {
     "@assistant-ui/react": "^0.15.22",
