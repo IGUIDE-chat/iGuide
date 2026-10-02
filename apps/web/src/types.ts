@@ -58,6 +58,8 @@ export interface ChatMessage {
   thinkingStartedAt?: number
   /** When the first reply text arrived, i.e. thinking finished (ms since epoch). */
   thinkingEndedAt?: number
+  /** Pages the agent read for this reply, in the order they were found. */
+  sources?: MessageSource[]
 }
 
 export interface ConversationSummary {

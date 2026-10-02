@@ -91,16 +91,23 @@ export const conversationService = {
   },
 
   async saveMessage(conversationId: string, message: ChatMessage) {
-    const { data, error } = await supabase
-      .from("messages")
-      .insert({
-        conversation_id: conversationId,
-        role: message.role,
-        content: message.text,
-        follow_up_questions: message.followUpQuestions || null,
-      })
-      .select()
-      .single()
+    const row = {
+      conversation_id: conversationId,
+      role: message.role,
+      content: message.text,
+      follow_up_questions: message.followUpQuestions || null,
+    }
+    const insert = (values: typeof row & { sources?: ChatMessage["sources"] }) =>
+      supabase.from("messages").insert(values).select().single()
+
+    let { data, error } = await insert(
+      message.sources?.length ? { ...row, sources: message.sources } : row,
+    )
+    // PGRST204: the `sources` column does not exist yet (migration
+    // add_message_sources.sql not applied). Keep the message, drop its sources.
+    if (error?.code === "PGRST204" && message.sources?.length) {
+      ;({ data, error } = await insert(row))
+    }
 
     await supabase
       .from("conversations")
@@ -149,6 +156,7 @@ export const conversationService = {
       role: msg.role as "user" | "model",
       text: msg.content,
       followUpQuestions: msg.follow_up_questions || undefined,
+      sources: msg.sources || undefined,
     }))
   },
 }

@@ -6,7 +6,7 @@ import { streamChatResponse } from "../../services/ai"
 import { conversationService } from "../../services/conversationService"
 import { localConversationService } from "../../services/localConversationService"
 import { memoryService } from "../../services/memoryService"
-import { Language, ChatMessage, ThinkingStep } from "../../types"
+import { Language, ChatMessage, MessageSource, ThinkingStep } from "../../types"
 
 interface UseChatSessionOptions {
   language: Language
@@ -257,8 +257,18 @@ export const useChatSession = ({
         let followUpQuestions: string[] | undefined
         let thinkingEndedAt: number | undefined
         const thinkingSteps: ThinkingStep[] = []
+        // Several searches can return the same page; keep its first position.
+        const sources: MessageSource[] = []
 
         for await (const chunk of stream) {
+          if (chunk.source && !sources.some((source) => source.url === chunk.source?.url)) {
+            sources.push(chunk.source)
+            dispatch({
+              type: "UPDATE_MESSAGE",
+              payload: { id: aiMsgId, updates: { sources: [...sources] } },
+            })
+          }
+
           if (chunk.thinkingStep) {
             if (thinkingSteps.length > 0) {
               thinkingSteps[thinkingSteps.length - 1].done = true
@@ -395,6 +405,7 @@ export const useChatSession = ({
           thinkingSteps: thinkingSteps.length > 0 ? thinkingSteps : undefined,
           thinkingStartedAt,
           thinkingEndedAt,
+          sources: sources.length > 0 ? sources : undefined,
         }
 
         streamingMessageIdRef.current = null

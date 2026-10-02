@@ -1,4 +1,4 @@
-import { ChatMessage } from "../types"
+import { ChatMessage, MessageSource } from "../types"
 
 const STORAGE_KEY = "guest_conversations"
 
@@ -9,6 +9,7 @@ interface LocalMessage {
   content: string
   created_at: string
   follow_up_questions?: string[]
+  sources?: MessageSource[]
 }
 
 interface LocalConversation {
@@ -107,6 +108,7 @@ export const localConversationService = {
       content: message.text,
       created_at: new Date().toISOString(),
       follow_up_questions: message.followUpQuestions,
+      sources: message.sources,
     }
 
     conv.messages.push(newMessage)
@@ -153,6 +155,7 @@ export const localConversationService = {
       role: msg.role,
       text: msg.content,
       followUpQuestions: msg.follow_up_questions,
+      sources: msg.sources,
     }))
   },
 }
