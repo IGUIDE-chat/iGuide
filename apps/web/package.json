@@ -5,14 +5,15 @@
   "type": "module",
   "scripts": {
     "build": "vp build",
+    "build:preview": "vp build --mode preview",
     "deploy": "cf deploy --prebuilt",
+    "deploy:preview": "cf previews deploy --prebuilt",
     "dev": "vp dev",
     "doctor": "npx react-doctor@latest",
-    "lint": "vp lint",
-    "lint:fix": "vp lint --fix",
     "fmt": "vp fmt",
     "fmt:fix": "vp fmt --fix",
-    "preview": "cf previews deploy --prebuilt"
+    "lint": "vp lint",
+    "lint:fix": "vp lint --fix"
   },
   "dependencies": {
     "@assistant-ui/react": "^0.15.22",
