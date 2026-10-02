@@ -10,7 +10,6 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: lazyPlugins(() => [
       react(),
-      ViteMcp(),
       // `cf build` and `cf deploy` delegate to `vite build`, which needs the
       // Cloudflare plugin to emit the Worker plus its static assets as Build
       // Output. Under `serve` the same plugin boots the Worker behind the dev
