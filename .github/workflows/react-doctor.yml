@@ -11,12 +11,16 @@ on:
   pull_request:
     paths:
       - "apps/web/**"
+      - "packages/dorm/**"
+      - "packages/ui/**"
     types: [opened, synchronize, reopened, ready_for_review]
   # Scans `main` on every push to track the health-score trend and catch regressions that slipped past PR review.
   push:
     branches: ["main"]
     paths:
       - "apps/web/**"
+      - "packages/dorm/**"
+      - "packages/ui/**"
 
 permissions:
   contents: read
