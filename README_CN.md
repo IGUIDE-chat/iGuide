@@ -35,7 +35,7 @@ cp apps/web/.env.local.example apps/web/.env.local   # SPA 使用的公开 VITE_
 cp apps/web/.dev.vars.example apps/web/.dev.vars     # 本地运行用的 Worker secrets
 ```
 
-启动服务器之前，先在 `.dev.vars` 中取消注释并设置 `DEEPSEEK_API_KEY`。DeepSeek 是唯一的模型服务商，虽然模板把这个密钥标为可选，但没有它，聊天就得不到回答。也请在那里设置 `TAVILY_API_KEY`，否则每次网页搜索都会向模型返回错误，模型就只能依靠通用知识作答。`.env.local` 中服务端用的 `DEEPSEEK_API_KEY`、`TAVILY_API_KEY`、`SUPABASE_URL` 和 `SUPABASE_ANON_KEY` 条目不会被仓库中的任何代码读取；Worker 读取的是 `.dev.vars`。其他你没有的值请留空，不要保留占位符：没有 Supabase URL 和 key 时，登录和同步功能关闭，宿舍从内置数据加载；没有 `VITE_MAPBOX_TOKEN` 时，地图会显示一条提示。
+启动服务器之前，请在 `.dev.vars` 中填写 `DEEPSEEK_API_KEY` 和 `TAVILY_API_KEY`：没有前者聊天就得不到回答，没有后者每次网页搜索都会报错。其他占位符请留空。[AGENTS.md](AGENTS.md#secrets) 列出了每个变量的作用。
 
 ```bash
 vp dev
@@ -47,51 +47,19 @@ vp dev
 curl http://localhost:5173/api/health
 ```
 
-## 整体架构
-
-- [`apps/web/src`](apps/web/src) 是 React 19 SPA：react-router 7、Tailwind CSS 4、负责聊天的 assistant-ui、负责宿舍地图的 Mapbox GL，以及负责鉴权和用户数据的 supabase-js。
-- [`apps/web/worker`](apps/web/worker) 是 Cloudflare Worker（名为 `uiuc`）。它负责路由 `/api/*`，其他所有路径都返回 SPA 的静态资源。它还承载 tool-use [agent 循环](apps/web/worker/agent)、配套的[工具](apps/web/worker/tools)和[技能](apps/web/worker/skills)，以及一个面向用户自行注册服务器的实验性 [MCP 客户端](apps/web/worker/mcp)（仅存于内存，暂无 UI）。
-- [`apps/web/scripts/migrations`](apps/web/scripts/migrations) 是宿舍 SQL 迁移链（宿舍、编辑历史、照片 bucket、人设和记忆表），需要在 Supabase SQL 编辑器中手动执行，并配合 [`apps/web/scripts/create_dorm_user_features.sql`](apps/web/scripts/create_dorm_user_features.sql) 实现宿舍收藏和浏览历史。
-- [`tools/vite-bin`](tools/vite-bin) 为 `cf build` 提供一个转发到已锁定版本 Vite+ 的 `vite` bin，这样构建时就不会下载未锁定版本的 Vite。
-
-```text
-Browser ──same origin──> Worker "uiuc" (apps/web/worker)
-                           ├─ /api/chat         基于 DeepSeek 的 tool-use agent，
-                           │                    ≤3 轮迭代，≤5 次工具调用
-                           │                      ├─ web_search ─> Tavily（仅限 illinois.edu）
-                           │                      └─ custom_skills、MCP 工具（实验性）
-                           ├─ /api/deepseek     已关闭的评论翻译按钮所用的 DeepSeek 代理
-                           ├─ /api/tavily       没有任何客户端调用的 Tavily 代理
-                           ├─ /api/gemini       没有任何客户端调用的 Gemini 代理
-                           ├─ /api/health, /api/integrations/*
-                           ├─ 其他任何 /api/*   返回列出可用端点的 404 JSON
-                           └─ 其他所有路径 ─> 静态资源（SPA）
-```
-
-`/api/chat` 是唯一的聊天路径：聊天页面和悬浮宿舍助手都向它发送 POST 请求，并读取返回的 SSE 流。问候、致谢和其他闲聊不使用工具。某轮 agent 迭代失败时，它会先用最多一个工具重试一次，然后不使用工具直接作答。
-
-检索无需预先导入任何数据：agent 唯一的来源是提问时进行的 Tavily 搜索。[`tests/fixtures/`](tests/fixtures) 中仍保留着已移除的知识库 schema 留下的 `seed-data.sql` 和 `golden-queries.json`；没有任何代码读取它们。
-
-## 安全
-
-- 所有带 `VITE_` 前缀或通过 Vite `define` 注入的内容都是公开的浏览器数据（[Vite 环境变量](https://vite.dev/guide/env-and-mode)），`apps/web/src` 下的所有内容也一样。在 SPA 中，只有 Supabase URL 和 anon key 以及 Mapbox token 使用这个前缀；绝不要把服务商密钥放进 `src`，也不要放进 `.env.local` 中的 `VITE_` 变量。旧版的 `VITE_DEEPSEEK_API_KEY` 只作为 `/api/deepseek` 的回退（不作用于 `/api/chat`），请改为设置 `DEEPSEEK_API_KEY`。
-- 服务商密钥（DeepSeek、Tavily、Google）以及 Worker 使用的 Supabase URL 和 anon key 都属于 Worker secrets。本地放在 `apps/web/.dev.vars` 中；生产环境在 `apps/web` 目录下用 `vp exec cf workers secrets update <NAME> --worker uiuc` 设置（CLI 随后会询问 secret 的类型和值）。Git 会忽略 `.env*` 和 `.dev.vars*`，只有 `.example` 模板纳入版本控制。
-- 允许访客使用。`/api/chat` 和 `/api/integrations` 接受不带 token 的请求，但 Bearer token 若被 Supabase 拒绝，会返回 401。所有不带 token 的调用方共用同一个 `anonymous` 身份，因此不带 token 注册的 MCP 服务器会被加载到每一个访客聊天中。目前还没有 `KV` 绑定，所以 MCP 注册表存放在 Worker isolate 的内存里，注册信息不会持久保存。
-- `/api/deepseek`、`/api/tavily` 和 `/api/gemini` 完全不做鉴权，会用 Worker 自己的密钥转发任何请求；`/api/deepseek` 会原样转发调用方提供的 `messages`，而 `/api/tavily` 和 `/api/gemini` 会发送 `Access-Control-Allow-Origin: *`，因此任何网站都能调用这两个接口。密钥本身不会暴露，但任何人都能消耗它们的额度。
-- Worker 没有对任何端点做限流。
-- Supabase RLS 已开启，写入宿舍数据需要 `user_metadata.is_admin`。
-
 ## 文档
 
-| 目标                           | 从这里开始                                                                                                                                                                                                                                   |
-| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 了解仓库规则、命令和数据模型   | [AGENTS.md](AGENTS.md)                                                                                                                                                                                                                       |
-| 开发 React 应用或 Worker       | [apps/web/AGENTS.md](apps/web/AGENTS.md)                                                                                                                                                                                                     |
-| 修改 agent 的提示词或循环      | [apps/web/worker/routes/agent-prompts](apps/web/worker/routes/agent-prompts) · [apps/web/worker/agent](apps/web/worker/agent)                                                                                                                |
-| 添加 agent 工具或技能          | [apps/web/worker/tools](apps/web/worker/tools) · [apps/web/worker/skills](apps/web/worker/skills)                                                                                                                                            |
-| 配置 secrets 和 Worker         | [apps/web/.dev.vars.example](apps/web/.dev.vars.example) · [apps/web/.env.local.example](apps/web/.env.local.example) · [apps/web/cloudflare.config.ts](apps/web/cloudflare.config.ts)                                                       |
-| 创建宿舍表并导入种子数据       | [apps/web/scripts/migrations](apps/web/scripts/migrations) · [apps/web/scripts/create_dorm_user_features.sql](apps/web/scripts/create_dorm_user_features.sql) · [apps/web/scripts/seed-dorms-table.ts](apps/web/scripts/seed-dorms-table.ts) |
-| 查看 pull request 上会运行什么 | [.github/workflows/react-doctor.yml](.github/workflows/react-doctor.yml)                                                                                                                                                                     |
+| 目标                           | 从这里开始                                                                                                                                                                                         |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 了解仓库规则、命令和数据模型   | [AGENTS.md](AGENTS.md)                                                                                                                                                                             |
+| 了解运行时、接口和访问模型     | [AGENTS.md](AGENTS.md#architecture) · [AGENTS.md](AGENTS.md#endpoint-access)                                                                                                                       |
+| 在 React 应用或 Worker 上开发  | [apps/web/AGENTS.md](apps/web/AGENTS.md)                                                                                                                                                           |
+| 修改 agent 的提示词或循环      | [apps/web/worker/routes/agent-prompts](apps/web/worker/routes/agent-prompts) · [apps/web/worker/agent](apps/web/worker/agent)                                                                      |
+| 添加 agent 工具或技能          | [apps/web/worker/tools](apps/web/worker/tools) · [apps/web/worker/skills](apps/web/worker/skills)                                                                                                  |
+| 配置 secrets 和 Worker         | [apps/web/.dev.vars.example](apps/web/.dev.vars.example) · [apps/web/.env.local.example](apps/web/.env.local.example) · [apps/web/cloudflare.config.ts](apps/web/cloudflare.config.ts)             |
+| 创建宿舍表并导入种子数据       | [apps/web/AGENTS.md](apps/web/AGENTS.md#dorm-database) · [apps/web/scripts/migrations](apps/web/scripts/migrations) · [apps/web/scripts/seed-dorms-table.ts](apps/web/scripts/seed-dorms-table.ts) |
+| 部署与回滚                     | [AGENTS.md](AGENTS.md#deploy)                                                                                                                                                                      |
+| 查看 pull request 上会运行什么 | [.github/workflows/react-doctor.yml](.github/workflows/react-doctor.yml)                                                                                                                           |
 
 ## 开发
 
@@ -106,20 +74,18 @@ vp build         # apps/web 的生产构建
 vp preview       # 在本地运行生产构建
 ```
 
-仓库里没有 `test` 或 `typecheck` 脚本或任务：类型检查在 `vp check` 中完成；`vp test`（Vitest）在本应用中无法启动，因为 Cloudflare Vite 插件会拒绝 Vitest 的 `ssr` 环境。Worker 和 SPA 的测试是 `node:test` 文件，请在 `apps/web` 下用 Node 运行它们：
+仓库里没有 `test` 或 `typecheck` 脚本：类型检查在 `vp check` 中完成。Worker 和 SPA 的测试是 `node:test` 文件，请在 `apps/web` 下运行：
 
 ```bash
 cd apps/web
 node --test "worker/**/*.test.ts" "src/**/*.test.ts"
 ```
 
-其中 `worker/agent/loop.test.ts` 和 `worker/agent/loop.baseline.test.ts` 这两个文件目前在纯 Node 下会失败，因为 agent 循环以文本模块的形式导入它的 `.txt` 提示词；其余文件都能通过。
-
-仓库没有 CI 测试工作流。[React Doctor](https://www.react.doctor/ci) 会审查涉及 `apps/web` 的 pull request 和推送到 `main` 的提交，只报告结果，不会让检查失败（[workflow](.github/workflows/react-doctor.yml)）。推送前请自己运行 `vp check --fix`、上面的测试和 `vp build`。
+其中两个测试文件目前在纯 Node 下会失败，而且 CI 根本不跑测试；细节见 [AGENTS.md](AGENTS.md#verification)。推送前请自己运行 `vp check --fix`、上面的测试和 `vp build`。
 
 ## 部署
 
-SPA 和整套 API 都由同一个 Worker 提供，所以它是唯一需要部署的东西。它在 [`apps/web/cloudflare.config.ts`](apps/web/cloudflare.config.ts) 中配置，使用 `cf` CLI 部署，而 `cf` 只是 `apps/web` 的开发依赖。该配置锁定了一个 Cloudflare `accountId` 和自定义域名 `iguide.chat`，所以 fork 必须先修改 `accountId` 和 `domains`；`cf` 本身见 [Get started with Workers](https://developers.cloudflare.com/workers/get-started/guide/)。
+SPA 和整套 API 都由同一个 Worker 提供，所以它是唯一需要部署的东西。它在 [`apps/web/cloudflare.config.ts`](apps/web/cloudflare.config.ts) 中配置，使用 `cf` CLI 部署（见 [Get started with Workers](https://developers.cloudflare.com/workers/get-started/guide/)）；fork 必须先修改其中锁定的 `accountId` 和 `domains`。
 
 手动部署：
 
@@ -129,47 +95,9 @@ vp exec cf build             # 把 Worker + SPA 静态资源构建为 Build Outp
 vp exec cf deploy --prebuilt # 部署上面的构建产物，不会重新构建
 ```
 
-如果想先试一个分支，可以改为部署 Worker Preview：`cf previews deploy` 会以当前 Git 分支为预览命名。`--prebuilt` 只接受标记为 Preview 构建的 Build Output，而 `vp build` 只有在环境中有 `CLOUDFLARE_PREVIEW_BUILD=true` 时才会设置这个标记（在 PowerShell 中，先运行 `$env:CLOUDFLARE_PREVIEW_BUILD = "true"`）；没有它，部署会中止并报错“Build Output was not created by a Preview build”。参见 [preview deployments](https://developers.cloudflare.com/workers/configuration/previews/)：
+如果想先试一个分支，可以部署以当前 Git 分支命名的 Worker Preview：先运行 `CLOUDFLARE_PREVIEW_BUILD=true vp build --mode preview`，再运行 `vp exec cf previews deploy --prebuilt`（[细节](https://developers.cloudflare.com/workers/configuration/previews/)）。
 
-```bash
-cd apps/web
-CLOUDFLARE_PREVIEW_BUILD=true vp build --mode preview
-vp exec cf previews deploy --prebuilt
-```
-
-也可以运行 `vp exec cf previews deploy`（不带 `--prebuilt`），它会带着该标记构建，并一步完成部署。
-
-按以下顺序上线：
-
-1. 自己创建 `conversations`、`messages`、`reading_history`、`user_profiles` 和 `mailing_list` 表：仓库中的 SQL 不会创建它们，而宿舍迁移链中的 `add_soul_and_memory.sql` 会引用 `conversations`。然后从 `create_dorms_table.sql` 开始执行 `apps/web/scripts/migrations/` 中的宿舍迁移链，并执行 `apps/web/scripts/create_dorm_user_features.sql`（收藏和浏览历史）。在全新项目上，请先删掉 `create_dorms_table.sql` 的最后一行：它给一张仓库里没有任何 SQL 创建的 `dorm_overrides` 表加注释，这个错误会让 SQL 编辑器回滚整个文件。
-2. 为宿舍表导入种子数据。该脚本从 shell 读取 `SUPABASE_URL` 和 `SUPABASE_SERVICE_KEY`，而不是从 `.env` 文件读取。
-
-   ```bash
-   cd apps/web && vp dlx tsx scripts/seed-dorms-table.ts
-   ```
-
-   如果数据库只由仓库中的 SQL 建成，导入种子数据会失败：`add_categorized_tags.sql` 添加的 `chk_bathroom_type` 只允许 `communal`、`semi-private` 和 `private`，但种子脚本会为四栋宿舍写入 `individual-use`，而只要有一行被拒绝，整个 upsert 就会失败。导入前请先放宽这个约束：
-
-   ```sql
-   ALTER TABLE public.dorms DROP CONSTRAINT chk_bathroom_type;
-   ALTER TABLE public.dorms ADD CONSTRAINT chk_bathroom_type
-     CHECK (bathroom_type IN ('communal', 'individual-use', 'semi-private', 'private'));
-   ```
-
-3. 设置 Worker secrets。[`worker/types.ts`](apps/web/worker/types.ts) 中的 `Env` 只要求 `SUPABASE_URL` 和 `SUPABASE_ANON_KEY`（`ASSETS` 由 Cloudflare 绑定），但聊天需要 `DEEPSEEK_API_KEY`，搜索需要 `TAVILY_API_KEY`。
-4. 部署一个预览（见上文），在预览上检查 `/api/health`，并验证流式输出、工具调用和回退行为。
-5. 部署到生产环境（先 `vp exec cf build`，再 `vp exec cf deploy --prebuilt`），然后在 `iguide.chat` 上检查 `/api/health`。
-
-**回滚。** 没有第二条聊天路径可供回退，所以要回滚 Worker 本身。无需重新构建、直接把流量指回之前上传过的某个版本（参见 [deployments](https://developers.cloudflare.com/workers/configuration/deployments/)）：
-
-```bash
-cd apps/web
-vp exec cf workers versions list --worker-id uiuc
-vp exec cf workers deployments create --worker uiuc --strategy percentage \
-  --versions '[{"version_id":"<last good version id>","percentage":100}]'
-```
-
-如果需要重新构建，就 check out 最后一个正常的 commit，然后按上文运行 `vp exec cf build` 和 `vp exec cf deploy --prebuilt`。这样也会重新部署该 commit 的 `cloudflare.config.ts`。
+上线顺序（创建仓库 SQL 遗漏的表、执行宿舍迁移链、导入种子、设置 secrets、部署预览，最后上生产）和回滚命令见 [AGENTS.md](AGENTS.md#deploy)。
 
 ## 社区
 
