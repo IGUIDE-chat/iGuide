@@ -85,8 +85,8 @@ Run checks before delivery; `package.json` defines no validation scripts, so
 ## Architecture
 
 - `apps/web/src` is the React 19 SPA: react-router 7, Tailwind CSS 4,
-  assistant-ui for chat, Mapbox GL for the dorm map, and supabase-js for auth
-  and user data.
+  shadcn/ui and AI Elements for chat, Mapbox GL for the dorm map, and
+  supabase-js for auth and user data.
 - `apps/web/worker` is the Cloudflare Worker named `uiuc`. It routes `/api/*` and
   serves the SPA's static assets for every other path, so the app and the whole
   API share one origin. It also hosts the streaming tool-use agent

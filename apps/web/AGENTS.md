@@ -121,6 +121,8 @@ Feature SQL, after the core schema:
   `add_floor_plan_bed_size.sql`; `add_soul_and_memory.sql` (all in
   `scripts/migrations/`).
 - `scripts/create_dorm_user_features.sql`: dorm favorites and viewing history.
+- `scripts/migrations/add_message_sources.sql`: `messages.sources`, the web
+  pages each chat reply cited. Until it runs, replies are saved without them.
 
 The tracked SQL does not create every table the app uses. Create `conversations`
 (referenced by `add_soul_and_memory.sql`), `messages`, `reading_history`,
@@ -155,26 +157,32 @@ service-role key that bypasses RLS. The seed upserts the bundled `UIUC_DORMS` in
 tags with stored ones, and never deletes rows. It does not read the archived
 `dorm_overrides`.
 
-## assistant-ui
+## shadcn/ui and AI Elements
 
-This project uses assistant-ui for chat interfaces.
+UI primitives come from [shadcn/ui](https://ui.shadcn.com) and chat building
+blocks from [AI Elements](https://ai-sdk.dev/elements), both copied into the
+repo by the shadcn CLI (`components.json`):
 
-Documentation: https://www.assistant-ui.com/llms-full.txt
-
-Key patterns:
-
-- Use AssistantRuntimeProvider at the app root
-- Thread component for full chat interface
-- AssistantModal for floating chat widget
-- useChatRuntime hook with AI SDK transport
+- `src/components/ui/` holds shadcn primitives next to the app's own generic
+  UI. `src/components/ai-elements/` holds AI Elements components.
+- Add components with `npx shadcn@latest add <name>` or
+  `npx shadcn@latest add @ai-elements/<name>` from `apps/web`. The CLI may
+  write `import { cn } from "cn"`; the helper lives at `@/utils/cn`.
+- Copied files are ours to edit; mark local changes with a comment so a later
+  `add --overwrite` does not silently drop them.
+- Theme tokens (`--background`, `--primary`, ...) are defined in
+  `src/index.css` and mapped onto the slate + Illini palette. The app is
+  light-only; `dark:` utilities only apply under a `.dark` ancestor.
 
 ## Chat Components
 
 ### General Chat (`src/components/chat/**` + `src/pages/chat/ChatPage.tsx`)
 
-- Full-page general-purpose chat interface
-- Uses assistant-ui runtime (ChatRuntimeProvider, ChatThread)
-- Supports tool-use (SearchToolUI, WebSearchToolUI, GrepDocsToolUI)
+- Full-page general-purpose chat interface (`ChatThread`), state in
+  `useChatSession`, scrolling in `useTopAnchoredScroll`
+- Replies show the agent's thinking steps until the answer starts, then the
+  web pages it read (`source-url` SSE events) as a sources pill and numbered
+  citations
 - Conversation management with persistent IDs
 - Route: `/chat`
 
