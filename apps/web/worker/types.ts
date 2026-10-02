@@ -25,8 +25,6 @@ export interface Env {
   VITE_DEEPSEEK_API_KEY?: string
   TAVILY_API_KEY?: string
   GOOGLE_API_KEY?: string
-  /** SiliconFlow also serves as the DeepSeek-compatible provider for CN traffic. */
-  SILICONFLOW_API_KEY?: string
 
   // Supabase: resolves the caller's identity for /api/chat and /api/integrations.
   SUPABASE_URL: string

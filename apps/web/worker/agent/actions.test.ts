@@ -9,7 +9,6 @@ import { executeToolAction } from "./actions.ts"
 const MOCK_CTX: RequestContext = {
   env: {},
   userId: "test-user",
-  region: "global",
 }
 
 function createToolCall(options: { id?: string; name?: string; arguments?: string }) {

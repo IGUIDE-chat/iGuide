@@ -73,7 +73,7 @@ pnpm run dev:web
 curl http://localhost:5173/api/health
 ```
 
-这个 Worker 在同一个源上同时提供 SPA 与全部接口，负责校验 Supabase JWT、根据 Geo-IP 执行路由、承载服务端 tool-use 运行时，并输出 SSE 聊天流。
+这个 Worker 在同一个源上同时提供 SPA 与全部接口，负责校验 Supabase JWT、承载服务端 tool-use 运行时，并输出 SSE 聊天流。
 
 ## API Worker 说明
 

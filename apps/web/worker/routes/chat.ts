@@ -31,7 +31,6 @@ async function runAgentStream(options: {
   env: Env
   userId: string
   isAuthenticated: boolean
-  region: string
   waitUntil: (promise: Promise<unknown>) => void
 }): Promise<Response> {
   const body = (await options.request.json()) as ChatRequestBody
@@ -69,7 +68,6 @@ async function runAgentStream(options: {
     registry,
     env: loopEnv,
     userId: options.isAuthenticated ? options.userId : undefined,
-    region: options.region,
     lang: body.lang,
     writer,
   }).catch((error) => {
@@ -90,12 +88,7 @@ export const onRequestPost: RouteHandler = async (context) => {
 
   const identity = await resolveIdentity(request, env)
   if (!identity.ok) return identity.response
-
-  // `cf` is a Workers-only field that the DOM lib types loosely, so narrow it.
-  const cfCountry = request.cf?.country
-  const country = typeof cfCountry === "string" ? cfCountry : "US"
-  const region = country === "CN" ? "CN" : "Global"
   const { userId, isAuthenticated } = identity.identity
 
-  return runAgentStream({ request, env, userId, isAuthenticated, region, waitUntil })
+  return runAgentStream({ request, env, userId, isAuthenticated, waitUntil })
 }

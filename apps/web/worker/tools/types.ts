@@ -1,7 +1,6 @@
 export interface RequestContext {
   env: Record<string, string>
   userId?: string
-  region?: string
 }
 
 export interface ToolDefinition {
