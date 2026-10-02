@@ -2,9 +2,7 @@ import { AnimatePresence, motion } from "framer-motion"
 import { useEffect, useRef, useState } from "react"
 
 const TOOL_LABELS: Record<string, string> = {
-  search_knowledge_base: "Searching knowledge base...",
   web_search: "Searching the web...",
-  grep_docs: "Looking up documents...",
   custom_skills: "Running skill...",
 }
 

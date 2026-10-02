@@ -1,252 +1,58 @@
 import type { StreamChunk, ChatHistoryItem } from "./ai/types"
-import { fetchChatRAGContext, isToolUseRagEnabled } from "./chatRagService"
 import { parseDeepSeekSSEStream } from "./deepseekSse"
-import { memoryService } from "./memoryService"
-import defaultSystemPrompt from "./prompts/deepseek-default-system.md?raw"
-import memoryExtractionInstructions from "./prompts/deepseek-memory-extraction.md?raw"
-import soulExtractionInstructions from "./prompts/deepseek-soul-extraction.md?raw"
-import languageEnPrompt from "./prompts/language-en.md?raw"
-import languageZhPrompt from "./prompts/language-zh.md?raw"
-import { quickSearch } from "./searchService"
-import { webSearch } from "./webSearchService"
 
-const viteEnv = (
-  import.meta as ImportMeta & {
-    env?: Record<string, string | boolean | undefined>
-  }
-).env
-const IS_DEV = Boolean(viteEnv?.DEV)
 // The Worker serves the SPA and the chat API from one origin, so the endpoint
 // is the same relative path in dev and in production.
 const CHAT_ENDPOINT = "/api/chat"
 
-async function _fetchQMDContext(query: string, lang: string): Promise<string[]> {
-  try {
-    const { results } = await quickSearch(query, lang as "en" | "zh", 5)
-    return results
-      .filter((r) => r.score > 0.3)
-      .map((r) => {
-        const typeLabel =
-          r.type === "dorm" ? "🏠 Dorm" : r.type === "article" ? "📄 Article" : "🌐 Web"
-        const url = r.id ? `/${r.type === "dorm" ? "housing" : "article"}/${r.id}` : "N/A"
-        return `[${typeLabel}] ${r.title} (relevance: ${r.score.toFixed(2)})\nURL: ${url}\n${r.snippet}`
-      })
-  } catch (err) {
-    console.warn("[RAG] QMD search failed:", err)
-    return []
+/** Reads a JSON error body without trusting its shape. */
+async function readErrorMessage(response: Response): Promise<string | null> {
+  const body: unknown = await response.json().catch(() => null)
+  if (body && typeof body === "object" && "error" in body && typeof body.error === "string") {
+    return body.error
   }
+  return null
 }
 
-async function _fetchWebContext(query: string): Promise<string[]> {
-  try {
-    const results = await webSearch(query, { maxResults: 3 })
-    return results.map((r) => `[🌐 Web] ${r.title}\nURL: ${r.url}\n${r.content.slice(0, 300)}`)
-  } catch (err) {
-    console.warn("[RAG] Web search failed:", err)
-    return []
+/** Reads a JSON success body without trusting its shape. */
+function readReplyText(body: unknown): string | null {
+  if (!body || typeof body !== "object") return null
+  const record = body as Record<string, unknown>
+  for (const key of ["reply", "text"]) {
+    const value = record[key]
+    if (typeof value === "string" && value) return value
   }
+  return null
 }
 
-const DEFAULT_SYSTEM_PROMPT = defaultSystemPrompt.trim()
-const MEMORY_EXTRACTION_INSTRUCTIONS = memoryExtractionInstructions.trim()
-const SOUL_EXTRACTION_INSTRUCTIONS = soulExtractionInstructions.trim()
-const LANGUAGE_PROMPTS = {
-  zh: languageZhPrompt.trim(),
-  en: languageEnPrompt.trim(),
-} as const
-
-interface RAGResult {
-  context: string
-  hasQMD: boolean
-  hasWeb: boolean
-  qmdUnavailable: boolean
-}
-
-async function fetchRAGContext(query: string, lang: string): Promise<RAGResult> {
-  return fetchChatRAGContext(query, lang)
-}
-
-interface OpenAIMessage {
-  role: "system" | "user" | "assistant"
-  content: string
-}
-
-function buildOpenAIMessages(
-  history: ChatHistoryItem[],
-  newMessage: string,
-  lang: string,
-  systemInstruction?: string,
-): OpenAIMessage[] {
-  const messages: OpenAIMessage[] = []
-
-  const systemContent = systemInstruction || DEFAULT_SYSTEM_PROMPT
-  const languagePrompt = lang === "zh" ? LANGUAGE_PROMPTS.zh : LANGUAGE_PROMPTS.en
-  messages.push({
-    role: "system",
-    content: [systemContent, languagePrompt].filter(Boolean).join("\n\n"),
-  })
-
-  for (const h of history) {
-    messages.push({
-      role: h.role === "model" ? "assistant" : "user",
-      content: h.text,
-    })
-  }
-
-  messages.push({ role: "user", content: newMessage })
-  return messages
-}
-
+/**
+ * Streams a chat turn from the Worker's tool-use agent. The agent owns prompt
+ * assembly, retrieval, and language selection; this only relays the request and
+ * re-emits the SSE stream as `StreamChunk`s.
+ */
 export const streamDeepSeekChat = async function* (
   history: ChatHistoryItem[],
   newMessage: string,
   lang: string = "en",
-  _conversationId?: string,
-  _userId?: string,
+  conversationId?: string,
+  userId?: string,
 ): AsyncGenerator<StreamChunk> {
   try {
-    const useToolUseRag = isToolUseRagEnabled()
-
-    if (useToolUseRag) {
-      const response = await fetch(CHAT_ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: newMessage,
-          history,
-          conversationId: _conversationId,
-          userId: _userId,
-          lang,
-        }),
-      })
-
-      if (!response.ok) {
-        const err = await response.json().catch(() => ({}))
-        throw new Error((err as { error?: string }).error || `Chat API returned ${response.status}`)
-      }
-
-      const contentType = response.headers.get("content-type") || ""
-
-      if (contentType.includes("text/event-stream") && response.body) {
-        const reader = response.body.getReader()
-        yield* parseDeepSeekSSEStream(reader, lang as "en" | "zh")
-        return
-      }
-
-      const data = (await response.json()) as { reply?: string; text?: string }
-      if (data.reply || data.text) {
-        yield { text: data.reply || data.text || "" }
-      }
-      return
-    }
-
-    let ragContext = ""
-    let soul = ""
-    let userMemory = ""
-    let conversationMemory = ""
-
-    try {
-      const [ragResult, chatCtx] = await Promise.all([
-        fetchRAGContext(newMessage, lang),
-        _userId
-          ? memoryService.getChatContext(_userId, _conversationId).catch(() => ({
-              soul: "",
-              userMemory: "",
-              conversationMemory: "",
-            }))
-          : Promise.resolve({
-              soul: "",
-              userMemory: "",
-              conversationMemory: "",
-            }),
-      ])
-      ragContext = ragResult.context
-      soul = chatCtx.soul
-      userMemory = chatCtx.userMemory
-      conversationMemory = chatCtx.conversationMemory
-
-      if (ragResult.qmdUnavailable) {
-        yield {
-          text: "",
-          thinkingStep: {
-            type: "searching",
-            label:
-              lang === "zh"
-                ? "知识库暂不可用，已改用网页搜索"
-                : "Knowledge base unavailable, using web search",
-          },
-        }
-      }
-      if (ragResult.hasQMD) {
-        yield {
-          text: "",
-          thinkingStep: {
-            type: "searching",
-            label: lang === "zh" ? "知识库检索完成" : "Knowledge base retrieved",
-            detail: "QMD knowledge base",
-          },
-        }
-      }
-      if (ragResult.hasWeb) {
-        yield {
-          text: "",
-          thinkingStep: {
-            type: "searching",
-            label: lang === "zh" ? "网络搜索完成" : "Web search complete",
-            detail: "Tavily web search",
-          },
-        }
-      }
-    } catch {}
-
-    const basePrompt = [
-      DEFAULT_SYSTEM_PROMPT,
-      soul ? `## 🎭 Persona Customization (用户自定义人设)\n${soul}` : "",
-      _userId ? MEMORY_EXTRACTION_INSTRUCTIONS : "",
-      _userId ? SOUL_EXTRACTION_INSTRUCTIONS : "",
-      userMemory ? `## 📋 User Profile (remembered from past conversations)\n${userMemory}` : "",
-      conversationMemory
-        ? `## 💬 This Conversation's Key Points (对话记忆)\n${conversationMemory}`
-        : "",
-    ]
-      .filter((s) => s?.trim())
-      .join("\n\n")
-
-    const systemInstruction = [basePrompt, ragContext].filter((s) => s?.trim()).join("\n\n")
-
-    let response: Response
-
-    if (IS_DEV) {
-      const messages = buildOpenAIMessages(history, newMessage, lang, systemInstruction)
-      response = await fetch("/api/deepseek-raw", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "deepseek-chat",
-          messages,
-          stream: true,
-          temperature: 1.0,
-        }),
-      })
-    } else {
-      response = await fetch("/api/deepseek", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          history,
-          newMessage,
-          lang,
-          stream: true,
-          systemInstruction,
-        }),
-      })
-    }
+    const response = await fetch(CHAT_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: newMessage,
+        history,
+        conversationId,
+        userId,
+        lang,
+      }),
+    })
 
     if (!response.ok) {
-      const err = await response.json().catch(() => ({}))
-      throw new Error(
-        (err as { error?: string }).error || `DeepSeek API returned ${response.status}`,
-      )
+      const message = await readErrorMessage(response)
+      throw new Error(message || `Chat API returned ${response.status}`)
     }
 
     const contentType = response.headers.get("content-type") || ""
@@ -254,11 +60,12 @@ export const streamDeepSeekChat = async function* (
     if (contentType.includes("text/event-stream") && response.body) {
       const reader = response.body.getReader()
       yield* parseDeepSeekSSEStream(reader, lang as "en" | "zh")
-    } else {
-      const data = (await response.json()) as { reply?: string }
-      if (data.reply) {
-        yield { text: data.reply }
-      }
+      return
+    }
+
+    const reply = readReplyText(await response.json().catch(() => null))
+    if (reply) {
+      yield { text: reply }
     }
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : "Unknown error"

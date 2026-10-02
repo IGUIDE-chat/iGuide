@@ -6,20 +6,10 @@ import react from "@vitejs/plugin-react"
 import { ViteMcp } from "vite-plugin-mcp"
 import { defineConfig, loadEnv, lazyPlugins } from "vite-plus"
 
-import { deepseekRawProxyPlugin } from "./scripts/deepseekRawGateway"
-import { qmdSearchPlugin } from "./scripts/qmdSearchGateway"
-
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, ".", "")
   return {
     plugins: lazyPlugins(() => [
-      // Both dev-only gateways must mount before `cloudflare()`. Vite runs
-      // `configureServer` hooks in plugin order and the Cloudflare pre-middleware
-      // claims every `/api/*` path, so anything registered later is unreachable.
-      // Going first is what keeps local hybrid search against `qmd-content`
-      // working in dev and keeps the DeepSeek key out of the browser bundle.
-      deepseekRawProxyPlugin(env),
-      qmdSearchPlugin({ forceMode: env.QMD_SEARCH_MODE }),
       react(),
       ViteMcp(),
       // `cf build` and `cf deploy` delegate to `vite build`, which needs the
