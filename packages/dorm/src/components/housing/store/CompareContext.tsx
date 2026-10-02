@@ -23,20 +23,23 @@ export const CompareProvider: React.FC<{ children: ReactNode }> = ({ children })
   const [compareIds, setCompareIds] = useRetainedState<string[]>("compare.ids", [])
   const [isCompareOpen, setIsCompareOpen] = useState(false)
 
-  const toggleCompare = useCallback((dormId: string) => {
-    setCompareIds((prev) => {
-      if (prev.includes(dormId)) {
-        return prev.filter((id) => id !== dormId)
-      }
-      if (prev.length >= MAX_COMPARE) return prev
-      return [...prev, dormId]
-    })
-  }, [])
+  const toggleCompare = useCallback(
+    (dormId: string) => {
+      setCompareIds((prev) => {
+        if (prev.includes(dormId)) {
+          return prev.filter((id) => id !== dormId)
+        }
+        if (prev.length >= MAX_COMPARE) return prev
+        return [...prev, dormId]
+      })
+    },
+    [setCompareIds],
+  )
 
   const clearCompare = useCallback(() => {
     setCompareIds([])
     setIsCompareOpen(false)
-  }, [])
+  }, [setCompareIds])
 
   const openCompare = useCallback(() => setIsCompareOpen(true), [])
   const closeCompare = useCallback(() => setIsCompareOpen(false), [])

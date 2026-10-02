@@ -45,7 +45,7 @@ export const DormDataProvider: React.FC<{ children: ReactNode }> = ({ children }
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [setDorms])
 
   useEffect(() => {
     if (!needsInitialLoad.current) return

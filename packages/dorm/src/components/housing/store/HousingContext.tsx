@@ -123,7 +123,21 @@ export const HousingProvider: React.FC<{ children: ReactNode }> = ({ children })
     setLifestyleFilters([])
     setRequireAc(false)
     setBathroomTypeFilters([])
-  }, [dorms])
+  }, [
+    dorms,
+    setSearchTerm,
+    setActiveFilters,
+    setPriceRange,
+    setLocationFilters,
+    setBedCountFilters,
+    setBathroomCountFilters,
+    setHousingTypeDetails,
+    setLivingConditionFilters,
+    setFacilityFilters,
+    setLifestyleFilters,
+    setRequireAc,
+    setBathroomTypeFilters,
+  ])
 
   const filtersValue = useMemo<HousingFiltersContextType>(
     () => ({
@@ -176,6 +190,20 @@ export const HousingProvider: React.FC<{ children: ReactNode }> = ({ children })
       requireAc,
       bathroomTypeFilters,
       clearAllFilters,
+      setSearchTerm,
+      setActiveFilters,
+      setPriceRange,
+      setLocationFilters,
+      setBedCountFilters,
+      setBathroomCountFilters,
+      setHousingTypeDetails,
+      setViewMode,
+      setSortBy,
+      setLivingConditionFilters,
+      setFacilityFilters,
+      setLifestyleFilters,
+      setRequireAc,
+      setBathroomTypeFilters,
     ],
   )
 
@@ -188,7 +216,7 @@ export const HousingProvider: React.FC<{ children: ReactNode }> = ({ children })
       showLandmarks,
       setShowLandmarks,
     }),
-    [showZones, showZoneLabels, showLandmarks],
+    [showZones, showZoneLabels, showLandmarks, setShowZones, setShowZoneLabels, setShowLandmarks],
   )
 
   return (
