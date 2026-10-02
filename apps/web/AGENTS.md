@@ -28,6 +28,14 @@ For repo-wide rules (secrets, CI, Worker retrieval, data model), see the root
 - Two build outputs exist on purpose. `vp build` produces the SPA in `dist/`
   (what CI's bundle scan reads); `cf build` produces the Worker plus its
   static assets under `.cloudflare/output/`. `cf deploy` runs the latter.
+- `scripts/` holds the chat persona and memory SQL
+  (`scripts/migrations/add_soul_and_memory.sql`) and the RLS fixes
+  (`scripts/optimize_rls_policies.sql`, `scripts/fix_function_security.sql`).
+  Dorm SQL and data scripts live in `packages/dorm`. Two unused leftovers from the
+  removed QMD knowledge base are also still here: `scripts/qmd-server.mjs` (the
+  search server behind the old `/api/search` route) and
+  `scripts/generate-handbook-ocr.py` (an OCR generator for QMD content).
+  Nothing references them.
 
 ## Core Principles
 
@@ -88,6 +96,30 @@ For structure-affecting changes:
    `node --test "worker/**/*.test.ts" "src/**/*.test.ts"`. They are `node:test`
    files, and `vp test` (Vitest) cannot start in this app: the Cloudflare Vite
    plugin rejects Vitest's `ssr` environment.
+
+## Environment and secrets
+
+- `.env.local.example` → `.env.local`: read by the Vite build and shipped to the
+  browser. Only `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, and
+  `VITE_MAPBOX_TOKEN` are used from it. Git ignores the real file.
+- `.dev.vars.example` → `.dev.vars`: Worker secrets for local `vp dev` runs.
+  `Env` requires `SUPABASE_URL` and `SUPABASE_ANON_KEY`. The template marks the
+  rest optional, but `/api/chat` gives no answer without `DEEPSEEK_API_KEY`, and
+  web search needs `TAVILY_API_KEY`. `GOOGLE_API_KEY` only feeds the
+  `/api/gemini` proxy, which nothing calls. In production, set them from
+  `apps/web/` with `vp exec cf workers secrets update <NAME> --worker uiuc`.
+- Install the workspace once from the repo root with `vp install`.
+
+## Database
+
+Run the SQL by hand in the Supabase SQL editor, starting with the dorm chain in
+[`packages/dorm/AGENTS.md`](../../packages/dorm/AGENTS.md#dorm-database).
+
+The tracked SQL does not create every table the app uses. Create `conversations`,
+`messages`, `reading_history`, `user_profiles` and `mailing_list` yourself, then
+run `scripts/migrations/add_soul_and_memory.sql`, which references
+`conversations`. `scripts/optimize_rls_policies.sql` and
+`scripts/fix_function_security.sql` assume some of those tables already exist.
 
 ## assistant-ui
 

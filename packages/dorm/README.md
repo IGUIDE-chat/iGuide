@@ -39,39 +39,7 @@ and define the `illini-*` theme colors the components use.
 - `scripts/`: dorm database SQL and data scripts.
 - `scrapers/`: standalone Puppeteer/Bun review scrapers, outside the workspace (see its README).
 
-## Dorm database
+## Database and data scripts
 
-Run the SQL by hand in the Supabase SQL editor. Core dorm schema, in this order:
-
-1. `scripts/migrations/create_dorms_table.sql`. On a fresh project, delete its last line first: it
-   comments on a `dorm_overrides` table that no tracked SQL creates, and the SQL editor then rolls back
-   the whole file.
-2. `scripts/migrations/add_categorized_tags.sql` (safe to rerun)
-3. `scripts/migrations/add_dorm_address.sql` and `scripts/migrations/add_dorm_website.sql`, which add
-   the `address`, `address_zh` and `website` columns the seed writes
-
-Feature SQL, after the core schema:
-
-- `scripts/migrations/create_storage_bucket.sql`: the `dorm-images` storage bucket.
-- `add_dorm_edit_history.sql`, then `fix_dorm_edit_history_rls.sql`; `add_dorm_comments.sql`, then
-  `add_dorm_comment_hidden.sql`; `add_floor_plan_bed_size.sql` (all in `scripts/migrations/`).
-- `scripts/create_dorm_user_features.sql`: dorm favorites and viewing history.
-
-Known conflict: `add_categorized_tags.sql` limits `bathroom_type` to `communal`, `semi-private` and
-`private`, but the seed writes `individual-use` for four dorms. Until that constraint changes, the seed
-fails on a database built only from this SQL.
-
-## Dorm data scripts
-
-`tsx` is not a dependency, so run the scripts with `vp dlx tsx`, from `packages/dorm/`:
-
-```sh
-vp dlx tsx scripts/validate-dorm-data.ts   # offline check of the bundled dataset
-vp dlx tsx scripts/audit-dorm-media.ts     # sends HEAD requests to suspicious media URLs
-SUPABASE_URL=<url> SUPABASE_SERVICE_KEY=<service-role-key> vp dlx tsx scripts/seed-dorms-table.ts
-```
-
-The seed reads both variables from the shell, not from env files (in PowerShell, set them first with
-`$env:NAME = "..."`). `SUPABASE_SERVICE_KEY` is a service-role key that bypasses RLS. The seed upserts
-the bundled `UIUC_DORMS` into `dorms` by `id`. It keeps stored images, gallery and floor-plan media,
-merges tags with stored ones, and never deletes rows. It does not read the archived `dorm_overrides`.
+The SQL order, the seed and data scripts, and their known conflicts are in
+[AGENTS.md](AGENTS.md#dorm-database).
