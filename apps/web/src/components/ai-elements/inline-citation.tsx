@@ -35,17 +35,20 @@ export type InlineCitationCardTriggerProps = ComponentProps<typeof Badge> & {
 export const InlineCitationCardTrigger = ({
   sources,
   className,
+  children,
   ...props
 }: InlineCitationCardTriggerProps) => (
   <HoverCardTrigger asChild>
     <Badge className={cn("ml-1 rounded-full", className)} variant="secondary" {...props}>
-      {sources[0] ? (
-        <>
-          {new URL(sources[0]).hostname} {sources.length > 1 && `+${sources.length - 1}`}
-        </>
-      ) : (
-        "unknown"
-      )}
+      {/* Local change: callers may pass their own label (IlliniGuide shows the source number). */}
+      {children ??
+        (sources[0] ? (
+          <>
+            {new URL(sources[0]).hostname} {sources.length > 1 && `+${sources.length - 1}`}
+          </>
+        ) : (
+          "unknown"
+        ))}
     </Badge>
   </HoverCardTrigger>
 )
