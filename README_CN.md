@@ -25,12 +25,12 @@ IlliniGuide（iGuide）是为伊利诺伊大学厄巴纳-香槟分校（UIUC）�
 
 ## 快速开始
 
-你需要 Node 22.18+ 或 24.11+（`vite-plus` 和 `cf` CLI 都接受的版本）以及 pnpm。仓库通过 `packageManager` 锁定了 `pnpm@12.7.0`。
+你需要 Node 22.18+ 或 24.11+（`vite-plus` 和 `cf` CLI 都接受的版本），以及全局 `vp` CLI（[安装说明](https://viteplus.dev/guide/install)：`curl -fsSL https://vite.plus | bash`）。本 README 中的命令都通过 `vp` 执行，它会调用仓库在 `packageManager` 中锁定的 pnpm 版本（`pnpm@12.7.0`）。
 
 ```bash
 git clone https://github.com/IGUIDE-chat/iGuide.git
 cd iGuide
-pnpm install
+vp install
 cp apps/web/.env.local.example apps/web/.env.local   # SPA 使用的公开 VITE_ 变量
 cp apps/web/.dev.vars.example apps/web/.dev.vars     # 本地运行用的 Worker secrets
 ```
@@ -38,10 +38,10 @@ cp apps/web/.dev.vars.example apps/web/.dev.vars     # 本地运行用的 Worker
 启动服务器之前，先在 `.dev.vars` 中取消注释并设置 `DEEPSEEK_API_KEY`。DeepSeek 是唯一的模型服务商，虽然模板把这个密钥标为可选，但没有它，聊天就得不到回答。也请在那里设置 `TAVILY_API_KEY`，否则每次网页搜索都会向模型返回错误，模型就只能依靠通用知识作答。`.env.local` 中服务端用的 `DEEPSEEK_API_KEY`、`TAVILY_API_KEY`、`SUPABASE_URL` 和 `SUPABASE_ANON_KEY` 条目不会被仓库中的任何代码读取；Worker 读取的是 `.dev.vars`。其他你没有的值请留空，不要保留占位符：没有 Supabase URL 和 key 时，登录和同步功能关闭，宿舍从内置数据加载；没有 `VITE_MAPBOX_TOKEN` 时，地图会显示一条提示。
 
 ```bash
-pnpm run dev:web
+vp dev
 ```
 
-`dev:web` 会在 Vite 开发服务器后面运行真实的 Worker，因此 SPA 和 `/api/*` 共用同一个 origin，与生产环境一致。在另一个终端里检查 Worker（5173 是 Vite 的默认端口；请以 `dev:web` 打印的 URL 为准）：
+`vp dev` 会在 Vite 开发服务器后面运行真实的 Worker，因此 SPA 和 `/api/*` 共用同一个 origin，与生产环境一致。在另一个终端里检查 Worker（5173 是 Vite 的默认端口；请以 `vp dev` 打印的 URL 为准）：
 
 ```bash
 curl http://localhost:5173/api/health
@@ -74,8 +74,8 @@ Browser ──same origin──> Worker "uiuc" (apps/web/worker)
 
 ## 安全
 
-- 所有带 `VITE_` 前缀或通过 Vite `define` 注入的内容都是公开的浏览器数据，`apps/web/src` 下的所有内容也一样。在 SPA 中，只有 Supabase URL 和 anon key 以及 Mapbox token 使用这个前缀；绝不要把服务商密钥放进 `src`，也不要放进 `.env.local` 中的 `VITE_` 变量。唯一的另一个 `VITE_` 名称在服务端：Worker 仍接受旧版的 `VITE_DEEPSEEK_API_KEY` secret，作为 `/api/deepseek`（而非 `/api/chat`）的回退。请改为设置 `DEEPSEEK_API_KEY`。
-- 服务商密钥（DeepSeek、Tavily、Google）以及 Worker 使用的 Supabase URL 和 anon key 都属于 Worker secrets。本地放在 `apps/web/.dev.vars` 中；生产环境在 `apps/web` 目录下用 `pnpm exec cf workers secrets update <NAME> --worker uiuc` 设置（CLI 随后会询问 secret 的类型和值）。Git 会忽略 `.env*` 和 `.dev.vars*`，只有 `.example` 模板纳入版本控制。
+- 所有带 `VITE_` 前缀或通过 Vite `define` 注入的内容都是公开的浏览器数据（[Vite 环境变量](https://vite.dev/guide/env-and-mode)），`apps/web/src` 下的所有内容也一样。在 SPA 中，只有 Supabase URL 和 anon key 以及 Mapbox token 使用这个前缀；绝不要把服务商密钥放进 `src`，也不要放进 `.env.local` 中的 `VITE_` 变量。旧版的 `VITE_DEEPSEEK_API_KEY` 只作为 `/api/deepseek` 的回退（不作用于 `/api/chat`），请改为设置 `DEEPSEEK_API_KEY`。
+- 服务商密钥（DeepSeek、Tavily、Google）以及 Worker 使用的 Supabase URL 和 anon key 都属于 Worker secrets。本地放在 `apps/web/.dev.vars` 中；生产环境在 `apps/web` 目录下用 `vp exec cf workers secrets update <NAME> --worker uiuc` 设置（CLI 随后会询问 secret 的类型和值）。Git 会忽略 `.env*` 和 `.dev.vars*`，只有 `.example` 模板纳入版本控制。
 - 允许访客使用。`/api/chat` 和 `/api/integrations` 接受不带 token 的请求，但 Bearer token 若被 Supabase 拒绝，会返回 401。所有不带 token 的调用方共用同一个 `anonymous` 身份，因此不带 token 注册的 MCP 服务器会被加载到每一个访客聊天中。目前还没有 `KV` 绑定，所以 MCP 注册表存放在 Worker isolate 的内存里，注册信息不会持久保存。
 - `/api/deepseek`、`/api/tavily` 和 `/api/gemini` 完全不做鉴权，会用 Worker 自己的密钥转发任何请求；`/api/deepseek` 会原样转发调用方提供的 `messages`，而 `/api/tavily` 和 `/api/gemini` 会发送 `Access-Control-Allow-Origin: *`，因此任何网站都能调用这两个接口。密钥本身不会暴露，但任何人都能消耗它们的额度。
 - Worker 没有对任何端点做限流。
@@ -95,18 +95,18 @@ Browser ──same origin──> Worker "uiuc" (apps/web/worker)
 
 ## 开发
 
-本仓库是一个由 [Vite+](https://viteplus.dev)（`vp`）驱动的 pnpm workspace。`pnpm-workspace.yaml` 列出了 `apps/*`、`packages/*` 和 `tools/*`，目前对应两个包：`@iguide/web`（`apps/web`）和 `@iguide/vite-bin`（`tools/vite-bin`）。依赖使用 `workspace:` 和 `catalog:` 协议，因此不支持直接用 `npm install`。`pnpm install` 还会装好一个 pre-commit hook，对暂存的文件运行 `vp check --fix`。
+本仓库是一个由 [Vite+](https://viteplus.dev)（`vp`）驱动的 pnpm workspace，`vp` 是安装、检查、构建和部署的唯一入口：`package.json` 不再为这些命令保留包装脚本，请直接运行下面的 `vp` 内置命令。`pnpm-workspace.yaml` 声明了 [workspace](https://viteplus.dev/guide/monorepo) 和 [catalog](https://pnpm.io/catalogs)，目前对应 `@iguide/web`（`apps/web`）和 `@iguide/vite-bin`（`tools/vite-bin`）两个包，因此不支持直接用 `npm install`。`vp install` 还会装好一个 pre-commit hook，对暂存的文件运行 `vp check --fix`。
 
 ```bash
-pnpm run dev:web     # Vite 开发服务器，Worker 运行在其后
-pnpm run check       # 格式化、lint 和类型检查，并自动修复
-pnpm run fmt         # Oxfmt，直接改写文件
-pnpm run lint        # Oxlint，type-aware 且带类型检查
-pnpm run build       # apps/web 的生产构建
-pnpm run preview     # 在本地运行生产构建
+vp dev           # Vite 开发服务器，Worker 运行在其后
+vp check --fix   # 格式化、lint 和类型检查，并自动修复
+vp fmt           # Oxfmt，直接改写文件
+vp lint          # Oxlint，type-aware 且带类型检查
+vp build         # apps/web 的生产构建
+vp preview       # 在本地运行生产构建
 ```
 
-`pnpm run test` 和 `pnpm run typecheck` 仍然存在，但没有任何包定义这两个任务，所以它们什么都不会运行；类型检查在 `vp lint` 中完成。Worker 和 SPA 的测试是 `node:test` 文件，目前还没有脚本运行它们，所以请在 `apps/web` 下用 Node 运行：
+仓库里没有 `test` 或 `typecheck` 脚本或任务：类型检查在 `vp check` 中完成；`vp test`（Vitest）在本应用中无法启动，因为 Cloudflare Vite 插件会拒绝 Vitest 的 `ssr` 环境。Worker 和 SPA 的测试是 `node:test` 文件，请在 `apps/web` 下用 Node 运行它们：
 
 ```bash
 cd apps/web
@@ -115,29 +115,29 @@ node --test "worker/**/*.test.ts" "src/**/*.test.ts"
 
 其中 `worker/agent/loop.test.ts` 和 `worker/agent/loop.baseline.test.ts` 这两个文件目前在纯 Node 下会失败，因为 agent 循环以文本模块的形式导入它的 `.txt` 提示词；其余文件都能通过。
 
-仓库没有 CI 测试工作流。[React Doctor](.github/workflows/react-doctor.yml) 会审查涉及 `apps/web` 的 pull request 和推送到 `main` 的提交，只报告结果，不会让检查失败。推送前请自己运行 `pnpm run check`、上面的测试和 `pnpm run build`。
+仓库没有 CI 测试工作流。[React Doctor](https://www.react.doctor/ci) 会审查涉及 `apps/web` 的 pull request 和推送到 `main` 的提交，只报告结果，不会让检查失败（[workflow](.github/workflows/react-doctor.yml)）。推送前请自己运行 `vp check --fix`、上面的测试和 `vp build`。
 
 ## 部署
 
-SPA 和整套 API 都由同一个 Worker 提供，所以它是唯一需要部署的东西。它在 [`apps/web/cloudflare.config.ts`](apps/web/cloudflare.config.ts) 中配置，使用 `cf` CLI 部署，而 `cf` 只是 `apps/web` 的开发依赖。该配置锁定了一个 Cloudflare `accountId` 和自定义域名 `iguide.chat`，并与 Dashboard 保持一致，开启了 `workers.dev` 子域名和 Preview URL。fork 在部署前必须修改 `accountId` 和 `domains`。
+SPA 和整套 API 都由同一个 Worker 提供，所以它是唯一需要部署的东西。它在 [`apps/web/cloudflare.config.ts`](apps/web/cloudflare.config.ts) 中配置，使用 `cf` CLI 部署，而 `cf` 只是 `apps/web` 的开发依赖。该配置锁定了一个 Cloudflare `accountId` 和自定义域名 `iguide.chat`，所以 fork 必须先修改 `accountId` 和 `domains`；`cf` 本身见 [Get started with Workers](https://developers.cloudflare.com/workers/get-started/guide/)。
 
 手动部署：
 
 ```bash
 cd apps/web
-pnpm exec cf build    # 把 Worker + SPA 静态资源构建为 Build Output
-pnpm run deploy       # cf deploy --prebuilt
+vp exec cf build             # 把 Worker + SPA 静态资源构建为 Build Output
+vp exec cf deploy --prebuilt # 部署上面的构建产物，不会重新构建
 ```
 
-如果想先试一个分支，可以改为部署 Worker Preview。`cf previews deploy` 会以当前 Git 分支为预览命名。`--prebuilt` 只接受标记为 Preview 构建的 Build Output，而 `vp build` 只有在环境中有 `CLOUDFLARE_PREVIEW_BUILD=true` 时才会设置这个标记（在 PowerShell 中，先运行 `$env:CLOUDFLARE_PREVIEW_BUILD = "true"`）；没有它，部署会中止并报错“Build Output was not created by a Preview build”：
+如果想先试一个分支，可以改为部署 Worker Preview：`cf previews deploy` 会以当前 Git 分支为预览命名。`--prebuilt` 只接受标记为 Preview 构建的 Build Output，而 `vp build` 只有在环境中有 `CLOUDFLARE_PREVIEW_BUILD=true` 时才会设置这个标记（在 PowerShell 中，先运行 `$env:CLOUDFLARE_PREVIEW_BUILD = "true"`）；没有它，部署会中止并报错“Build Output was not created by a Preview build”。参见 [preview deployments](https://developers.cloudflare.com/workers/configuration/previews/)：
 
 ```bash
 cd apps/web
-CLOUDFLARE_PREVIEW_BUILD=true pnpm run build:preview   # vp build --mode preview
-pnpm run deploy:preview                                # cf previews deploy --prebuilt
+CLOUDFLARE_PREVIEW_BUILD=true vp build --mode preview
+vp exec cf previews deploy --prebuilt
 ```
 
-也可以运行 `pnpm exec cf previews deploy`（不带 `--prebuilt`），它会带着该标记构建，并一步完成部署。
+也可以运行 `vp exec cf previews deploy`（不带 `--prebuilt`），它会带着该标记构建，并一步完成部署。
 
 按以下顺序上线：
 
@@ -145,7 +145,7 @@ pnpm run deploy:preview                                # cf previews deploy --pr
 2. 为宿舍表导入种子数据。该脚本从 shell 读取 `SUPABASE_URL` 和 `SUPABASE_SERVICE_KEY`，而不是从 `.env` 文件读取。
 
    ```bash
-   cd apps/web && pnpm dlx tsx scripts/seed-dorms-table.ts
+   cd apps/web && vp dlx tsx scripts/seed-dorms-table.ts
    ```
 
    如果数据库只由仓库中的 SQL 建成，导入种子数据会失败：`add_categorized_tags.sql` 添加的 `chk_bathroom_type` 只允许 `communal`、`semi-private` 和 `private`，但种子脚本会为四栋宿舍写入 `individual-use`，而只要有一行被拒绝，整个 upsert 就会失败。导入前请先放宽这个约束：
@@ -158,21 +158,21 @@ pnpm run deploy:preview                                # cf previews deploy --pr
 
 3. 设置 Worker secrets。[`worker/types.ts`](apps/web/worker/types.ts) 中的 `Env` 只要求 `SUPABASE_URL` 和 `SUPABASE_ANON_KEY`（`ASSETS` 由 Cloudflare 绑定），但聊天需要 `DEEPSEEK_API_KEY`，搜索需要 `TAVILY_API_KEY`。
 4. 部署一个预览（见上文），在预览上检查 `/api/health`，并验证流式输出、工具调用和回退行为。
-5. 部署到生产环境（先 `pnpm exec cf build`，再 `pnpm run deploy`），然后在 `iguide.chat` 上检查 `/api/health`。
+5. 部署到生产环境（先 `vp exec cf build`，再 `vp exec cf deploy --prebuilt`），然后在 `iguide.chat` 上检查 `/api/health`。
 
-**回滚。** 没有第二条聊天路径可供回退，所以要回滚 Worker 本身。最快的方法无需重新构建，直接把流量指回之前上传过的某个版本：
+**回滚。** 没有第二条聊天路径可供回退，所以要回滚 Worker 本身。无需重新构建、直接把流量指回之前上传过的某个版本（参见 [deployments](https://developers.cloudflare.com/workers/configuration/deployments/)）：
 
 ```bash
 cd apps/web
-pnpm exec cf workers versions list --worker-id uiuc
-pnpm exec cf workers deployments create --worker uiuc --strategy percentage \
+vp exec cf workers versions list --worker-id uiuc
+vp exec cf workers deployments create --worker uiuc --strategy percentage \
   --versions '[{"version_id":"<last good version id>","percentage":100}]'
 ```
 
-如果需要重新构建，就 check out 最后一个正常的 commit，然后按上文运行 `cf build` 和 `deploy`。这样也会重新部署该 commit 的 `cloudflare.config.ts`。
+如果需要重新构建，就 check out 最后一个正常的 commit，然后按上文运行 `vp exec cf build` 和 `vp exec cf deploy --prebuilt`。这样也会重新部署该 commit 的 `cloudflare.config.ts`。
 
 ## 社区
 
-在 [GitHub Issues](https://github.com/IGUIDE-chat/iGuide/issues) 中报告 bug 或提出功能需求。欢迎提交 pull request；提交前请先运行 `pnpm run check` 和[开发](#开发)一节中的测试。也欢迎 AI 辅助的 PR，只要 agent 遵守 [AGENTS.md](AGENTS.md)（在 `apps/web` 内还要遵守 [apps/web/AGENTS.md](apps/web/AGENTS.md)）。
+在 [GitHub Issues](https://github.com/IGUIDE-chat/iGuide/issues) 中报告 bug 或提出功能需求。欢迎提交 pull request；提交前请先运行 `vp check` 和[开发](#开发)一节中的测试。也欢迎 AI 辅助的 PR，只要 agent 遵守 [AGENTS.md](AGENTS.md)（在 `apps/web` 内还要遵守 [apps/web/AGENTS.md](apps/web/AGENTS.md)）。
 
 <a href="https://github.com/IGUIDE-chat/iGuide/graphs/contributors"><img src="https://contrib.rocks/image?repo=IGUIDE-chat/iGuide" alt="贡献者"></a>

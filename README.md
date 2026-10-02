@@ -25,12 +25,12 @@ Not live yet: **Courses** and **Resume** are "coming soon" pages with an email w
 
 ## Quick start
 
-You need Node 22.18+ or 24.11+ (what both `vite-plus` and the `cf` CLI accept) and pnpm. The repo pins `pnpm@12.7.0` through `packageManager`.
+You need Node 22.18+ or 24.11+ (what both `vite-plus` and the `cf` CLI accept) and the global `vp` CLI ([install guide](https://viteplus.dev/guide/install): `curl -fsSL https://vite.plus | bash`). `vp` is the only entry point in this README, and it drives the pnpm version the repo pins in `packageManager` (`pnpm@12.7.0`).
 
 ```bash
 git clone https://github.com/IGUIDE-chat/iGuide.git
 cd iGuide
-pnpm install
+vp install
 cp apps/web/.env.local.example apps/web/.env.local   # public VITE_ values for the SPA
 cp apps/web/.dev.vars.example apps/web/.dev.vars     # Worker secrets for local runs
 ```
@@ -38,10 +38,10 @@ cp apps/web/.dev.vars.example apps/web/.dev.vars     # Worker secrets for local 
 Before you start the server, uncomment and set `DEEPSEEK_API_KEY` in `.dev.vars`. DeepSeek is the only model provider, and although the template lists the key as optional, chat gets no answer without it. Set `TAVILY_API_KEY` there too, or every web search returns an error to the model, which can then answer only from general knowledge. The server-side `DEEPSEEK_API_KEY`, `TAVILY_API_KEY`, `SUPABASE_URL`, and `SUPABASE_ANON_KEY` entries in `.env.local` aren't read by any repo code; the Worker reads `.dev.vars`. Leave any other value you don't have empty rather than keeping its placeholder: without a Supabase URL and key, sign-in and sync are off and dorms load from bundled data; without `VITE_MAPBOX_TOKEN`, the map shows a notice.
 
 ```bash
-pnpm run dev:web
+vp dev
 ```
 
-`dev:web` runs the real Worker behind the Vite dev server, so the SPA and `/api/*` share one origin, as they do in production. Check the Worker from a second terminal (5173 is Vite's default port; use the URL `dev:web` prints):
+`vp dev` runs the real Worker behind the Vite dev server, so the SPA and `/api/*` share one origin, as they do in production. Check the Worker from a second terminal (5173 is Vite's default port; use the URL `vp dev` prints):
 
 ```bash
 curl http://localhost:5173/api/health
@@ -74,8 +74,8 @@ Nothing needs loading for retrieval: the agent's only source is a Tavily search 
 
 ## Security
 
-- Anything `VITE_`-prefixed or injected through Vite `define` is public browser data, and so is anything under `apps/web/src`. In the SPA, only the Supabase URL and anon key and the Mapbox token use that prefix; never put a provider key in `src` or in a `VITE_` variable in `.env.local`. The one other `VITE_` name is server-side: the Worker still accepts a legacy `VITE_DEEPSEEK_API_KEY` secret as a fallback for `/api/deepseek` (not `/api/chat`). Set `DEEPSEEK_API_KEY` instead.
-- Provider keys (DeepSeek, Tavily, Google) and the Worker's Supabase URL and anon key are Worker secrets. Keep them in `apps/web/.dev.vars` locally; in production, set them from `apps/web` with `pnpm exec cf workers secrets update <NAME> --worker uiuc` (the CLI then asks for the secret type and value). Git ignores `.env*` and `.dev.vars*`; only the `.example` templates are tracked.
+- Anything `VITE_`-prefixed or injected through Vite `define` is public browser data ([Vite env vars](https://vite.dev/guide/env-and-mode)), and so is everything under `apps/web/src`. In the SPA, only the Supabase URL and anon key and the Mapbox token carry that prefix; never put a provider key in `src` or in a `VITE_` variable in `.env.local`. The Worker's legacy `VITE_DEEPSEEK_API_KEY` fallback covers `/api/deepseek`, not `/api/chat`; set `DEEPSEEK_API_KEY` instead.
+- Provider keys (DeepSeek, Tavily, Google) and the Worker's Supabase URL and anon key are Worker secrets. Keep them in `apps/web/.dev.vars` locally; in production, set them from `apps/web` with `vp exec cf workers secrets update <NAME> --worker uiuc` (the CLI then asks for the secret type and value). Git ignores `.env*` and `.dev.vars*`; only the `.example` templates are tracked.
 - Guests are allowed. `/api/chat` and `/api/integrations` accept requests without a token, but a Bearer token that Supabase rejects gets a 401. Every tokenless caller shares one `anonymous` identity, so an MCP server registered without a token is loaded into every guest chat. There's no `KV` binding yet, so the MCP registry lives in Worker isolate memory and registrations don't last.
 - `/api/deepseek`, `/api/tavily`, and `/api/gemini` take no auth at all and relay any request with the Worker's own keys; `/api/deepseek` forwards caller-supplied `messages` as-is, and `/api/tavily` and `/api/gemini` send `Access-Control-Allow-Origin: *`, so any website can call them. The keys stay hidden, but anyone can spend their quota.
 - The Worker doesn't rate-limit any endpoint.
@@ -95,18 +95,18 @@ Nothing needs loading for retrieval: the agent's only source is a Tavily search 
 
 ## Development
 
-The repository is a pnpm workspace driven by [Vite+](https://viteplus.dev) (`vp`). `pnpm-workspace.yaml` lists `apps/*`, `packages/*`, and `tools/*`, which today means two packages: `@iguide/web` (`apps/web`) and `@iguide/vite-bin` (`tools/vite-bin`). Dependencies use the `workspace:` and `catalog:` protocols, so plain `npm install` is not supported. `pnpm install` also sets up a pre-commit hook that runs `vp check --fix` on staged files.
+The repository is a pnpm workspace driven by [Vite+](https://viteplus.dev) (`vp`), the single entry point for installing, checking, building and deploying: `package.json` keeps no wrapper scripts for those. `pnpm-workspace.yaml` declares the [workspaces](https://viteplus.dev/guide/monorepo) and [catalogs](https://pnpm.io/catalogs), which today means `@iguide/web` (`apps/web`) and `@iguide/vite-bin` (`tools/vite-bin`), so plain `npm install` does not work. `vp install` also sets up a pre-commit hook that runs `vp check --fix` on staged files.
 
 ```bash
-pnpm run dev:web     # Vite dev server with the Worker behind it
-pnpm run check       # format, lint, and type-check, with fixes
-pnpm run fmt         # Oxfmt, writes in place
-pnpm run lint        # Oxlint, type-aware and type-checked
-pnpm run build       # production build of apps/web
-pnpm run preview     # serve the production build locally
+vp dev           # Vite dev server with the Worker behind it
+vp check --fix   # format, lint, and type-check, with fixes
+vp fmt           # Oxfmt, writes in place
+vp lint          # Oxlint, type-aware and type-checked
+vp build         # production build of apps/web
+vp preview       # serve the production build locally
 ```
 
-`pnpm run test` and `pnpm run typecheck` still exist, but no package defines those tasks, so both run nothing; type checking happens inside `vp lint`. The Worker and SPA tests are `node:test` files that no script runs yet, so run them from `apps/web` with Node:
+Nothing defines a `test` or `typecheck` script or task: type checking happens inside `vp check`, and `vp test` (Vitest) cannot start in this app, because the Cloudflare Vite plugin rejects Vitest's `ssr` environment. The Worker and SPA suites are `node:test` files, so run them from `apps/web` with Node:
 
 ```bash
 cd apps/web
@@ -115,29 +115,29 @@ node --test "worker/**/*.test.ts" "src/**/*.test.ts"
 
 Two of those files, `worker/agent/loop.test.ts` and `worker/agent/loop.baseline.test.ts`, fail under plain Node today because the agent loop imports its `.txt` prompts as text modules; the rest pass.
 
-There's no CI test workflow. [React Doctor](.github/workflows/react-doctor.yml) reviews pull requests and pushes to `main` that touch `apps/web` and reports without failing the check. Run `pnpm run check`, the tests above, and `pnpm run build` yourself before you push.
+There's no CI test workflow. [React Doctor](https://www.react.doctor/ci) reviews pull requests and pushes to `main` that touch `apps/web` and reports without failing the check ([workflow](.github/workflows/react-doctor.yml)). Run `vp check --fix`, the tests above, and `vp build` yourself before you push.
 
 ## Deploy
 
-One Worker serves the SPA and the whole API, so it's the only thing to deploy. It's configured in [`apps/web/cloudflare.config.ts`](apps/web/cloudflare.config.ts) and deployed with the `cf` CLI, a dev dependency of `apps/web` only. The config pins a Cloudflare `accountId` and the custom domain `iguide.chat`, and mirrors the dashboard by enabling the `workers.dev` subdomain and Preview URLs. A fork must change `accountId` and `domains` before it deploys.
+One Worker serves the SPA and the whole API, so it's the only thing to deploy. It's configured in [`apps/web/cloudflare.config.ts`](apps/web/cloudflare.config.ts) and deployed with the `cf` CLI, a dev dependency of `apps/web` only. That config pins a Cloudflare `accountId` and the custom domain `iguide.chat`, so a fork must change `accountId` and `domains` first; `cf` itself is covered in [Get started with Workers](https://developers.cloudflare.com/workers/get-started/guide/).
 
 To deploy by hand:
 
 ```bash
 cd apps/web
-pnpm exec cf build    # Worker + SPA assets as Build Output
-pnpm run deploy       # cf deploy --prebuilt
+vp exec cf build             # Worker + SPA assets as Build Output
+vp exec cf deploy --prebuilt # deploys that output without rebuilding
 ```
 
-To try a branch first, deploy a Worker Preview instead. `cf previews deploy` names the preview after the current Git branch. `--prebuilt` accepts only Build Output flagged as a Preview build, and `vp build` sets that flag only when `CLOUDFLARE_PREVIEW_BUILD=true` is in the environment (in PowerShell, run `$env:CLOUDFLARE_PREVIEW_BUILD = "true"` first); without it, the deploy stops with "Build Output was not created by a Preview build":
+To try a branch first, deploy a Worker Preview instead: `cf previews deploy` names it after the current Git branch. `--prebuilt` accepts only Build Output flagged as a Preview build, and `vp build` sets that flag only when `CLOUDFLARE_PREVIEW_BUILD=true` is in the environment (in PowerShell, run `$env:CLOUDFLARE_PREVIEW_BUILD = "true"` first); without it, the deploy stops with "Build Output was not created by a Preview build". See [preview deployments](https://developers.cloudflare.com/workers/configuration/previews/):
 
 ```bash
 cd apps/web
-CLOUDFLARE_PREVIEW_BUILD=true pnpm run build:preview   # vp build --mode preview
-pnpm run deploy:preview                                # cf previews deploy --prebuilt
+CLOUDFLARE_PREVIEW_BUILD=true vp build --mode preview
+vp exec cf previews deploy --prebuilt
 ```
 
-Alternatively, `pnpm exec cf previews deploy` (without `--prebuilt`) builds with the flag set and deploys in one step.
+Alternatively, `vp exec cf previews deploy` (without `--prebuilt`) builds with the flag set and deploys in one step.
 
 Roll out in this order:
 
@@ -145,7 +145,7 @@ Roll out in this order:
 2. Seed the dorms table. The script reads `SUPABASE_URL` and `SUPABASE_SERVICE_KEY` from the shell, not from `.env` files.
 
    ```bash
-   cd apps/web && pnpm dlx tsx scripts/seed-dorms-table.ts
+   cd apps/web && vp dlx tsx scripts/seed-dorms-table.ts
    ```
 
    On a database built only from the tracked SQL, the seed fails: `add_categorized_tags.sql` adds `chk_bathroom_type`, which allows only `communal`, `semi-private`, and `private`, but the seed writes `individual-use` for four dorms, and one rejected row fails the whole upsert. Widen the constraint before you seed:
@@ -158,21 +158,21 @@ Roll out in this order:
 
 3. Set the Worker secrets. `Env` in [`worker/types.ts`](apps/web/worker/types.ts) requires only `SUPABASE_URL` and `SUPABASE_ANON_KEY` (Cloudflare binds `ASSETS`), but chat needs `DEEPSEEK_API_KEY` and search needs `TAVILY_API_KEY`.
 4. Deploy a preview (see above), check `/api/health` on it, and verify streaming, tool calls, and fallback.
-5. Deploy to production (`pnpm exec cf build`, then `pnpm run deploy`) and check `/api/health` on `iguide.chat`.
+5. Deploy to production (`vp exec cf build`, then `vp exec cf deploy --prebuilt`) and check `/api/health` on `iguide.chat`.
 
-**Rollback.** There's no second chat path to fall back to, so roll back the Worker itself. The quickest way points traffic back at an earlier uploaded version without rebuilding:
+**Rollback.** There's no second chat path to fall back to, so roll the Worker back itself. To point traffic back at an earlier uploaded version without rebuilding (see [deployments](https://developers.cloudflare.com/workers/configuration/deployments/)):
 
 ```bash
 cd apps/web
-pnpm exec cf workers versions list --worker-id uiuc
-pnpm exec cf workers deployments create --worker uiuc --strategy percentage \
+vp exec cf workers versions list --worker-id uiuc
+vp exec cf workers deployments create --worker uiuc --strategy percentage \
   --versions '[{"version_id":"<last good version id>","percentage":100}]'
 ```
 
-If you need to rebuild instead, check out the last good commit and run `cf build` and `deploy` as above. That also redeploys that commit's `cloudflare.config.ts`.
+If you need to rebuild instead, check out the last good commit and run `vp exec cf build` and `vp exec cf deploy --prebuilt` as above. That also redeploys that commit's `cloudflare.config.ts`.
 
 ## Community
 
-Report bugs and request features in [GitHub Issues](https://github.com/IGUIDE-chat/iGuide/issues). Pull requests are welcome; run `pnpm run check` and the tests in [Development](#development) before opening one. AI-assisted PRs are welcome too, as long as the agent follows [AGENTS.md](AGENTS.md) (and [apps/web/AGENTS.md](apps/web/AGENTS.md) inside `apps/web`).
+Report bugs and request features in [GitHub Issues](https://github.com/IGUIDE-chat/iGuide/issues). Pull requests are welcome; run `vp check` and the tests in [Development](#development) before opening one. AI-assisted PRs are welcome too, as long as the agent follows [AGENTS.md](AGENTS.md) (and [apps/web/AGENTS.md](apps/web/AGENTS.md) inside `apps/web`).
 
 <a href="https://github.com/IGUIDE-chat/iGuide/graphs/contributors"><img src="https://contrib.rocks/image?repo=IGUIDE-chat/iGuide" alt="Contributors"></a>
