@@ -15,7 +15,7 @@ import {
 function createMinimalToolCall() {
   return {
     id: "call_123",
-    name: "search_knowledge_base",
+    name: "stub_docs",
     input: { query: "test query" },
   }
 }
@@ -23,7 +23,7 @@ function createMinimalToolCall() {
 function createMinimalObservation(): Observation {
   return {
     toolCallId: "call_123",
-    toolName: "search_knowledge_base",
+    toolName: "stub_docs",
     input: { query: "test query" },
     output: { content: "test result" },
     status: "success",
@@ -97,7 +97,7 @@ test("tool calls have separate id, name, and input fields", () => {
   assert.ok(call.input !== undefined, "tool call must have separate input field")
 
   assert.equal(call.id, "call_123")
-  assert.equal(call.name, "search_knowledge_base")
+  assert.equal(call.name, "stub_docs")
   assert.deepEqual(call.input, { query: "test query" })
 })
 
@@ -133,7 +133,7 @@ test("observations maintain order", () => {
 
   const obs1: Observation = {
     toolCallId: "call_1",
-    toolName: "search_knowledge_base",
+    toolName: "stub_docs",
     input: { query: "first" },
     output: { content: "result 1" },
     status: "success",
@@ -250,7 +250,7 @@ test("state can track multiple concurrent tool calls", () => {
 
   state.currentToolCalls.push({
     id: "call_1",
-    name: "search_knowledge_base",
+    name: "stub_docs",
     input: { query: "dorms" },
   })
 
