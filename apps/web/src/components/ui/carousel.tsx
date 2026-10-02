@@ -95,8 +95,10 @@ function Carousel({
     api.on("reInit", onSelect)
     api.on("select", onSelect)
 
+    // Local change: upstream only removes the `select` listener, leaking `reInit`.
     return () => {
-      api?.off("select", onSelect)
+      api.off("reInit", onSelect)
+      api.off("select", onSelect)
     }
   }, [api, onSelect])
 
