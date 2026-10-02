@@ -1,6 +1,7 @@
 import { bindings, defineConfig } from "cf/config"
 
 export default defineConfig({
+  accountId: "0481ad2de24325b3ec75151a21886fce",
   worker: {
     name: "uiuc",
     compatibilityDate: "2026-09-08",
@@ -8,6 +9,14 @@ export default defineConfig({
     placement: {
       mode: "smart",
     },
+    domains: ["iguide.chat"],
+    // Mirror the Dashboard settings for this Worker: its workers.dev subdomain
+    // and Preview URLs are both enabled. `iguide.chat` stays a custom domain,
+    // but its Production-only routing (Dashboard-owned `enabled` /
+    // `previews_enabled`) cannot be expressed here, so `cf deploy` still asks
+    // before touching it.
+    workersDev: true,
+    previewUrls: true,
     assets: {
       // Client-side routes such as /dorms must still resolve to index.html
       // instead of 404ing on a hard refresh.
@@ -21,6 +30,7 @@ export default defineConfig({
       enabled: true,
       logs: { enabled: true },
       issues: { enabled: true },
+      traces: { enabled: true },
     },
     env: {
       ASSETS: bindings.assets(),
