@@ -1,7 +1,7 @@
 import { Dorm } from "../components/housing/types/index"
 import { finalizeDormRecord, sanitizeFloorPlansForStorage } from "../utils/dormData"
 import { normalizeDorm } from "../utils/roomOptions"
-import { supabase } from "./supabase"
+import { getSupabase } from "./host"
 
 const TABLE = "dorms"
 
@@ -58,7 +58,7 @@ function rowToDorm(row: Record<string, unknown>): Dorm {
 /** Fetch all dorms. Falls back to static data on failure. */
 async function getAllDorms(): Promise<Dorm[]> {
   try {
-    const { data, error } = await supabase.from(TABLE).select("*")
+    const { data, error } = await getSupabase().from(TABLE).select("*")
     if (error) {
       console.error("[dormService] getAllDorms error:", error)
       return getStaticDorms()
@@ -76,7 +76,7 @@ async function getAllDorms(): Promise<Dorm[]> {
 /** Fetch a single dorm by ID. Falls back to static data on failure. */
 async function getDormById(id: string): Promise<Dorm | undefined> {
   try {
-    const { data, error } = await supabase.from(TABLE).select("*").eq("id", id).maybeSingle()
+    const { data, error } = await getSupabase().from(TABLE).select("*").eq("id", id).maybeSingle()
     if (error) {
       console.error("[dormService] getDormById error:", error)
       const all = await getStaticDorms()

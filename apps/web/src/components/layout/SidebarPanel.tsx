@@ -1,8 +1,8 @@
 import React from "react"
 
+import { useLayout } from "../../contexts/LayoutContext"
 import { Language } from "../../types"
 import { ConversationSidebar } from "./ConversationSidebar"
-import { DormSidebar } from "./DormSidebar"
 import { LibrarySidebar } from "./LibrarySidebar"
 
 interface SidebarPanelProps {
@@ -12,7 +12,6 @@ interface SidebarPanelProps {
   currentConversationId?: string | null
   onNewConversation?: () => void
   onSelectConversation?: (conversationId: string | null) => void
-  favoritesIconRef: React.RefObject<SVGSVGElement | null>
 }
 
 export const SidebarPanel: React.FC<SidebarPanelProps> = ({
@@ -22,8 +21,10 @@ export const SidebarPanel: React.FC<SidebarPanelProps> = ({
   currentConversationId,
   onNewConversation,
   onSelectConversation,
-  favoritesIconRef,
 }) => {
+  // Feature packages (e.g. @iguide/dorm) fill this from inside their own route tree.
+  const { sidebarSlot } = useLayout()
+
   return (
     <div className="mx-3 flex min-h-0 flex-1 flex-col overflow-hidden border-t border-white/10 pt-2">
       {activeTab === "chat" && (
@@ -42,15 +43,7 @@ export const SidebarPanel: React.FC<SidebarPanelProps> = ({
           }
         />
       )}
-      {activeTab === "dorms" && (
-        <DormSidebar
-          language={language}
-          currentDormId={
-            currentPath.startsWith("/dorms/") ? currentPath.split("/").pop() : undefined
-          }
-          favoritesIconRef={favoritesIconRef}
-        />
-      )}
+      {sidebarSlot}
     </div>
   )
 }

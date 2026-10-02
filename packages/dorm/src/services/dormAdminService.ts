@@ -1,7 +1,7 @@
 import { Dorm } from "../components/housing/types/index"
 import { getDormPriceRange, sanitizeFloorPlansForStorage } from "../utils/dormData"
 import { getPersistedBathroomType } from "../utils/roomOptions"
-import { supabase } from "./supabase"
+import { getSupabase } from "./host"
 
 const TABLE = "dorms"
 
@@ -113,7 +113,7 @@ export function buildSummary(dorm: Dorm, updates: DormUpdate): string {
  * Fetch the last 20 edit history entries for a dorm, newest first.
  */
 async function getEditHistory(dormId: string): Promise<EditHistoryEntry[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("dorm_edit_history")
     .select("*")
     .eq("dorm_id", dormId)
@@ -136,7 +136,7 @@ async function logEdit(
   summary: string,
   snapshotBefore: Record<string, unknown>,
 ): Promise<void> {
-  const { error } = await supabase.from("dorm_edit_history").insert({
+  const { error } = await getSupabase().from("dorm_edit_history").insert({
     dorm_id: dormId,
     dorm_name: dormName,
     changed_by: changedBy,
@@ -161,7 +161,7 @@ async function restoreSnapshot(dormId: string, entry: EditHistoryEntry): Promise
           : value
     }
   }
-  const { error } = await supabase.from(TABLE).update(safeSnapshot).eq("id", dormId)
+  const { error } = await getSupabase().from(TABLE).update(safeSnapshot).eq("id", dormId)
   if (error) {
     console.error("[dormAdminService] restoreSnapshot error:", error)
     return false
@@ -195,7 +195,7 @@ async function updateDorm(dormId: string, updates: DormUpdate): Promise<DormMuta
     safeUpdates.price_range = getDormPriceRange(safeUpdates.price as number)
   }
 
-  const { error } = await supabase.from(TABLE).update(safeUpdates).eq("id", dormId)
+  const { error } = await getSupabase().from(TABLE).update(safeUpdates).eq("id", dormId)
   if (error) {
     console.error("[dormAdminService] updateDorm error:", error)
     const errorMessage = [error.message, error.details, error.hint].filter(Boolean).join(" ")
@@ -263,14 +263,14 @@ export interface DormImageUploadResult {
  * Refreshes the auth session first so Storage RLS checks use fresh JWT claims.
  */
 async function uploadDormImage(file: File): Promise<DormImageUploadResult> {
-  const { error: refreshError } = await supabase.auth.refreshSession()
+  const { error: refreshError } = await getSupabase().auth.refreshSession()
   if (refreshError) {
     console.warn("[dormAdminService] refreshSession warning:", refreshError.message)
   }
 
   const {
     data: { session },
-  } = await supabase.auth.getSession()
+  } = await getSupabase().auth.getSession()
   if (!session) {
     return {
       publicUrl: null,
@@ -282,11 +282,13 @@ async function uploadDormImage(file: File): Promise<DormImageUploadResult> {
   const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`
   const filePath = `user_uploads/${fileName}`
 
-  const { error: uploadError } = await supabase.storage.from("dorm-images").upload(filePath, file, {
-    cacheControl: "3600",
-    upsert: false,
-    contentType: file.type || undefined,
-  })
+  const { error: uploadError } = await getSupabase()
+    .storage.from("dorm-images")
+    .upload(filePath, file, {
+      cacheControl: "3600",
+      upsert: false,
+      contentType: file.type || undefined,
+    })
 
   if (uploadError) {
     console.error("[dormAdminService] uploadDormImage error:", uploadError)
@@ -296,7 +298,7 @@ async function uploadDormImage(file: File): Promise<DormImageUploadResult> {
     }
   }
 
-  const { data } = supabase.storage.from("dorm-images").getPublicUrl(filePath)
+  const { data } = getSupabase().storage.from("dorm-images").getPublicUrl(filePath)
   if (!data?.publicUrl) {
     return {
       publicUrl: null,

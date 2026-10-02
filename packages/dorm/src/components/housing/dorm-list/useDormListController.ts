@@ -1,7 +1,7 @@
 import { useLayoutEffect, useMemo, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { useLayout } from "../../../contexts/LayoutContext"
+import { useLayout } from "../../../contexts/DormHostContext"
 import { Language } from "../../../types"
 import { getPriceRangeFromData } from "../constants/pricing"
 import { useDormData } from "../store/DormDataContext"

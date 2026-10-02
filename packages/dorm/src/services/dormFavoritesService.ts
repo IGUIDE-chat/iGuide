@@ -1,5 +1,4 @@
-import { authService } from "./authService"
-import { supabase } from "./supabase"
+import { getCurrentUser, getSupabase } from "./host"
 
 export interface DormFavorite {
   id: string
@@ -20,10 +19,10 @@ export const dormFavoritesService = {
     dormName: string,
     dormNameZh?: string,
   ): Promise<{ added: boolean; favorite?: DormFavorite }> {
-    const user = await authService.getCurrentUser()
+    const user = await getCurrentUser()
     if (!user) throw new Error("User not authenticated")
 
-    const { data: existing } = await supabase
+    const { data: existing } = await getSupabase()
       .from(TABLE_NAME)
       .select("*")
       .eq("user_id", user.id)
@@ -31,7 +30,7 @@ export const dormFavoritesService = {
       .maybeSingle()
 
     if (existing) {
-      const { error } = await supabase.from(TABLE_NAME).delete().eq("id", existing.id)
+      const { error } = await getSupabase().from(TABLE_NAME).delete().eq("id", existing.id)
 
       if (error) {
         console.error("Error removing favorite:", error)
@@ -39,7 +38,7 @@ export const dormFavoritesService = {
       }
       return { added: false }
     } else {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabase()
         .from(TABLE_NAME)
         .insert({
           user_id: user.id,
@@ -59,10 +58,10 @@ export const dormFavoritesService = {
   },
 
   async getFavorites(): Promise<DormFavorite[]> {
-    const user = await authService.getCurrentUser()
+    const user = await getCurrentUser()
     if (!user) return []
 
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from(TABLE_NAME)
       .select("*")
       .eq("user_id", user.id)
@@ -77,10 +76,10 @@ export const dormFavoritesService = {
   },
 
   async isFavorited(dormId: string): Promise<boolean> {
-    const user = await authService.getCurrentUser()
+    const user = await getCurrentUser()
     if (!user) return false
 
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from(TABLE_NAME)
       .select("id")
       .eq("user_id", user.id)
@@ -96,10 +95,10 @@ export const dormFavoritesService = {
   },
 
   async updateNotes(favoriteId: string, notes: string): Promise<void> {
-    const user = await authService.getCurrentUser()
+    const user = await getCurrentUser()
     if (!user) return
 
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from(TABLE_NAME)
       .update({ notes, updated_at: new Date().toISOString() })
       .eq("id", favoriteId)
@@ -112,10 +111,10 @@ export const dormFavoritesService = {
   },
 
   async removeFavorite(favoriteId: string): Promise<void> {
-    const user = await authService.getCurrentUser()
+    const user = await getCurrentUser()
     if (!user) return
 
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from(TABLE_NAME)
       .delete()
       .eq("id", favoriteId)
@@ -128,10 +127,10 @@ export const dormFavoritesService = {
   },
 
   async removeFavoriteByDormId(dormId: string): Promise<void> {
-    const user = await authService.getCurrentUser()
+    const user = await getCurrentUser()
     if (!user) return
 
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from(TABLE_NAME)
       .delete()
       .eq("user_id", user.id)
@@ -144,10 +143,10 @@ export const dormFavoritesService = {
   },
 
   async clearFavorites(): Promise<void> {
-    const user = await authService.getCurrentUser()
+    const user = await getCurrentUser()
     if (!user) return
 
-    const { error } = await supabase.from(TABLE_NAME).delete().eq("user_id", user.id)
+    const { error } = await getSupabase().from(TABLE_NAME).delete().eq("user_id", user.id)
 
     if (error) {
       console.error("Error clearing favorites:", error)

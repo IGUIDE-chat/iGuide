@@ -18,6 +18,9 @@ interface LayoutContextType {
   /** Custom mobile header slot — when set, replaces the default mobileHeader content */
   mobileHeaderSlot: ReactNode | null
   setMobileHeaderSlot: (node: ReactNode | null) => void
+  /** Feature-owned sidebar content, rendered below the primary nav while set */
+  sidebarSlot: ReactNode | null
+  setSidebarSlot: (node: ReactNode | null) => void
 }
 
 const LayoutContext = createContext<LayoutContextType | null>(null)
@@ -40,6 +43,8 @@ export const LayoutProvider: React.FC<{
     (node: ReactNode | null) => setMobileHeaderSlotState(node),
     [],
   )
+  const [sidebarSlot, setSidebarSlotState] = useState<ReactNode | null>(null)
+  const setSidebarSlot = useCallback((node: ReactNode | null) => setSidebarSlotState(node), [])
   return (
     <LayoutContext.Provider
       value={{
@@ -49,6 +54,8 @@ export const LayoutProvider: React.FC<{
         mobileSidebarButtonRef,
         mobileHeaderSlot,
         setMobileHeaderSlot,
+        sidebarSlot,
+        setSidebarSlot,
       }}
     >
       {children}
@@ -72,6 +79,8 @@ export const useLayout = (): LayoutContextType => {
       } as React.RefObject<HTMLButtonElement | null>,
       mobileHeaderSlot: null,
       setMobileHeaderSlot: () => {},
+      sidebarSlot: null,
+      setSidebarSlot: () => {},
     }
   }
   return ctx

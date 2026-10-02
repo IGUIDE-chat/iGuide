@@ -1,5 +1,4 @@
-import { authService } from "./authService"
-import { supabase } from "./supabase"
+import { getCurrentUser, getSupabase } from "./host"
 
 export interface DormComment {
   id: string
@@ -77,11 +76,13 @@ export interface DormCommentStats {
 
 export const dormCommentsService = {
   async getAllDormStats(): Promise<Record<string, DormCommentStats>> {
-    let { data, error } = await supabase.from("dorm_comments").select("dorm_id, dorm_vote, hidden")
+    let { data, error } = await getSupabase()
+      .from("dorm_comments")
+      .select("dorm_id, dorm_vote, hidden")
 
     // Fall back if add_dorm_comment_hidden.sql has not been run yet (42703).
     if (error?.code === "42703") {
-      ;({ data, error } = await supabase.from("dorm_comments").select("dorm_id, dorm_vote"))
+      ;({ data, error } = await getSupabase().from("dorm_comments").select("dorm_id, dorm_vote"))
     }
 
     if (error) {
@@ -112,9 +113,9 @@ export const dormCommentsService = {
   },
 
   async getComments(dormId: string): Promise<DormComment[]> {
-    const user = await authService.getCurrentUser()
+    const user = await getCurrentUser()
 
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from("dorm_comments")
       .select(`*, dorm_comment_votes(vote, user_id)`)
       .eq("dorm_id", dormId)
@@ -141,12 +142,12 @@ export const dormCommentsService = {
     content: string,
     dormVote: 1 | -1 | null,
   ): Promise<DormComment> {
-    const user = await authService.getCurrentUser()
+    const user = await getCurrentUser()
     if (!user) throw new Error("User not authenticated")
 
     const display_name = user.email?.split("@")[0] ?? "Anonymous"
 
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from("dorm_comments")
       .upsert(
         {
@@ -174,10 +175,10 @@ export const dormCommentsService = {
   },
 
   async deleteComment(commentId: string): Promise<void> {
-    const user = await authService.getCurrentUser()
+    const user = await getCurrentUser()
     if (!user) throw new Error("User not authenticated")
 
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from("dorm_comments")
       .delete()
       .eq("id", commentId)
@@ -194,10 +195,13 @@ export const dormCommentsService = {
    * but are withheld from every non-admin reader by RLS.
    */
   async setCommentHidden(commentId: string, hidden: boolean): Promise<void> {
-    const user = await authService.getCurrentUser()
+    const user = await getCurrentUser()
     if (!isAdminUser(user)) throw new Error("Admin privileges required")
 
-    const { error } = await supabase.from("dorm_comments").update({ hidden }).eq("id", commentId)
+    const { error } = await getSupabase()
+      .from("dorm_comments")
+      .update({ hidden })
+      .eq("id", commentId)
 
     if (error) {
       console.error("Error updating dorm comment visibility:", error)
@@ -209,11 +213,11 @@ export const dormCommentsService = {
    * Upsert a vote on a comment. Pass null to remove the vote.
    */
   async voteOnComment(commentId: string, vote: 1 | -1 | null): Promise<void> {
-    const user = await authService.getCurrentUser()
+    const user = await getCurrentUser()
     if (!user) throw new Error("User not authenticated")
 
     if (vote === null) {
-      const { error } = await supabase
+      const { error } = await getSupabase()
         .from("dorm_comment_votes")
         .delete()
         .eq("comment_id", commentId)
@@ -224,7 +228,7 @@ export const dormCommentsService = {
         throw error
       }
     } else {
-      const { error } = await supabase
+      const { error } = await getSupabase()
         .from("dorm_comment_votes")
         .upsert(
           { comment_id: commentId, user_id: user.id, vote },

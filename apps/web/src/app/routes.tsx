@@ -10,8 +10,7 @@ const LibraryArticlePage = React.lazy(() => import("../pages/library/LibraryArti
 const ProfilePage = React.lazy(() => import("../pages/profile/ProfilePage"))
 const CoursesLandingPage = React.lazy(() => import("../pages/courses/CoursesLandingPage"))
 const ResumeLandingPage = React.lazy(() => import("../pages/resume/ResumeLandingPage"))
-const DormListPage = React.lazy(() => import("../pages/dorms/DormListPage"))
-const DormDetailPage = React.lazy(() => import("../pages/dorms/DormDetailPage"))
+const DormRoute = React.lazy(() => import("../pages/dorms/DormRoute"))
 
 export interface AppRoutesProps {
   language: Language
@@ -59,8 +58,7 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({
         <Route path="/profile" element={<ProfilePage language={language} />} />
         <Route path="/courses" element={<CoursesLandingPage language={language} />} />
         <Route path="/resume" element={<ResumeLandingPage language={language} />} />
-        <Route path="/dorms" element={<DormListPage language={language} />} />
-        <Route path="/dorms/:id" element={<DormDetailPage language={language} />} />
+        <Route path="/dorms/*" element={<DormRoute language={language} />} />
         <Route path="/dorm" element={<LegacyDormRedirect />} />
         <Route path="/dorm/:id" element={<LegacyDormRedirect />} />
         <Route path="*" element={<NotFoundRedirect />} />

@@ -3,7 +3,7 @@ import { GitCompareArrows, X } from "lucide-react"
 import React, { Suspense, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { useAuth } from "../../contexts/AuthContext"
+import { useAuth } from "../../contexts/DormHostContext"
 import { Language } from "../../types"
 import { SHOW_COMMENTS } from "./constants/featureFlags"
 import DormGrid from "./dorm-list/DormGrid"

@@ -2,23 +2,17 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "target": "ES2022",
-    "experimentalDecorators": true,
-    "useDefineForClassFields": false,
     "module": "ESNext",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
     "moduleResolution": "bundler",
     "isolatedModules": true,
     "moduleDetection": "force",
-    "allowJs": true,
     "esModuleInterop": true,
     "jsx": "react-jsx",
-    "paths": {
-      "@/*": ["./src/*"],
-      "@supabase/supabase-js": ["./node_modules/@supabase/supabase-js"]
-    },
     "allowImportingTsExtensions": true,
     "noEmit": true,
-    "types": ["vite/client", "@cloudflare/workers-types"]
-  }
+    "types": ["vite/client", "geojson", "node"]
+  },
+  "include": ["src", "scripts"]
 }

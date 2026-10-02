@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react"
 
-import { useAuth } from "../../../contexts/AuthContext"
+import { useAuth } from "../../../contexts/DormHostContext"
 import { dormCommentsService, DormComment } from "../../../services/dormCommentsService"
 import { SHOW_COMMENTS, SHOW_GOOGLE_REVIEWS } from "../constants/featureFlags"
 

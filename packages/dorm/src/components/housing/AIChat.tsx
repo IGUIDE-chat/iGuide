@@ -6,7 +6,7 @@ import ReactMarkdown from "react-markdown"
 import { useNavigate } from "react-router-dom"
 import remarkGfm from "remark-gfm"
 
-import { streamChatResponse } from "../../services/ai"
+import { streamChatResponse } from "../../services/host"
 import { Language } from "../../types"
 import { isDormMention, findMentionedDorms } from "../../utils/housingUtils"
 import { aiChatTexts } from "./i18n/dormTexts"

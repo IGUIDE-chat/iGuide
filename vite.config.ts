@@ -28,7 +28,7 @@ export default defineConfig({
     ignorePatterns,
     overrides: [
       {
-        files: ["apps/web/**", "packages/ui/**"],
+        files: ["apps/web/**", "packages/dorm/**", "packages/ui/**"],
         env: { browser: true },
       },
       {

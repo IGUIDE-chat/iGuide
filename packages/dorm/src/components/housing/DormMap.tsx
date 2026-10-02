@@ -1,3 +1,6 @@
+// mapbox-gl's types use the global GeoJSON namespace. Referencing it here gives it
+// to every program that compiles this file, the host app's included.
+/// <reference types="geojson" />
 import mapboxgl from "mapbox-gl"
 import React, {
   Component,

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react"
 
-import { useAuth } from "../../../contexts/AuthContext"
+import { useAuth } from "../../../contexts/DormHostContext"
 import { dormFavoritesService, type DormFavorite } from "../../../services/dormFavoritesService"
 import { dormViewingService } from "../../../services/dormViewingService"
 import { useDormData } from "../store/DormDataContext"
