@@ -2,6 +2,8 @@ import * as React from "react"
 import Markdown, { type Components } from "react-markdown"
 import remarkGfm from "remark-gfm"
 
+import { cn } from "@/utils/cn"
+
 import type { MessageSource } from "../../../types"
 import { CodeBlockHeader, CodeBlockPre } from "../../ui/CodeBlock"
 import { MarkdownContext } from "./markdownContext"
@@ -86,6 +88,13 @@ const components: Components = {
   a: MarkdownLink,
   pre: MarkdownPre,
   code: ({ node: _node, ...props }) => <code className="text-illini-blue font-mono" {...props} />,
+  // Tailwind's preflight strips list markers.
+  ul: ({ node: _node, className, ...props }) => (
+    <ul className={cn("list-disc marker:text-slate-400", className)} {...props} />
+  ),
+  ol: ({ node: _node, className, ...props }) => (
+    <ol className={cn("list-decimal marker:text-slate-400", className)} {...props} />
+  ),
   table: ({ node: _node, ...props }) => (
     <div className="table-frame">
       <table {...props} />
