@@ -32,19 +32,6 @@ export default defineConfig({
       SUPABASE_ANON_KEY: bindings.secret(),
       SUPABASE_URL: bindings.secret(),
       TAVILY_API_KEY: bindings.secret(),
-      EMBEDDING_API_BASE_URL: bindings.secret(),
-      EMBEDDING_API_KEY: bindings.secret(),
-      QMD_API_KEY: bindings.secret(),
-
-      // QMD nodes are self-hosted HTTPS endpoints, not secrets, but they are
-      // still deployment-specific so they stay out of the repo.
-      QMD_CN_URL: bindings.secret(),
-      QMD_US_URL: bindings.secret(),
-
-      // The knowledge base index is built at 384 dimensions; changing this
-      // requires re-embedding every document.
-      EMBEDDING_DIMENSIONS: bindings.text("384"),
-      EMBEDDING_MODEL: bindings.text("multilingual-e5-small"),
     },
   },
 })

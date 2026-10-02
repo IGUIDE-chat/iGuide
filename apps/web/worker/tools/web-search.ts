@@ -59,7 +59,7 @@ export function createWebSearchTool(registry: ToolRegistry): ToolDefinition {
   const tool: ToolDefinition = {
     name: "web_search",
     description:
-      "Search the web for current, time-sensitive, or externally sourced UIUC information when the knowledge base does not have answers. Do not use for greetings, thanks, acknowledgements, or casual conversation.",
+      "Search official UIUC websites for current, time-sensitive, or externally sourced information. Do not use for greetings, thanks, acknowledgements, or casual conversation.",
     parameters: {
       type: "object",
       properties: {

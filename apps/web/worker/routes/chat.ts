@@ -3,9 +3,7 @@ import { createSSEStream } from "../agent/stream"
 import { json, resolveIdentity } from "../auth"
 import { registerRuntimeMCPTools } from "../mcp/service"
 import { createCustomSkillsTool } from "../tools/custom-skills"
-import { createGrepDocsTool } from "../tools/grep-docs"
 import { ToolRegistry } from "../tools/registry"
-import { createSearchKnowledgeBaseTool } from "../tools/search-knowledge-base"
 import { createWebSearchTool } from "../tools/web-search"
 import type { Env, RouteHandler } from "../types"
 
@@ -58,9 +56,7 @@ async function runAgentStream(options: {
     : []
 
   const registry = new ToolRegistry()
-  createSearchKnowledgeBaseTool(registry)
   createWebSearchTool(registry)
-  createGrepDocsTool(registry)
   createCustomSkillsTool(registry)
   await registerRuntimeMCPTools({ registry, viewerId: options.userId, env: options.env })
 
@@ -86,9 +82,8 @@ async function runAgentStream(options: {
 }
 
 /**
- * POST /api/chat. The browser only calls this endpoint when
- * `VITE_USE_TOOL_USE_RAG` is `true`, so the tool-use agent loop is the single
- * answer: it retrieves through the Worker's own tools and streams SSE.
+ * POST /api/chat. The browser's only chat path: the tool-use agent loop
+ * retrieves through the Worker's own tools and streams SSE.
  */
 export const onRequestPost: RouteHandler = async (context) => {
   const { request, env, waitUntil } = context
