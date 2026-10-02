@@ -18,7 +18,8 @@ const SORT_OPTIONS = [
 const SortDropdownMobile: React.FC<{
   sortBy: string
   onSortChange: (v: string) => void
-}> = ({ sortBy, onSortChange }) => {
+  label: string
+}> = ({ sortBy, onSortChange, label }) => {
   const [open, setOpen] = React.useState(false)
   const ref = React.useRef<HTMLDivElement>(null)
 
@@ -34,6 +35,8 @@ const SortDropdownMobile: React.FC<{
     <div className="relative shrink-0" ref={ref}>
       <button
         type="button"
+        aria-label={label}
+        aria-expanded={open}
         onClick={() => setOpen(!open)}
         className={`flex size-10 items-center justify-center rounded-full border transition-all duration-200 ${
           open
@@ -111,7 +114,11 @@ const DormListMobileHeader: React.FC<{ language: Language }> = ({ language }) =>
           </div>
         )}
       </div>
-      <SortDropdownMobile sortBy={sortBy} onSortChange={setSortBy} />
+      <SortDropdownMobile
+        sortBy={sortBy}
+        onSortChange={setSortBy}
+        label={language === "zh" ? "排序" : "Sort"}
+      />
       <button
         type="button"
         aria-label={
