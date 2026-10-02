@@ -34,7 +34,6 @@ export interface AgentLoopOptions {
   registry: ToolRegistry
   env: Record<string, string>
   userId?: string
-  region?: string
   maxIterations?: number
   lang?: string
 }
@@ -112,7 +111,6 @@ interface DeepSeekResponse {
 interface ProviderConfig {
   endpoint: string
   apiKey: string
-  region: string
 }
 
 interface StreamingToolCallAccumulator {
@@ -155,55 +153,17 @@ interface StreamingIterationOutcome {
   fallbackReason?: FallbackReason
 }
 
-function detectRegion(region?: string, env?: Record<string, string>): string {
-  const candidates = [
-    region,
-    env?.USER_REGION,
-    env?.X_USER_REGION,
-    env?.CF_REGION,
-    env?.USER_COUNTRY,
-    env?.X_USER_COUNTRY,
-    env?.CF_COUNTRY,
-  ]
-    .filter(Boolean)
-    .map((value) => value!.toUpperCase())
+function getProviderConfig(env: Record<string, string>): ProviderConfig {
+  const deepSeekKey = env.DEEPSEEK_API_KEY
 
-  return candidates.some((value) => value === "CN" || value === "CHINA") ? "CN" : "Global"
-}
-
-function getProviderConfig(options: {
-  region?: string
-  env: Record<string, string>
-}): ProviderConfig {
-  const detectedRegion = detectRegion(options.region, options.env)
-  const deepSeekKey = options.env.DEEPSEEK_API_KEY
-  const siliconFlowKey = options.env.SILICONFLOW_API_KEY
-
-  if (detectedRegion === "CN" && siliconFlowKey) {
-    return {
-      endpoint: "https://api.siliconflow.cn/v1/chat/completions",
-      apiKey: siliconFlowKey,
-      region: "CN",
-    }
+  if (!deepSeekKey) {
+    throw new Error("No DeepSeek-compatible API key configured")
   }
 
-  if (deepSeekKey) {
-    return {
-      endpoint: "https://api.deepseek.com/chat/completions",
-      apiKey: deepSeekKey,
-      region: "Global",
-    }
+  return {
+    endpoint: "https://api.deepseek.com/chat/completions",
+    apiKey: deepSeekKey,
   }
-
-  if (siliconFlowKey) {
-    return {
-      endpoint: "https://api.siliconflow.cn/v1/chat/completions",
-      apiKey: siliconFlowKey,
-      region: detectedRegion,
-    }
-  }
-
-  throw new Error("No DeepSeek-compatible API key configured")
 }
 
 function buildSupabaseHeaders(env: Record<string, string>): HeadersInit | null {
@@ -755,14 +715,10 @@ async function runDirectFallbackResponse(options: {
 export async function runAgentLoop(options: AgentLoopOptions): Promise<AgentLoopResult> {
   const maxIterations = options.maxIterations ?? DEFAULT_MAX_ITERATIONS
   const userMemory = await getUserMemoryBlock(options.userId, options.env)
-  const provider = getProviderConfig({
-    region: options.region,
-    env: options.env,
-  })
+  const provider = getProviderConfig(options.env)
   const requestContext: RequestContext = {
     env: options.env,
     userId: options.userId,
-    region: provider.region,
   }
 
   const messages = buildProviderMessages({
@@ -914,14 +870,10 @@ export async function runStreamingAgentLoop(
 ): Promise<AgentLoopResult> {
   const maxIterations = options.maxIterations ?? DEFAULT_MAX_ITERATIONS
   const userMemory = await getUserMemoryBlock(options.userId, options.env)
-  const provider = getProviderConfig({
-    region: options.region,
-    env: options.env,
-  })
+  const provider = getProviderConfig(options.env)
   const requestContext: RequestContext = {
     env: options.env,
     userId: options.userId,
-    region: provider.region,
   }
 
   let messages = buildProviderMessages({

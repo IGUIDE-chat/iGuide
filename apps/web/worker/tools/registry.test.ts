@@ -8,7 +8,6 @@ import type { RequestContext, ToolDefinition, ToolResult } from "./types.ts"
 const MOCK_CTX: RequestContext = {
   env: {},
   userId: "test-user",
-  region: "global",
 }
 
 test("execute returns tool result on success", async () => {

@@ -59,7 +59,7 @@ test("test utilities provide provider responses and executable stub tools", asyn
   const success = await registry.execute(
     "stub_echo",
     { query: "Allen Hall" },
-    { env: {}, userId: "user-1", region: "global" },
+    { env: {}, userId: "user-1" },
   )
   assert.equal(success.content, JSON.stringify({ query: "Allen Hall" }))
   assert.equal(success.metadata?.stub, true)

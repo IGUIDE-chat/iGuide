@@ -72,8 +72,8 @@ curl http://localhost:5173/api/health
 ```
 
 The Worker serves the SPA and the whole API surface from one origin. It verifies
-Supabase JWTs, routes by Geo-IP, hosts the server-side tool-use runtime, and
-supports SSE chat responses.
+Supabase JWTs, hosts the server-side tool-use runtime, and supports SSE chat
+responses.
 
 ## API Notes
 
