@@ -5,6 +5,7 @@ import React, {
   RefObject,
   useState,
   useCallback,
+  useMemo,
 } from "react"
 
 interface LayoutContextType {
@@ -45,22 +46,29 @@ export const LayoutProvider: React.FC<{
   )
   const [sidebarSlot, setSidebarSlotState] = useState<ReactNode | null>(null)
   const setSidebarSlot = useCallback((node: ReactNode | null) => setSidebarSlotState(node), [])
-  return (
-    <LayoutContext.Provider
-      value={{
-        isSidebarOpen,
-        favoritesIconRef,
-        sidebarToggleButtonRef,
-        mobileSidebarButtonRef,
-        mobileHeaderSlot,
-        setMobileHeaderSlot,
-        sidebarSlot,
-        setSidebarSlot,
-      }}
-    >
-      {children}
-    </LayoutContext.Provider>
+  const value = useMemo<LayoutContextType>(
+    () => ({
+      isSidebarOpen,
+      favoritesIconRef,
+      sidebarToggleButtonRef,
+      mobileSidebarButtonRef,
+      mobileHeaderSlot,
+      setMobileHeaderSlot,
+      sidebarSlot,
+      setSidebarSlot,
+    }),
+    [
+      isSidebarOpen,
+      favoritesIconRef,
+      sidebarToggleButtonRef,
+      mobileSidebarButtonRef,
+      mobileHeaderSlot,
+      setMobileHeaderSlot,
+      sidebarSlot,
+      setSidebarSlot,
+    ],
   )
+  return <LayoutContext.Provider value={value}>{children}</LayoutContext.Provider>
 }
 
 export const useLayout = (): LayoutContextType => {
