@@ -46,7 +46,7 @@ test("replay-turn provider messages preserve assistant tool call and linked tool
     id: "call_search_1",
     type: "function" as const,
     function: {
-      name: "search_knowledge_base",
+      name: "stub_docs",
       arguments: JSON.stringify({ query: "PAR dorm dining" }),
     },
   }
@@ -80,7 +80,7 @@ test("replay-turn provider messages preserve assistant tool call and linked tool
 
   const assistantMessage = messages[2]
   assert.equal(assistantMessage.tool_calls?.[0]?.id, "call_search_1")
-  assert.equal(assistantMessage.tool_calls?.[0]?.function.name, "search_knowledge_base")
+  assert.equal(assistantMessage.tool_calls?.[0]?.function.name, "stub_docs")
 
   const replayToolMessage = messages[3]
   assert.equal(replayToolMessage.tool_call_id, "call_search_1")
@@ -95,7 +95,7 @@ test("plain tool result conversion keeps simple content unchanged", () => {
     toolCall: {
       id: "call_plain",
       type: "function",
-      function: { name: "grep_docs", arguments: "{}" },
+      function: { name: "stub_grep", arguments: "{}" },
     },
     result: { content: "plain result" },
   })

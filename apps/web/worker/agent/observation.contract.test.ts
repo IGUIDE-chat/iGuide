@@ -17,7 +17,7 @@ import {
 function createSuccessObservation(): Observation {
   return {
     toolCallId: "call_abc123",
-    toolName: "search_knowledge_base",
+    toolName: "stub_docs",
     input: { query: "PAR dorm dining", limit: 5 },
     output: { content: "Found 3 dining options at PAR", results: [] },
     status: "success",
@@ -45,7 +45,7 @@ function createErrorObservation(): Observation {
 function createTruncatedObservation(): Observation {
   return {
     toolCallId: "call_ghi789",
-    toolName: "grep_docs",
+    toolName: "stub_grep",
     input: { pattern: "dorm", path: "/docs" },
     output: { content: "Very long output..." },
     status: "success",
@@ -69,7 +69,7 @@ test("toolCallId and toolName are separate fields", () => {
   const obs = createSuccessObservation()
 
   assert.equal(obs.toolCallId, "call_abc123")
-  assert.equal(obs.toolName, "search_knowledge_base")
+  assert.equal(obs.toolName, "stub_docs")
   assert.notEqual(obs.toolCallId, obs.toolName, "toolCallId and toolName must be distinct")
 })
 
@@ -139,7 +139,7 @@ test("observationToolCallId extracts tool call identifier", () => {
 test("observationToolName extracts tool name", () => {
   const obs = createSuccessObservation()
 
-  assert.equal(observationToolName(obs), "search_knowledge_base")
+  assert.equal(observationToolName(obs), "stub_docs")
 })
 
 test("observationInput extracts tool input arguments", () => {
@@ -211,7 +211,7 @@ test("observation fields are independently accessible", () => {
   const error = observationError(obs)
 
   assert.equal(toolCallId, "call_abc123")
-  assert.equal(toolName, "search_knowledge_base")
+  assert.equal(toolName, "stub_docs")
   assert.ok(input !== undefined)
   assert.ok(output !== undefined)
   assert.equal(status, "success")
@@ -240,7 +240,7 @@ test("truncated observation still has valid output", () => {
 test("observation preserves complex input structures", () => {
   const obs: Observation = {
     toolCallId: "call_complex",
-    toolName: "search_knowledge_base",
+    toolName: "stub_docs",
     input: {
       query: "dorm options",
       filters: { type: "residence", year: 2024 },
@@ -262,7 +262,7 @@ test("observation preserves complex input structures", () => {
 test("observation preserves complex output structures", () => {
   const obs: Observation = {
     toolCallId: "call_complex",
-    toolName: "search_knowledge_base",
+    toolName: "stub_docs",
     input: { query: "test" },
     output: {
       content: "Found dorms",

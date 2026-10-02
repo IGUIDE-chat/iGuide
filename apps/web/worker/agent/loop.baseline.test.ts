@@ -38,9 +38,9 @@ function createTestRegistry(): ToolRegistry {
   const registry = new ToolRegistry()
   registry.register(
     createStubTool({
-      name: "search_knowledge_base",
-      description: "Search the UIUC knowledge base",
-      content: "test knowledge result",
+      name: "stub_docs",
+      description: "Search the documentation",
+      content: "test docs result",
     }),
   )
   registry.register(
@@ -52,8 +52,8 @@ function createTestRegistry(): ToolRegistry {
   )
   registry.register(
     createStubTool({
-      name: "grep_docs",
-      description: "Grep documentation",
+      name: "stub_grep",
+      description: "Look up a specific document",
       content: "test grep result",
     }),
   )
@@ -148,7 +148,7 @@ test("substantive UIUC query exposes all registered tools", async () => {
       content: "PAR dorm has several dining options...",
       toolCalls: [
         {
-          name: "search_knowledge_base",
+          name: "stub_docs",
           arguments: { query: "PAR dorm dining options" },
         },
       ],
@@ -176,15 +176,12 @@ test("substantive UIUC query exposes all registered tools", async () => {
     assert.ok(firstRequest.tools!.length > 0, "First request should have non-empty tools array")
 
     const toolNames = firstRequest.tools!.map((t) => t.function.name)
-    assert.ok(
-      toolNames.includes("search_knowledge_base"),
-      "Should include search_knowledge_base tool",
-    )
+    assert.ok(toolNames.includes("stub_docs"), "Should include stub_docs tool")
     assert.ok(toolNames.includes("web_search"), "Should include web_search tool")
-    assert.ok(toolNames.includes("grep_docs"), "Should include grep_docs tool")
+    assert.ok(toolNames.includes("stub_grep"), "Should include stub_grep tool")
 
     assert.equal(result.toolCalls.length, 1, "One tool call should be made")
-    assert.equal(result.toolCalls[0].name, "search_knowledge_base")
+    assert.equal(result.toolCalls[0].name, "stub_docs")
   } finally {
     globalThis.fetch = originalFetch
   }
@@ -196,7 +193,7 @@ test("housing query exposes tools and can trigger search", async () => {
       content: "Let me search for ISR dorm information...",
       toolCalls: [
         {
-          name: "search_knowledge_base",
+          name: "stub_docs",
           arguments: { query: "ISR dorm amenities" },
         },
       ],
@@ -224,7 +221,7 @@ test("housing query exposes tools and can trigger search", async () => {
     )
 
     assert.equal(result.toolCalls.length, 1)
-    assert.equal(result.toolCalls[0].name, "search_knowledge_base")
+    assert.equal(result.toolCalls[0].name, "stub_docs")
   } finally {
     globalThis.fetch = originalFetch
   }
@@ -268,7 +265,7 @@ test("max iterations triggers fallback behavior", async () => {
   const mockResponses: MockProviderResponseInput[] = [
     {
       content: "Searching...",
-      toolCalls: [{ name: "search_knowledge_base", arguments: { query: "test" } }],
+      toolCalls: [{ name: "stub_docs", arguments: { query: "test" } }],
     },
     {
       content: "Still searching...",
@@ -276,11 +273,11 @@ test("max iterations triggers fallback behavior", async () => {
     },
     {
       content: "One more search...",
-      toolCalls: [{ name: "grep_docs", arguments: { query: "test" } }],
+      toolCalls: [{ name: "stub_grep", arguments: { query: "test" } }],
     },
     {
       content: "Final search...",
-      toolCalls: [{ name: "search_knowledge_base", arguments: { query: "test" } }],
+      toolCalls: [{ name: "stub_docs", arguments: { query: "test" } }],
     },
     { content: "I reached the maximum tool-call iterations." },
   ]
@@ -353,7 +350,7 @@ test("tool execution error is captured in result", async () => {
       content: "Let me search...",
       toolCalls: [
         {
-          name: "search_knowledge_base",
+          name: "stub_docs",
           arguments: { query: "test" },
         },
       ],
@@ -369,8 +366,8 @@ test("tool execution error is captured in result", async () => {
     const registry = new ToolRegistry()
     registry.register(
       createStubTool({
-        name: "search_knowledge_base",
-        description: "Search the UIUC knowledge base",
+        name: "stub_docs",
+        description: "Search the documentation",
         throws: "Database connection failed",
       }),
     )
@@ -424,7 +421,7 @@ test("streaming substantive query exposes tools", async () => {
   const mockResponses: MockProviderResponseInput[] = [
     {
       content: "Searching for info...",
-      toolCalls: [{ name: "search_knowledge_base", arguments: { query: "test" } }],
+      toolCalls: [{ name: "stub_docs", arguments: { query: "test" } }],
       stream: true,
     },
     { content: "Here is the answer.", stream: true },

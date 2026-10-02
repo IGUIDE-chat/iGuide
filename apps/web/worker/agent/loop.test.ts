@@ -43,9 +43,9 @@ function createTestRegistry(): ToolRegistry {
   const registry = new ToolRegistry()
   registry.register(
     createStubTool({
-      name: "search_knowledge_base",
-      description: "Search the UIUC knowledge base",
-      content: "test knowledge result",
+      name: "stub_docs",
+      description: "Search the documentation",
+      content: "test docs result",
     }),
   )
   registry.register(
@@ -57,8 +57,8 @@ function createTestRegistry(): ToolRegistry {
   )
   registry.register(
     createStubTool({
-      name: "grep_docs",
-      description: "Grep documentation",
+      name: "stub_grep",
+      description: "Look up a specific document",
       content: "test grep result",
     }),
   )
@@ -186,7 +186,7 @@ test("streaming one tool then final answer completes act-observe loop", async ()
       content: "Let me search for that...",
       toolCalls: [
         {
-          name: "search_knowledge_base",
+          name: "stub_docs",
           arguments: { query: "PAR dorm dining" },
         },
       ],
@@ -225,7 +225,7 @@ test("streaming one tool then final answer completes act-observe loop", async ()
       name: string
       args: unknown
     }
-    assert.equal(toolStartPayload.name, "search_knowledge_base", "Tool name should match")
+    assert.equal(toolStartPayload.name, "stub_docs", "Tool name should match")
 
     const toolResultEvent = parsed.find((e) => e.event === "tool_result")
     assert.ok(toolResultEvent, "tool_result event should exist")
@@ -233,7 +233,7 @@ test("streaming one tool then final answer completes act-observe loop", async ()
       name: string
       status: string
     }
-    assert.equal(toolResultPayload.name, "search_knowledge_base", "Tool result name should match")
+    assert.equal(toolResultPayload.name, "stub_docs", "Tool result name should match")
     assert.equal(toolResultPayload.status, "success", "Tool should succeed")
 
     assert.equal(mockFetch.requests.length, 2, "Provider should be called twice")
@@ -244,7 +244,7 @@ test("streaming one tool then final answer completes act-observe loop", async ()
     assert.equal(toolMessages?.length, 1, "Should have one tool message")
 
     assert.equal(result.toolCalls.length, 1, "Should have one tool call")
-    assert.equal(result.toolCalls[0].name, "search_knowledge_base", "Tool name should match")
+    assert.equal(result.toolCalls[0].name, "stub_docs", "Tool name should match")
     assert.equal(result.iterations, 2, "Should complete in 2 iterations")
   } finally {
     globalThis.fetch = originalFetch
@@ -255,7 +255,7 @@ test("streaming multiple iterations with tool chaining", async () => {
   const mockResponses: MockProviderResponseInput[] = [
     {
       content: "Searching knowledge base...",
-      toolCalls: [{ name: "search_knowledge_base", arguments: { query: "dorms" } }],
+      toolCalls: [{ name: "stub_docs", arguments: { query: "dorms" } }],
       stream: true,
     },
     {
@@ -305,7 +305,7 @@ test("streaming tool error is captured and handled gracefully", async () => {
       content: "Let me search...",
       toolCalls: [
         {
-          name: "search_knowledge_base",
+          name: "stub_docs",
           arguments: { query: "test" },
         },
       ],
@@ -322,7 +322,7 @@ test("streaming tool error is captured and handled gracefully", async () => {
     const registry = new ToolRegistry()
     registry.register(
       createStubTool({
-        name: "search_knowledge_base",
+        name: "stub_docs",
         description: "Search that fails",
         throws: "Database connection failed",
       }),
@@ -358,7 +358,7 @@ test("streaming max iterations triggers fallback with bounded stop", async () =>
   const mockResponses: MockProviderResponseInput[] = [
     {
       content: "Searching...",
-      toolCalls: [{ name: "search_knowledge_base", arguments: { query: "test1" } }],
+      toolCalls: [{ name: "stub_docs", arguments: { query: "test1" } }],
       stream: true,
     },
     {
@@ -368,7 +368,7 @@ test("streaming max iterations triggers fallback with bounded stop", async () =>
     },
     {
       content: "More searching...",
-      toolCalls: [{ name: "grep_docs", arguments: { query: "test3" } }],
+      toolCalls: [{ name: "stub_grep", arguments: { query: "test3" } }],
       stream: true,
     },
   ]
@@ -416,7 +416,7 @@ test("streaming fallback direct response when all tools fail", async () => {
   const mockResponses: MockProviderResponseInput[] = [
     {
       content: "Let me try...",
-      toolCalls: [{ name: "search_knowledge_base", arguments: { query: "test" } }],
+      toolCalls: [{ name: "stub_docs", arguments: { query: "test" } }],
       stream: true,
     },
     { content: "I couldn't search but here's what I know...", stream: true },
@@ -430,7 +430,7 @@ test("streaming fallback direct response when all tools fail", async () => {
     const registry = new ToolRegistry()
     registry.register(
       createStubTool({
-        name: "search_knowledge_base",
+        name: "stub_docs",
         description: "Search that fails",
         throws: "Connection error",
       }),
@@ -466,7 +466,7 @@ test("streaming trace events are emitted at key points", async () => {
   const mockResponses: MockProviderResponseInput[] = [
     {
       content: "Let me search...",
-      toolCalls: [{ name: "search_knowledge_base", arguments: { query: "test" } }],
+      toolCalls: [{ name: "stub_docs", arguments: { query: "test" } }],
       stream: true,
     },
     { content: "Here is the answer.", stream: true },
@@ -503,7 +503,7 @@ test("streaming trace events are emitted at key points", async () => {
         status: string
         summary: string
       }
-      assert.equal(payload.name, "search_knowledge_base", "Observation should have tool name")
+      assert.equal(payload.name, "stub_docs", "Observation should have tool name")
       assert.equal(payload.status, "success", "Observation should have status")
       assert.ok(payload.summary, "Observation should have summary")
     }
@@ -516,7 +516,7 @@ test("streaming preserves SSE backward compatibility", async () => {
   const mockResponses: MockProviderResponseInput[] = [
     {
       content: "Let me search...",
-      toolCalls: [{ name: "search_knowledge_base", arguments: { query: "test" } }],
+      toolCalls: [{ name: "stub_docs", arguments: { query: "test" } }],
       stream: true,
     },
     { content: "Here is the answer.", stream: true },
@@ -600,7 +600,7 @@ test("streaming allows tools for substantive query", async () => {
   const mockResponses: MockProviderResponseInput[] = [
     {
       content: "Let me search...",
-      toolCalls: [{ name: "search_knowledge_base", arguments: { query: "PAR dorm" } }],
+      toolCalls: [{ name: "stub_docs", arguments: { query: "PAR dorm" } }],
       stream: true,
     },
     { content: "PAR has...", stream: true },

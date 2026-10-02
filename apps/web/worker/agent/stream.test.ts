@@ -67,7 +67,7 @@ function createTestWriterPair(): {
 test("tool_start payload uses 'name' field (not 'tool')", async () => {
   const { writer, events } = createTestWriterPair()
 
-  await sendToolStart(writer, "search_knowledge_base", { query: "housing" })
+  await sendToolStart(writer, "stub_docs", { query: "housing" })
   await writer.close()
 
   const parsed = await events
@@ -75,7 +75,7 @@ test("tool_start payload uses 'name' field (not 'tool')", async () => {
   assert.equal(parsed[0].event, "tool_start")
 
   const payload = parsed[0].data as Record<string, unknown>
-  assert.equal(payload.name, "search_knowledge_base", "tool_start payload must use 'name' field")
+  assert.equal(payload.name, "stub_docs", "tool_start payload must use 'name' field")
   assert.ok(!("tool" in payload), "tool_start must NOT have 'tool' field")
   assert.deepEqual(payload.args, { query: "housing" })
 })
@@ -83,7 +83,7 @@ test("tool_start payload uses 'name' field (not 'tool')", async () => {
 test("tool_result payload uses 'name' field (not 'tool')", async () => {
   const { writer, events } = createTestWriterPair()
 
-  await sendToolResult(writer, "search_knowledge_base", "success", "2 results")
+  await sendToolResult(writer, "stub_docs", "success", "2 results")
   await writer.close()
 
   const parsed = await events
@@ -91,7 +91,7 @@ test("tool_result payload uses 'name' field (not 'tool')", async () => {
   assert.equal(parsed[0].event, "tool_result")
 
   const payload = parsed[0].data as Record<string, unknown>
-  assert.equal(payload.name, "search_knowledge_base", "tool_result payload must use 'name' field")
+  assert.equal(payload.name, "stub_docs", "tool_result payload must use 'name' field")
   assert.ok(!("tool" in payload), "tool_result must NOT have 'tool' field")
   assert.equal(payload.status, "success")
   assert.equal(payload.summary, "2 results")
@@ -101,7 +101,7 @@ test("tool_start payload includes args object", async () => {
   const { writer, events } = createTestWriterPair()
 
   const args = { query: "PAR dorm", limit: 5, filters: { type: "dorm" } }
-  await sendToolStart(writer, "search_knowledge_base", args)
+  await sendToolStart(writer, "stub_docs", args)
   await writer.close()
 
   const parsed = await events
@@ -187,8 +187,8 @@ test("done payload includes usage object", async () => {
 test("tool_start -> tool_result -> content -> done order is stable", async () => {
   const { writer, events } = createTestWriterPair()
 
-  await sendToolStart(writer, "search_knowledge_base", { query: "test" })
-  await sendToolResult(writer, "search_knowledge_base", "success", "found 3 results")
+  await sendToolStart(writer, "stub_docs", { query: "test" })
+  await sendToolResult(writer, "stub_docs", "success", "found 3 results")
   await sendContent(writer, "Here are the results...")
   await sendDone(writer, { prompt_tokens: 50, completion_tokens: 30 })
   await writer.close()
@@ -205,8 +205,8 @@ test("tool_start -> tool_result -> content -> done order is stable", async () =>
 test("multiple tool calls maintain sequential order", async () => {
   const { writer, events } = createTestWriterPair()
 
-  await sendToolStart(writer, "search_knowledge_base", { query: "housing" })
-  await sendToolResult(writer, "search_knowledge_base", "success", "5 results")
+  await sendToolStart(writer, "stub_docs", { query: "housing" })
+  await sendToolResult(writer, "stub_docs", "success", "5 results")
 
   await sendToolStart(writer, "web_search", { query: "UIUC dorms" })
   await sendToolResult(writer, "web_search", "success", "3 results")
@@ -325,7 +325,7 @@ test("observation payload includes name, status, and bounded summary", async () 
 test("observation payload does not include raw content", async () => {
   const { writer, events } = createTestWriterPair()
 
-  await emitObservation(writer, "search_knowledge_base", "success", "5 results")
+  await emitObservation(writer, "stub_docs", "success", "5 results")
   await writer.close()
 
   const parsed = await events
@@ -368,10 +368,10 @@ test("trace events do not break existing event order", async () => {
   const { writer, events } = createTestWriterPair()
 
   await emitAgentStep(writer, 1, 0)
-  await emitToolDecision(writer, "search_knowledge_base", "user query about housing")
-  await sendToolStart(writer, "search_knowledge_base", { query: "housing" })
-  await emitObservation(writer, "search_knowledge_base", "success", "5 results")
-  await sendToolResult(writer, "search_knowledge_base", "success", "5 results")
+  await emitToolDecision(writer, "stub_docs", "user query about housing")
+  await sendToolStart(writer, "stub_docs", { query: "housing" })
+  await emitObservation(writer, "stub_docs", "success", "5 results")
+  await sendToolResult(writer, "stub_docs", "success", "5 results")
   await sendContent(writer, "Here are the results...")
   await emitFinalizing(writer, "complete")
   await sendDone(writer, { prompt_tokens: 50, completion_tokens: 30 })
@@ -396,7 +396,7 @@ test("trace events do not break existing event order", async () => {
 test("existing tool_start test still passes (backward compat)", async () => {
   const { writer, events } = createTestWriterPair()
 
-  await sendToolStart(writer, "search_knowledge_base", { query: "housing" })
+  await sendToolStart(writer, "stub_docs", { query: "housing" })
   await writer.close()
 
   const parsed = await events
@@ -404,7 +404,7 @@ test("existing tool_start test still passes (backward compat)", async () => {
   assert.equal(parsed[0].event, "tool_start")
 
   const payload = parsed[0].data as Record<string, unknown>
-  assert.equal(payload.name, "search_knowledge_base", "tool_start payload must use 'name' field")
+  assert.equal(payload.name, "stub_docs", "tool_start payload must use 'name' field")
   assert.ok(!("tool" in payload), "tool_start must NOT have 'tool' field")
   assert.deepEqual(payload.args, { query: "housing" })
 })
@@ -412,7 +412,7 @@ test("existing tool_start test still passes (backward compat)", async () => {
 test("existing tool_result test still passes (backward compat)", async () => {
   const { writer, events } = createTestWriterPair()
 
-  await sendToolResult(writer, "search_knowledge_base", "success", "2 results")
+  await sendToolResult(writer, "stub_docs", "success", "2 results")
   await writer.close()
 
   const parsed = await events
@@ -420,7 +420,7 @@ test("existing tool_result test still passes (backward compat)", async () => {
   assert.equal(parsed[0].event, "tool_result")
 
   const payload = parsed[0].data as Record<string, unknown>
-  assert.equal(payload.name, "search_knowledge_base", "tool_result payload must use 'name' field")
+  assert.equal(payload.name, "stub_docs", "tool_result payload must use 'name' field")
   assert.ok(!("tool" in payload), "tool_result must NOT have 'tool' field")
   assert.equal(payload.status, "success")
   assert.equal(payload.summary, "2 results")

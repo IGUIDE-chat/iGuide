@@ -6,7 +6,7 @@ import { buildObservation } from "./observation.ts"
 test("buildObservation converts successful tool results into canonical observations", () => {
   const observation = buildObservation({
     toolCallId: "call_123",
-    toolName: "search_knowledge_base",
+    toolName: "stub_docs",
     input: { query: "PAR" },
     result: {
       content: "PAR has multiple dining options.\nSource: housing guide",
@@ -15,7 +15,7 @@ test("buildObservation converts successful tool results into canonical observati
   })
 
   assert.equal(observation.toolCallId, "call_123")
-  assert.equal(observation.toolName, "search_knowledge_base")
+  assert.equal(observation.toolName, "stub_docs")
   assert.deepEqual(observation.input, { query: "PAR" })
   assert.equal(observation.status, "success")
   assert.equal(observation.summary, "PAR has multiple dining options.")
@@ -39,12 +39,12 @@ test("buildObservation converts successful tool results into canonical observati
 test("buildObservation preserves error result diagnostics", () => {
   const observation = buildObservation({
     toolCallId: "call_error",
-    toolName: "grep_docs",
+    toolName: "stub_grep",
     input: { pattern: "housing" },
     result: {
       content: JSON.stringify({
         error: "execution_failed",
-        tool: "grep_docs",
+        tool: "stub_grep",
         message: "permission denied",
       }),
       metadata: { error: true },
@@ -61,7 +61,7 @@ test("buildObservation preserves error result diagnostics", () => {
   })
   assert.equal(
     observation.raw,
-    '{"error":"execution_failed","tool":"grep_docs","message":"permission denied"}',
+    '{"error":"execution_failed","tool":"stub_grep","message":"permission denied"}',
   )
   assert.ok(observation.providerMessage)
   assert.equal(observation.providerMessage.tool_call_id, "call_error")
