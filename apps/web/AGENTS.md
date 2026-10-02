@@ -36,16 +36,17 @@ For repo-wide rules (secrets, CI, Worker retrieval, data model), see the root
   guest-localStorage favorites.
 - That Worker also hosts the agent runtime: the streaming tool-use loop
   (`worker/agent/`), its tool registry (`worker/tools/`), skills
-  (`worker/skills/`), the MCP connection router (`worker/mcp/`), and the
-  Supabase/embedding helpers (`worker/lib/`).
+  (`worker/skills/`), the MCP connection router (`worker/mcp/`), and Supabase
+  token verification (`worker/auth.ts`).
 - The Worker is configured in `cloudflare.config.ts` (`cf/config`). The SPA
   fallback is `assets.notFoundHandling: "single-page-application"`, and
   `assets.runWorkerFirst: ["/api/*"]` sends only API traffic through the Worker.
-- `vite.config.ts` registers `@cloudflare/vite-plugin` for `vite build` only, so
-  `vp dev` keeps using the Vite proxy for `/api/*` against `.env.local` secrets.
-- Two build outputs exist on purpose. `vp build` produces the SPA in `dist/`
-  (what CI's bundle scan reads); `cf build` produces the Worker plus its
-  static assets under `.cloudflare/output/`. `cf deploy` runs the latter.
+- `vite.config.ts` registers `@cloudflare/vite-plugin` for both `vp dev` and
+  `vp build`, so dev boots the real Worker with `.dev.vars` secrets and serves
+  `/api/*` through the production routing table.
+- `vp build` and `cf build` produce the same output: the Worker bundle plus the
+  SPA's static assets under `.cloudflare/output/`. There is no `dist/`.
+  `cf deploy` uploads that output.
 - `scripts/` holds the chat persona and memory SQL
   (`scripts/migrations/add_soul_and_memory.sql`) and the RLS fixes
   (`scripts/optimize_rls_policies.sql`, `scripts/fix_function_security.sql`).

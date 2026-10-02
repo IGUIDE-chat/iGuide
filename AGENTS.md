@@ -81,8 +81,6 @@ Run checks before delivery; `package.json` defines no validation scripts, so
 - Set production secrets from `apps/web` with
   `vp exec cf workers secrets update <NAME> --worker uiuc`. Git ignores `.env*`
   and `.dev.vars*`; only the `.example` templates are tracked.
-- For dev-proxy debugging, set `LLM_REQUEST_DUMP=1`; redacted dumps go to
-  `apps/web/.debug/llm-requests/`.
 
 ## Architecture
 
