@@ -2,7 +2,7 @@ import { bindings, defineConfig } from "cf/config"
 
 export default defineConfig({
   worker: {
-    name: "web",
+    name: "uiuc",
     compatibilityDate: "2026-09-08",
     entrypoint: "worker/index.ts",
     placement: {
@@ -16,6 +16,11 @@ export default defineConfig({
       // whole API surface to the Worker while assets serve straight from the
       // asset store. The SPA and its API are therefore same-origin.
       runWorkerFirst: ["/api/*"],
+    },
+    observability: {
+      enabled: true,
+      logs: { enabled: true },
+      issues: { enabled: true },
     },
     env: {
       ASSETS: bindings.assets(),
