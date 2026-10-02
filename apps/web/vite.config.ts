@@ -28,7 +28,7 @@ export default defineConfig(({ mode }) => {
       // server, so dev exercises the production routing table instead of a proxy
       // that only simulates it. It is not hoisted out of `lazyPlugins`: that
       // would defeat the point of the helper.
-      cloudflare({ experimental: { newConfig: true } }),
+      cloudflare(),
       tailwindcss(),
     ]),
     define: {
