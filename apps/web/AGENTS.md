@@ -86,12 +86,11 @@ For repo-wide rules (secrets, CI, Worker retrieval, data model), see the root
 
 ## Practical Placement Rules
 
-- Server-side proxy routes belong in `worker/routes/<name>.ts`, exporting
-  `onRequestPost` / `onRequestOptions` typed as `RouteHandler` from
-  `worker/types.ts`, and must be registered in the `API_ROUTES` or
-  `API_PREFIX_ROUTES` table in `worker/routes/index.ts`. Never put them under
-  `src/` — CI's secret scan greps `src/**` and rejects `VITE_*API_KEY`
-  patterns there.
+- Server-side API routes belong in `worker/routes/<name>.ts`, exporting
+  handlers typed as `RouteHandler` from `worker/types.ts`, and are registered in
+  the `API_ROUTES` or `API_PREFIX_ROUTES` table in `worker/routes/index.ts`,
+  which `worker/app.ts` mounts. Never put them under `src/`, which ships to the
+  browser.
 - Route-only composition belongs in `src/pages/**`.
 - Feature-local UI belongs next to that feature under `src/components/**`.
 - Shared layout belongs in `src/components/layout/**`.
@@ -135,11 +134,10 @@ For structure-affecting changes:
   browser. Only `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, and
   `VITE_MAPBOX_TOKEN` are used from it. Git ignores the real file.
 - `.dev.vars.example` → `.dev.vars`: Worker secrets for local `vp dev` runs.
-  `Env` requires `SUPABASE_URL` and `SUPABASE_ANON_KEY`. The template marks the
-  rest optional, but `/api/chat` gives no answer without `DEEPSEEK_API_KEY`, and
-  web search needs `TAVILY_API_KEY`. `GOOGLE_API_KEY` only feeds the
-  `/api/gemini` proxy, which nothing calls. In production, set them from
-  `apps/web/` with `vp exec cf workers secrets update <NAME> --worker uiuc`.
+  `Env` requires `SUPABASE_URL` and `SUPABASE_ANON_KEY`. `/api/chat` also gives
+  no answer without `DEEPSEEK_API_KEY`, and web search needs `TAVILY_API_KEY`.
+  In production, set them from `apps/web/` with
+  `vp exec cf workers secrets update <NAME> --worker uiuc`.
 - Install the workspace once from the repo root with `vp install`.
 
 ## Database

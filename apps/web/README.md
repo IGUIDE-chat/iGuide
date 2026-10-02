@@ -11,8 +11,8 @@ overall architecture, see the root [README](../../README.md). For where code bel
 
 - `src/`: the React SPA. Entry `src/index.tsx`, composition `src/App.tsx`, routes `src/app/routes.tsx`.
 - `worker/`: the Worker, entry `worker/index.ts`, configured in `cloudflare.config.ts`. It serves
-  `/api/chat` (the tool-use agent; Tavily web search is its only retrieval source), the provider
-  proxies, `/api/health` and `/api/integrations*`.
+  `/api/chat` (the tool-use agent; Tavily web search is its only retrieval source), `/api/health`
+  and `/api/integrations*`.
 - `src/pages/dorms/DormRoute.tsx`: the only file that touches the dorm feature, which lives in
   [`packages/dorm`](../../packages/dorm) and is lazy-loaded at `/dorms/*`.
 - `scripts/`: the chat persona and memory SQL and the RLS fixes.
