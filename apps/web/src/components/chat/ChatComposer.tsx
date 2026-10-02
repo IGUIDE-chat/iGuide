@@ -39,7 +39,7 @@ export const ChatComposer = ({ placeholder, hint, isRunning, onSend }: ChatCompo
         event.preventDefault()
         submit()
       }}
-      className="relative flex flex-col rounded-[28px] border border-slate-200 bg-white p-2 shadow-[0_8px_30px_-12px_rgba(15,23,42,0.18)] transition-all focus-within:border-slate-300 focus-within:shadow-[0_8px_30px_-10px_rgba(15,23,42,0.28)]"
+      className="relative flex flex-col rounded-[28px] border border-slate-200 bg-white p-2 shadow-[0_8px_30px_-12px_rgba(15,23,42,0.18)] transition-[border-color,box-shadow] focus-within:border-slate-300 focus-within:shadow-[0_8px_30px_-10px_rgba(15,23,42,0.28)]"
     >
       <textarea
         value={value}
