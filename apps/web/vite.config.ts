@@ -1,8 +1,7 @@
-// [CONFIG] Vite build configuration and plugin setup.
-// [配置] Vite 构建配置和插件设置。
 import path from "path"
 
 import { cloudflare } from "@cloudflare/vite-plugin"
+import tailwindcss from "@tailwindcss/vite"
 import react from "@vitejs/plugin-react"
 import { ViteMcp } from "vite-plugin-mcp"
 import { defineConfig, loadEnv, lazyPlugins } from "vite-plus"
@@ -30,6 +29,7 @@ export default defineConfig(({ mode }) => {
       // that only simulates it. It is not hoisted out of `lazyPlugins`: that
       // would defeat the point of the helper.
       cloudflare({ experimental: { newConfig: true } }),
+      tailwindcss(),
     ]),
     define: {
       // Only inject public keys that are safe for frontend
