@@ -1,3 +1,4 @@
+import { Typewriter } from "@iguide/ui"
 import * as React from "react"
 import { useEffect, useState } from "react"
 
@@ -5,7 +6,6 @@ import { useAuth } from "../../contexts/AuthContext"
 import { conversationService } from "../../services/conversationService"
 import { localConversationService } from "../../services/localConversationService"
 import { ConversationSummary } from "../../types"
-import { Typewriter } from "../ui/Typewriter"
 import {
   BaseSidebar,
   SidebarItem,

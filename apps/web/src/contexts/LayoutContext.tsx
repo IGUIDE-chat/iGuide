@@ -5,6 +5,7 @@ import React, {
   RefObject,
   useState,
   useCallback,
+  useMemo,
 } from "react"
 
 interface LayoutContextType {
@@ -18,6 +19,9 @@ interface LayoutContextType {
   /** Custom mobile header slot — when set, replaces the default mobileHeader content */
   mobileHeaderSlot: ReactNode | null
   setMobileHeaderSlot: (node: ReactNode | null) => void
+  /** Feature-owned sidebar content, rendered below the primary nav while set */
+  sidebarSlot: ReactNode | null
+  setSidebarSlot: (node: ReactNode | null) => void
 }
 
 const LayoutContext = createContext<LayoutContextType | null>(null)
@@ -40,20 +44,31 @@ export const LayoutProvider: React.FC<{
     (node: ReactNode | null) => setMobileHeaderSlotState(node),
     [],
   )
-  return (
-    <LayoutContext.Provider
-      value={{
-        isSidebarOpen,
-        favoritesIconRef,
-        sidebarToggleButtonRef,
-        mobileSidebarButtonRef,
-        mobileHeaderSlot,
-        setMobileHeaderSlot,
-      }}
-    >
-      {children}
-    </LayoutContext.Provider>
+  const [sidebarSlot, setSidebarSlotState] = useState<ReactNode | null>(null)
+  const setSidebarSlot = useCallback((node: ReactNode | null) => setSidebarSlotState(node), [])
+  const value = useMemo<LayoutContextType>(
+    () => ({
+      isSidebarOpen,
+      favoritesIconRef,
+      sidebarToggleButtonRef,
+      mobileSidebarButtonRef,
+      mobileHeaderSlot,
+      setMobileHeaderSlot,
+      sidebarSlot,
+      setSidebarSlot,
+    }),
+    [
+      isSidebarOpen,
+      favoritesIconRef,
+      sidebarToggleButtonRef,
+      mobileSidebarButtonRef,
+      mobileHeaderSlot,
+      setMobileHeaderSlot,
+      sidebarSlot,
+      setSidebarSlot,
+    ],
   )
+  return <LayoutContext.Provider value={value}>{children}</LayoutContext.Provider>
 }
 
 export const useLayout = (): LayoutContextType => {
@@ -72,6 +87,8 @@ export const useLayout = (): LayoutContextType => {
       } as React.RefObject<HTMLButtonElement | null>,
       mobileHeaderSlot: null,
       setMobileHeaderSlot: () => {},
+      sidebarSlot: null,
+      setSidebarSlot: () => {},
     }
   }
   return ctx

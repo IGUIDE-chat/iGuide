@@ -28,7 +28,7 @@ export default defineConfig({
     ignorePatterns,
     overrides: [
       {
-        files: ["apps/web/**"],
+        files: ["apps/web/**", "packages/dorm/**", "packages/ui/**"],
         env: { browser: true },
       },
       {
@@ -39,7 +39,7 @@ export default defineConfig({
         rules: { "no-console": "off" },
       },
       {
-        files: ["tools/**"],
+        files: ["tools/**", "packages/dorm/scrapers/**"],
         env: { node: true },
       },
     ],

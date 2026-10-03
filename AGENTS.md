@@ -1,7 +1,7 @@
 # IlliniGuide agent guide
 
 These rules apply repository-wide. `apps/web/AGENTS.md` takes precedence within
-`apps/web/**`.
+`apps/web/**`, and `packages/dorm/AGENTS.md` within `packages/dorm/**`.
 
 ## Project
 
@@ -9,10 +9,11 @@ A UIUC knowledge platform with a React 19 frontend and Cloudflare Worker gateway
 Supabase provides auth and Postgres; DeepSeek handles inference and Tavily
 supplies web search.
 
-| Path            | Role                                                                     |
-| :-------------- | :----------------------------------------------------------------------- |
-| `apps/web/`     | Frontend and Worker: SPA, static assets, agent loop, tools, skills, MCP. |
-| `dorm_scripts/` | Standalone Puppeteer/Bun review scrapers.                                |
+| Path             | Role                                                                        |
+| :--------------- | :-------------------------------------------------------------------------- |
+| `apps/web/`      | Frontend and Worker: SPA, static assets, agent loop, tools, skills, MCP.    |
+| `packages/dorm/` | Dorm feature (`@iguide/dorm`): UI, state, dorm SQL, data scripts, scrapers. |
+| `packages/ui/`   | Business-agnostic UI primitives shared by the app and feature packages.     |
 
 <!--VITE PLUS START-->
 
@@ -84,9 +85,14 @@ Run checks before delivery; `package.json` defines no validation scripts, so
 
 ## Architecture
 
-- `apps/web/src` is the React 19 SPA: react-router 7, Tailwind CSS 4,
-  assistant-ui for chat, Mapbox GL for the dorm map, and supabase-js for auth
-  and user data.
+- `apps/web/src` is the React 19 SPA shell: react-router 7, Tailwind CSS 4,
+  assistant-ui for chat, and supabase-js for auth and user data.
+- `packages/dorm` (`@iguide/dorm`) is the dorm feature: list, Mapbox GL map,
+  detail, compare, and reviews, plus the dorm SQL, data scripts, and review
+  scrapers. The SPA mounts it lazily at `/dorms/*` through
+  `apps/web/src/pages/dorms/DormRoute.tsx`, so no other page loads dorm code or
+  queries dorm tables. `packages/ui` (`@iguide/ui`) holds UI primitives both
+  use.
 - `apps/web/worker` is the Cloudflare Worker named `uiuc`. It routes `/api/*` and
   serves the SPA's static assets for every other path, so the app and the whole
   API share one origin. It also hosts the streaming tool-use agent
@@ -181,10 +187,11 @@ Paths below are relative to `apps/web/`:
 
 - Enable RLS and grants in each new table's migration: `anon` and `authenticated`
   receive `select`; writes use the service key.
-- Apply the dorm chain in `apps/web/scripts/migrations/`, starting with
+- Apply the dorm chain in `packages/dorm/scripts/migrations/`, starting with
   `create_dorms_table.sql`, then `add_categorized_tags.sql`, then follow-ups.
-  `apps/web/AGENTS.md` owns the dorm schema order, the tables the tracked SQL
-  never creates, the seed scripts, and their known conflicts.
+  `packages/dorm/AGENTS.md` owns the dorm schema order, the seed scripts, and
+  their known conflicts. `apps/web/AGENTS.md` owns the tables the tracked SQL
+  never creates and the chat-owned `add_soul_and_memory.sql`.
 
 ## Deploy
 
@@ -218,8 +225,8 @@ the current Git branch.
 
 Roll out in this order:
 
-1. Create the tables the tracked SQL omits and run the dorm chain, then seed the
-   dorms table. Both steps are spelled out in `apps/web/AGENTS.md`.
+1. Create the tables the tracked SQL omits (`apps/web/AGENTS.md`), run the dorm
+   chain, then seed the dorms table (`packages/dorm/AGENTS.md`).
 2. Set the Worker secrets: `SUPABASE_URL` and `SUPABASE_ANON_KEY` are what
    `Env` requires (Cloudflare binds `ASSETS`), but chat needs `DEEPSEEK_API_KEY`
    and search needs `TAVILY_API_KEY`.

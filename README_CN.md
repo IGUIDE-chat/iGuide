@@ -49,17 +49,18 @@ curl http://localhost:5173/api/health
 
 ## 文档
 
-| 目标                           | 从这里开始                                                                                                                                                                                         |
-| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 了解仓库规则、命令和数据模型   | [AGENTS.md](AGENTS.md)                                                                                                                                                                             |
-| 了解运行时、接口和访问模型     | [AGENTS.md](AGENTS.md#architecture) · [AGENTS.md](AGENTS.md#endpoint-access)                                                                                                                       |
-| 在 React 应用或 Worker 上开发  | [apps/web/AGENTS.md](apps/web/AGENTS.md)                                                                                                                                                           |
-| 修改 agent 的提示词或循环      | [apps/web/worker/routes/agent-prompts](apps/web/worker/routes/agent-prompts) · [apps/web/worker/agent](apps/web/worker/agent)                                                                      |
-| 添加 agent 工具或技能          | [apps/web/worker/tools](apps/web/worker/tools) · [apps/web/worker/skills](apps/web/worker/skills)                                                                                                  |
-| 配置 secrets 和 Worker         | [apps/web/.dev.vars.example](apps/web/.dev.vars.example) · [apps/web/.env.local.example](apps/web/.env.local.example) · [apps/web/cloudflare.config.ts](apps/web/cloudflare.config.ts)             |
-| 创建宿舍表并导入种子数据       | [apps/web/AGENTS.md](apps/web/AGENTS.md#dorm-database) · [apps/web/scripts/migrations](apps/web/scripts/migrations) · [apps/web/scripts/seed-dorms-table.ts](apps/web/scripts/seed-dorms-table.ts) |
-| 部署与回滚                     | [AGENTS.md](AGENTS.md#deploy)                                                                                                                                                                      |
-| 查看 pull request 上会运行什么 | [.github/workflows/react-doctor.yml](.github/workflows/react-doctor.yml)                                                                                                                           |
+| 目标                           | 从这里开始                                                                                                                                                                                                                       |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 了解仓库规则、命令和数据模型   | [AGENTS.md](AGENTS.md)                                                                                                                                                                                                           |
+| 了解运行时、接口和访问模型     | [AGENTS.md](AGENTS.md#architecture) · [AGENTS.md](AGENTS.md#endpoint-access)                                                                                                                                                     |
+| 在 React 应用或 Worker 上开发  | [apps/web/AGENTS.md](apps/web/AGENTS.md)                                                                                                                                                                                         |
+| 修改 agent 的提示词或循环      | [apps/web/worker/routes/agent-prompts](apps/web/worker/routes/agent-prompts) · [apps/web/worker/agent](apps/web/worker/agent)                                                                                                    |
+| 添加 agent 工具或技能          | [apps/web/worker/tools](apps/web/worker/tools) · [apps/web/worker/skills](apps/web/worker/skills)                                                                                                                                |
+| 配置 secrets 和 Worker         | [apps/web/.dev.vars.example](apps/web/.dev.vars.example) · [apps/web/.env.local.example](apps/web/.env.local.example) · [apps/web/cloudflare.config.ts](apps/web/cloudflare.config.ts)                                           |
+| 开发宿舍功能                   | [packages/dorm/AGENTS.md](packages/dorm/AGENTS.md) · [packages/dorm/README_CN.md](packages/dorm/README_CN.md)                                                                                                                    |
+| 创建宿舍表并导入种子数据       | [packages/dorm/AGENTS.md](packages/dorm/AGENTS.md#dorm-database) · [packages/dorm/scripts/migrations](packages/dorm/scripts/migrations) · [packages/dorm/scripts/seed-dorms-table.ts](packages/dorm/scripts/seed-dorms-table.ts) |
+| 部署与回滚                     | [AGENTS.md](AGENTS.md#deploy)                                                                                                                                                                                                    |
+| 查看 pull request 上会运行什么 | [.github/workflows/react-doctor.yml](.github/workflows/react-doctor.yml)                                                                                                                                                         |
 
 ## 开发
 

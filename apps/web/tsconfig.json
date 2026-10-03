@@ -19,6 +19,6 @@
     },
     "allowImportingTsExtensions": true,
     "noEmit": true,
-    "types": ["vite/client", "@cloudflare/workers-types", "geojson"]
+    "types": ["vite/client", "@cloudflare/workers-types"]
   }
 }

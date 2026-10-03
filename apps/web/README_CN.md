@@ -13,9 +13,12 @@ Worker，Worker 负责托管 SPA，并在同源下处理所有 `/api/*` 路由�
 - `worker/`：Worker，入口 `worker/index.ts`，配置在 `cloudflare.config.ts`。它提供 `/api/chat`
   （tool-use 智能体，唯一的检索来源是 Tavily 网页搜索）、各模型服务代理、`/api/health` 和
   `/api/integrations*`。
-- `scripts/`：宿舍数据库 SQL 和宿舍数据脚本。
+- `src/pages/dorms/DormRoute.tsx`：唯一接触宿舍功能的文件；宿舍功能本身在
+  [`packages/dorm`](../../packages/dorm) 中，在 `/dorms/*` 懒加载。
+- `scripts/`：聊天人设和记忆的 SQL 以及 RLS 修复脚本。
 
-代码放置规则、重要的环境变量，以及宿舍数据库和 seed 脚本都写在 [AGENTS.md](AGENTS.md) 中。
+代码放置规则、重要的环境变量和数据库设置都写在 [AGENTS.md](AGENTS.md) 中。宿舍 SQL 和 seed 脚本见
+[`packages/dorm/AGENTS.md`](../../packages/dorm/AGENTS.md)。
 
 ## 环境配置
 

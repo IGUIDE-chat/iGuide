@@ -4,10 +4,6 @@ import { useCallback, useEffect, useState } from "react"
 
 import { AppRoutes } from "./app/routes"
 import { LoginScreen } from "./components/auth/LoginScreen"
-import { CompareProvider } from "./components/housing/store/CompareContext"
-import { DormDataProvider } from "./components/housing/store/DormDataContext"
-import { DormUserInteractionProvider } from "./components/housing/store/DormUserInteractionContext"
-import { HousingProvider } from "./components/housing/store/HousingContext"
 import { Layout } from "./components/layout/Layout"
 import { useAuth } from "./contexts/AuthContext"
 import { Language } from "./types"
@@ -101,29 +97,21 @@ export default function App() {
           transition={{ duration: 0.4, ease: "easeOut" }}
           className="size-full"
         >
-          <DormDataProvider>
-            <CompareProvider>
-              <HousingProvider>
-                <DormUserInteractionProvider>
-                  <Layout
-                    language={language}
-                    onLanguageChange={setLanguage}
-                    isGuest={isGuest}
-                    onExitGuest={() => setIsGuest(false)}
-                    currentConversationId={currentConversationId}
-                    onNewConversation={handleNewConversation}
-                    onSelectConversation={handleSelectConversation}
-                  >
-                    <AppRoutes
-                      language={language}
-                      currentConversationId={currentConversationId}
-                      onConversationCreated={setCurrentConversationId}
-                    />
-                  </Layout>
-                </DormUserInteractionProvider>
-              </HousingProvider>
-            </CompareProvider>
-          </DormDataProvider>
+          <Layout
+            language={language}
+            onLanguageChange={setLanguage}
+            isGuest={isGuest}
+            onExitGuest={() => setIsGuest(false)}
+            currentConversationId={currentConversationId}
+            onNewConversation={handleNewConversation}
+            onSelectConversation={handleSelectConversation}
+          >
+            <AppRoutes
+              language={language}
+              currentConversationId={currentConversationId}
+              onConversationCreated={setCurrentConversationId}
+            />
+          </Layout>
         </motion.div>
       )}
     </AnimatePresence>

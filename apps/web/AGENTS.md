@@ -28,8 +28,10 @@ For repo-wide rules (secrets, CI, Worker retrieval, data model), see the root
 - Two build outputs exist on purpose. `vp build` produces the SPA in `dist/`
   (what CI's bundle scan reads); `cf build` produces the Worker plus its
   static assets under `.cloudflare/output/`. `cf deploy` runs the latter.
-- `scripts/` holds the dorm database SQL (`scripts/migrations/*.sql`,
-  `scripts/*.sql`) and the dorm data scripts. Two unused leftovers from the
+- `scripts/` holds the chat persona and memory SQL
+  (`scripts/migrations/add_soul_and_memory.sql`) and the RLS fixes
+  (`scripts/optimize_rls_policies.sql`, `scripts/fix_function_security.sql`).
+  Dorm SQL and data scripts live in `packages/dorm`. Two unused leftovers from the
   removed QMD knowledge base are also still here: `scripts/qmd-server.mjs` (the
   search server behind the old `/api/search` route) and
   `scripts/generate-handbook-ocr.py` (an OCR generator for QMD content).
@@ -69,8 +71,15 @@ For repo-wide rules (secrets, CI, Worker retrieval, data model), see the root
 - Route-only composition belongs in `src/pages/**`.
 - Feature-local UI belongs next to that feature under `src/components/**`.
 - Shared layout belongs in `src/components/layout/**`.
-- Shared dumb UI belongs in `src/components/ui/**`.
+- Shared dumb UI belongs in `src/components/ui/**`; primitives that a feature
+  package also needs belong in `packages/ui` (`@iguide/ui`).
 - Shared persistence and external integrations belong in `src/services/**`.
+- Dorm (housing) code belongs in `packages/dorm`, not `src/`. This app reaches
+  it only through `src/pages/dorms/DormRoute.tsx`, which imports from
+  `@iguide/dorm` and never from the package's internal paths. Shell code
+  (`App.tsx`, `src/components/layout/**`) must not import dorm code; a feature
+  that needs shell space fills `useLayout().setSidebarSlot` or
+  `setMobileHeaderSlot` from inside its own route.
 
 ## Verification
 
@@ -79,10 +88,10 @@ For structure-affecting changes:
 1. Run `vp check` when TypeScript boundaries moved: it type-checks, lints, and
    formats in one pass (`vp check --fix` to apply fixes).
 2. Run `vp build` for renamed imports, route changes, or moved modules.
-3. Run `vp dlx tsx scripts/validate-dorm-data.ts` when changing dorm data
-   contracts.
-4. Run `vp dlx tsx scripts/audit-dorm-media.ts` when changing dorm media
-   sourcing or media validation.
+3. Run `vp dlx tsx scripts/validate-dorm-data.ts` from `packages/dorm/` when
+   changing dorm data contracts.
+4. Run `vp dlx tsx scripts/audit-dorm-media.ts` from `packages/dorm/` when
+   changing dorm media sourcing or media validation.
 5. Run the Worker and SPA suites from `apps/web` with
    `node --test "worker/**/*.test.ts" "src/**/*.test.ts"`. They are `node:test`
    files, and `vp test` (Vitest) cannot start in this app: the Cloudflare Vite
@@ -101,59 +110,16 @@ For structure-affecting changes:
   `apps/web/` with `vp exec cf workers secrets update <NAME> --worker uiuc`.
 - Install the workspace once from the repo root with `vp install`.
 
-## Dorm database
+## Database
 
-Run the SQL by hand in the Supabase SQL editor. Core dorm schema, in this order:
+Run the SQL by hand in the Supabase SQL editor, starting with the dorm chain in
+[`packages/dorm/AGENTS.md`](../../packages/dorm/AGENTS.md#dorm-database).
 
-1. `scripts/migrations/create_dorms_table.sql`. On a fresh project, delete its
-   last line first: it comments on a `dorm_overrides` table that no tracked SQL
-   creates, and the SQL editor then rolls back the whole file.
-2. `scripts/migrations/add_categorized_tags.sql` (safe to rerun)
-3. `scripts/migrations/add_dorm_address.sql` and
-   `scripts/migrations/add_dorm_website.sql`, which add the `address`,
-   `address_zh` and `website` columns the seed writes
-
-Feature SQL, after the core schema:
-
-- `scripts/migrations/create_storage_bucket.sql`: the `dorm-images` storage bucket.
-- `add_dorm_edit_history.sql`, then `fix_dorm_edit_history_rls.sql`;
-  `add_dorm_comments.sql`, then `add_dorm_comment_hidden.sql`;
-  `add_floor_plan_bed_size.sql`; `add_soul_and_memory.sql` (all in
-  `scripts/migrations/`).
-- `scripts/create_dorm_user_features.sql`: dorm favorites and viewing history.
-
-The tracked SQL does not create every table the app uses. Create `conversations`
-(referenced by `add_soul_and_memory.sql`), `messages`, `reading_history`,
-`user_profiles` and `mailing_list` yourself. `scripts/optimize_rls_policies.sql`
-and `scripts/fix_function_security.sql` assume some of them already exist.
-
-Known conflict: `add_categorized_tags.sql` limits `bathroom_type` to `communal`,
-`semi-private` and `private`, but the seed writes `individual-use` for four
-dorms, and one rejected row fails the whole upsert. Widen the constraint before
-seeding:
-
-```sql
-ALTER TABLE public.dorms DROP CONSTRAINT chk_bathroom_type;
-ALTER TABLE public.dorms ADD CONSTRAINT chk_bathroom_type
-  CHECK (bathroom_type IN ('communal', 'individual-use', 'semi-private', 'private'));
-```
-
-## Dorm data scripts
-
-`tsx` is not a dependency, so run the scripts with `vp dlx tsx`, from `apps/web/`:
-
-```sh
-vp dlx tsx scripts/validate-dorm-data.ts   # offline check of the bundled dataset
-vp dlx tsx scripts/audit-dorm-media.ts     # sends HEAD requests to suspicious media URLs
-SUPABASE_URL=<url> SUPABASE_SERVICE_KEY=<service-role-key> vp dlx tsx scripts/seed-dorms-table.ts
-```
-
-The seed reads both variables from the shell, not from env files (in PowerShell,
-set them first with `$env:NAME = "..."`). `SUPABASE_SERVICE_KEY` is a
-service-role key that bypasses RLS. The seed upserts the bundled `UIUC_DORMS` into
-`dorms` by `id`. It keeps stored images, gallery and floor-plan media, merges
-tags with stored ones, and never deletes rows. It does not read the archived
-`dorm_overrides`.
+The tracked SQL does not create every table the app uses. Create `conversations`,
+`messages`, `reading_history`, `user_profiles` and `mailing_list` yourself, then
+run `scripts/migrations/add_soul_and_memory.sql`, which references
+`conversations`. `scripts/optimize_rls_policies.sql` and
+`scripts/fix_function_security.sql` assume some of those tables already exist.
 
 ## assistant-ui
 
@@ -178,11 +144,12 @@ Key patterns:
 - Conversation management with persistent IDs
 - Route: `/chat`
 
-### Housing Chat (`src/components/housing/AIChat.tsx`)
+### Housing Chat (`packages/dorm/src/components/housing/AIChat.tsx`)
 
 - Housing/dorm-specific floating chat widget
 - Dorm mention detection and highlighting
 - Shows dorm cards with navigation to dorm details
-- Uses housing-specific i18n and streamChatResponse
+- Uses housing-specific i18n and this app's streamChatResponse, lent through
+  `configureDormServices` in `src/pages/dorms/DormRoute.tsx`
 - Embedded in DormDetailPage and DormListPage
 - Domain-specific to housing module per Colocation Principle

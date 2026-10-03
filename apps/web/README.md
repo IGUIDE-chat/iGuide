@@ -13,10 +13,12 @@ overall architecture, see the root [README](../../README.md). For where code bel
 - `worker/`: the Worker, entry `worker/index.ts`, configured in `cloudflare.config.ts`. It serves
   `/api/chat` (the tool-use agent; Tavily web search is its only retrieval source), the provider
   proxies, `/api/health` and `/api/integrations*`.
-- `scripts/`: the dorm database SQL and the dorm data scripts.
+- `src/pages/dorms/DormRoute.tsx`: the only file that touches the dorm feature, which lives in
+  [`packages/dorm`](../../packages/dorm) and is lazy-loaded at `/dorms/*`.
+- `scripts/`: the chat persona and memory SQL and the RLS fixes.
 
-[AGENTS.md](AGENTS.md) owns where code belongs, which env variables matter, and the dorm database
-and seed scripts.
+[AGENTS.md](AGENTS.md) owns where code belongs, which env variables matter, and the database setup.
+Dorm SQL and seed scripts are in [`packages/dorm/AGENTS.md`](../../packages/dorm/AGENTS.md).
 
 ## Setup
 
