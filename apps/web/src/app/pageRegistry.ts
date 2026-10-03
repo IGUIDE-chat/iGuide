@@ -75,7 +75,7 @@ export const PAGE_REGISTRY: PageRegistryItem[] = [
   {
     id: "dorm-list",
     path: "/dorms",
-    componentPath: "@iguide/dorm/src/pages/dorms/DormListPage.tsx",
+    componentPath: "src/pages/dorms/DormListPage.tsx",
     ownerFeature: "dorms",
     contexts: ["auth", "housing", "dorm-user-interaction"],
     status: "active",
@@ -83,7 +83,7 @@ export const PAGE_REGISTRY: PageRegistryItem[] = [
   {
     id: "dorm-detail",
     path: "/dorms/:id",
-    componentPath: "@iguide/dorm/src/pages/dorms/DormDetailPage.tsx",
+    componentPath: "src/pages/dorms/DormDetailPage.tsx",
     ownerFeature: "dorms",
     contexts: ["auth", "housing", "dorm-user-interaction"],
     status: "active",

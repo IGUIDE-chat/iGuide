@@ -6,7 +6,7 @@ like Puppeteer stay out of both the app and the package.
 
 All scripts write to:
 
-`packages/dorm/src/components/housing/constants/googleReviews.ts`
+`apps/web/src/components/housing/constants/googleReviews.ts`
 
 ## Included scripts
 

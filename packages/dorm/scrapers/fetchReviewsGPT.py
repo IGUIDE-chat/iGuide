@@ -100,7 +100,7 @@ with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
 
 print(f"Total reviews extracted: {len(all_collected)}")
 
-target_file = Path(__file__).resolve().parent.parent / 'src/components/housing/constants/googleReviews.ts'
+target_file = Path(__file__).resolve().parent / '../../../apps/web/src/components/housing/constants/googleReviews.ts'
 
 with open(target_file, 'w', encoding='utf-8') as f:
     f.write('''import { DormComment } from '../../../services/dormCommentsService';
