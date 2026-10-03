@@ -11,8 +11,7 @@ Worker，Worker 负责托管 SPA，并在同源下处理所有 `/api/*` 路由�
 
 - `src/`：React SPA。入口 `src/index.tsx`，组合入口 `src/App.tsx`，路由 `src/app/routes.tsx`。
 - `worker/`：Worker，入口 `worker/index.ts`，配置在 `cloudflare.config.ts`。它提供 `/api/chat`
-  （tool-use 智能体，唯一的检索来源是 Tavily 网页搜索）、各模型服务代理、`/api/health` 和
-  `/api/integrations*`。
+  （tool-use 智能体，唯一的检索来源是 Tavily 网页搜索）、`/api/health` 和 `/api/integrations*`。
 - `src/pages/dorms/DormRoute.tsx`：唯一接触宿舍功能的文件；宿舍功能本身在
   [`packages/dorm`](../../packages/dorm) 中，在 `/dorms/*` 懒加载。
 - `scripts/`：聊天人设和记忆的 SQL 以及 RLS 修复脚本。

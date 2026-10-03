@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion"
-import { MessageSquare, ThumbsUp, User, X, Globe, Eye, EyeOff } from "lucide-react"
+import { MessageSquare, ThumbsUp, User, X, Eye, EyeOff } from "lucide-react"
 import React, { useState } from "react"
 
 import { Language } from "../../types"
@@ -32,9 +32,6 @@ interface DormDetailReviewsProps {
   onToggleCommentHidden?: (commentId: string, hidden: boolean) => Promise<void>
 }
 
-const isChinese = (text: string) => /[\u4e00-\u9fff]/.test(text)
-const detectLang = (text: string): "zh" | "en" => (isChinese(text) ? "zh" : "en")
-
 export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
   comments,
   commentsLoading,
@@ -53,9 +50,6 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [showAllReviews, setShowAllReviews] = useState(false)
-  const [translations, setTranslations] = useState<Record<string, string>>({})
-  const [translating, setTranslating] = useState<Record<string, boolean>>({})
-  const [translateErrors, setTranslateErrors] = useState<Record<string, boolean>>({})
 
   // Hidden comments are only sent to admins — keep them out of the ratings.
   const visibleComments = comments.filter((c) => !c.hidden)
@@ -99,51 +93,6 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
     } catch (err) {
       console.error("Error toggling comment visibility:", err)
       window.alert(language === "zh" ? "操作失败，请稍后再试" : "Action failed. Try again.")
-    }
-  }
-
-  const handleTranslate = async (commentId: string, text: string) => {
-    if (translations[commentId]) {
-      setTranslations((prev) => {
-        const next = { ...prev }
-        delete next[commentId]
-        return next
-      })
-      return
-    }
-    setTranslating((prev) => ({ ...prev, [commentId]: true }))
-    setTranslateErrors((prev) => {
-      const next = { ...prev }
-      delete next[commentId]
-      return next
-    })
-    try {
-      const targetLang = language === "zh" ? "English" : "中文"
-      const res = await fetch("/api/deepseek", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: [
-            {
-              role: "system",
-              content: `You are a translator. Translate the following text to ${targetLang}. Return ONLY the translation, nothing else.`,
-            },
-            { role: "user", content: text },
-          ],
-        }),
-      })
-      if (res.ok) {
-        const data = (await res.json()) as Record<string, unknown>
-        const choices = data.choices as Array<{ message?: { content?: string } }> | undefined
-        const translated = choices?.[0]?.message?.content ?? (data.reply as string) ?? text
-        setTranslations((prev) => ({ ...prev, [commentId]: translated }))
-      } else {
-        setTranslateErrors((prev) => ({ ...prev, [commentId]: true }))
-      }
-    } catch {
-      setTranslateErrors((prev) => ({ ...prev, [commentId]: true }))
-    } finally {
-      setTranslating((prev) => ({ ...prev, [commentId]: false }))
     }
   }
 
@@ -333,27 +282,9 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
                       )}
                     </div>
                   </div>
-                  {translations[comment.id] ? (
-                    <>
-                      <p className="text-[13px] leading-relaxed font-medium text-slate-600 md:text-[14px]">
-                        {translations[comment.id]}
-                      </p>
-                      <p className="mt-1.5 border-l-2 border-slate-200 pl-3 text-[12px] leading-relaxed text-slate-400">
-                        {comment.content}
-                      </p>
-                    </>
-                  ) : (
-                    <p className="text-[13px] leading-relaxed font-medium text-slate-600 md:text-[14px]">
-                      {comment.content}
-                    </p>
-                  )}
-                  {translateErrors[comment.id] && (
-                    <p className="mt-1 text-[12px] text-red-400">
-                      {language === "zh"
-                        ? "翻译失败，点击重试"
-                        : "Translation failed, click to retry"}
-                    </p>
-                  )}
+                  <p className="text-[13px] leading-relaxed font-medium text-slate-600 md:text-[14px]">
+                    {comment.content}
+                  </p>
                   <div className="mt-4 flex items-center gap-4 border-t border-slate-100/50 pt-3">
                     <motion.button
                       type="button"
@@ -377,27 +308,6 @@ export const DormDetailReviews: React.FC<DormDetailReviewsProps> = ({
                         {comment.upvotes > 0 ? ` (${comment.upvotes})` : ""}
                       </span>
                     </motion.button>
-                    {detectLang(comment.content) !== language && (
-                      <button
-                        type="button"
-                        onClick={() => handleTranslate(comment.id, comment.content)}
-                        disabled={translating[comment.id]}
-                        className="hover:text-illini-blue flex items-center gap-1 text-[12px] font-semibold text-slate-400 transition-colors disabled:opacity-50"
-                      >
-                        <Globe className="size-3.5" />
-                        {translating[comment.id]
-                          ? language === "zh"
-                            ? "翻译中..."
-                            : "Translating..."
-                          : translations[comment.id]
-                            ? language === "zh"
-                              ? "显示原文"
-                              : "Original"
-                            : language === "zh"
-                              ? "翻译"
-                              : "Translate"}
-                      </button>
-                    )}
                   </div>
                 </motion.div>
               ))}

@@ -36,7 +36,6 @@ export default defineConfig({
 
       // Values live on the Worker as secrets, never in the repo or a VITE_ variable.
       DEEPSEEK_API_KEY: bindings.secret(),
-      GOOGLE_API_KEY: bindings.secret(),
       SUPABASE_ANON_KEY: bindings.secret(),
       SUPABASE_URL: bindings.secret(),
       TAVILY_API_KEY: bindings.secret(),

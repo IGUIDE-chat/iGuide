@@ -13,10 +13,7 @@
 SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
 SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 
-# Optional provider keys. Each route reports a clear 500 when its key is
-# missing, so set only the ones whose features you use.
+# Provider keys for the /api/chat agent. Without DEEPSEEK_API_KEY chat gets
+# no answer; without TAVILY_API_KEY every web search returns an error.
 # DEEPSEEK_API_KEY=YOUR_DEEPSEEK_API_KEY
-# Deprecated alias for DEEPSEEK_API_KEY, still accepted as a fallback.
-# VITE_DEEPSEEK_API_KEY=YOUR_DEEPSEEK_API_KEY
 # TAVILY_API_KEY=YOUR_TAVILY_API_KEY
-# GOOGLE_API_KEY=YOUR_GOOGLE_API_KEY

@@ -78,14 +78,9 @@ Run checks before delivery; `package.json` defines no validation scripts, so
 - The Worker reads `apps/web/.dev.vars`, never `.env.local`: `Env` in
   `apps/web/worker/types.ts` requires `SUPABASE_URL` and `SUPABASE_ANON_KEY`,
   `/api/chat` needs `DEEPSEEK_API_KEY`, and web search needs `TAVILY_API_KEY`.
-  `GOOGLE_API_KEY` only feeds the `/api/gemini` proxy, which nothing calls. The
-  legacy `VITE_DEEPSEEK_API_KEY` fallback covers `/api/deepseek`, never
-  `/api/chat`; set `DEEPSEEK_API_KEY` instead.
 - Set production secrets from `apps/web` with
   `vp exec cf workers secrets update <NAME> --worker uiuc`. Git ignores `.env*`
   and `.dev.vars*`; only the `.example` templates are tracked.
-- For dev-proxy debugging, set `LLM_REQUEST_DUMP=1`; redacted dumps go to
-  `apps/web/.debug/llm-requests/`.
 
 ## Architecture
 
@@ -122,9 +117,6 @@ Browser ──same origin──> Worker "uiuc" (apps/web/worker)
                            │                    ≤3 iterations, ≤5 tool calls
                            │                      ├─ web_search ─> Tavily (illinois.edu only)
                            │                      └─ custom_skills, MCP tools (experimental)
-                           ├─ /api/deepseek     DeepSeek proxy behind the switched-off review translate button
-                           ├─ /api/tavily       Tavily proxy that no client calls
-                           ├─ /api/gemini       Gemini proxy that no client calls
                            ├─ /api/health, /api/integrations/*
                            ├─ /api/dorms/*       dorm API from @iguide/dorm, anon client + caller token
                            ├─ any other /api/*  404 JSON listing the available endpoints
@@ -143,11 +135,8 @@ the agent's only source is a Tavily search at question time.
   without a token, but a Bearer token that Supabase rejects gets a 401. Every
   tokenless caller shares one `anonymous` identity, so an MCP server registered
   without a token loads into every guest chat.
-- `/api/deepseek`, `/api/tavily`, and `/api/gemini` take no auth at all and
-  relay any request with the Worker's own keys; `/api/deepseek` forwards
-  caller-supplied `messages` as-is, and `/api/tavily` and `/api/gemini` send
-  `Access-Control-Allow-Origin: *`, so any website can call them. Keys stay
-  hidden, but anyone can spend their quota.
+- Never add a route that relays a provider call with the Worker's keys and no
+  auth. The agent calls DeepSeek and Tavily from inside the Worker.
 - The Worker rate-limits no endpoint.
 - The MCP registry has no `KV` binding, so registrations live in Worker isolate
   memory and do not last.

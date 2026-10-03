@@ -22,9 +22,7 @@ export interface Env {
   /** Workers Static Assets binding; used for the SPA fallback. */
   ASSETS: Fetcher
   DEEPSEEK_API_KEY?: string
-  VITE_DEEPSEEK_API_KEY?: string
   TAVILY_API_KEY?: string
-  GOOGLE_API_KEY?: string
 
   // Supabase: resolves the caller's identity for /api/chat and /api/integrations.
   SUPABASE_URL: string
