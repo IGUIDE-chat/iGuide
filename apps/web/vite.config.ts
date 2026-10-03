@@ -3,7 +3,6 @@ import path from "path"
 import { cloudflare } from "@cloudflare/vite-plugin"
 import tailwindcss from "@tailwindcss/vite"
 import react from "@vitejs/plugin-react"
-import { ViteMcp } from "vite-plugin-mcp"
 import { defineConfig, loadEnv, lazyPlugins } from "vite-plus"
 
 export default defineConfig(({ mode }) => {
@@ -11,7 +10,6 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: lazyPlugins(() => [
       react(),
-      ViteMcp(),
       // `cf build` and `cf deploy` delegate to `vite build`, which needs the
       // Cloudflare plugin to emit the Worker plus its static assets as Build
       // Output. Under `serve` the same plugin boots the Worker behind the dev
