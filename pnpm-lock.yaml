@@ -400,15 +400,36 @@ importers:
 
   packages/ui:
     dependencies:
+      '@base-ui/react':
+        specifier: ^1.8.0
+        version: 1.8.0(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      class-variance-authority:
+        specifier: ^0.7.1
+        version: 0.7.1
+      cn:
+        specifier: ^0.4.0
+        version: 0.4.0
       framer-motion:
         specifier: ^13.4.4
         version: 13.5.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      lucide-react:
+        specifier: ^1.49.0
+        version: 1.49.0(@types/react@19.3.0)(react@19.3.0)
       react-markdown:
         specifier: ^10.1.0
         version: 10.1.0(@types/react@19.3.0)(react@19.3.0)(supports-color@10.2.2)
       remark-gfm:
         specifier: ^4.0.1
         version: 4.0.1(supports-color@10.2.2)
+      shadcn:
+        specifier: ^4.21.1
+        version: 4.21.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(typescript@7.0.2)
+      tailwindcss:
+        specifier: ^4.3.3
+        version: 4.3.3
+      tw-animate-css:
+        specifier: ^1.4.0
+        version: 1.4.0
     devDependencies:
       '@types/react':
         specifier: ^19.3.0
