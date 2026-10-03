@@ -1,11 +1,11 @@
-import {
+import type {
   BathroomScope,
   BathroomType,
   Dorm,
   FloorPlan,
   RoomOption,
   RoomType,
-} from "../components/housing/types/index"
+} from "../types.ts"
 
 const LEGACY_CODE_RE = /^(\d)B(\d)B$/
 const SPECIAL_ROOM_TYPES = new Set<RoomType>(["Studio", "Suite", "Cluster"])

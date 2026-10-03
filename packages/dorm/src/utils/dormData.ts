@@ -1,4 +1,4 @@
-import {
+import type {
   Dorm,
   DormCategorizedTags,
   DormTags,
@@ -6,8 +6,8 @@ import {
   FloorPlan,
   LifestyleTag,
   LivingConditionTag,
-} from "../components/housing/types/index"
-import { deriveRoomOptions } from "./roomOptions"
+} from "../types.ts"
+import { deriveRoomOptions } from "./roomOptions.ts"
 
 const LIVING_CONDITION_LABELS: Record<LivingConditionTag, string> = {
   noAc: "No AC",

@@ -9,10 +9,9 @@
     "isolatedModules": true,
     "moduleDetection": "force",
     "esModuleInterop": true,
-    "jsx": "react-jsx",
     "allowImportingTsExtensions": true,
     "noEmit": true,
-    "types": ["vite/client", "geojson", "node"]
+    "types": ["node"]
   },
-  "include": ["src", "scripts"]
+  "include": ["src", "test"]
 }

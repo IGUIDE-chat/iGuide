@@ -2,39 +2,23 @@
   "name": "@iguide/dorm",
   "version": "0.0.0",
   "private": true,
-  "description": "Dorm (housing) feature for IlliniGuide: list, map, detail, compare, reviews, and admin editing.",
+  "description": "Worker-side dorm domain API for IlliniGuide: reads, comments, favorites, viewing history, and admin editing under /api/dorms.",
   "type": "module",
   "exports": {
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@headlessui/react": "^2.2.10",
-    "@iguide/ui": "workspace:*",
-    "framer-motion": "^13.4.4",
-    "lucide-react": "^1.48.0",
-    "mapbox-gl": "^3.31.0",
-    "rc-slider": "^11.1.9",
-    "react-map-gl": "^8.1.3",
-    "react-markdown": "^10.1.0",
-    "remark-gfm": "^4.0.1"
+    "@supabase/supabase-js": "^2.117.2",
+    "hono": "^4.13.12"
   },
   "devDependencies": {
-    "@supabase/supabase-js": "^2.117.2",
     "@types/geojson": "^7946.0.16",
     "@types/node": "^26.6.3",
-    "@types/react": "^19.3.0",
-    "@types/react-dom": "^19.3.0",
-    "react": "^19.3.0",
-    "react-dom": "^19.3.0",
-    "react-router-dom": "^7.18.4",
     "typescript": "~7.0.2",
     "vite": "catalog:",
     "vite-plus": "catalog:"
   },
   "peerDependencies": {
-    "@supabase/supabase-js": "^2.117.2",
-    "react": "^19.3.0",
-    "react-dom": "^19.3.0",
-    "react-router-dom": "^7.18.4"
+    "@supabase/supabase-js": "^2.117.2"
   }
 }

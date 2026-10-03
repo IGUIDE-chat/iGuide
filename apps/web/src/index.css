@@ -3,7 +3,6 @@
 @import "tailwindcss";
 
 /* Workspace UI packages sit outside this app's root, so Tailwind won't find their classes on its own. */
-@source "../../../packages/dorm/src";
 @source "../../../packages/ui/src";
 
 @theme {
