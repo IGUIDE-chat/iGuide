@@ -1,4 +1,4 @@
-import { Typewriter } from "@iguide/ui"
+import { Typewriter } from "@iguide/ui/components/typewriter"
 import React, { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
@@ -7,12 +7,12 @@ import { supabase } from "../../services/supabase"
 import { LibraryHistoryItem } from "../../types"
 import {
   BaseSidebar,
-  SidebarItem,
-  PinButton,
   DeleteButton,
-  SidebarEmptyState,
-  groupByCategory,
   getCategoryOrder,
+  groupByCategory,
+  PinButton,
+  SidebarEmptyState,
+  SidebarItem,
   TimeCategoryLabels,
 } from "./BaseSidebar"
 

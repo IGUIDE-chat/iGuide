@@ -14,9 +14,9 @@
   "rtl": false,
   "aliases": {
     "components": "@/components",
-    "utils": "@/lib/utils",
-    "ui": "@/components/ui",
-    "lib": "@/lib",
+    "utils": "@iguide/ui/lib/utils",
+    "ui": "@iguide/ui/components",
+    "lib": "@iguide/ui/lib",
     "hooks": "@/hooks"
   },
   "menuColor": "default",
