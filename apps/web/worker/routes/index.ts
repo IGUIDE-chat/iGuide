@@ -2,11 +2,8 @@ import type { Context } from "hono"
 
 import type { Env, RouteHandler } from "../types"
 import * as chat from "./chat"
-import * as deepseek from "./deepseek"
-import * as gemini from "./gemini"
 import * as health from "./health"
 import * as integrations from "./integrations"
-import * as tavily from "./tavily"
 
 /**
  * The Worker's whole URL table. `createApiApp()` mounts these on the Hono app,
@@ -32,16 +29,7 @@ export interface ApiRoute {
  */
 export const API_ROUTES: ApiRoute[] = [
   { path: "/api/chat", methods: { POST: chat.onRequestPost } },
-  { path: "/api/deepseek", methods: { POST: deepseek.onRequestPost } },
-  {
-    path: "/api/gemini",
-    methods: { POST: gemini.onRequestPost, OPTIONS: gemini.onRequestOptions },
-  },
   { path: "/api/health", methods: { GET: health.onRequestGet } },
-  {
-    path: "/api/tavily",
-    methods: { POST: tavily.onRequestPost, OPTIONS: tavily.onRequestOptions },
-  },
 ]
 
 /**
