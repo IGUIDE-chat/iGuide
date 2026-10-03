@@ -49,22 +49,22 @@ curl http://localhost:5173/api/health
 
 ## 文档
 
-| 目标                           | 从这里开始                                                                                                                                                                                                                       |
-| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 了解仓库规则、命令和数据模型   | [AGENTS.md](AGENTS.md)                                                                                                                                                                                                           |
-| 了解运行时、接口和访问模型     | [AGENTS.md](AGENTS.md#architecture) · [AGENTS.md](AGENTS.md#endpoint-access)                                                                                                                                                     |
-| 在 React 应用或 Worker 上开发  | [apps/web/AGENTS.md](apps/web/AGENTS.md)                                                                                                                                                                                         |
-| 修改 agent 的提示词或循环      | [apps/web/worker/routes/agent-prompts](apps/web/worker/routes/agent-prompts) · [apps/web/worker/agent](apps/web/worker/agent)                                                                                                    |
-| 添加 agent 工具或技能          | [apps/web/worker/tools](apps/web/worker/tools) · [apps/web/worker/skills](apps/web/worker/skills)                                                                                                                                |
-| 配置 secrets 和 Worker         | [apps/web/.dev.vars.example](apps/web/.dev.vars.example) · [apps/web/.env.local.example](apps/web/.env.local.example) · [apps/web/cloudflare.config.ts](apps/web/cloudflare.config.ts)                                           |
-| 开发宿舍功能                   | [packages/dorm/AGENTS.md](packages/dorm/AGENTS.md) · [packages/dorm/README_CN.md](packages/dorm/README_CN.md)                                                                                                                    |
-| 创建宿舍表并导入种子数据       | [packages/dorm/AGENTS.md](packages/dorm/AGENTS.md#dorm-database) · [packages/dorm/scripts/migrations](packages/dorm/scripts/migrations) · [packages/dorm/scripts/seed-dorms-table.ts](packages/dorm/scripts/seed-dorms-table.ts) |
-| 部署与回滚                     | [AGENTS.md](AGENTS.md#deploy)                                                                                                                                                                                                    |
-| 查看 pull request 上会运行什么 | [.github/workflows/react-doctor.yml](.github/workflows/react-doctor.yml)                                                                                                                                                         |
+| 目标                           | 从这里开始                                                                                                                                                                                                             |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 了解仓库规则、命令和数据模型   | [AGENTS.md](AGENTS.md)                                                                                                                                                                                                 |
+| 了解运行时、接口和访问模型     | [AGENTS.md](AGENTS.md#architecture) · [AGENTS.md](AGENTS.md#endpoint-access)                                                                                                                                           |
+| 在 React 应用或 Worker 上开发  | [apps/web/AGENTS.md](apps/web/AGENTS.md)                                                                                                                                                                               |
+| 修改 agent 的提示词或循环      | [apps/web/worker/routes/agent-prompts](apps/web/worker/routes/agent-prompts) · [apps/web/worker/agent](apps/web/worker/agent)                                                                                          |
+| 添加 agent 工具或技能          | [apps/web/worker/tools](apps/web/worker/tools) · [apps/web/worker/skills](apps/web/worker/skills)                                                                                                                      |
+| 配置 secrets 和 Worker         | [apps/web/.dev.vars.example](apps/web/.dev.vars.example) · [apps/web/.env.local.example](apps/web/.env.local.example) · [apps/web/cloudflare.config.ts](apps/web/cloudflare.config.ts)                                 |
+| 开发宿舍功能                   | [packages/dorm/AGENTS.md](packages/dorm/AGENTS.md) · [packages/dorm/README_CN.md](packages/dorm/README_CN.md) · [apps/web/src/components/housing](apps/web/src/components/housing)                                     |
+| 创建宿舍表并导入种子数据       | [packages/dorm/AGENTS.md](packages/dorm/AGENTS.md#dorm-database) · [packages/dorm/scripts/migrations](packages/dorm/scripts/migrations) · [apps/web/scripts/seed-dorms-table.ts](apps/web/scripts/seed-dorms-table.ts) |
+| 部署与回滚                     | [AGENTS.md](AGENTS.md#deploy)                                                                                                                                                                                          |
+| 查看 pull request 上会运行什么 | [.github/workflows/react-doctor.yml](.github/workflows/react-doctor.yml)                                                                                                                                               |
 
 ## 开发
 
-本仓库是一个由 [Vite+](https://viteplus.dev)（`vp`）驱动的 pnpm workspace，`vp` 是安装、检查、构建和部署的唯一入口：`package.json` 不再为这些命令保留包装脚本，请直接运行下面的 `vp` 内置命令。`pnpm-workspace.yaml` 声明了 [workspace](https://viteplus.dev/guide/monorepo) 和 [catalog](https://pnpm.io/catalogs)，目前对应 `@iguide/web`（`apps/web`）和 `@iguide/vite-bin`（`tools/vite-bin`）两个包，因此不支持直接用 `npm install`。`vp install` 还会装好一个 pre-commit hook，对暂存的文件运行 `vp check --fix`。
+本仓库是一个由 [Vite+](https://viteplus.dev)（`vp`）驱动的 pnpm workspace，`vp` 是安装、检查、构建和部署的唯一入口：`package.json` 不再为这些命令保留包装脚本，请直接运行下面的 `vp` 内置命令。`pnpm-workspace.yaml` 声明了 [workspace](https://viteplus.dev/guide/monorepo) 和 [catalog](https://pnpm.io/catalogs)，目前对应 `@iguide/web`（`apps/web`）、`@iguide/dorm` 与 `@iguide/ui`（`packages/*`）以及 `@iguide/vite-bin`（`tools/vite-bin`），因此不支持直接用 `npm install`。`vp install` 还会装好一个 pre-commit hook，对暂存的文件运行 `vp check --fix`。
 
 ```bash
 vp dev           # Vite 开发服务器，Worker 运行在其后

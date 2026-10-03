@@ -9,11 +9,11 @@ A UIUC knowledge platform with a React 19 frontend and Cloudflare Worker gateway
 Supabase provides auth and Postgres; DeepSeek handles inference and Tavily
 supplies web search.
 
-| Path             | Role                                                                        |
-| :--------------- | :-------------------------------------------------------------------------- |
-| `apps/web/`      | Frontend and Worker: SPA, static assets, agent loop, tools, skills, MCP.    |
-| `packages/dorm/` | Dorm feature (`@iguide/dorm`): UI, state, dorm SQL, data scripts, scrapers. |
-| `packages/ui/`   | Business-agnostic UI primitives shared by the app and feature packages.     |
+| Path             | Role                                                                                                                                                                                    |
+| :--------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/web/`      | Frontend and Worker: SPA, static assets, agent loop, tools, skills, MCP.                                                                                                                |
+| `packages/dorm/` | Dorm API (`@iguide/dorm`), bundled into the single Worker and mounted at `/api/dorms`; it also owns the shared dorm model and normalization helpers the SPA imports, plus the dorm SQL. |
+| `packages/ui/`   | Business-agnostic UI primitives shared by the app and feature packages.                                                                                                                 |
 
 <!--VITE PLUS START-->
 
@@ -62,6 +62,10 @@ Run from the repo root: `dev`, `build`, and `preview` resolve to `apps/web`
 through `defaultPackage` in the root `vite.config.ts`, and `cf` and `tsx`
 commands run through `vp exec cf` and `vp dlx tsx` from `apps/web`.
 
+Worker build, deploy, and secret commands all go through `vp exec cf` (or `cf`
+once inside `apps/web`). There is no wrangler in this repo: no `wrangler.toml`,
+no `npx wrangler`.
+
 Run checks before delivery; `package.json` defines no validation scripts, so
 `vp check` and the `node --test` run above are the whole local gate.
 
@@ -87,16 +91,26 @@ Run checks before delivery; `package.json` defines no validation scripts, so
 
 - `apps/web/src` is the React 19 SPA shell: react-router 7, Tailwind CSS 4,
   assistant-ui for chat, and supabase-js for auth and user data.
-- `packages/dorm` (`@iguide/dorm`) is the dorm feature: list, Mapbox GL map,
-  detail, compare, and reviews, plus the dorm SQL, data scripts, and review
-  scrapers. The SPA mounts it lazily at `/dorms/*` through
-  `apps/web/src/pages/dorms/DormRoute.tsx`, so no other page loads dorm code or
-  queries dorm tables. `packages/ui` (`@iguide/ui`) holds UI primitives both
-  use.
-- `apps/web/worker` is the Cloudflare Worker named `uiuc`. It routes `/api/*` and
-  serves the SPA's static assets for every other path, so the app and the whole
-  API share one origin. It also hosts the streaming tool-use agent
-  (`worker/agent/`), its tools and skills, and the in-memory MCP client.
+- `packages/dorm` (`@iguide/dorm`) is the dorm domain API: a Hono sub-app
+  plus its Supabase repositories, bundled into the Worker's output and mounted
+  at `/api/dorms`. It is never deployed or built on its own. It is a runtime
+  dependency of the SPA too — the `Dorm` model and the row/room normalization
+  helpers live in `packages/dorm/src/types.ts` and `packages/dorm/src/utils/`,
+  and `apps/web` imports them from `@iguide/dorm` instead of keeping a second
+  copy. The dorm React UI lives in `apps/web/src` again —
+  `src/pages/dorms/DormRoute.tsx` plus `src/components/housing/**` — and the
+  SPA reaches it lazily at `/dorms/*`, so no other page loads dorm code.
+  `packages/ui` (`@iguide/ui`) holds the UI primitives both use.
+- The Worker's `/api/*` is routed by Hono: `worker/app.ts` builds the app,
+  `worker/routes/index.ts` is the single URL table every endpoint is registered
+  in, and `worker/middleware/` holds the `/api/*` JSON 404 and the SPA
+  fallback. Hono never routes pages; react-router 7 still does that in the
+  browser.
+- `apps/web/worker` is the Cloudflare Worker named `uiuc`, and the only deployed
+  Worker. It routes `/api/*` and serves the SPA's static assets for every other
+  path, so the app and the whole API share one origin. It also hosts the
+  streaming tool-use agent (`worker/agent/`), its tools and skills, and the
+  in-memory MCP client.
 - `tools/vite-bin` gives `cf build` a `vite` bin that forwards to the pinned
   Vite+, so builds never download an unpinned Vite.
 - `tests/fixtures/` still holds `seed-data.sql` and `golden-queries.json` from
@@ -112,6 +126,7 @@ Browser ──same origin──> Worker "uiuc" (apps/web/worker)
                            ├─ /api/tavily       Tavily proxy that no client calls
                            ├─ /api/gemini       Gemini proxy that no client calls
                            ├─ /api/health, /api/integrations/*
+                           ├─ /api/dorms/*       dorm API from @iguide/dorm, anon client + caller token
                            ├─ any other /api/*  404 JSON listing the available endpoints
                            └─ everything else ─> static assets (the SPA)
 ```
@@ -136,7 +151,16 @@ the agent's only source is a Tavily search at question time.
 - The Worker rate-limits no endpoint.
 - The MCP registry has no `KV` binding, so registrations live in Worker isolate
   memory and do not last.
-- Supabase RLS is on, and dorm writes require `user_metadata.is_admin`.
+- Supabase RLS is on. The dorm API reads through an anon client with the
+  caller's own bearer token forwarded per query, so RLS decides every row and no
+  service-role key exists in the Worker. Its writes require an admin caller,
+  resolved from `user_metadata.is_admin` on the same GoTrue user document the
+  Worker's identity resolver already fetches.
+- `/api/dorms` is the dorm surface: the dorm list, one dorm, its comments, and
+  the comment stats are guest-readable; `/favorites` and `/history` need a
+  signed-in caller and answer `401` without one; `/:id/edit-history`,
+  `PATCH /:id`, `POST /:id/restore`, `POST /:id/images` and comment moderation
+  need an admin caller, `401` signed out and `403` signed in but not one.
 
 ## Verification
 
@@ -145,8 +169,15 @@ the agent's only source is a Tavily search at question time.
   `vp test` cannot start in this app, because `@cloudflare/vite-plugin` rejects
   Vitest's `ssr` environment.
 - `worker/agent/loop.test.ts` and `worker/agent/loop.baseline.test.ts` fail under
-  plain Node, because the agent loop imports its `.txt` prompts as text modules.
-  The rest pass.
+  plain Node, because those files import the agent's `.txt` prompts without the
+  resolution hooks in `worker/test/utils/workerModules.ts` and die with
+  `ERR_UNKNOWN_FILE_EXTENSION`. The rest pass.
+- `packages/dorm` has its own suite, run from that directory with
+  `node --test "test/**/*.test.ts"`. It injects a fake Supabase, so it needs no
+  network. The cross-boundary test lives in the host instead:
+  `src/services/__tests__/dormApi.contract.test.ts` drives the real
+  `src/services/dormApi.ts` against the real Worker app with only the network
+  stubbed.
 - The only CI workflow is
   `.github/workflows/react-doctor.yml`: [React Doctor](https://www.react.doctor/ci)
   reviews pull requests and pushes to `main` that touch `apps/web` and reports
@@ -186,12 +217,19 @@ Paths below are relative to `apps/web/`:
 ## Data and migrations
 
 - Enable RLS and grants in each new table's migration: `anon` and `authenticated`
-  receive `select`; writes use the service key.
+  receive `select`. The Worker holds no service-role key at all: it forwards the
+  caller's own bearer token per query, so RLS is the only authority for both
+  reads and writes. The one place a service-role key is used is the offline
+  seed, which takes `SUPABASE_SERVICE_KEY` from the shell
+  (`apps/web/scripts/seed-dorms-table.ts`); it runs offline and is not the
+  Worker.
 - Apply the dorm chain in `packages/dorm/scripts/migrations/`, starting with
   `create_dorms_table.sql`, then `add_categorized_tags.sql`, then follow-ups.
-  `packages/dorm/AGENTS.md` owns the dorm schema order, the seed scripts, and
-  their known conflicts. `apps/web/AGENTS.md` owns the tables the tracked SQL
-  never creates and the chat-owned `add_soul_and_memory.sql`.
+  `packages/dorm/AGENTS.md` owns the dorm schema order and its known conflicts;
+  the seed and audit scripts live in `apps/web/scripts/` because they read the
+  SPA's bundled dataset, and `apps/web/AGENTS.md` owns how to run them. It also
+  owns the tables the tracked SQL never creates and the chat-owned
+  `add_soul_and_memory.sql`.
 
 ## Deploy
 
@@ -226,7 +264,8 @@ the current Git branch.
 Roll out in this order:
 
 1. Create the tables the tracked SQL omits (`apps/web/AGENTS.md`), run the dorm
-   chain, then seed the dorms table (`packages/dorm/AGENTS.md`).
+   chain (`packages/dorm/AGENTS.md`), then seed the dorms table with
+   `apps/web/scripts/seed-dorms-table.ts` (`apps/web/AGENTS.md` for the command).
 2. Set the Worker secrets: `SUPABASE_URL` and `SUPABASE_ANON_KEY` are what
    `Env` requires (Cloudflare binds `ASSETS`), but chat needs `DEEPSEEK_API_KEY`
    and search needs `TAVILY_API_KEY`.
