@@ -59,6 +59,7 @@ export type UITextEntry = {
   registerError: string
   genericError: string
   coursesTab: string
+  quizTab: string
   dormsTab: string
   resumeTab: string
   comingSoon: string
@@ -144,6 +145,7 @@ export const UI_TEXT: Record<Language, UITextEntry> = {
     registerError: "Registration failed, try again later",
     genericError: "An error occurred, please try again",
     coursesTab: "Courses",
+    quizTab: "Daily Quiz",
     dormsTab: "Housing",
     resumeTab: "Resume",
     comingSoon: "Coming soon",
@@ -224,6 +226,7 @@ export const UI_TEXT: Record<Language, UITextEntry> = {
     registerError: "注册失败，请稍后重试",
     genericError: "发生错误，请稍后重试",
     coursesTab: "选课",
+    quizTab: "每日测验",
     dormsTab: "宿舍",
     resumeTab: "简历",
     comingSoon: "即将上线",
