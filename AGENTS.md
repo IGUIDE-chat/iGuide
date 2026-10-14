@@ -9,11 +9,12 @@ A UIUC knowledge platform with a React 19 frontend and Cloudflare Worker gateway
 Supabase provides auth and Postgres; DeepSeek handles inference and Tavily
 supplies web search.
 
-| Path             | Role                                                                                                                                                                                    |
-| :--------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `apps/web/`      | Frontend and Worker: SPA, static assets, agent loop, tools, skills, MCP.                                                                                                                |
-| `packages/dorm/` | Dorm API (`@iguide/dorm`), bundled into the single Worker and mounted at `/api/dorms`; it also owns the shared dorm model and normalization helpers the SPA imports, plus the dorm SQL. |
-| `packages/ui/`   | Business-agnostic UI primitives shared by the app and feature packages.                                                                                                                 |
+| Path                         | Role                                                                                                                                                                                    |
+| :--------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/web/`                  | Frontend and Worker: SPA, static assets, agent loop, tools, skills, MCP.                                                                                                                |
+| `packages/dorm/`             | Dorm API (`@iguide/dorm`), bundled into the single Worker and mounted at `/api/dorms`; it also owns the shared dorm model and normalization helpers the SPA imports, plus the dorm SQL. |
+| `packages/ui/`               | Business-agnostic UI primitives shared by the app and feature packages.                                                                                                                 |
+| `extensions/canvas-connect/` | Chrome extension that reads the student's Canvas in their own browser and hands `/quiz` plain-text course digests. Not a workspace package; see its README.                             |
 
 <!--VITE PLUS START-->
 
@@ -119,6 +120,7 @@ Browser ──same origin──> Worker "uiuc" (apps/web/worker)
                            │                      └─ custom_skills, MCP tools (experimental)
                            ├─ /api/health, /api/integrations/*
                            ├─ /api/dorms/*       dorm API from @iguide/dorm, anon client + caller token
+                           ├─ /api/quiz/*        daily quiz: course digests in, DeepSeek questions out
                            ├─ any other /api/*  404 JSON listing the available endpoints
                            └─ everything else ─> static assets (the SPA)
 ```
@@ -150,6 +152,12 @@ the agent's only source is a Tavily search at question time.
   signed-in caller and answer `401` without one; `/:id/edit-history`,
   `PATCH /:id`, `POST /:id/restore`, `POST /:id/images` and comment moderation
   need an admin caller, `401` signed out and `403` signed in but not one.
+- `/api/quiz` is signed-in only and answers guests `401 SIGN_IN_REQUIRED`
+  before touching storage or DeepSeek. It never receives a Canvas credential:
+  the `extensions/canvas-connect` extension reads Canvas in the student's own
+  browser, and the `/quiz` page uploads only plain-text course digests
+  (`PUT /api/quiz/courses`). Questions are generated once per student per
+  America/Chicago day.
 
 ## Verification
 
@@ -167,6 +175,8 @@ the agent's only source is a Tavily search at question time.
   `src/services/__tests__/dormApi.contract.test.ts` drives the real
   `src/services/dormApi.ts` against the real Worker app with only the network
   stubbed.
+- The Canvas extension's reader has its own suite, run from the repo root with
+  `node --test extensions/canvas-connect/canvas.test.mjs`.
 - The only CI workflow is
   `.github/workflows/react-doctor.yml`: [React Doctor](https://www.react.doctor/ci)
   reviews pull requests and pushes to `main` that touch `apps/web` and reports
@@ -219,6 +229,10 @@ Paths below are relative to `apps/web/`:
   SPA's bundled dataset, and `apps/web/AGENTS.md` owns how to run them. It also
   owns the tables the tracked SQL never creates and the chat-owned
   `add_soul_and_memory.sql`.
+- The daily quiz's tables are private to their owner, so
+  `apps/web/scripts/migrations/create_quiz_tables.sql` departs from the
+  `select`-for-everyone default: `anon` gets nothing, `authenticated` gets
+  owner-only policies.
 
 ## Deploy
 

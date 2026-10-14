@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "iGuide Canvas Connect",
+  "version": "0.1.0",
+  "description": "Syncs your UIUC Canvas course progress to the iGuide daily quiz. Read-only; your Canvas sign-in never leaves your browser.",
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "permissions": ["scripting"],
+  "host_permissions": ["https://canvas.illinois.edu/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://iguide.chat/*", "http://localhost:5173/*"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ]
+}
