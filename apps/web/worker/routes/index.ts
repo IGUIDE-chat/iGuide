@@ -4,6 +4,7 @@ import type { Env, RouteHandler } from "../types"
 import * as chat from "./chat"
 import * as health from "./health"
 import * as integrations from "./integrations"
+import * as quiz from "./quiz"
 
 /**
  * The Worker's whole URL table. `createApiApp()` mounts these on the Hono app,
@@ -34,8 +35,8 @@ export const API_ROUTES: ApiRoute[] = [
 
 /**
  * Prefix routes match anywhere below their prefix. `/api/integrations*` is the
- * MCP connection registry, which has its own sub-paths; auth is resolved inside
- * the handler, not by the router.
+ * MCP connection registry and `/api/quiz*` the daily quiz; both have their own
+ * sub-paths, and auth is resolved inside the handler, not by the router.
  */
 export interface ApiPrefixRoute {
   prefix: string
@@ -44,6 +45,7 @@ export interface ApiPrefixRoute {
 
 export const API_PREFIX_ROUTES: ApiPrefixRoute[] = [
   { prefix: "/api/integrations", handler: integrations.onRequest },
+  { prefix: "/api/quiz", handler: quiz.onRequest },
 ]
 
 /**

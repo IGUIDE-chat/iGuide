@@ -2,7 +2,7 @@ export interface PageRegistryItem {
   id: string
   path: string
   componentPath: string
-  ownerFeature: "chat" | "library" | "dorms" | "courses" | "resume" | "profile" | "router"
+  ownerFeature: "chat" | "library" | "dorms" | "courses" | "quiz" | "resume" | "profile" | "router"
   contexts: Array<"auth" | "housing" | "dorm-user-interaction" | "none">
   status: "active" | "redirect"
 }
@@ -61,6 +61,14 @@ export const PAGE_REGISTRY: PageRegistryItem[] = [
     path: "/courses",
     componentPath: "src/pages/courses/CoursesLandingPage.tsx",
     ownerFeature: "courses",
+    contexts: ["auth"],
+    status: "active",
+  },
+  {
+    id: "quiz",
+    path: "/quiz",
+    componentPath: "src/pages/quiz/QuizPage.tsx",
+    ownerFeature: "quiz",
     contexts: ["auth"],
     status: "active",
   },

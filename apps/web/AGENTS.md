@@ -48,7 +48,8 @@ For repo-wide rules (secrets, CI, Worker retrieval, data model), see the root
   SPA's static assets under `.cloudflare/output/`. There is no `dist/`.
   `cf deploy` uploads that output.
 - `scripts/` holds the chat persona and memory SQL
-  (`scripts/migrations/add_soul_and_memory.sql`) and the RLS fixes
+  (`scripts/migrations/add_soul_and_memory.sql`), the daily quiz tables
+  (`scripts/migrations/create_quiz_tables.sql`), and the RLS fixes
   (`scripts/optimize_rls_policies.sql`, `scripts/fix_function_security.sql`).
   Dorm SQL stays in `packages/dorm/scripts/migrations/`, next to the dorm API
   it describes. The dorm data scripts are back here instead —
@@ -171,6 +172,28 @@ The tracked SQL does not create every table the app uses. Create `conversations`
 run `scripts/migrations/add_soul_and_memory.sql`, which references
 `conversations`. `scripts/optimize_rls_policies.sql` and
 `scripts/fix_function_security.sql` assume some of those tables already exist.
+
+`scripts/migrations/create_quiz_tables.sql` stands alone: it creates the
+`/quiz` tables (`quiz_courses`, `quiz_questions`, `quiz_daily`) with
+owner-only RLS and is safe to re-run.
+
+## Daily quiz
+
+- Route `/quiz`: `src/pages/quiz/QuizPage.tsx` over
+  `src/components/quiz/**`; `src/services/quizApi.ts` is the only door to
+  `/api/quiz` and the only thing that adds the bearer token.
+- Worker: `worker/routes/quiz.ts` dispatches, `worker/quiz/service.ts` holds the
+  rules (one quiz per America/Chicago day, 8 new questions plus up to 4 open
+  mistakes, a mistake closes after two correct answers in a row),
+  `worker/quiz/generate.ts` makes one DeepSeek call per quiz, and
+  `worker/quiz/store.ts` is the Supabase store.
+- Canvas data arrives from `extensions/canvas-connect` through
+  `src/components/quiz/canvasBridge.ts` (window `postMessage` to the
+  extension's content script). The page uploads the digests itself; the Worker
+  never talks to Canvas and stores no Canvas credential.
+- The extension download the page links to is
+  `public/downloads/iguide-canvas-connect.zip`; rebuild it after changing the
+  extension (command in `extensions/canvas-connect/README.md`).
 
 ## assistant-ui
 

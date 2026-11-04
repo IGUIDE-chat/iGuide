@@ -1,0 +1,98 @@
+import type { Language } from "../../types"
+
+export const EXTENSION_DOWNLOAD_URL = "/downloads/iguide-canvas-connect.zip"
+
+export const QUIZ_TEXT = {
+  en: {
+    title: "Daily Quiz",
+    subtitle: "Questions on what your courses cover this week, plus a few past mistakes.",
+    signInTitle: "Sign in to start your daily quiz",
+    signInBody: "Your quiz, progress and mistake bank are saved to your iGuide account.",
+    todayTab: "Today",
+    mistakesTab: "Mistake bank",
+    loading: "Loading…",
+    canvasTitle: "Canvas",
+    installTitle: "Install iGuide Canvas Connect",
+    installBody:
+      "UIUC does not issue Canvas tokens to students, so a small Chrome extension reads your courses with your own Canvas sign-in, right in your browser. Your password and Canvas session never leave your browser; only course summaries are sent to iGuide.",
+    installSteps: [
+      "Download and unzip the extension.",
+      "Open chrome://extensions and turn on Developer mode.",
+      'Click "Load unpacked" and choose the unzipped folder.',
+      "Come back to this page and refresh.",
+    ],
+    download: "Download extension",
+    connect: "Connect Canvas",
+    connectHint: "A Canvas tab opens; sign in with your NetID there if asked.",
+    syncNow: "Sync now",
+    syncing: "Reading your courses from Canvas…",
+    lastSynced: "Last synced",
+    never: "never",
+    needsSignIn: "Canvas is signed out in this browser. Click Connect Canvas to sign in.",
+    cancelled: "Canvas sign-in was closed before it finished.",
+    syncFailed: "Canvas sync failed",
+    noCourses: "No current-term courses were found on Canvas.",
+    courseHint: "Turn a course off to leave it out of tomorrow's quiz.",
+    start: "Start today's quiz",
+    generating: "Writing today's questions… this takes up to a minute.",
+    needCourse: "Sync Canvas and keep at least one course on to get a quiz.",
+    review: "Review",
+    correct: "Correct",
+    wrong: "Not quite",
+    progress: (answered: number, total: number, correct: number) =>
+      `${answered}/${total} answered · ${correct} correct`,
+    done: (correct: number, total: number) =>
+      `Done for today: ${correct}/${total}. See you tomorrow!`,
+    mistakesEmpty:
+      "No open mistakes. Questions you miss show up here until you get them right twice.",
+    missed: (times: number) => `missed ${times}×`,
+    answer: "Answer",
+    error: "Something went wrong. Please try again.",
+  },
+  zh: {
+    title: "每日测验",
+    subtitle: "按本周课程进度出题，并随机复习错题。",
+    signInTitle: "登录后开始每日测验",
+    signInBody: "测验、进度和错题本都保存在你的 iGuide 账号里。",
+    todayTab: "今日测验",
+    mistakesTab: "错题本",
+    loading: "加载中…",
+    canvasTitle: "Canvas",
+    installTitle: "安装 iGuide Canvas Connect 扩展",
+    installBody:
+      "UIUC 不给学生发 Canvas Token，所以由一个 Chrome 小扩展在你自己的浏览器里、用你自己的 Canvas 登录读取课程。密码和 Canvas 登录会话都不会离开你的浏览器，只有课程摘要会发给 iGuide。",
+    installSteps: [
+      "下载并解压扩展。",
+      "打开 chrome://extensions，开启右上角「开发者模式」。",
+      "点击「加载已解压的扩展程序」，选择解压后的文件夹。",
+      "回到本页面刷新。",
+    ],
+    download: "下载扩展",
+    connect: "连接 Canvas",
+    connectHint: "会打开 Canvas 页面，如需登录请在那里用 NetID 登录。",
+    syncNow: "立即同步",
+    syncing: "正在从 Canvas 读取课程…",
+    lastSynced: "上次同步",
+    never: "从未",
+    needsSignIn: "这个浏览器里的 Canvas 已退出登录，点击「连接 Canvas」重新登录。",
+    cancelled: "Canvas 登录窗口在完成前被关闭了。",
+    syncFailed: "Canvas 同步失败",
+    noCourses: "Canvas 上没有找到本学期的课程。",
+    courseHint: "关掉某门课，明天的测验就不再出这门课的题。",
+    start: "开始今天的测验",
+    generating: "正在出今天的题……大约需要一分钟。",
+    needCourse: "先同步 Canvas，并至少保留一门课开启，才能出题。",
+    review: "错题重练",
+    correct: "答对了",
+    wrong: "答错了",
+    progress: (answered: number, total: number, correct: number) =>
+      `已答 ${answered}/${total} · 答对 ${correct}`,
+    done: (correct: number, total: number) => `今天完成啦：${correct}/${total}，明天见！`,
+    mistakesEmpty: "暂无错题。答错的题会留在这里，连续答对两次才会移出。",
+    missed: (times: number) => `错过 ${times} 次`,
+    answer: "答案",
+    error: "出错了，请重试。",
+  },
+} satisfies Record<Language, unknown>
+
+export type QuizText = (typeof QUIZ_TEXT)["en"]

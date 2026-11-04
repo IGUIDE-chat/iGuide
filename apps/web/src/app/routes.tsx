@@ -9,6 +9,7 @@ const LibraryCategoryPage = React.lazy(() => import("../pages/library/LibraryCat
 const LibraryArticlePage = React.lazy(() => import("../pages/library/LibraryArticlePage"))
 const ProfilePage = React.lazy(() => import("../pages/profile/ProfilePage"))
 const CoursesLandingPage = React.lazy(() => import("../pages/courses/CoursesLandingPage"))
+const QuizPage = React.lazy(() => import("../pages/quiz/QuizPage"))
 const ResumeLandingPage = React.lazy(() => import("../pages/resume/ResumeLandingPage"))
 const DormRoute = React.lazy(() => import("../pages/dorms/DormRoute"))
 
@@ -57,6 +58,7 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({
         />
         <Route path="/profile" element={<ProfilePage language={language} />} />
         <Route path="/courses" element={<CoursesLandingPage language={language} />} />
+        <Route path="/quiz" element={<QuizPage language={language} />} />
         <Route path="/resume" element={<ResumeLandingPage language={language} />} />
         <Route path="/dorms/*" element={<DormRoute language={language} />} />
         <Route path="/dorm" element={<LegacyDormRedirect />} />
