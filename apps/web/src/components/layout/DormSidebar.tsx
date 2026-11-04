@@ -1,5 +1,5 @@
 import type { Dorm } from "@iguide/dorm"
-import { Typewriter } from "@iguide/ui"
+import { Typewriter } from "@iguide/ui/components/typewriter"
 import { AnimatePresence, motion } from "framer-motion"
 import { Clock, Heart, Trash2 } from "lucide-react"
 import React, { useMemo } from "react"

@@ -1,4 +1,4 @@
-import { Typewriter } from "@iguide/ui"
+import { Typewriter } from "@iguide/ui/components/typewriter"
 import * as React from "react"
 import { useEffect, useState } from "react"
 
@@ -8,13 +8,13 @@ import { localConversationService } from "../../services/localConversationServic
 import { ConversationSummary } from "../../types"
 import {
   BaseSidebar,
-  SidebarItem,
-  PinButton,
   DeleteButton,
-  SidebarLoadingSpinner,
-  SidebarEmptyState,
-  groupByCategory,
   getCategoryOrder,
+  groupByCategory,
+  PinButton,
+  SidebarEmptyState,
+  SidebarItem,
+  SidebarLoadingSpinner,
   TimeCategoryLabels,
 } from "./BaseSidebar"
 
