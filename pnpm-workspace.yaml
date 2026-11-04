@@ -4,7 +4,10 @@ packages:
   - tools/*
 
 allowBuilds:
+  "@mongodb-js/zstd": true
+  core-js-pure: true
   esbuild: true
+  node-liblzma: true
   sharp: true
   workerd: true
 catalog:
