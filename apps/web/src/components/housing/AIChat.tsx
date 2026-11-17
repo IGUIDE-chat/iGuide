@@ -1,15 +1,15 @@
 import { ChatMessage } from "@iguide/dorm"
-import { Typewriter } from "@iguide/ui"
-import { motion, AnimatePresence } from "framer-motion"
-import { MessageCircle, X, Send, Sparkles, Loader2 } from "lucide-react"
-import React, { useState, useRef, useEffect } from "react"
+import { Typewriter } from "@iguide/ui/components/typewriter"
+import { AnimatePresence, motion } from "framer-motion"
+import { Loader2, MessageCircle, Send, Sparkles, X } from "lucide-react"
+import React, { useEffect, useRef, useState } from "react"
 import ReactMarkdown from "react-markdown"
 import { useNavigate } from "react-router-dom"
 import remarkGfm from "remark-gfm"
 
 import { streamChatResponse } from "../../services/ai"
 import { Language } from "../../types"
-import { isDormMention, findMentionedDorms } from "../../utils/housingUtils"
+import { findMentionedDorms, isDormMention } from "../../utils/housingUtils"
 import { aiChatTexts } from "./i18n/dormTexts"
 
 interface AIChatProps {
